@@ -1,0 +1,131 @@
+import { randomUUID } from 'node:crypto';
+import { LlmAdapter, LlmError, attributionHeaders } from '@deepseek-ai/dsh-llm';
+
+function textOf(blocks) {
+  return blocks.flatMap(block => {
+    if (block.type === 'text' || block.type === 'reasoning') return [block.text];
+    if (block.type === 'tool-result') return [textOf(block.content)];
+    return [];
+  }).filter(Boolean).join('\n');
+}
+
+function toWireMessage(message) {
+  const toolResult = message.content.find(block => block.type === 'tool-result');
+  if (toolResult) return { role: 'tool', tool_call_id: toolResult.toolCallId, content: textOf(toolResult.content) };
+  const calls = message.content.filter(block => block.type === 'tool-call').map(block => ({
+    id: block.id, type: 'function', function: { name: block.name, arguments: block.arguments },
+  }));
+  const visible = message.content.filter(block => block.type === 'text').map(block => block.text).join('\n');
+  const reasoning = message.content.filter(block => block.type === 'reasoning').map(block => block.text).join('\n');
+  return {
+    role: message.role,
+    content: visible || null,
+    ...(reasoning ? { reasoning_content: reasoning } : {}),
+    ...(calls.length ? { tool_calls: calls } : {}),
+  };
+}
+
+function usageOf(value) {
+  if (!value || !Number.isSafeInteger(value.prompt_tokens) || value.prompt_tokens < 0 || !Number.isSafeInteger(value.completion_tokens) || value.completion_tokens < 0) return null;
+  const cached = value.prompt_tokens_details?.cached_tokens;
+  const cacheReadTokens = Number.isSafeInteger(cached) && cached >= 0 && cached <= value.prompt_tokens ? cached : 0;
+  const reasoning = value.completion_tokens_details?.reasoning_tokens;
+  return {
+    inputTokens: value.prompt_tokens - cacheReadTokens,
+    outputTokens: value.completion_tokens,
+    ...(cacheReadTokens ? { cacheReadTokens } : {}),
+    ...(Number.isSafeInteger(reasoning) && reasoning >= 0 ? { reasoningTokens: reasoning } : {}),
+    ...(Number.isSafeInteger(value.total_tokens) && value.total_tokens >= value.prompt_tokens + value.completion_tokens ? { totalTokens: value.total_tokens } : {}),
+  };
+}
+
+function finishReason(value, hasCalls) {
+  if (hasCalls || value === 'tool_calls' || value === 'function_call') return { kind: 'tool-calls' };
+  if (value === 'length') return { kind: 'max-tokens' };
+  return { kind: 'stop' };
+}
+
+export class OpenAiCompatibleAdapter extends LlmAdapter {
+  constructor({ routes, maxBudget, onUsage, onError }) {
+    super();
+    this.routes = new Map(routes.map(route => [route.id, Object.freeze({ ...route })]));
+    this.maxBudget = maxBudget;
+    this.onUsage = onUsage;
+    this.onError = onError;
+    this.spent = 0;
+    this.reserved = 0;
+  }
+
+  providerInfo(provider) { return { id: provider, name: 'Agent Department Relay' }; }
+  async listModels(provider) { return [...this.routes.values()].map(route => ({ provider, id: route.id, name: route.name })); }
+  async resolveModel(provider, model) {
+    const route = this.routes.get(model);
+    if (!route) throw new LlmError(`运行快照中不存在模型 ${model}`, 'UNKNOWN_MODEL');
+    return { provider, id: model, name: route.name, defaultMaxTokens: route.maxOutputTokens };
+  }
+
+  async *stream(options) {
+    const route = this.routes.get(options.model);
+    if (!route) throw new LlmError(`运行快照中不存在模型 ${options.model}`, 'UNKNOWN_MODEL');
+    options.signal?.throwIfAborted();
+    const messages = [...(options.system ? [{ role: 'system', content: options.system }] : []), ...options.messages.map(toWireMessage)];
+    const maxTokens = Math.max(1, Math.min(options.maxTokens ?? route.maxOutputTokens, route.maxOutputTokens));
+    const tools = options.tools?.map(tool => ({ type: 'function', function: { name: tool.name, description: tool.description, parameters: tool.parameters } }));
+    const body = {
+      model: route.wireModel, messages, stream: false, max_tokens: maxTokens,
+      ...(tools?.length ? { tools } : {}),
+      ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
+      ...(options.stop?.length ? { stop: options.stop } : {}),
+    };
+    const inputUpperBound = Buffer.byteLength(JSON.stringify(messages));
+    const reservation = (inputUpperBound * route.inputRate + maxTokens * route.outputRate) / 1e6;
+    if (this.spent + this.reserved + reservation > this.maxBudget) {
+      const error = new LlmError('模型请求的保守预留将超过本次运行预算', 'BUDGET_EXCEEDED');
+      this.onError?.(error); throw error;
+    }
+    this.reserved += reservation;
+    let reservationHeld = true;
+    let response;
+    try {
+      response = await fetch(route.baseUrl.replace(/\/$/, '') + '/chat/completions', {
+        method: 'POST', signal: options.signal, redirect: 'error',
+        headers: { 'Content-Type': 'application/json', ...attributionHeaders(), ...(route.apiKey ? { Authorization: `Bearer ${route.apiKey}` } : {}) },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) throw new LlmError(`中转站返回 HTTP ${response.status}`, response.status === 401 || response.status === 403 ? 'AUTH' : response.status === 429 ? 'RATE_LIMIT' : 'PROVIDER_ERROR', { status: response.status });
+      let payload;
+      try { payload = await response.json(); }
+      catch { throw new LlmError('中转站返回的模型响应不是 JSON', 'INVALID_RESPONSE'); }
+      const reported = usageOf(payload.usage);
+      if (!reported) throw new LlmError('中转站未返回标准 Token 用量，已停止本次运行', 'USAGE_MISSING');
+      const actualCost = ((reported.inputTokens + (reported.cacheReadTokens ?? 0)) * route.inputRate + reported.outputTokens * route.outputRate) / 1e6;
+      this.reserved -= reservation;
+      reservationHeld = false;
+      this.spent += actualCost;
+      this.onUsage?.({ id: randomUUID(), modelId: route.id, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });
+      const message = payload.choices?.[0]?.message;
+      if (!message || typeof message !== 'object') throw new LlmError('中转站响应缺少 assistant message', 'INVALID_RESPONSE');
+      const blocks = [];
+      if (typeof message.reasoning_content === 'string' && message.reasoning_content) blocks.push({ type: 'reasoning', text: message.reasoning_content });
+      if (typeof message.content === 'string' && message.content) blocks.push({ type: 'text', text: message.content });
+      if (Array.isArray(message.tool_calls)) {
+        for (const call of message.tool_calls) {
+          if (!call || typeof call.id !== 'string' || typeof call.function?.name !== 'string' || typeof call.function?.arguments !== 'string') throw new LlmError('中转站返回了无效工具调用', 'INVALID_RESPONSE');
+          blocks.push({ type: 'tool-call', id: call.id, name: call.function.name, arguments: call.function.arguments });
+        }
+      }
+      if (!blocks.length) throw new LlmError('模型返回了空响应', 'EMPTY_RESPONSE');
+      for (const [index, block] of blocks.entries()) {
+        yield { type: 'block-start', index, blockType: block.type };
+        yield { type: 'block-end', index, block };
+      }
+      yield { type: 'usage', usage: reported };
+      yield { type: 'finish', reason: finishReason(payload.choices?.[0]?.finish_reason, blocks.some(block => block.type === 'tool-call')) };
+    } catch (error) {
+      if (reservationHeld) this.reserved -= reservation;
+      const normalized = error instanceof LlmError ? error : options.signal?.aborted ? options.signal.reason ?? error : new LlmError('无法连接中转站执行模型请求', 'CONNECTION_FAILED', { cause: error });
+      this.onError?.(normalized);
+      throw normalized;
+    }
+  }
+}

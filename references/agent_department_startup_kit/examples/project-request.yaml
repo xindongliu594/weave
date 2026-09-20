@@ -1,0 +1,36 @@
+requirement: >
+  在本地开发一个简单的 Todo REST API，支持健康检查、创建、查询、更新和删除 Todo，
+  同时提供自动化测试和运行说明。
+creationMode: recommended
+qualityPreference: balanced
+expectedDeliverables:
+  - 需求与接口说明
+  - 可运行源代码
+  - 自动化测试
+  - 验收报告
+
+executionPolicy:
+  currency: USD
+  maxBudget: 12
+  maxPlanningBudget: 1.2
+  maxAgents: 4
+  maxConcurrentAgents: 3
+  deadlineSeconds: 7200
+  allowedModelCatalogIds:
+    - openai-coding-primary
+    - deepseek-analysis-economy
+    - anthropic-review-primary
+  allowedTools:
+    - knowledge_search
+    - filesystem
+    - terminal
+    - terminal_test
+    - artifact_write
+  allowedKnowledgeBases:
+    - company-common
+    - engineering-docs
+  network: allowlist
+  externalWrite: approval_required
+  approvalMode: risky_actions
+  automaticApprovalThreshold: 3
+

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.example/schemas/project-request.schema.json",
+  "title": "ProjectRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["requirement", "creationMode", "qualityPreference", "expectedDeliverables", "executionPolicy"],
+  "properties": {
+    "requirement": {"type": "string", "minLength": 10, "maxLength": 50000},
+    "creationMode": {"enum": ["recommended", "automatic", "custom"]},
+    "qualityPreference": {"enum": ["economy", "balanced", "quality", "custom"]},
+    "expectedDeliverables": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "executionPolicy": {"$ref": "execution-policy.schema.json"}
+  }
+}
+

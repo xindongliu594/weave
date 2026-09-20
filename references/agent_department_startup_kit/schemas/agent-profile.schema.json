@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.example/schemas/agent-profile.schema.json",
+  "title": "AgentProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "roleType", "role", "model", "knowledgeBases", "tools", "permissions", "budget"],
+  "properties": {
+    "name": {"type": "string", "minLength": 1, "maxLength": 80},
+    "roleType": {"enum": ["manager", "member"]},
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "instructions"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1, "maxLength": 100},
+        "instructions": {"type": "string", "minLength": 1, "maxLength": 10000},
+        "expectedOutputs": {"type": "array", "items": {"type": "string"}, "maxItems": 20}
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model", "mode"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "mode": {"enum": ["fixed", "fallback", "router"]},
+        "reasoningEffort": {"type": ["string", "null"]},
+        "credentialRef": {"type": ["string", "null"]},
+        "fallbackModelConfigId": {"type": ["string", "null"]}
+      }
+    },
+    "knowledgeBases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspace", "network", "externalWrite"],
+      "properties": {
+        "workspace": {"enum": ["none", "agent", "department"]},
+        "network": {"enum": ["denied", "allowlist", "allowed"]},
+        "externalWrite": {"enum": ["denied", "approval_required", "allowed"]}
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxTurns", "timeoutSeconds"],
+      "properties": {
+        "maxTurns": {"type": "integer", "minimum": 1, "maximum": 100},
+        "timeoutSeconds": {"type": "integer", "minimum": 10, "maximum": 86400},
+        "maxCostPerTask": {"type": ["number", "null"], "minimum": 0}
+      }
+    }
+  }
+}
+

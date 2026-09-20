@@ -1,0 +1,81 @@
+multiAgentJustification: 需求、实现与独立验证可以形成明确依赖，并通过不同角色减少自我审查偏差。
+
+department:
+  name: 软件研发部
+  goal: 交付经过自动化测试的本地 Todo REST API
+
+manager:
+  id: manager
+  name: 研发经理
+  roleTitle: 技术项目经理
+  instructions: 管理依赖、检查验收标准并汇总交付，不修改预算和权限。
+  modelCatalogId: openai-coding-primary
+  knowledgeBases: [company-common, engineering-docs]
+  tools: [knowledge_search, artifact_write]
+  maxCost: 2
+
+agents:
+  - id: analyst
+    name: 需求分析师
+    roleTitle: 产品分析师
+    instructions: 编写接口需求和可验证验收标准。
+    modelCatalogId: deepseek-analysis-economy
+    knowledgeBases: [company-common]
+    tools: [knowledge_search, artifact_write]
+    maxCost: 1
+
+  - id: developer
+    name: 后端工程师
+    roleTitle: 后端开发工程师
+    instructions: 根据批准需求实现代码和单元测试。
+    modelCatalogId: openai-coding-primary
+    knowledgeBases: [engineering-docs]
+    tools: [knowledge_search, filesystem, terminal]
+    maxCost: 5
+
+  - id: tester
+    name: 测试工程师
+    roleTitle: 独立质量工程师
+    instructions: 独立运行测试并根据验收标准给出结论。
+    modelCatalogId: anthropic-review-primary
+    knowledgeBases: [engineering-docs]
+    tools: [filesystem, terminal_test, artifact_write]
+    maxCost: 2
+
+tasks:
+  - id: requirements
+    subject: 编写需求与接口说明
+    objective: 明确端点、数据结构、错误处理和验收标准。
+    assigneeId: analyst
+    dependencies: []
+    acceptanceCriteria: [覆盖健康检查和 Todo CRUD, 所有接口具有明确响应]
+
+  - id: implementation
+    subject: 实现 API
+    objective: 实现需求并编写单元测试。
+    assigneeId: developer
+    dependencies: [requirements]
+    acceptanceCriteria: [服务可在本地启动, 单元测试通过]
+
+  - id: verification
+    subject: 独立验收
+    objective: 运行测试并检查实现是否满足全部需求。
+    assigneeId: tester
+    dependencies: [implementation]
+    acceptanceCriteria: [测试结果可复现, 缺陷和未满足项被明确列出]
+
+estimate:
+  currency: USD
+  planningCost: 1
+  executionCost: 7
+  verificationCost: 2
+  retryReserve: 1
+  total: 11
+  durationSeconds: 5400
+
+risk:
+  level: low
+  reasons: [仅在本地工作区操作, 不包含部署或外部写入]
+
+degradationPlan: 如果预算不足，合并需求分析和经理角色，但保留独立测试角色。
+

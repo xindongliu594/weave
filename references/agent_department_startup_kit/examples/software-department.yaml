@@ -1,0 +1,104 @@
+name: 软件研发部
+description: 负责需求分析、后端实现和质量验证
+goal: 将用户需求交付为经过测试的本地软件成果
+requirePlanApproval: true
+maxConcurrentAgents: 3
+
+knowledgeBases:
+  - company-common
+  - engineering-docs
+
+manager:
+  name: 研发经理
+  roleType: manager
+  role:
+    title: 技术经理
+    instructions: 拆解目标、设计任务依赖、检查验收标准并汇总交付。不得绕过人工审批。
+    expectedOutputs: [任务计划, 风险说明, 最终交付报告]
+  model:
+    provider: openai
+    model: CHANGE_ME
+    mode: fixed
+    reasoningEffort: medium
+    credentialRef: cred_openai_default
+  knowledgeBases: [company-common, engineering-docs]
+  tools: [knowledge_search, task_management, artifact_read]
+  permissions:
+    workspace: department
+    network: allowlist
+    externalWrite: approval_required
+  budget:
+    maxTurns: 30
+    timeoutSeconds: 1800
+    maxCostPerTask: 5
+
+agents:
+  - name: 产品经理
+    roleType: member
+    role:
+      title: 产品经理
+      instructions: 澄清需求并形成可验证的接口需求，不修改实现代码。
+      expectedOutputs: [需求说明, 验收标准]
+    model:
+      provider: deepseek
+      model: CHANGE_ME
+      mode: fixed
+      reasoningEffort: default
+      credentialRef: cred_deepseek_default
+    knowledgeBases: [company-common]
+    tools: [knowledge_search, artifact_write]
+    permissions:
+      workspace: department
+      network: denied
+      externalWrite: denied
+    budget:
+      maxTurns: 15
+      timeoutSeconds: 900
+      maxCostPerTask: 1
+
+  - name: 后端工程师
+    roleType: member
+    role:
+      title: 后端工程师
+      instructions: 根据批准的需求实现代码和单元测试，只修改分配范围内的文件。
+      expectedOutputs: [源代码, 单元测试, 变更说明]
+    model:
+      provider: openai
+      model: CHANGE_ME
+      mode: fixed
+      reasoningEffort: medium
+      credentialRef: cred_openai_default
+    knowledgeBases: [engineering-docs]
+    tools: [knowledge_search, filesystem, terminal]
+    permissions:
+      workspace: department
+      network: allowlist
+      externalWrite: approval_required
+    budget:
+      maxTurns: 30
+      timeoutSeconds: 1800
+      maxCostPerTask: 3
+
+  - name: 测试工程师
+    roleType: member
+    role:
+      title: 测试工程师
+      instructions: 独立检查需求与实现，运行测试并报告可复现问题。
+      expectedOutputs: [测试报告, 缺陷清单, 验收结论]
+    model:
+      provider: anthropic
+      model: CHANGE_ME
+      mode: fixed
+      reasoningEffort: default
+      credentialRef: cred_anthropic_default
+    knowledgeBases: [engineering-docs]
+    tools: [knowledge_search, filesystem_read, terminal_test]
+    permissions:
+      workspace: department
+      network: denied
+      externalWrite: denied
+    budget:
+      maxTurns: 20
+      timeoutSeconds: 1200
+      maxCostPerTask: 2
+

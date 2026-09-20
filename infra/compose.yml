@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: agent_department
+      POSTGRES_USER: agent_department
+      POSTGRES_PASSWORD: local-development-only
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - department-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent_department -d agent_department"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  department-db:
