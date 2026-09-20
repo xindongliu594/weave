@@ -23,12 +23,15 @@ export async function gatewayRequest(gatewayId: string, path: string, body?: unk
   try { return await response.json() as unknown; }
   catch { throw new AppError(502, '中转站返回的内容不是 JSON', 'GATEWAY_INVALID_RESPONSE'); }
 }
+const toolCallSchema=z.object({id:z.string().min(1),type:z.literal('function'),function:z.object({name:z.string().min(1),arguments:z.string()})});
+export type ChatMessage={role:string;content:string|null;tool_calls?:z.infer<typeof toolCallSchema>[];tool_call_id?:string};
+export type CompletionOptions={tools?:unknown[];tool_choice?:unknown};
 const completionSchema = z.object({
-  choices: z.array(z.object({ message: z.object({ content: z.string().nullable() }) })).min(1),
+  choices: z.array(z.object({ message: z.object({ content: z.string().nullable().default(null),tool_calls:z.array(toolCallSchema).optional() }) })).min(1),
   usage: z.object({ prompt_tokens: z.number().int().nonnegative(), completion_tokens: z.number().int().nonnegative() }).optional(),
 });
-export async function complete(model: Model, messages: { role: string; content: string }[], maxTokens: number,onUsage?:(usage:{prompt_tokens:number;completion_tokens:number})=>Promise<void>) {
-  const data = await gatewayRequest(model.gatewayId, '/chat/completions', { model: model.model, messages, max_tokens: maxTokens, stream: false });
+export async function complete(model: Model, messages: ChatMessage[], maxTokens: number,onUsage?:(usage:{prompt_tokens:number;completion_tokens:number})=>Promise<void>,request:CompletionOptions={}) {
+  const data = await gatewayRequest(model.gatewayId, '/chat/completions', { ...request,model: model.model, messages, max_tokens: maxTokens, stream: false });
   const usage=z.object({usage:z.object({prompt_tokens:z.number().int().nonnegative(),completion_tokens:z.number().int().nonnegative()})}).safeParse(data);
   if(usage.success)await onUsage?.(usage.data.usage);
   const parsed = completionSchema.safeParse(data);

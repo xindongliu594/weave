@@ -26,8 +26,8 @@ export function productRouter(){
     let planningUsageId:string|undefined;
     let department=departmentSchema.parse({...template.data,agents:template.data.agents.slice(0,input.policy.maxAgents).map((a:any)=>({...a,modelId:input.modelId}))});
     let plan=templatePlan(department,input.requirement);
-    const rows=(await pool.query("SELECT id,data,version,status FROM models WHERE deleted_at IS NULL")).rows;
-    const catalog:Model[]=rows.map(r=>({...r.data,id:r.id,version:r.version,status:r.status}));
+    const rows=(await pool.query("SELECT id,data,version,status,capabilities FROM models WHERE deleted_at IS NULL")).rows;
+    const catalog:Model[]=rows.map(r=>({...r.data,id:r.id,version:r.version,status:r.status,capabilities:r.capabilities}));
     if(input.generate){
       const model=catalog.find(m=>m.id===input.modelId&&m.status==='available');if(!model)throw new AppError(422,'请先选择可用的规划模型');
       const messages=[{role:'system',content:'根据需求生成完整的部门、岗位配置与任务依赖 DAG，只输出符合 JSON Schema 的对象。岗位职责是长期职能，不把当前项目目标写入岗位。任务必须有负责人、具体目标、依赖和验收标准，最后由经理验收。小任务可只有经理。只可使用给定模型，工具和知识权限为空。'+JSON.stringify(z.toJSONSchema(organizationCandidateSchema))},{role:'user',content:JSON.stringify({requirement:input.requirement,policy:input.policy,template:department,models:catalog.filter(m=>m.status==='available').map(m=>({id:m.id,name:m.name,inputRate:m.inputRate,outputRate:m.outputRate}))})}];
@@ -35,12 +35,12 @@ export function productRouter(){
       planningUsageId=response.usageId;
       try{const candidate=organizationCandidateSchema.parse(JSON.parse((response.choices[0].message.content??'').replace(/^\s*```(?:json)?\s*/,'').replace(/\s*```\s*$/,'')));department=candidate.department;plan={agents:department.agents,rationale:candidate.rationale,tasks:candidate.tasks};}catch{throw new AppError(422,'生成结果格式不正确，未创建部门');}
       if(department.agents.length>input.policy.maxAgents||department.agents.some(a=>a.tools.length||!catalog.some(m=>m.id===a.modelId)||(a.knowledgeSpaceIds??[]).length))throw new AppError(422,'生成结果超出人数、模型或权限约束');
-      const validation=validatePlan(plan,input.policy,catalog);if(!validation.valid)throw new AppError(422,'生成方案校验失败：'+validation.errors.join('；'));
+      const validation=validatePlan(plan,input.policy,catalog,false);if(!validation.valid)throw new AppError(422,'生成方案校验失败：'+validation.errors.join('；'));
     }
     const previewId=randomUUID(),source=input.generate?'model':'template',draft={department,plan,requirement:input.requirement,policy:input.policy,source};
     await pool.query('INSERT INTO organization_previews(id,data) VALUES($1,$2)',[previewId,draft]);
     if(planningUsageId)await pool.query('UPDATE usage SET planning_preview_id=$1 WHERE id=$2',[previewId,planningUsageId]);
-    res.json({...draft,previewId,validation:validatePlan(plan,input.policy,catalog)});
+    res.json({...draft,previewId,validation:validatePlan(plan,input.policy,catalog,false)});
   });
   router.post('/organizations',async(req,res)=>{
     const input=z.object({department:departmentSchema,requirement:z.string().trim().min(10).max(50000),policy:policySchema,plan:planSchema.optional(),previewId:z.uuid().optional()}).parse(req.body);

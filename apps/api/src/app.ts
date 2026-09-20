@@ -1,3 +1,4 @@
+import { probeTools,routeFingerprint } from './model-capabilities.ts';
 import { startKnowledgeIndex,waitKnowledgeIndex } from './knowledge-vector.ts';
 import express from 'express';
 import { randomUUID } from 'node:crypto';
@@ -25,8 +26,8 @@ import { idempotency } from './idempotency.ts';
 import { obsidianRouter, syncObsidian } from './obsidian.ts';
 
 async function models(): Promise<Model[]> {
-  const { rows } = await pool.query('SELECT id,data,version,status,checked_at FROM models WHERE deleted_at IS NULL ORDER BY id');
-  return rows.map(r => ({ ...r.data, id: r.id, version: r.version, status: r.status, checkedAt: r.checked_at }));
+  const { rows } = await pool.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
+  return rows.map(r => ({ ...r.data, id: r.id, version: r.version, status: r.status, checkedAt: r.checked_at,capabilities:r.capabilities }));
 }
 async function log(kind: string, title: string) { await pool.query('INSERT INTO activity(id,kind,title) VALUES($1,$2,$3)', [randomUUID(), kind, title]); }
 const numericVersion = z.number().int().positive();
@@ -50,7 +51,7 @@ export function createApp() {
     res.setHeader('Cache-Control', 'no-store'); next();
   });
   app.use('/api/backup/restore', express.json({ limit: '45mb' }));
-  app.use(express.json({ limit: '512kb' }));
+  app.use(express.json({ limit: '2mb' }));
   app.use('/api', idempotency);
   app.use('/api', obsidianRouter());
   app.use('/api', knowledgeRouter());
@@ -101,7 +102,7 @@ export function createApp() {
       await client.query('BEGIN');
       const result = await client.query('UPDATE gateways SET data=$1,credential=CASE WHEN $2::text IS NULL THEN credential ELSE $2 END,version=version+1 WHERE id=$3 AND version=$4 RETURNING id', [data, apiKey ? seal(apiKey) : null, req.params.id, version]);
       if (!result.rowCount) throw new AppError(409, '中转站配置已变化，请刷新');
-      await client.query(`UPDATE models SET status='untested',version=version+1 WHERE data->>'gatewayId'=$1`, [req.params.id]);
+      await client.query(`UPDATE models SET status='untested',capabilities='{}',version=version+1 WHERE data->>'gatewayId'=$1`, [req.params.id]);
       await client.query('COMMIT'); res.json({ ok: true });
     } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
   });
@@ -122,7 +123,7 @@ export function createApp() {
   app.put('/api/models/:id', async (req, res) => {
     const data = modelSchema.parse(req.body), version = numericVersion.parse(req.body.version);
     requireRow((await pool.query('SELECT id FROM gateways WHERE id=$1', [data.gatewayId])).rows[0]);
-    const result = await pool.query(`UPDATE models SET data=$1,version=version+1,status='untested' WHERE id=$2 AND version=$3 AND deleted_at IS NULL RETURNING id`, [data, req.params.id, version]);
+    const result = await pool.query(`UPDATE models SET data=$1,version=version+1,status='untested',capabilities='{}' WHERE id=$2 AND version=$3 AND deleted_at IS NULL RETURNING id`, [data, req.params.id, version]);
     if (!result.rowCount) throw new AppError(409, '模型配置已变化，请刷新'); res.json({ ok: true });
   });
   const testing = new Set<string>();
@@ -132,9 +133,10 @@ export function createApp() {
     testing.add(model.id);
     try {
       const result = await completeBudgeted(model, [{ role: 'user', content: 'Reply with OK.' }], 16, {purpose:'连接测试'});
+      if(!result.choices[0].message.content?.trim())throw new AppError(502,'模型未返回有效文本','GATEWAY_INVALID_RESPONSE');
       const update = await pool.query(`UPDATE models SET status='available',checked_at=now(),version=version+1 WHERE id=$1 AND version=$2 RETURNING id`, [model.id, model.version]);
       if (!update.rowCount) throw new AppError(409, '测试期间配置已变化，请重新测试');
-      res.json({ ok: true, usageReported: !!result.usage, message: '文本调用成功；工具调用能力将在执行接入时单独验证' });
+      res.json({ ok: true, usageReported: !!result.usage, message: '文本调用成功；执行团队前还需完成工具能力测试' });
     } catch (error) {
       // Local admission failures say nothing about the provider's availability.
       if (!(error instanceof AppError && (error.status === 409 || error.code.endsWith('BUDGET_EXCEEDED')))) {
@@ -142,6 +144,14 @@ export function createApp() {
       }
       throw error;
     } finally { testing.delete(model.id); }
+  });
+  app.get('/api/models/:id/capability-tests',async(req,res)=>{res.json((await pool.query('SELECT id,model_version AS "modelVersion",probe_version AS "probeVersion",status,code,request_ids AS "requestIds",created_at AS "createdAt",finished_at AS "finishedAt" FROM model_capability_tests WHERE model_id=$1 ORDER BY created_at DESC LIMIT 20',[req.params.id])).rows);});
+  app.post('/api/models/:id/test-tools',async(req,res)=>{
+    const {maxCost}=z.object({maxCost:z.number().positive().max(10).default(.1)}).parse(req.body);
+    const model=requireRow((await models()).find(m=>m.id===req.params.id));
+    if(model.status!=='available')throw new AppError(422,'请先通过文本连接测试');
+    if(testing.has(model.id))throw new AppError(409,'此模型正在测试');testing.add(model.id);
+    try{res.json(await probeTools(model,maxCost));}finally{testing.delete(model.id);}
   });
   app.get('/api/projects', async (_req, res) => {
     const catalog = await models();
@@ -213,8 +223,8 @@ export function createApp() {
       existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
       if (existing) { await client.query('COMMIT'); }
       else {
-        const { rows: modelRows } = await client.query('SELECT id,data,version,status,checked_at FROM models WHERE deleted_at IS NULL ORDER BY id');
-        const catalog: Model[] = modelRows.map(row => ({ ...row.data, id: row.id, version: row.version, status: row.status, checkedAt: row.checked_at }));
+        const { rows: modelRows } = await client.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
+        const catalog: Model[] = modelRows.map(row => ({ ...row.data, id: row.id, version: row.version, status: row.status, checkedAt: row.checked_at,capabilities:row.capabilities }));
         await requireProjectCostReady(client,project.id);
         const planningCost = Number((await client.query('SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE project_id=$1', [project.id])).rows[0].cost);
         const executionBudget = project.policy.maxBudget - planningCost;
@@ -229,10 +239,11 @@ export function createApp() {
         await checkDailyBudget(client,config,project.department_id,executionBudget);
         if (req.body.automatic && (project.policy.mode !== 'automatic' || executionBudget > config.autoBudgetLimit || requestedTools.some((tool: string) => !['knowledge_search','knowledge_read'].includes(tool)))) throw new AppError(422, '全自动仅允许预算门槛内的文本与知识任务，其他任务需要人工批准', 'AUTO_POLICY_DENIED');
         const modelIds = [...new Set(project.plan.agents.flatMap((agent: any) => [agent.modelId,agent.fallbackModelId].filter(Boolean)))];
-        const { rows: routeRows } = await client.query(`SELECT m.id,m.data,g.data AS gateway_data,g.credential
+        const { rows: routeRows } = await client.query(`SELECT m.id,m.data,m.version,g.version AS gateway_version,g.data AS gateway_data,g.credential
           FROM models m JOIN gateways g ON g.id=m.data->>'gatewayId'
-          WHERE m.id=ANY($1::text[]) AND m.deleted_at IS NULL AND m.status='available'`, [modelIds]);
+          WHERE m.id=ANY($1::text[]) AND m.deleted_at IS NULL AND m.status='available' FOR SHARE OF m,g`, [modelIds]);
         if (routeRows.length !== modelIds.length) throw new AppError(422, '执行模型或中转站配置已变化，请重新测试模型连接', 'MODEL_ROUTE_CHANGED');
+        if(routeRows.some(row=>row.version!==catalog.find(m=>m.id===row.id)?.version))throw new AppError(409,'批准期间模型配置已变化，请刷新后重试','MODEL_ROUTE_CHANGED');
         const runtimeNames = new Map(project.plan.agents.map((agent: any, index: number) => [agent.id, `employee-${index + 1}`]));
         const agents = project.plan.agents.map((agent: any, index: number) => {
           const model = requireRow(catalog.find(item => item.id === agent.modelId));
@@ -247,7 +258,7 @@ export function createApp() {
           const model = requireRow(catalog.find(item => item.id === row.id));
           const assigned = project.plan.tasks.filter((task: any) => project.plan.agents.some((agent: any) => agent.id === task.assigneeId && (agent.modelId === row.id || agent.fallbackModelId === row.id)));
           const maxOutputTokens = Math.min(32768, Math.max(512, ...assigned.map((task: any) => task.estimatedOutputTokens)));
-          return { id: row.id, gatewayId: model.gatewayId, contextBytes: model.contextBytes, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
+          return { id: row.id, gatewayId: model.gatewayId, configurationHash:routeFingerprint(row.data,row.gateway_version),toolCapabilityTestId:model.capabilities?.tools?.testId, contextBytes: model.contextBytes, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
         });
         const runId = randomUUID();
         const knowledge=attachRunInputs(await knowledgeSnapshot(agents,project.department_id,client,project.plan.knowledgeDocumentIds),project.plan.runInputs,agents,runId);

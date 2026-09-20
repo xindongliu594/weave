@@ -78,7 +78,7 @@ export type Agent = z.infer<typeof agentSchema>;
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type Department = DepartmentInput & { id: string; version: number; createdAt: string; updatedAt: string; runCount: number };
 export type Gateway = Omit<z.infer<typeof gatewaySchema>, 'apiKey'> & { id: string; hasCredential: boolean; version: number };
-export type Model = z.infer<typeof modelSchema> & { id: string; version: number; status: 'untested' | 'available' | 'error'; checkedAt?: string };
+export type Model = z.infer<typeof modelSchema> & { id: string; version: number; status: 'untested' | 'available' | 'error'; checkedAt?: string; capabilities?:{tools?:{status:'supported'|'failed';checkedAt:string;testId:string;probeVersion:string}} };
 export type Policy = z.infer<typeof policySchema>;
 export type Plan = z.infer<typeof planSchema>;
 export type Validation = { valid: boolean; errors: string[]; estimate: number | null; checks: { label: string; pass: boolean }[] };
@@ -87,7 +87,7 @@ export type Activity = { id: string; kind: string; title: string; createdAt: str
 export type Usage = { runId?: string|null; agentId?: string|null; employeeId?: string|null; agentName?: string|null; sessionId?: string|null; taskId?: string|null; attemptId?: string|null; requestId?: string|null; durationMs?: number|null; id: string; modelId: string; projectId: string | null; inputTokens: number; outputTokens: number; cost: number; purpose: string; createdAt: string };
 
 /** Validation runs on the server again on every state-changing operation. */
-export function validatePlan(plan: Plan, policy: Policy, models: Model[]): Validation {
+export function validatePlan(plan: Plan, policy: Policy, models: Model[],requireToolSupport=true): Validation {
   const errors: string[] = [];
   const checks: Validation['checks'] = [];
   const check = (label: string, pass: boolean, message: string) => { checks.push({ label, pass }); if (!pass) errors.push(message); };
@@ -97,6 +97,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[]): Valid
   check('并发上限', policy.maxConcurrentAgents <= policy.maxAgents, '并发数不能超过 Agent 人数上限');
   check('模型可用性', plan.agents.every(a => models.some(m => m.id === a.modelId && m.status === 'available')), '请为所有员工选择连接测试通过的模型');
   check('备用模型可用性', plan.agents.every(a => !a.fallbackModelId || models.some(m => m.id === a.fallbackModelId && m.status === 'available')), '备用模型也必须存在且可用');
+  if(requireToolSupport)check('团队工具协议能力',plan.agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>models.find(m=>m.id===id)?.capabilities?.tools?.status==='supported')),'团队调度本身需要工具调用；所有主模型和备用模型必须通过工具往返测试');
   check('本次资料授权', (plan.runInputs??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '本次资料的授权员工必须在方案中，并开启知识检索工具');
   const taskIds = new Set(plan.tasks.map(t => t.id));
   const referencesOK = taskIds.size === plan.tasks.length && plan.tasks.every(t => ids.has(t.assigneeId) && t.dependencies.every(id => taskIds.has(id)));

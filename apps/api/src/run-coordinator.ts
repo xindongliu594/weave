@@ -10,6 +10,7 @@ import { command } from '../../../services/agent-runtime/sandbox.mjs';
 import { queryKnowledge } from './knowledge-store.ts';
 import { reserveCall,settleCall,markCallUncertain,expireReservations } from './cost-control.ts';
 import { settings } from './product.ts';
+import { assertRunModels,routeFingerprint } from './model-capabilities.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 export class RunCoordinator {
@@ -26,6 +27,7 @@ export class RunCoordinator {
   async reserve(runId:string,data:any){
     const run=(await pool.query('SELECT project_id,snapshot FROM project_runs WHERE id=$1 AND lease_owner=$2',[runId,this.owner])).rows[0];
     if(!run)throw new AppError(409,'工作进程已失去运行租约');
+    await assertRunModels(run.snapshot);
     const model=run.snapshot.modelRoutes.find((m:any)=>m.id===data.modelId);if(!model)throw new AppError(422,'模型不属于批准快照');
     await reserveCall({id:data.id,model,amount:data.reservation,purpose:'项目执行',projectId:run.project_id,runId,context:{agentId:data.agentId,employeeId:data.employeeId,sessionId:data.sessionId,taskId:data.taskId,attemptId:data.attemptId,requestId:data.requestId}});
   }
@@ -79,10 +81,11 @@ export class RunCoordinator {
   }
   async launch(row:any){
     try{
+      await assertRunModels(row.snapshot);
       const routes=[];
       for(const route of row.snapshot.modelRoutes){
-        const gateway=(await pool.query('SELECT credential FROM gateways WHERE id=$1',[route.gatewayId??row.snapshot.agents.find((a:any)=>a.modelId===route.id)?.gatewayId])).rows[0];
-        if(!gateway)throw Error('运行快照的中转站已删除');routes.push({...route,apiKey:gateway.credential?unseal(gateway.credential):''});
+        const gateway=(await pool.query("SELECT g.credential,g.version,m.data FROM models m JOIN gateways g ON g.id=m.data->>'gatewayId' WHERE m.id=$1 AND g.id=$2",[route.id,route.gatewayId])).rows[0];
+        if(!gateway||routeFingerprint(gateway.data,gateway.version)!==route.configurationHash)throw Error('运行快照的模型或中转站配置已变化');routes.push({...route,apiKey:gateway.credential?unseal(gateway.credential):''});
       }
       if(row.parent_run_id&&existsSync(join(this.traceRoot,row.parent_run_id,'artifacts')))cpSync(join(this.traceRoot,row.parent_run_id,'artifacts'),join(this.traceRoot,row.id,'artifacts'),{recursive:true});
       const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes});

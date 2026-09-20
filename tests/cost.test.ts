@@ -1,3 +1,4 @@
+import {toolEvidence} from './model-fixture.ts';
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -12,7 +13,7 @@ const base=process.env.DATABASE_URL??'postgres://agent_department:local-developm
 const admin=new pg.Pool({connectionString:base}),schema='cost_'+Date.now();
 let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,cost:typeof import('../apps/api/src/cost-control.ts');
 let requests=0,mode='ok';
-const model:Model={id:'model',gatewayId:'gateway',name:'Local fixture',model:'fixture',inputRate:0,outputRate:10000,version:1,status:'available'};
+const model:Model={id:'model',gatewayId:'gateway',name:'Local fixture',model:'fixture',inputRate:0,outputRate:10000,version:1,status:'available',capabilities:toolEvidence};
 const policy={maxBudget:10,maxAgents:1,maxConcurrentAgents:1,deadlineSeconds:300};
 const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:model.id,tools:[]};
 const plan={rationale:'费用测试',agents:[agent],tasks:[{id:'task',subject:'任务',objective:'验证费用',assigneeId:agent.id,dependencies:[],acceptanceCriteria:['通过'],estimatedInputTokens:10,estimatedOutputTokens:10,maxBudget:2}]};
@@ -24,7 +25,7 @@ before(async()=>{
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();cost=await import('../apps/api/src/cost-control.ts');
  const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
  gateway=http.createServer(async(req:any,res:any)=>{for await(const _ of req){}requests++;if(mode==='drop'){req.socket.destroy();return;}res.setHeader('content-type','application/json');res.end(JSON.stringify({choices:mode==='bad-message'?[]:[{message:{content:'OK'}}],...(mode==='missing'?{}:{usage:{prompt_tokens:0,completion_tokens:mode==='overrun'?200:25}})}));});gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
- await pool.query('INSERT INTO gateways(id,data) VALUES($1,$2)',['gateway',{name:'Fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available')",[model.id,model]);
+ await pool.query('INSERT INTO gateways(id,data) VALUES($1,$2)',['gateway',{name:'Fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[model.id,model,toolEvidence]);
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'测试部门',description:'',agents:[agent]}]);
  await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES('project','department',1,'测试部门','核对所有模型调用的预算上限',$1,$2,'manual')",[policy,plan]);
 });

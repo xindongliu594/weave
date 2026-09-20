@@ -13,6 +13,8 @@ export async function migrateProduct(pool: pg.Pool) {
     DROP TRIGGER IF EXISTS department_version_history ON departments;
     CREATE TRIGGER department_version_history AFTER INSERT OR UPDATE ON departments FOR EACH ROW EXECUTE FUNCTION record_department_version();
     CREATE TABLE IF NOT EXISTS templates (id text PRIMARY KEY, kind text NOT NULL, name text NOT NULL, data jsonb NOT NULL, version integer NOT NULL DEFAULT 1, deleted_at timestamptz);
+    ALTER TABLE models ADD COLUMN IF NOT EXISTS capabilities jsonb NOT NULL DEFAULT '{}';
+    CREATE TABLE IF NOT EXISTS model_capability_tests(id text PRIMARY KEY,model_id text NOT NULL REFERENCES models(id),model_version int NOT NULL,probe_version text NOT NULL,status text NOT NULL,code text,request_ids jsonb NOT NULL DEFAULT '[]',created_at timestamptz NOT NULL DEFAULT now(),finished_at timestamptz);
     CREATE TABLE IF NOT EXISTS knowledge_spaces (id text PRIMARY KEY, name text NOT NULL, scope text NOT NULL, department_id text, agent_ids jsonb NOT NULL DEFAULT '[]', version integer NOT NULL DEFAULT 1, deleted_at timestamptz);
     CREATE TABLE IF NOT EXISTS knowledge_documents (id text PRIMARY KEY, space_id text NOT NULL REFERENCES knowledge_spaces(id), title text NOT NULL, version integer NOT NULL DEFAULT 1, deleted_at timestamptz, created_at timestamptz NOT NULL DEFAULT now());
     CREATE TABLE IF NOT EXISTS knowledge_revisions (document_id text NOT NULL REFERENCES knowledge_documents(id), version integer NOT NULL, content text NOT NULL, sha256 text NOT NULL, source jsonb NOT NULL DEFAULT '{}', created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(document_id,version));

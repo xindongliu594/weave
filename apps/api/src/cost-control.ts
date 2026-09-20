@@ -1,7 +1,7 @@
 import type pg from 'pg';
 import { randomUUID } from 'node:crypto';
 import { pool } from './db.ts';
-import { AppError,complete } from './provider.ts';
+import { AppError,complete,type ChatMessage,type CompletionOptions } from './provider.ts';
 import type { Model } from '../../../packages/contracts/index.ts';
 type Database=Pick<pg.PoolClient,'query'>;
 const today="date_trunc('day',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'";
@@ -10,6 +10,7 @@ const greater=(a:number,b:number)=>a-b>Number.EPSILON*Math.max(Math.abs(a),Math.
 export async function shareCostMaintenance(db:Database){await db.query('SELECT pg_advisory_xact_lock_shared(918275)');}
 
 export async function expireReservations(db:Database=pool) {
+ await db.query("UPDATE model_capability_tests SET status='interrupted',code='PROBE_INTERRUPTED',finished_at=now() WHERE status='running' AND created_at<now()-interval '6 minutes'");
  await db.query(`UPDATE model_reservations SET status='uncertain',history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','timeout','note','请求租约过期，费用待核对')) WHERE status='pending' AND expires_at<now()`);
 }
 
@@ -58,6 +59,7 @@ export async function reserveCall(input:CallInput) {
   if(input.projectId&&!project)throw new AppError(404,'项目不存在');
   if(input.projectVersion!==undefined&&project.version!==input.projectVersion)throw new AppError(409,'方案版本已变化');
   const config=await lockCostPolicy(client);await expireReservations(client);
+  if(input.context?.probeId&&!(await client.query("SELECT id FROM model_capability_tests WHERE id=$1 AND status='running' AND created_at>now()-interval '3 minutes' FOR SHARE",[input.context.probeId])).rowCount)throw new AppError(409,'能力测试已中断或超时，请重新开始','PROBE_EXPIRED');
   const existing=(await client.query('SELECT id FROM model_reservations WHERE id=$1',[id])).rows[0];
   if(existing)throw new AppError(409,'该模型请求已创建费用预留');
   if(!Number.isFinite(input.amount)||input.amount<0)throw new AppError(422,'请求预留费用无效');
@@ -124,15 +126,15 @@ export async function settleCall(id:string,inputTokens:number,outputTokens:numbe
  });
 }
 
-export async function completeBudgeted(model:Model,messages:{role:string;content:string}[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;maxCost?:number}) {
- const amount=((Buffer.byteLength(JSON.stringify(messages))+1024)*model.inputRate+maxTokens*model.outputRate)/1e6;
+export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;maxCost?:number;context?:Record<string,any>},request:CompletionOptions={}) {
+ const amount=((Buffer.byteLength(JSON.stringify({messages,...request}))+1024)*model.inputRate+maxTokens*model.outputRate)/1e6;
  const id=await reserveCall({model,amount,...options});
  let received=false;
  try{
   const response=await complete(model,messages,maxTokens,async usage=>{
    const receipt=await settleCall(id,usage.prompt_tokens,usage.completion_tokens);received=true;
    if(greater(receipt.cost,amount))throw new AppError(422,'实际费用超过本次保守预留，已记录用量并停止后续操作','CALL_BUDGET_EXCEEDED');
-  });
+  },request);
   if(!response.usage)throw new AppError(502,'中转站未返回用量，费用预留保留为待核对','USAGE_MISSING');
   return {...response,usageId:id};
  }catch(error){if(!received)await markCallUncertain(id,error instanceof AppError?error.code:'CALL_INTERRUPTED');throw error;}

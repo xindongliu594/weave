@@ -1,3 +1,4 @@
+import {recoveryModel} from './model-fixture.ts';
 import { before,after,test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
@@ -78,7 +79,7 @@ test('expired runs require explicit checkpoint resume and cancelled queue entrie
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const coordinator=new RunCoordinator(join(dir,'runs'));await coordinator.close();
  const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
  const project=(await call('/projects')).data[0];
- const snapshot={title:'Recovery fixture',projectId:project.id,departmentId:project.departmentId,policy:{maxBudget:1},executionBudget:1,tasks:[{id:'first',dependencies:[],taskPrompt:'first'},{id:'second',dependencies:['first'],taskPrompt:'second'}],agents:[],modelRoutes:[]};
+ const snapshot={title:'Recovery fixture',projectId:project.id,departmentId:project.departmentId,policy:{maxBudget:1},executionBudget:1,tasks:[{id:'first',dependencies:[],taskPrompt:'first'},{id:'second',dependencies:['first'],taskPrompt:'second'}],...await recoveryModel(pool)};
  const archive=createRunArchive(join(dir,'runs'),snapshot);
  archive.append('run/task-mapping',{tasks:[{task_id:'runtime-first',seed_id:'first'}]});archive.append('team/snapshot',{tasks:[{id:'runtime-first',status:'completed',output:'verified checkpoint output'}]});
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,lease_until) VALUES($1,$2,$3,'running',$4,now()-interval '1 minute')",[archive.id,project.id,project.version,snapshot]);
@@ -100,7 +101,7 @@ test('retry admission preserves billed task cost and all wire calls, and refuses
  async function attempt({cost=.1,calls=1,maxCalls=10,maxTaskCalls=3,missing=false}={}) {
   const projectId=randomUUID(),id=randomUUID();
   await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[projectId,source.department_id,source.department_version,source.department_name,source.requirement,source.policy,source.plan,'manual']);
-  const snapshot={projectId,departmentId:source.department_id,agents:[],modelRoutes:[],policy:{maxBudget:1,maxModelCalls:maxCalls,maxTaskModelCalls:maxTaskCalls},executionBudget:1,tasks:[{id:'task',subject:'Budget task',assigneeId:'employee',taskPrompt:'Work',dependencies:[],maxBudget:.4}]};
+  const snapshot={projectId,departmentId:source.department_id,...await recoveryModel(pool),policy:{maxBudget:1,maxModelCalls:maxCalls,maxTaskModelCalls:maxTaskCalls},executionBudget:1,tasks:[{id:'task',subject:'Budget task',assigneeId:'employee',taskPrompt:'Work',dependencies:[],maxBudget:.4}]};
   if(!missing){
    const archive=createRunArchive(join(dir,'runs'),snapshot,{id});
    archive.append('run/task-mapping',{tasks:[{task_id:'t1',seed_id:'task'}]});

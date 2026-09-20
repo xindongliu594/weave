@@ -7,6 +7,7 @@ import { AppError } from './provider.ts';
 import { queryKnowledge } from './knowledge-store.ts';
 import { requireProjectCostReady,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
+import { assertRunModels } from './model-capabilities.ts';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
 export function runManagementRouter(traceRoot:string){
@@ -56,6 +57,7 @@ export function runManagementRouter(traceRoot:string){
     if(history&&(history.cost>=(task.maxBudget??snapshot.policy.maxBudget)||history.calls>=(task.maxModelCalls??snapshot.policy.maxTaskModelCalls??40)))
      throw new AppError(422,`任务「${task.subject??task.id}」已达到费用或调用次数上限，请调整方案后重新批准`,'TASK_BUDGET_EXHAUSTED');
    }
+   await assertRunModels(snapshot,client);
    const config=await lockCostPolicy(client);await checkDailyBudget(client,config,snapshot.departmentId,snapshot.executionBudget);
    snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id};
    const newId=randomUUID(),attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);

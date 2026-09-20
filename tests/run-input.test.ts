@@ -1,3 +1,4 @@
+import {toolEvidence} from './model-fixture.ts';
 import {before,after,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -16,7 +17,7 @@ before(async()=>{
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();store=await import('../apps/api/src/knowledge-store.ts');
  const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
  await pool.query("INSERT INTO gateways(id,data) VALUES('gateway',$1)",[{name:'Unused fixture',baseUrl:'http://127.0.0.1:1/v1'}]);
- await pool.query("INSERT INTO models(id,data,status) VALUES('model',$1,'available')",[{name:'Fixture',gatewayId:'gateway',model:'fixture',inputRate:1,outputRate:1}]);
+ await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES('model',$1,'available',$2)",[{name:'Fixture',gatewayId:'gateway',model:'fixture',inputRate:1,outputRate:1},toolEvidence]);
 });
 after(async()=>{await app?.locals.shutdown();if(server)await new Promise<void>(r=>server.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
 
@@ -72,4 +73,6 @@ test('approval intersects long-term scope, freezes per-employee run inputs and p
  const backup=await call('/backup/export','POST',{password:'run-inputs-backup'});assert.equal(backup.status,200);
  assert.equal((await call('/backup/restore','POST',{password:'run-inputs-backup',backup:backup.data,confirmation:'RESTORE'})).status,200);
  assert.equal((await call('/runs/'+runId+'/citations/'+input.id)).data.content,input.content);
+ const largeInputs=Array.from({length:5},(_,i)=>({id:'large'+i,title:'中文资料',content:'中'.repeat(50000),agentIds:['manager']}));
+ assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:3,plan:{...second,runInputs:largeInputs}})).status,200,'the HTTP body limit accommodates the declared 250,000 Chinese-character input allowance');
 });

@@ -16,7 +16,7 @@ const {once}=require('node:events');
  const model={id:'model',name:'Fixture',model:'fixture',status:'available',gatewayId:'gateway',inputRate:1,outputRate:2};
  const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[]};
  const project={id:'project',departmentId:'department',departmentName:'测试部门',requirement:'预算表单测试需求',version:1,source:'manual',status:'DRAFT',createdAt:event.at,policy:run.snapshot.policy,planningCost:0,validation:{valid:true,estimate:.01,checks:[],errors:[]},plan:{rationale:'Fixture',agents:[agent],tasks:[{id:'task',subject:'测试任务',objective:'核对预算配置',assigneeId:'manager',dependencies:[],acceptanceCriteria:['预算保存正确'],estimatedInputTokens:10,estimatedOutputTokens:10}]}};
- let savedPlan,reconciled,retrievalSaved;
+ let savedPlan,reconciled,retrievalSaved,toolProbeRequest;
  const retrieval={mode:'keyword',version:1,installed:true,model:'Local fixture embedding',embeddingVersion:'fixture-v1',indexed:1,total:2,running:false,error:null};
  const costCall={id:'cost',modelName:'Fixture',purpose:'连接测试',amount:.5,inputRate:1,outputRate:2,status:'uncertain',createdAt:event.at,history:[]};
  const costs={timezone:'UTC',spent:.1,reserved:.5,calls:[costCall],recent:[],departments:[{id:'department',name:'测试部门',spent:.1,reserved:.5,limit:2}]};
@@ -28,6 +28,8 @@ const {once}=require('node:events');
    if(apiPath===`/api/runs/${id}/citations/chunk`){res.statusCode=missing?409:200;res.end(JSON.stringify(missing?{message:'运行引用的知识版本缺失或不完整'}:source));return;}
    if(apiPath==='/api/projects/project/plan'&&req.method==='PUT'){let body='';for await(const data of req)body+=data;savedPlan=JSON.parse(body).plan;project.plan=savedPlan;res.end('{}');return;}
    if(apiPath==='/api/projects/project/knowledge-options'){res.end(JSON.stringify([{id:'doc1',title:'本次选用规范',version:1,agentIds:['manager']},{id:'doc2',title:'无需使用规范',version:2,agentIds:['manager']}]));return;}
+   if(apiPath==='/api/models/model/test-tools'){let body='';for await(const data of req)body+=data;toolProbeRequest=JSON.parse(body);model.capabilities={tools:{status:'supported',checkedAt:event.at,testId:'probe-fixture',probeVersion:'chat-tools-roundtrip-v1'}};res.end(JSON.stringify({message:'工具参数和工具结果往返测试通过；用量已记录。'}));return;}
+   if(apiPath==='/api/models/model/capability-tests'){res.end(JSON.stringify([{id:'probe-fixture',createdAt:event.at,status:'supported',modelVersion:1,requestIds:['first','second'],probeVersion:'chat-tools-roundtrip-v1'}]));return;}
    if(apiPath==='/api/costs/cost/reconcile'&&req.method==='POST'){let body='';for await(const data of req)body+=data;reconciled=JSON.parse(body);costs.calls=[];costs.reserved=0;costs.recent=[{...costCall,status:'settled',history:[{source:'manual',...reconciled}]}];res.end('{}');return;}
    if(apiPath==='/api/costs'){res.end(JSON.stringify(costs));return;}
    if(apiPath==='/api/settings'){res.end(JSON.stringify({data:{autoBudgetLimit:.25,dailyBudgetLimit:20,maxActiveRuns:2}}));return;}
@@ -107,6 +109,14 @@ const {once}=require('node:events');
   await page.getByText('当前：关键词检索',{exact:false}).waitFor();
   assert.deepEqual(retrievalSaved,{mode:'keyword',version:2});
   await page.screenshot({path:path.resolve(__dirname,'../dist/hybrid-retrieval-ui.png'),fullPage:true});
+  await page.getByRole('button',{name:'模型目录',exact:true}).click();
+  await page.getByText('工具调用：尚未验证',{exact:true}).waitFor();
+  await page.getByRole('spinbutton',{name:'工具测试费用上限（USD）',exact:true}).fill('0.05');
+  await page.getByRole('button',{name:'测试工具能力',exact:true}).click();
+  await page.getByText('工具调用：往返测试通过',{exact:true}).waitFor();assert.deepEqual(toolProbeRequest,{maxCost:.05});
+  await page.getByRole('button',{name:'查看能力测试记录',exact:true}).click();
+  await page.getByText('配置 v1 · 2 次请求 · chat-tools-roundtrip-v1',{exact:true}).waitFor();
+  await page.screenshot({path:path.resolve(__dirname,'../dist/model-capabilities-ui.png'),fullPage:true});
   assert.deepEqual(errors,[]);console.log('Historical citations, escaped markup, budget forms, and explicit cost reconciliation verified in Chrome.');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
