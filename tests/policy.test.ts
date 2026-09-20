@@ -29,3 +29,11 @@ test('task estimates and task turn limits must fit the approved policy',()=>{
   assert.equal(validatePlan(plan,policy,[model]).valid,true);
   assert.equal(planSchema.safeParse({...plan,tasks:[{...plan.tasks[0],maxModelCalls:0}]}).success,false);
 });
+test('run inputs require valid recipients, bounded text, unique IDs and a retrieval grant',()=>{
+ const input={id:'brief',title:'资料',content:'本次任务输入',agentIds:['manager']};
+ const plan={...structuredClone(base),runInputs:[input],knowledgeDocumentIds:[]};
+ assert.equal(planSchema.safeParse(plan).success,true);
+ assert.equal(validatePlan(plan,policy,[model]).valid,false);
+ plan.agents[0].tools=['knowledge_search'];assert.equal(validatePlan(plan,policy,[model]).valid,true);
+ for(const inputs of [[{...input,agentIds:['foreign']}],[input,input],[{...input,content:'binary\0text'}],[{...input,agentIds:[]}],[{...input,content:'x'.repeat(50001)}],Array.from({length:6},(_,i)=>({...input,id:'file'+i,content:'x'.repeat(50000)}))])assert.equal(planSchema.safeParse({...plan,runInputs:inputs}).success,false);
+});

@@ -42,10 +42,23 @@ export const taskSchema = z.object({
   maxBudget: z.number().finite().positive().max(10000).optional(),
   maxModelCalls: z.number().int().min(1).max(1000).optional(),
 });
+export const runInputSchema = z.object({
+  id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),
+  title: z.string().trim().min(1).max(200),
+  content: z.string().trim().min(1).max(50000).refine(v=>!v.includes('\0'),'不支持二进制资料'),
+  agentIds: z.array(z.string().min(1).max(80)).min(1).max(6),
+});
 export const planSchema = z.object({
   rationale: z.string().trim().min(1).max(5000),
   agents: z.array(agentSchema).min(1).max(6),
   tasks: z.array(taskSchema).min(1).max(50),
+  knowledgeDocumentIds: z.array(z.string().min(1).max(100)).max(1000).optional(),
+  runInputs: z.array(runInputSchema).max(20).optional(),
+}).superRefine((plan,ctx)=>{
+  const inputs=plan.runInputs??[];
+  if(new Set(inputs.map(i=>i.id)).size!==inputs.length)ctx.addIssue({code:'custom',message:'本次资料 ID 不能重复'});
+  if(inputs.reduce((n,i)=>n+i.content.length,0)>250000)ctx.addIssue({code:'custom',message:'本次资料正文合计不能超过 250,000 字符'});
+  if(inputs.some(i=>i.agentIds.some(id=>!plan.agents.some(a=>a.id===id))))ctx.addIssue({code:'custom',message:'本次资料的授权员工不在方案中'});
 });
 export const gatewaySchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -84,6 +97,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[]): Valid
   check('并发上限', policy.maxConcurrentAgents <= policy.maxAgents, '并发数不能超过 Agent 人数上限');
   check('模型可用性', plan.agents.every(a => models.some(m => m.id === a.modelId && m.status === 'available')), '请为所有员工选择连接测试通过的模型');
   check('备用模型可用性', plan.agents.every(a => !a.fallbackModelId || models.some(m => m.id === a.fallbackModelId && m.status === 'available')), '备用模型也必须存在且可用');
+  check('本次资料授权', (plan.runInputs??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '本次资料的授权员工必须在方案中，并开启知识检索工具');
   const taskIds = new Set(plan.tasks.map(t => t.id));
   const referencesOK = taskIds.size === plan.tasks.length && plan.tasks.every(t => ids.has(t.assigneeId) && t.dependencies.every(id => taskIds.has(id)));
   check('任务负责人和引用', referencesOK, '任务 ID 重复、负责人不存在或依赖任务不存在');

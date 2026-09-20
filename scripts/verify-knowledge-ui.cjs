@@ -26,6 +26,7 @@ const {once}=require('node:events');
    res.setHeader('content-type','application/json');
    if(apiPath===`/api/runs/${id}/citations/chunk`){res.statusCode=missing?409:200;res.end(JSON.stringify(missing?{message:'运行引用的知识版本缺失或不完整'}:source));return;}
    if(apiPath==='/api/projects/project/plan'&&req.method==='PUT'){let body='';for await(const data of req)body+=data;savedPlan=JSON.parse(body).plan;project.plan=savedPlan;res.end('{}');return;}
+   if(apiPath==='/api/projects/project/knowledge-options'){res.end(JSON.stringify([{id:'doc1',title:'本次选用规范',version:1,agentIds:['manager']},{id:'doc2',title:'无需使用规范',version:2,agentIds:['manager']}]));return;}
    if(apiPath==='/api/costs/cost/reconcile'&&req.method==='POST'){let body='';for await(const data of req)body+=data;reconciled=JSON.parse(body);costs.calls=[];costs.reserved=0;costs.recent=[{...costCall,status:'settled',history:[{source:'manual',...reconciled}]}];res.end('{}');return;}
    if(apiPath==='/api/costs'){res.end(JSON.stringify(costs));return;}
    if(apiPath==='/api/settings'){res.end(JSON.stringify({data:{autoBudgetLimit:.25,dailyBudgetLimit:20,maxActiveRuns:2}}));return;}
@@ -59,9 +60,19 @@ const {once}=require('node:events');
   await page.getByRole('button',{name:'编辑方案',exact:true}).click();
   await page.getByRole('spinbutton',{name:'任务费用上限（USD，可选）',exact:false}).fill('0.25');
   await page.getByRole('spinbutton',{name:'任务调用次数上限（可选）',exact:false}).fill('12');
+  await page.getByRole('combobox',{name:'长期知识资料',exact:true}).selectOption('selected');
+  await page.getByRole('checkbox',{name:'本次选用规范',exact:false}).check();
+  await page.getByRole('checkbox',{name:'知识检索',exact:true}).check();
+  await page.getByRole('button',{name:'添加本次资料',exact:true}).click();
+  await page.getByRole('textbox',{name:'资料标题',exact:true}).fill('本次会议记录');
+  await page.getByRole('textbox',{name:'本次资料正文',exact:true}).fill('仅供本次分析使用的输入资料。');
   await page.getByRole('button',{name:'保存新版本',exact:true}).click();
   await page.getByRole('dialog').waitFor({state:'hidden'});
   assert.equal(savedPlan.tasks[0].maxBudget,.25);assert.equal(savedPlan.tasks[0].maxModelCalls,12);
+  assert.deepEqual(savedPlan.knowledgeDocumentIds,['doc1']);assert.equal(savedPlan.runInputs[0].content,'仅供本次分析使用的输入资料。');assert.deepEqual(savedPlan.runInputs[0].agentIds,['manager']);
+  await page.getByText('本次会议记录 · 本次专用 · 经理',{exact:true}).click();
+  await page.getByText('仅供本次分析使用的输入资料。',{exact:true}).waitFor();
+  await page.screenshot({path:path.resolve(__dirname,'../dist/run-input-scope-ui.png'),fullPage:true});
   await page.getByRole('button',{name:'系统设置',exact:true}).click();
   await page.getByText('费用待核对 · 预留 $0.500000',{exact:false}).waitFor();
   await page.getByRole('button',{name:'核对这次费用',exact:true}).click();

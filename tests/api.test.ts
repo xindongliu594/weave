@@ -117,7 +117,10 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'billing/usage'));
   const billed=(await call('/usage')).data.filter((u:any)=>u.runId===approved.data.id);
   const receipts=(await pool.query('SELECT id,status FROM model_reservations WHERE run_id=$1',[approved.data.id])).rows;
-  assert.equal(receipts.length,billed.length);assert.ok(receipts.every(r=>r.status==='settled'&&billed.some((u:any)=>u.id===r.id)));
+  assert.equal(receipts.filter(r=>r.status==='settled').length,billed.length);
+  assert.ok(billed.every((u:any)=>receipts.some(r=>r.id===u.id&&r.status==='settled')));
+  // Finishing a team may abort a redundant in-flight member response. Its fee remains unknown, not zero.
+  assert.ok(receipts.every(r=>r.status==='settled'||(['uncertain','released'].includes(r.status)&&run.data.events.some((e:any)=>e.type==='billing/unconfirmed'&&e.data.id===r.id))),JSON.stringify(receipts));
   assert.ok(billed.length>0);assert.ok(billed.every((u:any)=>u.agentId==='employee-1'&&u.employeeId==='manager'&&u.sessionId&&u.requestId&&u.durationMs>=0),JSON.stringify(billed.map((u:any)=>({agent:u.agentId,employee:u.employeeId,session:u.sessionId,request:u.requestId,task:u.taskId}))));
   assert.ok(billed.some((u:any)=>u.taskId===project.plan.tasks[0].id&&u.attemptId));
   assert.ok(billed.every((u:any)=>!u.taskId||u.taskId===project.plan.tasks[0].id),'message text cannot change budget attribution');
@@ -146,6 +149,22 @@ test('organization planning returns a complete editable DAG, rejects invalid pla
  plannedResponse={department:template.department,rationale:'bad cycle',tasks:template.plan.tasks.map((t:any,i:number)=>({...t,dependencies:i===0?['deliver']:t.dependencies}))};
  assert.equal((await call('/organizations/preview','POST',{...input,generate:true,maxPlanningCost:.1})).status,422);
  assert.equal((await call('/departments')).data.length,before+1);
+});
+test('model planning preserves user input scope and refuses to remove an input recipient',async()=>{
+ const model=(await call('/models')).data[0];
+ const agent={id:'manager',role:'manager',name:'经理',title:'协调',instructions:'协调任务',modelId:model.id,tools:['knowledge_search']};
+ const department=(await call('/departments','POST',{name:'规划资料范围',description:'测试',agents:[agent]})).data;
+ const created=(await call('/projects','POST',{departmentId:department.id,requirement:'使用用户提供的临时资料进行分析',policy:{maxBudget:1,maxAgents:1,maxConcurrentAgents:1,deadlineSeconds:300}})).data;
+ const project=(await call('/projects')).data.find((p:any)=>p.id===created.id);
+ const plan={...project.plan,knowledgeDocumentIds:[],runInputs:[{id:'brief',title:'用户简报',content:'user-owned-input',agentIds:['manager']}]};
+ assert.equal((await call('/projects/'+created.id+'/plan','PUT',{version:1,plan})).status,200);
+ plannedResponse={...plan,knowledgeDocumentIds:['invented-document'],runInputs:[]};
+ assert.equal((await call('/projects/'+created.id+'/generate','POST',{version:2,modelId:model.id,maxPlanningCost:.1})).status,200);
+ const saved=(await call('/projects')).data.find((p:any)=>p.id===created.id);
+ assert.deepEqual(saved.plan.knowledgeDocumentIds,[]);assert.deepEqual(saved.plan.runInputs,plan.runInputs);
+ plannedResponse={...plan,runInputs:[],agents:[{...agent,id:'replacement'}],tasks:plan.tasks.map((t:any)=>({...t,assigneeId:'replacement'}))};
+ assert.equal((await call('/projects/'+created.id+'/generate','POST',{version:3,modelId:model.id,maxPlanningCost:.1})).status,422);
+ assert.equal((await call('/projects')).data.find((p:any)=>p.id===created.id).version,3);
 });
 test('dynamic loopback preview can save a gateway through the local proxy', async () => {
   for (const origin of ['http://localhost:54234', 'http://127.0.0.1:54674', 'http://[::1]:55123']) {

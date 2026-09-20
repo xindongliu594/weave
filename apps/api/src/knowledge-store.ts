@@ -1,11 +1,13 @@
 import type pg from 'pg';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
-import { tokenize, searchKnowledge } from '../../../services/agent-runtime/knowledge.mjs';
+import { createHash } from 'node:crypto';
+import type { Plan } from '../../../packages/contracts/index.ts';
+import { tokenize, searchKnowledge, chunkDocument } from '../../../services/agent-runtime/knowledge.mjs';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type DocumentVersion = { documentId: string; version: number; title: string; spaceId: string; sha256: string; source: Record<string,unknown>; chunkCount: number };
-export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]> };
+export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]>; runInputs?:{documentId:string;title:string;agentIds:string[];chunks:any[]}[] };
 const permission = `(s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2)))`;
 
 export async function validateKnowledgeGrants(agents:any[], departmentId:string, db:Database=pool) {
@@ -20,10 +22,10 @@ export async function validateKnowledgeGrants(agents:any[], departmentId:string,
   }
 }
 
-export async function knowledgeSnapshot(agents:any[], departmentId:string, db?:Database):Promise<KnowledgeManifest> {
+export async function knowledgeSnapshot(agents:any[], departmentId:string, db?:Database,documentIds?:string[]):Promise<KnowledgeManifest> {
   if (!db) {
     const client=await pool.connect();
-    try { await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ'); const manifest=await knowledgeSnapshot(agents,departmentId,client); await client.query('COMMIT'); return manifest; }
+    try { await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ'); const manifest=await knowledgeSnapshot(agents,departmentId,client,documentIds); await client.query('COMMIT'); return manifest; }
     catch(error) { await client.query('ROLLBACK'); throw error; }
     finally { client.release(); }
   }
@@ -36,12 +38,24 @@ export async function knowledgeSnapshot(agents:any[], departmentId:string, db?:D
     JOIN knowledge_spaces s ON s.id=ANY(a."knowledgeSpaceIds")
     JOIN knowledge_documents d ON d.space_id=s.id
     JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=d.version
-    WHERE d.deleted_at IS NULL AND s.deleted_at IS NULL
+    WHERE d.deleted_at IS NULL AND s.deleted_at IS NULL AND ($3::text[] IS NULL OR d.id=ANY($3::text[]))
       AND (s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? a."employeeId")))
-    ORDER BY d.id,a.id FOR SHARE OF d,s`,[departmentId,JSON.stringify(agents.map(a=>({id:a.id,employeeId:a.employeeId??a.id,knowledgeSpaceIds:a.knowledgeSpaceIds??[]})))])).rows;
+    ORDER BY d.id,a.id FOR SHARE OF d,s`,[departmentId,JSON.stringify(agents.map(a=>({id:a.id,employeeId:a.employeeId??a.id,knowledgeSpaceIds:a.knowledgeSpaceIds??[]}))),documentIds??null])).rows;
   for (const {agentId,...doc} of rows) { agentDocuments[agentId].push(doc.documentId); documents.set(doc.documentId,doc as DocumentVersion); }
+  if(documentIds?.some(id=>!documents.has(id)))throw new AppError(422,'本次选用的资料已归档、缺失或没有员工获授权，请更新资料范围后重新批准。','KNOWLEDGE_SCOPE_INVALID');
   // Store references, not a truncated copy of the corpus. Revisions are immutable and included in backups.
   return {format:'document-versions-v2',documents:[...documents.values()],agentDocuments};
+}
+
+/** Run inputs are immutable snapshot data, never imported into the shared Vault or its index. */
+export function attachRunInputs(manifest:KnowledgeManifest,inputs:Plan['runInputs'],agents:any[],runId:string) {
+  if(!inputs?.length)return manifest;
+  return {...manifest,runInputs:inputs.map(input=>{
+    const documentId=`run:${runId}:${input.id}`,sha256=createHash('sha256').update(input.content).digest('hex');
+    const agentIds=input.agentIds.map(id=>agents.find(a=>(a.employeeId??a.id)===id)?.id);
+    if(agentIds.some(id=>!id))throw new AppError(422,'本次资料授权员工不存在','KNOWLEDGE_SCOPE_INVALID');
+    return {documentId,title:input.title,agentIds,chunks:chunkDocument(documentId,1,input.content).map(chunk=>({...chunk,tokens:tokenize(input.title+' '+chunk.content),title:input.title,sha256,spaceId:`run:${runId}`,source:{type:'run-input',runId,inputId:input.id}}))};
+  })};
 }
 
 function references(manifest:KnowledgeManifest,agentId:string) {
@@ -65,8 +79,12 @@ export async function queryKnowledge(snapshot:any,agentId:string,operation:'sear
     return operation==='search'?searchKnowledge(chunks,value,limit):chunks.find((chunk:any)=>chunk.id===value);
   }
   const refs=references(snapshot,agentId);
-  if (!refs.length) return operation==='search'?[]:undefined;
+  // Filter authorization before ranking, including inputs only assigned to one team member.
+  const inputChunks=(snapshot.runInputs??[]).filter((doc:any)=>doc.agentIds.includes(agentId)).flatMap((doc:any)=>doc.chunks);
+  const inputResults=operation==='search'?searchKnowledge(inputChunks,value,limit):inputChunks.find((c:any)=>c.id===value);
+  if (!refs.length) return inputResults;
   await verifyVersions(refs,db);
+  if(operation==='read'&&inputResults)return inputResults;
   const terms=tokenize(value);
   if (operation==='search'&&!terms.length) return [];
   const rows=(await db.query(`WITH refs AS (SELECT * FROM jsonb_to_recordset($1) AS x("documentId" text,version int,title text,"spaceId" text,sha256 text,source jsonb)),
@@ -80,7 +98,7 @@ export async function queryKnowledge(snapshot:any,agentId:string,operation:'sear
     FROM authorized WHERE ${operation==='search'?'tokens ?| $2::text[]':'id=$2'}
     ORDER BY ${operation==='search'?'score DESC,':''} id LIMIT ${operation==='search'?'$4':'$3'}`,
     operation==='search'?[JSON.stringify(refs),terms,value,Math.min(20,Math.max(1,limit))]:[JSON.stringify(refs),value,1])).rows;
-  return operation==='search'?rows:rows[0];
+  return operation==='search'?[...rows,...inputResults].sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id)).slice(0,Math.min(20,Math.max(1,limit))):rows[0];
 }
 
 export async function searchAvailableKnowledge(departmentId:string,agent:any,query:string) {
