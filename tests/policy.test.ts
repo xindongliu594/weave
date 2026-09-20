@@ -20,3 +20,12 @@ test('manager count, duplicate agent IDs and empty acceptance are rejected', () 
   assert.equal(validatePlan(plan, policy, [model]).valid, false);
   plan.tasks[0].acceptanceCriteria = []; assert.equal(planSchema.safeParse(plan).success, false);
 });
+test('task estimates and task turn limits must fit the approved policy',()=>{
+  const plan=structuredClone(base);plan.tasks[0].maxBudget=.001;plan.tasks[0].maxModelCalls=41;
+  const invalid=validatePlan(plan,policy,[model]);
+  assert.equal(invalid.checks.find(c=>c.label==='任务费用上限')?.pass,false);
+  assert.equal(invalid.checks.find(c=>c.label==='员工每任务调用上限')?.pass,false);
+  plan.tasks[0].maxBudget=.01;plan.tasks[0].maxModelCalls=20;
+  assert.equal(validatePlan(plan,policy,[model]).valid,true);
+  assert.equal(planSchema.safeParse({...plan,tasks:[{...plan.tasks[0],maxModelCalls:0}]}).success,false);
+});

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 /** Observe the actual runtime. Session records are deduplicated on durable source identity. */
-export function attachTrace(ctx, archive) {
+export function attachTrace(ctx, archive,taskFor) {
   const disposers = [];
   const links = new Map();
   const requests = new Map();
@@ -46,7 +46,8 @@ export function attachTrace(ctx, archive) {
     const assignment = options.messages.filter(m => m.role === 'user').flatMap(m => m.content).filter(b => b.type === 'text').map(b => b.text).reverse().find(text => text.includes('AgentTeams automatic task assignment')) ?? '';
     const taskId = /Task: (t\d+)/.exec(assignment)?.[1];
     const attemptId = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
-    if (taskId && attemptId) links.set(options.sessionId, { taskId, attemptId });
+    if(taskFor)links.set(options.sessionId,taskFor(options.sessionId)??{});
+    else if (taskId && attemptId) links.set(options.sessionId, { taskId, attemptId });
     const requestId = randomUUID();
     const ref = { sessionId: options.sessionId, requestId, ...links.get(options.sessionId) };
     requests.set(options.sessionId,ref);

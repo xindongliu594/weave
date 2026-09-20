@@ -65,11 +65,17 @@ export class ProductDshRuntime {
       const adapter = new OpenAiCompatibleAdapter({
         routes,
         maxBudget: snapshot.executionBudget,
+        priorSpend: Math.max(0,snapshot.policy.maxBudget-snapshot.executionBudget),
+        priorModelCalls: snapshot.budgetHistory?.calls??0,
+        taskUsage: snapshot.budgetHistory?.tasks??{},
+        tasks: snapshot.tasks,
+        maxTaskModelCalls: snapshot.policy.maxTaskModelCalls??40,
+        onBudget: data=>archive.append('budget/'+data.kind,data,{taskId:data.taskId}),
         maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
         contextBytes: snapshot.policy.contextBytes ?? 64000,
         signal: job.controller.signal,
         onContext: data => archive.append('context/compacted', data),
-        onRequest: data => archive.append('model/wire-request', data, {sessionId:data.sessionId}),
+        onRequest: data => archive.append('model/wire-request', data, {sessionId:data.sessionId,requestId:data.requestId,taskId:data.taskId,attemptId:data.attemptId}),
         onFallback: data => archive.append('model/fallback', data, {sessionId:data.sessionId}),
         onUsage: async usage => { usages.push(usage); archive.append('billing/usage', usage, {sessionId:usage.sessionId,requestId:usage.requestId,taskId:usage.taskId,attemptId:usage.attemptId}); await this.onUsage?.(archive.id, usage); },
         onError: error => { runtimeFailure ??= error; },
@@ -93,7 +99,7 @@ export class ProductDshRuntime {
         name: `run-${archive.id.slice(0, 8)}`, description: snapshot.requirement, approval: 'required', plan,
       }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(15_000)]));
       archive.append('run/task-mapping', { tasks: created.tasks });
-      host.bindTaskMapping(created.tasks);
+      host.bindTaskMapping(created.tasks,created.team_id);
       archive.append('run/approved', snapshot.approval);
       await host.call(captain, 'agent_teams_approve', { confirmation: `执行已批准项目 ${snapshot.projectId} 方案 v${snapshot.planVersion}` }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(30_000)]));
       host.lockPlan();

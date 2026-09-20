@@ -26,6 +26,7 @@ export const policySchema = z.object({
   maxConcurrentAgents: z.number().int().min(1).max(6),
   deadlineSeconds: z.number().int().min(60).max(86400),
   maxModelCalls: z.number().int().min(1).max(1000).optional(),
+  maxTaskModelCalls: z.number().int().min(1).max(1000).optional(),
   contextBytes: z.number().int().min(4096).max(1000000).optional(),
   mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
   preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
@@ -37,6 +38,8 @@ export const taskSchema = z.object({
   acceptanceCriteria: z.array(z.string().trim().min(1).max(2000)).min(1).max(20),
   estimatedInputTokens: z.number().int().min(0).max(2000000),
   estimatedOutputTokens: z.number().int().min(1).max(200000),
+  maxBudget: z.number().finite().positive().max(10000).optional(),
+  maxModelCalls: z.number().int().min(1).max(1000).optional(),
 });
 export const planSchema = z.object({
   rationale: z.string().trim().min(1).max(5000),
@@ -94,10 +97,17 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[]): Valid
   }
   check('任务依赖无环', referencesOK && plan.tasks.every(t => visit(t.id)), '任务依赖必须组成无环图');
   let estimate = 0;
+  let taskBudgetsOK = true;
   for (const task of plan.tasks) {
     const a = plan.agents.find(a => a.id === task.assigneeId), m = models.find(m => m.id === a?.modelId);
-    if (m) estimate += (task.estimatedInputTokens * m.inputRate + task.estimatedOutputTokens * m.outputRate) / 1e6;
+    if (m) {
+      const cost=(task.estimatedInputTokens * m.inputRate + task.estimatedOutputTokens * m.outputRate) / 1e6;
+      estimate += cost;
+      if(task.maxBudget!==undefined&&Math.ceil(cost*1.2*1e6)/1e6>task.maxBudget)taskBudgetsOK=false;
+    }
   }
+  check('任务费用上限',taskBudgetsOK,'任务执行估算（含 20% 预留）超过该任务的费用上限');
+  check('员工每任务调用上限',plan.tasks.every(t=>t.maxModelCalls===undefined||t.maxModelCalls<=(policy.maxTaskModelCalls??40)),'任务调用上限不能超过策略允许的每任务调用次数');
   estimate = Math.ceil(estimate * 1.2 * 1e6) / 1e6;
   const pricesKnown = plan.tasks.every(t => models.some(m => m.id === plan.agents.find(a => a.id === t.assigneeId)?.modelId));
   check('预估执行费用', pricesKnown && estimate <= policy.maxBudget, pricesKnown ? '执行估算（含 20% 预留）超过剩余预算' : '模型配置不完整，暂时无法估算费用');

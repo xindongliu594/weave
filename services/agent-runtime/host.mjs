@@ -1,11 +1,13 @@
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
-import { isAbsolute } from 'node:path';
+import { isAbsolute,join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { Context } from '@deepseek-ai/cordis';
 import * as teams from '@nanmicoder/dsh-agent-teams';
 import { attachTrace } from './trace.mjs';
 import { installProductTools, employeeFor } from './product-tools.mjs';
+import { assignedTask } from './task-attribution.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
@@ -20,7 +22,15 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   let closing;
   let trace;
   const taskIds = new Map();
+  const assignments=new Map();let teamId,workspaceRoot;
   let productDispose, captainId, locked = false;
+  function taskFor(sessionId) {
+    if(sessionId===captainId)return undefined; // Coordination is charged to the project, not an arbitrary task.
+    const employee=employeeFor(ctx.agents.get(sessionId),product.snapshot,captainId);
+    if(!teamId||!workspaceRoot||!employee)throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
+    const state=JSON.parse(readFileSync(join(workspaceRoot,'.agent-teams',teamId,'team.json'),'utf8'));
+    const task=assignedTask(state,sessionId,employee.id,assignments.get(sessionId));assignments.set(sessionId,task);return task;
+  }
   async function mount(name, config) {
     const mod = await import(pathToFileURL(baseRequire.resolve(name)).href);
     const fiber = ctx.plugin(mod.default ?? mod, config);
@@ -68,7 +78,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         return next();
       });
     }
-    if (archive) trace = attachTrace(ctx, archive);
+    if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined);
     if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId);return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId:taskIds.get(request.taskId)??request.taskId};};
     await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: sessionRoot, compression: 'none' });
     await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
@@ -81,8 +91,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ctx,
       close,
       lockPlan() { locked = true; },
-      bindTaskMapping(tasks) { for(const task of tasks)taskIds.set(task.task_id,task.seed_id); },
+      bindTaskMapping(tasks,id) { teamId=id;for(const task of tasks)taskIds.set(task.task_id,task.seed_id); },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
+        workspaceRoot=cwd;
         const handle = await ctx.agents.create({ sessionId: id, meta: { cwd }, agentOptions: { provider, model, ...(maxTokens ? { maxTokens } : {}) },
           setup: instructions ? agentCtx => { agentCtx.systemPrompt.section({ name: 'department:role', order: 118, text: instructions }); } : undefined });
         handles.push(handle);

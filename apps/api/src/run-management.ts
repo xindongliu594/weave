@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { queryKnowledge } from './knowledge-store.ts';
+import { budgetHistory } from './budget-history.ts';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
 export function runManagementRouter(traceRoot:string){
@@ -45,6 +46,14 @@ export function runManagementRouter(traceRoot:string){
    if(!snapshot.tasks.length)throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
    const used=Number((await client.query('SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE project_id=$1',[old.project_id])).rows[0].cost);
    snapshot.executionBudget=snapshot.policy.maxBudget-used;if(snapshot.executionBudget<=0)throw new AppError(422,'项目预算已用尽，修改方案预算后重新批准');
+   if(used>=snapshot.policy.maxBudget*.9)throw new AppError(422,'项目费用已达到预算的 90%，不能通过重试增加调用；请检查已有结果并重新制定方案','BUDGET_RETRY_DISABLED');
+   snapshot.budgetVersion=1;snapshot.budgetHistory=await budgetHistory(client,traceRoot,old.project_id,old.project_version);
+   if(snapshot.budgetHistory.calls>=(snapshot.policy.maxModelCalls??100))throw new AppError(422,'该方案的模型调用次数已用尽，请修改方案后重新批准','TURN_LIMIT');
+   for(const task of snapshot.tasks) {
+    const history=snapshot.budgetHistory.tasks[task.id];
+    if(history&&(history.cost>=(task.maxBudget??snapshot.policy.maxBudget)||history.calls>=(task.maxModelCalls??snapshot.policy.maxTaskModelCalls??40)))
+     throw new AppError(422,`任务「${task.subject??task.id}」已达到费用或调用次数上限，请调整方案后重新批准`,'TASK_BUDGET_EXHAUSTED');
+   }
    const config=(await client.query('SELECT data FROM product_settings WHERE id=1 FOR UPDATE')).rows[0].data;
    const committed=Number((await client.query("SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE created_at>=date_trunc('day',now())")).rows[0].cost);
    const reserved=Number((await client.query("SELECT COALESCE(sum((snapshot->>'executionBudget')::numeric),0) AS cost FROM project_runs WHERE status IN ('queued','running')")).rows[0].cost);

@@ -5,6 +5,7 @@ import { mkdtemp,rm,readFile,writeFile,unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import pg from 'pg';
+import { randomUUID } from 'node:crypto';
 const base=process.env.DATABASE_URL??'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const admin=new pg.Pool({connectionString:base}),schema='product_'+Date.now();
 let app:any,server:any,pool:any,url:string,dir:string;
@@ -89,4 +90,39 @@ test('expired runs require explicit checkpoint resume and cancelled queue entrie
  await coordinator.cancel(resumed.data.id);
  assert.equal((await call('/runs')).data.find((r:any)=>r.id===resumed.data.id).status,'cancelled');
  assert.equal((await call('/runs/'+resumed.data.id)).data.status,'cancelled');
+});
+
+test('retry admission preserves billed task cost and all wire calls, and refuses exhausted allowances',async()=>{
+ await app.locals.shutdown();
+ const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
+ const source=(await pool.query('SELECT * FROM projects LIMIT 1')).rows[0];
+ await pool.query("INSERT INTO models(id,data) VALUES('budget-fixture','{}')");
+ async function attempt({cost=.1,calls=1,maxCalls=10,maxTaskCalls=3,missing=false}={}) {
+  const projectId=randomUUID(),id=randomUUID();
+  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[projectId,source.department_id,source.department_version,source.department_name,source.requirement,source.policy,source.plan,'manual']);
+  const snapshot={projectId,departmentId:source.department_id,agents:[],modelRoutes:[],policy:{maxBudget:1,maxModelCalls:maxCalls,maxTaskModelCalls:maxTaskCalls},executionBudget:1,tasks:[{id:'task',subject:'Budget task',assigneeId:'employee',taskPrompt:'Work',dependencies:[],maxBudget:.4}]};
+  if(!missing){
+   const archive=createRunArchive(join(dir,'runs'),snapshot,{id});
+   archive.append('run/task-mapping',{tasks:[{task_id:'t1',seed_id:'task'}]});
+   // Old archives put task references on model/request; new archives repeat them on wire-request.
+   archive.append('model/request',{}, {sessionId:'session',taskId:'t1'});
+   for(let n=0;n<calls;n++)archive.append('model/wire-request',n?{taskId:'task'}:{}, {sessionId:'session'});
+   archive.append('run/finished',{status:'failed'});
+  }
+  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,started_at) VALUES($1,$2,1,'failed',$3,now())",[id,projectId,snapshot]);
+  await pool.query("INSERT INTO usage(id,model_id,project_id,run_id,input_tokens,output_tokens,cost,purpose,task_id) VALUES($1,'budget-fixture',$2,$3,1,1,$4,'fixture','task')",[randomUUID(),projectId,id,cost]);
+  const response=await call('/runs/'+id+'/retry','POST',{resume:true});
+  if(response.status===202){
+   const next=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[response.data.id])).rows[0].snapshot;
+   assert.equal(next.executionBudget,1-cost);assert.equal(next.budgetHistory.calls,calls);assert.deepEqual(next.budgetHistory.tasks.task,{cost,calls});
+   await pool.query("UPDATE project_runs SET status='cancelled' WHERE id=$1",[response.data.id]);
+  }
+  return response;
+ }
+ assert.equal((await attempt()).status,202);
+ assert.equal((await attempt({calls:3})).data.code,'TASK_BUDGET_EXHAUSTED');
+ assert.equal((await attempt({cost:.4})).data.code,'TASK_BUDGET_EXHAUSTED');
+ assert.equal((await attempt({maxCalls:1})).data.code,'TURN_LIMIT');
+ assert.equal((await attempt({cost:.95})).data.code,'BUDGET_RETRY_DISABLED');
+ assert.equal((await attempt({missing:true})).data.code,'BUDGET_HISTORY_MISSING');
 });
