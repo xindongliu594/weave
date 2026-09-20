@@ -5,19 +5,21 @@ import { pathToFileURL } from 'node:url';
 import { Context } from '@deepseek-ai/cordis';
 import * as teams from '@nanmicoder/dsh-agent-teams';
 import { attachTrace } from './trace.mjs';
+import { installProductTools } from './product-tools.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
 const baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
 
 /** Integration host, not yet the product execution adapter. Only team tools are mounted. */
-export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6 }) {
+export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product }) {
   if (!sessionRoot || !isAbsolute(sessionRoot)) throw new Error('An absolute, dedicated sessionRoot is required');
   const ctx = new Context();
   const fibers = [];
   const handles = [];
   let closing;
   let trace;
+  let productDispose, captainId, locked = false;
   async function mount(name, config) {
     const mod = await import(pathToFileURL(baseRequire.resolve(name)).href);
     const fiber = ctx.plugin(mod.default ?? mod, config);
@@ -31,6 +33,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         try { await item.dispose(); } catch (error) { failures.push(error); }
       }
       trace?.dispose();
+      productDispose?.();
       try { trace?.check(); } catch (error) { failures.push(error); }
       if (failures.length) throw new AggregateError(failures, 'Runtime teardown failed');
     })();
@@ -43,6 +46,24 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     await mount('@deepseek-ai/dsh-system-prompt');
     await mount('@deepseek-ai/dsh-tools', { mode: 'native' });
     await mount('@deepseek-ai/dsh-agent');
+    if (product) {
+      ctx.on('session/event', (session,event) => {
+        if(event.type==='subagent/descriptor'){
+          const name=event.data.label?.split(':').at(-1);
+          const employee=product.snapshot.agents.find(a=>a.id===name);
+          if(employee)adapter.sessionPolicies?.set(session.id,employee);
+        }
+      });
+      productDispose = installProductTools(ctx, { ...product, archive, captainId: () => captainId });
+      ctx.on('llm/stream', async function* (options, next) {
+        const release = await product.gate.acquire(options.signal);
+        try { yield* next(); } finally { release(); }
+      });
+      ctx.on('tools/pre-execute', async (exec,next) => {
+        if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) throw Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
+        return next();
+      });
+    }
     if (archive) trace = attachTrace(ctx, archive);
     await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: sessionRoot, compression: 'none' });
     await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
@@ -54,10 +75,13 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     return {
       ctx,
       close,
+      lockPlan() { locked = true; },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
         const handle = await ctx.agents.create({ sessionId: id, meta: { cwd }, agentOptions: { provider, model, ...(maxTokens ? { maxTokens } : {}) },
           setup: instructions ? agentCtx => { agentCtx.systemPrompt.section({ name: 'department:role', order: 118, text: instructions }); } : undefined });
         handles.push(handle);
+        captainId = handle.agent.id;
+        if(product)adapter.sessionPolicies?.set(captainId,product.snapshot.agents.find(a=>a.role==='manager'));
         return handle.agent;
       },
       async resumeCaptain({ id, model }) {

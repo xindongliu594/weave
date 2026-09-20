@@ -3,6 +3,8 @@ import { join } from 'node:path';
 import { createRunArchive, readRun } from './trace-store.mjs';
 import { createTeamHost } from './host.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
+import { RunSandbox } from './sandbox.mjs';
+import { Semaphore } from './limits.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -18,13 +20,14 @@ function lastAssistantText(agent) {
 }
 
 export class ProductDshRuntime {
-  constructor({ traceRoot }) {
+  constructor({ traceRoot, onUsage, requestApproval }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
+    this.onUsage = onUsage; this.requestApproval = requestApproval;
   }
 
   async inspect() {
-    return { ready: true, reason: 'DSH + AgentTeams 正式 Run 已接通；当前只允许纯文本协作，文件与终端工具仍处于关闭状态。' };
+    return { ready: true, reason: 'DSH + AgentTeams：受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。' };
   }
 
   async start({ runId, approvedSnapshot, routes }) {
@@ -52,6 +55,8 @@ export class ProductDshRuntime {
     const usages = [];
     let runtimeFailure;
     let host;
+    const sandbox = new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
+    const gate = new Semaphore(snapshot.policy.maxConcurrentAgents);
     const timer = setTimeout(() => {
       job.controller.abort(new Error('Run deadline exceeded'));
       void job.host?.close();
@@ -60,12 +65,19 @@ export class ProductDshRuntime {
       const adapter = new OpenAiCompatibleAdapter({
         routes,
         maxBudget: snapshot.executionBudget,
-        onUsage: usage => { usages.push(usage); archive.append('billing/usage', usage); },
+        maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
+        contextBytes: snapshot.policy.contextBytes ?? 64000,
+        signal: job.controller.signal,
+        onContext: data => archive.append('context/compacted', data),
+        onRequest: data => archive.append('model/wire-request', data, {sessionId:data.sessionId}),
+        onFallback: data => archive.append('model/fallback', data, {sessionId:data.sessionId}),
+        onUsage: async usage => { usages.push(usage); archive.append('billing/usage', usage); await this.onUsage?.(archive.id, usage); },
         onError: error => { runtimeFailure ??= error; },
       });
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
-      host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length });
+      host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
+        product: { snapshot, sandbox, gate, requestApproval: this.requestApproval } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');
@@ -74,7 +86,7 @@ export class ProductDshRuntime {
       const captain = await host.captain({ cwd: workspace, model: manager.modelId, instructions: manager.rolePrompt, maxTokens: managerRoute.maxOutputTokens });
       archive.append('run/captain', { agentId: manager.id, employeeId: manager.employeeId, sessionId: captain.id });
       const plan = {
-        members: snapshot.agents.map(agent => ({ name: agent.id, role: agent.rolePrompt, provider, model: agent.modelId })),
+        members: snapshot.agents.map(agent => ({ name: agent.id, role: agent.rolePrompt, provider, model: agent.modelId, ...(agent.reasoningEffort ? { reasoning_effort: agent.reasoningEffort } : {}) })),
         tasks: snapshot.tasks.map(task => ({ id: task.id, subject: task.subject, description: task.taskPrompt, assignee: task.assignee, dependencies: task.dependencies })),
       };
       const created = await host.call(captain, 'agent_teams_create', {
@@ -83,6 +95,7 @@ export class ProductDshRuntime {
       archive.append('run/task-mapping', { tasks: created.tasks });
       archive.append('run/approved', snapshot.approval);
       await host.call(captain, 'agent_teams_approve', { confirmation: `执行已批准项目 ${snapshot.projectId} 方案 v${snapshot.planVersion}` }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(30_000)]));
+      host.lockPlan();
       archive.append('run/started', { teamId: created.team_id });
       let status;
       let stalledSince = 0;
@@ -113,6 +126,7 @@ export class ProductDshRuntime {
       return { status: job.cancelled ? 'cancelled' : 'failed', usages, message: error instanceof Error ? error.message : String(error) };
     } finally {
       clearTimeout(timer);
+      await sandbox.close();
       job.host = undefined;
     }
   }

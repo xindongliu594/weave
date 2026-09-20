@@ -1,0 +1,55 @@
+{
+  "name": "agent-department-desktop",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Agent Department desktop workspace",
+  "author": "Agent Department",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test *.test.cjs",
+    "dist": "electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron": "44.4.3",
+    "electron-builder": "26.15.3",
+    "playwright": "1.63.0"
+  },
+  "build": {
+    "appId": "com.agentdepartment.desktop",
+    "productName": "Agent Department",
+    "directories": {
+      "output": "../../dist/desktop"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "connection.cjs",
+      "settings.html",
+      "settings.js",
+      "settings.css",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "identity": null
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
+    },
+    "artifactName": "Agent-Department-${version}-${os}-${arch}.${ext}"
+  }
+}

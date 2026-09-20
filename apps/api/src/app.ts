@@ -5,10 +5,20 @@ import { pool } from './db.ts';
 import { seal, unseal } from './vault.ts';
 import { AppError, complete, gatewayRequest } from './provider.ts';
 import { departmentSchema, gatewaySchema, modelSchema, planSchema, policySchema, validatePlan, type Model, type Plan } from '../../../packages/contracts/index.ts';
-import { DshRuntimeAdapter } from '../../../services/agent-runtime/adapter.ts';
+import { RunCoordinator } from './run-coordinator.ts';
+import { settings } from './product.ts';
+import { knowledgeSnapshot } from './knowledge.ts';
+import { command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
 import { resolve } from 'node:path';
 import { listRuns, readRun } from '../../../services/agent-runtime/trace-store.mjs';
 import { runTraceVerification } from '../../../services/agent-runtime/verification.mjs';
+import { configuredOrigins, isAllowedRequestOrigin } from './request-origin.ts';
+import { knowledgeRouter } from './knowledge.ts';
+import { productRouter } from './product.ts';
+import { runManagementRouter } from './run-management.ts';
+import { backupRouter } from './backup.ts';
+import { idempotency } from './idempotency.ts';
+import { obsidianRouter, syncObsidian } from './obsidian.ts';
 
 async function models(): Promise<Model[]> {
   const { rows } = await pool.query('SELECT id,data,version,status,checked_at FROM models WHERE deleted_at IS NULL ORDER BY id');
@@ -24,20 +34,31 @@ async function recordUsage(model: Model, usage: { prompt_tokens: number; complet
 }
 export function createApp() {
   const app = express();
+  const allowedOrigins = configuredOrigins();
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
-  const runtime = new DshRuntimeAdapter({ traceRoot });
+  const coordinator = new RunCoordinator(traceRoot);
+  const runtime = coordinator.runtime;
+  const vaultTimer = setInterval(() => { void syncObsidian().catch(() => {}); }, 10000); vaultTimer.unref();
+  app.locals.shutdown = async () => { clearInterval(vaultTimer); await coordinator.close(); };
   let verifying = false;
   app.disable('x-powered-by');
   app.use((req, res, next) => {
     if (!['127.0.0.1', 'localhost', '[::1]'].includes(req.hostname)) return res.status(403).json({ message: '仅允许本机访问' });
     const origin = req.get('origin');
-    if (origin && !['http://127.0.0.1:4310', 'http://localhost:4310', 'http://127.0.0.1:4311', 'http://localhost:4311'].includes(origin)) return res.status(403).json({ message: '不允许跨站请求' });
+    if (req.get('sec-fetch-site') === 'cross-site' || (origin && !isAllowedRequestOrigin(origin, req.get('sec-fetch-site'), allowedOrigins))) return res.status(403).json({ message: '不允许跨站请求，请从当前工作台页面操作。' });
     if (!['GET', 'HEAD'].includes(req.method) && !req.is('application/json')) return res.status(415).json({ message: '请求必须使用 application/json' });
     res.setHeader('Cache-Control', 'no-store'); next();
   });
+  app.use('/api/backup/restore', express.json({ limit: '45mb' }));
   app.use(express.json({ limit: '512kb' }));
+  app.use('/api', idempotency);
+  app.use('/api', obsidianRouter());
+  app.use('/api', knowledgeRouter());
+  app.use('/api', productRouter());
+  app.use('/api', runManagementRouter(traceRoot));
+  app.use('/api', backupRouter(traceRoot));
   app.get('/api/health', async (_req, res) => {
-    await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.1.0' });
+    await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.2.0' });
   });
   app.get('/api/departments', async (_req, res) => {
     const { rows } = await pool.query(`SELECT d.*, (SELECT count(*)::int FROM projects p WHERE p.department_id=d.id) AS project_count FROM departments d WHERE deleted_at IS NULL ORDER BY created_at DESC`);
@@ -45,11 +66,14 @@ export function createApp() {
   });
   app.post('/api/departments', async (req, res) => {
     const data = departmentSchema.parse(req.body), id = randomUUID();
+    data.agents = data.agents.map(a => ({...a, roleVersion: 1}));
     await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [id, data]);
     await log('department', `创建部门「${data.name}」`); res.status(201).json({ id });
   });
   app.put('/api/departments/:id', async (req, res) => {
     const data = departmentSchema.parse(req.body), version = numericVersion.parse(req.body.version);
+    const before = requireRow((await pool.query('SELECT data FROM departments WHERE id=$1 AND deleted_at IS NULL', [req.params.id])).rows[0]);
+    data.agents = data.agents.map(a => { const old = before.data.agents.find((item: any) => item.id === a.id); const changed = !old || ['instructions','systemConstraints','outputFormat','title'].some(key => (old[key] ?? '') !== ((a as any)[key] ?? '')); return {...a, roleVersion: old ? (old.roleVersion ?? 1) + (changed ? 1 : 0) : 1}; });
     const result = await pool.query('UPDATE departments SET data=$1,version=version+1,updated_at=now() WHERE id=$2 AND version=$3 AND deleted_at IS NULL RETURNING id', [data, req.params.id, version]);
     if (!result.rowCount) throw new AppError(409, '部门已被修改或删除，请刷新后重试', 'VERSION_CONFLICT');
     await log('department', `更新部门「${data.name}」及员工配置`); res.json({ ok: true });
@@ -167,6 +191,7 @@ export function createApp() {
       catch { throw new AppError(422, '模型未返回有效 JSON，原方案已保留；本次调用用量已记录'); }
       const parsed = planSchema.safeParse(candidate);
       if (!parsed.success) throw new AppError(422, '模型方案不符合结构要求，原方案已保留；本次调用用量已记录');
+      for(const agent of parsed.data.agents){const original=project.plan.agents.find((a:any)=>a.id===agent.id);agent.tools=agent.tools.filter((tool:string)=>original?.tools.includes(tool));agent.knowledgeSpaceIds=(agent.knowledgeSpaceIds??[]).filter((id:string)=>original?.knowledgeSpaceIds?.includes(id));}
       await savePlan(project.id, input.version, parsed.data, 'model');
       res.json({ ok: true, validation: validatePlan(parsed.data, project.policy, catalog) });
     } finally { planning.delete(lockId); }
@@ -180,7 +205,7 @@ export function createApp() {
       await client.query('BEGIN');
       const project = requireRow((await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE', [req.params.id])).rows[0]);
       if (project.version !== input.version) throw new AppError(409, '方案版本已变化，请刷新后重新批准', 'VERSION_CONFLICT');
-      existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2', [project.id, project.version])).rows[0];
+      existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
       if (existing) { await client.query('COMMIT'); }
       else {
         const { rows: modelRows } = await client.query('SELECT id,data,version,status,checked_at FROM models WHERE deleted_at IS NULL ORDER BY id');
@@ -190,9 +215,16 @@ export function createApp() {
         const validation = validatePlan(project.plan, { ...project.policy, maxBudget: executionBudget }, catalog);
         if (!validation.valid) throw new AppError(422, `方案未通过执行校验：${validation.errors.join('；')}`, 'PLAN_NOT_READY');
         const requestedTools = project.plan.agents.flatMap((agent: any) => agent.tools);
-        if (requestedTools.length) throw new AppError(422, '正式 Run 当前只支持纯文本协作。请在“编辑方案”中清空员工工具权限后再批准；文件与终端工具将在完成执行侧隔离后开放。', 'TOOL_POLICY_NOT_READY');
-        if (project.policy.maxConcurrentAgents < project.plan.agents.length) throw new AppError(422, '当前执行桥要求最大并发数不少于员工数；调度限流接入后将允许更低的并发上限。', 'CONCURRENCY_POLICY_NOT_READY');
-        const modelIds = [...new Set(project.plan.agents.map((agent: any) => agent.modelId))];
+        if (requestedTools.some((tool: string) => ['artifact_write','filesystem','terminal','terminal_test'].includes(tool))) {
+          try { await command(['image','inspect',SANDBOX_IMAGE], { signal: AbortSignal.timeout(5000), limit: 100000 }); }
+          catch { throw new AppError(422, '隔离工作区尚未就绪，请在系统设置中安装沙箱镜像', 'SANDBOX_NOT_READY'); }
+        }
+        const config = (await client.query('SELECT data FROM product_settings WHERE id=1 FOR UPDATE')).rows[0].data;
+        const committed = Number((await client.query("SELECT COALESCE(sum(cost),0) AS total FROM usage WHERE created_at>=date_trunc('day',now())")).rows[0].total);
+        const reserved = Number((await client.query("SELECT COALESCE(sum(GREATEST(0,(snapshot->>'executionBudget')::numeric-COALESCE((SELECT sum(cost) FROM usage WHERE run_id=r.id),0))),0) AS total FROM project_runs r WHERE status IN ('queued','running')")).rows[0].total);
+        if (committed + reserved + executionBudget > config.dailyBudgetLimit) throw new AppError(422, '已用费用与运行预留将超过当天费用上限', 'DAILY_BUDGET_EXCEEDED');
+        if (req.body.automatic && (project.policy.mode !== 'automatic' || executionBudget > config.autoBudgetLimit || requestedTools.some((tool: string) => !['knowledge_search','knowledge_read'].includes(tool)))) throw new AppError(422, '全自动仅允许预算门槛内的文本与知识任务，其他任务需要人工批准', 'AUTO_POLICY_DENIED');
+        const modelIds = [...new Set(project.plan.agents.flatMap((agent: any) => [agent.modelId,agent.fallbackModelId].filter(Boolean)))];
         const { rows: routeRows } = await client.query(`SELECT m.id,m.data,g.data AS gateway_data,g.credential
           FROM models m JOIN gateways g ON g.id=m.data->>'gatewayId'
           WHERE m.id=ANY($1::text[]) AND m.deleted_at IS NULL AND m.status='available'`, [modelIds]);
@@ -201,22 +233,23 @@ export function createApp() {
         const agents = project.plan.agents.map((agent: any, index: number) => {
           const model = requireRow(catalog.find(item => item.id === agent.modelId));
           return { id: runtimeNames.get(agent.id), employeeId: agent.id, name: agent.name, title: agent.title, role: agent.role, modelId: agent.modelId,
-            model: model.model, modelName: model.name, gatewayId: model.gatewayId, roleVersion: project.department_version, rolePrompt: agent.instructions, tools: agent.tools };
+            model: model.model, modelName: model.name, gatewayId: model.gatewayId, roleVersion: agent.roleVersion ?? project.department_version, rolePrompt: [agent.instructions, agent.systemConstraints && '系统约束：' + agent.systemConstraints, agent.outputFormat && '输出格式：' + agent.outputFormat].filter(Boolean).join('\n\n'), tools: agent.tools, knowledgeSpaceIds: agent.knowledgeSpaceIds ?? [], reasoningEffort: agent.reasoningEffort, fallbackModelId: agent.fallbackModelId };
         });
         const tasks = project.plan.tasks.map((task: any) => ({ id: task.id, subject: task.subject, assignee: runtimeNames.get(task.assigneeId), assigneeId: task.assigneeId,
           dependencies: task.dependencies, taskPrompt: `项目需求：${project.requirement}\n\n任务目标：${task.objective}\n\n验收标准：\n${task.acceptanceCriteria.map((criterion: string, index: number) => `${index + 1}. ${criterion}`).join('\n')}`,
           acceptanceCriteria: task.acceptanceCriteria, estimatedInputTokens: task.estimatedInputTokens, estimatedOutputTokens: task.estimatedOutputTokens }));
         const routes = routeRows.map(row => {
           const model = requireRow(catalog.find(item => item.id === row.id));
-          const assigned = project.plan.tasks.filter((task: any) => project.plan.agents.find((agent: any) => agent.id === task.assigneeId)?.modelId === row.id);
+          const assigned = project.plan.tasks.filter((task: any) => project.plan.agents.some((agent: any) => agent.id === task.assigneeId && (agent.modelId === row.id || agent.fallbackModelId === row.id)));
           const maxOutputTokens = Math.min(32768, Math.max(512, ...assigned.map((task: any) => task.estimatedOutputTokens)));
-          return { id: row.id, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
+          return { id: row.id, gatewayId: model.gatewayId, contextBytes: model.contextBytes, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
         });
         const runId = randomUUID();
         const snapshot = { title: project.requirement.slice(0, 120), mode: 'product', templateVersion: 'department-execution-v1', projectId: project.id,
           departmentId: project.department_id, departmentName: project.department_name, departmentVersion: project.department_version, planVersion: project.version,
           requirement: project.requirement, rationale: project.plan.rationale, policy: project.policy, executionBudget, estimatedCost: validation.estimate,
-          approval: { kind: 'project', approvedAt: new Date().toISOString(), projectVersion: project.version }, agents, tasks,
+          knowledge: await knowledgeSnapshot(agents, project.department_id),
+          approval: { kind: req.body.automatic ? 'automatic-policy' : 'project', approvedAt: new Date().toISOString(), projectVersion: project.version }, agents, tasks,
           modelRoutes: routes.map(({ apiKey: _secret, ...route }) => route) };
         await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES($1,$2,$3,$4,$5)', [runId, project.id, project.version, 'queued', snapshot]);
         await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1", [project.id]);
@@ -229,28 +262,9 @@ export function createApp() {
     } finally { client.release(); }
     if (existing) return res.json({ id: existing.id, status: existing.status, existing: true });
     if (!launch) throw new AppError(500, '运行准备失败');
-    try {
-      const started = await runtime.start({ runId: launch.runId, approvedSnapshot: launch.snapshot, routes: launch.routes });
-      await pool.query("UPDATE project_runs SET status='running',started_at=now() WHERE id=$1", [launch.runId]);
-      await pool.query("UPDATE projects SET status='RUNNING' WHERE id=$1", [launch.projectId]);
-      void started.completion.then(async result => {
-        const finishClient = await pool.connect();
-        try {
-          await finishClient.query('BEGIN');
-          for (const usage of result.usages) await finishClient.query('INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (id) DO NOTHING', [usage.id, usage.modelId, launch!.projectId, usage.inputTokens, usage.outputTokens, usage.cost, '项目执行']);
-          await finishClient.query('UPDATE project_runs SET status=$1,error=$2,finished_at=now() WHERE id=$3', [result.status, result.message ?? null, launch!.runId]);
-          await finishClient.query('UPDATE projects SET status=$1 WHERE id=$2', [result.status.toUpperCase(), launch!.projectId]);
-          await finishClient.query('COMMIT');
-        } catch (error) { await finishClient.query('ROLLBACK'); console.error('Run completion persistence failed:', error instanceof Error ? error.name : 'UnknownError'); }
-        finally { finishClient.release(); }
-      });
-      await log('run', `已批准并启动「${launch.snapshot.departmentName}」项目 Run`);
-      return res.status(202).json({ id: started.runtimeRunId, status: 'running' });
-    } catch (error) {
-      await pool.query("UPDATE project_runs SET status='failed',error=$1,finished_at=now() WHERE id=$2", ['运行 Host 启动失败', launch.runId]);
-      await pool.query("UPDATE projects SET status='FAILED' WHERE id=$1", [launch.projectId]);
-      throw error;
-    }
+    await log('run', `已批准「${launch.snapshot.departmentName}」项目并进入执行队列`);
+    void coordinator.tick();
+    return res.status(202).json({ id: launch.runId, status: 'queued' });
   });
   app.get('/api/activity', async (_req, res) => {
     res.json((await pool.query('SELECT id,kind,title,created_at AS "createdAt" FROM activity ORDER BY created_at DESC LIMIT 30')).rows);
@@ -258,21 +272,19 @@ export function createApp() {
   app.get('/api/usage', async (_req, res) => {
     const { rows } = await pool.query('SELECT id,model_id AS "modelId",project_id AS "projectId",input_tokens AS "inputTokens",output_tokens AS "outputTokens",cost::float AS cost,purpose,created_at AS "createdAt" FROM usage ORDER BY created_at DESC'); res.json(rows);
   });
-  app.get('/api/runs', (_req, res) => { res.json(listRuns(traceRoot)); });
-  app.get('/api/runs/:id', (req, res) => {
+  app.get('/api/runs', async (_req, res) => { const archived = listRuns(traceRoot); const pending = (await pool.query("SELECT id,created_at AS \"createdAt\",snapshot->>'title' AS title,status FROM project_runs")).rows.filter(r => !archived.some(a => a.id === r.id)); res.json([...pending.map(r => ({...r,createdAt: new Date(r.createdAt).toISOString(),mode:'product',eventCount:0,integrity:'ok'})),...archived]); });
+  app.get('/api/runs/:id', async (req, res) => {
     const id = z.uuid().parse(req.params.id);
     const run = readRun(traceRoot, id);
-    if (!run) throw new AppError(404, '运行记录不存在');
+    if (!run) { const row = (await pool.query('SELECT snapshot,status,created_at FROM project_runs WHERE id=$1',[id])).rows[0]; if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false}); }
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
     const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, 300);
-    res.json({ ...run, events, nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
+    res.json({ ...run, events, summaryEvents: run.events.filter(e => ['team/snapshot','run/finished','billing/usage','knowledge/citation'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);
-    const row = requireRow((await pool.query('SELECT status FROM project_runs WHERE id=$1', [id])).rows[0]);
-    if (['completed', 'failed', 'cancelled'].includes(row.status)) throw new AppError(409, '运行已经结束');
-    if (!await runtime.cancel(id)) throw new AppError(409, '当前进程没有此运行，服务重启后的恢复与停止将在下一阶段接入', 'RUN_NOT_RESIDENT');
+    await coordinator.cancel(id);
     res.status(202).json({ id, status: 'cancelling' });
   });
   app.post('/api/runs/verify', async (_req, res) => {

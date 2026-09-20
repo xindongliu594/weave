@@ -7,3 +7,4 @@ export function listRuns(root: string): RunSummary[];
 export function readRun(root: string, id: string): RunDetail | null;
 export function redact(value: unknown): unknown;
 export function createRunArchive(root: string, snapshot: unknown, options?: { id?: string }): { id: string; dir: string; append(type: string, data?: unknown, links?: unknown): unknown };
+export function openRunArchive(root: string, id: string): { id: string; dir: string; append(type: string, data?: unknown, links?: unknown): unknown };

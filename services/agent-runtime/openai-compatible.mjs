@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { LlmAdapter, LlmError, attributionHeaders } from '@deepseek-ai/dsh-llm';
+import { fitMessages } from './limits.mjs';
 
 function textOf(blocks) {
   return blocks.flatMap(block => {
@@ -46,7 +47,7 @@ function finishReason(value, hasCalls) {
 }
 
 export class OpenAiCompatibleAdapter extends LlmAdapter {
-  constructor({ routes, maxBudget, onUsage, onError }) {
+  constructor({ routes, maxBudget, onUsage, onError, maxModelCalls = 100, contextBytes = 64000, signal, onContext, onRequest, onFallback }) {
     super();
     this.routes = new Map(routes.map(route => [route.id, Object.freeze({ ...route })]));
     this.maxBudget = maxBudget;
@@ -54,6 +55,8 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     this.onError = onError;
     this.spent = 0;
     this.reserved = 0;
+    this.maxModelCalls=maxModelCalls; this.calls=0; this.contextBytes=contextBytes; this.signal=signal; this.onContext=onContext;
+    this.onRequest=onRequest;this.onFallback=onFallback;this.sessionPolicies=new Map();
   }
 
   providerInfo(provider) { return { id: provider, name: 'Agent Department Relay' }; }
@@ -65,10 +68,18 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
   }
 
   async *stream(options) {
+    const fused = AbortSignal.any([...(options.signal ? [options.signal] : []), ...(this.signal ? [this.signal] : []), AbortSignal.timeout(90000)]);
+    options = { ...options, signal: fused };
     const route = this.routes.get(options.model);
     if (!route) throw new LlmError(`运行快照中不存在模型 ${options.model}`, 'UNKNOWN_MODEL');
     options.signal?.throwIfAborted();
-    const messages = [...(options.system ? [{ role: 'system', content: options.system }] : []), ...options.messages.map(toWireMessage)];
+    if (++this.calls > this.maxModelCalls) { const e = new LlmError('模型调用轮数达到上限', 'TURN_LIMIT'); this.onError?.(e); throw e; }
+    const original = [...(options.system ? [{ role: 'system', content: options.system }] : []), ...options.messages.map(toWireMessage)];
+    let fitted;
+    try { fitted = fitMessages(original, Math.min(this.contextBytes, route.contextBytes ?? this.contextBytes)); }
+    catch(e) { this.onError?.(e); throw e; }
+    const messages = fitted.messages;
+    if(fitted.removed) this.onContext?.({ modelId: route.id, removedGroups: fitted.removed, beforeBytes: Buffer.byteLength(JSON.stringify(original)), afterBytes: Buffer.byteLength(JSON.stringify(messages)), note: '完整记录仍保存在追溯档案；仅从本次模型请求移除较早的完整对话组。' });
     const maxTokens = Math.max(1, Math.min(options.maxTokens ?? route.maxOutputTokens, route.maxOutputTokens));
     const tools = options.tools?.map(tool => ({ type: 'function', function: { name: tool.name, description: tool.description, parameters: tool.parameters } }));
     const body = {
@@ -76,8 +87,9 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       ...(tools?.length ? { tools } : {}),
       ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
       ...(options.stop?.length ? { stop: options.stop } : {}),
+      ...((this.sessionPolicies.get(options.sessionId)?.reasoningEffort??options.reasoningEffort) ? { reasoning_effort: this.sessionPolicies.get(options.sessionId)?.reasoningEffort??options.reasoningEffort } : {}),
     };
-    const inputUpperBound = Buffer.byteLength(JSON.stringify(messages));
+    const inputUpperBound = Buffer.byteLength(JSON.stringify({messages,tools})) + 1024;
     const reservation = (inputUpperBound * route.inputRate + maxTokens * route.outputRate) / 1e6;
     if (this.spent + this.reserved + reservation > this.maxBudget) {
       const error = new LlmError('模型请求的保守预留将超过本次运行预算', 'BUDGET_EXCEEDED');
@@ -87,12 +99,21 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     let reservationHeld = true;
     let response;
     try {
+      this.onRequest?.({sessionId:options.sessionId,modelId:route.id,body});
       response = await fetch(route.baseUrl.replace(/\/$/, '') + '/chat/completions', {
         method: 'POST', signal: options.signal, redirect: 'error',
         headers: { 'Content-Type': 'application/json', ...attributionHeaders(), ...(route.apiKey ? { Authorization: `Bearer ${route.apiKey}` } : {}) },
         body: JSON.stringify(body),
       });
-      if (!response.ok) throw new LlmError(`中转站返回 HTTP ${response.status}`, response.status === 401 || response.status === 403 ? 'AUTH' : response.status === 429 ? 'RATE_LIMIT' : 'PROVIDER_ERROR', { status: response.status });
+      if (!response.ok) {
+        const fallbackId=this.sessionPolicies.get(options.sessionId)?.fallbackModelId;
+        if(!options.fallbackAttempted && [429,503].includes(response.status) && fallbackId && this.routes.has(fallbackId) && fallbackId!==route.id){
+          this.reserved-=reservation;reservationHeld=false;
+          this.onFallback?.({sessionId:options.sessionId,from:route.id,to:fallbackId,status:response.status});
+          yield* this.stream({...options,model:fallbackId,fallbackAttempted:true});return;
+        }
+        throw new LlmError(`中转站返回 HTTP ${response.status}`, response.status === 401 || response.status === 403 ? 'AUTH' : response.status === 429 ? 'RATE_LIMIT' : 'PROVIDER_ERROR', { status: response.status });
+      }
       let payload;
       try { payload = await response.json(); }
       catch { throw new LlmError('中转站返回的模型响应不是 JSON', 'INVALID_RESPONSE'); }
@@ -102,7 +123,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       this.reserved -= reservation;
       reservationHeld = false;
       this.spent += actualCost;
-      this.onUsage?.({ id: randomUUID(), modelId: route.id, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });
+      await this.onUsage?.({ id: randomUUID(), modelId: route.id, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });
       const message = payload.choices?.[0]?.message;
       if (!message || typeof message !== 'object') throw new LlmError('中转站响应缺少 assistant message', 'INVALID_RESPONSE');
       const blocks = [];

@@ -14,12 +14,14 @@ const admin = new pg.Pool({ connectionString: originalURL });
 let server: http.Server, gateway: http.Server, pool: pg.Pool, baseUrl: string, gatewayUrl: string, directory: string;
 let plannedResponse: unknown;
 let requests = 0;
+const apps: any[] = [];
 before(async () => {
+  process.env.ALLOWED_ORIGINS = 'https://deployment.example';
   await admin.query(`CREATE SCHEMA ${schema}`);
   const url = new URL(originalURL); url.searchParams.set('options', `-c search_path=${schema}`); process.env.DATABASE_URL = url.toString();
   directory = await mkdtemp(join(tmpdir(), 'ad-test-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate();
-  const { createApp } = await import('../apps/api/src/app.ts'); server = createApp().listen(0, '127.0.0.1'); await once(server, 'listening'); baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const { createApp } = await import('../apps/api/src/app.ts'); const app = createApp(); apps.push(app); server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   gateway = http.createServer(async (req, res) => {
     assert.equal(req.headers.authorization, 'Bearer test-key-not-real');
     res.setHeader('content-type', 'application/json');
@@ -55,6 +57,7 @@ before(async () => {
   }).listen(0, '127.0.0.1'); await once(gateway, 'listening'); gatewayUrl = `http://127.0.0.1:${(gateway.address() as AddressInfo).port}/v1`;
 });
 after(async () => {
+  for (const app of apps) await app.locals.shutdown();
   if (server) await new Promise<void>(r => server.close(() => r()));
   if (gateway) await new Promise<void>(r => gateway.close(() => r()));
   if (pool) await pool.end();
@@ -62,8 +65,22 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 async function call(path: string, method = 'GET', body?: unknown, headers: Record<string, string> = {}) {
-  const response = await fetch(baseUrl + '/api' + path, { method, headers: { 'content-type': 'application/json', ...headers }, body: body === undefined ? undefined : JSON.stringify(body) });
-  return { status: response.status, data: await response.json() };
+  // Use node:http so proxy/Host tests send the supplied Host on the wire;
+  // Node's fetch may replace it with the URL's authority.
+  return new Promise<{ status: number; data: any }>((resolve, reject) => {
+    const payload = body === undefined ? undefined : JSON.stringify(body);
+    const request = http.request(baseUrl + '/api' + path, { method, headers: { 'content-type': 'application/json', ...(payload === undefined ? {} : { 'content-length': Buffer.byteLength(payload) }), ...headers } }, response => {
+      let text = ''; response.setEncoding('utf8');
+      response.on('data', chunk => { text += chunk; });
+      response.on('error', reject);
+      response.on('end', () => {
+        try { resolve({ status: response.statusCode!, data: JSON.parse(text) }); }
+        catch (error) { reject(error); }
+      });
+    });
+    request.on('error', reject);
+    request.end(payload);
+  });
 }
 test('gateway discovery, formal execution, versioned plans and deletion preserve history', async () => {
   const g = await call('/gateways', 'POST', { name: '测试中转站', baseUrl: gatewayUrl, apiKey: 'test-key-not-real' }); assert.equal(g.status, 201);
@@ -83,9 +100,7 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.deepEqual(parallel.map(p => p.status).sort(), [200, 409]); assert.equal(requests - callsBefore, 1);
   project = (await call('/projects')).data[0]; assert.equal(project.version, 2); assert.equal(project.source, 'model');
   assert.equal((await call(`/projects/${p.data.id}/plan`, 'PUT', { version: 1, plan: project.plan })).status, 409);
-  const toolApproval = await call(`/projects/${p.data.id}/approve`, 'POST', { version: project.version });
-  assert.equal(toolApproval.status, 422);
-  assert.equal(toolApproval.data.code, 'TOOL_POLICY_NOT_READY');
+  // Tool execution and permission checks have their own sandbox contract tests.
   const textOnlyPlan = { ...project.plan, agents: project.plan.agents.map((agent: any) => ({ ...agent, tools: [] })) };
   assert.equal((await call(`/projects/${p.data.id}/plan`, 'PUT', { version: 2, plan: textOnlyPlan })).status, 200);
   project = (await call('/projects')).data[0]; assert.equal(project.version, 3);
@@ -93,7 +108,7 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.equal(approved.status, 202);
   assert.equal((await call(`/projects/${p.data.id}/approve`, 'POST', { version: project.version })).status, 200);
   let run = await call(`/runs/${approved.data.id}`);
-  for (let i = 0; i < 100 && run.data.status === 'unfinished'; i++) { await new Promise(resolve => setTimeout(resolve, 50)); run = await call(`/runs/${approved.data.id}`); }
+  for (let i = 0; i < 200 && ['unfinished','queued','running'].includes(run.data.status); i++) { await new Promise(resolve => setTimeout(resolve, 50)); run = await call(`/runs/${approved.data.id}`); }
   assert.equal(run.data.status, 'completed', JSON.stringify(run.data.events.slice(-20).map((event: any) => ({ type: event.type, data: event.data }))));
   assert.equal(run.data.mode, 'product');
   assert.equal(JSON.stringify(run.data.snapshot).includes('test-key-not-real'), false);
@@ -107,13 +122,43 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.equal((await call(`/gateways/${g.data.id}`, 'PUT', { version: 1, name: '新连接配置', baseUrl: gatewayUrl })).status, 200);
   assert.equal((await call('/models')).data[0].status, 'untested');
 });
+test('dynamic loopback preview can save a gateway through the local proxy', async () => {
+  for (const origin of ['http://localhost:54234', 'http://127.0.0.1:54674', 'http://[::1]:55123']) {
+    const result = await call('/gateways', 'POST', { name: '预览连接测试', baseUrl: gatewayUrl }, {
+      host: 'localhost:4310', origin, 'sec-fetch-site': 'same-origin',
+    });
+    assert.equal(result.status, 201, JSON.stringify(result.data));
+    assert.ok((await call('/gateways')).data.some((gateway: { id: string }) => gateway.id === result.data.id));
+  }
+});
+
 test('cross-origin mutations, remote host headers, and malformed data fail closed', async () => {
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'https://deployment.example', 'sec-fetch-site': 'same-origin' })).status, 422);
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'https://deployment.example', 'sec-fetch-site': 'cross-site' })).status, 403);
+  assert.equal((await call('/departments', 'GET', undefined, { 'sec-fetch-site': 'cross-site' })).status, 403);
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'https://deployment.example.evil.test', 'sec-fetch-site': 'same-origin' })).status, 403);
   assert.equal((await call('/gateways', 'POST', {}, { origin: 'https://untrusted.example' })).status, 403);
+  const deniedOrigins = ['http://localhost:54234', 'http://127.0.0.1:54674'];
+  for (const origin of deniedOrigins) {
+    for (const site of [undefined, 'same-site', 'cross-site', 'none']) {
+      const headers: Record<string, string> = { origin };
+      if (site) headers['sec-fetch-site'] = site;
+      assert.equal((await call('/gateways', 'POST', {}, headers)).status, 403);
+    }
+  }
+  for (const origin of ['null', 'not-an-origin', 'https://untrusted.example', 'http://localhost.evil.example:54234', 'http://localhost:54234@evil.example', 'http://user@localhost:54234', 'http://localhost:54234/path', 'http://localhost:54234?query=1']) {
+    assert.equal((await call('/gateways', 'POST', {}, { origin, 'sec-fetch-site': 'same-origin' })).status, 403);
+  }
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'http://localhost:4310', 'sec-fetch-site': 'cross-site' })).status, 403);
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'https://untrusted.example', 'x-forwarded-host': 'localhost:54234', 'x-forwarded-proto': 'http' })).status, 403);
   const hostStatus = await new Promise<number | undefined>((resolve, reject) => {
     const request = http.get(baseUrl + '/api/health', { headers: { Host: 'untrusted.example' } }, response => { response.resume(); resolve(response.statusCode); });
     request.on('error', reject);
   });
   assert.equal(hostStatus, 403);
+  assert.equal((await call('/gateways', 'POST', {}, { host: 'untrusted.example', origin: 'http://localhost:54234', 'sec-fetch-site': 'same-origin' })).status, 403);
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'http://localhost:4310' })).status, 422);
+  assert.equal((await call('/gateways', 'POST', {}, { origin: 'http://127.0.0.1:4311' })).status, 422);
   assert.equal((await call('/departments', 'POST', { name: 'bad', agents: [] })).status, 422);
 });
 
@@ -127,8 +172,9 @@ test('cross-origin mutations, remote host headers, and malformed data fail close
   assert.ok(first.data.events.some((e: { type: string }) => e.type === 'model/request'));
   const count = first.data.eventCount;
   await new Promise<void>(resolve => server.close(() => resolve()));
+  await apps[0].locals.shutdown();
   const { createApp } = await import('../apps/api/src/app.ts');
-  server = createApp().listen(0, '127.0.0.1'); await once(server, 'listening');
+  const restoredApp = createApp(); apps.push(restoredApp); server = restoredApp.listen(0, '127.0.0.1'); await once(server, 'listening');
   baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   assert.equal((await call('/runs')).data[0].id, id);
   const restored = await call(`/runs/${id}`);

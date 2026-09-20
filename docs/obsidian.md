@@ -1,0 +1,37 @@
+# Obsidian 知识库
+
+Markdown 文件是资料源。工作台负责授权、版本索引和运行引用，不要求安装社区插件，也不需要模型 API 或 embedding API。
+
+## 当前 Mac
+
+Obsidian 已安装到 `~/Applications/Obsidian.app`。默认 Vault 为：
+
+```
+/Users/macmini1/Library/Application Support/AgentDepartment/.data/obsidian-vault
+```
+
+在 Obsidian 选择“打开本地仓库 / Open folder as vault”，打开该目录。工作台“知识库”页也会显示实际目录。自定义目录使用 `OBSIDIAN_VAULT` 环境变量；安装后台服务时可同时传入该变量。迁移目录前应备份，并把原 Vault 文件一起复制到新目录。
+
+1. 在工作台创建公司、部门或员工知识空间，系统创建对应目录。
+2. 在目录内新增或编辑 `.md`。每 10 秒重新检查，工作台可手动“立即同步笔记”。根目录的说明文件和隐藏目录不会进入员工检索。
+3. 在员工配置中勾选知识空间，并开启 `knowledge_search` / `knowledge_read` 工具。
+4. 运行批准时冻结每位员工可见的资料；后续修改不会改变已批准运行的引用。
+5. 运行结果可手动“保存到知识库”，生成普通 Markdown。不会自动把未经检查的输出当成长期知识。
+
+文档引用包括 ID、版本、内容 SHA256、切片和原 Markdown 行号。Wiki 链接、标签及原文件属性保持在文件中；当前检索采用中文/英文关键词分词与排序，不提供向量语义检索、图片 OCR、PDF/Office 解析、Wiki 链接自动遍历。
+
+已索引笔记可选使用 `ad_document_id` 保持重命名后的身份，工作台生成的文件自动包含该属性。外部新笔记没有该属性时按路径追踪，改名会成为新文档。复制笔记时删除原 ID；把带 ID 的笔记移到另一个知识空间会被拒绝，不能靠修改 frontmatter 扩权。
+
+删除或移出空间目录的文件会退出后续检索，旧版本和运行引用保留。工作台归档文档会移入 Vault `.trash`；归档整个知识空间保留文件但停止索引。文件冲突会报错并保留版本，需先同步后重新编辑。
+
+## Windows 与 Mac 同步
+
+Windows Obsidian 与 Mac 后端需要同一套 Markdown 文件。可选 Obsidian Sync（需要自己的账户/订阅）、Syncthing，或已有的文件同步方式；本版本不自动开通付费同步，也未配置用户 Windows 电脑。
+
+参考 [Obsidian 官方跨设备同步说明](https://obsidian.md/help/sync-notes)。只同步 Vault 文件夹，不要同步 `.data` 上层目录，那里包含凭证和运行记录。同步目标需在 Mac 保持可离线读取；同一 Vault 使用一种同步方式，避免多套同步工具互相覆盖。
+
+## 限制与备份
+
+单份正文最多 250,000 字符，索引扫描文件最多 500 KB，每空间最多 1,000 份。每员工运行快照最多 300 个切片、160 KB 内容；应拆分过大的知识空间。文件符号链接不被索引。
+
+工作台加密备份包含已登记 Markdown 文件、索引和历史引用，不包含 `.obsidian` 的个人界面配置、未登记空间文件或附件。完整 Vault 可另外做文件备份。恢复前的 Markdown 会保留在 `.trash/restore-*`；运行档案亦保留恢复前副本。

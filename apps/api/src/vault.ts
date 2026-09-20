@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 const directory = resolve(process.env.DATA_DIR ?? '.data');
 let key: Buffer | undefined;
+export function resetVaultCache() { key = undefined; }
 function masterKey() {
   if (key) return key;
   mkdirSync(directory, { recursive: true, mode: 0o700 });

@@ -42,3 +42,16 @@ test('adapter refuses a request before fetch when its reservation exceeds the ru
     assert.equal(called, false);
   } finally { globalThis.fetch = original; }
 });
+
+test('fallback is explicit, bounded, attributed and never retries ambiguous network failures', async()=>{
+ const original=globalThis.fetch, calls=[],usages=[],events=[];
+ const fallback={...route,id:'backup',wireModel:'backup-wire'};
+ const adapter=new OpenAiCompatibleAdapter({routes:[route,fallback],maxBudget:1,onUsage:u=>usages.push(u),onFallback:e=>events.push(e)});
+ adapter.sessionPolicies.set('employee',{fallbackModelId:'backup',reasoningEffort:'low'});
+ globalThis.fetch=async(_url,init)=>{const body=JSON.parse(init.body);calls.push(body);return body.model===route.wireModel?new Response('',{status:429}):Response.json({choices:[{message:{content:'success'},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:2}});};
+ try{for await(const _ of adapter.stream({model:route.id,sessionId:'employee',messages:[message]})){}
+  assert.equal(calls.length,2);assert.equal(calls[1].reasoning_effort,'low');assert.equal(usages[0].modelId,'backup');assert.equal(events.length,1);assert.equal(adapter.reserved,0);
+  globalThis.fetch=async()=>{calls.push({});throw Error('Connection dropped');};
+  await assert.rejects(async()=>{for await(const _ of adapter.stream({model:route.id,sessionId:'employee',messages:[message]})){}},e=>e.code==='CONNECTION_FAILED');assert.equal(calls.length,3);
+ }finally{globalThis.fetch=original;}
+});

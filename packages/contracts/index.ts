@@ -4,7 +4,12 @@ export const agentSchema = z.object({
   id: z.string().min(1).max(80), name: z.string().trim().min(1).max(80),
   role: z.enum(['manager', 'member']), title: z.string().trim().min(1).max(100),
   instructions: z.string().trim().min(1).max(10000), modelId: z.string().max(100),
-  tools: z.array(z.enum(['artifact_write', 'filesystem', 'terminal_test', 'terminal'])).max(4),
+  tools: z.array(z.enum(['artifact_write', 'filesystem', 'terminal_test', 'terminal', 'knowledge_search', 'knowledge_read'])).max(6),
+  roleVersion: z.number().int().positive().optional(), templateId: z.string().max(100).optional(),
+  systemConstraints: z.string().max(5000).optional(), outputFormat: z.string().max(2000).optional(),
+  reasoningEffort: z.enum(['low', 'medium', 'high']).optional(),
+  knowledgeSpaceIds: z.array(z.string().max(100)).max(30).optional(),
+  fallbackModelId: z.string().max(100).optional(),
 });
 export const departmentSchema = z.object({
   name: z.string().trim().min(1).max(80), description: z.string().trim().max(2000),
@@ -20,6 +25,10 @@ export const policySchema = z.object({
   maxAgents: z.number().int().min(1).max(6),
   maxConcurrentAgents: z.number().int().min(1).max(6),
   deadlineSeconds: z.number().int().min(60).max(86400),
+  maxModelCalls: z.number().int().min(1).max(1000).optional(),
+  contextBytes: z.number().int().min(4096).max(1000000).optional(),
+  mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
+  preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
 });
 export const taskSchema = z.object({
   id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),
@@ -46,6 +55,7 @@ export const modelSchema = z.object({
   name: z.string().trim().min(1).max(100), gatewayId: z.string().min(1).max(100),
   model: z.string().trim().min(1).max(200),
   inputRate: z.number().finite().min(0).max(10000), outputRate: z.number().finite().min(0).max(10000),
+  contextBytes: z.number().int().min(4096).max(2000000).optional(),
 });
 export type Agent = z.infer<typeof agentSchema>;
 export type DepartmentInput = z.infer<typeof departmentSchema>;
@@ -69,6 +79,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[]): Valid
     '需恰好一名经理、唯一员工 ID，且总人数不能超过上限');
   check('并发上限', policy.maxConcurrentAgents <= policy.maxAgents, '并发数不能超过 Agent 人数上限');
   check('模型可用性', plan.agents.every(a => models.some(m => m.id === a.modelId && m.status === 'available')), '请为所有员工选择连接测试通过的模型');
+  check('备用模型可用性', plan.agents.every(a => !a.fallbackModelId || models.some(m => m.id === a.fallbackModelId && m.status === 'available')), '备用模型也必须存在且可用');
   const taskIds = new Set(plan.tasks.map(t => t.id));
   const referencesOK = taskIds.size === plan.tasks.length && plan.tasks.every(t => ids.has(t.assigneeId) && t.dependencies.every(id => taskIds.has(id)));
   check('任务负责人和引用', referencesOK, '任务 ID 重复、负责人不存在或依赖任务不存在');

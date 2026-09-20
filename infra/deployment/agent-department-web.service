@@ -1,0 +1,14 @@
+[Unit]
+Description=Agent Department frontend container
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/podman start agent-department-web
+ExecStop=/usr/bin/podman stop --time 10 agent-department-web
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
