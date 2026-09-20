@@ -16,7 +16,8 @@ const {once}=require('node:events');
  const model={id:'model',name:'Fixture',model:'fixture',status:'available',gatewayId:'gateway',inputRate:1,outputRate:2};
  const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[]};
  const project={id:'project',departmentId:'department',departmentName:'测试部门',requirement:'预算表单测试需求',version:1,source:'manual',status:'DRAFT',createdAt:event.at,policy:run.snapshot.policy,planningCost:0,validation:{valid:true,estimate:.01,checks:[],errors:[]},plan:{rationale:'Fixture',agents:[agent],tasks:[{id:'task',subject:'测试任务',objective:'核对预算配置',assigneeId:'manager',dependencies:[],acceptanceCriteria:['预算保存正确'],estimatedInputTokens:10,estimatedOutputTokens:10}]}};
- let savedPlan,reconciled;
+ let savedPlan,reconciled,retrievalSaved;
+ const retrieval={mode:'keyword',version:1,installed:true,model:'Local fixture embedding',embeddingVersion:'fixture-v1',indexed:1,total:2,running:false,error:null};
  const costCall={id:'cost',modelName:'Fixture',purpose:'连接测试',amount:.5,inputRate:1,outputRate:2,status:'uncertain',createdAt:event.at,history:[]};
  const costs={timezone:'UTC',spent:.1,reserved:.5,calls:[costCall],recent:[],departments:[{id:'department',name:'测试部门',spent:.1,reserved:.5,limit:2}]};
  let missing=false;
@@ -31,6 +32,12 @@ const {once}=require('node:events');
    if(apiPath==='/api/costs'){res.end(JSON.stringify(costs));return;}
    if(apiPath==='/api/settings'){res.end(JSON.stringify({data:{autoBudgetLimit:.25,dailyBudgetLimit:20,maxActiveRuns:2}}));return;}
    if(apiPath==='/api/diagnostics'){res.end(JSON.stringify({platform:'fixture',node:'fixture',sandbox:true,knowledge:1,worker:{}}));return;}
+   if(apiPath==='/api/knowledge/retrieval'){
+    if(req.method==='PUT'){let body='';for await(const data of req)body+=data;retrievalSaved=JSON.parse(body);retrieval.mode=retrievalSaved.mode;retrieval.version++;}
+    res.end(JSON.stringify(retrieval));return;
+   }
+   if(apiPath==='/api/knowledge/index'){retrieval.indexed=retrieval.total;res.end('{}');return;}
+   if(apiPath==='/api/knowledge/vault'){res.end(JSON.stringify({root:'/fixture/obsidian',instructions:'本地 Markdown Vault'}));return;}
    const value=apiPath==='/api/health'?{version:'fixture',runtime:{reason:'fixture'}}:apiPath==='/api/models'?[model]:apiPath==='/api/projects'?[project]:apiPath==='/api/runs'?[run]:apiPath===`/api/runs/${id}`?run:[];
    res.end(JSON.stringify(value));return;
   }
@@ -89,6 +96,17 @@ const {once}=require('node:events');
   await page.getByText('Fixture · 连接测试 · 已结算',{exact:true}).click();
   assert.ok((await page.locator('.product-pre').allTextContents()).some(t=>t.includes('fixture-receipt')));
   await page.screenshot({path:path.resolve(__dirname,'../dist/cost-reconciliation-ui.png'),fullPage:true});
+  await page.getByRole('button',{name:'知识库',exact:true}).click();
+  await page.getByRole('heading',{name:'知识检索方式',exact:true}).waitFor();
+  await page.getByRole('button',{name:'启用混合检索',exact:true}).click();
+  await page.getByText('当前：关键词 + 本地语义混合检索',{exact:false}).waitFor();
+  assert.deepEqual(retrievalSaved,{mode:'hybrid',version:1});
+  await page.getByRole('button',{name:'补建语义索引',exact:true}).click();
+  await page.getByText('已索引 2 / 2 个当前资料切片',{exact:false}).waitFor();
+  await page.getByRole('button',{name:'使用关键词检索',exact:true}).click();
+  await page.getByText('当前：关键词检索',{exact:false}).waitFor();
+  assert.deepEqual(retrievalSaved,{mode:'keyword',version:2});
+  await page.screenshot({path:path.resolve(__dirname,'../dist/hybrid-retrieval-ui.png'),fullPage:true});
   assert.deepEqual(errors,[]);console.log('Historical citations, escaped markup, budget forms, and explicit cost reconciliation verified in Chrome.');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

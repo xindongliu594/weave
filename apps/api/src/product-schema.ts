@@ -1,5 +1,9 @@
 import type pg from 'pg';
 export async function migrateProduct(pool: pg.Pool) {
+  // Tests use isolated search paths; install the shared extension once under an advisory lock.
+  const extension=await pool.connect();
+  try{await extension.query('BEGIN');await extension.query('SELECT pg_advisory_xact_lock(918276)');await extension.query('CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public');await extension.query('COMMIT');}
+  catch(error){await extension.query('ROLLBACK');throw error;}finally{extension.release();}
   await pool.query(`
     CREATE TABLE IF NOT EXISTS department_versions (department_id text NOT NULL, version integer NOT NULL, data jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(department_id,version));
     INSERT INTO department_versions(department_id,version,data) SELECT id,version,data FROM departments ON CONFLICT DO NOTHING;
@@ -15,6 +19,7 @@ export async function migrateProduct(pool: pg.Pool) {
     CREATE TABLE IF NOT EXISTS knowledge_chunks (id text PRIMARY KEY, document_id text NOT NULL, version integer NOT NULL, line_start integer NOT NULL, line_end integer NOT NULL, content text NOT NULL, tokens jsonb NOT NULL);
     CREATE INDEX IF NOT EXISTS knowledge_chunks_document ON knowledge_chunks(document_id,version);
     CREATE INDEX IF NOT EXISTS knowledge_chunks_tokens ON knowledge_chunks USING gin(tokens);
+    CREATE TABLE IF NOT EXISTS knowledge_embeddings(chunk_id text NOT NULL,model_version text NOT NULL,title text NOT NULL,embedding public.vector(384) NOT NULL,created_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(chunk_id,model_version,title));
     ALTER TABLE knowledge_spaces ADD COLUMN IF NOT EXISTS vault_folder text;
     ALTER TABLE knowledge_documents ADD COLUMN IF NOT EXISTS vault_path text;
     ALTER TABLE knowledge_documents ADD COLUMN IF NOT EXISTS vault_hash text;

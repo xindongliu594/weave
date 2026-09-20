@@ -7,7 +7,7 @@ import { agentSchema, departmentSchema, policySchema, planSchema, validatePlan, 
 import { organizationCandidateSchema, templatePlan } from '../../../packages/contracts/organization.ts';
 import { completeBudgeted,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { departmentTemplates, roleTemplates } from '../../../packages/contracts/templates.ts';
-export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0)});
+export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0),knowledgeSearchMode:z.enum(['keyword','hybrid']).optional()});
 export async function settings(){return (await pool.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];}
 export function productRouter(){
   const router=Router();

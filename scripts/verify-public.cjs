@@ -17,6 +17,9 @@ const fs=require('node:fs');const assert=require('node:assert/strict');
   }
   const health=await context.request.get(url+'api/health');assert.equal(health.status(),200);assert.equal((await health.json()).version,'0.2.0');
   const vault=await context.request.get(url+'api/knowledge/vault');assert.equal((await vault.json()).mode,'obsidian-markdown');
+  const retrieval=await (await context.request.get(url+'api/knowledge/retrieval')).json();
+  assert.equal(retrieval.mode,'hybrid');assert.equal(retrieval.installed,true);assert.equal(retrieval.error,null);assert.equal(retrieval.indexed,retrieval.total);
+  console.log('Public local semantic index verified:',retrieval.indexed,'/',retrieval.total);
   const denied=await context.request.post(url+'api/knowledge/vault/sync',{data:{},headers:{Origin:'https://untrusted.invalid','Sec-Fetch-Site':'cross-site'}});assert.equal(denied.status(),403);
   for(const path of ['','admin/','portal/']){const r=await context.request.get('https://47.88.76.167/'+path);assert.equal(r.status(),200);}
   for(const name of ['win-x64.exe','win-x64.zip','mac-arm64.dmg','mac-x64.dmg']){const r=await context.request.head(url+'downloads/Agent-Department-0.2.0-'+name);assert.equal(r.status(),200);assert.ok(Number(r.headers()['content-length'])>1000000);}

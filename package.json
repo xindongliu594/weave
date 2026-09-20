@@ -17,6 +17,7 @@
     "runtime:test": "node --test services/agent-runtime/*.test.mjs"
   },
   "dependencies": {
+    "@huggingface/transformers": "4.3.0",
     "express": "5.1.0",
     "lucide-react": "0.468.0",
     "pg": "8.16.3",

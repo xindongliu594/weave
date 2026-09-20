@@ -10,7 +10,7 @@ import { AppError } from './provider.ts';
 import { resetVaultCache } from './vault.ts';
 import { vaultFileSnapshot, restoreVaultFiles, syncObsidian, withVaultLock } from './obsidian.ts';
 const scrypt=promisify(scryptCallback);
-const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','model_reservations'];
+const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','model_reservations','knowledge_embeddings'];
 const password=z.string().min(12).max(200);
 export async function encryptBackup(value:unknown,passphrase:string){const salt=randomBytes(16),iv=randomBytes(12),key=await scrypt(passphrase,salt,32) as Buffer;const cipher=createCipheriv('aes-256-gcm',key,iv);const data=Buffer.concat([cipher.update(gzipSync(JSON.stringify(value))),cipher.final()]);return {format:'agent-department-backup-v1',salt:salt.toString('base64'),iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),data:data.toString('base64')};}
 export async function decryptBackup(value:any,passphrase:string){try{if(value.format!=='agent-department-backup-v1')throw Error();const key=await scrypt(passphrase,Buffer.from(value.salt,'base64'),32) as Buffer;const cipher=createDecipheriv('aes-256-gcm',key,Buffer.from(value.iv,'base64'));cipher.setAuthTag(Buffer.from(value.tag,'base64'));return JSON.parse(gunzipSync(Buffer.concat([cipher.update(Buffer.from(value.data,'base64')),cipher.final()]),{maxOutputLength:50*1024*1024}).toString());}catch{throw new AppError(422,'备份密码不正确、文件损坏或格式不支持');}}
@@ -20,6 +20,7 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
  router.post('/backup/restore',async(req,res)=>withVaultLock(async()=>{
   const input=z.object({password,backup:z.record(z.string(),z.unknown()),confirmation:z.literal('RESTORE')}).parse(req.body);const value=await decryptBackup(input.backup,input.password);
   if(value.tables&&!value.tables.organization_previews)value.tables.organization_previews=[];
+  if(value.tables&&!value.tables.knowledge_embeddings)value.tables.knowledge_embeddings=[];
   if(value.tables&&!value.tables.model_reservations)value.tables.model_reservations=[];
   if(Array.isArray(value.tables?.model_reservations)&&value.tables.model_reservations.some((r:any)=>r.status==='pending'))throw new AppError(422,'不能恢复包含进行中模型调用的备份');
   if(value.version!==1||!value.tables||!value.files||tables.some(t=>!Array.isArray(value.tables[t]))||Object.keys(value.files).some(p=>!validFile(p)))throw new AppError(422,'备份结构不正确');

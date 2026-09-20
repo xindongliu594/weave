@@ -4,10 +4,12 @@ import { AppError } from './provider.ts';
 import { createHash } from 'node:crypto';
 import type { Plan } from '../../../packages/contracts/index.ts';
 import { tokenize, searchKnowledge, chunkDocument } from '../../../services/agent-runtime/knowledge.mjs';
+import { vectorCandidates,fuseKnowledge } from './knowledge-vector.ts';
+import { embeddingVersion } from '../../../services/embedding/local.mjs';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type DocumentVersion = { documentId: string; version: number; title: string; spaceId: string; sha256: string; source: Record<string,unknown>; chunkCount: number };
-export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]>; runInputs?:{documentId:string;title:string;agentIds:string[];chunks:any[]}[] };
+export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]>; retrieval?:{mode:'keyword'|'hybrid';embeddingVersion?:string}; runInputs?:{documentId:string;title:string;agentIds:string[];chunks:any[]}[] };
 const permission = `(s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2)))`;
 
 export async function validateKnowledgeGrants(agents:any[], departmentId:string, db:Database=pool) {
@@ -44,7 +46,8 @@ export async function knowledgeSnapshot(agents:any[], departmentId:string, db?:D
   for (const {agentId,...doc} of rows) { agentDocuments[agentId].push(doc.documentId); documents.set(doc.documentId,doc as DocumentVersion); }
   if(documentIds?.some(id=>!documents.has(id)))throw new AppError(422,'本次选用的资料已归档、缺失或没有员工获授权，请更新资料范围后重新批准。','KNOWLEDGE_SCOPE_INVALID');
   // Store references, not a truncated copy of the corpus. Revisions are immutable and included in backups.
-  return {format:'document-versions-v2',documents:[...documents.values()],agentDocuments};
+  const settings=(await db.query('SELECT data FROM product_settings WHERE id=1')).rows[0]?.data;
+  return {format:'document-versions-v2',documents:[...documents.values()],agentDocuments,retrieval:settings?.knowledgeSearchMode==='hybrid'?{mode:'hybrid',embeddingVersion}:{mode:'keyword'}};
 }
 
 /** Run inputs are immutable snapshot data, never imported into the shared Vault or its index. */
@@ -74,19 +77,24 @@ async function verifyVersions(refs:DocumentVersion[],db:Database) {
 
 /** Permissions are fixed by the approved manifest before any ranking or chunk lookup. */
 export async function queryKnowledge(snapshot:any,agentId:string,operation:'search'|'read',value:string,limit=6,db:Database=pool):Promise<any> {
+  if(operation==='search'&&!value.trim())return [];
   if (snapshot?.format!=='document-versions-v2') {
     const chunks=Array.isArray(snapshot?.[agentId])?snapshot[agentId]:[];
     return operation==='search'?searchKnowledge(chunks,value,limit):chunks.find((chunk:any)=>chunk.id===value);
   }
   const refs=references(snapshot,agentId);
+  const hybrid=operation==='search'&&snapshot.retrieval?.mode==='hybrid';
+  if(hybrid&&snapshot.retrieval.embeddingVersion!==embeddingVersion)throw new AppError(409,'本次运行使用不同的语义索引版本，请恢复对应模型后检索。','EMBEDDING_VERSION_MISMATCH');
+  const count=Math.min(20,Math.max(1,limit)),candidateCount=hybrid?20:count;
   // Filter authorization before ranking, including inputs only assigned to one team member.
   const inputChunks=(snapshot.runInputs??[]).filter((doc:any)=>doc.agentIds.includes(agentId)).flatMap((doc:any)=>doc.chunks);
-  const inputResults=operation==='search'?searchKnowledge(inputChunks,value,limit):inputChunks.find((c:any)=>c.id===value);
-  if (!refs.length) return inputResults;
+  const inputResults=operation==='search'?searchKnowledge(inputChunks,value,candidateCount):inputChunks.find((c:any)=>c.id===value);
+  if (!refs.length&&!hybrid) return inputResults;
+  if(!refs.length&&!inputChunks.length)return [];
   await verifyVersions(refs,db);
   if(operation==='read'&&inputResults)return inputResults;
   const terms=tokenize(value);
-  if (operation==='search'&&!terms.length) return [];
+  if (operation==='search'&&!terms.length&&!hybrid) return [];
   const rows=(await db.query(`WITH refs AS (SELECT * FROM jsonb_to_recordset($1) AS x("documentId" text,version int,title text,"spaceId" text,sha256 text,source jsonb)),
     authorized AS (
       SELECT c.id,c.document_id AS "documentId",c.version,c.line_start AS "lineStart",c.line_end AS "lineEnd",c.content,c.tokens,x.title,x."spaceId",x.sha256,x.source
@@ -97,8 +105,10 @@ export async function queryKnowledge(snapshot:any,agentId:string,operation:'sear
       + CASE WHEN strpos(lower(content),lower($3))>0 THEN 1 ELSE 0 END AS score`:''}
     FROM authorized WHERE ${operation==='search'?'tokens ?| $2::text[]':'id=$2'}
     ORDER BY ${operation==='search'?'score DESC,':''} id LIMIT ${operation==='search'?'$4':'$3'}`,
-    operation==='search'?[JSON.stringify(refs),terms,value,Math.min(20,Math.max(1,limit))]:[JSON.stringify(refs),value,1])).rows;
-  return operation==='search'?[...rows,...inputResults].sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id)).slice(0,Math.min(20,Math.max(1,limit))):rows[0];
+    operation==='search'?[JSON.stringify(refs),terms,value,candidateCount]:[JSON.stringify(refs),value,1])).rows;
+  if(operation==='read')return rows[0];
+  const lexical=[...rows,...inputResults].sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id)).slice(0,candidateCount);
+  return hybrid?fuseKnowledge(lexical,await vectorCandidates(refs,inputChunks,value,candidateCount,db),count):lexical;
 }
 
 export async function searchAvailableKnowledge(departmentId:string,agent:any,query:string) {

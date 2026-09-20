@@ -9,8 +9,18 @@ const spaceSchema = z.object({ name: z.string().trim().min(1).max(100), scope: z
 const documentSchema = z.object({ spaceId: z.string(), title: z.string().trim().min(1).max(200), content: z.string().min(1).max(250000), version: z.number().int().positive().optional(), source: z.object({ runId: z.string().optional(), note: z.string().max(1000).optional() }).default({}) });
 export { knowledgeSnapshot, validateKnowledgeGrants } from './knowledge-store.ts';
 import { searchAvailableKnowledge } from './knowledge-store.ts';
+import { knowledgeIndexStatus,startKnowledgeIndex } from './knowledge-vector.ts';
+import { embedTexts } from '../../../services/embedding/local.mjs';
 export function knowledgeRouter() {
   const router=Router();
+  router.get('/knowledge/retrieval',async(_req,res)=>{const row=(await pool.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];res.json({mode:row.data.knowledgeSearchMode??'keyword',version:row.version,...await knowledgeIndexStatus()});});
+  router.put('/knowledge/retrieval',async(req,res)=>{
+    const input=z.object({mode:z.enum(['keyword','hybrid']),version:z.number().int().positive()}).parse(req.body);
+    if(input.mode==='hybrid')try{await embedTexts(['local readiness'],'query');}catch{throw new AppError(503,'本地语义模型缺失或不可用，请先运行模型安装脚本','EMBEDDING_NOT_READY');}
+    const result=await pool.query("UPDATE product_settings SET data=data||jsonb_build_object('knowledgeSearchMode',$1::text),version=version+1 WHERE id=1 AND version=$2",[input.mode,input.version]);if(!result.rowCount)throw new AppError(409,'设置已变化，请刷新');
+    if(input.mode==='hybrid')void startKnowledgeIndex();res.json({ok:true});
+  });
+  router.post('/knowledge/index',async(_req,res)=>{const state=await knowledgeIndexStatus();if(!state.installed)throw new AppError(503,'请先安装本地语义模型','EMBEDDING_NOT_READY');void startKnowledgeIndex();res.status(202).json({ok:true});});
   router.get('/knowledge/spaces',async(_req,res)=>res.json((await pool.query('SELECT id,name,scope,department_id AS "departmentId",agent_ids AS "agentIds",version,vault_folder AS "vaultFolder" FROM knowledge_spaces WHERE deleted_at IS NULL ORDER BY name')).rows));
   router.post('/knowledge/spaces',async(req,res)=>{
     const input=spaceSchema.parse(req.body),id=randomUUID();

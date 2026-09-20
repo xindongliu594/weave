@@ -1,3 +1,4 @@
+import { startKnowledgeIndex,waitKnowledgeIndex } from './knowledge-vector.ts';
 import express from 'express';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -36,8 +37,9 @@ export function createApp() {
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
   const coordinator = new RunCoordinator(traceRoot);
   const runtime = coordinator.runtime;
-  const vaultTimer = setInterval(() => { void syncObsidian().catch(() => {}); }, 10000); vaultTimer.unref();
-  app.locals.shutdown = async () => { clearInterval(vaultTimer); await coordinator.close(); };
+  let stopping=false,vaultBusy=false,vaultWork=Promise.resolve();
+  const vaultTimer = setInterval(() => { if(stopping||vaultBusy)return;vaultBusy=true;vaultWork=syncObsidian().then(async()=>{const row=(await pool.query('SELECT data FROM product_settings WHERE id=1')).rows[0];if(!stopping&&row?.data.knowledgeSearchMode==='hybrid')await startKnowledgeIndex();}).catch(() => {}).finally(()=>{vaultBusy=false;}); }, 10000); vaultTimer.unref();
+  app.locals.shutdown = async () => { stopping=true;clearInterval(vaultTimer); await coordinator.close(); await vaultWork;await waitKnowledgeIndex(); };
   let verifying = false;
   app.disable('x-powered-by');
   app.use((req, res, next) => {

@@ -18,7 +18,25 @@ Obsidian 已安装到 `~/Applications/Obsidian.app`。默认 Vault 为：
 4. 运行批准时固定每位员工可见的文档版本清单；检索覆盖这些版本的全部切片，后续修改不会改变已批准运行的引用。
 5. 运行结果可手动“保存到知识库”，生成普通 Markdown。不会自动把未经检查的输出当成长期知识。
 
-文档引用包括 ID、版本、内容 SHA256、切片和原 Markdown 行号。运行详情的“查看引用原文”可打开当时的切片，即使笔记后来改名、更新或归档；引用版本缺失时明确报错，不会替换成新版本。Wiki 链接、标签及原文件属性保持在文件中；当前检索采用中文/英文关键词分词与排序，不提供向量语义检索、图片 OCR、PDF/Office 解析、Wiki 链接自动遍历。
+文档引用包括 ID、版本、内容 SHA256、切片和原 Markdown 行号。运行详情的“查看引用原文”可打开当时的切片，即使笔记后来改名、更新或归档；引用版本缺失时明确报错，不会替换成新版本。Wiki 链接、标签及原文件属性保持在文件中；检索支持中文/英文关键词和本地多语言语义检索，不提供图片 OCR、PDF/Office 解析、Wiki 链接自动遍历。
+
+## 本地语义与混合检索
+
+后端使用 Transformers.js 4.3.0 和固定修订的 `Xenova/multilingual-e5-small` q8 模型，CPU 推理，384 维向量存入 PostgreSQL/pgvector。首次准备需要 Python 3，在后端项目目录运行：
+
+```sh
+python3 scripts/install-embedding-model.py
+```
+
+脚本从 Hugging Face 下载约 136 MB 公开模型文件，并逐一核对 `services/embedding/model-lock.json` 中固定的 SHA256。默认目录 `.data/embedding-models`，可用 `EMBEDDING_MODEL_DIR` 指定其他绝对路径。资料和查询不会上传；运行时禁止远程模型下载。启用前和进程首次加载时检查文件哈希，依赖审计使用固定锁文件。
+
+在知识库页点击“启用混合检索”，系统先验证模型能运行，再补建当前笔记的索引；每 10 秒同步后的新内容自动补建。界面显示已索引数量和错误，可手动重试。历史版本和本次专用资料在首次检索时按需索引，因此大批资料的第一次查询可能较慢。关闭混合检索后，交互查询和新批准运行使用关键词；已批准运行保持原来的模式和模型版本，模型缺失或版本不匹配时明确报错，不悄悄改用其他模型。
+
+两路召回均先限定授权的文档版本：关键词使用中文/英文词项，语义使用精确余弦距离 Top-20，再以 Reciprocal Rank Fusion 合并，默认返回 6 个引用。输入文本加 `query:` / `passage:` 前缀，使用均值池化和归一化。长切片分为重叠窗口，并按实际 Token 数再次拆分，覆盖尾部内容；窗口向量平均后归一化。排名只表示相对匹配，不能证明资料适用或答案正确。
+
+模型、修订、运行库和窗口算法共同构成索引版本。索引与历史引用进入加密备份；模型文件较大，不进入在线备份，换机器后须用安装脚本重新准备。旧版备份无向量表时可恢复并重新索引。
+
+依据：[ONNX 模型说明](https://huggingface.co/Xenova/multilingual-e5-small)、[原模型前缀与池化说明](https://huggingface.co/intfloat/multilingual-e5-small)、[Transformers.js 本地文件设置](https://huggingface.co/docs/transformers.js/custom_usage)、[pgvector 距离查询](https://github.com/pgvector/pgvector)。模型原作者使用 MIT 许可；下载权重不提交到本项目 Git 仓库。
 
 已索引笔记可选使用 `ad_document_id` 保持重命名后的身份，工作台生成的文件自动包含该属性。外部新笔记没有该属性时按路径追踪，改名会成为新文档。复制笔记时删除原 ID；把带 ID 的笔记移到另一个知识空间会被拒绝，不能靠修改 frontmatter 扩权。
 
