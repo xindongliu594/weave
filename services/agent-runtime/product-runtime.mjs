@@ -20,10 +20,11 @@ function lastAssistantText(agent) {
 }
 
 export class ProductDshRuntime {
-  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge }) {
+  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, beforeRequest,onCallError }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
     this.queryKnowledge = queryKnowledge; this.onUsage = onUsage; this.requestApproval = requestApproval;
+    this.beforeRequest=beforeRequest;this.onCallError=onCallError;
   }
 
   async inspect() {
@@ -71,6 +72,8 @@ export class ProductDshRuntime {
         tasks: snapshot.tasks,
         maxTaskModelCalls: snapshot.policy.maxTaskModelCalls??40,
         onBudget: data=>archive.append('budget/'+data.kind,data,{taskId:data.taskId}),
+        beforeRequest:this.beforeRequest?data=>this.beforeRequest(archive.id,data):undefined,
+        onCallError:async data=>{archive.append('billing/unconfirmed',data);await this.onCallError?.(data);},
         maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
         contextBytes: snapshot.policy.contextBytes ?? 64000,
         signal: job.controller.signal,

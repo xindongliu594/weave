@@ -48,7 +48,7 @@ function finishReason(value, hasCalls) {
 }
 
 export class OpenAiCompatibleAdapter extends LlmAdapter {
-  constructor({ routes, maxBudget, onUsage, onError, maxModelCalls = 100, contextBytes = 64000, signal, onContext, onRequest, onFallback, priorSpend=0,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},onBudget }) {
+  constructor({ routes, maxBudget, onUsage, onError, maxModelCalls = 100, contextBytes = 64000, signal, onContext, onRequest, onFallback, priorSpend=0,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},onBudget,beforeRequest,onCallError }) {
     super();
     this.routes = new Map(routes.map(route => [route.id, Object.freeze({ ...route })]));
     this.maxBudget = maxBudget;
@@ -59,6 +59,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     this.maxModelCalls=maxModelCalls; this.calls=0; this.contextBytes=contextBytes; this.signal=signal; this.onContext=onContext;
     this.onRequest=onRequest;this.onFallback=onFallback;this.sessionPolicies=new Map();
     this.budget=new ExecutionBudget({maxBudget,priorSpend,maxModelCalls,priorModelCalls,tasks,maxTaskModelCalls,taskUsage,onEvent:onBudget});
+    this.beforeRequest=beforeRequest;this.onCallError=onCallError;
   }
 
   providerInfo(provider) { return { id: provider, name: 'Agent Department Relay' }; }
@@ -101,8 +102,11 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const release=()=>{ticket.release();if(reservationHeld){this.reserved=Math.max(0,this.reserved-reservation);reservationHeld=false;}};
     let response;
     const started=Date.now();
+    const usageId=randomUUID();let registered=false,dispatched=false,accounted=false;
     try {
-      this.onRequest?.({...attribution,modelId:route.id,body,reservation});
+      await this.beforeRequest?.({id:usageId,...attribution,modelId:route.id,reservation});registered=!!this.beforeRequest;
+      this.onRequest?.({usageId,...attribution,modelId:route.id,body,reservation});
+      dispatched=true;
       response = await fetch(route.baseUrl.replace(/\/$/, '') + '/chat/completions', {
         method: 'POST', signal: options.signal, redirect: 'error',
         headers: { 'Content-Type': 'application/json', ...attributionHeaders(), ...(route.apiKey ? { Authorization: `Bearer ${route.apiKey}` } : {}) },
@@ -111,6 +115,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       if (!response.ok) {
         const fallbackId=this.sessionPolicies.get(options.sessionId)?.fallbackModelId;
         if(!options.fallbackAttempted && [429,503].includes(response.status) && fallbackId && this.routes.has(fallbackId) && fallbackId!==route.id){
+          if(registered)await this.onCallError?.({id:usageId,dispatched:true,code:'HTTP_'+response.status});accounted=true;
           release();
           this.onFallback?.({sessionId:options.sessionId,from:route.id,to:fallbackId,status:response.status});
           yield* this.stream({...options,model:fallbackId,fallbackAttempted:true});return;
@@ -125,7 +130,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       const actualCost = ((reported.inputTokens + (reported.cacheReadTokens ?? 0)) * route.inputRate + reported.outputTokens * route.outputRate) / 1e6;
       release();ticket.settle(actualCost);
       this.spent += actualCost;
-      await this.onUsage?.({ id: randomUUID(), ...attribution, modelId: route.id, durationMs:Date.now()-started, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });
+      await this.onUsage?.({ id: usageId, ...attribution, modelId: route.id, durationMs:Date.now()-started, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });accounted=true;
       ticket.check();
       const message = payload.choices?.[0]?.message;
       if (!message || typeof message !== 'object') throw new LlmError('中转站响应缺少 assistant message', 'INVALID_RESPONSE');
@@ -147,7 +152,11 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       yield { type: 'finish', reason: finishReason(payload.choices?.[0]?.finish_reason, blocks.some(block => block.type === 'tool-call')) };
     } catch (error) {
       release();
-      const normalized = error instanceof LlmError ? error : options.signal?.aborted ? options.signal.reason ?? error : new LlmError('无法连接中转站执行模型请求', 'CONNECTION_FAILED', { cause: error });
+      let accountingError;
+      try{if(registered&&!accounted)await this.onCallError?.({id:usageId,dispatched,code:error.code??'CALL_INTERRUPTED'});}catch(failure){accountingError=failure;}
+      const normalized = accountingError?new LlmError('费用状态未能持久化，停止运行并保留请求预留','BILLING_PERSISTENCE_FAILED',{cause:accountingError}):
+        error instanceof LlmError ? error : !dispatched&&typeof error.status==='number'&&typeof error.code==='string'?new LlmError(error.message,error.code):
+        options.signal?.aborted ? options.signal.reason ?? error : new LlmError('无法连接中转站执行模型请求', 'CONNECTION_FAILED', { cause: error });
       this.onError?.(normalized);
       throw normalized;
     }

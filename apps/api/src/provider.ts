@@ -27,8 +27,10 @@ const completionSchema = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string().nullable() }) })).min(1),
   usage: z.object({ prompt_tokens: z.number().int().nonnegative(), completion_tokens: z.number().int().nonnegative() }).optional(),
 });
-export async function complete(model: Model, messages: { role: string; content: string }[], maxTokens: number) {
+export async function complete(model: Model, messages: { role: string; content: string }[], maxTokens: number,onUsage?:(usage:{prompt_tokens:number;completion_tokens:number})=>Promise<void>) {
   const data = await gatewayRequest(model.gatewayId, '/chat/completions', { model: model.model, messages, max_tokens: maxTokens, stream: false });
+  const usage=z.object({usage:z.object({prompt_tokens:z.number().int().nonnegative(),completion_tokens:z.number().int().nonnegative()})}).safeParse(data);
+  if(usage.success)await onUsage?.(usage.data.usage);
   const parsed = completionSchema.safeParse(data);
   if (!parsed.success) throw new AppError(502, '中转站返回格式不兼容 Chat Completions', 'GATEWAY_INVALID_RESPONSE');
   return parsed.data;

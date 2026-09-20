@@ -116,6 +116,8 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'team/snapshot'));
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'billing/usage'));
   const billed=(await call('/usage')).data.filter((u:any)=>u.runId===approved.data.id);
+  const receipts=(await pool.query('SELECT id,status FROM model_reservations WHERE run_id=$1',[approved.data.id])).rows;
+  assert.equal(receipts.length,billed.length);assert.ok(receipts.every(r=>r.status==='settled'&&billed.some((u:any)=>u.id===r.id)));
   assert.ok(billed.length>0);assert.ok(billed.every((u:any)=>u.agentId==='employee-1'&&u.employeeId==='manager'&&u.sessionId&&u.requestId&&u.durationMs>=0),JSON.stringify(billed.map((u:any)=>({agent:u.agentId,employee:u.employeeId,session:u.sessionId,request:u.requestId,task:u.taskId}))));
   assert.ok(billed.some((u:any)=>u.taskId===project.plan.tasks[0].id&&u.attemptId));
   assert.ok(billed.every((u:any)=>!u.taskId||u.taskId===project.plan.tasks[0].id),'message text cannot change budget attribution');

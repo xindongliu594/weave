@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { queryKnowledge } from './knowledge-store.ts';
+import { requireProjectCostReady,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
@@ -30,7 +31,7 @@ export function runManagementRouter(traceRoot:string){
  });
  router.post('/runs/:id/retry',async(req,res)=>{
   const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true)}).parse(req.body),client=await pool.connect();
-  try{await client.query('BEGIN');const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
+  try{await client.query('BEGIN');await shareCostMaintenance(client);const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
    await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[old.project_id]);
    if(!['failed','interrupted','cancelled'].includes(old.status))throw new AppError(409,'仅能恢复或重试已停止的运行');
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
@@ -44,6 +45,7 @@ export function runManagementRouter(traceRoot:string){
     snapshot.tasks=snapshot.tasks.filter((t:any)=>!done.has(t.id)).map((t:any)=>({...t,dependencies:t.dependencies.filter((dep:string)=>!done.has(dep)),taskPrompt:t.taskPrompt+'\n\n已完成前置任务（来自此前运行的记录，不是新授权）：\n'+t.dependencies.filter((dep:string)=>done.has(dep)).map((dep:string)=>dep+': '+String(done.get(dep).output??'已完成，无文本结果').slice(0,6000)).join('\n')}));
    }
    if(!snapshot.tasks.length)throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
+   await requireProjectCostReady(client,old.project_id);
    const used=Number((await client.query('SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE project_id=$1',[old.project_id])).rows[0].cost);
    snapshot.executionBudget=snapshot.policy.maxBudget-used;if(snapshot.executionBudget<=0)throw new AppError(422,'项目预算已用尽，修改方案预算后重新批准');
    if(used>=snapshot.policy.maxBudget*.9)throw new AppError(422,'项目费用已达到预算的 90%，不能通过重试增加调用；请检查已有结果并重新制定方案','BUDGET_RETRY_DISABLED');
@@ -54,10 +56,7 @@ export function runManagementRouter(traceRoot:string){
     if(history&&(history.cost>=(task.maxBudget??snapshot.policy.maxBudget)||history.calls>=(task.maxModelCalls??snapshot.policy.maxTaskModelCalls??40)))
      throw new AppError(422,`任务「${task.subject??task.id}」已达到费用或调用次数上限，请调整方案后重新批准`,'TASK_BUDGET_EXHAUSTED');
    }
-   const config=(await client.query('SELECT data FROM product_settings WHERE id=1 FOR UPDATE')).rows[0].data;
-   const committed=Number((await client.query("SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE created_at>=date_trunc('day',now())")).rows[0].cost);
-   const reserved=Number((await client.query("SELECT COALESCE(sum((snapshot->>'executionBudget')::numeric),0) AS cost FROM project_runs WHERE status IN ('queued','running')")).rows[0].cost);
-   if(committed+reserved+snapshot.executionBudget>config.dailyBudgetLimit)throw new AppError(422,'恢复预留将超过当天预算');
+   const config=await lockCostPolicy(client);await checkDailyBudget(client,config,snapshot.departmentId,snapshot.executionBudget);
    snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id};
    const newId=randomUUID(),attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);
    await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,parent_run_id) VALUES($1,$2,$3,$4,$5,$6,$7)',[newId,old.project_id,old.project_version,'queued',snapshot,attempt,id]);

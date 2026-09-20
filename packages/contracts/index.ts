@@ -13,6 +13,7 @@ export const agentSchema = z.object({
 });
 export const departmentSchema = z.object({
   name: z.string().trim().min(1).max(80), description: z.string().trim().max(2000),
+  dailyBudget: z.number().finite().min(0).max(100000).optional(),
   agents: z.array(agentSchema).min(1).max(6),
 }).superRefine((d, ctx) => {
   if (d.agents.filter(a => a.role === 'manager').length !== 1)

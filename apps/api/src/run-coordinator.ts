@@ -8,18 +8,26 @@ import { ProductDshRuntime } from '../../../services/agent-runtime/product-runti
 import { readRun, createRunArchive, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { command } from '../../../services/agent-runtime/sandbox.mjs';
 import { queryKnowledge } from './knowledge-store.ts';
+import { reserveCall,settleCall,markCallUncertain,expireReservations } from './cost-control.ts';
 import { settings } from './product.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 export class RunCoordinator {
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;
   constructor(public traceRoot:string){
-    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal)});
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data)=>this.reserve(id,data),onCallError:data=>markCallUncertain(data.id,data.code,data.dispatched)});
     this.timer=setInterval(()=>void this.tick(),1000);this.timer.unref();void this.tick();
   }
   async recordUsage(runId:string,u:RuntimeUsage){
+    if((await pool.query('SELECT id FROM model_reservations WHERE id=$1',[u.id])).rowCount){await settleCall(u.id,u.inputTokens,u.outputTokens,u);return;}
     await pool.query(`INSERT INTO usage(id,model_id,project_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
       SELECT $1,$2,project_id,id,$3,$4,$5,'项目执行',$7,$8,$9,$10,$11,$12,$13 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null]);
+  }
+  async reserve(runId:string,data:any){
+    const run=(await pool.query('SELECT project_id,snapshot FROM project_runs WHERE id=$1 AND lease_owner=$2',[runId,this.owner])).rows[0];
+    if(!run)throw new AppError(409,'工作进程已失去运行租约');
+    const model=run.snapshot.modelRoutes.find((m:any)=>m.id===data.modelId);if(!model)throw new AppError(422,'模型不属于批准快照');
+    await reserveCall({id:data.id,model,amount:data.reservation,purpose:'项目执行',projectId:run.project_id,runId,context:{agentId:data.agentId,employeeId:data.employeeId,sessionId:data.sessionId,taskId:data.taskId,attemptId:data.attemptId,requestId:data.requestId}});
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();
@@ -29,6 +37,7 @@ export class RunCoordinator {
     finally{await pool.query("UPDATE tool_approvals SET status='cancelled',decided_at=now() WHERE id=$1 AND status='pending'",[id]);}
   }
   async recover(){
+    await expireReservations();
     const stale=(await pool.query("UPDATE project_runs SET status='interrupted',error='运行进程中断，请检查记录后恢复',lease_owner=NULL,lease_until=NULL,finished_at=now() WHERE status='running' AND (lease_until IS NULL OR lease_until<now()) RETURNING *")).rows;
     for(const row of stale){
       if(/^[a-f0-9-]{36}$/.test(row.id))try{await command(['rm','-f','agent-department-'+row.id],{signal:AbortSignal.timeout(5000)});}catch{}

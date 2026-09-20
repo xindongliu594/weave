@@ -68,3 +68,23 @@ test('adapter persists an excessive actual receipt before stopping and does not 
   assert.equal(usage.length,1);assert.equal(usage[0].cost,.0001);assert.equal(chunks.length,0);assert.equal(events.at(-1).kind,'stopped');assert.equal(adapter.reserved,0);
  }finally{globalThis.fetch=original;}
 });
+
+test('persistent reservations precede dispatch, and fallback preserves the first uncertain request identity',async()=>{
+ const original=globalThis.fetch,reserved=[],failed=[],billed=[];let count=0;
+ globalThis.fetch=async()=>{assert.equal(reserved.length,++count);return count===1?new Response('',{status:503}):Response.json({choices:[{message:{content:'ok'}}],usage:{prompt_tokens:0,completion_tokens:1}});};
+ try{
+  const adapter=new OpenAiCompatibleAdapter({routes:[route,{...route,id:'backup'}],maxBudget:1,beforeRequest:async data=>reserved.push(data),onCallError:async data=>failed.push(data),onUsage:async data=>billed.push(data)});
+  adapter.sessionPolicies.set('session',{fallbackModelId:'backup'});await consume(adapter);
+  assert.equal(reserved.length,2);assert.notEqual(reserved[0].id,reserved[1].id);assert.deepEqual(failed,[{id:reserved[0].id,dispatched:true,code:'HTTP_503'}]);assert.equal(billed[0].id,reserved[1].id);
+ }finally{globalThis.fetch=original;}
+});
+test('admission rejection never dispatches; archive failure after reservation releases an unsent call',async()=>{
+ const original=globalThis.fetch;let count=0;const errors=[];
+ globalThis.fetch=async()=>{count++;throw Error('unexpected fetch');};
+ try{
+  const denied=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,beforeRequest:async()=>{throw Object.assign(Error('部门预算已用尽'),{status:422,code:'DEPARTMENT_DAILY_BUDGET_EXCEEDED'});},onCallError:async data=>errors.push(data)});
+  await assert.rejects(consume(denied),e=>e.code==='DEPARTMENT_DAILY_BUDGET_EXCEEDED');assert.equal(count,0);assert.equal(errors.length,0);
+  const brokenArchive=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,beforeRequest:async()=>{},onRequest:()=>{throw Error('disk full');},onCallError:async data=>errors.push(data)});
+  await assert.rejects(consume(brokenArchive));assert.equal(count,0);assert.equal(errors.length,1);assert.equal(errors[0].dispatched,false);
+ }finally{globalThis.fetch=original;}
+});

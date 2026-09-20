@@ -16,7 +16,9 @@ const {once}=require('node:events');
  const model={id:'model',name:'Fixture',model:'fixture',status:'available',gatewayId:'gateway',inputRate:1,outputRate:2};
  const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[]};
  const project={id:'project',departmentId:'department',departmentName:'测试部门',requirement:'预算表单测试需求',version:1,source:'manual',status:'DRAFT',createdAt:event.at,policy:run.snapshot.policy,planningCost:0,validation:{valid:true,estimate:.01,checks:[],errors:[]},plan:{rationale:'Fixture',agents:[agent],tasks:[{id:'task',subject:'测试任务',objective:'核对预算配置',assigneeId:'manager',dependencies:[],acceptanceCriteria:['预算保存正确'],estimatedInputTokens:10,estimatedOutputTokens:10}]}};
- let savedPlan;
+ let savedPlan,reconciled;
+ const costCall={id:'cost',modelName:'Fixture',purpose:'连接测试',amount:.5,inputRate:1,outputRate:2,status:'uncertain',createdAt:event.at,history:[]};
+ const costs={timezone:'UTC',spent:.1,reserved:.5,calls:[costCall],recent:[],departments:[{id:'department',name:'测试部门',spent:.1,reserved:.5,limit:2}]};
  let missing=false;
  const server=http.createServer(async(req,res)=>{
   const pathname=new URL(req.url,'http://127.0.0.1').pathname,apiPath=pathname.replace(/^\/agent-department/,'');
@@ -24,6 +26,10 @@ const {once}=require('node:events');
    res.setHeader('content-type','application/json');
    if(apiPath===`/api/runs/${id}/citations/chunk`){res.statusCode=missing?409:200;res.end(JSON.stringify(missing?{message:'运行引用的知识版本缺失或不完整'}:source));return;}
    if(apiPath==='/api/projects/project/plan'&&req.method==='PUT'){let body='';for await(const data of req)body+=data;savedPlan=JSON.parse(body).plan;project.plan=savedPlan;res.end('{}');return;}
+   if(apiPath==='/api/costs/cost/reconcile'&&req.method==='POST'){let body='';for await(const data of req)body+=data;reconciled=JSON.parse(body);costs.calls=[];costs.reserved=0;costs.recent=[{...costCall,status:'settled',history:[{source:'manual',...reconciled}]}];res.end('{}');return;}
+   if(apiPath==='/api/costs'){res.end(JSON.stringify(costs));return;}
+   if(apiPath==='/api/settings'){res.end(JSON.stringify({data:{autoBudgetLimit:.25,dailyBudgetLimit:20,maxActiveRuns:2}}));return;}
+   if(apiPath==='/api/diagnostics'){res.end(JSON.stringify({platform:'fixture',node:'fixture',sandbox:true,knowledge:1,worker:{}}));return;}
    const value=apiPath==='/api/health'?{version:'fixture',runtime:{reason:'fixture'}}:apiPath==='/api/models'?[model]:apiPath==='/api/projects'?[project]:apiPath==='/api/runs'?[run]:apiPath===`/api/runs/${id}`?run:[];
    res.end(JSON.stringify(value));return;
   }
@@ -56,6 +62,22 @@ const {once}=require('node:events');
   await page.getByRole('button',{name:'保存新版本',exact:true}).click();
   await page.getByRole('dialog').waitFor({state:'hidden'});
   assert.equal(savedPlan.tasks[0].maxBudget,.25);assert.equal(savedPlan.tasks[0].maxModelCalls,12);
-  assert.deepEqual(errors,[]);console.log('Historical citations, escaped markup, errors, budget warning and task budget form verified in Chrome.');
+  await page.getByRole('button',{name:'系统设置',exact:true}).click();
+  await page.getByText('费用待核对 · 预留 $0.500000',{exact:false}).waitFor();
+  await page.getByRole('button',{name:'核对这次费用',exact:true}).click();
+  const submit=page.getByRole('button',{name:'确认记录用量',exact:true});assert.equal(await submit.isDisabled(),true);
+  await page.getByRole('spinbutton',{name:'账单输入 Token',exact:true}).fill('12');
+  await page.getByRole('spinbutton',{name:'账单输出 Token',exact:true}).fill('34');
+  await page.getByRole('textbox',{name:'核对依据',exact:true}).fill('测试账单编号 fixture-receipt');
+  assert.equal(await submit.isDisabled(),true);
+  await page.getByRole('checkbox',{name:'我已核对供应方账单，确认以上用量',exact:true}).check();
+  await submit.click();await page.getByRole('status').filter({hasText:'费用已按请求时的单价核对'}).waitFor();
+  assert.deepEqual(reconciled,{inputTokens:12,outputTokens:34,note:'测试账单编号 fixture-receipt',confirmation:'RECONCILE'});
+  await page.getByText('没有进行中或待核对的调用。',{exact:true}).waitFor();
+  await page.getByText('最近 20 次已结算或未发送的请求',{exact:true}).click();
+  await page.getByText('Fixture · 连接测试 · 已结算',{exact:true}).click();
+  assert.ok((await page.locator('.product-pre').allTextContents()).some(t=>t.includes('fixture-receipt')));
+  await page.screenshot({path:path.resolve(__dirname,'../dist/cost-reconciliation-ui.png'),fullPage:true});
+  assert.deepEqual(errors,[]);console.log('Historical citations, escaped markup, budget forms, and explicit cost reconciliation verified in Chrome.');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

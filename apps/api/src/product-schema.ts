@@ -35,6 +35,13 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS attempt_id text;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS request_id text;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS duration_ms integer;
+    CREATE TABLE IF NOT EXISTS model_reservations (
+      id text PRIMARY KEY, model_id text NOT NULL REFERENCES models(id), project_id text REFERENCES projects(id), department_id text, run_id text,
+      purpose text NOT NULL, amount numeric NOT NULL CHECK(amount>=0), input_rate numeric NOT NULL, output_rate numeric NOT NULL,
+      status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','uncertain','settled','released')), context jsonb NOT NULL DEFAULT '{}',
+      history jsonb NOT NULL DEFAULT '[]', created_at timestamptz NOT NULL DEFAULT now(), expires_at timestamptz NOT NULL DEFAULT now()+interval '5 minutes'
+    );
+    CREATE INDEX IF NOT EXISTS model_reservations_open ON model_reservations(status,project_id,run_id);
     ALTER TABLE project_runs DROP CONSTRAINT IF EXISTS project_runs_project_id_project_version_key;
     CREATE UNIQUE INDEX IF NOT EXISTS project_runs_attempt ON project_runs(project_id,project_version,attempt);
     CREATE TABLE IF NOT EXISTS tool_approvals (id text PRIMARY KEY, run_id text NOT NULL REFERENCES project_runs(id), agent_id text NOT NULL, tool text NOT NULL, arguments jsonb NOT NULL, status text NOT NULL DEFAULT 'pending', created_at timestamptz NOT NULL DEFAULT now(), decided_at timestamptz);
