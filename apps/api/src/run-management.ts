@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
+import { queryKnowledge } from './knowledge-store.ts';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
 export function runManagementRouter(traceRoot:string){
@@ -13,6 +14,19 @@ export function runManagementRouter(traceRoot:string){
  router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');res.json(listArtifacts(join(traceRoot,id,'artifacts')));});
  router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');try{const file=artifactFile(join(traceRoot,id,'artifacts'),path);res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.setHeader('X-Content-Type-Options','nosniff');res.type('application/octet-stream');res.attachment(path.split('/').at(-1));res.sendFile(file);}catch{throw new AppError(404,'交付物不存在或路径不允许');}});
  router.get('/runs/:id/export',async(req,res)=>{const run=readRun(traceRoot,z.uuid().parse(req.params.id));if(!run)throw new AppError(404,'运行不存在');res.attachment('run-'+run.id+'.json').json(run);});
+ router.get('/runs/:id/citations/:chunkId',async(req,res)=>{
+  const run=readRun(traceRoot,z.uuid().parse(req.params.id));
+  if(!run)throw new AppError(404,'运行不存在');
+  if(run.integrity!=='ok')throw new AppError(409,'运行档案不完整，无法核对引用');
+  const chunkId=z.string().min(1).max(200).parse(req.params.chunkId);
+  const event=run.events.find(e=>e.type==='knowledge/citation'&&e.data.sources?.some((c:any)=>c.chunkId===chunkId));
+  if(!event)throw new AppError(404,'此切片不在该运行的引用记录中');
+  const expected=event.data.sources.find((c:any)=>c.chunkId===chunkId);
+  const chunk=await queryKnowledge(run.snapshot.knowledge,event.data.agentId,'read',chunkId);
+  if(!chunk||chunk.documentId!==expected.documentId||chunk.version!==expected.version||chunk.sha256!==expected.sha256)
+   throw new AppError(409,'知识引用与运行快照不一致');
+  res.json(chunk);
+ });
  router.post('/runs/:id/retry',async(req,res)=>{
   const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true)}).parse(req.body),client=await pool.connect();
   try{await client.query('BEGIN');const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');

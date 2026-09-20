@@ -14,6 +14,7 @@ export async function migrateProduct(pool: pg.Pool) {
     CREATE TABLE IF NOT EXISTS knowledge_revisions (document_id text NOT NULL REFERENCES knowledge_documents(id), version integer NOT NULL, content text NOT NULL, sha256 text NOT NULL, source jsonb NOT NULL DEFAULT '{}', created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(document_id,version));
     CREATE TABLE IF NOT EXISTS knowledge_chunks (id text PRIMARY KEY, document_id text NOT NULL, version integer NOT NULL, line_start integer NOT NULL, line_end integer NOT NULL, content text NOT NULL, tokens jsonb NOT NULL);
     CREATE INDEX IF NOT EXISTS knowledge_chunks_document ON knowledge_chunks(document_id,version);
+    CREATE INDEX IF NOT EXISTS knowledge_chunks_tokens ON knowledge_chunks USING gin(tokens);
     ALTER TABLE knowledge_spaces ADD COLUMN IF NOT EXISTS vault_folder text;
     ALTER TABLE knowledge_documents ADD COLUMN IF NOT EXISTS vault_path text;
     ALTER TABLE knowledge_documents ADD COLUMN IF NOT EXISTS vault_hash text;

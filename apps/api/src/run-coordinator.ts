@@ -7,13 +7,14 @@ import { AppError } from './provider.ts';
 import { ProductDshRuntime } from '../../../services/agent-runtime/product-runtime.mjs';
 import { readRun, createRunArchive, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { command } from '../../../services/agent-runtime/sandbox.mjs';
+import { queryKnowledge } from './knowledge-store.ts';
 import { settings } from './product.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 export class RunCoordinator {
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;
   constructor(public traceRoot:string){
-    this.runtime=new ProductDshRuntime({traceRoot,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal)});
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal)});
     this.timer=setInterval(()=>void this.tick(),1000);this.timer.unref();void this.tick();
   }
   async recordUsage(runId:string,u:RuntimeUsage){

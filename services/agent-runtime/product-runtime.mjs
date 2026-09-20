@@ -20,10 +20,10 @@ function lastAssistantText(agent) {
 }
 
 export class ProductDshRuntime {
-  constructor({ traceRoot, onUsage, requestApproval }) {
+  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
-    this.onUsage = onUsage; this.requestApproval = requestApproval;
+    this.queryKnowledge = queryKnowledge; this.onUsage = onUsage; this.requestApproval = requestApproval;
   }
 
   async inspect() {
@@ -77,7 +77,7 @@ export class ProductDshRuntime {
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
-        product: { snapshot, sandbox, gate, requestApproval: this.requestApproval } });
+        product: { snapshot, sandbox, gate, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');

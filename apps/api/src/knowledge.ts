@@ -4,36 +4,11 @@ import { randomUUID, createHash } from 'node:crypto';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { ensureSpaceFolder, writeVaultDocument, archiveVaultDocument, syncObsidian, withVaultLock } from './obsidian.ts';
-import { chunkDocument, searchKnowledge } from '../../../services/agent-runtime/knowledge.mjs';
+import { chunkDocument } from '../../../services/agent-runtime/knowledge.mjs';
 const spaceSchema = z.object({ name: z.string().trim().min(1).max(100), scope: z.enum(['company','department','employee']), departmentId: z.string().nullable().optional(), agentIds: z.array(z.string()).max(6).default([]) });
 const documentSchema = z.object({ spaceId: z.string(), title: z.string().trim().min(1).max(200), content: z.string().min(1).max(250000), version: z.number().int().positive().optional(), source: z.object({ runId: z.string().optional(), note: z.string().max(1000).optional() }).default({}) });
-export async function availableKnowledge(departmentId: string, agentId: string, grants: string[]) {
-  return (await pool.query(`SELECT c.id,c.document_id AS "documentId",c.version,c.line_start AS "lineStart",c.line_end AS "lineEnd",c.content,c.tokens,d.title,d.space_id AS "spaceId",r.sha256,r.source
-    FROM knowledge_chunks c JOIN knowledge_documents d ON d.id=c.document_id AND d.version=c.version
-    JOIN knowledge_revisions r ON r.document_id=c.document_id AND r.version=c.version JOIN knowledge_spaces s ON s.id=d.space_id
-    WHERE d.deleted_at IS NULL AND s.deleted_at IS NULL AND s.id=ANY($3::text[])
-      AND (s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2)))
-    ORDER BY d.id,c.line_start LIMIT 300`,[departmentId,agentId,grants])).rows;
-}
-export async function validateKnowledgeGrants(agents:any[],departmentId:string,db=pool){
- for(const agent of agents){
-  const ids=[...new Set<string>(agent.knowledgeSpaceIds??[])];if(!ids.length)continue;
-  const allowed=(await db.query(`SELECT id FROM knowledge_spaces WHERE id=ANY($1::text[]) AND deleted_at IS NULL
-   AND (scope='company' OR (department_id=$2 AND (scope='department' OR agent_ids ? $3)))`,[ids,departmentId,agent.employeeId??agent.id])).rows.map(r=>r.id);
-  const invalid=ids.filter(id=>!allowed.includes(id));
-  if(invalid.length)throw new AppError(422,`${agent.name??agent.employeeId??agent.id} 的知识授权已失效或不属于该员工：${invalid.join('、')}。请修改方案后重新批准。`,'KNOWLEDGE_GRANT_INVALID');
- }
-}
-export async function knowledgeSnapshot(agents: any[], departmentId: string) {
-  await validateKnowledgeGrants(agents,departmentId);
-  const result: Record<string,any[]> = {};
-  for (const agent of agents) {
-    const chunks = await availableKnowledge(departmentId,agent.employeeId ?? agent.id,agent.knowledgeSpaceIds ?? []);
-    let bytes = 0;
-    result[agent.id] = chunks.filter(c => (bytes += Buffer.byteLength(c.content)) <= 160000);
-  }
-  return result;
-}
+export { knowledgeSnapshot, validateKnowledgeGrants } from './knowledge-store.ts';
+import { searchAvailableKnowledge } from './knowledge-store.ts';
 export function knowledgeRouter() {
   const router=Router();
   router.get('/knowledge/spaces',async(_req,res)=>res.json((await pool.query('SELECT id,name,scope,department_id AS "departmentId",agent_ids AS "agentIds",version,vault_folder AS "vaultFolder" FROM knowledge_spaces WHERE deleted_at IS NULL ORDER BY name')).rows));
@@ -73,7 +48,7 @@ export function knowledgeRouter() {
     const department=(await pool.query('SELECT data FROM departments WHERE id=$1 AND deleted_at IS NULL',[input.departmentId])).rows[0];
     const agent=department?.data.agents.find((a:any)=>a.id===input.agentId);
     if(!agent)throw new AppError(404,'员工不存在');
-    res.json(searchKnowledge(await availableKnowledge(input.departmentId,agent.id,agent.knowledgeSpaceIds??[]),input.query));
+    res.json(await searchAvailableKnowledge(input.departmentId,agent,input.query));
   });
   return router;
 }

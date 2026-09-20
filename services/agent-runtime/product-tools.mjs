@@ -6,7 +6,7 @@ export function employeeFor(agent,snapshot,captainId){
   const name=descriptor?.data?.label?.split(':').at(-1);
   return snapshot.agents.find(a=>a.id===name);
 }
-export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId}){
+export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge}){
   const string={type:'string',required:true};
   const tools=[
     ['artifact_write','写入文本交付物。新文件可直接写；修改已有文件必须先 filesystem 读取，再传入读取时的 sha256 为 expectedSha256，冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
@@ -21,9 +21,11 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     if(!employee||!employee.tools.includes(name))throw Error('TOOL_PERMISSION_DENIED: 此员工没有该工具权限');
     if(name.startsWith('knowledge_')){
       const chunks=snapshot.knowledge?.[employee.id]??[];
-      const result=name==='knowledge_search'?searchKnowledge(chunks,String(args.query).slice(0,1000)):chunks.find(c=>c.id===args.chunkId);
+      if(snapshot.knowledge?.format==='document-versions-v2'&&!queryKnowledge)throw Error('KNOWLEDGE_SERVICE_UNAVAILABLE: 历史版本检索服务不可用');
+      const result=queryKnowledge?await queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000)):
+        name==='knowledge_search'?searchKnowledge(chunks,String(args.query).slice(0,1000)):chunks.find(c=>c.id===args.chunkId);
       if(!result)throw Error('知识切片不存在或未授权');
-      archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256}))},{sessionId:exec.agent.id});return result;
+      archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});return result;
     }
     if(name==='terminal'||name==='terminal_test'){
       if(!requestApproval)throw Error('审批服务不可用');

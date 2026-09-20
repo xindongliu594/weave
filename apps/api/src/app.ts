@@ -248,7 +248,7 @@ export function createApp() {
         const snapshot = { title: project.requirement.slice(0, 120), mode: 'product', templateVersion: 'department-execution-v1', projectId: project.id,
           departmentId: project.department_id, departmentName: project.department_name, departmentVersion: project.department_version, planVersion: project.version,
           requirement: project.requirement, rationale: project.plan.rationale, policy: project.policy, executionBudget, estimatedCost: validation.estimate,
-          knowledge: await knowledgeSnapshot(agents, project.department_id),
+          knowledge: await knowledgeSnapshot(agents, project.department_id, client),
           approval: { kind: req.body.automatic ? 'automatic-policy' : 'project', approvedAt: new Date().toISOString(), projectVersion: project.version }, agents, tasks,
           modelRoutes: routes.map(({ apiKey: _secret, ...route }) => route) };
         await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES($1,$2,$3,$4,$5)', [runId, project.id, project.version, 'queued', snapshot]);
