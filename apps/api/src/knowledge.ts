@@ -15,7 +15,17 @@ export async function availableKnowledge(departmentId: string, agentId: string, 
       AND (s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2)))
     ORDER BY d.id,c.line_start LIMIT 300`,[departmentId,agentId,grants])).rows;
 }
+export async function validateKnowledgeGrants(agents:any[],departmentId:string,db=pool){
+ for(const agent of agents){
+  const ids=[...new Set<string>(agent.knowledgeSpaceIds??[])];if(!ids.length)continue;
+  const allowed=(await db.query(`SELECT id FROM knowledge_spaces WHERE id=ANY($1::text[]) AND deleted_at IS NULL
+   AND (scope='company' OR (department_id=$2 AND (scope='department' OR agent_ids ? $3)))`,[ids,departmentId,agent.employeeId??agent.id])).rows.map(r=>r.id);
+  const invalid=ids.filter(id=>!allowed.includes(id));
+  if(invalid.length)throw new AppError(422,`${agent.name??agent.employeeId??agent.id} 的知识授权已失效或不属于该员工：${invalid.join('、')}。请修改方案后重新批准。`,'KNOWLEDGE_GRANT_INVALID');
+ }
+}
 export async function knowledgeSnapshot(agents: any[], departmentId: string) {
+  await validateKnowledgeGrants(agents,departmentId);
   const result: Record<string,any[]> = {};
   for (const agent of agents) {
     const chunks = await availableKnowledge(departmentId,agent.employeeId ?? agent.id,agent.knowledgeSpaceIds ?? []);

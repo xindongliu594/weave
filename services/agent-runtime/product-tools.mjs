@@ -9,7 +9,7 @@ export function employeeFor(agent,snapshot,captainId){
 export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId}){
   const string={type:'string',required:true};
   const tools=[
-    ['artifact_write','在隔离工作区写入文本交付物。只允许相对路径。',{path:string,content:string}],
+    ['artifact_write','写入文本交付物。新文件可直接写；修改已有文件必须先 filesystem 读取，再传入读取时的 sha256 为 expectedSha256，冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
     ['filesystem','读取隔离工作区中的文件，不能读取宿主机。',{path:string}],
     ['terminal','申请在无网络、无宿主机挂载的受限容器内运行命令，等待用户批准。',{command:string}],
     ['terminal_test','申请在受限容器内执行测试命令，等待用户批准。',{command:string}],
@@ -27,6 +27,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     }
     if(name==='terminal'||name==='terminal_test'){
       if(!requestApproval)throw Error('审批服务不可用');
+      args={...args,expectedWorkspaceRevision:sandbox.revision()};
       await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal);
     }
     const release=await gate.acquire(exec.signal);

@@ -14,7 +14,9 @@ async function call(path:string,method='GET',body?:unknown,headers:Record<string
 test('organization templates, prompt versions, archive and restore remain durable',async()=>{
  const t=await call('/templates');assert.equal(t.status,200);assert.ok(t.data.roles.length>=4);
  const preview=await call('/organizations/preview','POST',{templateId:'research',requirement:'整理现有产品资料并形成可验证的研究报告',policy:{maxBudget:1,maxAgents:3,maxConcurrentAgents:1,deadlineSeconds:300}});assert.equal(preview.status,200);assert.equal(preview.data.department.agents.length,3);
- const created=await call('/organizations','POST',preview.data);assert.equal(created.status,201,JSON.stringify(created.data));
+ const created=await call('/organizations','POST',preview.data);assert.equal(created.status,201,JSON.stringify(created.data));assert.equal(preview.data.plan.tasks.length,3);assert.deepEqual((await call('/projects')).data[0].plan.tasks,preview.data.plan.tasks);
+ const duplicate=await call('/organizations','POST',preview.data);assert.equal(duplicate.data.projectId,created.data.projectId);assert.equal((await call('/departments')).data.length,1);
+ assert.equal((await call('/organizations','POST',{...preview.data,requirement:'修改成不同的新需求，必须显式创建预览'})).status,409);
  const d=(await call('/departments')).data[0];d.agents[0].instructions='更新后的协调职责，与当前任务指令独立。';assert.equal((await call('/departments/'+d.id,'PUT',d)).status,200);
  const current=(await call('/departments')).data[0];assert.equal(current.agents[0].roleVersion,2);assert.equal((await call('/departments/'+d.id+'/versions')).data.length,2);
  assert.equal((await call('/departments/'+d.id,'DELETE',{version:current.version})).status,200);const archived=(await call('/departments/archived')).data[0];assert.equal((await call('/departments/'+d.id+'/restore','POST',{version:archived.version})).status,200);assert.equal((await call('/projects')).data.length,1);
@@ -59,6 +61,16 @@ test('idempotency rejects mismatched content and encrypted backup restores data'
  const before=(await call('/departments')).data;await call('/departments/'+before[0].id,'DELETE',{version:before[0].version});assert.equal((await call('/departments')).data.length,0);
  assert.equal((await call('/backup/restore','POST',{password:'wrong-password-long',backup:backup.data,confirmation:'RESTORE'})).status,422);
  const restored=await call('/backup/restore','POST',{password:pass,backup:backup.data,confirmation:'RESTORE'});assert.equal(restored.status,200,JSON.stringify(restored.data));assert.deepEqual((await call('/departments')).data,before);assert.equal(await readFile(file,'utf8'),saved);
+});
+test('approval knowledge grants reject missing, archived and foreign employee spaces',async()=>{
+ const {validateKnowledgeGrants,knowledgeSnapshot}=await import('../apps/api/src/knowledge.ts');
+ const department=(await call('/departments')).data[0],agent=department.agents[0],other=department.agents[1];
+ const spaces=(await call('/knowledge/spaces')).data,privateSpace=spaces.find((s:any)=>s.scope==='employee');
+ await validateKnowledgeGrants([{...agent,knowledgeSpaceIds:[privateSpace.id]}],department.id);
+ await assert.rejects(knowledgeSnapshot([{...other,knowledgeSpaceIds:[privateSpace.id]}],department.id),e=>(e as any).code==='KNOWLEDGE_GRANT_INVALID');
+ await assert.rejects(validateKnowledgeGrants([{...agent,knowledgeSpaceIds:['missing']}],department.id),/知识授权已失效/);
+ const archived=await call('/knowledge/spaces','POST',{name:'待归档资料',scope:'company'});await call('/knowledge/spaces/'+archived.data.id,'DELETE',{version:1});
+ await assert.rejects(validateKnowledgeGrants([{...agent,knowledgeSpaceIds:[archived.data.id]}],department.id),/知识授权已失效/);
 });
 test('expired runs require explicit checkpoint resume and cancelled queue entries stay visible',async()=>{
  await app.locals.shutdown();

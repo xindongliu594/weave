@@ -98,6 +98,8 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     this.reserved += reservation;
     let reservationHeld = true;
     let response;
+    const attribution=this.attribution?.(options.sessionId)??{sessionId:options.sessionId};
+    const started=Date.now();
     try {
       this.onRequest?.({sessionId:options.sessionId,modelId:route.id,body});
       response = await fetch(route.baseUrl.replace(/\/$/, '') + '/chat/completions', {
@@ -123,7 +125,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       this.reserved -= reservation;
       reservationHeld = false;
       this.spent += actualCost;
-      await this.onUsage?.({ id: randomUUID(), modelId: route.id, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });
+      await this.onUsage?.({ id: randomUUID(), ...attribution, modelId: route.id, durationMs:Date.now()-started, inputTokens: reported.inputTokens + (reported.cacheReadTokens ?? 0), outputTokens: reported.outputTokens, cost: actualCost });
       const message = payload.choices?.[0]?.message;
       if (!message || typeof message !== 'object') throw new LlmError('中转站响应缺少 assistant message', 'INVALID_RESPONSE');
       const blocks = [];

@@ -67,7 +67,7 @@ export type Plan = z.infer<typeof planSchema>;
 export type Validation = { valid: boolean; errors: string[]; estimate: number | null; checks: { label: string; pass: boolean }[] };
 export type Project = { id: string; departmentId: string; departmentVersion: number; departmentName: string; requirement: string; policy: Policy; plan: Plan; version: number; status: string; source: 'manual' | 'model'; createdAt: string; validation: Validation; planningCost: number };
 export type Activity = { id: string; kind: string; title: string; createdAt: string };
-export type Usage = { id: string; modelId: string; projectId: string | null; inputTokens: number; outputTokens: number; cost: number; purpose: string; createdAt: string };
+export type Usage = { runId?: string|null; agentId?: string|null; employeeId?: string|null; agentName?: string|null; sessionId?: string|null; taskId?: string|null; attemptId?: string|null; requestId?: string|null; durationMs?: number|null; id: string; modelId: string; projectId: string | null; inputTokens: number; outputTokens: number; cost: number; purpose: string; createdAt: string };
 
 /** Validation runs on the server again on every state-changing operation. */
 export function validatePlan(plan: Plan, policy: Policy, models: Model[]): Validation {

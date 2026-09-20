@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { Context } from '@deepseek-ai/cordis';
 import * as teams from '@nanmicoder/dsh-agent-teams';
 import { attachTrace } from './trace.mjs';
-import { installProductTools } from './product-tools.mjs';
+import { installProductTools, employeeFor } from './product-tools.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
@@ -19,6 +19,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const handles = [];
   let closing;
   let trace;
+  const taskIds = new Map();
   let productDispose, captainId, locked = false;
   async function mount(name, config) {
     const mod = await import(pathToFileURL(baseRequire.resolve(name)).href);
@@ -56,6 +57,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       });
       productDispose = installProductTools(ctx, { ...product, archive, captainId: () => captainId });
       ctx.on('llm/stream', async function* (options, next) {
+        const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
+        if(!employee)throw Error('MODEL_PERMISSION_DENIED: 无法确认此会话所属员工');
+        adapter.sessionPolicies?.set(options.sessionId,employee);
         const release = await product.gate.acquire(options.signal);
         try { yield* next(); } finally { release(); }
       });
@@ -65,6 +69,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       });
     }
     if (archive) trace = attachTrace(ctx, archive);
+    if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId);return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId:taskIds.get(request.taskId)??request.taskId};};
     await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: sessionRoot, compression: 'none' });
     await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
     await mount('@deepseek-ai/dsh-subagent');
@@ -76,6 +81,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ctx,
       close,
       lockPlan() { locked = true; },
+      bindTaskMapping(tasks) { for(const task of tasks)taskIds.set(task.task_id,task.seed_id); },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
         const handle = await ctx.agents.create({ sessionId: id, meta: { cwd }, agentOptions: { provider, model, ...(maxTokens ? { maxTokens } : {}) },
           setup: instructions ? agentCtx => { agentCtx.systemPrompt.section({ name: 'department:role', order: 118, text: instructions }); } : undefined });

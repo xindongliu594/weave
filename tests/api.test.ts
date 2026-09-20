@@ -114,6 +114,10 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.equal(JSON.stringify(run.data.snapshot).includes('test-key-not-real'), false);
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'team/snapshot'));
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'billing/usage'));
+  const billed=(await call('/usage')).data.filter((u:any)=>u.runId===approved.data.id);
+  assert.ok(billed.length>0);assert.ok(billed.every((u:any)=>u.agentId==='employee-1'&&u.employeeId==='manager'&&u.sessionId&&u.requestId&&u.durationMs>=0),JSON.stringify(billed.map((u:any)=>({agent:u.agentId,employee:u.employeeId,session:u.sessionId,request:u.requestId,task:u.taskId}))));
+  assert.ok(billed.some((u:any)=>u.taskId===project.plan.tasks[0].id&&u.attemptId));
+  const requestIds=new Set(run.data.events.filter((e:any)=>e.type==='model/request').map((e:any)=>e.requestId));assert.ok(billed.every((u:any)=>requestIds.has(u.requestId)));
   assert.equal((await call(`/projects/${p.data.id}/versions`)).data.length, 3);
   assert.equal((await call(`/departments/${d.data.id}`, 'DELETE', { version: 1 })).status, 200);
   assert.equal((await call('/departments')).data.length, 0);
@@ -121,6 +125,23 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.ok((await call('/usage')).data.some((item: { purpose: string }) => item.purpose === '项目执行'));
   assert.equal((await call(`/gateways/${g.data.id}`, 'PUT', { version: 1, name: '新连接配置', baseUrl: gatewayUrl })).status, 200);
   assert.equal((await call('/models')).data[0].status, 'untested');
+});
+test('organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost',async()=>{
+ const model=(await call('/models')).data[0];await call('/models/'+model.id+'/test','POST',{});
+ const input={requirement:'整理现有资料，分析需求并独立审查最后汇总',templateId:'research',modelId:model.id,policy:{maxBudget:1,maxAgents:3,maxConcurrentAgents:2,deadlineSeconds:300},generate:false};
+ const template=(await call('/organizations/preview','POST',input)).data;
+ plannedResponse={department:template.department,rationale:'根据需求明确拆解并审查',tasks:template.plan.tasks};
+ const before=(await call('/departments')).data.length;
+ const preview=await call('/organizations/preview','POST',{...input,generate:true,maxPlanningCost:.1});assert.equal(preview.status,200,JSON.stringify(preview.data));assert.equal(preview.data.plan.tasks.length,3);assert.equal(preview.data.validation.valid,true);assert.equal((await call('/departments')).data.length,before);
+ const edited=structuredClone(preview.data);edited.plan.tasks[0].objective+='；用户补充需要记录证据';
+ const created=await call('/organizations','POST',edited);assert.equal(created.status,201,JSON.stringify(created.data));
+ const project=(await call('/projects')).data.find((p:any)=>p.id===created.data.projectId);assert.deepEqual(project.plan,edited.plan);assert.equal(project.source,'model');assert.ok(project.planningCost>0);
+ const versions=(await call('/projects/'+project.id+'/versions')).data;assert.equal(versions[0].version,1);assert.equal(versions[1].version,0);assert.deepEqual(versions[1].plan,preview.data.plan);
+ const invalidGrant=structuredClone(project.plan);invalidGrant.agents[0].knowledgeSpaceIds=['missing-space'];await call('/projects/'+project.id+'/plan','PUT',{version:1,plan:invalidGrant});
+ const beforeApprovalCalls=requests;const denied=await call('/projects/'+project.id+'/approve','POST',{version:2});assert.equal(denied.status,422);assert.equal(denied.data.code,'KNOWLEDGE_GRANT_INVALID');assert.equal(requests,beforeApprovalCalls);
+ plannedResponse={department:template.department,rationale:'bad cycle',tasks:template.plan.tasks.map((t:any,i:number)=>({...t,dependencies:i===0?['deliver']:t.dependencies}))};
+ assert.equal((await call('/organizations/preview','POST',{...input,generate:true,maxPlanningCost:.1})).status,422);
+ assert.equal((await call('/departments')).data.length,before+1);
 });
 test('dynamic loopback preview can save a gateway through the local proxy', async () => {
   for (const origin of ['http://localhost:54234', 'http://127.0.0.1:54674', 'http://[::1]:55123']) {

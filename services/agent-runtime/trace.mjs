@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 export function attachTrace(ctx, archive) {
   const disposers = [];
   const links = new Map();
+  const requests = new Map();
   let failure;
   const write = (type, data, ref) => {
     try { return archive.append(type, data, ref); }
@@ -48,6 +49,7 @@ export function attachTrace(ctx, archive) {
     if (taskId && attemptId) links.set(options.sessionId, { taskId, attemptId });
     const requestId = randomUUID();
     const ref = { sessionId: options.sessionId, requestId, ...links.get(options.sessionId) };
+    requests.set(options.sessionId,ref);
     const started = Date.now();
     write('model/request', { provider: options.provider, model: options.model, messages: options.messages, system: options.system, tools: options.tools, reasoningEffort: options.reasoningEffort, maxTokens: options.maxTokens }, ref);
     try {
@@ -59,7 +61,7 @@ export function attachTrace(ctx, archive) {
     } catch (error) {
       write('model/error', { message: String(error.message ?? error), durationMs: Date.now() - started }, ref);
       throw error;
-    }
+    } finally { if(requests.get(options.sessionId)===ref)requests.delete(options.sessionId); }
   }));
-  return { check, dispose() { for (const dispose of disposers.reverse()) dispose(); } };
+  return { check, request(sessionId) { return requests.get(sessionId); }, dispose() { for (const dispose of disposers.reverse()) dispose(); } };
 }

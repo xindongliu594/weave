@@ -17,8 +17,8 @@ export class RunCoordinator {
     this.timer=setInterval(()=>void this.tick(),1000);this.timer.unref();void this.tick();
   }
   async recordUsage(runId:string,u:RuntimeUsage){
-    await pool.query(`INSERT INTO usage(id,model_id,project_id,run_id,input_tokens,output_tokens,cost,purpose)
-      SELECT $1,$2,project_id,id,$3,$4,$5,'项目执行' FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId]);
+    await pool.query(`INSERT INTO usage(id,model_id,project_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
+      SELECT $1,$2,project_id,id,$3,$4,$5,'项目执行',$7,$8,$9,$10,$11,$12,$13 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null]);
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();

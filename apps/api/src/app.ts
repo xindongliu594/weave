@@ -270,7 +270,7 @@ export function createApp() {
     res.json((await pool.query('SELECT id,kind,title,created_at AS "createdAt" FROM activity ORDER BY created_at DESC LIMIT 30')).rows);
   });
   app.get('/api/usage', async (_req, res) => {
-    const { rows } = await pool.query('SELECT id,model_id AS "modelId",project_id AS "projectId",input_tokens AS "inputTokens",output_tokens AS "outputTokens",cost::float AS cost,purpose,created_at AS "createdAt" FROM usage ORDER BY created_at DESC'); res.json(rows);
+    const { rows } = await pool.query('SELECT u.id,u.model_id AS "modelId",u.project_id AS "projectId",u.run_id AS "runId",u.agent_id AS "agentId",u.employee_id AS "employeeId",u.session_id AS "sessionId",u.task_id AS "taskId",u.attempt_id AS "attemptId",u.request_id AS "requestId",u.duration_ms AS "durationMs",u.input_tokens AS "inputTokens",u.output_tokens AS "outputTokens",u.cost::float AS cost,u.purpose,u.created_at AS "createdAt",(SELECT a->>\'name\' FROM jsonb_array_elements(r.snapshot->\'agents\') a WHERE a->>\'id\'=u.agent_id LIMIT 1) AS "agentName" FROM usage u LEFT JOIN project_runs r ON r.id=u.run_id ORDER BY u.created_at DESC'); res.json(rows);
   });
   app.get('/api/runs', async (_req, res) => { const archived = listRuns(traceRoot); const pending = (await pool.query("SELECT id,created_at AS \"createdAt\",snapshot->>'title' AS title,status FROM project_runs")).rows.filter(r => !archived.some(a => a.id === r.id)); res.json([...pending.map(r => ({...r,createdAt: new Date(r.createdAt).toISOString(),mode:'product',eventCount:0,integrity:'ok'})),...archived]); });
   app.get('/api/runs/:id', async (req, res) => {

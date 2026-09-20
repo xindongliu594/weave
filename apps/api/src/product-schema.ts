@@ -25,6 +25,15 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS parent_run_id text;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS cancel_requested boolean NOT NULL DEFAULT false;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS run_id text;
+    CREATE TABLE IF NOT EXISTS organization_previews(id text PRIMARY KEY,data jsonb NOT NULL,project_id text,department_id text,created_at timestamptz NOT NULL DEFAULT now());
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS planning_preview_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS agent_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS employee_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS session_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS task_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS attempt_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS request_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS duration_ms integer;
     ALTER TABLE project_runs DROP CONSTRAINT IF EXISTS project_runs_project_id_project_version_key;
     CREATE UNIQUE INDEX IF NOT EXISTS project_runs_attempt ON project_runs(project_id,project_version,attempt);
     CREATE TABLE IF NOT EXISTS tool_approvals (id text PRIMARY KEY, run_id text NOT NULL REFERENCES project_runs(id), agent_id text NOT NULL, tool text NOT NULL, arguments jsonb NOT NULL, status text NOT NULL DEFAULT 'pending', created_at timestamptz NOT NULL DEFAULT now(), decided_at timestamptz);
