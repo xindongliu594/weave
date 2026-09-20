@@ -1,0 +1,58 @@
+name: Windows desktop verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-windows-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  desktop:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.19.0
+          package-manager-cache: false
+      - name: Install pinned desktop dependencies
+        run: npm ci --prefix apps/desktop
+      - name: Unit tests
+        run: npm test --prefix apps/desktop
+      - name: Build Windows installer and portable package
+        run: npm run dist --prefix apps/desktop -- --win --x64
+      - name: Verify packaged app against local fixture
+        shell: pwsh
+        run: |
+          $env:DESKTOP_EXECUTABLE = (Resolve-Path 'dist/desktop/win-unpacked/Agent Department.exe').Path
+          node apps/desktop/desktop.smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Install, verify installed app, and uninstall
+        shell: pwsh
+        run: |
+          $version = (Get-Content apps/desktop/package.json | ConvertFrom-Json).version
+          $installer = (Resolve-Path "dist/desktop/Agent-Department-$version-win-x64.exe").Path
+          $installDir = Join-Path $env:RUNNER_TEMP 'agent-department-installed'
+          $result = Start-Process -FilePath $installer -ArgumentList @('/S', "/D=$installDir") -Wait -PassThru
+          if ($result.ExitCode -ne 0) { throw "Installer failed: $($result.ExitCode)" }
+          $env:DESKTOP_EXECUTABLE = Join-Path $installDir 'Agent Department.exe'
+          if (!(Test-Path $env:DESKTOP_EXECUTABLE)) { throw 'Installed executable missing' }
+          node apps/desktop/desktop.smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Process 'Agent Department' -ErrorAction SilentlyContinue | Stop-Process -Force
+          $uninstaller = Join-Path $installDir 'Uninstall Agent Department.exe'
+          if (!(Test-Path $uninstaller)) { throw 'Uninstaller missing' }
+          $result = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
+          if ($result.ExitCode -ne 0) { throw "Uninstaller failed: $($result.ExitCode)" }
+          for ($i=0; $i -lt 30 -and (Test-Path $env:DESKTOP_EXECUTABLE); $i++) { Start-Sleep -Seconds 1 }
+          if (Test-Path $env:DESKTOP_EXECUTABLE) { throw 'Uninstaller left the executable behind' }
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: verified-windows-desktop
+          retention-days: 7
+          path: |
+            dist/desktop/*.exe
+            dist/desktop/*win-x64.zip
