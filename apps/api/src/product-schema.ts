@@ -1,4 +1,5 @@
 import type pg from 'pg';
+import {bindPolicy} from '../../../packages/contracts/index.ts';
 export async function migrateProduct(pool: pg.Pool) {
   // Tests use isolated search paths; install the shared extension once under an advisory lock.
   const extension=await pool.connect();
@@ -14,6 +15,7 @@ export async function migrateProduct(pool: pg.Pool) {
     CREATE TRIGGER department_version_history AFTER INSERT OR UPDATE ON departments FOR EACH ROW EXECUTE FUNCTION record_department_version();
     CREATE TABLE IF NOT EXISTS templates (id text PRIMARY KEY, kind text NOT NULL, name text NOT NULL, data jsonb NOT NULL, version integer NOT NULL DEFAULT 1, deleted_at timestamptz);
     ALTER TABLE models ADD COLUMN IF NOT EXISTS capabilities jsonb NOT NULL DEFAULT '{}';
+    ALTER TABLE plan_versions ADD COLUMN IF NOT EXISTS policy jsonb;
     CREATE TABLE IF NOT EXISTS model_capability_tests(id text PRIMARY KEY,model_id text NOT NULL REFERENCES models(id),model_version int NOT NULL,probe_version text NOT NULL,status text NOT NULL,code text,request_ids jsonb NOT NULL DEFAULT '[]',created_at timestamptz NOT NULL DEFAULT now(),finished_at timestamptz);
     CREATE TABLE IF NOT EXISTS knowledge_spaces (id text PRIMARY KEY, name text NOT NULL, scope text NOT NULL, department_id text, agent_ids jsonb NOT NULL DEFAULT '[]', version integer NOT NULL DEFAULT 1, deleted_at timestamptz);
     CREATE TABLE IF NOT EXISTS knowledge_documents (id text PRIMARY KEY, space_id text NOT NULL REFERENCES knowledge_spaces(id), title text NOT NULL, version integer NOT NULL DEFAULT 1, deleted_at timestamptz, created_at timestamptz NOT NULL DEFAULT now());
@@ -54,4 +56,11 @@ export async function migrateProduct(pool: pg.Pool) {
     CREATE TABLE IF NOT EXISTS tool_approvals (id text PRIMARY KEY, run_id text NOT NULL REFERENCES project_runs(id), agent_id text NOT NULL, tool text NOT NULL, arguments jsonb NOT NULL, status text NOT NULL DEFAULT 'pending', created_at timestamptz NOT NULL DEFAULT now(), decided_at timestamptz);
     CREATE TABLE IF NOT EXISTS request_keys (key text PRIMARY KEY, fingerprint text NOT NULL, status integer, response jsonb, created_at timestamptz NOT NULL DEFAULT now());
   `);
+  // Preserve the existing scope on upgrade; do not invent policies for older historical versions.
+  const client=await pool.connect();
+  try{await client.query('BEGIN');
+    const legacy=(await client.query("SELECT id,policy,plan FROM projects WHERE NOT (policy ?& ARRAY['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds']) FOR UPDATE")).rows;
+    for(const row of legacy)await client.query('UPDATE projects SET policy=$1 WHERE id=$2',[bindPolicy(row.policy,row.plan.agents),row.id]);
+    await client.query('COMMIT');
+  }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
 }

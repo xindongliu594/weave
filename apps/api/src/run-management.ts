@@ -1,3 +1,4 @@
+import {assertRunAuthorization} from './execution-policy.ts';
 import { Router } from 'express';
 import { z } from 'zod';
 import { join } from 'node:path';
@@ -32,8 +33,10 @@ export function runManagementRouter(traceRoot:string){
  });
  router.post('/runs/:id/retry',async(req,res)=>{
   const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true)}).parse(req.body),client=await pool.connect();
-  try{await client.query('BEGIN');await shareCostMaintenance(client);const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
-   await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[old.project_id]);
+  try{await client.query('BEGIN');await shareCostMaintenance(client);
+   const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
+   await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
+   const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
    if(!['failed','interrupted','cancelled'].includes(old.status))throw new AppError(409,'仅能恢复或重试已停止的运行');
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    const already=(await client.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];if(already){await client.query('COMMIT');return res.json({id:already.id,existing:true});}
@@ -47,6 +50,7 @@ export function runManagementRouter(traceRoot:string){
    }
    if(!snapshot.tasks.length)throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
    await requireProjectCostReady(client,old.project_id);
+   await assertRunAuthorization(old,client);
    const used=Number((await client.query('SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE project_id=$1',[old.project_id])).rows[0].cost);
    snapshot.executionBudget=snapshot.policy.maxBudget-used;if(snapshot.executionBudget<=0)throw new AppError(422,'项目预算已用尽，修改方案预算后重新批准');
    if(used>=snapshot.policy.maxBudget*.9)throw new AppError(422,'项目费用已达到预算的 90%，不能通过重试增加调用；请检查已有结果并重新制定方案','BUDGET_RETRY_DISABLED');

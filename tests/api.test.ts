@@ -151,7 +151,7 @@ test('organization planning returns a complete editable DAG, rejects invalid pla
  const created=await call('/organizations','POST',edited);assert.equal(created.status,201,JSON.stringify(created.data));
  const project=(await call('/projects')).data.find((p:any)=>p.id===created.data.projectId);assert.deepEqual(project.plan,edited.plan);assert.equal(project.source,'model');assert.ok(project.planningCost>0);
  const versions=(await call('/projects/'+project.id+'/versions')).data;assert.equal(versions[0].version,1);assert.equal(versions[1].version,0);assert.deepEqual(versions[1].plan,preview.data.plan);
- const invalidGrant=structuredClone(project.plan);invalidGrant.agents[0].knowledgeSpaceIds=['missing-space'];await call('/projects/'+project.id+'/plan','PUT',{version:1,plan:invalidGrant});
+ const invalidGrant=structuredClone(project.plan);invalidGrant.agents[0].knowledgeSpaceIds=['missing-space'];assert.equal((await call('/projects/'+project.id+'/plan','PUT',{version:1,plan:invalidGrant,policy:{...project.policy,allowedKnowledgeSpaceIds:['missing-space']}})).status,200);
  const beforeApprovalCalls=requests;const denied=await call('/projects/'+project.id+'/approve','POST',{version:2});assert.equal(denied.status,422);assert.equal(denied.data.code,'KNOWLEDGE_GRANT_INVALID');assert.equal(requests,beforeApprovalCalls);
  plannedResponse={department:template.department,rationale:'bad cycle',tasks:template.plan.tasks.map((t:any,i:number)=>({...t,dependencies:i===0?['deliver']:t.dependencies}))};
  assert.equal((await call('/organizations/preview','POST',{...input,generate:true,maxPlanningCost:.1})).status,422);

@@ -11,12 +11,12 @@ const {once}=require('node:events');
  const source={id:'chunk',chunkId:'chunk',documentId:'doc',title:'冻结的部门规范',version:3,lineStart:7,lineEnd:9,sha256:'a'.repeat(64),source:{vaultPath:'department/规范.md'},content:'原文：先执行部署验证。\n<script>window.unsafeCitation=true</script>'};
  const event={seq:1,at:new Date().toISOString(),type:'knowledge/citation',data:{agentId:'manager',sources:[source]}};
  const run={id,title:'知识引用界面验证',mode:'product',status:'completed',integrity:'ok',createdAt:new Date().toISOString(),events:[event],eventCount:1,hasMore:false,snapshot:{requirement:'核对历史原文',planVersion:1,templateVersion:'fixture',agents:[],tasks:[],knowledge:{format:'document-versions-v2',documents:[{documentId:'doc'}],agentDocuments:{manager:['doc']}}}};
- run.snapshot.policy={maxBudget:1,maxModelCalls:100,maxTaskModelCalls:40};run.snapshot.budgetVersion=1;
+ run.snapshot.policy={maxBudget:1,maxAgents:2,maxConcurrentAgents:1,deadlineSeconds:300,maxModelCalls:100,maxTaskModelCalls:40};run.snapshot.budgetVersion=1;
  run.events.push({seq:2,at:event.at,type:'budget/warning',data:{scope:'project',threshold:90,spent:.9,limit:1,calls:20,maxCalls:100}});
  const model={id:'model',name:'Fixture',model:'fixture',status:'available',gatewayId:'gateway',inputRate:1,outputRate:2};
  const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[]};
  const project={id:'project',departmentId:'department',departmentName:'测试部门',requirement:'预算表单测试需求',version:1,source:'manual',status:'DRAFT',createdAt:event.at,policy:run.snapshot.policy,planningCost:0,validation:{valid:true,estimate:.01,checks:[],errors:[]},plan:{rationale:'Fixture',agents:[agent],tasks:[{id:'task',subject:'测试任务',objective:'核对预算配置',assigneeId:'manager',dependencies:[],acceptanceCriteria:['预算保存正确'],estimatedInputTokens:10,estimatedOutputTokens:10}]}};
- let savedPlan,reconciled,retrievalSaved,toolProbeRequest;
+ let savedPlan,savedPolicy,reconciled,retrievalSaved,toolProbeRequest;
  const retrieval={mode:'keyword',version:1,installed:true,model:'Local fixture embedding',embeddingVersion:'fixture-v1',indexed:1,total:2,running:false,error:null};
  const costCall={id:'cost',modelName:'Fixture',purpose:'连接测试',amount:.5,inputRate:1,outputRate:2,status:'uncertain',createdAt:event.at,history:[]};
  const costs={timezone:'UTC',spent:.1,reserved:.5,calls:[costCall],recent:[],departments:[{id:'department',name:'测试部门',spent:.1,reserved:.5,limit:2}]};
@@ -26,7 +26,7 @@ const {once}=require('node:events');
   if(apiPath.startsWith('/api/')){
    res.setHeader('content-type','application/json');
    if(apiPath===`/api/runs/${id}/citations/chunk`){res.statusCode=missing?409:200;res.end(JSON.stringify(missing?{message:'运行引用的知识版本缺失或不完整'}:source));return;}
-   if(apiPath==='/api/projects/project/plan'&&req.method==='PUT'){let body='';for await(const data of req)body+=data;savedPlan=JSON.parse(body).plan;project.plan=savedPlan;res.end('{}');return;}
+   if(apiPath==='/api/projects/project/plan'&&req.method==='PUT'){let body='';for await(const data of req)body+=data;savedPlan=JSON.parse(body).plan;savedPolicy=JSON.parse(body).policy;project.plan=savedPlan;project.policy=savedPolicy;res.end('{}');return;}
    if(apiPath==='/api/projects/project/knowledge-options'){res.end(JSON.stringify([{id:'doc1',title:'本次选用规范',version:1,agentIds:['manager']},{id:'doc2',title:'无需使用规范',version:2,agentIds:['manager']}]));return;}
    if(apiPath==='/api/models/model/test-tools'){let body='';for await(const data of req)body+=data;toolProbeRequest=JSON.parse(body);model.capabilities={tools:{status:'supported',checkedAt:event.at,testId:'probe-fixture',probeVersion:'chat-tools-roundtrip-v1'}};res.end(JSON.stringify({message:'工具参数和工具结果往返测试通过；用量已记录。'}));return;}
    if(apiPath==='/api/models/model/capability-tests'){res.end(JSON.stringify([{id:'probe-fixture',createdAt:event.at,status:'supported',modelVersion:1,requestIds:['first','second'],probeVersion:'chat-tools-roundtrip-v1'}]));return;}
@@ -34,6 +34,7 @@ const {once}=require('node:events');
    if(apiPath==='/api/costs'){res.end(JSON.stringify(costs));return;}
    if(apiPath==='/api/settings'){res.end(JSON.stringify({data:{autoBudgetLimit:.25,dailyBudgetLimit:20,maxActiveRuns:2}}));return;}
    if(apiPath==='/api/diagnostics'){res.end(JSON.stringify({platform:'fixture',node:'fixture',sandbox:true,knowledge:1,worker:{}}));return;}
+   if(apiPath==='/api/templates'){res.end(JSON.stringify({departments:[],roles:[]}));return;}
    if(apiPath==='/api/knowledge/retrieval'){
     if(req.method==='PUT'){let body='';for await(const data of req)body+=data;retrievalSaved=JSON.parse(body);retrieval.mode=retrievalSaved.mode;retrieval.version++;}
     res.end(JSON.stringify(retrieval));return;
@@ -67,6 +68,8 @@ const {once}=require('node:events');
   await page.getByRole('button',{name:'项目与方案',exact:true}).click();
   await page.getByText(project.requirement,{exact:true}).click();
   await page.getByRole('button',{name:'编辑方案',exact:true}).click();
+  await page.getByRole('checkbox',{name:'策略允许：知识检索',exact:true}).check();
+  await page.getByRole('spinbutton',{name:'项目预算（USD）',exact:true}).fill('2');
   await page.getByRole('spinbutton',{name:'任务费用上限（USD，可选）',exact:false}).fill('0.25');
   await page.getByRole('spinbutton',{name:'任务调用次数上限（可选）',exact:false}).fill('12');
   await page.getByRole('combobox',{name:'长期知识资料',exact:true}).selectOption('selected');
@@ -77,7 +80,7 @@ const {once}=require('node:events');
   await page.getByRole('textbox',{name:'本次资料正文',exact:true}).fill('仅供本次分析使用的输入资料。');
   await page.getByRole('button',{name:'保存新版本',exact:true}).click();
   await page.getByRole('dialog').waitFor({state:'hidden'});
-  assert.equal(savedPlan.tasks[0].maxBudget,.25);assert.equal(savedPlan.tasks[0].maxModelCalls,12);
+  assert.equal(savedPolicy.maxBudget,2);assert.deepEqual(savedPolicy.allowedTools,['knowledge_search']);assert.deepEqual(savedPolicy.allowedModelIds,['model']);assert.deepEqual(savedPolicy.allowedKnowledgeSpaceIds,[]);assert.equal(savedPlan.tasks[0].maxBudget,.25);assert.equal(savedPlan.tasks[0].maxModelCalls,12);
   assert.deepEqual(savedPlan.knowledgeDocumentIds,['doc1']);assert.equal(savedPlan.runInputs[0].content,'仅供本次分析使用的输入资料。');assert.deepEqual(savedPlan.runInputs[0].agentIds,['manager']);
   await page.getByText('本次会议记录 · 本次专用 · 经理',{exact:true}).click();
   await page.getByText('仅供本次分析使用的输入资料。',{exact:true}).waitFor();

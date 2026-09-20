@@ -49,7 +49,7 @@ export async function requireProjectCostReady(db:Database,projectId:string) {
   throw new AppError(409,'项目还有进行中或待核对的模型费用，请先等待返回或在设置中核对费用','COST_PENDING');
 }
 
-type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;maxCost?:number;context?:Record<string,any>};
+type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;leaseOwner?:string;authorize?:(db:Database,row:any)=>Promise<void>;maxCost?:number;context?:Record<string,any>};
 export async function reserveCall(input:CallInput) {
  const id=input.id??randomUUID(),client=await pool.connect();
  try{
@@ -71,8 +71,10 @@ export async function reserveCall(input:CallInput) {
    if(greater(spent+input.amount,project.policy.maxBudget))throw new AppError(422,'规划预留超过项目剩余预算','BUDGET_EXCEEDED');
   }
   if(input.runId){
-   const run=(await client.query("SELECT snapshot FROM project_runs WHERE id=$1 AND project_id=$2 AND status='running' AND NOT cancel_requested",[input.runId,input.projectId])).rows[0];
+   const run=(await client.query("SELECT * FROM project_runs WHERE id=$1 AND project_id=$2 AND status='running' AND NOT cancel_requested FOR UPDATE",[input.runId,input.projectId])).rows[0];
    if(!run)throw new AppError(409,'运行已停止，不能再发起模型请求');
+   if(input.leaseOwner&&(run.lease_owner!==input.leaseOwner||!run.lease_until||new Date(run.lease_until).getTime()<=Date.now()))throw new AppError(409,'工作进程已失去运行租约','LEASE_LOST');
+   if(input.authorize)await input.authorize(client,run);
    const committed=Number((await client.query('SELECT COALESCE(sum(cost),0) AS n FROM usage WHERE run_id=$1',[input.runId])).rows[0].n);
    const held=Number((await client.query(`SELECT COALESCE(sum(amount),0) AS n FROM model_reservations WHERE run_id=$1 AND ${open}`,[input.runId])).rows[0].n);
    if(greater(committed+held+input.amount,run.snapshot.executionBudget))throw new AppError(422,'请求与待核对费用超过运行剩余预算','BUDGET_EXCEEDED');

@@ -10,6 +10,8 @@ const fs=require('node:fs');const assert=require('node:assert/strict');
    await page.getByRole('button',{name:'项目与方案',exact:true}).click();await page.locator('.project-row').first().click();
    await page.getByRole('heading',{name:'批准后可用的资料',exact:true}).waitFor();
    await page.getByRole('button',{name:'编辑方案',exact:true}).click();
+   await page.getByRole('dialog').getByRole('heading',{name:'项目执行策略',exact:true}).waitFor();
+   assert.ok(projects.every(p=>['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds'].every(key=>Array.isArray(p.policy[key]))));
    await page.getByRole('combobox',{name:'长期知识资料',exact:true}).waitFor();
    await page.getByRole('button',{name:'添加本次资料',exact:true}).waitFor();
    await page.screenshot({path:'dist/public-run-inputs.png',fullPage:true});

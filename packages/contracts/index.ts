@@ -31,6 +31,9 @@ export const policySchema = z.object({
   contextBytes: z.number().int().min(4096).max(1000000).optional(),
   mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
   preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
+  allowedModelIds: z.array(z.string().min(1).max(100)).max(200).optional(),
+  allowedTools: z.array(agentSchema.shape.tools.element).max(6).optional(),
+  allowedKnowledgeSpaceIds: z.array(z.string().min(1).max(100)).max(180).optional(),
 });
 export const taskSchema = z.object({
   id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),
@@ -80,6 +83,18 @@ export type Department = DepartmentInput & { id: string; version: number; create
 export type Gateway = Omit<z.infer<typeof gatewaySchema>, 'apiKey'> & { id: string; hasCredential: boolean; version: number };
 export type Model = z.infer<typeof modelSchema> & { id: string; version: number; status: 'untested' | 'available' | 'error'; checkedAt?: string; capabilities?:{tools?:{status:'supported'|'failed';checkedAt:string;testId:string;probeVersion:string}} };
 export type Policy = z.infer<typeof policySchema>;
+/** Missing fields inherit the existing team once; an explicit empty list grants nothing. */
+export function bindPolicy(policy:Policy,agents:Pick<Agent,'modelId'|'fallbackModelId'|'tools'|'knowledgeSpaceIds'>[]):Policy {
+  const unique=(values:string[])=>[...new Set(values.filter(Boolean))];
+  return {...policy,allowedModelIds:policy.allowedModelIds??unique(agents.flatMap(a=>[a.modelId,a.fallbackModelId??''])),allowedTools:policy.allowedTools??[...new Set(agents.flatMap(a=>a.tools))],allowedKnowledgeSpaceIds:policy.allowedKnowledgeSpaceIds??unique(agents.flatMap(a=>a.knowledgeSpaceIds??[]))};
+}
+export function permissionChecks(agents:Pick<Agent,'modelId'|'fallbackModelId'|'tools'|'knowledgeSpaceIds'>[],policy:Policy){
+  return [
+    {label:'策略允许的模型',pass:agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>policy.allowedModelIds?.includes(id!)??false))},
+    {label:'策略允许的工具',pass:agents.every(a=>a.tools.every(t=>policy.allowedTools?.includes(t)??false))},
+    {label:'策略允许的知识空间',pass:agents.every(a=>(a.knowledgeSpaceIds??[]).every(id=>policy.allowedKnowledgeSpaceIds?.includes(id)??false))},
+  ];
+}
 export type Plan = z.infer<typeof planSchema>;
 export type Validation = { valid: boolean; errors: string[]; estimate: number | null; checks: { label: string; pass: boolean }[] };
 export type Project = { id: string; departmentId: string; departmentVersion: number; departmentName: string; requirement: string; policy: Policy; plan: Plan; version: number; status: string; source: 'manual' | 'model'; createdAt: string; validation: Validation; planningCost: number };
@@ -91,6 +106,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   const errors: string[] = [];
   const checks: Validation['checks'] = [];
   const check = (label: string, pass: boolean, message: string) => { checks.push({ label, pass }); if (!pass) errors.push(message); };
+  for(const item of permissionChecks(plan.agents,bindPolicy(policy,plan.agents)))check(item.label,item.pass,item.label+'不包含方案请求的权限，请调整策略或员工配置');
   const ids = new Set(plan.agents.map(a => a.id));
   check('组织与人数', ids.size === plan.agents.length && plan.agents.filter(a => a.role === 'manager').length === 1 && plan.agents.length <= policy.maxAgents,
     '需恰好一名经理、唯一员工 ID，且总人数不能超过上限');

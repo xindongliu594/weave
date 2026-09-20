@@ -1,3 +1,4 @@
+import {bindPolicy} from './execution-policy.ts';
 import { Router } from 'express';
 import { z } from 'zod';
 import { scrypt as scryptCallback, randomBytes, createCipheriv, createDecipheriv, randomUUID } from 'node:crypto';
@@ -26,6 +27,8 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
   if(value.tables&&!value.tables.model_reservations)value.tables.model_reservations=[];
   if(Array.isArray(value.tables?.model_reservations)&&value.tables.model_reservations.some((r:any)=>r.status==='pending'))throw new AppError(422,'不能恢复包含进行中模型调用的备份');
   if(value.version!==1||!value.tables||!value.files||tables.some(t=>!Array.isArray(value.tables[t]))||Object.keys(value.files).some(p=>!validFile(p)))throw new AppError(422,'备份结构不正确');
+  for(const project of value.tables.projects)project.policy=bindPolicy(project.policy,project.plan.agents);
+  for(const version of value.tables.plan_versions)version.policy??=null;
   if(value.tables.model_capability_tests.some((r:any)=>r.status==='running'))throw new AppError(422,'不能恢复包含进行中能力测试的备份');
   if(value.tables.project_runs.some((r:any)=>['queued','running'].includes(r.status)))throw new AppError(422,'不允许恢复包含执行中任务的备份');
   const stage=join(dataRoot,'restore-'+randomUUID()),rollback=join(dataRoot,'before-restore-'+randomUUID());mkdirSync(stage,{recursive:true,mode:0o700});

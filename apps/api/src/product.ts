@@ -1,3 +1,4 @@
+import {bindPolicy,assertPolicy,assertPlanningModel} from './execution-policy.ts';
 import { Router } from 'express';
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
@@ -25,12 +26,14 @@ export function productRouter(){
     if(!template)throw new AppError(404,'部门模板不存在');
     let planningUsageId:string|undefined;
     let department=departmentSchema.parse({...template.data,agents:template.data.agents.slice(0,input.policy.maxAgents).map((a:any)=>({...a,modelId:input.modelId}))});
+    input.policy=bindPolicy(input.policy,department.agents);
     let plan=templatePlan(department,input.requirement);
     const rows=(await pool.query("SELECT id,data,version,status,capabilities FROM models WHERE deleted_at IS NULL")).rows;
     const catalog:Model[]=rows.map(r=>({...r.data,id:r.id,version:r.version,status:r.status,capabilities:r.capabilities}));
     if(input.generate){
+      assertPlanningModel(input.modelId,input.policy);
       const model=catalog.find(m=>m.id===input.modelId&&m.status==='available');if(!model)throw new AppError(422,'请先选择可用的规划模型');
-      const messages=[{role:'system',content:'根据需求生成完整的部门、岗位配置与任务依赖 DAG，只输出符合 JSON Schema 的对象。岗位职责是长期职能，不把当前项目目标写入岗位。任务必须有负责人、具体目标、依赖和验收标准，最后由经理验收。小任务可只有经理。只可使用给定模型，工具和知识权限为空。'+JSON.stringify(z.toJSONSchema(organizationCandidateSchema))},{role:'user',content:JSON.stringify({requirement:input.requirement,policy:input.policy,template:department,models:catalog.filter(m=>m.status==='available').map(m=>({id:m.id,name:m.name,inputRate:m.inputRate,outputRate:m.outputRate}))})}];
+      const messages=[{role:'system',content:'根据需求生成完整的部门、岗位配置与任务依赖 DAG，只输出符合 JSON Schema 的对象。岗位职责是长期职能，不把当前项目目标写入岗位。任务必须有负责人、具体目标、依赖和验收标准，最后由经理验收。小任务可只有经理。只可使用给定模型，工具和知识权限为空。'+JSON.stringify(z.toJSONSchema(organizationCandidateSchema))},{role:'user',content:JSON.stringify({requirement:input.requirement,policy:input.policy,template:department,models:catalog.filter(m=>m.status==='available'&&input.policy.allowedModelIds!.includes(m.id)).map(m=>({id:m.id,name:m.name,inputRate:m.inputRate,outputRate:m.outputRate}))})}];
       const response=await completeBudgeted(model,messages,4000,{purpose:'部门组织规划',maxCost:Math.min(input.policy.maxBudget,input.maxPlanningCost??input.policy.maxBudget*.1)});
       planningUsageId=response.usageId;
       try{const candidate=organizationCandidateSchema.parse(JSON.parse((response.choices[0].message.content??'').replace(/^\s*```(?:json)?\s*/,'').replace(/\s*```\s*$/,'')));department=candidate.department;plan={agents:department.agents,rationale:candidate.rationale,tasks:candidate.tasks};}catch{throw new AppError(422,'生成结果格式不正确，未创建部门');}
@@ -47,6 +50,7 @@ export function productRouter(){
     if(input.department.agents.length>input.policy.maxAgents)throw new AppError(422,'员工数超过上限');
     const dId=randomUUID(),pId=randomUUID();
     const plan=input.plan??templatePlan(input.department,input.requirement);
+    input.policy=bindPolicy(input.policy,input.department.agents);assertPolicy(plan.agents,input.policy);
     if(JSON.stringify(plan.agents)!==JSON.stringify(input.department.agents))throw new AppError(422,'方案员工必须与待创建部门的员工配置一致');
     const client=await pool.connect();try{await client.query('BEGIN');await shareCostMaintenance(client);
       const preview=input.previewId?(await client.query('SELECT * FROM organization_previews WHERE id=$1 FOR UPDATE',[input.previewId])).rows[0]:null;
@@ -54,8 +58,8 @@ export function productRouter(){
       if(preview?.project_id){const same=(await client.query('SELECT p.id FROM projects p JOIN departments d ON d.id=p.department_id WHERE p.id=$1 AND p.plan=$2::jsonb AND p.policy=$3::jsonb AND p.requirement=$4 AND d.data=$5::jsonb',[preview.project_id,plan,input.policy,input.requirement,input.department])).rowCount;if(!same)throw new AppError(409,'此预览已保存，请在现有项目中修改或重新生成预览');await client.query('COMMIT');return res.json({departmentId:preview.department_id,projectId:preview.project_id,existing:true});}
       const planningCost=input.previewId?Number((await client.query('SELECT COALESCE(sum(cost),0) AS total FROM usage WHERE planning_preview_id=$1',[input.previewId])).rows[0].total):0;
       if(planningCost>=input.policy.maxBudget)throw new AppError(422,'组织规划费用已达到项目预算，请调整预算后保存');
-      await client.query('INSERT INTO departments(id,data) VALUES($1,$2)',[dId,input.department]);await client.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',[pId,dId,input.department.name,input.requirement,input.policy,plan,preview?.data.source==='model'?'model':'manual']);await client.query('INSERT INTO plan_versions(project_id,version,plan) VALUES($1,1,$2)',[pId,plan]);
-      if(preview?.data.source==='model')await client.query('INSERT INTO plan_versions(project_id,version,plan) VALUES($1,0,$2)',[pId,preview.data.plan]);
+      await client.query('INSERT INTO departments(id,data) VALUES($1,$2)',[dId,input.department]);await client.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',[pId,dId,input.department.name,input.requirement,input.policy,plan,preview?.data.source==='model'?'model':'manual']);await client.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,1,$2,$3)',[pId,plan,input.policy]);
+      if(preview?.data.source==='model')await client.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,0,$2,$3)',[pId,preview.data.plan,preview.data.policy]);
       if(input.previewId){await client.query('UPDATE organization_previews SET project_id=$1,department_id=$2 WHERE id=$3',[pId,dId,input.previewId]);await client.query('UPDATE usage SET project_id=$1 WHERE planning_preview_id=$2',[pId,input.previewId]);await client.query('UPDATE model_reservations SET project_id=$1,department_id=$2 WHERE id IN (SELECT id FROM usage WHERE planning_preview_id=$3)',[pId,dId,input.previewId]);}
       await checkDailyBudget(client,await lockCostPolicy(client),dId,0);
       await client.query('COMMIT');}catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}res.status(201).json({departmentId:dId,projectId:pId});
