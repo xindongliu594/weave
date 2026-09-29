@@ -121,6 +121,8 @@ test('legacy projects inherit only their existing scope; backup restores policy 
  const {encryptBackup,decryptBackup}=await import('../apps/api/src/backup.ts');const legacy=await decryptBackup(backup.data,'execution-policy-backup');
  for(const item of legacy.tables.projects)for(const key of ['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds'])delete item.policy[key];
  for(const version of legacy.tables.plan_versions)delete version.policy;
+  for(const run of legacy.tables.project_runs)delete run.department_ids;
+  for(const usage of legacy.tables.usage)delete usage.department_id;
  const oldBackup=await encryptBackup(legacy,'execution-policy-backup');assert.equal((await call('/backup/restore','POST',{password:'execution-policy-backup',backup:oldBackup,confirmation:'RESTORE'})).status,200);
  assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy.allowedTools,[]);
  assert.ok((await call('/projects/'+p.id+'/versions')).data.every((version:any)=>version.policy===null));

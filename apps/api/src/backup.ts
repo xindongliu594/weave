@@ -25,6 +25,8 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
   if(Array.isArray(value.tables?.models))for(const model of value.tables.models)if(model&&typeof model==='object')model.capabilities??={};
   if(value.tables&&!value.tables.knowledge_embeddings)value.tables.knowledge_embeddings=[];
   if(value.tables&&!value.tables.model_reservations)value.tables.model_reservations=[];
+  if(Array.isArray(value.tables?.project_runs))for(const run of value.tables.project_runs)run.department_ids??=run.snapshot?.departmentIds??[run.snapshot?.departmentId].filter(Boolean);
+  if(Array.isArray(value.tables?.usage)){const projects=new Map<string,any>((value.tables.projects??[]).map((project:any)=>[project.id,project]));for(const usage of value.tables.usage)usage.department_id??=projects.get(usage.project_id)?.department_id??null;}
   if(Array.isArray(value.tables?.model_reservations)&&value.tables.model_reservations.some((r:any)=>r.status==='pending'))throw new AppError(422,'不能恢复包含进行中模型调用的备份');
   if(value.version!==1||!value.tables||!value.files||tables.some(t=>!Array.isArray(value.tables[t]))||Object.keys(value.files).some(p=>!validFile(p)))throw new AppError(422,'备份结构不正确');
   for(const project of value.tables.projects)project.policy=bindPolicy(project.policy,project.plan.agents,project.department_id);
