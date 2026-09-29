@@ -10,15 +10,15 @@ import { embeddingVersion } from '../../../services/embedding/local.mjs';
 type Database = Pick<pg.PoolClient, 'query'>;
 type DocumentVersion = { documentId: string; version: number; title: string; spaceId: string; sha256: string; source: Record<string,unknown>; chunkCount: number };
 export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]>; retrieval?:{mode:'keyword'|'hybrid';embeddingVersion?:string}; runInputs?:{documentId:string;title:string;agentIds:string[];chunks:any[]}[] };
-const permission = `(s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2)))`;
-
 export async function validateKnowledgeGrants(agents:any[], departmentId:string, db:Database=pool) {
   // Lock grants in a stable order when called inside approval's transaction.
   for (const agent of [...agents].sort((a,b)=>a.id.localeCompare(b.id))) {
     const ids = [...new Set<string>(agent.knowledgeSpaceIds??[])].sort();
     if (!ids.length) continue;
+    const agentDepartmentId=agent.sourceDepartmentId??agent.departmentId??departmentId;
+    const employeeId=agent.sourceAgentId??agent.knowledgeEmployeeId??agent.employeeId??agent.id;
     const allowed = (await db.query(`SELECT s.id FROM knowledge_spaces s WHERE s.id=ANY($3::text[])
-      AND s.deleted_at IS NULL AND ${permission} ORDER BY s.id FOR SHARE`, [departmentId,agent.employeeId??agent.id,ids])).rows.map(r=>r.id);
+      AND s.deleted_at IS NULL AND (s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2))) ORDER BY s.id FOR SHARE`, [agentDepartmentId,employeeId,ids])).rows.map(r=>r.id);
     const invalid = ids.filter(id=>!allowed.includes(id));
     if (invalid.length) throw new AppError(422,`${agent.name??agent.employeeId??agent.id} 的知识授权已失效或不属于该员工：${invalid.join('、')}。请修改方案后重新批准。`,'KNOWLEDGE_GRANT_INVALID');
   }
@@ -36,13 +36,13 @@ export async function knowledgeSnapshot(agents:any[], departmentId:string, db?:D
   // One MVCC statement sees the same corpus for the whole team, including newly imported documents.
   const rows=(await db.query(`SELECT a.id AS "agentId",d.id AS "documentId",d.version,d.title,d.space_id AS "spaceId",r.sha256,r.source,
       (SELECT count(*)::int FROM knowledge_chunks c WHERE c.document_id=d.id AND c.version=d.version) AS "chunkCount"
-    FROM jsonb_to_recordset($2) AS a(id text,"employeeId" text,"knowledgeSpaceIds" text[])
+    FROM jsonb_to_recordset($1) AS a(id text,"departmentId" text,"employeeId" text,"knowledgeSpaceIds" text[])
     JOIN knowledge_spaces s ON s.id=ANY(a."knowledgeSpaceIds")
     JOIN knowledge_documents d ON d.space_id=s.id
     JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=d.version
-    WHERE d.deleted_at IS NULL AND s.deleted_at IS NULL AND ($3::text[] IS NULL OR d.id=ANY($3::text[]))
-      AND (s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? a."employeeId")))
-    ORDER BY d.id,a.id FOR SHARE OF d,s`,[departmentId,JSON.stringify(agents.map(a=>({id:a.id,employeeId:a.employeeId??a.id,knowledgeSpaceIds:a.knowledgeSpaceIds??[]}))),documentIds??null])).rows;
+    WHERE d.deleted_at IS NULL AND s.deleted_at IS NULL AND ($2::text[] IS NULL OR d.id=ANY($2::text[]))
+      AND (s.scope='company' OR (s.department_id=a."departmentId" AND (s.scope='department' OR s.agent_ids ? a."employeeId")))
+    ORDER BY d.id,a.id FOR SHARE OF d,s`,[JSON.stringify(agents.map(a=>({id:a.id,departmentId:a.sourceDepartmentId??a.departmentId??departmentId,employeeId:a.sourceAgentId??a.knowledgeEmployeeId??a.employeeId??a.id,knowledgeSpaceIds:a.knowledgeSpaceIds??[]}))),documentIds??null])).rows;
   for (const {agentId,...doc} of rows) { agentDocuments[agentId].push(doc.documentId); documents.set(doc.documentId,doc as DocumentVersion); }
   if(documentIds?.some(id=>!documents.has(id)))throw new AppError(422,'本次选用的资料已归档、缺失或没有员工获授权，请更新资料范围后重新批准。','KNOWLEDGE_SCOPE_INVALID');
   // Store references, not a truncated copy of the corpus. Revisions are immutable and included in backups.
@@ -113,7 +113,7 @@ export async function queryKnowledge(snapshot:any,agentId:string,operation:'sear
 
 export async function searchAvailableKnowledge(departmentId:string,agent:any,query:string) {
   // Interactive search uses the current authorized versions; run tools use their stored manifest.
-  const granted=(await pool.query(`SELECT s.id FROM knowledge_spaces s WHERE s.deleted_at IS NULL AND s.id=ANY($3::text[]) AND ${permission}`,
+  const granted=(await pool.query(`SELECT s.id FROM knowledge_spaces s WHERE s.deleted_at IS NULL AND s.id=ANY($3::text[]) AND (s.scope='company' OR (s.department_id=$1 AND (s.scope='department' OR s.agent_ids ? $2)))`,
     [departmentId,agent.id,agent.knowledgeSpaceIds??[]])).rows.map(row=>row.id);
   const manifest=await knowledgeSnapshot([{...agent,knowledgeSpaceIds:granted}],departmentId);
   return queryKnowledge(manifest,agent.id,'search',query);

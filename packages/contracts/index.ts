@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const agentSchema = z.object({
-  id: z.string().min(1).max(80), name: z.string().trim().min(1).max(80),
+  id: z.string().min(1).max(180), name: z.string().trim().min(1).max(80),
   role: z.enum(['manager', 'member']), title: z.string().trim().min(1).max(100),
   instructions: z.string().trim().min(1).max(10000), modelId: z.string().max(100),
   tools: z.array(z.enum(['artifact_write', 'filesystem', 'terminal_test', 'terminal', 'knowledge_search', 'knowledge_read'])).max(6),
@@ -10,6 +10,8 @@ export const agentSchema = z.object({
   reasoningEffort: z.enum(['low', 'medium', 'high']).optional(),
   knowledgeSpaceIds: z.array(z.string().max(100)).max(30).optional(),
   fallbackModelId: z.string().max(100).optional(),
+  sourceDepartmentId: z.string().min(1).max(100).optional(),
+  sourceAgentId: z.string().min(1).max(100).optional(),
 });
 export const departmentSchema = z.object({
   name: z.string().trim().min(1).max(80), description: z.string().trim().max(2000),
@@ -34,6 +36,7 @@ export const policySchema = z.object({
   allowedModelIds: z.array(z.string().min(1).max(100)).max(200).optional(),
   allowedTools: z.array(agentSchema.shape.tools.element).max(6).optional(),
   allowedKnowledgeSpaceIds: z.array(z.string().min(1).max(100)).max(180).optional(),
+  allowedDepartmentIds: z.array(z.string().min(1).max(100)).min(1).max(20).optional(),
 });
 export const taskSchema = z.object({
   id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),
@@ -84,22 +87,24 @@ export type Gateway = Omit<z.infer<typeof gatewaySchema>, 'apiKey'> & { id: stri
 export type Model = z.infer<typeof modelSchema> & { id: string; version: number; status: 'untested' | 'available' | 'error'; checkedAt?: string; capabilities?:{tools?:{status:'supported'|'failed';checkedAt:string;testId:string;probeVersion:string}} };
 export type Policy = z.infer<typeof policySchema>;
 /** Missing fields inherit the existing team once; an explicit empty list grants nothing. */
-export function bindPolicy(policy:Policy,agents:Pick<Agent,'modelId'|'fallbackModelId'|'tools'|'knowledgeSpaceIds'>[]):Policy {
+export function bindPolicy(policy:Policy,agents:Pick<Agent,'modelId'|'fallbackModelId'|'tools'|'knowledgeSpaceIds'|'sourceDepartmentId'>[],primaryDepartmentId?:string):Policy {
   const unique=(values:string[])=>[...new Set(values.filter(Boolean))];
-  return {...policy,allowedModelIds:policy.allowedModelIds??unique(agents.flatMap(a=>[a.modelId,a.fallbackModelId??''])),allowedTools:policy.allowedTools??[...new Set(agents.flatMap(a=>a.tools))],allowedKnowledgeSpaceIds:policy.allowedKnowledgeSpaceIds??unique(agents.flatMap(a=>a.knowledgeSpaceIds??[]))};
+  const departments=unique([primaryDepartmentId??'',...agents.map(a=>a.sourceDepartmentId??'')]);
+  return {...policy,allowedModelIds:policy.allowedModelIds??unique(agents.flatMap(a=>[a.modelId,a.fallbackModelId??''])),allowedTools:policy.allowedTools??[...new Set(agents.flatMap(a=>a.tools))],allowedKnowledgeSpaceIds:policy.allowedKnowledgeSpaceIds??unique(agents.flatMap(a=>a.knowledgeSpaceIds??[])),...(policy.allowedDepartmentIds?{allowedDepartmentIds:policy.allowedDepartmentIds}:departments.length?{allowedDepartmentIds:departments}:{})};
 }
-export function permissionChecks(agents:Pick<Agent,'modelId'|'fallbackModelId'|'tools'|'knowledgeSpaceIds'>[],policy:Policy){
+export function permissionChecks(agents:Pick<Agent,'modelId'|'fallbackModelId'|'tools'|'knowledgeSpaceIds'|'sourceDepartmentId'>[],policy:Policy){
   return [
     {label:'策略允许的模型',pass:agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>policy.allowedModelIds?.includes(id!)??false))},
     {label:'策略允许的工具',pass:agents.every(a=>a.tools.every(t=>policy.allowedTools?.includes(t)??false))},
     {label:'策略允许的知识空间',pass:agents.every(a=>(a.knowledgeSpaceIds??[]).every(id=>policy.allowedKnowledgeSpaceIds?.includes(id)??false))},
+    {label:'策略允许的参与部门',pass:agents.every(a=>!a.sourceDepartmentId||(policy.allowedDepartmentIds?.includes(a.sourceDepartmentId)??false))},
   ];
 }
 export type Plan = z.infer<typeof planSchema>;
 export type Validation = { valid: boolean; errors: string[]; estimate: number | null; checks: { label: string; pass: boolean }[] };
 export type Project = { id: string; departmentId: string; departmentVersion: number; departmentName: string; requirement: string; policy: Policy; plan: Plan; version: number; status: string; source: 'manual' | 'model'; createdAt: string; validation: Validation; planningCost: number };
 export type Activity = { id: string; kind: string; title: string; createdAt: string };
-export type Usage = { runId?: string|null; agentId?: string|null; employeeId?: string|null; agentName?: string|null; sessionId?: string|null; taskId?: string|null; attemptId?: string|null; requestId?: string|null; durationMs?: number|null; id: string; modelId: string; projectId: string | null; inputTokens: number; outputTokens: number; cost: number; purpose: string; createdAt: string };
+export type Usage = { runId?: string|null; agentId?: string|null; employeeId?: string|null; agentName?: string|null; departmentId?:string|null; sessionId?: string|null; taskId?: string|null; attemptId?: string|null; requestId?: string|null; durationMs?: number|null; id: string; modelId: string; projectId: string | null; inputTokens: number; outputTokens: number; cost: number; purpose: string; createdAt: string };
 
 /** Validation runs on the server again on every state-changing operation. */
 export function validatePlan(plan: Plan, policy: Policy, models: Model[],requireToolSupport=true): Validation {

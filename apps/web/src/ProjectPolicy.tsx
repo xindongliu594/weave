@@ -2,13 +2,13 @@ import {useEffect,useState} from 'react';
 import type {Policy,Model} from '../../../packages/contracts/index.ts';
 import {api} from './api.ts';
 const tools=[['artifact_write','交付物写入'],['filesystem','工作区文件'],['terminal','开发终端'],['terminal_test','测试终端'],['knowledge_search','知识检索'],['knowledge_read','知识原文']] as const;
-export function ProjectPolicy({policy,models,departmentId,onChange}:{policy:Policy;models:Model[];departmentId:string;onChange?:(value:Policy)=>void}){
+export function ProjectPolicy({policy,models,departmentId,departmentIds,onChange}:{policy:Policy;models:Model[];departmentId:string;departmentIds?:string[];onChange?:(value:Policy)=>void}){
  const [spaces,setSpaces]=useState<any[]>([]),[error,setError]=useState('');
  useEffect(()=>{api<any[]>('/knowledge/spaces').then(setSpaces).catch(e=>setError(e.message));},[]);
  const groups=[
   {key:'allowedModelIds',title:'允许的模型（含规划和备用）',options:models.map(m=>({id:m.id,name:m.name}))},
   {key:'allowedTools',title:'允许的工具',options:tools.map(([id,name])=>({id,name}))},
-  {key:'allowedKnowledgeSpaceIds',title:'允许的知识空间',options:spaces.filter(s=>s.scope==='company'||s.departmentId===departmentId).map(s=>({id:s.id,name:s.name}))},
+  {key:'allowedKnowledgeSpaceIds',title:'允许的知识空间',options:spaces.filter(s=>s.scope==='company'||(departmentIds??policy.allowedDepartmentIds??[departmentId]).includes(s.departmentId)).map(s=>({id:s.id,name:s.name}))},
  ] as const;
  return <section className="panel padded lower-small"><h3>项目执行策略</h3><p className="subcopy">这是项目可使用的范围。员工还需单独分配权限；私有知识空间仍按所属部门和员工检查。修改策略保存为新版本后，需要重新批准。</p>
   {error&&<p role="alert" className="form-error">{error}</p>}

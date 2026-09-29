@@ -21,19 +21,23 @@ export async function lockCostPolicy(db:Database) {
 
 export async function dailyTotals(db:Database,departmentId:string|null=null) {
  const spent=Number((await db.query(`SELECT COALESCE(sum(u.cost),0) AS n FROM usage u LEFT JOIN projects p ON p.id=u.project_id
-   WHERE u.created_at>=${today} AND ($1::text IS NULL OR p.department_id=$1)`,[departmentId])).rows[0].n);
- const runs=Number((await db.query(`SELECT COALESCE(sum(GREATEST(0,(r.snapshot->>'executionBudget')::numeric-
-   COALESCE((SELECT sum(u.cost) FROM usage u WHERE u.run_id=r.id),0))),0) AS n FROM project_runs r
-   WHERE r.status IN ('queued','running') AND ($1::text IS NULL OR r.snapshot->>'departmentId'=$1)`,[departmentId])).rows[0].n);
- // Calls inside a live run are already covered by that run's remaining reservation.
+   WHERE u.created_at>=${today} AND ($1::text IS NULL OR COALESCE(u.department_id,p.department_id)=$1)`,[departmentId])).rows[0].n);
+ const runs=departmentId===null
+  ?Number((await db.query(`SELECT COALESCE(sum(GREATEST(0,(r.snapshot->>'executionBudget')::numeric-
+    COALESCE((SELECT sum(u.cost) FROM usage u WHERE u.run_id=r.id),0))),0) AS n FROM project_runs r WHERE r.status IN ('queued','running')`)).rows[0].n)
+  :Number((await db.query(`SELECT COALESCE(sum(GREATEST(0,COALESCE((r.snapshot->'departmentBudgets'->>$1)::numeric,
+    CASE WHEN r.snapshot->>'departmentId'=$1 THEN (r.snapshot->>'executionBudget')::numeric ELSE 0 END)-
+    COALESCE((SELECT sum(u.cost) FROM usage u LEFT JOIN projects p ON p.id=u.project_id WHERE u.run_id=r.id AND COALESCE(u.department_id,p.department_id)=$1),0))),0) AS n
+    FROM project_runs r WHERE r.status IN ('queued','running')`,[departmentId])).rows[0].n);
+ // Open calls inside a live run are covered by that run's global and per-department reservation.
  const calls=Number((await db.query(`SELECT COALESCE(sum(c.amount),0) AS n FROM model_reservations c WHERE c.${open}
    AND ($1::text IS NULL OR c.department_id=$1) AND NOT EXISTS(SELECT 1 FROM project_runs r WHERE r.id=c.run_id AND r.status IN ('queued','running'))`,[departmentId])).rows[0].n);
  return {spent,reserved:runs+calls};
 }
 
-export async function checkDailyBudget(db:Database,config:any,departmentId:string|null,additional:number) {
+export async function checkDailyBudget(db:Database,config:any,departmentId:string|null,additional:number,globalAdditional=additional) {
  const global=await dailyTotals(db);
- if(greater(global.spent+global.reserved+additional,Number(config.dailyBudgetLimit)))throw new AppError(422,'已确认费用和未结算预留将超过全局每日预算（UTC）','DAILY_BUDGET_EXCEEDED');
+ if(greater(global.spent+global.reserved+globalAdditional,Number(config.dailyBudgetLimit)))throw new AppError(422,'已确认费用和未结算预留将超过全局每日预算（UTC）','DAILY_BUDGET_EXCEEDED');
  if(departmentId){
   const department=(await db.query('SELECT data FROM departments WHERE id=$1',[departmentId])).rows[0];
   if(!department)throw new AppError(404,'部门不存在');
@@ -49,7 +53,7 @@ export async function requireProjectCostReady(db:Database,projectId:string) {
   throw new AppError(409,'项目还有进行中或待核对的模型费用，请先等待返回或在设置中核对费用','COST_PENDING');
 }
 
-type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;leaseOwner?:string;authorize?:(db:Database,row:any)=>Promise<void>;maxCost?:number;context?:Record<string,any>};
+type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;leaseOwner?:string;billingDepartmentId?:string;authorize?:(db:Database,row:any)=>Promise<void>;maxCost?:number;context?:Record<string,any>};
 export async function reserveCall(input:CallInput) {
  const id=input.id??randomUUID(),client=await pool.connect();
  try{
@@ -75,6 +79,7 @@ export async function reserveCall(input:CallInput) {
    if(!run)throw new AppError(409,'运行已停止，不能再发起模型请求');
    if(input.leaseOwner&&(run.lease_owner!==input.leaseOwner||!run.lease_until||new Date(run.lease_until).getTime()<=Date.now()))throw new AppError(409,'工作进程已失去运行租约','LEASE_LOST');
    if(input.authorize)await input.authorize(client,run);
+   if(input.billingDepartmentId&&!(run.department_ids?.length?run.department_ids:run.snapshot.departmentIds??[run.snapshot.departmentId]).includes(input.billingDepartmentId))throw new AppError(422,'费用归属部门不在批准快照中','POLICY_DEPARTMENT_DENIED');
    const committed=Number((await client.query('SELECT COALESCE(sum(cost),0) AS n FROM usage WHERE run_id=$1',[input.runId])).rows[0].n);
    const held=Number((await client.query(`SELECT COALESCE(sum(amount),0) AS n FROM model_reservations WHERE run_id=$1 AND ${open}`,[input.runId])).rows[0].n);
    if(greater(committed+held+input.amount,run.snapshot.executionBudget))throw new AppError(422,'请求与待核对费用超过运行剩余预算','BUDGET_EXCEEDED');
@@ -85,9 +90,10 @@ export async function reserveCall(input:CallInput) {
     if(greater(taskCost+taskHeld+input.amount,task.maxBudget??project.policy.maxBudget))throw new AppError(422,'任务请求与待核对费用超过任务上限','TASK_BUDGET_EXCEEDED');
    }
   }
-  await checkDailyBudget(client,config,project?.department_id??null,input.runId?0:input.amount);
+  const billingDepartmentId=input.billingDepartmentId??project?.department_id??null;
+  await checkDailyBudget(client,config,billingDepartmentId,input.amount,input.runId?0:input.amount);
   await client.query(`INSERT INTO model_reservations(id,model_id,project_id,department_id,run_id,purpose,amount,input_rate,output_rate,context)
-    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,[id,input.model.id,input.projectId??null,project?.department_id??null,input.runId??null,input.purpose,input.amount,input.model.inputRate,input.model.outputRate,input.context??{}]);
+    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,[id,input.model.id,input.projectId??null,billingDepartmentId,input.runId??null,input.purpose,input.amount,input.model.inputRate,input.model.outputRate,input.context??{}]);
   await client.query('COMMIT');return id;
  }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
 }
@@ -117,10 +123,10 @@ export async function settleCall(id:string,inputTokens:number,outputTokens:numbe
   const last=row.history.at(-1);
   if(manualNote===undefined&&row.status==='settled'&&last?.source==='provider'&&last.inputTokens===inputTokens&&last.outputTokens===outputTokens)return {cost,reserved:Number(row.amount)};
   const context={...row.context,...metadata};
-  await db.query(`INSERT INTO usage(id,model_id,project_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
-    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+  await db.query(`INSERT INTO usage(id,model_id,project_id,department_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
+    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
     ON CONFLICT(id) DO UPDATE SET input_tokens=EXCLUDED.input_tokens,output_tokens=EXCLUDED.output_tokens,cost=EXCLUDED.cost,duration_ms=EXCLUDED.duration_ms`,
-    [id,row.model_id,row.project_id,row.run_id,inputTokens,outputTokens,cost,row.purpose,context.agentId??null,context.employeeId??null,context.sessionId??null,context.taskId??null,context.attemptId??null,context.requestId??null,context.durationMs??null]);
+    [id,row.model_id,row.project_id,row.department_id,row.run_id,inputTokens,outputTokens,cost,row.purpose,context.agentId??null,context.employeeId??null,context.sessionId??null,context.taskId??null,context.attemptId??null,context.requestId??null,context.durationMs??null]);
   const entry={at:new Date().toISOString(),source:manualNote===undefined?'provider':'manual',inputTokens,outputTokens,cost,...(manualNote===undefined?{}:{note:manualNote})};
   // A late authoritative receipt can replace an earlier manual reconciliation; the history preserves both.
   await db.query("UPDATE model_reservations SET status='settled',history=history||$2::jsonb WHERE id=$1",[id,JSON.stringify([entry])]);

@@ -34,7 +34,11 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS attempt integer NOT NULL DEFAULT 1;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS parent_run_id text;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS cancel_requested boolean NOT NULL DEFAULT false;
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS department_ids text[] NOT NULL DEFAULT '{}';
+    UPDATE project_runs SET department_ids=ARRAY[snapshot->>'departmentId'] WHERE department_ids='{}' AND snapshot ? 'departmentId';
+    CREATE INDEX IF NOT EXISTS project_runs_departments ON project_runs USING gin(department_ids);
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS run_id text;
+    ALTER TABLE usage ADD COLUMN IF NOT EXISTS department_id text;
     CREATE TABLE IF NOT EXISTS organization_previews(id text PRIMARY KEY,data jsonb NOT NULL,project_id text,department_id text,created_at timestamptz NOT NULL DEFAULT now());
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS planning_preview_id text;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS agent_id text;
@@ -59,8 +63,8 @@ export async function migrateProduct(pool: pg.Pool) {
   // Preserve the existing scope on upgrade; do not invent policies for older historical versions.
   const client=await pool.connect();
   try{await client.query('BEGIN');
-    const legacy=(await client.query("SELECT id,policy,plan FROM projects WHERE NOT (policy ?& ARRAY['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds']) FOR UPDATE")).rows;
-    for(const row of legacy)await client.query('UPDATE projects SET policy=$1 WHERE id=$2',[bindPolicy(row.policy,row.plan.agents),row.id]);
+    const legacy=(await client.query("SELECT id,department_id,policy,plan FROM projects WHERE NOT (policy ?& ARRAY['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds','allowedDepartmentIds']) FOR UPDATE")).rows;
+    for(const row of legacy)await client.query('UPDATE projects SET policy=$1 WHERE id=$2',[bindPolicy(row.policy,row.plan.agents,row.department_id),row.id]);
     await client.query('COMMIT');
   }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
 }

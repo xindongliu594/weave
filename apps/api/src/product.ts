@@ -48,13 +48,14 @@ export function productRouter(){
   router.post('/organizations',async(req,res)=>{
     const input=z.object({department:departmentSchema,requirement:z.string().trim().min(10).max(50000),policy:policySchema,plan:planSchema.optional(),previewId:z.uuid().optional()}).parse(req.body);
     if(input.department.agents.length>input.policy.maxAgents)throw new AppError(422,'员工数超过上限');
-    const dId=randomUUID(),pId=randomUUID();
+    let dId=randomUUID();const pId=randomUUID();
     const plan=input.plan??templatePlan(input.department,input.requirement);
-    input.policy=bindPolicy(input.policy,input.department.agents);assertPolicy(plan.agents,input.policy);
     if(JSON.stringify(plan.agents)!==JSON.stringify(input.department.agents))throw new AppError(422,'方案员工必须与待创建部门的员工配置一致');
     const client=await pool.connect();try{await client.query('BEGIN');await shareCostMaintenance(client);
       const preview=input.previewId?(await client.query('SELECT * FROM organization_previews WHERE id=$1 FOR UPDATE',[input.previewId])).rows[0]:null;
       if(input.previewId&&!preview)throw new AppError(404,'组织预览不存在');
+      dId=preview?.department_id??dId;
+      input.policy=bindPolicy(input.policy,input.department.agents,dId);assertPolicy(plan.agents,input.policy);
       if(preview?.project_id){const same=(await client.query('SELECT p.id FROM projects p JOIN departments d ON d.id=p.department_id WHERE p.id=$1 AND p.plan=$2::jsonb AND p.policy=$3::jsonb AND p.requirement=$4 AND d.data=$5::jsonb',[preview.project_id,plan,input.policy,input.requirement,input.department])).rowCount;if(!same)throw new AppError(409,'此预览已保存，请在现有项目中修改或重新生成预览');await client.query('COMMIT');return res.json({departmentId:preview.department_id,projectId:preview.project_id,existing:true});}
       const planningCost=input.previewId?Number((await client.query('SELECT COALESCE(sum(cost),0) AS total FROM usage WHERE planning_preview_id=$1',[input.previewId])).rows[0].total):0;
       if(planningCost>=input.policy.maxBudget)throw new AppError(422,'组织规划费用已达到项目预算，请调整预算后保存');

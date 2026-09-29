@@ -23,15 +23,21 @@ export class RunCoordinator {
   }
   async recordUsage(runId:string,u:RuntimeUsage){
     if((await pool.query('SELECT id FROM model_reservations WHERE id=$1',[u.id])).rowCount){await settleCall(u.id,u.inputTokens,u.outputTokens,u);return;}
-    await pool.query(`INSERT INTO usage(id,model_id,project_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
-      SELECT $1,$2,project_id,id,$3,$4,$5,'项目执行',$7,$8,$9,$10,$11,$12,$13 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null]);
+    const run=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0];
+    const agent=run?.snapshot?.agents?.find((item:any)=>item.id===u.agentId||item.employeeId===u.employeeId);
+    const departmentId=agent?.sourceDepartmentId??run?.snapshot?.departmentId??null;
+    await pool.query(`INSERT INTO usage(id,model_id,project_id,department_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
+      SELECT $1,$2,project_id,$7,id,$3,$4,$5,'项目执行',$8,$9,$10,$11,$12,$13,$14 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,departmentId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null]);
   }
   async reserve(runId:string,data:any){
     const run=(await pool.query('SELECT project_id,snapshot FROM project_runs WHERE id=$1 AND lease_owner=$2',[runId,this.owner])).rows[0];
     if(!run)throw new AppError(409,'工作进程已失去运行租约');
     await assertRunModels(run.snapshot);
     const model=run.snapshot.modelRoutes.find((m:any)=>m.id===data.modelId);if(!model)throw new AppError(422,'模型不属于批准快照');
-    await reserveCall({id:data.id,model,amount:data.reservation,purpose:'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,authorize:async(db,row)=>{await assertRunAuthorization(row,db);await assertRunModels(row.snapshot,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sessionId:data.sessionId,taskId:data.taskId,attemptId:data.attemptId,requestId:data.requestId}});
+    const agent=run.snapshot.agents.find((item:any)=>item.id===data.agentId||item.employeeId===data.employeeId)??(!data.agentId&&!data.employeeId?run.snapshot.agents[0]:undefined);
+    if(!agent)throw new AppError(422,'调用员工不在批准快照中');
+    const billingDepartmentId=agent.sourceDepartmentId??run.snapshot.departmentId;
+    await reserveCall({id:data.id,model,amount:data.reservation,purpose:'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,authorize:async(db,row)=>{await assertRunAuthorization(row,db);await assertRunModels(row.snapshot,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,attemptId:data.attemptId,requestId:data.requestId}});
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();
@@ -76,7 +82,8 @@ export class RunCoordinator {
         const count=Number((await client.query("SELECT count(*) FROM project_runs WHERE status='running'")).rows[0].count);
         if(count<limit&&!this.stopped){
           const candidate=(await client.query(`SELECT r.id,r.project_id FROM project_runs r WHERE r.status='queued' AND NOT r.cancel_requested
-            AND NOT EXISTS(SELECT 1 FROM project_runs a WHERE a.status='running' AND a.snapshot->>'departmentId'=r.snapshot->>'departmentId')
+            AND NOT EXISTS(SELECT 1 FROM project_runs a WHERE a.status='running' AND
+              COALESCE(NULLIF(a.department_ids,'{}'),ARRAY[a.snapshot->>'departmentId']) && COALESCE(NULLIF(r.department_ids,'{}'),ARRAY[r.snapshot->>'departmentId']))
             ORDER BY r.created_at LIMIT 1`)).rows[0];
           // All operations lock project before run; skip an in-flight edit instead of inverting that order.
           if(candidate&&(await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE SKIP LOCKED',[candidate.project_id])).rowCount)
