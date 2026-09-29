@@ -1,3 +1,4 @@
+import {employeeHistoryRouter} from './employee-history.ts';
 import {bindPolicy,assertPolicy,assertPlanningModel} from './execution-policy.ts';
 import { probeTools,routeFingerprint } from './model-capabilities.ts';
 import { startKnowledgeIndex,waitKnowledgeIndex } from './knowledge-vector.ts';
@@ -57,6 +58,7 @@ export function createApp() {
   app.use('/api', obsidianRouter());
   app.use('/api', knowledgeRouter());
   app.use('/api', productRouter());
+  app.use('/api', employeeHistoryRouter());
   app.use('/api', costRouter());
   app.use('/api', runManagementRouter(traceRoot));
   app.use('/api', backupRouter(traceRoot));
@@ -298,15 +300,20 @@ export function createApp() {
   app.get('/api/usage', async (_req, res) => {
     const { rows } = await pool.query('SELECT u.id,u.model_id AS "modelId",u.project_id AS "projectId",u.run_id AS "runId",u.agent_id AS "agentId",u.employee_id AS "employeeId",u.session_id AS "sessionId",u.task_id AS "taskId",u.attempt_id AS "attemptId",u.request_id AS "requestId",u.duration_ms AS "durationMs",u.input_tokens AS "inputTokens",u.output_tokens AS "outputTokens",u.cost::float AS cost,u.purpose,u.created_at AS "createdAt",(SELECT a->>\'name\' FROM jsonb_array_elements(r.snapshot->\'agents\') a WHERE a->>\'id\'=u.agent_id LIMIT 1) AS "agentName" FROM usage u LEFT JOIN project_runs r ON r.id=u.run_id ORDER BY u.created_at DESC'); res.json(rows);
   });
-  app.get('/api/runs', async (_req, res) => { const archived = listRuns(traceRoot); const pending = (await pool.query("SELECT id,created_at AS \"createdAt\",snapshot->>'title' AS title,status FROM project_runs")).rows.filter(r => !archived.some(a => a.id === r.id)); res.json([...pending.map(r => ({...r,createdAt: new Date(r.createdAt).toISOString(),mode:'product',eventCount:0,integrity:'ok'})),...archived]); });
+  app.get('/api/runs', async (_req, res) => {
+    const archived=listRuns(traceRoot),stored=(await pool.query(`SELECT id,created_at AS "createdAt",snapshot->>'title' AS title,status,error FROM project_runs`)).rows;
+    const byId=new Map(stored.map(row=>[row.id,row]));
+    res.json([...stored.filter(row=>!archived.some(a=>a.id===row.id)).map(row=>({...row,createdAt:new Date(row.createdAt).toISOString(),mode:'product',eventCount:0,integrity:'ok'})),...archived.map(run=>({...run,...(byId.has(run.id)?{status:byId.get(run.id).status,error:byId.get(run.id).error}:{})}))]);
+  });
   app.get('/api/runs/:id', async (req, res) => {
     const id = z.uuid().parse(req.params.id);
     const run = readRun(traceRoot, id);
-    if (!run) { const row = (await pool.query('SELECT snapshot,status,created_at FROM project_runs WHERE id=$1',[id])).rows[0]; if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false}); }
+    const row = (await pool.query('SELECT snapshot,status,error,created_at FROM project_runs WHERE id=$1',[id])).rows[0];
+    if (!run) { if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,error:row.error,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false}); }
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
     const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, 300);
-    res.json({ ...run, events, summaryEvents: run.events.filter(e => ['team/snapshot','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
+    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), events, summaryEvents: run.events.filter(e => ['team/snapshot','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);

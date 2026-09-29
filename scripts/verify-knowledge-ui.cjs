@@ -15,6 +15,9 @@ const {once}=require('node:events');
  run.events.push({seq:2,at:event.at,type:'budget/warning',data:{scope:'project',threshold:90,spent:.9,limit:1,calls:20,maxCalls:100}});
  const model={id:'model',name:'Fixture',model:'fixture',status:'available',gatewayId:'gateway',inputRate:1,outputRate:2};
  const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[]};
+ const department={id:'department',name:'测试部门',description:'员工恢复界面测试',agents:[agent],version:3,createdAt:event.at,updatedAt:event.at,runCount:1};
+ const removed={agent:{id:'analyst',name:'历史分析员',role:'member',title:'研究分析员',instructions:'查证资料并引用来源',systemConstraints:'不得猜测',outputFormat:'Markdown',modelId:'model',tools:['knowledge_search'],roleVersion:2},sourceVersion:2};
+ let removedEmployees=[removed],restoredEmployee;
  const project={id:'project',departmentId:'department',departmentName:'测试部门',requirement:'预算表单测试需求',version:1,source:'manual',status:'DRAFT',createdAt:event.at,policy:run.snapshot.policy,planningCost:0,validation:{valid:true,estimate:.01,checks:[],errors:[]},plan:{rationale:'Fixture',agents:[agent],tasks:[{id:'task',subject:'测试任务',objective:'核对预算配置',assigneeId:'manager',dependencies:[],acceptanceCriteria:['预算保存正确'],estimatedInputTokens:10,estimatedOutputTokens:10}]}};
  let savedPlan,savedPolicy,reconciled,retrievalSaved,toolProbeRequest;
  const retrieval={mode:'keyword',version:1,installed:true,model:'Local fixture embedding',embeddingVersion:'fixture-v1',indexed:1,total:2,running:false,error:null};
@@ -28,6 +31,8 @@ const {once}=require('node:events');
    if(apiPath===`/api/runs/${id}/citations/chunk`){res.statusCode=missing?409:200;res.end(JSON.stringify(missing?{message:'运行引用的知识版本缺失或不完整'}:source));return;}
    if(apiPath==='/api/projects/project/plan'&&req.method==='PUT'){let body='';for await(const data of req)body+=data;savedPlan=JSON.parse(body).plan;savedPolicy=JSON.parse(body).policy;project.plan=savedPlan;project.policy=savedPolicy;res.end('{}');return;}
    if(apiPath==='/api/projects/project/knowledge-options'){res.end(JSON.stringify([{id:'doc1',title:'本次选用规范',version:1,agentIds:['manager']},{id:'doc2',title:'无需使用规范',version:2,agentIds:['manager']}]));return;}
+   if(apiPath==='/api/departments/department/removed-employees'){res.end(JSON.stringify({departmentVersion:department.version,employees:removedEmployees}));return;}
+   if(apiPath==='/api/departments/department/restore-employee'&&req.method==='POST'){let body='';for await(const data of req)body+=data;restoredEmployee=JSON.parse(body);removedEmployees=[];department.version++;department.agents.push({...removed.agent,role:restoredEmployee.role,roleVersion:3});res.end(JSON.stringify({ok:true,version:department.version,agent:department.agents.at(-1)}));return;}
    if(apiPath==='/api/models/model/test-tools'){let body='';for await(const data of req)body+=data;toolProbeRequest=JSON.parse(body);model.capabilities={tools:{status:'supported',checkedAt:event.at,testId:'probe-fixture',probeVersion:'chat-tools-roundtrip-v1'}};res.end(JSON.stringify({message:'工具参数和工具结果往返测试通过；用量已记录。'}));return;}
    if(apiPath==='/api/models/model/capability-tests'){res.end(JSON.stringify([{id:'probe-fixture',createdAt:event.at,status:'supported',modelVersion:1,requestIds:['first','second'],probeVersion:'chat-tools-roundtrip-v1'}]));return;}
    if(apiPath==='/api/costs/cost/reconcile'&&req.method==='POST'){let body='';for await(const data of req)body+=data;reconciled=JSON.parse(body);costs.calls=[];costs.reserved=0;costs.recent=[{...costCall,status:'settled',history:[{source:'manual',...reconciled}]}];res.end('{}');return;}
@@ -41,7 +46,7 @@ const {once}=require('node:events');
    }
    if(apiPath==='/api/knowledge/index'){retrieval.indexed=retrieval.total;res.end('{}');return;}
    if(apiPath==='/api/knowledge/vault'){res.end(JSON.stringify({root:'/fixture/obsidian',instructions:'本地 Markdown Vault'}));return;}
-   const value=apiPath==='/api/health'?{version:'fixture',runtime:{reason:'fixture'}}:apiPath==='/api/models'?[model]:apiPath==='/api/projects'?[project]:apiPath==='/api/runs'?[run]:apiPath===`/api/runs/${id}`?run:[];
+   const value=apiPath==='/api/health'?{version:'fixture',runtime:{reason:'fixture'}}:apiPath==='/api/models'?[model]:apiPath==='/api/departments'?[department]:apiPath==='/api/departments/archived'?[]:apiPath==='/api/projects'?[project]:apiPath==='/api/runs'?[run]:apiPath===`/api/runs/${id}`?run:[];
    res.end(JSON.stringify(value));return;
   }
   const relative=pathname.replace(/^\/agent-department\/?/,'')||'index.html',file=path.resolve(root,relative);
@@ -85,6 +90,17 @@ const {once}=require('node:events');
   await page.getByText('本次会议记录 · 本次专用 · 经理',{exact:true}).click();
   await page.getByText('仅供本次分析使用的输入资料。',{exact:true}).waitFor();
   await page.screenshot({path:path.resolve(__dirname,'../dist/run-input-scope-ui.png'),fullPage:true});
+  await page.goto(`http://127.0.0.1:${server.address().port}/agent-department/#departments`);
+  await page.getByRole('heading',{name:'部门与员工',exact:true}).waitFor();
+  await page.getByRole('button',{name:'恢复已移除员工 · 测试部门',exact:true}).click();
+  await page.getByRole('button',{name:'查看并恢复 历史分析员',exact:true}).click();
+  await page.getByText('查证资料并引用来源',{exact:true}).waitFor();
+  await page.getByText('系统约束：不得猜测 · 输出规范：Markdown',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'确认恢复员工',exact:true}).click();
+  await page.getByRole('status').filter({hasText:'员工已恢复'}).waitFor();
+  assert.deepEqual(restoredEmployee,{agentId:'analyst',sourceVersion:2,departmentVersion:3,role:'member'});
+  await page.getByText('没有可恢复的员工。',{exact:true}).waitFor();
+  await page.screenshot({path:path.resolve(__dirname,'../dist/employee-restore-ui.png'),fullPage:true});
   await page.getByRole('button',{name:'系统设置',exact:true}).click();
   await page.getByText('费用待核对 · 预留 $0.500000',{exact:false}).waitFor();
   await page.getByRole('button',{name:'核对这次费用',exact:true}).click();

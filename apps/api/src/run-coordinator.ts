@@ -1,3 +1,4 @@
+import {claimExpiredRun,finishRun,terminalStatus} from './run-state.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
@@ -41,20 +42,23 @@ export class RunCoordinator {
   }
   async recover(){
     await expireReservations();
-    const stale=(await pool.query("UPDATE project_runs SET status='interrupted',error='运行进程中断，请检查记录后恢复',lease_owner=NULL,lease_until=NULL,finished_at=now() WHERE status='running' AND (lease_until IS NULL OR lease_until<now()) RETURNING *")).rows;
-    for(const row of stale){
+    const stale=(await pool.query("SELECT id FROM project_runs WHERE status='running' AND (lease_until IS NULL OR lease_until<clock_timestamp())")).rows;
+    for(const candidate of stale){
+      const row=await claimExpiredRun(candidate.id);if(!row)continue;
       if(/^[a-f0-9-]{36}$/.test(row.id))try{await command(['rm','-f','agent-department-'+row.id],{signal:AbortSignal.timeout(5000)});}catch{}
       const archived=readRun(this.traceRoot,row.id);
       if(archived?.integrity==='ok'){
         for(const event of archived.events.filter(e=>e.type==='billing/usage'))await this.recordUsage(row.id,event.data);
         const finished=archived.events.findLast(e=>e.type==='run/finished');
-        if(finished){await pool.query('UPDATE project_runs SET status=$1,error=$2 WHERE id=$3',[finished.data.status,finished.data.message??null,row.id]);await pool.query('UPDATE projects SET status=$1 WHERE id=$2 AND version=$3',[finished.data.status.toUpperCase(),row.project_id,row.project_version]);continue;}
-        openRunArchive(this.traceRoot,row.id).append('run/finished',{status:'interrupted',message:'服务租约过期，运行已停止；可从已记录的任务结果恢复。'});
+        if(finished&&terminalStatus(finished.data.status)){await finishRun(row.id,row.lease_owner,finished.data.status,finished.data.message??null);continue;}
       }
-      await pool.query("UPDATE tool_approvals SET status='cancelled',decided_at=now() WHERE run_id=$1 AND status='pending'",[row.id]);
-      await pool.query("UPDATE projects SET status='INTERRUPTED' WHERE id=$1 AND version=$2",[row.project_id,row.project_version]);
+      await finishRun(row.id,row.lease_owner,'interrupted','运行进程中断，请检查记录后恢复',record=>this.traceFinished(record,'interrupted','服务租约过期，运行已停止；可从已记录的任务结果恢复。'));
     }
   }
+  traceFinished(row:any,status:string,message:string){
+    try{const existing=readRun(this.traceRoot,row.id);const archive=existing?openRunArchive(this.traceRoot,row.id):createRunArchive(this.traceRoot,row.snapshot,{id:row.id});archive.append('run/finished',{status,message});}catch{}
+  }
+
   async tick(){
     if(this.ticking||this.stopped)return;this.ticking=true;
     try{
@@ -81,7 +85,7 @@ export class RunCoordinator {
         }
         await client.query('COMMIT');
       }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
-      if(job&&this.stopped){await pool.query("UPDATE project_runs SET status='interrupted',error='工作进程关闭，任务尚未启动',lease_owner=NULL,lease_until=NULL,finished_at=now() WHERE id=$1 AND lease_owner=$2",[job.id,this.owner]);await pool.query("UPDATE projects SET status='INTERRUPTED' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);return;}
+      if(job&&this.stopped){await finishRun(job.id,this.owner,'interrupted','工作进程关闭，任务尚未启动',row=>this.traceFinished(row,'interrupted','工作进程关闭，任务尚未启动'));return;}
       if(job){this.active.set(job.id,{projectId:job.project_id});void this.launch(job);}
     }catch(e){if(!this.stopped)console.error('Run worker:',e instanceof Error?e.name:'error');}finally{this.ticking=false;}
   }
@@ -98,14 +102,10 @@ export class RunCoordinator {
       const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes});
       const result=await started.completion;
       for(const usage of result.usages)await this.recordUsage(row.id,usage);
-      const updated=await pool.query('UPDATE project_runs SET status=$1,error=$2,finished_at=now(),lease_owner=NULL,lease_until=NULL WHERE id=$3 AND lease_owner=$4',[result.status,result.message??null,row.id,this.owner]);
-      if(updated.rowCount)await pool.query('UPDATE projects SET status=$1 WHERE id=$2 AND version=$3',[result.status.toUpperCase(),row.project_id,row.project_version]);
+      await finishRun(row.id,this.owner,result.status,result.message??null);
     }catch(error){
-      if(!(await pool.query("SELECT id FROM project_runs WHERE id=$1 AND lease_owner=$2 AND status='running'",[row.id,this.owner])).rowCount)return;
       const message=error instanceof Error?error.message:'启动失败';
-      try{const existing=readRun(this.traceRoot,row.id);const archive=existing?openRunArchive(this.traceRoot,row.id):createRunArchive(this.traceRoot,row.snapshot,{id:row.id});archive.append('run/finished',{status:'failed',message});}catch{}
-      await pool.query("UPDATE project_runs SET status='failed',error=$1,finished_at=now(),lease_owner=NULL,lease_until=NULL WHERE id=$2 AND lease_owner=$3",[message,row.id,this.owner]);
-      await pool.query("UPDATE projects SET status='FAILED' WHERE id=$1 AND version=$2",[row.project_id,row.project_version]);
+      await finishRun(row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
     }finally{this.active.delete(row.id);}
   }
   async cancel(id:string){

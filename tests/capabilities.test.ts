@@ -53,7 +53,7 @@ test('only a complete tool roundtrip enables execution; evidence, cost and route
  const gatewayRow=(await call('/gateways')).data.find((g:any)=>g.id===gatewayId);
  assert.equal((await call('/gateways/'+gatewayId,'PUT',{...gatewayRow,version:gatewayRow.version})).status,200);assert.deepEqual((await model()).capabilities,{});
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
- await pool.query("UPDATE project_runs SET status='running',lease_owner=$1 WHERE id=$2",[worker.owner,approved.data.id]);
+ await pool.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=now()+interval '1 minute' WHERE id=$2",[worker.owner,approved.data.id]);
  const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[approved.data.id])).rows[0],beforeLaunch=requests;
  await worker.launch(row);assert.equal(requests,beforeLaunch,'changed routes never reach the provider from the worker');assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].status,'failed');
 });
