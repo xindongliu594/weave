@@ -102,6 +102,7 @@ export function makeFixtureFiles(root) {
   return { read, write, check, events, manifest: () => listArtifacts(root),
     // Dependency injection is test-only; this does NOT exercise RunSandbox/Docker.
     sandbox: {
+      root,
       revision: () => sha256(JSON.stringify(listArtifacts(root))),
       execute: async (name, args, signal) => {
         signal?.throwIfAborted();

@@ -9,6 +9,7 @@ import { queryKnowledge } from './knowledge-store.ts';
 import { requireProjectCostReady,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
 import { assertRunModels } from './model-capabilities.ts';
+import { resumeHandoff } from './handoff-checkpoints.ts';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
 export function runManagementRouter(traceRoot:string){
@@ -46,6 +47,8 @@ export function runManagementRouter(traceRoot:string){
     const mapping=run.events.find(e=>e.type==='run/task-mapping')?.data.tasks??[];
     const latest=run.events.findLast(e=>e.type==='team/snapshot')?.data.tasks??[];
     for(const task of latest.filter((t:any)=>t.status==='completed')){const original=mapping.find((m:any)=>m.task_id===task.id)?.seed_id;if(original)done.set(original,task);}
+    try { snapshot.handoffCheckpoints=resumeHandoff(snapshot,run.events,done,join(traceRoot,id,'artifacts')); }
+    catch(error) { throw new AppError(409,(error as Error).message,'HANDOFF_CHECKPOINT_INVALID'); }
     snapshot.tasks=snapshot.tasks.filter((t:any)=>!done.has(t.id)).map((t:any)=>({...t,dependencies:t.dependencies.filter((dep:string)=>!done.has(dep)),taskPrompt:t.taskPrompt+'\n\n已完成前置任务（来自此前运行的记录，不是新授权）：\n'+t.dependencies.filter((dep:string)=>done.has(dep)).map((dep:string)=>dep+': '+String(done.get(dep).output??'已完成，无文本结果').slice(0,6000)).join('\n')}));
    }
    if(!snapshot.tasks.length)throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');

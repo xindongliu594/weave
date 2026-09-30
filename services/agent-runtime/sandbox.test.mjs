@@ -9,7 +9,7 @@ test('sandbox bounds paths, denies symlink reads, has no host mounts or network,
   const written=await sandbox.execute('artifact_write',{path:'result/report.md',content:'# 验收\n本地沙箱测试通过。'},signal);assert.equal(written.artifacts.length,1);
   assert.match((await sandbox.execute('filesystem',{path:'result/report.md'},signal)).content,/验收/);
   const state=JSON.parse(await command(['inspect',sandbox.name]));assert.equal(state[0].HostConfig.NetworkMode,'none');assert.equal(state[0].HostConfig.ReadonlyRootfs,true);assert.equal(state[0].Mounts.length,0);assert.equal(state[0].HostConfig.Memory,512*1024*1024);
-  const run=await sandbox.execute('terminal_test',{command:'node -e "console.log(2+2)"'},signal);assert.match(run.output,/4/);assert.match(run.output,/exit_code=0/);
+  const run=await sandbox.execute('terminal_test',{command:'node -e "console.log(2+2)"'},signal);assert.match(run.output,/4/);assert.equal(run.exitCode,0);
   await sandbox.execute('filesystem',{path:'result/report.md'},signal);
   await command(['exec',sandbox.name,'ln','-s','/etc/passwd','/workspace/escaped'],{signal});await assert.rejects(sandbox.execute('filesystem',{path:'escaped'},signal),/Symlinks/);
   assert.match(await readFile(artifactFile(root,'result/report.md'),'utf8'),/本地沙箱/);

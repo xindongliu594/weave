@@ -36,6 +36,7 @@ API Key 使用本机生成的 AES-256-GCM 密钥加密保存。主密钥位于 `
 
 - [Obsidian 配置与同步](docs/obsidian.md)
 - [项目策略与执行授权](docs/execution-policy.md)
+- [文件合同、版本核验与质量任务](docs/reliable-handoff.md)
 - [v0.2 验收与使用说明](docs/v0.2.md)
 - [功能清单](docs/completion-plan.md)
 - [下一阶段待办：员工运行时调整与桌面本机操作](docs/next-stage-plan.md)
@@ -50,7 +51,7 @@ API Key 使用本机生成的 AES-256-GCM 密钥加密保存。主密钥位于 `
 
 ## 检查
 
-固定文件的无模型 API 交接验证：`npm run test:handoff`。覆盖依赖等待、同一员工继续任务、文件结果传递及预设修复链；已知缺口单独报告。资料和边界见 [固定文件测试](tests/fixtures/offline-handoff/README.md) 与 [依赖设计说明](docs/offline-handoff-testing.md)。首次运行需安装下方的 runtime 依赖。
+固定文件的无模型 API 交接验证：`npm run test:handoff`。覆盖依赖等待、同一员工继续任务、文件版本传递及预设修复链；缺文件拒绝完成，过期输入在下游模型请求前阻塞。资料和边界见 [固定文件测试](tests/fixtures/offline-handoff/README.md) 与 [可靠交接说明](docs/reliable-handoff.md)。首次运行需安装下方的 runtime 依赖。
 
 ```sh
 npm run build

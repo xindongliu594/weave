@@ -8,6 +8,7 @@ import * as teams from '@nanmicoder/dsh-agent-teams';
 import { attachTrace } from './trace.mjs';
 import { installProductTools, employeeFor } from './product-tools.mjs';
 import { assignedTask } from './task-attribution.mjs';
+import { HandoffGate } from './handoff.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
@@ -24,12 +25,25 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const taskIds = new Map();
   const assignments=new Map();let teamId,workspaceRoot;
   let productDispose, captainId, locked = false;
+  const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
+  function teamState() {
+    if (!teamId || !workspaceRoot) throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
+    return JSON.parse(readFileSync(join(workspaceRoot, '.agent-teams', teamId, 'team.json'), 'utf8'));
+  }
   function taskFor(sessionId) {
     if(sessionId===captainId)return undefined; // Coordination is charged to the project, not an arbitrary task.
     const employee=employeeFor(ctx.agents.get(sessionId),product.snapshot,captainId);
     if(!teamId||!workspaceRoot||!employee)throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
-    const state=JSON.parse(readFileSync(join(workspaceRoot,'.agent-teams',teamId,'team.json'),'utf8'));
+    const state=teamState();
     const task=assignedTask(state,sessionId,employee.id,assignments.get(sessionId));assignments.set(sessionId,task);return task;
+  }
+  function activeWork(agent, requested) {
+    const state = teamState(), employee = employeeFor(agent, product.snapshot, captainId);
+    const task = requested ? state.tasks.find(t => t.id === requested) : state.tasks.find(t => t.assignee === employee?.id && ['claimed', 'in_progress'].includes(t.status));
+    if (!task || !employee || task.assignee !== employee.id || !state.members.some(m => m.id === agent.id && m.name === employee.id) || !['claimed', 'in_progress'].includes(task.status)) throw Error('TASK_NOT_ACTIVE: 工具仅能用于当前分派的任务');
+    const id = taskIds.get(task.id);
+    if (!id) throw Error('UNAPPROVED_TASK: ' + task.id);
+    return { taskId: id, attemptId: task.attemptId, task };
   }
   async function mount(name, config) {
     const mod = await import(pathToFileURL(baseRequire.resolve(name)).href);
@@ -65,17 +79,57 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
           if(employee)adapter.sessionPolicies?.set(session.id,employee);
         }
       });
-      productDispose = installProductTools(ctx, { ...product, archive, captainId: () => captainId });
+      productDispose = installProductTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId });
       ctx.on('llm/stream', async function* (options, next) {
         const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
         if(!employee)throw Error('MODEL_PERMISSION_DENIED: 无法确认此会话所属员工');
         adapter.sessionPolicies?.set(options.sessionId,employee);
+        if (handoff && options.sessionId !== captainId) {
+          const current = taskFor(options.sessionId), task = teamState().tasks.find(t => t.id === current.taskId);
+          if (task && ['claimed', 'in_progress'].includes(task.status)) {
+            const taskId = taskIds.get(task.id);
+            try { await handoff.exclusive(options.signal, () => handoff.begin(taskId, task.attemptId)); }
+            catch (error) { const blocked = handoff.block(taskId, task.attemptId, error); product.onHandoffBlocked?.(blocked); throw blocked; }
+          }
+        }
         const release = await product.gate.acquire(options.signal);
         try { yield* next(); } finally { release(); }
       });
       ctx.on('tools/pre-execute', async (exec,next) => {
         if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) throw Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
         return next();
+      });
+      ctx.on('tools/execute', async (exec, next) => {
+        if (!handoff || exec.name !== 'agent_teams_update_task') return next();
+        const args = exec.arguments;
+        if (!['completed', 'failed'].includes(args.status)) return next();
+        const work = activeWork(exec.agent, args.task_id);
+        if (args.attempt_id !== work.attemptId) throw Error('STALE_ATTEMPT: 完成交付物需要当前任务凭证');
+        const contract = handoff.tasks.get(work.taskId);
+        if (args.status === 'failed') {
+          // The plugin's needs_revision loop creates tasks internally. Stop it before
+          // it can bypass the approved product snapshot and its budget/permissions.
+          if (['review', 'requirements'].includes(contract.kind) && args.verdict === 'needs_revision') {
+            const blocked = handoff.block(work.taskId, work.attemptId, Error('REPLAN_REQUIRED: 审查需要修订，请重新批准修复方案'));
+            product.onHandoffBlocked?.(blocked); throw blocked;
+          }
+          return next();
+        }
+        return handoff.exclusive(exec.signal, async () => {
+          let record;
+          try { record = handoff.prepare(work.taskId, work.attemptId, args); }
+          catch (error) { throw handoff.block(work.taskId, work.attemptId, error); }
+          const previous = handoff.accepted.get(work.taskId);
+          // Native update commits state and queues dependents before returning.
+          // This provisional seal is usable only behind native completed state;
+          // the shared mutex fences their first request until the outcome is known.
+          handoff.stage(record);
+          try {
+            const result = await next();
+            if (result.isError) handoff.rollback(record, previous); else handoff.commit(record);
+            return result;
+          } catch (error) { handoff.rollback(record, previous); throw error; }
+        });
       });
     }
     if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined);
@@ -94,6 +148,18 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ctx,
       close,
       lockPlan() { locked = true; },
+      handoffStatus() { return handoff?.summary() ?? []; },
+      async verifyDeliverable(signal) {
+        if (!handoff) return;
+        await handoff.exclusive(signal, () => {
+          const state = teamState();
+          for (const contract of handoff.tasks.values()) {
+            const task = state.tasks.find(t => taskIds.get(t.id) === contract.id);
+            if (task?.status !== 'completed' || handoff.accepted.get(contract.id)?.attemptId !== task.attemptId)
+              throw Error('HANDOFF_NOT_COMMITTED: ' + contract.id);
+          }
+        });
+      },
       bindTaskMapping(tasks,id) { teamId=id;for(const task of tasks)taskIds.set(task.task_id,task.seed_id); },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
         workspaceRoot=cwd;

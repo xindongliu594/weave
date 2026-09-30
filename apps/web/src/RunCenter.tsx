@@ -11,6 +11,7 @@ const eventNames: Record<string, string> = {
   'run/created': '创建运行档案', 'run/queued': '进入执行队列', 'run/captain': '绑定协调经理', 'run/task-mapping': '任务编号映射', 'run/approved': '确认启动', 'run/started': '团队开始执行', 'run/finished': '运行结束', 'billing/usage': '记录执行用量', 'billing/unconfirmed': '调用费用待核对', 'budget/warning': '预算阈值提醒', 'budget/stopped': '预算或调用次数停止',
   'session/created': '创建员工会话', 'agent/created': '加载员工模型', 'model/wire-request': '实际发送的模型请求', 'model/fallback': '切换备用模型', 'context/compacted': '整理上下文', 'approval/requested': '请求工具审批', 'approval/decided': '用户处理审批', 'knowledge/citation': '引用知识资料', 'artifact/updated': '更新交付物', 'model/request': '运行时原始上下文', 'model/finish': '模型返回', 'model/error': '模型调用失败', 'model/usage': '模型用量',
   'tool/start': '开始调用工具', 'tool/result': '工具执行结果', 'team/operation': '团队操作', 'team/snapshot': '团队状态快照',
+  'handoff/inputs-bound': '固定任务输入版本', 'handoff/accepted': '核验并接收交付物', 'handoff/blocked': '交接条件未满足', 'handoff/command-observed': '记录验证命令结果',
   'session/user/message': '收到任务或追加指令', 'session/system/message': '实际系统提示词', 'session/assistant/message': '员工回复', 'session/turn/start': '开始工作', 'session/turn/end': '本轮结束',
 };
 function eventSummary(e: TraceEvent) {
