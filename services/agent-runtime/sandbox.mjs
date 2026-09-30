@@ -71,6 +71,11 @@ export class RunSandbox {
       else {if(typeof args.command!=='string'||args.command.length>5000)throw Error('Invalid command');
         const script='timeout 60s sh -lc "$1" 2>&1; code=$?; printf "\\n[exit_code=%s]\\n" "$code"';
         result={output:await command(['exec',this.name,'sh','-c',script,'sh',args.command],{signal,limit:1024*1024})};}
+      if(name==='terminal'||name==='terminal_test'){
+        const match=/\n\[exit_code=(\d+)\]\n?$/.exec(result.output);
+        if(!match)throw Error('COMMAND_RESULT_MISSING: 无法核对命令退出码');
+        result.exitCode=Number(match[1]);result.output=result.output.slice(0,match.index);
+      }
       const artifacts=await this.sync(signal);if(name==='terminal'||name==='terminal_test')await this.close();return {...result,artifacts,workspaceRevision:this.revision()};
     }finally{signal?.removeEventListener('abort',abort);release();}
   }

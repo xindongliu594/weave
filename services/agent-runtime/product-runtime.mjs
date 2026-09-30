@@ -5,6 +5,7 @@ import { createTeamHost } from './host.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 import { RunSandbox } from './sandbox.mjs';
 import { Semaphore } from './limits.mjs';
+import { teamTaskPlan, stageApprovedTeam } from './handoff.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -86,7 +87,7 @@ export class ProductDshRuntime {
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
-        product: { snapshot, sandbox, gate, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge } });
+        product: { snapshot, sandbox, gate, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');
@@ -96,11 +97,11 @@ export class ProductDshRuntime {
       archive.append('run/captain', { agentId: manager.id, employeeId: manager.employeeId, sessionId: captain.id });
       const plan = {
         members: snapshot.agents.map(agent => ({ name: agent.id, role: agent.rolePrompt, provider, model: agent.modelId, ...(agent.reasoningEffort ? { reasoning_effort: agent.reasoningEffort } : {}) })),
-        tasks: snapshot.tasks.map(task => ({ id: task.id, subject: task.subject, description: task.taskPrompt, assignee: task.assignee, dependencies: task.dependencies })),
+        tasks: teamTaskPlan(snapshot.tasks),
       };
-      const created = await host.call(captain, 'agent_teams_create', {
-        name: `run-${archive.id.slice(0, 8)}`, description: snapshot.requirement, approval: 'required', plan,
-      }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(15_000)]));
+      const created = await stageApprovedTeam(host, captain, {
+        name: `run-${archive.id.slice(0, 8)}`, description: snapshot.requirement, ...plan,
+      }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(30_000)]));
       archive.append('run/task-mapping', { tasks: created.tasks });
       host.bindTaskMapping(created.tasks,created.team_id);
       archive.append('run/approved', snapshot.approval);
@@ -114,12 +115,13 @@ export class ProductDshRuntime {
         if (runtimeFailure) throw runtimeFailure;
         status = await host.call(captain, 'agent_teams_status', {}, AbortSignal.any([job.controller.signal, AbortSignal.timeout(15_000)]));
         if (status.members.some(member => member.spawn_error)) throw new Error('AgentTeams member startup failed');
-        if (status.deliverable) break;
+        if (status.deliverable) { await host.verifyDeliverable(job.controller.signal); break; }
+        if (status.tasks.some(task => task.status === 'failed')) throw new Error('前置任务失败，相关下游未执行；请检查记录后重新制定方案');
         const terminal = status.tasks.length > 0 && status.tasks.every(task => ['completed', 'failed', 'cancelled'].includes(task.status));
         if (terminal) throw new Error('Team finished without a deliverable');
         const parked = status.tasks.some(task => ['claimed', 'in_progress'].includes(task.status)) && status.members.every(member => member.status === 'idle');
         stalledSince = parked ? stalledSince || Date.now() : 0;
-        if (stalledSince && Date.now() - stalledSince > 10_000) throw new Error('员工已停止响应，但任务尚未完成');
+        if (stalledSince && Date.now() - stalledSince > 10_000) throw new Error(host.handoffStatus().map(item => item.message).join('；') || '员工已停止响应，但任务尚未完成');
         await delay(500);
       }
       await captain.whenIdle();

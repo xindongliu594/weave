@@ -1,6 +1,6 @@
 export type TraceEvent = { seq: number; at: string; type: string; sessionId?: string; taskId?: string; attemptId?: string; sourceKey?: string; callId?: string; requestId?: string; data: any };
 export type TraceAgent = { id: string; name: string; model: string; roleVersion: number; rolePrompt: string };
-export type TraceTask = { id: string; subject: string; taskPrompt: string; assignee: string; dependencies: string[] };
+export type TraceTask = { id: string; subject: string; taskPrompt: string; assignee: string; dependencies: string[]; kind?: string; inputs?: {path:string;producerTaskId?:string;sha256?:string}[]; outputs?: {path:string;format?:string}[] };
 export type RunSummary = { id: string; title: string; mode: string; status: string; integrity: string; createdAt: string; eventCount: number };
 export type RunDetail = RunSummary & { snapshot: { requirement: string; planVersion: number; templateVersion: string; agents: TraceAgent[]; tasks: TraceTask[]; approval: unknown; knowledge?: any }; events: TraceEvent[] };
 export function listRuns(root: string): RunSummary[];

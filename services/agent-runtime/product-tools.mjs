@@ -6,7 +6,7 @@ export function employeeFor(agent,snapshot,captainId){
   const name=descriptor?.data?.label?.split(':').at(-1);
   return snapshot.agents.find(a=>a.id===name);
 }
-export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge}){
+export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,handoff,activeWork}){
   const string={type:'string',required:true};
   const tools=[
     ['artifact_write','写入文本交付物。新文件可直接写；修改已有文件必须先 filesystem 读取，再传入读取时的 sha256 为 expectedSha256，冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
@@ -33,7 +33,26 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal);
     }
     const release=await gate.acquire(exec.signal);
-    try{const result=await sandbox.execute(name,args,exec.signal);archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts});return result;}finally{release();}
+    try {
+      const execute = async () => {
+        const work = handoff ? activeWork(exec.agent) : undefined;
+        try {
+          const before = handoff?.beforeFile(work.taskId, work.attemptId, name, args);
+          const result = await sandbox.execute(name,args,exec.signal);
+          if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before);
+          archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts}); return result;
+        } catch (error) {
+          if (handoff && work) {
+            // Failed mutations may leave an unsynchronized container workspace.
+            // Require fresh observed verification instead of reusing old proof.
+            if (name !== 'filesystem') handoff.invalidateCommands(work.taskId, work.attemptId);
+            throw handoff.block(work.taskId, work.attemptId, error);
+          }
+          throw error;
+        }
+      };
+      return handoff ? await handoff.exclusive(exec.signal, execute) : await execute();
+    } finally { release(); }
   }})));
   return ()=>disposers.reverse().forEach(dispose=>dispose());
 }

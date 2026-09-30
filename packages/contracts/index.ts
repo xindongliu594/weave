@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isArtifactPath, taskContractErrors } from './task-contracts.mjs';
 
 export const agentSchema = z.object({
   id: z.string().min(1).max(180), name: z.string().trim().min(1).max(80),
@@ -38,6 +39,17 @@ export const policySchema = z.object({
   allowedKnowledgeSpaceIds: z.array(z.string().min(1).max(100)).max(180).optional(),
   allowedDepartmentIds: z.array(z.string().min(1).max(100)).min(1).max(20).optional(),
 });
+export const artifactPathSchema = z.string().refine(isArtifactPath, '需要工作区相对路径，不能包含越界或团队状态目录');
+export const artifactInputSchema = z.object({
+  path: artifactPathSchema,
+  producerTaskId: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/).optional(),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+}).refine(v => !!v.producerTaskId || !!v.sha256, '输入必须绑定来源任务或固定 SHA256');
+export const artifactOutputSchema = z.object({
+  path: artifactPathSchema, format: z.enum(['text', 'json']).optional(),
+  requiredKeys: z.array(z.string().min(1).max(100)).max(30).optional(),
+  expectedValues: z.record(z.string().min(1).max(100), z.union([z.string().max(2000), z.number().finite(), z.boolean(), z.null()])).refine(v => Object.keys(v).length <= 30).optional(),
+}).refine(v => (!v.requiredKeys?.length && !Object.keys(v.expectedValues ?? {}).length) || v.format === 'json', '字段检查需要 JSON 格式');
 export const taskSchema = z.object({
   id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),
   subject: z.string().trim().min(1).max(200), objective: z.string().trim().min(1).max(5000),
@@ -47,6 +59,15 @@ export const taskSchema = z.object({
   estimatedOutputTokens: z.number().int().min(1).max(200000),
   maxBudget: z.number().finite().positive().max(10000).optional(),
   maxModelCalls: z.number().int().min(1).max(1000).optional(),
+  kind: z.enum(['work', 'requirements', 'implementation', 'verification', 'review', 'repair', 'integration']).optional(),
+  inputs: z.array(artifactInputSchema).max(40).optional(),
+  outputs: z.array(artifactOutputSchema).max(40).optional(),
+  inScope: z.array(artifactPathSchema).max(40).optional(),
+  outOfScope: z.array(artifactPathSchema).max(40).optional(),
+  verify: z.array(z.string().trim().min(1).max(5000)).max(20).optional(),
+  reviewedTaskId: z.string().min(1).max(64).optional(),
+  sourceTaskId: z.string().min(1).max(64).optional(),
+  sourceFindingIds: z.array(z.string().min(1).max(100)).max(30).optional(),
 });
 export const runInputSchema = z.object({
   id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),
@@ -133,6 +154,8 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
     visiting.delete(id); done.add(id); return true;
   }
   check('任务依赖无环', referencesOK && plan.tasks.every(t => visit(t.id)), '任务依赖必须组成无环图');
+  const contracts = taskContractErrors(plan.tasks, requireToolSupport ? plan.agents : []);
+  check('文件交接与质量合同', contracts.length === 0, contracts.join('；'));
   let estimate = 0;
   let taskBudgetsOK = true;
   for (const task of plan.tasks) {

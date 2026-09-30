@@ -20,21 +20,22 @@ npm run test:handoff
 
 `request.md` 是需求；`inputs/orders.json` 是两行订单；`expected/report.json` 固定预期为 2 行、4095 分。错误模块故意遗漏数量，实际执行得到 1798 分。
 
-`plan.json` 明确 library → application → inspect → repair → verify 五个任务。同一 producer 员工完成 library 和 repair，同一 checker 员工完成 inspect 和 verify。三个员工使用相同模型名、独立会话。这里的 `inputs`、`outputs` 是测试契约说明，**当前产品没有接入这些字段**，不能直接把本文件当成网页导入方案。
+`plan.json` 明确 library → application → inspect → repair → verify 五个任务。同一 producer 员工完成 library 和 repair，同一 checker 员工完成 inspect 和 verify。三个员工使用相同模型名、独立会话。测试把此资料的输入/输出简写转换为实际产品合同（`producerTaskId`、固定 SHA256、输出对象），使用与生产相同的建队、任务映射和宿主门禁。此文件仍是测试资料，缺少网页方案所需的模型、预算等字段，不能直接作为完整方案导入。
 
 | 场景 | 检查什么 | 通过含义 |
 |---|---|---|
 | happy | 4095、依赖等待、结果转交、同模型独立会话、员工自己的历史保留 | 固定输入的调度和文件流程符合断言 |
 | repair | 1798 被真实执行的检查识别，修复模块后重新执行得到 4095 | 预先批准的诊断/修复/复验链可运行 |
 | failed-upstream | 上游明确失败，下游保持 pending | 任务状态依赖生效 |
-| missing-file | 上游标完成但未写文件，下游仍启动并读文件失败 | **诊断确认产品缺口，不能解释为文件依赖保护通过** |
+| missing-file | 上游未写文件就提交完成，被宿主拒绝；下游 pending、尝试为 0 | 产品文件完成门禁保护通过 |
+| stale-input | 在上游验收后、下游执行前改变文件 | 产品输入门禁阻止下游模型请求与文件工具调用 |
 | 版本检查 | 文件变化后旧 SHA256 不匹配、文件缺失、非法路径 | 测试 oracle 能识别，未接入生产调度 |
 | 声明检查 | 依赖环、漏声明上游、无先后关系的相同文件写入 | 测试 oracle 能识别，未接入生产文件契约 |
 
 测试不伪造完成结果：期望值与实际 Node 执行结果比较；传给下游的交接标识在上游运行时随机生成；会话隔离通过仅向 producer 返回的工具标识检查；每项任务的尝试次数须为 1。测试适配器负责发起预设动作，不能证明真实模型会自主选择这些动作。
 
-inspect 的目标是生成诊断记录，检测到计算错误仍完成“诊断任务”；它不是最终验收通过。repair 和 verify 已预先列在批准任务图内。本测试未接入 AgentTeams 原生质量任务类型、运行中新增任务或自动重规划。
+inspect 的目标是生成诊断记录，检测到计算错误仍完成“诊断任务”；它不是最终验收通过。repair 和 verify 已预先列在批准任务图内。这套固定场景使用普通 work 类型；另外的 `services/agent-runtime/quality-handoff.test.mjs` 覆盖原生实现/独立审查、实际命令证据、原生验收失败回滚及拒绝未批准修订。两套测试都未验证自动重规划或真实模型。
 
 执行文件仅允许仓库中逐字匹配的固定源码；终端运行由测试专用检查工具完成，未开放通用宿主命令。禁止把这里的文件执行器用于正式项目。
 
-完整依赖设计与本次发现见 [说明](../../../docs/offline-handoff-testing.md)。
+当前实现与限制见 [可靠交接说明](../../../docs/reliable-handoff.md)，第一轮发现见 [历史记录](../../../docs/offline-handoff-testing.md)。

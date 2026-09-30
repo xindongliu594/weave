@@ -1,0 +1,346 @@
+{
+  "date": "2026-09-30",
+  "baseCommit": "fd92595f226b905edce60d764d879b597466739e",
+  "stage": "Approved artifact contracts and host handoff gates",
+  "runtime": {
+    "passed": 38,
+    "failed": 0,
+    "command": "node --test services/agent-runtime/{budget,limits,product-tools,openai-compatible,smoke,trace,handoff-fixtures,handoff,quality-handoff}.test.mjs"
+  },
+  "pureRules": {
+    "passed": 14,
+    "failed": 0,
+    "command": "npx tsx --test tests/policy.test.ts tests/task-contracts.test.ts tests/handoff-checkpoints.test.ts tests/request-origin.test.ts"
+  },
+  "build": {
+    "status": "passed",
+    "command": "npm run build",
+    "checks": [
+      "tsc --noEmit",
+      "Vite production build"
+    ]
+  },
+  "fullTestAttempt": {
+    "command": "npm test",
+    "passed": 14,
+    "failed": 51,
+    "status": "environment-blocked",
+    "reason": "Database setup ECONNREFUSED 127.0.0.1:55432; PostgreSQL/Docker unavailable"
+  },
+  "fixedFileSuite": {
+    "command": "npm run test:handoff",
+    "testsPassed": 7,
+    "runtimeScenarios": 5,
+    "modelHttpCalls": 0,
+    "gapsWithinThisSuite": [],
+    "startedAt": "2026-09-30T06:13:54.761Z",
+    "finishedAt": "2026-09-30T06:13:56.341Z",
+    "scenarios": [
+      {
+        "name": "happy",
+        "result": "PASS",
+        "tasks": [
+          {
+            "subject": "[fixture:library] 提供金额模块",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:application] 组装报告程序",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:inspect] 生成计算诊断记录",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:repair] 按诊断修复或保留模块",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:verify] 复验最终报告",
+            "status": "completed",
+            "attempt": 1
+          }
+        ],
+        "checks": [
+          {
+            "label": "inspect",
+            "accepted": true,
+            "expected": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "actual": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "inputs": [
+              {
+                "path": "lib/money.mjs",
+                "sha256": "20b6093d52be129471a11395ec18816f2b258dd5647664d3ce7bb22d63ec2066"
+              },
+              {
+                "path": "report.mjs",
+                "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+              },
+              {
+                "path": "inputs/orders.json",
+                "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+              }
+            ]
+          },
+          {
+            "label": "verify",
+            "accepted": true,
+            "expected": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "actual": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "inputs": [
+              {
+                "path": "lib/money.mjs",
+                "sha256": "20b6093d52be129471a11395ec18816f2b258dd5647664d3ce7bb22d63ec2066"
+              },
+              {
+                "path": "report.mjs",
+                "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+              },
+              {
+                "path": "inputs/orders.json",
+                "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+              }
+            ]
+          }
+        ],
+        "acceptedCount": 5,
+        "blockedReasons": []
+      },
+      {
+        "name": "repair",
+        "result": "PASS",
+        "tasks": [
+          {
+            "subject": "[fixture:library] 提供金额模块",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:application] 组装报告程序",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:inspect] 生成计算诊断记录",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:repair] 按诊断修复或保留模块",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:verify] 复验最终报告",
+            "status": "completed",
+            "attempt": 1
+          }
+        ],
+        "checks": [
+          {
+            "label": "inspect",
+            "accepted": false,
+            "expected": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "actual": {
+              "orderCount": 2,
+              "totalCents": 1798
+            },
+            "inputs": [
+              {
+                "path": "lib/money.mjs",
+                "sha256": "4233c892b0c1ca435eb22165fab49e46711cbce902155a5f9baa2fea19c49af0"
+              },
+              {
+                "path": "report.mjs",
+                "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+              },
+              {
+                "path": "inputs/orders.json",
+                "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+              }
+            ]
+          },
+          {
+            "label": "verify",
+            "accepted": true,
+            "expected": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "actual": {
+              "orderCount": 2,
+              "totalCents": 4095
+            },
+            "inputs": [
+              {
+                "path": "lib/money.mjs",
+                "sha256": "20b6093d52be129471a11395ec18816f2b258dd5647664d3ce7bb22d63ec2066"
+              },
+              {
+                "path": "report.mjs",
+                "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+              },
+              {
+                "path": "inputs/orders.json",
+                "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+              }
+            ]
+          }
+        ],
+        "acceptedCount": 5,
+        "blockedReasons": []
+      },
+      {
+        "name": "failed-upstream",
+        "result": "PASS",
+        "tasks": [
+          {
+            "subject": "[fixture:library] 提供金额模块",
+            "status": "failed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:application] 组装报告程序",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:inspect] 生成计算诊断记录",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:repair] 按诊断修复或保留模块",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:verify] 复验最终报告",
+            "status": "pending",
+            "attempt": 0
+          }
+        ],
+        "checks": [],
+        "acceptedCount": 0,
+        "blockedReasons": []
+      },
+      {
+        "name": "missing-file",
+        "result": "PASS",
+        "tasks": [
+          {
+            "subject": "[fixture:library] 提供金额模块",
+            "status": "in_progress",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:application] 组装报告程序",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:inspect] 生成计算诊断记录",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:repair] 按诊断修复或保留模块",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:verify] 复验最终报告",
+            "status": "pending",
+            "attempt": 0
+          }
+        ],
+        "checks": [],
+        "acceptedCount": 0,
+        "blockedReasons": [
+          "MISSING_FILE: lib/money.mjs"
+        ]
+      },
+      {
+        "name": "stale-input",
+        "result": "PASS",
+        "tasks": [
+          {
+            "subject": "[fixture:library] 提供金额模块",
+            "status": "completed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:application] 组装报告程序",
+            "status": "failed",
+            "attempt": 1
+          },
+          {
+            "subject": "[fixture:inspect] 生成计算诊断记录",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:repair] 按诊断修复或保留模块",
+            "status": "pending",
+            "attempt": 0
+          },
+          {
+            "subject": "[fixture:verify] 复验最终报告",
+            "status": "pending",
+            "attempt": 0
+          }
+        ],
+        "checks": [],
+        "acceptedCount": 1,
+        "blockedReasons": [
+          "VERSION_MISMATCH: lib/money.mjs"
+        ]
+      }
+    ]
+  },
+  "additionalChecks": [
+    "Actual native quality tools receive approved contracts with production employee-ID mapping",
+    "Forged, failed or stale command evidence cannot unlock completion",
+    "Native acceptance failure rolls back provisional seal",
+    "Stale task attempt cannot publish a seal",
+    "Final delivery waits for host seal commits",
+    "Unapproved needs_revision expansion is blocked",
+    "Persistent out-of-scope terminal mutation prevents attempt completion",
+    "Resume requires exact accepted attempt and restored input version"
+  ],
+  "excluded": [
+    "Production database and approval UI",
+    "Docker RunSandbox",
+    "real model/API compatibility or quality",
+    "automatic discovery of dependencies",
+    "automatic creation of repair tasks",
+    "reverse invalidation after upstream edits"
+  ],
+  "limits": [
+    "Legacy tasks without explicit artifact contracts retain old behavior",
+    "Terminal scope checking audits after execution and does not roll back changes",
+    "No new external workspace file upload interface",
+    "Partial resume cannot recreate completed native quality source identities",
+    "No automatic dependency inference or reverse invalidation of completed downstream results"
+  ]
+}

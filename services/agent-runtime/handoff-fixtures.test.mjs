@@ -11,6 +11,7 @@ import { createTeamHost } from './host.mjs';
 import { employeeFor } from './product-tools.mjs';
 import { Semaphore } from './limits.mjs';
 import { createRunArchive, readRun } from './trace-store.mjs';
+import { teamTaskPlan, stageApprovedTeam } from './handoff.mjs';
 import { fixtureText, fixtureJson, makeFixtureFiles, inspectInput, validateFixtureGraph } from './test-support/handoff-fixtures.mjs';
 
 const originalFetch = globalThis.fetch;
@@ -24,11 +25,27 @@ async function runScenario(scenario) {
   mkdirSync(workspace);
   const plan = fixtureJson('plan.json');
   assert.deepEqual(validateFixtureGraph(plan), []);
-  const snapshot = { mode: 'fixture', title: scenario, agents: [
+  const tasks = plan.tasks.map(task => ({ ...task,
+    inputs: (task.inputs ?? []).map(input => ({ path: input.path, ...(input.producer === 'user' ? { sha256: files.read(input.path).sha256 } : { producerTaskId: input.producer }) })),
+    outputs: (task.outputs ?? []).map(path => ({ path, format: path.endsWith('.json') ? 'json' : 'text',
+      ...(task.id === 'verify' && path === 'report.json' ? { expectedValues: { orderCount: 2, totalCents: 4095 } } : {}),
+      ...(path === 'checks/verify.json' ? { expectedValues: { accepted: true } } : {}),
+    })),
+  }));
+  tasks.find(t => t.id === 'inspect').inputs.push({ path: 'lib/money.mjs', producerTaskId: 'library' });
+  tasks.find(t => t.id === 'repair').inputs.push({ path: 'lib/money.mjs', producerTaskId: 'library' });
+  const snapshot = { mode: 'fixture', title: scenario, tasks, agents: [
     { id: 'manager', role: 'manager', tools: [] },
     ...plan.members.map(member => ({ id: member.name, role: 'member', tools: ['artifact_write', 'filesystem'] })),
   ] };
-  const archive = createRunArchive(root, snapshot);
+  const rawArchive = createRunArchive(root, snapshot);
+  const archive = { ...rawArchive, append(type, data, links) {
+    const event = rawArchive.append(type, data, links);
+    // Fault injection after acceptance but before releasing the next worker.
+    if (scenario === 'stale-input' && type === 'handoff/accepted' && data.taskId === 'library')
+      files.write('lib/money.mjs', fixtureText('candidates/money-broken.mjs'), files.read('lib/money.mjs').sha256);
+    return event;
+  } };
   const requests = [], toolResults = [], errors = [], steps = new Map(), outputs = new Map();
   const privateNote = 'SESSION_ONLY_' + randomUUID();
   let releaseLibrary, waitingAtLibrary = false, host, captain;
@@ -46,7 +63,7 @@ async function runScenario(scenario) {
     if (task === 'library') {
       work.push(() => call('fixture_private_note', {}));
       if (!['missing-file', 'failed-upstream'].includes(scenario)) work.push(() => call('artifact_write', {
-        path: 'lib/money.mjs', content: fixtureText(scenario === 'happy' ? 'candidates/money-fixed.mjs' : 'candidates/money-broken.mjs'),
+        path: 'lib/money.mjs', content: fixtureText(['happy', 'stale-input'].includes(scenario) ? 'candidates/money-fixed.mjs' : 'candidates/money-broken.mjs'),
       }));
       if (scenario === 'failed-upstream') finalStatus = 'failed';
     } else if (task === 'application') {
@@ -132,11 +149,10 @@ async function runScenario(scenario) {
       assert.ok(['inspect', 'verify'].includes(args.label)); return files.check(args.label);
     } }));
     host.ctx.on('tools/result', (exec, result) => { toolResults.push({ name: exec.name, args: exec.arguments, sessionId: exec.agent?.id, result }); });
-    const created = await host.call(captain, 'agent_teams_create', { name: 'fixture-' + scenario, approval: 'required', plan: {
+    const created = await stageApprovedTeam(host, captain, { name: 'fixture-' + scenario,
       members: plan.members.map(member => ({ ...member, provider: 'fixture', model: 'same-fixture-model' })),
-      // Preserve the current product mapping; file contracts are oracle metadata only.
-      tasks: plan.tasks.map(({ id, subject, assignee, dependencies }) => ({ id, subject, assignee, dependencies })),
-    } });
+      tasks: teamTaskPlan(tasks),
+    });
     host.bindTaskMapping(created.tasks, created.team_id);
     const staged = await host.call(captain, 'agent_teams_status');
     assert.equal(requests.length, 0);
@@ -149,16 +165,16 @@ async function runScenario(scenario) {
     assert.ok(early.tasks.slice(1).every(task => task.status === 'pending'));
     releaseLibrary();
     let status;
-    const expectedReports = scenario === 'failed-upstream' ? 1 : scenario === 'missing-file' ? 2 : 5;
+    const expectedReports = ['failed-upstream', 'missing-file', 'stale-input'].includes(scenario) ? 1 : 5;
     await until(async () => {
       status = await host.call(captain, 'agent_teams_status');
       assert.ok(status.members.every(member => !member.spawn_error));
       const reports = toolResults.filter(item => item.name === 'agent_teams_send_message' && !item.result.isError).length;
-      return reports >= expectedReports && (['happy', 'repair'].includes(scenario) ? status.deliverable : status.tasks.some(task => task.status === 'failed'));
+      return reports >= expectedReports && (['happy', 'repair'].includes(scenario) ? status.deliverable : ['missing-file', 'stale-input'].includes(scenario) ? host.handoffStatus().length > 0 : status.tasks.some(task => task.status === 'failed'));
     });
     await captain.whenIdle();
     await host.close(); host = undefined;
-    const unexpectedErrors = toolResults.filter(item => item.result.isError && !(scenario === 'missing-file' && item.name === 'filesystem'));
+    const unexpectedErrors = toolResults.filter(item => item.result.isError && !(scenario === 'missing-file' && item.name === 'agent_teams_update_task' && item.args.status === 'completed'));
     assert.deepEqual(unexpectedErrors, []);
     const firstByTask = new Map();
     for (const request of requests) if (request.task && !firstByTask.has(request.task)) firstByTask.set(request.task, request);
@@ -175,12 +191,18 @@ async function runScenario(scenario) {
       assert.deepEqual([...firstByTask.keys()], ['library']);
       assert.equal(status.tasks[0].status, 'failed');
       assert.ok(status.tasks.slice(1).every(task => task.status === 'pending'));
-    } else if (scenario === 'missing-file') {
-      assert.deepEqual([...firstByTask.keys()], ['library', 'application']);
+    } else if (scenario === 'stale-input') {
+      assert.deepEqual([...firstByTask.keys()], ['library'], 'consumer must not make even its first model request');
       assert.equal(status.tasks[0].status, 'completed');
-      assert.equal(status.tasks[1].status, 'failed');
+      assert.ok(readRun(root, archive.id).events.some(e => e.type === 'handoff/blocked' && e.data.message.includes('VERSION_MISMATCH')));
+      assert.ok(!toolResults.some(item => item.name === 'filesystem'));
+    } else if (scenario === 'missing-file') {
+      assert.deepEqual([...firstByTask.keys()], ['library']);
+      assert.equal(status.tasks[0].status, 'in_progress');
+      assert.ok(status.tasks.slice(1).every(task => task.status === 'pending' && task.attempt === 0));
       assert.equal(inspectInput(join(root, 'artifacts'), { path: 'lib/money.mjs' }).reason, 'MISSING_FILE');
-      assert.ok(toolResults.some(item => item.name === 'filesystem' && item.result.isError));
+      assert.ok(toolResults.some(item => item.name === 'agent_teams_update_task' && item.result.isError));
+      assert.ok(!toolResults.some(item => item.name === 'filesystem'));
     } else {
       assert.ok(status.tasks.every(task => task.status === 'completed'));
       assert.ok(status.tasks.every(task => task.attempt === 1), 'idle-member follow-up must not churn failed delivery attempts');
@@ -192,9 +214,10 @@ async function runScenario(scenario) {
       assert.equal(files.events[1].accepted, true);
       assert.deepEqual(JSON.parse(files.read('report.json').content), fixtureJson('expected/report.json'));
     }
-    const result = { scenario, observation: scenario === 'missing-file' ? 'GAP: missing output did not prevent downstream dispatch' : 'PASS',
+    const result = { scenario, observation: 'PASS',
       mocked: ['model responses', 'sandbox file executor', 'preapproved repair plan'], real: ['DSH Host', 'AgentTeams scheduler', 'product file-tool registration and employee grants', 'session persistence', 'tool/message trace', 'fixed report code execution'],
       modelHttpCalls: networkAttempts, tasks: status.tasks.map(task => ({ subject: task.subject, status: task.status, attempt: task.attempt })),
+      handoff: readRun(root, archive.id).events.filter(event => event.type.startsWith('handoff/')).map(event => ({ type: event.type, ...event.data })),
       distinctWorkerSessions: new Set(requests.filter(r => r.task).map(r => r.sessionId)).size,
       checks: files.events, artifacts: files.manifest(), toolErrors: toolResults.filter(item => item.result.isError).map(item => ({ tool: item.name, error: item.result.error })) };
     archive.append('fixture/result', result);
@@ -220,7 +243,8 @@ async function runScenario(scenario) {
 test('fixture: valid files flow through independent sessions with the same model', { timeout: 20000 }, () => runScenario('happy'));
 test('fixture: real output 1798 fails the oracle, preapproved repair produces 4095', { timeout: 20000 }, () => runScenario('repair'));
 test('fixture: failed upstream task keeps all dependents pending', { timeout: 20000 }, () => runScenario('failed-upstream'));
-test('diagnostic GAP: completed task without its promised file still dispatches its dependent', { timeout: 20000 }, () => runScenario('missing-file'));
+test('production handoff gate rejects missing output and never dispatches the dependent', { timeout: 20000 }, () => runScenario('missing-file'));
+test('production input gate stops a changed accepted file before the consumer model request', { timeout: 20000 }, () => runScenario('stale-input'));
 
 test('fixture oracle rejects a changed input version; this is not a production scheduling gate', async () => {
   const root = await mkdtemp(join(tmpdir(), 'handoff-version-'));
