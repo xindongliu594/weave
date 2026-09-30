@@ -1,0 +1,14 @@
+{
+  "members": [
+    {"name": "producer", "role": "提供整数分金额计算模块；仅处理被分派任务。"},
+    {"name": "assembler", "role": "读取前置交付物，组装订单报告程序。"},
+    {"name": "checker", "role": "依据真实执行结果生成诊断和验收结论。"}
+  ],
+  "tasks": [
+    {"id": "library", "subject": "[fixture:library] 提供金额模块", "assignee": "producer", "dependencies": [], "outputs": ["lib/money.mjs"]},
+    {"id": "application", "subject": "[fixture:application] 组装报告程序", "assignee": "assembler", "dependencies": ["library"], "inputs": [{"path": "lib/money.mjs", "producer": "library"}], "outputs": ["report.mjs"]},
+    {"id": "inspect", "subject": "[fixture:inspect] 生成计算诊断记录", "assignee": "checker", "dependencies": ["application"], "inputs": [{"path": "report.mjs", "producer": "application"}, {"path": "inputs/orders.json", "producer": "user"}], "outputs": ["checks/inspect.json"]},
+    {"id": "repair", "subject": "[fixture:repair] 按诊断修复或保留模块", "assignee": "producer", "dependencies": ["inspect"], "inputs": [{"path": "checks/inspect.json", "producer": "inspect"}], "outputs": ["lib/money.mjs"]},
+    {"id": "verify", "subject": "[fixture:verify] 复验最终报告", "assignee": "checker", "dependencies": ["repair"], "inputs": [{"path": "lib/money.mjs", "producer": "repair"}, {"path": "report.mjs", "producer": "application"}], "outputs": ["checks/verify.json", "report.json"]}
+  ]
+}

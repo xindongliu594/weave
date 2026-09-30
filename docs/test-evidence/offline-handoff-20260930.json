@@ -1,0 +1,318 @@
+{
+  "startedAt": "2026-09-30T03:02:05.476Z",
+  "finishedAt": "2026-09-30T03:02:06.959Z",
+  "node": "v24.19.0",
+  "testExitCode": 0,
+  "modelHttpCalls": 0,
+  "gaps": [
+    "GAP: missing output did not prevent downstream dispatch"
+  ],
+  "scenarios": [
+    {
+      "scenario": "happy",
+      "observation": "PASS",
+      "tasks": [
+        {
+          "subject": "[fixture:library] 提供金额模块",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:application] 组装报告程序",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:inspect] 生成计算诊断记录",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:repair] 按诊断修复或保留模块",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:verify] 复验最终报告",
+          "status": "completed",
+          "attempt": 1
+        }
+      ],
+      "checks": [
+        {
+          "label": "inspect",
+          "accepted": true,
+          "expected": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "actual": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "inputs": [
+            {
+              "path": "lib/money.mjs",
+              "sha256": "20b6093d52be129471a11395ec18816f2b258dd5647664d3ce7bb22d63ec2066"
+            },
+            {
+              "path": "report.mjs",
+              "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+            },
+            {
+              "path": "inputs/orders.json",
+              "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+            }
+          ]
+        },
+        {
+          "label": "verify",
+          "accepted": true,
+          "expected": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "actual": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "inputs": [
+            {
+              "path": "lib/money.mjs",
+              "sha256": "20b6093d52be129471a11395ec18816f2b258dd5647664d3ce7bb22d63ec2066"
+            },
+            {
+              "path": "report.mjs",
+              "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+            },
+            {
+              "path": "inputs/orders.json",
+              "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+            }
+          ]
+        }
+      ],
+      "mocked": [
+        "model responses",
+        "sandbox file executor",
+        "preapproved repair plan"
+      ],
+      "real": [
+        "DSH Host",
+        "AgentTeams scheduler",
+        "product file-tool registration and employee grants",
+        "session persistence",
+        "tool/message trace",
+        "fixed report code execution"
+      ]
+    },
+    {
+      "scenario": "repair",
+      "observation": "PASS",
+      "tasks": [
+        {
+          "subject": "[fixture:library] 提供金额模块",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:application] 组装报告程序",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:inspect] 生成计算诊断记录",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:repair] 按诊断修复或保留模块",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:verify] 复验最终报告",
+          "status": "completed",
+          "attempt": 1
+        }
+      ],
+      "checks": [
+        {
+          "label": "inspect",
+          "accepted": false,
+          "expected": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "actual": {
+            "orderCount": 2,
+            "totalCents": 1798
+          },
+          "inputs": [
+            {
+              "path": "lib/money.mjs",
+              "sha256": "4233c892b0c1ca435eb22165fab49e46711cbce902155a5f9baa2fea19c49af0"
+            },
+            {
+              "path": "report.mjs",
+              "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+            },
+            {
+              "path": "inputs/orders.json",
+              "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+            }
+          ]
+        },
+        {
+          "label": "verify",
+          "accepted": true,
+          "expected": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "actual": {
+            "orderCount": 2,
+            "totalCents": 4095
+          },
+          "inputs": [
+            {
+              "path": "lib/money.mjs",
+              "sha256": "20b6093d52be129471a11395ec18816f2b258dd5647664d3ce7bb22d63ec2066"
+            },
+            {
+              "path": "report.mjs",
+              "sha256": "89fd6c36dd25c33916259c8a84342b87151465a38b305b6a749ea6233dd45c5e"
+            },
+            {
+              "path": "inputs/orders.json",
+              "sha256": "c6ebd382fedfb28ab6124ccd06c7a33194fdecb6bdb43b06204616a41e93558e"
+            }
+          ]
+        }
+      ],
+      "mocked": [
+        "model responses",
+        "sandbox file executor",
+        "preapproved repair plan"
+      ],
+      "real": [
+        "DSH Host",
+        "AgentTeams scheduler",
+        "product file-tool registration and employee grants",
+        "session persistence",
+        "tool/message trace",
+        "fixed report code execution"
+      ]
+    },
+    {
+      "scenario": "failed-upstream",
+      "observation": "PASS",
+      "tasks": [
+        {
+          "subject": "[fixture:library] 提供金额模块",
+          "status": "failed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:application] 组装报告程序",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "subject": "[fixture:inspect] 生成计算诊断记录",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "subject": "[fixture:repair] 按诊断修复或保留模块",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "subject": "[fixture:verify] 复验最终报告",
+          "status": "pending",
+          "attempt": 0
+        }
+      ],
+      "checks": [],
+      "mocked": [
+        "model responses",
+        "sandbox file executor",
+        "preapproved repair plan"
+      ],
+      "real": [
+        "DSH Host",
+        "AgentTeams scheduler",
+        "product file-tool registration and employee grants",
+        "session persistence",
+        "tool/message trace",
+        "fixed report code execution"
+      ]
+    },
+    {
+      "scenario": "missing-file",
+      "observation": "GAP: missing output did not prevent downstream dispatch",
+      "tasks": [
+        {
+          "subject": "[fixture:library] 提供金额模块",
+          "status": "completed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:application] 组装报告程序",
+          "status": "failed",
+          "attempt": 1
+        },
+        {
+          "subject": "[fixture:inspect] 生成计算诊断记录",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "subject": "[fixture:repair] 按诊断修复或保留模块",
+          "status": "pending",
+          "attempt": 0
+        },
+        {
+          "subject": "[fixture:verify] 复验最终报告",
+          "status": "pending",
+          "attempt": 0
+        }
+      ],
+      "checks": [],
+      "mocked": [
+        "model responses",
+        "sandbox file executor",
+        "preapproved repair plan"
+      ],
+      "real": [
+        "DSH Host",
+        "AgentTeams scheduler",
+        "product file-tool registration and employee grants",
+        "session persistence",
+        "tool/message trace",
+        "fixed report code execution"
+      ]
+    }
+  ],
+  "excluded": [
+    "Production API/database and approval UI",
+    "Docker RunSandbox",
+    "real model/API compatibility or quality",
+    "automatic discovery of dependencies",
+    "automatic creation of repair tasks",
+    "production artifact/version scheduling gates"
+  ],
+  "baselineCommit": "a9298b0e2051a65d9c384583f15b6c12249f60ed",
+  "additionalValidation": {
+    "existingNonDockerRuntimeTests": {
+      "passed": 20,
+      "failed": 0
+    },
+    "planPolicyTests": {
+      "passed": 7,
+      "failed": 0
+    },
+    "typescriptAndViteBuild": "passed"
+  }
+}

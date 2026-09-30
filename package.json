@@ -14,7 +14,8 @@
     "test": "tsx --test tests/*.test.ts",
     "db:migrate": "tsx apps/api/src/migrate.ts",
     "runtime:inspect": "node scripts/runtime-inspect.mjs",
-    "runtime:test": "node --test services/agent-runtime/*.test.mjs"
+    "runtime:test": "node --test services/agent-runtime/*.test.mjs",
+    "test:handoff": "node scripts/test-handoff.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "4.3.0",

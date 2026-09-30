@@ -1,0 +1,4 @@
+[
+  {"sku": "book", "unitPriceCents": 1299, "quantity": 2},
+  {"sku": "pen", "unitPriceCents": 499, "quantity": 3}
+]
