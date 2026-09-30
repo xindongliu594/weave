@@ -81,6 +81,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined);
     if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId);return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId:taskIds.get(request.taskId)??request.taskId};};
     await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: sessionRoot, compression: 'none' });
+    // Idle continuable members can be disposed between assignments. Their next
+    // task needs the public query service to read and resume the saved session.
+    await mount('@deepseek-ai/dsh-session-query');
     await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
     await mount('@deepseek-ai/dsh-subagent');
     await mount('@deepseek-ai/dsh-subagent-spawn-in-process', { providerName: 'spawn' });

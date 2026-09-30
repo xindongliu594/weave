@@ -50,6 +50,8 @@ API Key 使用本机生成的 AES-256-GCM 密钥加密保存。主密钥位于 `
 
 ## 检查
 
+固定文件的无模型 API 交接验证：`npm run test:handoff`。覆盖依赖等待、同一员工继续任务、文件结果传递及预设修复链；已知缺口单独报告。资料和边界见 [固定文件测试](tests/fixtures/offline-handoff/README.md) 与 [依赖设计说明](docs/offline-handoff-testing.md)。首次运行需安装下方的 runtime 依赖。
+
 ```sh
 npm run build
 python3 scripts/install-embedding-model.py
