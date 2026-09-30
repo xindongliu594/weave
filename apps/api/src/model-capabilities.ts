@@ -21,7 +21,7 @@ export async function probeTools(model:Model,maxCost=.1){
  try{
   try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock_shared(918275)');
    await client.query("INSERT INTO model_capability_tests(id,model_id,model_version,probe_version,status) VALUES($1,$2,$3,$4,'running')",[id,model.id,model.version,toolProbeVersion]);
-   await client.query('COMMIT');}catch(error){await client.query('ROLLBACK');throw error;}
+   await client.query('COMMIT');}catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
   const messages:ChatMessage[]=[{role:'user',content:`Call capability_probe with nonce ${challenge}. After the tool returns, reply with only its result value, exactly as written.`}];
   const unchanged=async()=>{if(!(await pool.query("SELECT id FROM models WHERE id=$1 AND version=$2 AND status='available' AND deleted_at IS NULL",[model.id,model.version])).rowCount)throw new AppError(409,'测试期间模型或中转站配置已变化，请重新测试','MODEL_CONFIG_CHANGED');};
   const options={purpose:'工具能力测试',maxCost:maxCost/2,context:{probeId:id,capability:'tools'}};
@@ -45,7 +45,6 @@ export async function probeTools(model:Model,maxCost=.1){
   if(!local)await pool.query("UPDATE models SET capabilities=jsonb_set(capabilities,'{tools}',$1::jsonb),version=version+1 WHERE id=$2 AND version=$3 AND deleted_at IS NULL",[JSON.stringify({status:'failed',checkedAt:new Date().toISOString(),testId:id,probeVersion:toolProbeVersion}),model.id,model.version]);
   throw error;
  }finally{
-  try{await pool.query("UPDATE model_capability_tests SET status=$1,code=$2,finished_at=now(),request_ids=(SELECT COALESCE(jsonb_agg(id ORDER BY created_at),'[]'::jsonb) FROM model_reservations WHERE context->>'probeId'=$3) WHERE id=$3",[outcome,code,id]);}
-  finally{client.release();}
+  await pool.query("UPDATE model_capability_tests SET status=$1,code=$2,finished_at=now(),request_ids=(SELECT COALESCE(jsonb_agg(id ORDER BY created_at),'[]'::jsonb) FROM model_reservations WHERE context->>'probeId'=$3) WHERE id=$3",[outcome,code,id]);
  }
 }

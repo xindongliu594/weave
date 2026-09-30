@@ -38,16 +38,18 @@ export function openRunArchive(root, id) {
   const existing = readRun(root, id);
   if (!existing) throw new Error('Run not found');
   if (existing.integrity !== 'ok') throw new Error('Run journal is incomplete; repair is required before appending');
-  let seq = existing.events.length;
-  const keys = new Set(existing.events.map(e => e.sourceKey).filter(Boolean));
   return {
     id, dir,
     append(type, data = {}, links = {}) {
-      if (links.sourceKey && keys.has(links.sourceKey)) return;
-      const event = redact({ ...links, seq: seq + 1, at: new Date().toISOString(), type, data });
+      // Approval and runtime handles append to the same journal. A handle's
+      // cached sequence becomes stale as soon as another handle writes.
+      // Keep validation and append synchronous so these writers cannot yield
+      // between reading the current cursor and committing the next record.
+      const current = readRun(root, id);
+      if (!current || current.integrity !== 'ok') throw new Error('Run journal is incomplete; repair is required before appending');
+      if (links.sourceKey && current.events.some(event => event.sourceKey === links.sourceKey)) return;
+      const event = redact({ ...links, seq: current.events.length + 1, at: new Date().toISOString(), type, data });
       durableWrite(join(dir, 'events.jsonl'), JSON.stringify(event) + '\n', 'a');
-      seq++;
-      if (links.sourceKey) keys.add(links.sourceKey);
       return event;
     },
   };
