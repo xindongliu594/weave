@@ -36,6 +36,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     return JSON.parse(readFileSync(join(workspaceRoot, '.agent-teams', teamId, 'team.json'), 'utf8'));
   }
   function taskFor(sessionId) {
+    product?.supervisor?.check();
     rework?.check();
     if(sessionId===captainId)return undefined; // Coordination is charged to the project, not an arbitrary task.
     const employee=employeeFor(ctx.agents.get(sessionId),product.snapshot,captainId);
@@ -44,6 +45,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const task=assignedTask(state,sessionId,employee.id,assignments.get(sessionId));assignments.set(sessionId,task);return task;
   }
   function activeWork(agent, requested) {
+    product?.supervisor?.check();
     rework?.check();
     const state = teamState(), employee = employeeFor(agent, product.snapshot, captainId);
     const task = requested ? state.tasks.find(t => t.id === requested) : state.tasks.find(t => t.assignee === employee?.id && ['claimed', 'in_progress'].includes(t.status));
@@ -114,22 +116,27 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       });
       productDispose = installProductTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId });
       ctx.on('llm/stream', async function* (options, next) {
+        product.supervisor?.check();
         const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
         if(!employee)throw Error('MODEL_PERMISSION_DENIED: 无法确认此会话所属员工');
         if (![employee.modelId, employee.fallbackModelId].includes(options.model)) throw Error('MODEL_PERMISSION_DENIED: 模型不属于此员工批准的范围');
         adapter.sessionPolicies?.set(options.sessionId,employee);
         if (handoff && options.sessionId !== captainId) {
           const current = taskFor(options.sessionId), task = teamState().tasks.find(t => t.id === current.taskId);
+          product.supervisor?.session(options.sessionId,current);
           if (task && ['claimed', 'in_progress'].includes(task.status)) {
             const taskId = taskIds.get(task.id);
             try { await handoff.exclusive(options.signal, () => handoff.begin(taskId, task.attemptId)); }
             catch (error) { const blocked = handoff.block(taskId, task.attemptId, error); product.onHandoffBlocked?.(blocked); throw blocked; }
           }
         }
-        const release = await product.gate.acquire(options.signal);
-        try { yield* next(); } finally { release(); }
+        const stopWaiting=product.supervisor?.enter(options.sessionId,'waiting_capacity');
+        let release;
+        try{release=await product.gate.acquire(options.signal);}finally{stopWaiting?.();}
+        try { product.supervisor?.check(); yield* next(); } finally { release(); }
       });
       ctx.on('tools/pre-execute', async (exec,next) => {
+        product.supervisor?.check();
         if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) throw Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
         return next();
       });
@@ -191,6 +198,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     return {
       ctx,
       employeeHosts() { return employees.list(); },
+      checkpointState() { return teamId && workspaceRoot ? teamState() : undefined; },
       close,
       lockPlan() { locked = true; },
       handoffStatus() { return handoff?.summary() ?? []; },

@@ -3,14 +3,29 @@ import { taskContractErrors } from '../../../packages/contracts/task-contracts.m
 
 /** Retain only host seals belonging to the exact completed attempt in the archive. */
 export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string) {
-  if (events.some(event=>event.type==='quality/rework-created'))
-    throw Error('自动返工改变了原生任务身份，暂不能跳过检查点；请检查产物后完整重试，费用和调用上限继续累积');
+  // Collapse a rework graph only at an independently accepted boundary. A
+  // half-finished repair/review must retain native identities and is not replayed.
+  for (const event of events.filter(event=>event.type==='quality/rework-created')) {
+    const review=snapshot.tasks.find((task:any)=>task.id===event.data.reviewTaskId);
+    const source=review&&snapshot.tasks.find((task:any)=>task.id===review.reviewedTaskId);
+    if (!review || !source || !Number.isInteger(event.data.round) || event.data.round<1 || event.data.round>(review.maxReworkRounds??0) ||
+        !completed.has(source.id) || completed.get(review.id)?.verdict!=='pass')
+      throw Error('返工尚未形成独立验收通过的检查点，请检查产物后完整重试，或重新批准方案');
+    const reviewed=events.findLast(item=>item.type==='quality/reviewed'&&item.data.taskId===review.id&&item.data.attemptId===(completed.get(review.id).attempt_id??completed.get(review.id).attemptId));
+    if(reviewed?.data.verdict!=='pass')throw Error('返工缺少宿主独立复验记录，不能跳过，请完整重试');
+  }
   const records = new Map<string,any>((snapshot.handoffCheckpoints??[]).map((record:any)=>[record.taskId,record]));
   for (const [id, task] of completed) {
     const contract = snapshot.tasks.find((item:any)=>item.id===id);
     const accepted = events.findLast(event=>event.type==='handoff/accepted'&&event.data.taskId===id&&event.data.attemptId===(task.attempt_id??task.attemptId))?.data;
-    if (contract?.outputs?.length && !accepted) throw Error(`任务 ${id} 缺少宿主交付物验收记录，不能跳过，请完整重试`);
-    if (accepted) records.set(id,accepted);
+    if ((contract?.outputs?.length || ['implementation','repair','review','requirements'].includes(contract?.kind)) && !accepted) throw Error(`任务 ${id} 缺少宿主交付物验收记录，不能跳过，请完整重试`);
+    if (accepted) {
+      for(const output of contract?.outputs??[]) {
+        const seal=accepted.outputs?.find((file:any)=>file.path===output.path);
+        if(!seal||inspectArtifact(root,output).sha256!==seal.sha256)throw Error(`产物 ${output.path} 已变化，不能沿用原验收版本`);
+      }
+      records.set(id,accepted);
+    }
   }
   const remaining = snapshot.tasks.filter((task:any)=>!completed.has(task.id));
   for (const task of remaining) {
@@ -29,4 +44,14 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
   const errors=taskContractErrors(tasks,snapshot.agents,checkpoints);
   if(errors.length)throw Error(errors.join('；'));
   return checkpoints;
+}
+
+/** Use the newest native task per approved ID, including repair/review mappings.
+ * An older completed implementation cannot hide a still-running repair. */
+export function completedTasks(events:any[]) {
+  const mapping=new Map<string,string>();
+  for(const event of events.filter(event=>event.type==='run/task-mapping'))for(const item of event.data.tasks??[])mapping.set(item.task_id,item.seed_id);
+  const latest=events.findLast(event=>event.type==='team/checkpoint')?.data.tasks??events.findLast(event=>event.type==='team/snapshot')?.data.tasks??[];
+  const current=new Map<string,any>();for(const task of latest){const id=mapping.get(task.id);if(id)current.set(id,task);}
+  return new Map([...current].filter(([,task])=>task.status==='completed'));
 }

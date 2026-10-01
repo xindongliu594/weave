@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import { createRunArchive, readRun } from './trace-store.mjs';
 import { createTeamHost } from './host.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
-import { RunSandbox } from './sandbox.mjs';
+import { RunSandbox, listArtifacts } from './sandbox.mjs';
+import { RuntimeSupervisor } from './supervisor.mjs';
 import { Semaphore } from './limits.mjs';
 import { teamTaskPlan, stageApprovedTeam } from './handoff.mjs';
 import { employeeContextPolicy } from './employee-context.mjs';
@@ -59,6 +60,10 @@ export class ProductDshRuntime {
     let runtimeFailure;
     let host;
     const sandbox = new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
+    const supervisor = new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;job.controller.abort(error);}});
+    const durableArchive=archive;
+    archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
+    archive.append('runtime/supervision',{version:1,progressTimeoutSeconds:snapshot.policy.progressTimeoutSeconds??300,repeatActionLimit:snapshot.policy.repeatActionLimit??8,repeatErrorLimit:snapshot.policy.repeatErrorLimit??3,maxReadRetries:snapshot.policy.maxReadRetries??2});
     const gate = new Semaphore(snapshot.policy.maxConcurrentAgents);
     const timer = setTimeout(() => {
       job.controller.abort(new Error('Run deadline exceeded'));
@@ -89,7 +94,7 @@ export class ProductDshRuntime {
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
-        product: { snapshot, sandbox, gate, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
+        product: { snapshot, sandbox, gate, supervisor, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');
@@ -111,7 +116,6 @@ export class ProductDshRuntime {
       host.lockPlan();
       archive.append('run/started', { teamId: created.team_id });
       let status;
-      let stalledSince = 0;
       while (true) {
         job.controller.signal.throwIfAborted();
         if (runtimeFailure) throw runtimeFailure;
@@ -121,19 +125,19 @@ export class ProductDshRuntime {
         if (host.hasBlockingFailure(status.tasks)) throw new Error('前置任务失败，相关下游未执行；请检查记录后重新制定方案');
         const terminal = status.tasks.length > 0 && status.tasks.every(task => ['completed', 'failed', 'cancelled'].includes(task.status));
         if (terminal) throw new Error('Team finished without a deliverable');
-        const parked = status.tasks.some(task => ['claimed', 'in_progress'].includes(task.status)) && status.members.every(member => member.status === 'idle');
-        stalledSince = parked ? stalledSince || Date.now() : 0;
-        if (stalledSince && Date.now() - stalledSince > 10_000) throw new Error(host.handoffStatus().map(item => item.message).join('；') || '员工已停止响应，但任务尚未完成');
+        supervisor.tick({...status,members:status.members.map(member=>({...member,member_id:host.employeeHosts().find(slot=>slot.agentId===member.name)?.sessionId}))});
         await delay(500);
       }
       await captain.whenIdle();
       const summary = lastAssistantText(captain);
+      archive.append('team/checkpoint',host.checkpointState());
       await host.close();
       host = undefined;
       archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       return { status: 'completed', usages, summary };
     } catch (error) {
       try { await host?.close(); } finally {
+        try { const checkpoint=host?.checkpointState();if(checkpoint)archive.append('team/checkpoint',checkpoint); } catch { /* Missing/incomplete evidence will refuse recovery. */ }
         const status = job.cancelled ? 'cancelled' : 'failed';
         archive.append('run/finished', { status, message: error instanceof Error ? error.message : String(error), usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       }

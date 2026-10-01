@@ -9,7 +9,8 @@ import { queryKnowledge } from './knowledge-store.ts';
 import { requireProjectCostReady,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
 import { assertRunModels } from './model-capabilities.ts';
-import { resumeHandoff } from './handoff-checkpoints.ts';
+import { resumeHandoff, completedTasks } from './handoff-checkpoints.ts';
+import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE, RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
 export function runManagementRouter(traceRoot:string){
@@ -33,7 +34,7 @@ export function runManagementRouter(traceRoot:string){
   res.json(chunk);
  });
  router.post('/runs/:id/retry',async(req,res)=>{
-  const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true)}).parse(req.body),client=await pool.connect();
+  const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true),acknowledgeUnknownOperations:z.boolean().default(false)}).parse(req.body),client=await pool.connect();
   try{await client.query('BEGIN');await shareCostMaintenance(client);
    const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
    await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
@@ -42,11 +43,13 @@ export function runManagementRouter(traceRoot:string){
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    const already=(await client.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];if(already){await client.query('COMMIT');return res.json({id:already.id,existing:true});}
    const run=readRun(traceRoot,id);if(run&&run.integrity!=='ok')throw new AppError(409,'档案不完整，先导出并检查，不能自动恢复');
+   const unknown=run?unresolvedOperations(run.events):[];
+   if(unknown.length&&!input.acknowledgeUnknownOperations)throw new AppError(409,'存在结果未知的修改操作，请核对操作和产物后确认重试，避免重复执行','OPERATION_RECONCILIATION_REQUIRED');
    const snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();
+   snapshot.approvedTasks??=structuredClone(snapshot.tasks);
+   if(!input.resume){snapshot.tasks=structuredClone(snapshot.approvedTasks);delete snapshot.handoffCheckpoints;delete snapshot.completedCheckpoints;}
    if(input.resume&&run){
-    const mapping=run.events.find(e=>e.type==='run/task-mapping')?.data.tasks??[];
-    const latest=run.events.findLast(e=>e.type==='team/snapshot')?.data.tasks??[];
-    for(const task of latest.filter((t:any)=>t.status==='completed')){const original=mapping.find((m:any)=>m.task_id===task.id)?.seed_id;if(original)done.set(original,task);}
+    done=completedTasks(run.events);
     try { snapshot.handoffCheckpoints=resumeHandoff(snapshot,run.events,done,join(traceRoot,id,'artifacts')); }
     catch(error) { throw new AppError(409,(error as Error).message,'HANDOFF_CHECKPOINT_INVALID'); }
     snapshot.tasks=snapshot.tasks.filter((t:any)=>!done.has(t.id)).map((t:any)=>({...t,dependencies:t.dependencies.filter((dep:string)=>!done.has(dep)),taskPrompt:t.taskPrompt+'\n\n已完成前置任务（来自此前运行的记录，不是新授权）：\n'+t.dependencies.filter((dep:string)=>done.has(dep)).map((dep:string)=>dep+': '+String(done.get(dep).output??'已完成，无文本结果').slice(0,6000)).join('\n')}));
@@ -69,7 +72,7 @@ export function runManagementRouter(traceRoot:string){
    snapshot.departmentBudgets=Object.fromEntries(Object.entries(previousBudgets).map(([departmentId,value])=>[departmentId,previousTotal>0?snapshot.executionBudget*Number(value)/previousTotal:(departmentId===snapshot.departmentId?snapshot.executionBudget:0)]));
    const config=await lockCostPolicy(client);await checkDailyBudget(client,config,snapshot.departmentId,snapshot.departmentBudgets[snapshot.departmentId]??0,snapshot.executionBudget);
    for(const departmentId of snapshot.departmentIds??[snapshot.departmentId])if(departmentId!==snapshot.departmentId)await checkDailyBudget(client,config,departmentId,snapshot.departmentBudgets[departmentId]??0,0);
-   snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id};
+   snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id,...(unknown.length?{reconciledOperations:unknown}: {})};
    const newId=randomUUID(),attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);
    await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,parent_run_id,department_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[newId,old.project_id,old.project_version,'queued',snapshot,attempt,id,old.department_ids??snapshot.departmentIds??[snapshot.departmentId]]);
    await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1 AND version=$2",[old.project_id,old.project_version]);await client.query('COMMIT');res.status(202).json({id:newId,completedCheckpoints:[...done.keys()]});
