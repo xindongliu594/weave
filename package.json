@@ -15,7 +15,8 @@
     "db:migrate": "tsx apps/api/src/migrate.ts",
     "runtime:inspect": "node scripts/runtime-inspect.mjs",
     "runtime:test": "node --test services/agent-runtime/*.test.mjs",
-    "test:handoff": "node scripts/test-handoff.mjs"
+    "test:handoff": "node scripts/test-handoff.mjs",
+    "test:integration": "node scripts/test-integration.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "4.3.0",
@@ -27,6 +28,9 @@
     "zod": "4.1.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@electric-sql/pglite-pgvector": "0.0.9",
+    "@electric-sql/pglite-socket": "0.2.11",
     "@types/express": "5.0.3",
     "@types/node": "22.18.1",
     "@types/pg": "8.15.5",

@@ -78,7 +78,7 @@ export class RunCoordinator {
       try{
         await client.query('BEGIN');
         if(!(await client.query('SELECT pg_try_advisory_xact_lock(918274) AS locked')).rows[0].locked){await client.query('ROLLBACK');return;}
-        const limit=(await settings()).data.maxActiveRuns;
+        const limit=(await settings(client)).data.maxActiveRuns;
         const count=Number((await client.query("SELECT count(*) FROM project_runs WHERE status='running'")).rows[0].count);
         if(count<limit&&!this.stopped){
           const candidate=(await client.query(`SELECT r.id,r.project_id FROM project_runs r WHERE r.status='queued' AND NOT r.cancel_requested

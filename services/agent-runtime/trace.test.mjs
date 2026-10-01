@@ -42,6 +42,24 @@ test('actual team execution archives prompts, task attempts, messages and result
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
+test('approval and runtime handles share the journal cursor and deduplicate source identities', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'trace-writers-'));
+  try {
+    const runtime = createRunArchive(root, { title: 'shared writers' });
+    const approvals = openRunArchive(root, runtime.id);
+    runtime.append('model/request', { request: 1 }, { sourceKey: 'request-1' });
+    approvals.append('approval/requested', { id: 'approval-1' });
+    runtime.append('model/response', { request: 1 });
+    approvals.append('approval/decided', { decision: 'approved' });
+    approvals.append('model/request', { request: 1 }, { sourceKey: 'request-1' });
+    runtime.append('run/finished', { status: 'completed' });
+    const run = readRun(root, runtime.id);
+    assert.equal(run.integrity, 'ok'); assert.equal(run.status, 'completed');
+    assert.deepEqual(run.events.map(event => event.seq), [1, 2, 3, 4, 5, 6]);
+    assert.equal(run.events.filter(event => event.sourceKey === 'request-1').length, 1);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test('partial journal is reported as incomplete, snapshots redact known credential fields', async () => {
   const root = await mkdtemp(join(tmpdir(), 'trace-integrity-'));
   try {
@@ -52,6 +70,7 @@ test('partial journal is reported as incomplete, snapshots redact known credenti
     await appendFile(join(archive.dir, 'events.jsonl'), '{"seq":');
     assert.equal(readRun(root, archive.id).status, 'incomplete');
     assert.throws(() => openRunArchive(root, archive.id), /incomplete/);
+    assert.throws(() => archive.append('run/finished', { status: 'completed' }), /incomplete/);
     assert.throws(() => readRun(root, '../../outside'), /Invalid run id/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });

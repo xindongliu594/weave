@@ -1,0 +1,121 @@
+{
+  "executor": "bounded test double",
+  "model": "simulated HTTP gateway",
+  "scenarios": [
+    {
+      "scenario": "approval-handoff-billing",
+      "status": "completed",
+      "seals": 2,
+      "commands": 1,
+      "usageRows": 14,
+      "separateWorkerSessions": true,
+      "report": {
+        "orderCount": 2,
+        "totalCents": 4095
+      }
+    },
+    {
+      "scenario": "missing",
+      "downstreamModelCalls": 0,
+      "commands": 0,
+      "blocked": true
+    },
+    {
+      "scenario": "forged",
+      "downstreamModelCalls": 0,
+      "commands": 0,
+      "blocked": true
+    },
+    {
+      "scenario": "stale-input",
+      "status": "failed",
+      "downstreamModelCalls": 0,
+      "blocked": true
+    },
+    {
+      "scenario": "cancel-pending-approval",
+      "status": "cancelled",
+      "commands": 0,
+      "obsoleteApprovalStatus": 409
+    }
+  ],
+  "date": "2026-09-30",
+  "baseCommit": "f95f8cc4bfd529108f015109dcf6d2f11ae895a1",
+  "stage": "Simulated product API flow",
+  "database": {
+    "engine": "PGlite 0.5.8 + pgvector 0.0.9",
+    "socket": "0.2.11",
+    "productPoolMax": 1,
+    "nativePostgreSQL": false,
+    "independentBackendConcurrency": false
+  },
+  "integration": {
+    "command": "npm run test:integration",
+    "passed": 14,
+    "failed": 0,
+    "files": [
+      "tests/api.test.ts",
+      "tests/capabilities.test.ts",
+      "tests/product-flow.test.ts"
+    ]
+  },
+  "runtime": {
+    "passed": 39,
+    "failed": 0,
+    "command": "node --test services/agent-runtime/{budget,handoff,handoff-fixtures,quality-handoff,trace,smoke,limits,openai-compatible,product-tools}.test.mjs"
+  },
+  "pureRules": {
+    "passed": 14,
+    "failed": 0,
+    "command": "node --import tsx --test tests/{request-origin,handoff-checkpoints,policy,task-contracts}.test.ts"
+  },
+  "build": {
+    "command": "npm run build",
+    "status": "passed"
+  },
+  "fixedDefects": [
+    "Queue settings used a second connection inside the transaction",
+    "Tool capability probe held a connection across model calls and its final update",
+    "Approval and runtime archive handles cached conflicting event sequences"
+  ],
+  "notCovered": [
+    "Native PostgreSQL independent sessions, locks and concurrent leases",
+    "Real Docker readiness, execution, isolation and cleanup",
+    "Simultaneous cross-process journal writers",
+    "Real model quality or external gateway compatibility",
+    "Browser UI and Mac deployment",
+    "Real embedding inference"
+  ],
+  "logEvidence": {
+    "integration-fixed.log": {
+      "sha256": "ac23e733331ba2211dea08f99b151cdb53b2d25bfea0fb1e3b1b277d1fc2c668",
+      "summary": [
+        "ℹ tests 14",
+        "ℹ pass 14",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ duration_ms 11916.946769"
+      ]
+    },
+    "runtime.log": {
+      "sha256": "03fe1f1a32df821ba7d16857575b401eb8725e7916be14a324d27aae75519088",
+      "summary": [
+        "ℹ tests 39",
+        "ℹ pass 39",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ duration_ms 7404.439194"
+      ]
+    },
+    "contracts.log": {
+      "sha256": "0b595c60338d0939a38e9b104ab3175863e01509ff486cf0fee3aced8f12c76d",
+      "summary": [
+        "ℹ tests 14",
+        "ℹ pass 14",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ duration_ms 409.19012"
+      ]
+    }
+  }
+}

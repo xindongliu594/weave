@@ -81,4 +81,6 @@ scripts/verify-clean-install.sh
 
 ## 执行追溯
 
+无需外部模型与 Docker 的产品流程复验：`npm run test:integration`。该命令使用 PGlite、模拟 HTTP 模型和固定文件执行器，验证 API、审批、交接、取消与用量。测试边界及实际结果见 [模拟产品流程验证](docs/simulated-product-flow.md)。真实 PostgreSQL 并发锁、Docker 隔离与部署验收仍单独执行。
+
 打开 `http://127.0.0.1:4310/#run`，可以查看正式项目和无 API 验证的员工提示词、任务指令、模型请求、工具调用与团队结果。运行档案保存在 `.data/runs`，重启后可读取；失去进程租约的 Run 标记为中断，可经人工确认后从任务检查点恢复。测试模型记录会明确标注。详见 [执行追溯说明](docs/execution-trace.md)。

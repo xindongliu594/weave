@@ -99,3 +99,5 @@ DSH/AgentTeams 依赖版本保持锁定。本产品通过公开工具先创建�
 `npm test` 已尝试：14 项通过，51 项数据库相关测试在准备阶段因 `127.0.0.1:55432` 连接被拒绝而失败。当前环境没有 PostgreSQL/Docker，未完成生产 API/数据库、Docker 沙箱、浏览器 UI 或真实模型的集成验收。
 
 复验命令与机器可读范围见 [本轮测试证据](test-evidence/reliable-handoff-20260930.json)。固定场景使用 [预设资料](../tests/fixtures/offline-handoff/README.md)。此前缺口的历史记录见 [第一轮验证](offline-handoff-testing.md)。
+
+后续已在 PGlite 和受限测试替身下通过 14 项 API/产品流程集成测试，并修复连接占用与审批日志序号问题。覆盖范围、复验命令及仍需真实环境验收的部分见 [模拟产品流程验证](simulated-product-flow.md)；上方测试数字保留为该阶段的历史记录。

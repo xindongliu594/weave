@@ -3,13 +3,14 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
 import { pool } from './db.ts';
+import type pg from 'pg';
 import { AppError } from './provider.ts';
 import { agentSchema, departmentSchema, policySchema, planSchema, validatePlan, type Model } from '../../../packages/contracts/index.ts';
 import { organizationCandidateSchema, templatePlan } from '../../../packages/contracts/organization.ts';
 import { completeBudgeted,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { departmentTemplates, roleTemplates } from '../../../packages/contracts/templates.ts';
 export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0),knowledgeSearchMode:z.enum(['keyword','hybrid']).optional()});
-export async function settings(){return (await pool.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];}
+export async function settings(client:pg.Pool|pg.PoolClient=pool){return (await client.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];}
 export function productRouter(){
   const router=Router();
   router.get('/settings',async(_req,res)=>res.json(await settings()));
