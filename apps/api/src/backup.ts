@@ -40,6 +40,8 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
   try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918274)');await client.query('SELECT pg_advisory_xact_lock(918275)');await client.query('LOCK TABLE project_runs IN EXCLUSIVE MODE');if((await client.query("SELECT id FROM model_capability_tests WHERE status='running' LIMIT 1")).rowCount)throw new AppError(409,'请等待模型能力测试结束');if((await client.query("SELECT id FROM model_reservations WHERE status='pending' LIMIT 1")).rowCount)throw new AppError(409,'请等待模型调用结束后再恢复');if((await client.query("SELECT id FROM project_runs WHERE status IN ('queued','running')")).rowCount)throw new AppError(409,'请先停止队列和运行任务');
     const previousPaths=(await client.query('SELECT vault_path FROM knowledge_documents WHERE vault_path IS NOT NULL')).rows.map(r=>r.vault_path);
     await client.query('TRUNCATE '+tables.join(',')+' CASCADE');
+    // Device credentials and host-directory permissions are not portable backup data.
+    await client.query('DELETE FROM local_devices');
     await client.query('DELETE FROM request_keys');
     for(const table of tables)if(value.tables[table].length)await client.query(`INSERT INTO ${table} SELECT * FROM json_populate_recordset(NULL::${table},$1::json) ON CONFLICT DO NOTHING`,[JSON.stringify(value.tables[table])]);
     undoVault=restoreVaultFiles(value.vaultFiles??{},previousPaths);

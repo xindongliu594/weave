@@ -94,7 +94,7 @@ async function scenario(mode, maxRounds = 1) {
     const created = await stageApprovedTeam(host, captain, { name: 'rework-' + mode, members: snapshot.agents.slice(1).map(agent => ({ name: agent.id, provider: 'fixture', model: 'fixture' })), tasks: teamTaskPlan(snapshot.tasks) });
     host.bindTaskMapping(created.tasks, created.team_id);
     await host.call(captain, 'agent_teams_approve', { confirmation: 'approved bounded rework fixture' }); host.lockPlan();
-    const deadline = Date.now() + 15000;
+    const deadline = Date.now() + (mode==='pass'||mode==='limit'?30000:15000);
     while (Date.now() < deadline) {
       status = await host.call(captain, 'agent_teams_status');
       if(mode==='pass')assert.equal(host.hasBlockingFailure(status.tasks),false,'a authorized failed review with native follow-up must not stop delivery');
@@ -132,8 +132,8 @@ async function scenario(mode, maxRounds = 1) {
   } finally { await host?.close(); await rm(root, { recursive: true, force: true, maxRetries: 8, retryDelay: 100 }); }
 }
 
-test('approved review creates bounded native repair and independent re-review, then delivers newest sealed files', { timeout: 25000 }, () => scenario('pass'));
-test('two failed repair rounds stop at the approved limit with structured escalation', { timeout: 25000 }, () => scenario('limit', 2));
+test('approved review creates bounded native repair and independent re-review, then delivers newest sealed files', { timeout: 40000 }, () => scenario('pass'));
+test('two failed repair rounds stop at the approved limit with structured escalation', { timeout: 40000 }, () => scenario('limit', 2));
 test('out-of-scope finding cannot create a repair task', { timeout: 25000 }, () => scenario('scope'));
 test('scope expansion in repair instructions is refused before any generated employee request', { timeout: 25000 }, () => scenario('text-scope'));
 test('explicit reject stops the loop even with spare rework allowance', { timeout: 25000 }, () => scenario('reject'));

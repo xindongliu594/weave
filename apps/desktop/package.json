@@ -25,6 +25,8 @@
       "main.cjs",
       "preload.cjs",
       "connection.cjs",
+      "local-executor.cjs",
+      "local-client.cjs",
       "settings.html",
       "settings.js",
       "settings.css",

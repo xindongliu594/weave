@@ -4,6 +4,7 @@ import {pool} from './db.ts';
 import type pg from 'pg';
 import {validateKnowledgeGrants} from './knowledge-store.ts';
 import {validateProjectTeam} from './collaboration.ts';
+import {localTarget} from './local-execution.ts';
 export function assertPolicy(agents:Agent[],policy:Policy){
  const invalid=permissionChecks(agents,policy).filter(c=>!c.pass);
  if(invalid.length)throw new AppError(422,invalid.map(c=>c.label).join('、')+'不包含方案请求的权限；请先编辑项目策略或移除超范围配置','POLICY_PERMISSION_DENIED');
@@ -19,5 +20,9 @@ export async function assertRunAuthorization(row:any,db:Pick<pg.PoolClient,'quer
  assertPolicy(row.snapshot.agents,policy);
  await validateProjectTeam(row.snapshot.agents,project.department_id,policy,db);
  await validateKnowledgeGrants(row.snapshot.agents,project.department_id,db);
+ if(row.snapshot.policy.executionTarget?.kind==='local'){
+  const target=await localTarget(row.snapshot.policy,row.snapshot.agents,db);
+  if(row.snapshot.executionTarget?.deviceId!==target.deviceId||row.snapshot.executionTarget?.grantId!==target.grantId||row.snapshot.executionTarget?.platform!==target.platform)throw new AppError(409,'本机运行的设备快照不一致，请重新批准','LOCAL_GRANT_CHANGED');
+ }
 }
 export {bindPolicy};

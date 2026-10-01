@@ -23,11 +23,11 @@ function lastAssistantText(agent) {
 }
 
 export class ProductDshRuntime {
-  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, beforeRequest,onCallError }) {
+  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, beforeRequest,onCallError,createExecutor }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
     this.queryKnowledge = queryKnowledge; this.onUsage = onUsage; this.requestApproval = requestApproval;
-    this.beforeRequest=beforeRequest;this.onCallError=onCallError;
+    this.beforeRequest=beforeRequest;this.onCallError=onCallError;this.createExecutor=createExecutor;
   }
 
   async inspect() {
@@ -59,7 +59,7 @@ export class ProductDshRuntime {
     const usages = [];
     let runtimeFailure;
     let host;
-    const sandbox = new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
+    const sandbox = this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
     const supervisor = new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;job.controller.abort(error);}});
     const durableArchive=archive;
     archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
@@ -70,6 +70,7 @@ export class ProductDshRuntime {
       void job.host?.close();
     }, snapshot.policy.deadlineSeconds * 1000);
     try {
+      await sandbox.prepare?.(job.controller.signal);
       const adapter = new OpenAiCompatibleAdapter({
         routes,
         maxBudget: snapshot.executionBudget,
