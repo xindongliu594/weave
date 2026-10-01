@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import pg from 'pg';
-import { RunSandbox, listArtifacts, artifactFile, SANDBOX_IMAGE } from '../services/agent-runtime/sandbox.mjs';
+import { RunSandbox, listArtifacts, artifactFile } from '../services/agent-runtime/sandbox.mjs';
 import { HandoffGate } from '../services/agent-runtime/handoff.mjs';
 
 // The API, queue, billing and DSH host are real. Only the model and Docker
@@ -21,7 +21,6 @@ const hash = (value: string | Buffer) => createHash('sha256').update(value).dige
 let app: any, server: http.Server, gateway: http.Server, pool: pg.Pool, directory: string, url: string;
 let modelId: string, mode = 'pass', commands = 0;
 const steps = new Map<string, number>(), assignments: string[] = [], evidence: any[] = [];
-const savedPath = process.env.PATH;
 
 before(async () => {
   await admin.query('CREATE SCHEMA ' + schema);
@@ -29,11 +28,12 @@ before(async () => {
   process.env.DATABASE_URL = dbURL.toString();
   directory = await mkdtemp(join(tmpdir(), 'product-flow-'));
   process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs');
-  const bin = join(directory, 'bin'); mkdirSync(bin);
-  // Simulated readiness only. Every actual Docker execution fails if the
-  // test inadvertently reaches it instead of the bounded executor below.
-  writeFileSync(join(bin, 'docker'), `#!/bin/sh\nif [ "$#" = 3 ] && [ "$1" = image ] && [ "$2" = inspect ] && [ "$3" = ${SANDBOX_IMAGE} ]; then echo '{}'; else echo 'TEST_DOCKER_EXECUTION_FORBIDDEN' >&2; exit 1; fi\n`, { mode: 0o700 });
-  process.env.PATH = bin + ':' + savedPath;
+  // Replace the readiness boundary directly on every OS. No shell shim or
+  // PATH mutation; accidental real container operations must fail loudly.
+  mock.method(RunSandbox, 'assertReady', async (signal?: AbortSignal) => { signal?.throwIfAborted(); });
+  for (const name of ['start', 'file', 'sync'] as const) {
+    mock.method(RunSandbox.prototype as any, name, async () => { throw Error('TEST_DOCKER_EXECUTION_FORBIDDEN'); });
+  }
   mock.method(RunSandbox.prototype, 'close', async function () {});
   mock.method(RunSandbox.prototype, 'execute', async function (this: any, name: string, args: any, signal?: AbortSignal) {
     signal?.throwIfAborted(); mkdirSync(this.root, { recursive: true });
@@ -103,7 +103,7 @@ before(async () => {
 after(async () => {
   await app?.locals.shutdown();
   for (const instance of [server, gateway]) if (instance) await new Promise<void>(resolve => instance.close(() => resolve()));
-  mock.restoreAll(); process.env.PATH = savedPath;
+  mock.restoreAll();
   await pool?.end(); await admin.query('DROP SCHEMA ' + schema + ' CASCADE'); await admin.end();
   if (process.env.E2E_EVIDENCE_PATH) writeFileSync(process.env.E2E_EVIDENCE_PATH, JSON.stringify({ executor: 'bounded test double', model: 'simulated HTTP gateway', scenarios: evidence }, null, 2) + '\n');
   if (directory) await rm(directory, { recursive: true, force: true });
@@ -160,6 +160,17 @@ test('approved API flow waits for command approval, hands off verified files and
   const usage = (await call('/usage')).filter((u: any) => u.runId === id);
   const producer = usage.find((u: any) => u.employeeId === 'producer'), reviewer = usage.find((u: any) => u.employeeId === 'reviewer');
   assert.ok(producer?.sessionId && reviewer?.sessionId); assert.notEqual(producer.sessionId, reviewer.sessionId);
+  assert.equal(result.snapshot.runtimeArchitecture, 'employee-host-v1');
+  const hosts = result.events.filter((e: any) => e.type === 'runtime/created');
+  for (const receipt of [producer, reviewer]) {
+    assert.ok(hosts.some((e: any) => e.sessionId === receipt.sessionId && e.data.agentId === receipt.agentId && e.data.employeeId === receipt.employeeId), 'Host identity must match the billed session and employee');
+  }
+  assert.equal(new Set(hosts.map((e: any) => e.data.hostId)).size, hosts.length, 'every residency has its own Host');
+  const disposed = result.events.filter((e: any) => e.type === 'runtime/disposed');
+  assert.deepEqual(disposed.map((e: any) => e.data.hostId).sort(), hosts.map((e: any) => e.data.hostId).sort(), 'completed runs release every employee Host');
+  for (const host of hosts) {
+    assert.ok(disposed.some((e: any) => e.data.hostId === host.data.hostId && e.sessionId === host.sessionId && e.data.agentId === host.data.agentId && e.data.employeeId === host.data.employeeId));
+  }
   const receipts = (await pool.query('SELECT id,status FROM model_reservations WHERE run_id=$1', [id])).rows;
   assert.ok(usage.length > 0); assert.ok(usage.every((u: any) => receipts.some(r => r.id === u.id && r.status === 'settled')));
   assert.ok(receipts.every(r => r.status !== 'pending'));
