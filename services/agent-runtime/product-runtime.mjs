@@ -6,6 +6,7 @@ import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 import { RunSandbox } from './sandbox.mjs';
 import { Semaphore } from './limits.mjs';
 import { teamTaskPlan, stageApprovedTeam } from './handoff.mjs';
+import { employeeContextPolicy } from './employee-context.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -78,7 +79,7 @@ export class ProductDshRuntime {
         maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
         contextBytes: snapshot.policy.contextBytes ?? 64000,
         signal: job.controller.signal,
-        onContext: data => archive.append('context/compacted', data),
+        onContext: data => archive.append('context/compacted', data, { sessionId: data.sessionId }),
         onRequest: data => archive.append('model/wire-request', data, {sessionId:data.sessionId,requestId:data.requestId,taskId:data.taskId,attemptId:data.attemptId}),
         onFallback: data => archive.append('model/fallback', data, {sessionId:data.sessionId}),
         onUsage: async usage => { usages.push(usage); archive.append('billing/usage', usage, {sessionId:usage.sessionId,requestId:usage.requestId,taskId:usage.taskId,attemptId:usage.attemptId}); await this.onUsage?.(archive.id, usage); },
@@ -87,6 +88,7 @@ export class ProductDshRuntime {
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
+        context: employeeContextPolicy(snapshot.policy, routes, provider),
         product: { snapshot, sandbox, gate, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
       job.host = host;
       job.controller.signal.throwIfAborted();

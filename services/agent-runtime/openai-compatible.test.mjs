@@ -55,3 +55,45 @@ test('fallback is explicit, bounded, attributed and never retries ambiguous netw
   await assert.rejects(async()=>{for await(const _ of adapter.stream({model:route.id,sessionId:'employee',messages:[message]})){}},e=>e.code==='CONNECTION_FAILED');assert.equal(calls.length,3);
  }finally{globalThis.fetch=original;}
 });
+
+test('summaries read every selected source message and refuse oversized input before dispatch', async () => {
+  const original = globalThis.fetch, bodies = [], requests = [], usages = [];
+  globalThis.fetch = async (_url, init) => {
+    bodies.push(JSON.parse(init.body));
+    return Response.json({ choices: [{ message: { content: 'checkpoint' }, finish_reason: 'stop' }], usage: { prompt_tokens: 20, completion_tokens: 5 } });
+  };
+  try {
+    const adapter = new OpenAiCompatibleAdapter({ routes: [{ ...route, contextBytes: 4096 }], maxBudget: 1, onRequest: r => requests.push(r), onUsage: u => usages.push(u) });
+    const history = [message, { ...message, id: 'old', role: 'assistant', content: [{ type: 'text', text: 'FULL_SOURCE ' + 'x'.repeat(5000) }] }, { ...message, id: 'directive', content: [{ type: 'text', text: 'Summarize all the history above' }] }];
+    await assert.rejects(async () => { for await (const _ of adapter.stream({ model: route.id, sessionId: 'worker', messages: history, purpose: 'compaction' })) {} }, e => e.code === 'CONTEXT_LIMIT');
+    assert.equal(bodies.length, 0);
+    history[1].content[0].text = 'FULL_SOURCE ' + 'x'.repeat(1000);
+    for await (const _ of adapter.stream({ model: route.id, sessionId: 'worker', messages: history, purpose: 'compaction' })) {}
+    assert.equal(bodies[0].messages.length, history.length);
+    assert.equal(bodies[0].messages[1].content, history[1].content[0].text);
+    assert.equal(requests[0].requestPurpose, 'compaction');
+    assert.equal(usages[0].requestPurpose, 'compaction');
+    assert.equal(usages[0].sessionId, 'worker');
+  } finally { globalThis.fetch = original; }
+});
+
+test('wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit', async () => {
+  const original = globalThis.fetch, bodies = [];
+  globalThis.fetch = async (_url, init) => {
+    bodies.push(JSON.parse(init.body));
+    return Response.json({ choices: [{ message: { content: 'continue' }, finish_reason: 'stop' }], usage: { prompt_tokens: 20, completion_tokens: 5 } });
+  };
+  try {
+    const adapter = new OpenAiCompatibleAdapter({ routes: [{ ...route, contextBytes: 4096 }], maxBudget: 1 });
+    const checkpoint = { ...message, id: 'checkpoint', source: { kind: 'plugin', plugin: 'compact' }, content: [{ type: 'text', text: 'APPROVED_CHECKPOINT ' + 's'.repeat(2000) }] };
+    const latest = { ...message, id: 'latest', content: [{ type: 'text', text: 'CURRENT_TASK ' + 't'.repeat(1000) }] };
+    const history = [{ ...message, content: [{ type: 'text', text: 'OLD_SOURCE ' + 'x'.repeat(3000) }] }, checkpoint, latest];
+    for await (const _ of adapter.stream({ model: route.id, messages: history })) {}
+    assert.ok(bodies[0].messages.some(m => m.content.startsWith('APPROVED_CHECKPOINT')));
+    assert.ok(bodies[0].messages.some(m => m.content.startsWith('CURRENT_TASK')));
+    assert.ok(!bodies[0].messages.some(m => m.content.startsWith('OLD_SOURCE')));
+    latest.content[0].text += 't'.repeat(3000);
+    await assert.rejects(async () => { for await (const _ of adapter.stream({ model: route.id, messages: history })) {} }, /CONTEXT_LIMIT/);
+    assert.equal(bodies.length, 1);
+  } finally { globalThis.fetch = original; }
+});

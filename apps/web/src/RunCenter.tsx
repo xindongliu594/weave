@@ -13,6 +13,8 @@ const eventNames: Record<string, string> = {
   'tool/start': '开始调用工具', 'tool/result': '工具执行结果', 'team/operation': '团队操作', 'team/snapshot': '团队状态快照',
   'handoff/inputs-bound': '固定任务输入版本', 'handoff/accepted': '核验并接收交付物', 'handoff/blocked': '交接条件未满足', 'handoff/command-observed': '记录验证命令结果',
   'session/user/message': '收到任务或追加指令', 'session/system/message': '实际系统提示词', 'session/assistant/message': '员工回复', 'session/turn/start': '开始工作', 'session/turn/end': '本轮结束',
+  'context/pruned': '缩减工具结果并保留证据', 'context/summarized': '生成员工历史摘要', 'context/capacity-unknown': '使用工具缩减保护上下文',
+  'session/compaction/summary': '摘要内容、来源和用量', 'session/compaction/prune': '工具缩减来源', 'session/compaction/end': '历史整理结束',
 };
 function eventSummary(e: TraceEvent) {
   if (e.type === 'model/request') return `${e.data.provider} / ${e.data.model}`;

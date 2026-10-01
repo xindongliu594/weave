@@ -2,13 +2,14 @@ import { Context } from '@deepseek-ai/cordis';
 import { emitAgentEvent } from '@deepseek-ai/dsh-agent';
 import { LlmAdapter, HarnessError } from '@deepseek-ai/dsh-llm';
 import { randomUUID } from 'node:crypto';
+import { installEmployeeContext } from './employee-context.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -50,7 +51,7 @@ export class EmployeeHostFactory {
     unfollowOwner = ownerCtx.effect(() => () => { if (!disposing) return dispose(true); }, `employeeHost(${sessionId})`);
     const mount = async (name, config) => {
       signal.throwIfAborted();
-      const mod = await this.loadPlugin(name);
+      const mod = typeof name === 'string' ? await this.loadPlugin(name) : { default: name };
       signal.throwIfAborted();
       const fiber = ctx.plugin(mod.default ?? mod, config);
       fibers.push(fiber);
@@ -75,6 +76,9 @@ export class EmployeeHostFactory {
       await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: this.sessionRoot, compression: 'none' });
       await mount('@deepseek-ai/dsh-session-query');
       await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
+      if (this.context) await installEmployeeContext(ctx, mount, { ...this.context, archive: this.archive });
+      if (this.protectedContext) ctx.systemPrompt.section({ name: 'department:approved-context', order: 119,
+        text: context => this.protectedContext(context.agent) });
       for (const schema of coordinator.tools.schemas()) {
         const definition = coordinator.tools.get(schema.name);
         ctx.tools.register({ ...definition, async execute(args, exec) {

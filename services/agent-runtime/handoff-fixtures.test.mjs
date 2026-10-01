@@ -35,8 +35,8 @@ async function runScenario(scenario) {
   tasks.find(t => t.id === 'inspect').inputs.push({ path: 'lib/money.mjs', producerTaskId: 'library' });
   tasks.find(t => t.id === 'repair').inputs.push({ path: 'lib/money.mjs', producerTaskId: 'library' });
   const snapshot = { mode: 'fixture', title: scenario, tasks, agents: [
-    { id: 'manager', role: 'manager', tools: [] },
-    ...plan.members.map(member => ({ id: member.name, role: 'member', tools: ['artifact_write', 'filesystem'] })),
+    { id: 'manager', role: 'manager', modelId: 'fixture-captain', tools: [] },
+    ...plan.members.map(member => ({ id: member.name, role: 'member', modelId: 'same-fixture-model', tools: ['artifact_write', 'filesystem'] })),
   ] };
   const rawArchive = createRunArchive(root, snapshot);
   const archive = { ...rawArchive, append(type, data, links) {
@@ -120,7 +120,9 @@ async function runScenario(scenario) {
     }
   }
   async function until(predicate) {
-    const deadline = Date.now() + 10000;
+    // Five persisted task handoffs include cold Host resumes. Windows fsync and
+    // the per-employee context plugins must fit without relying on a fast disk.
+    const deadline = Date.now() + 15000;
     while (Date.now() < deadline) {
       if (errors.length) throw errors[0];
       if (await predicate()) return;
@@ -240,8 +242,8 @@ async function runScenario(scenario) {
   } finally { releaseLibrary(); await host?.close(); await rm(root, { recursive: true, force: true }); }
 }
 
-test('fixture: valid files flow through independent sessions with the same model', { timeout: 20000 }, () => runScenario('happy'));
-test('fixture: real output 1798 fails the oracle, preapproved repair produces 4095', { timeout: 20000 }, () => runScenario('repair'));
+test('fixture: valid files flow through independent sessions with the same model', { timeout: 30000 }, () => runScenario('happy'));
+test('fixture: real output 1798 fails the oracle, preapproved repair produces 4095', { timeout: 30000 }, () => runScenario('repair'));
 test('fixture: failed upstream task keeps all dependents pending', { timeout: 20000 }, () => runScenario('failed-upstream'));
 test('production handoff gate rejects missing output and never dispatches the dependent', { timeout: 20000 }, () => runScenario('missing-file'));
 test('production input gate stops a changed accepted file before the consumer model request', { timeout: 20000 }, () => runScenario('stale-input'));

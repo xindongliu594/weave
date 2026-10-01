@@ -53,7 +53,7 @@ export function attachTrace(ctx, archive,taskFor) {
     const ref = { sessionId: options.sessionId, requestId, ...links.get(options.sessionId) };
     requests.set(options.sessionId,ref);
     const started = Date.now();
-    write('model/request', { provider: options.provider, model: options.model, messages: options.messages, system: options.system, tools: options.tools, reasoningEffort: options.reasoningEffort, maxTokens: options.maxTokens }, ref);
+    write('model/request', { provider: options.provider, model: options.model, purpose: options.purpose ?? 'execution', messages: options.messages, system: options.system, tools: options.tools, reasoningEffort: options.reasoningEffort, maxTokens: options.maxTokens }, ref);
     try {
       for await (const chunk of next()) {
         if (chunk.type === 'usage') write('model/usage', chunk.usage, ref);

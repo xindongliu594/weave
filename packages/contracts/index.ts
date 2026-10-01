@@ -32,6 +32,7 @@ export const policySchema = z.object({
   maxModelCalls: z.number().int().min(1).max(1000).optional(),
   maxTaskModelCalls: z.number().int().min(1).max(1000).optional(),
   contextBytes: z.number().int().min(4096).max(1000000).optional(),
+  contextManagement: z.enum(['summary', 'prune', 'off']).optional(),
   mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
   preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
   allowedModelIds: z.array(z.string().min(1).max(100)).max(200).optional(),
@@ -100,6 +101,7 @@ export const modelSchema = z.object({
   model: z.string().trim().min(1).max(200),
   inputRate: z.number().finite().min(0).max(10000), outputRate: z.number().finite().min(0).max(10000),
   contextBytes: z.number().int().min(4096).max(2000000).optional(),
+  contextWindowTokens: z.number().int().min(2048).max(2000000).optional(),
 });
 export type Agent = z.infer<typeof agentSchema>;
 export type DepartmentInput = z.infer<typeof departmentSchema>;

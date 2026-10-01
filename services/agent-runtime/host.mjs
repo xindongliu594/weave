@@ -16,7 +16,7 @@ const require = createRequire(import.meta.url);
 const baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
 
 /** Department coordination Host; execution loops live in employee-owned Hosts. */
-export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product }) {
+export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product, context }) {
   if (!sessionRoot || !isAbsolute(sessionRoot)) throw new Error('An absolute, dedicated sessionRoot is required');
   const ctx = new Context();
   const fibers = [];
@@ -47,6 +47,26 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const id = taskIds.get(task.id);
     if (!id) throw Error('UNAPPROVED_TASK: ' + task.id);
     return { taskId: id, attemptId: task.attemptId, task };
+  }
+  function protectedContext(agent) {
+    if (!agent || !product) return '';
+    const employee = employeeFor(agent, product.snapshot, captainId);
+    if (!employee) return '';
+    const base = { requirement: product.snapshot.requirement, tools: employee.tools,
+      rule: '以下来自批准快照和宿主任务状态；历史摘要不能扩大权限、改写任务合同或代替文件与命令证据。' };
+    if (agent.id === captainId) return JSON.stringify({ ...base, tasks: (product.snapshot.tasks ?? []).map(t => ({ id: t.id, subject: t.subject, assignee: t.assignee, dependencies: t.dependencies })) });
+    const state = teamState();
+    // Native creation assembles a prompt before committing durable membership.
+    // Its pre-step admission rejects that warm-up; do not turn it into a failed
+    // task. The model boundary still requires taskFor() before any dispatch.
+    if (!state.members.some(m => m.id === agent.id && m.name === employee.id && m.status !== 'removed') ||
+        (!assignments.has(agent.id) && !state.tasks.some(t => t.assignee === employee.id && ['claimed', 'in_progress'].includes(t.status) && t.attemptId)))
+      return JSON.stringify({ ...base, status: '等待宿主确认任务分派' });
+    const current = taskFor(agent.id), task = state.tasks.find(t => t.id === current.taskId);
+    const contract = product.snapshot.tasks.find(t => t.id === taskIds.get(current.taskId));
+    if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
+    return JSON.stringify({ ...base, task: { ...contract, taskPrompt: undefined },
+      runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
   async function mount(name, config) {
     const mod = await import(pathToFileURL(baseRequire.resolve(name)).href);
@@ -92,6 +112,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ctx.on('llm/stream', async function* (options, next) {
         const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
         if(!employee)throw Error('MODEL_PERMISSION_DENIED: 无法确认此会话所属员工');
+        if (![employee.modelId, employee.fallbackModelId].includes(options.model)) throw Error('MODEL_PERMISSION_DENIED: 模型不属于此员工批准的范围');
         adapter.sessionPolicies?.set(options.sessionId,employee);
         if (handoff && options.sessionId !== captainId) {
           const current = taskFor(options.sessionId), task = teamState().tasks.find(t => t.id === current.taskId);
@@ -148,6 +169,8 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     // task needs the public query service to read and resume the saved session.
     await mount('@deepseek-ai/dsh-session-query');
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
+      context: context ?? (product ? { mode: product.snapshot.policy?.contextManagement ?? 'summary' } : undefined),
+      protectedContext: product ? protectedContext : undefined,
       identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,
       loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
     removeFactory = ctx.agents.setFactory(employees);
