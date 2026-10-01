@@ -6,16 +6,18 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const args = process.argv.slice(2);
-const tests = args.length ? args : ['tests/api.test.ts', 'tests/capabilities.test.ts', 'tests/product-flow.test.ts'];
+const options=args.filter(value=>value.startsWith('--test-name-pattern=')||value.startsWith('--test-skip-pattern='));
+const paths=args.filter(value=>!options.includes(value));
+const tests = paths.length ? paths : ['tests/api.test.ts', 'tests/capabilities.test.ts', 'tests/product-flow.test.ts'];
 console.log('Simulated integration: PGlite + pgvector, one product DB connection.');
-console.log('Model and file executor are test doubles; Docker and independent backend locks are excluded.');
+console.log('Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.');
 const db = await PGlite.create({ extensions: { vector } });
 const socket = new PGLiteSocketServer({ db, host: '127.0.0.1', port: 0, maxConnections: 8 });
 let port;
 socket.addEventListener('listening', event => { port = event.detail.port; });
 await socket.start();
 try {
-  const child = spawn(process.execPath, ['--import', 'tsx', '--import', './scripts/test-support/pglite-pool.mjs', '--test', '--test-concurrency=1', ...tests], {
+  const child = spawn(process.execPath, ['--import', 'tsx', '--import', './scripts/test-support/pglite-pool.mjs', '--test', '--test-concurrency=1', ...options,...tests], {
     cwd: root, stdio: 'inherit', env: { ...process.env, SIMULATED_INTEGRATION: 'pglite', DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${port}/postgres` },
   });
   let timedOut = false;

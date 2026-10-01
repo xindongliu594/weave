@@ -37,6 +37,10 @@ export const policySchema = z.object({
   repeatActionLimit: z.number().int().min(3).max(20).optional(),
   repeatErrorLimit: z.number().int().min(2).max(10).optional(),
   maxReadRetries: z.number().int().min(0).max(2).optional(),
+  executionTarget: z.discriminatedUnion('kind',[
+    z.object({kind:z.literal('server')}),
+    z.object({kind:z.literal('local'),deviceId:z.uuid(),grantId:z.uuid()}),
+  ]).optional(),
   mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
   preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
   allowedModelIds: z.array(z.string().min(1).max(100)).max(200).optional(),

@@ -4,7 +4,8 @@ import http from 'node:http';
 import { once } from 'node:events';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import { createHash,randomUUID,randomBytes } from 'node:crypto';
+import {createRequire} from 'node:module';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import pg from 'pg';
@@ -12,7 +13,8 @@ import { RunSandbox, listArtifacts, artifactFile } from '../services/agent-runti
 import { HandoffGate } from '../services/agent-runtime/handoff.mjs';
 
 // The API, queue, billing and DSH host are real. Only the model and Docker
-// boundary are test doubles; the fixed executor never runs model-supplied code.
+// boundary are test doubles in legacy scenarios. D1 uses a real desktop helper,
+// temporary directories and fixed native commands with the actual DSH pipeline.
 const base = process.env.DATABASE_URL ?? 'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const schema = 'flow_' + Date.now();
 const admin = new pg.Pool({ connectionString: base });
@@ -20,6 +22,8 @@ const expected = JSON.parse(readFileSync(new URL('./fixtures/offline-handoff/exp
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 let app: any, server: http.Server, gateway: http.Server, pool: pg.Pool, directory: string, url: string;
 let modelId: string, mode = 'pass', commands = 0, summaryCalls = 0,readFaults=0,mutations=0;
+let verificationCommand='check-fixed-result';
+const {LocalDeviceClient}=createRequire(import.meta.url)('../apps/desktop/local-client.cjs');
 const contextRequests: any[] = [];
 const steps = new Map<string, number>(), assignments: string[] = [], evidence: any[] = [];
 
@@ -96,8 +100,8 @@ before(async () => {
           const previous=messages.filter((m:any)=>m.role==='tool').map((m:any)=>{try{return JSON.parse(m.content);}catch{return undefined;}}).findLast((value:any)=>value?.path==='result.json'&&value.sha256);
           if(repair||mode==='c3-reconciled')actions.push(['filesystem',{path:'result.json'}]);
           if (mode !== 'missing') actions.push(['artifact_write', { path: 'result.json', content: JSON.stringify(rework?{...expected,reviewStage:repair?'final':'initial'}:expected),...(repair||mode==='c3-reconciled'?{expectedSha256:previous?.sha256}:{}) }]);
-          if (!['missing', 'forged'].includes(mode)) actions.push(['terminal_test', { command: 'check-fixed-result' }]);
-          actions.push(update('completed', { output: 'fixed report', changedPaths: ['result.json'], acceptanceResults: [{ criterion: repair?'Set result.json reviewStage to final':'result correct', status: 'passed', evidence: 'fixed fixture' }], commandsRun: [{ command: 'check-fixed-result', status: 'passed', exitCode: 0, evidence: 'model claim' }] }));
+          if (!['missing', 'forged'].includes(mode)) actions.push(['terminal_test', { command: verificationCommand }]);
+          actions.push(update('completed', { output: 'fixed report', changedPaths: ['result.json'], acceptanceResults: [{ criterion: repair?'Set result.json reviewStage to final':'result correct', status: 'passed', evidence: 'fixed fixture' }], commandsRun: [{ command: verificationCommand, status: 'passed', exitCode: 0, evidence: 'model claim' }] }));
           if(mode==='c3-repeat-action')actions.splice(3,actions.length-3,...Array.from({length:12},()=>['filesystem',{path:'result.json'}]));
           if(mode==='c3-repeat-error')actions.splice(2,actions.length-2,...Array.from({length:6},()=>['filesystem',{path:'review.json'}]));
         } else if(label==='consume') {
@@ -146,19 +150,21 @@ async function waitFor(read: () => Promise<any>, accept: (value: any) => boolean
   while (Date.now() < deadline) { value = await read(); if (accept(value)) return value; await new Promise(resolve => setTimeout(resolve, 50)); }
   assert.fail(label + ': ' + JSON.stringify(value));
 }
-async function launch(nextMode: string) {
+async function launch(nextMode: string,executionTarget?:any) {
   mode = nextMode; commands = 0; summaryCalls = 0;readFaults=0;mutations=0; contextRequests.length = 0; assignments.length = 0; steps.clear();
+  const localCode=nextMode==='local-long'?"require('fs').writeFileSync('command-started.txt','started');setTimeout(()=>console.log('long command complete'),25000)":"const result=require('./result.json');require('node:assert/strict').deepEqual(result,JSON.parse(Buffer.from('"+Buffer.from(JSON.stringify(expected)).toString('base64')+"','base64').toString()));console.log('local validation passed')";
+  verificationCommand=nextMode.startsWith('local-')?'node -e "'+localCode+'"':'check-fixed-result';
   const agents = [
     { id: 'manager', role: 'manager', name: '经理', tools: [] },
     { id: 'producer', role: 'member', name: '产出者', tools: nextMode.startsWith('rework')||nextMode.startsWith('c3-')?['filesystem','artifact_write','terminal_test']:['artifact_write', 'terminal_test'] },
     { id: 'reviewer', role: 'member', name: '审查者', tools: nextMode==='rework-checkpoint'?['filesystem','artifact_write','terminal_test']:['filesystem', 'artifact_write'] },
   ].map(a => ({ ...a, title: a.name, instructions: 'Execute only the approved fixture tasks', modelId }));
   const department = await call('/departments', 'POST', { name: 'Flow ' + mode, description: 'Integration fixture', agents }, 201);
-  const project = await call('/projects', 'POST', { departmentId: department.id, requirement: '生成固定测试报告并由另一位员工独立审查，核对文件版本和审批。', policy: { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 60 } }, 201);
+  const project = await call('/projects', 'POST', { departmentId: department.id, requirement: '生成固定测试报告并由另一位员工独立审查，核对文件版本和审批。', policy: { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 60,...(executionTarget?{executionTarget}:{}) } }, 201);
   const original = (await call('/projects')).find((p: any) => p.id === project.id);
   const common = { estimatedInputTokens: 1000, estimatedOutputTokens: 512, maxModelCalls: 15, maxBudget: .2 };
   const plan:any = { rationale: 'An approved producer and an independent reviewer exchange a versioned file', agents: original.plan.agents, tasks: [
-    { ...common, id: 'produce', subject: '[flow:produce]', objective: 'Write the fixed report', assigneeId: 'producer', dependencies: [], acceptanceCriteria: ['result correct'], kind: 'implementation', inScope: ['result.json'], verify: ['check-fixed-result'], outputs: [{ path: 'result.json', format: 'json', requiredKeys: ['orderCount', 'totalCents'], expectedValues: expected }] },
+    { ...common, id: 'produce', subject: '[flow:produce]', objective: 'Write the fixed report', assigneeId: 'producer', dependencies: [], acceptanceCriteria: ['result correct'], kind: 'implementation', inScope: ['result.json'], verify: [verificationCommand], outputs: [{ path: 'result.json', format: 'json', requiredKeys: ['orderCount', 'totalCents'], expectedValues: expected }] },
     { ...common, id: 'review', subject: '[flow:review]', objective: 'Read and independently review the fixed report', assigneeId: 'reviewer', dependencies: ['produce'], acceptanceCriteria: ['independent approval'], kind: 'review', reviewedTaskId: 'produce', inputs: [{ path: 'result.json', producerTaskId: 'produce' }], outputs: [{ path: 'review.json', format: 'json', expectedValues: { accepted: true } }] },
   ] };
   if(mode.startsWith('rework')){
@@ -166,11 +172,18 @@ async function launch(nextMode: string) {
     Object.assign(plan.tasks[1],{outputs:[],maxReworkRounds:1});
   }
   if(mode==='rework-checkpoint')plan.tasks.push({...common,id:'deliver',subject:'[flow:consume]',objective:'Deliver after independent review',assigneeId:'reviewer',dependencies:['review'],acceptanceCriteria:['delivery correct'],kind:'work',inputs:[{path:'result.json',producerTaskId:'produce'}],outputs:[{path:'review.json',format:'json',expectedValues:{accepted:true}}]});
+  if(mode==='local-long'){plan.tasks[0].inScope.push('command-started.txt');plan.tasks[0].outputs.push({path:'command-started.txt',format:'text',nonEmpty:true});}
   await call('/projects/' + project.id + '/plan', 'PUT', { version: 1, plan });
   const saved = (await call('/projects')).find((p: any) => p.id === project.id); assert.equal(saved.validation.valid, true, JSON.stringify(saved.validation));
   return (await call('/projects/' + project.id + '/approve', 'POST', { version: 2 }, 202)).id;
 }
 const approvals = (id: string) => call('/approvals?runId=' + id);
+async function localFixture(){
+ const root=join(directory,'local-workspaces-'+randomUUID()),journalRoot=join(directory,'local-journal-'+randomUUID());mkdirSync(root,{recursive:true});
+ const device={id:randomUUID(),token:randomBytes(32).toString('hex'),name:'真实本机测试设备',grant:{id:randomUUID(),root,allowCommands:true}};
+ const input={connection:{server:url.replace(/api$/,''),username:'fixture',password:'fixture'},device,journalRoot,pollMs:50};
+ const client=new LocalDeviceClient(input);await client.start();return {root,device,input,client,target:{kind:'local',deviceId:device.id,grantId:device.grant.id}};
+}
 const run = (id: string) => call('/runs/' + id);
 async function pendingApproval(id: string) { return (await waitFor(() => approvals(id), list => list.some((a: any) => a.status === 'pending'), 'pending approval')).find((a: any) => a.status === 'pending'); }
 async function stopped(id: string) {
@@ -181,6 +194,54 @@ async function stopped(id: string) {
   return { ...result, events };
 }
 
+test('D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting', {timeout:40000},async()=>{
+ const local=await localFixture();try{
+  const listed=await call('/local-devices');assert.equal(listed.find((d:any)=>d.id===local.device.id).online,true);assert.equal(JSON.stringify(listed).includes(local.device.token),false);
+  await call('/local-devices/'+local.device.id+'/poll','POST',{},403);
+  const id=await launch('local-pass',local.target),approval=await pendingApproval(id);
+  assert.deepEqual(JSON.parse(readFileSync(join(local.root,id,'result.json'),'utf8')),expected);
+  const waiting=await call('/runs/'+id+'/local-operations');assert.equal(waiting.some((job:any)=>job.payload.name==='terminal_test'),false,'no native command is dispatched before approval');
+  await call('/approvals/'+approval.id,'POST',{decision:'approved'});const result=await stopped(id);assert.equal(result.status,'completed',JSON.stringify(result.events.at(-1)));
+  assert.equal(commands,0,'the Docker test double was never used');assert.equal(mutations,0);
+  assert.equal(result.snapshot.executionTarget.deviceId,local.device.id);assert.equal(result.snapshot.executionTarget.grantId,local.device.grant.id);
+  assert.ok(result.events.some((event:any)=>event.type==='local/device-bound'));assert.ok(result.events.some((event:any)=>event.type==='handoff/command-observed'&&event.data.exitCode===0));
+  assert.deepEqual(JSON.parse(readFileSync(join(local.root,id,'review.json'),'utf8')),{accepted:true});assert.deepEqual(JSON.parse(readFileSync(join(directory,'runs',id,'artifacts','result.json'),'utf8')),expected);
+  const operations=await call('/runs/'+id+'/local-operations');assert.ok(operations.every((job:any)=>job.status==='completed'));assert.equal(operations.filter((job:any)=>job.payload.name==='terminal_test').length,1);
+  assert.ok(operations.find((job:any)=>job.payload.name==='terminal_test').result.output.includes('local validation passed'));assert.equal(result.recovery.unknownOperations.length,0);
+  const stored=(await pool.query("SELECT * FROM local_operations WHERE run_id=$1 AND approval_id IS NOT NULL",[id])).rows[0];
+  const protocol=async(endpoint:string,body:any,status:number)=>{const response=await fetch(url+'/local-devices/'+local.device.id+'/operations/'+stored.id+endpoint,{method:'POST',headers:{'Content-Type':'application/json','X-Local-Device-Key':local.device.token},body:JSON.stringify(body)});assert.equal(response.status,status,JSON.stringify(await response.json()));};
+  await protocol('/start',{claimToken:stored.claim_token},409);
+  await protocol('/result',stored.result,200);await protocol('/result',stored.result,200);
+  await protocol('/result',{...stored.result,claimToken:randomUUID()},403);
+  await protocol('/result',{...stored.result,result:{...stored.result.result,exitCode:null}},422);
+  await protocol('/result',{...stored.result,result:{...stored.result.result,output:'forged changed receipt'}},409);
+  assert.equal((await pool.query('SELECT COUNT(*)::int AS count FROM local_operations WHERE approval_id=$1',[stored.approval_id])).rows[0].count,1);
+  const {LocalOperationService}=await import('../apps/api/src/local-execution.ts');
+  await assert.rejects(new LocalOperationService(join(directory,'runs'),stored.lease_owner).wait(stored.id),{code:'LOCAL_OPERATION_CANCELLED',notExecuted:false},'a stopped worker cannot adopt an old completed receipt');
+  const usage=(await call('/usage')).filter((item:any)=>item.runId===id);assert.ok(usage.length>0);assert.ok(usage.every((item:any)=>item.agentId&&item.cost>0));
+  assert.ok(usage.some((item:any)=>item.employeeId==='producer'&&item.taskId==='produce'));assert.ok(usage.some((item:any)=>item.employeeId==='reviewer'&&item.taskId==='review'));
+  assert.equal(usage.length,result.events.filter((event:any)=>event.type==='billing/usage').length);
+ }finally{await local.client.disable();}
+});
+test('D1 revoked device grants reject dispatch after approval and do not become unknown mutations',{timeout:35000},async()=>{
+ const local=await localFixture();try{
+  const id=await launch('local-pass',local.target),approval=await pendingApproval(id);
+  await call('/local-devices/'+local.device.id,'DELETE',{});await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+  const result=await stopped(id);assert.equal(result.status,'failed');const operations=await call('/runs/'+id+'/local-operations');assert.equal(operations.some((job:any)=>job.payload.name==='terminal_test'),false);assert.deepEqual(result.recovery.unknownOperations,[]);
+  const duplicate=await fetch(url+'/local-devices/register',{method:'POST',headers:{'Content-Type':'application/json','X-Local-Device-Key':local.device.token},body:JSON.stringify({id:local.device.id,token:local.device.token,name:local.device.name,platform:process.platform,grant:{id:local.device.grant.id,label:local.root.split(/[\\/]/).at(-1),allowCommands:true}})});assert.equal(duplicate.status,403,'an old client cannot silently undo device revocation');
+ }finally{await local.client.close();}
+});
+test('D1 cancels an in-flight native command and reconnects by reporting its receipt without replay',{timeout:45000},async()=>{
+ const local=await localFixture();let reconnected:any;
+ try{
+  const id=await launch('local-long',local.target),approval=await pendingApproval(id);await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+  const marker=join(local.root,id,'command-started.txt');await waitFor(async()=>existsSync(marker),Boolean,'native command started');
+  await call('/runs/'+id+'/cancel','POST',{},202);await local.client.close();const result=await stopped(id);assert.equal(result.status,'cancelled');assert.ok(result.recovery.unknownOperations.some((operation:any)=>operation.name==='terminal_test'));
+  await call('/runs/'+id+'/retry','POST',{resume:false},409);
+  reconnected=new LocalDeviceClient(local.input);await reconnected.start();const operations=await waitFor(()=>call('/runs/'+id+'/local-operations'),jobs=>jobs.some((job:any)=>job.payload.name==='terminal_test'&&job.lateResult),'late native receipt');
+  assert.equal(operations.filter((job:any)=>job.payload.name==='terminal_test').length,1);assert.equal(readFileSync(marker,'utf8'),'started');assert.equal(operations.find((job:any)=>job.payload.name==='terminal_test').lateResult.ok,false);
+ }finally{await reconnected?.disable();await local.client.close();}
+});
 test('approved API flow waits for command approval, hands off verified files and settles usage', { timeout: 30000 }, async () => {
   const id = await launch('pass'), approval = await pendingApproval(id);
   assert.equal(commands, 0); assert.ok(!assignments.includes('review')); assert.equal(approval.tool, 'terminal_test');

@@ -9,11 +9,12 @@ export function employeeFor(agent,snapshot,captainId){
 }
 export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,handoff,activeWork,supervisor}){
   const string={type:'string',required:true};
+  const local=snapshot.executionTarget?.kind==='local';
   const tools=[
     ['artifact_write','写入文本交付物。新文件可直接写；修改已有文件必须先 filesystem 读取，再传入读取时的 sha256 为 expectedSha256，冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
-    ['filesystem','读取隔离工作区中的文件，不能读取宿主机。',{path:string}],
-    ['terminal','申请在无网络、无宿主机挂载的受限容器内运行命令，等待用户批准。',{command:string}],
-    ['terminal_test','申请在受限容器内执行测试命令，等待用户批准。',{command:string}],
+    ['filesystem',local?'读取已授权本机运行工作区中的文件，只接受工作区相对路径。':'读取隔离工作区中的文件，不能读取宿主机。',{path:string}],
+    ['terminal',local?'申请在已授权本机工作区运行命令；Windows 使用 PowerShell，macOS 使用 sh，等待用户逐次批准。':'申请在无网络、无宿主机挂载的受限容器内运行命令，等待用户批准。',{command:string}],
+    ['terminal_test',local?'申请在本机工作区执行测试命令，等待用户逐次批准。':'申请在受限容器内执行测试命令，等待用户批准。',{command:string}],
     ['knowledge_search','检索员工获授权的运行时知识快照，返回可引用的文档版本和行号。',{query:string}],
     ['knowledge_read','读取已授权知识快照的指定切片。',{chunkId:string}],
   ];
@@ -31,11 +32,12 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       if(!result)throw Error('知识切片不存在或未授权');
       archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});return result;
     }
+    let approvalId;
     if(name==='terminal'||name==='terminal_test'){
       if(!requestApproval)throw Error('审批服务不可用');
       args={...args,expectedWorkspaceRevision:sandbox.revision()};
       const leave=supervisor?.enter(exec.agent.id,'waiting_approval');
-      try { await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal); }
+      try { approvalId=await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal); }
       finally { leave?.(); }
     }
     const leave=supervisor?.enter(exec.agent.id,'waiting_capacity');
@@ -50,13 +52,14 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
           const before = handoff?.beforeFile(work.taskId, work.attemptId, name, args);
           if(name!=='filesystem')archive.append('runtime/operation-start',{name,arguments:args},ref);
           dispatched=true;
-          const result = await retryRead(name,()=>sandbox.execute(name,args,exec.signal),readOptions);
+          const result = await retryRead(name,()=>sandbox.execute(name,args,exec.signal,{agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,approvalId,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}),readOptions);
           outcomeKnown=true;
           if(name!=='filesystem')archive.append('runtime/operation-finished',{name},ref);
           if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before);
           archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}); return result;
         } catch (error) {
-          const classification=classifyFailure(name,error,dispatched&&!outcomeKnown);
+          if(error.notExecuted&&name!=='filesystem')archive.append('runtime/operation-finished',{name,notExecuted:true},ref);
+          const classification=classifyFailure(name,error,dispatched&&!outcomeKnown&&!error.notExecuted);
           archive.append('runtime/operation-failed',{name,classification,code:error.code??error.name,message:error.message},ref);
           if(classification==='outcome_unknown')archive.append('runtime/outcome-unknown',{name,callId:exec.callId,arguments:args,message:error.message},ref);
           if (handoff && work) {

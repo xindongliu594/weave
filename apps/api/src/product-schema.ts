@@ -59,6 +59,19 @@ export async function migrateProduct(pool: pg.Pool) {
     CREATE UNIQUE INDEX IF NOT EXISTS project_runs_attempt ON project_runs(project_id,project_version,attempt);
     CREATE TABLE IF NOT EXISTS tool_approvals (id text PRIMARY KEY, run_id text NOT NULL REFERENCES project_runs(id), agent_id text NOT NULL, tool text NOT NULL, arguments jsonb NOT NULL, status text NOT NULL DEFAULT 'pending', created_at timestamptz NOT NULL DEFAULT now(), decided_at timestamptz);
     CREATE TABLE IF NOT EXISTS request_keys (key text PRIMARY KEY, fingerprint text NOT NULL, status integer, response jsonb, created_at timestamptz NOT NULL DEFAULT now());
+    CREATE TABLE IF NOT EXISTS local_devices (
+      id text PRIMARY KEY, token_hash text NOT NULL, name text NOT NULL, platform text NOT NULL,
+      grant_id text NOT NULL, label text NOT NULL, allow_commands boolean NOT NULL DEFAULT false,
+      enabled boolean NOT NULL DEFAULT true, last_seen timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE TABLE IF NOT EXISTS local_operations (
+      id text PRIMARY KEY, device_id text NOT NULL REFERENCES local_devices(id), run_id text NOT NULL REFERENCES project_runs(id),
+      grant_id text NOT NULL, lease_owner text NOT NULL, payload jsonb NOT NULL, approval_id text UNIQUE REFERENCES tool_approvals(id),
+      status text NOT NULL DEFAULT 'queued', claim_token text, started boolean NOT NULL DEFAULT false,
+      result jsonb, late_result jsonb, deadline timestamptz NOT NULL DEFAULT now()+interval '90 seconds',
+      created_at timestamptz NOT NULL DEFAULT now(), finished_at timestamptz
+    );
+    CREATE INDEX IF NOT EXISTS local_operations_device ON local_operations(device_id,status,created_at);
   `);
   // Preserve the existing scope on upgrade; do not invent policies for older historical versions.
   const client=await pool.connect();

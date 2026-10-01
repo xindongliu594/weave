@@ -36,7 +36,7 @@ jobs:
       - run: npm run runtime:inspect
       - run: npm run runtime:test:portable
       - run: npm run test:integration
-      - run: node --test apps/desktop/connection.test.cjs
+      - run: npm test --prefix apps/desktop
   backend:
     name: PostgreSQL and Docker
     runs-on: ubuntu-latest

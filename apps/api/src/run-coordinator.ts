@@ -14,11 +14,13 @@ import { reserveCall,settleCall,markCallUncertain,expireReservations } from './c
 import { settings } from './product.ts';
 import { assertRunModels,routeFingerprint } from './model-capabilities.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
+import {LocalOperationService,LocalRunExecutor} from './local-execution.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 export class RunCoordinator {
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;
   constructor(public traceRoot:string){
-    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data)=>this.reserve(id,data),onCallError:data=>markCallUncertain(data.id,data.code,data.dispatched)});
+    const local=new LocalOperationService(traceRoot,this.owner);
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,createExecutor:(archive,snapshot)=>snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data)=>this.reserve(id,data),onCallError:data=>markCallUncertain(data.id,data.code,data.dispatched)});
     this.timer=setInterval(()=>void this.tick(),1000);this.timer.unref();void this.tick();
   }
   async recordUsage(runId:string,u:RuntimeUsage){
@@ -43,7 +45,7 @@ export class RunCoordinator {
     signal?.throwIfAborted();const id=randomUUID();
     await pool.query('INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments) VALUES($1,$2,$3,$4,$5)',[id,input.runId,input.agentId,input.tool,input.arguments]);
     openRunArchive(this.traceRoot,input.runId).append('approval/requested',{id,...input});
-    try{while(true){signal?.throwIfAborted();const row=(await pool.query('SELECT status FROM tool_approvals WHERE id=$1',[id])).rows[0];if(row?.status==='approved')return;if(row?.status!=='pending')throw Error('工具操作未获批准');await sleep(500);}}
+    try{while(true){signal?.throwIfAborted();const row=(await pool.query('SELECT status FROM tool_approvals WHERE id=$1',[id])).rows[0];if(row?.status==='approved')return id;if(row?.status!=='pending')throw Error('工具操作未获批准');await sleep(500);}}
     finally{await pool.query("UPDATE tool_approvals SET status='cancelled',decided_at=now() WHERE id=$1 AND status='pending'",[id]);}
   }
   async recover(){
@@ -51,7 +53,8 @@ export class RunCoordinator {
     const stale=(await pool.query("SELECT id FROM project_runs WHERE status='running' AND (lease_until IS NULL OR lease_until<clock_timestamp())")).rows;
     for(const candidate of stale){
       const row=await claimExpiredRun(candidate.id);if(!row)continue;
-      if(/^[a-f0-9-]{36}$/.test(row.id))try{await command(['rm','-f','agent-department-'+row.id],{signal:AbortSignal.timeout(5000)});}catch{}
+      await pool.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE run_id=$1 AND status IN ('queued','claimed','started')",[row.id]);
+      if(row.snapshot.executionTarget?.kind!=='local'&&/^[a-f0-9-]{36}$/.test(row.id))try{await command(['rm','-f','agent-department-'+row.id],{signal:AbortSignal.timeout(5000)});}catch{}
       const archived=readRun(this.traceRoot,row.id);
       if(archived?.integrity==='ok'){
         for(const event of archived.events.filter(e=>e.type==='billing/usage'))await this.recordUsage(row.id,event.data);

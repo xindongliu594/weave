@@ -14,6 +14,7 @@ const eventNames: Record<string, string> = {
   'handoff/inputs-bound': '固定任务输入版本', 'handoff/accepted': '核验并接收交付物', 'handoff/blocked': '交接条件未满足', 'handoff/command-observed': '记录验证命令结果',
   'quality/review-submitted': '提交结构化审查问题', 'quality/reviewed': '独立审查通过', 'quality/rework-created': '授权范围内修复与独立复验', 'quality/escalated': '停止返工并交给用户处理',
   'runtime/status':'员工运行状态','runtime/anomaly':'发现停滞或重复失败','runtime/read-retry':'重试短暂失败的只读操作','runtime/outcome-unknown':'操作结果需要核对','team/checkpoint':'保存停止时的任务状态',
+  'local/device-bound':'绑定本机工作区','local/operation-queued':'派发获授权的本机操作','local/operation-finished':'收到本机操作回执',
   'session/user/message': '收到任务或追加指令', 'session/system/message': '实际系统提示词', 'session/assistant/message': '员工回复', 'session/turn/start': '开始工作', 'session/turn/end': '本轮结束',
   'context/pruned': '缩减工具结果并保留证据', 'context/summarized': '生成员工历史摘要', 'context/capacity-unknown': '使用工具缩减保护上下文',
   'session/compaction/summary': '摘要内容、来源和用量', 'session/compaction/prune': '工具缩减来源', 'session/compaction/end': '历史整理结束',
@@ -76,7 +77,7 @@ export function RunCenter() {
   const assigned = detail?.snapshot.agents.find(a => a.id === sessions.find(s => s.id === employee)?.agentId);
   return <>
     <div className="page-head"><div><div className="eyebrow">EXECUTION HISTORY</div><h1>执行记录</h1><p>查看当时的职责、任务指令和实际操作。历史快照独立保留。</p></div><button className="primary" disabled={busy} onClick={verify}><Play size={16}/>{busy ? '正在验证…' : '运行追溯验证'}</button></div>
-    <div className="notice-box"><ShieldCheck size={18}/><p>工具执行受岗位授权约束；终端操作在隔离工作区中执行并需要审批。追溯验证使用测试模型，不会调用真实 API。</p></div>
+    <div className="notice-box"><ShieldCheck size={18}/><p>工具执行受岗位授权约束；文件与终端按批准的执行位置操作，终端需要逐次审批。追溯验证使用测试模型，不会调用真实 API。</p></div>
     {error && <div className="banner error" role="alert">{error}</div>}
     {!selected ? <section className="panel lower"><div className="trace-list-head"><h2>历史运行</h2><button onClick={() => refresh().catch(e => setError(e.message))}><RefreshCw size={14}/>刷新</button></div>{loading ? <p className="compact-empty">正在读取本地档案…</p> : runs.length ? runs.map(run => <button className="project-row" key={run.id} onClick={() => setSelected(run.id)}><Clock3 size={20}/><span><strong>{run.title}</strong><small>{date(run.createdAt)} · {run.eventCount} 条事件</small></span><span className="tag">{run.mode === 'fixture' ? '测试模型' : run.mode}</span><span className={'tag ' + (run.status === 'completed' ? 'green' : 'amber')}>{stateName[run.status] ?? run.status}</span></button>) : <div className="empty"><Search size={28}/><h3>还没有执行记录</h3><p>运行一次追溯验证，查看真实采集的团队过程。</p></div>}</section> : <>
       <button className="text-button back lower" onClick={() => setSelected(null)}><ArrowLeft size={15}/>返回运行列表</button>
