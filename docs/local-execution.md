@@ -17,6 +17,8 @@
 
 文件工具拒绝绝对路径、上级路径、Windows 盘符/ADS、保留设备名、链接目录、符号链接和硬链接；重查所选父目录身份与文件版本。每次回传最多 128 个文件，单文件 5 MiB、合计 20 MiB；文件读取最多 1 MiB。路径检查无法提供对抗同一系统用户恶意并发替换文件的完整 OS 安全隔离。
 
+本批使用可跨系统传递的文件路径，拒绝 Windows 禁用字符、大小写重名及文件/目录前缀冲突；Windows 的上标数字设备别名也在拒绝范围内。命名依据 [Microsoft 文件与路径规则](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file)。
+
 本机命令使用当前登录系统用户权限，能够访问工作区外的文件、网络和程序。因此目录文件工具的限制不能视为命令的系统沙箱。Windows 使用非交互 PowerShell，macOS/Linux 使用 `/bin/sh`；模型提示和批准快照记录实际平台。每次命令最多 60 秒、输出最多 1 MiB。
 
 Windows 在调用用户命令前把执行进程加入 kill-on-close Job Object，退出或取消时清理普通后代进程；macOS/Linux 使用独立进程组。进程清理用于结束普通命令和后台子进程，不保证阻止蓄意脱离进程归属的外部系统服务或所有系统调用。Windows 机制依据 [Microsoft Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)。

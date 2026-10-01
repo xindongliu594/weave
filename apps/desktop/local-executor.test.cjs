@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {tmpdir}=require('node:os');
 const {randomUUID,randomBytes}=require('node:crypto');
-const {LocalExecutor,validPath,exportFiles,revision,runCommand}=require('./local-executor.cjs');
+const {LocalExecutor,validPath,decodeFiles,exportFiles,revision,runCommand}=require('./local-executor.cjs');
 const {LocalDeviceClient}=require('./local-client.cjs');
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function fixture(){const root=fs.mkdtempSync(path.join(tmpdir(),'department-local-test-')),grant={id:randomUUID(),root,allowCommands:true},runId=randomUUID(),executor=new LocalExecutor(grant);return {root,grant,runId,executor,cleanup(){assert.ok(path.resolve(root).startsWith(path.resolve(tmpdir())+path.sep+'department-local-test-'));fs.rmSync(root,{recursive:true,force:true});}};}
@@ -16,7 +16,8 @@ test('native workspace preserves file versions and rejects traversal, Windows al
   const read=await f.executor.execute({...job,name:'filesystem',arguments:{path:'out/report.txt'}});assert.equal(read.content,'version 1');assert.equal(read.sha256,written.sha256);
   await assert.rejects(f.executor.execute({...job,name:'artifact_write',arguments:{path:'out/report.txt',content:'stale'}}),{code:'FILE_VERSION_CONFLICT'});
   await f.executor.execute({...job,name:'artifact_write',arguments:{path:'out/report.txt',content:'version 2',expectedSha256:read.sha256}});
-  for(const name of ['../outside','C:/outside','a:stream','a\\b','CON.txt','out/file.','out/dir /file','/outside'])assert.throws(()=>validPath(name));
+  for(const name of ['../outside','C:/outside','a:stream','a\\b','CON.txt','COM¹.txt','LPT²','out/file?','out/file.','out/dir /file','/outside','.Agent-private'])assert.throws(()=>validPath(name));
+  for(const paths of [['Report.txt','report.txt'],['Report','report/file.txt']])assert.throws(()=>decodeFiles(paths.map(path=>({path,content:''}))),/格式/);
   await assert.rejects(f.executor.execute({...job,grantId:randomUUID(),name:'filesystem',arguments:{path:'out/report.txt'}}),/授权已经变化/);
   const outside=path.join(f.root,'outside.txt');fs.writeFileSync(outside,'outside');fs.linkSync(outside,path.join(f.root,f.runId,'hardlink.txt'));
   await assert.rejects(f.executor.execute({...job,name:'filesystem',arguments:{path:'hardlink.txt'}}),/链接/);fs.unlinkSync(path.join(f.root,f.runId,'hardlink.txt'));

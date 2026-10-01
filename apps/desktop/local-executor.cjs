@@ -6,7 +6,7 @@ const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 function denied(message,code='LOCAL_SCOPE_DENIED'){return Object.assign(Error(message),{code,notExecuted:true});}
 function validPath(value){
- if(typeof value!=='string'||!value||value.length>240||/[\\:\x00-\x1f]/.test(value)||value.startsWith('/')||value.split('/').some(p=>!p||p==='.'||p==='..'||p.startsWith('.agent')||/[. ]$/.test(p)||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p)))throw denied('非法本机工作区路径');
+ if(typeof value!=='string'||!value||value.length>240||/[\\:<>"|?*\x00-\x1f]/.test(value)||value.startsWith('/')||value.split('/').some(p=>!p||p==='.'||p==='..'||p.toLowerCase().startsWith('.agent')||/[. ]$/.test(p)||/^(con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])(?:\.|$)/i.test(p)))throw denied('非法本机工作区路径');
  return value;
 }
 function checkedPath(root,value){
@@ -23,8 +23,9 @@ function decodeFiles(files){
  let total=0;const names=new Set();
  return files.map(file=>{
   validPath(file?.path);
-  if(names.has(file.path)||typeof file.content!=='string'||file.content.length>7*1024*1024||! /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(file.content))throw denied('回传文件格式不正确');
-  names.add(file.path);const bytes=Buffer.from(file.content,'base64');total+=bytes.length;
+  const key=file.path.toLowerCase();
+  if(names.has(key)||[...names].some(name=>name.startsWith(key+'/')||key.startsWith(name+'/'))||typeof file.content!=='string'||file.content.length>7*1024*1024||! /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(file.content))throw denied('回传文件格式不正确');
+  names.add(key);const bytes=Buffer.from(file.content,'base64');total+=bytes.length;
   if(bytes.length>5*1024*1024||total>20*1024*1024)throw denied('文件大小超过限制','LOCAL_FILE_LIMIT');
   return {path:file.path,bytes};
  }).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
