@@ -1,12 +1,13 @@
 import { defineTool } from '@deepseek-ai/dsh-tools';
 import { searchKnowledge } from './knowledge.mjs';
+import { retryRead, classifyFailure } from './recovery.mjs';
 export function employeeFor(agent,snapshot,captainId){
   if(agent?.id===captainId)return snapshot.agents.find(a=>a.role==='manager');
   const descriptor=agent?.session.snapshotEvents().find(e=>e.type==='subagent/descriptor');
   const name=descriptor?.data?.label?.split(':').at(-1);
   return snapshot.agents.find(a=>a.id===name);
 }
-export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,handoff,activeWork}){
+export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,handoff,activeWork,supervisor}){
   const string={type:'string',required:true};
   const tools=[
     ['artifact_write','写入文本交付物。新文件可直接写；修改已有文件必须先 filesystem 读取，再传入读取时的 sha256 为 expectedSha256，冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
@@ -19,10 +20,13 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
   const disposers=tools.map(([name,description,parameters])=>ctx.tools.register(defineTool({name,description,parameters,output:{schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},async execute(args,exec){
     const employee=employeeFor(exec.agent,snapshot,captainId());
     if(!employee||!employee.tools.includes(name))throw Error('TOOL_PERMISSION_DENIED: 此员工没有该工具权限');
+    supervisor?.check();
+    const ref={sessionId:exec.agent.id,callId:exec.callId};
+    const readOptions={signal:exec.signal,maxRetries:snapshot.policy?.maxReadRetries??2,onRetry:data=>archive.append('runtime/read-retry',data,ref)};
     if(name.startsWith('knowledge_')){
       const chunks=snapshot.knowledge?.[employee.id]??[];
       if(snapshot.knowledge?.format==='document-versions-v2'&&!queryKnowledge)throw Error('KNOWLEDGE_SERVICE_UNAVAILABLE: 历史版本检索服务不可用');
-      const result=queryKnowledge?await queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000)):
+      const result=queryKnowledge?await retryRead(name,()=>queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000)),readOptions):
         name==='knowledge_search'?searchKnowledge(chunks,String(args.query).slice(0,1000)):chunks.find(c=>c.id===args.chunkId);
       if(!result)throw Error('知识切片不存在或未授权');
       archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});return result;
@@ -30,18 +34,31 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     if(name==='terminal'||name==='terminal_test'){
       if(!requestApproval)throw Error('审批服务不可用');
       args={...args,expectedWorkspaceRevision:sandbox.revision()};
-      await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal);
+      const leave=supervisor?.enter(exec.agent.id,'waiting_approval');
+      try { await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal); }
+      finally { leave?.(); }
     }
-    const release=await gate.acquire(exec.signal);
+    const leave=supervisor?.enter(exec.agent.id,'waiting_capacity');
+    let release;
+    try { release=await gate.acquire(exec.signal); } finally { leave?.(); }
     try {
       const execute = async () => {
+        supervisor?.check();
         const work = handoff ? activeWork(exec.agent) : undefined;
+        let dispatched=false,outcomeKnown=false;
         try {
           const before = handoff?.beforeFile(work.taskId, work.attemptId, name, args);
-          const result = await sandbox.execute(name,args,exec.signal);
+          if(name!=='filesystem')archive.append('runtime/operation-start',{name,arguments:args},ref);
+          dispatched=true;
+          const result = await retryRead(name,()=>sandbox.execute(name,args,exec.signal),readOptions);
+          outcomeKnown=true;
+          if(name!=='filesystem')archive.append('runtime/operation-finished',{name},ref);
           if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before);
-          archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts}); return result;
+          archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}); return result;
         } catch (error) {
+          const classification=classifyFailure(name,error,dispatched&&!outcomeKnown);
+          archive.append('runtime/operation-failed',{name,classification,code:error.code??error.name,message:error.message},ref);
+          if(classification==='outcome_unknown')archive.append('runtime/outcome-unknown',{name,callId:exec.callId,arguments:args,message:error.message},ref);
           if (handoff && work) {
             // Failed mutations may leave an unsynchronized container workspace.
             // Require fresh observed verification instead of reusing old proof.
@@ -51,7 +68,10 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
           throw error;
         }
       };
-      return handoff ? await handoff.exclusive(exec.signal, execute) : await execute();
+      if(!handoff)return await execute();
+      const stopWaiting=supervisor?.enter(exec.agent.id,'waiting_capacity');
+      try{return await handoff.exclusive(exec.signal,()=>{stopWaiting?.();return execute();});}
+      finally{stopWaiting?.();}
     } finally { release(); }
   }})));
   return ()=>disposers.reverse().forEach(dispose=>dispose());

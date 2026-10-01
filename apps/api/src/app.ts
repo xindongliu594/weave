@@ -23,6 +23,8 @@ import { configuredOrigins, isAllowedRequestOrigin } from './request-origin.ts';
 import { knowledgeRouter } from './knowledge.ts';
 import { productRouter } from './product.ts';
 import { runManagementRouter } from './run-management.ts';
+import { resumeHandoff, completedTasks } from './handoff-checkpoints.ts';
+import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { backupRouter } from './backup.ts';
 import { idempotency } from './idempotency.ts';
 import { obsidianRouter, syncObsidian } from './obsidian.ts';
@@ -326,7 +328,9 @@ export function createApp() {
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
     const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, 300);
-    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || ['team/snapshot','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
+    const recovery:{unknownOperations:any[];checkpointBlocked?:string}={unknownOperations:unresolvedOperations(run.events)};
+    if(row&&['failed','interrupted','cancelled'].includes(row.status))try{resumeHandoff(run.snapshot,run.events,completedTasks(run.events),resolve(traceRoot,id,'artifacts'));}catch(error){recovery.checkpointBlocked=(error as Error).message;}
+    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','team/snapshot','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);

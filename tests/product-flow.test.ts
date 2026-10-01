@@ -19,7 +19,7 @@ const admin = new pg.Pool({ connectionString: base });
 const expected = JSON.parse(readFileSync(new URL('./fixtures/offline-handoff/expected/report.json', import.meta.url), 'utf8'));
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 let app: any, server: http.Server, gateway: http.Server, pool: pg.Pool, directory: string, url: string;
-let modelId: string, mode = 'pass', commands = 0, summaryCalls = 0;
+let modelId: string, mode = 'pass', commands = 0, summaryCalls = 0,readFaults=0,mutations=0;
 const contextRequests: any[] = [];
 const steps = new Map<string, number>(), assignments: string[] = [], evidence: any[] = [];
 
@@ -45,8 +45,11 @@ before(async () => {
       const file = join(this.root, args.path), current = existsSync(file) ? hash(readFileSync(file)) : undefined;
       if (current !== args.expectedSha256) throw Error('FILE_VERSION_CONFLICT');
       mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, args.content);
+      mutations++;
+      if(mode==='c3-unknown-write'){writeFileSync(file,'{"interrupted":true}');throw Object.assign(Error('write response lost'),{code:'ETIMEDOUT'});}
       result = { path: args.path, sha256: hash(args.content) };
     } else if (name === 'filesystem') {
+      if(mode==='c3-read-retry'&&readFaults++<2)throw Object.assign(Error('temporary read busy'),{code:'EBUSY'});
       const content = readFileSync(artifactFile(this.root, args.path), 'utf8');
       result = { path: args.path, content, sha256: hash(content) };
     } else {
@@ -91,10 +94,14 @@ before(async () => {
         const actions: any[] = [['agent_teams_claim_task', { task_id: id }], update('in_progress')];
         if (label === 'produce'||repair) {
           const previous=messages.filter((m:any)=>m.role==='tool').map((m:any)=>{try{return JSON.parse(m.content);}catch{return undefined;}}).findLast((value:any)=>value?.path==='result.json'&&value.sha256);
-          if(repair)actions.push(['filesystem',{path:'result.json'}]);
-          if (mode !== 'missing') actions.push(['artifact_write', { path: 'result.json', content: JSON.stringify(rework?{...expected,reviewStage:repair?'final':'initial'}:expected),...(repair?{expectedSha256:previous?.sha256}:{}) }]);
+          if(repair||mode==='c3-reconciled')actions.push(['filesystem',{path:'result.json'}]);
+          if (mode !== 'missing') actions.push(['artifact_write', { path: 'result.json', content: JSON.stringify(rework?{...expected,reviewStage:repair?'final':'initial'}:expected),...(repair||mode==='c3-reconciled'?{expectedSha256:previous?.sha256}:{}) }]);
           if (!['missing', 'forged'].includes(mode)) actions.push(['terminal_test', { command: 'check-fixed-result' }]);
           actions.push(update('completed', { output: 'fixed report', changedPaths: ['result.json'], acceptanceResults: [{ criterion: repair?'Set result.json reviewStage to final':'result correct', status: 'passed', evidence: 'fixed fixture' }], commandsRun: [{ command: 'check-fixed-result', status: 'passed', exitCode: 0, evidence: 'model claim' }] }));
+          if(mode==='c3-repeat-action')actions.splice(3,actions.length-3,...Array.from({length:12},()=>['filesystem',{path:'result.json'}]));
+          if(mode==='c3-repeat-error')actions.splice(2,actions.length-2,...Array.from({length:6},()=>['filesystem',{path:'review.json'}]));
+        } else if(label==='consume') {
+          actions.push(['filesystem',{path:'result.json'}],['terminal_test',{command:'check-fixed-result'}],['artifact_write',{path:'review.json',content:'{"accepted":true}'}],update('completed',{output:'delivered checkpoint result'}));
         } else {
           actions.push(['filesystem', { path: 'result.json' }]);
           if(rework){
@@ -140,17 +147,17 @@ async function waitFor(read: () => Promise<any>, accept: (value: any) => boolean
   assert.fail(label + ': ' + JSON.stringify(value));
 }
 async function launch(nextMode: string) {
-  mode = nextMode; commands = 0; summaryCalls = 0; contextRequests.length = 0; assignments.length = 0; steps.clear();
+  mode = nextMode; commands = 0; summaryCalls = 0;readFaults=0;mutations=0; contextRequests.length = 0; assignments.length = 0; steps.clear();
   const agents = [
     { id: 'manager', role: 'manager', name: '经理', tools: [] },
-    { id: 'producer', role: 'member', name: '产出者', tools: nextMode.startsWith('rework')?['filesystem','artifact_write','terminal_test']:['artifact_write', 'terminal_test'] },
-    { id: 'reviewer', role: 'member', name: '审查者', tools: ['filesystem', 'artifact_write'] },
+    { id: 'producer', role: 'member', name: '产出者', tools: nextMode.startsWith('rework')||nextMode.startsWith('c3-')?['filesystem','artifact_write','terminal_test']:['artifact_write', 'terminal_test'] },
+    { id: 'reviewer', role: 'member', name: '审查者', tools: nextMode==='rework-checkpoint'?['filesystem','artifact_write','terminal_test']:['filesystem', 'artifact_write'] },
   ].map(a => ({ ...a, title: a.name, instructions: 'Execute only the approved fixture tasks', modelId }));
   const department = await call('/departments', 'POST', { name: 'Flow ' + mode, description: 'Integration fixture', agents }, 201);
   const project = await call('/projects', 'POST', { departmentId: department.id, requirement: '生成固定测试报告并由另一位员工独立审查，核对文件版本和审批。', policy: { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 60 } }, 201);
   const original = (await call('/projects')).find((p: any) => p.id === project.id);
   const common = { estimatedInputTokens: 1000, estimatedOutputTokens: 512, maxModelCalls: 15, maxBudget: .2 };
-  const plan = { rationale: 'An approved producer and an independent reviewer exchange a versioned file', agents: original.plan.agents, tasks: [
+  const plan:any = { rationale: 'An approved producer and an independent reviewer exchange a versioned file', agents: original.plan.agents, tasks: [
     { ...common, id: 'produce', subject: '[flow:produce]', objective: 'Write the fixed report', assigneeId: 'producer', dependencies: [], acceptanceCriteria: ['result correct'], kind: 'implementation', inScope: ['result.json'], verify: ['check-fixed-result'], outputs: [{ path: 'result.json', format: 'json', requiredKeys: ['orderCount', 'totalCents'], expectedValues: expected }] },
     { ...common, id: 'review', subject: '[flow:review]', objective: 'Read and independently review the fixed report', assigneeId: 'reviewer', dependencies: ['produce'], acceptanceCriteria: ['independent approval'], kind: 'review', reviewedTaskId: 'produce', inputs: [{ path: 'result.json', producerTaskId: 'produce' }], outputs: [{ path: 'review.json', format: 'json', expectedValues: { accepted: true } }] },
   ] };
@@ -158,6 +165,7 @@ async function launch(nextMode: string) {
     Object.assign(plan.tasks[0],{inputs:[],maxModelCalls:mode==='rework-budget'?8:20});
     Object.assign(plan.tasks[1],{outputs:[],maxReworkRounds:1});
   }
+  if(mode==='rework-checkpoint')plan.tasks.push({...common,id:'deliver',subject:'[flow:consume]',objective:'Deliver after independent review',assigneeId:'reviewer',dependencies:['review'],acceptanceCriteria:['delivery correct'],kind:'work',inputs:[{path:'result.json',producerTaskId:'produce'}],outputs:[{path:'review.json',format:'json',expectedValues:{accepted:true}}]});
   await call('/projects/' + project.id + '/plan', 'PUT', { version: 1, plan });
   const saved = (await call('/projects')).find((p: any) => p.id === project.id); assert.equal(saved.validation.valid, true, JSON.stringify(saved.validation));
   return (await call('/projects/' + project.id + '/approve', 'POST', { version: 2 }, 202)).id;
@@ -321,4 +329,60 @@ test('cancellation while approval is pending cancels the receipt and never runs 
   assert.equal((await approvals(id)).find((a: any) => a.id === approval.id).status, 'cancelled');
   await call('/approvals/' + approval.id, 'POST', { decision: 'approved' }, 409);
   evidence.push({ scenario: 'cancel-pending-approval', status: 'cancelled', commands, obsoleteApprovalStatus: 409 });
+});
+
+test('C3 monitors actual employee waits and stops repeated actions/errors before more paid calls', {timeout:45000},async()=>{
+ for(const [fault,code,limit] of [['c3-repeat-action','REPEATED_ACTION',8],['c3-repeat-error','REPEATED_ERROR',3]] as const){
+  const id=await launch(fault),result=await stopped(id);
+  assert.equal(result.status,'failed');assert.ok(result.events.some((event:any)=>event.type==='runtime/anomaly'&&event.data.code===code));
+  assert.equal(commands,0);assert.ok(!assignments.includes('review'));
+  const actions=result.events.filter((event:any)=>event.type==='tool/result'&&event.data.name==='filesystem');assert.equal(actions.length,limit);
+  const anomaly=result.events.find((event:any)=>event.type==='runtime/anomaly');
+  assert.ok(!result.events.some((event:any)=>event.type==='model/wire-request'&&event.seq>anomaly.seq),'anomaly fences the next model dispatch');
+  assert.ok(result.summaryEvents.some((event:any)=>event.type==='runtime/anomaly'));
+ }
+});
+
+test('C3 retries a transient read within the same tool call, without extra model charges', {timeout:30000},async()=>{
+ const id=await launch('c3-read-retry'),approval=await pendingApproval(id);
+ const waiting=await waitFor(()=>run(id),value=>value.summaryEvents?.some((event:any)=>event.type==='runtime/status'&&event.data.employees.some((employee:any)=>employee.phase==='waiting_approval')),'approval classified');
+ assert.deepEqual(waiting.recovery.unknownOperations,[],'unapproved command has not started');
+ await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+ const result=await stopped(id);assert.equal(result.status,'completed');
+ const retries=result.events.filter((event:any)=>event.type==='runtime/read-retry');assert.deepEqual(retries.map((event:any)=>event.data.retry),[1,2]);
+ assert.equal(result.events.filter((event:any)=>event.type==='tool/start'&&event.data.name==='filesystem').length,1);
+ assert.ok(!result.events.some((event:any)=>event.type==='runtime/outcome-unknown'));
+});
+
+async function reconcileFixtureUsage(id:string){
+ // The fixed HTTP fixture reports precisely 50/10 for each non-summary call.
+ // Use the product reconciliation endpoint, preserving the real cost gate.
+ for(const receipt of (await call('/costs')).calls.filter((item:any)=>item.runId===id))await call('/costs/'+receipt.id+'/reconcile','POST',{inputTokens:50,outputTokens:10,note:'Confirmed fixed gateway fixture usage',confirmation:'RECONCILE'});
+}
+
+test('C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry', {timeout:35000},async()=>{
+ const id=await launch('c3-unknown-write'),result=await stopped(id);assert.equal(result.status,'failed');assert.equal(mutations,1);
+ assert.equal(result.recovery.unknownOperations.length,1);assert.ok(result.events.some((event:any)=>event.type==='runtime/anomaly'&&event.data.code==='OUTCOME_UNKNOWN'));
+ const rejected=await call('/runs/'+id+'/retry','POST',{resume:false},409);assert.equal(rejected.code,'OPERATION_RECONCILIATION_REQUIRED');
+ await reconcileFixtureUsage(id);mode='c3-reconciled';
+ const retry=await call('/runs/'+id+'/retry','POST',{resume:false,acknowledgeUnknownOperations:true},202);
+ const approval=await pendingApproval(retry.id);await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+ const restored=await stopped(retry.id);assert.equal(restored.status,'completed');assert.equal(restored.snapshot.approval.reconciledOperations.length,1);
+ assert.equal(restored.snapshot.budgetHistory.tasks.produce.calls,result.events.filter((event:any)=>event.type==='model/wire-request'&&event.data.taskId==='produce').length);
+});
+
+test('C3 restores an independently passed rework pair and runs only its remaining consumer', {timeout:45000},async()=>{
+ const id=await launch('rework-checkpoint');
+ for(let count=0;count<2;count++){const approval=await pendingApproval(id);await call('/approvals/'+approval.id,'POST',{decision:'approved'});}
+ const downstream=await pendingApproval(id);assert.equal(commands,2);assert.equal(downstream.agentId,(await run(id)).snapshot.agents.find((agent:any)=>agent.employeeId==='reviewer').id);
+ await call('/runs/'+id+'/cancel','POST',{},202);const before=await stopped(id);assert.equal(before.status,'cancelled');
+ assert.ok(before.events.some((event:any)=>event.type==='quality/reviewed'&&event.data.reworkRound===1));
+ assert.equal(before.recovery.checkpointBlocked,undefined);assert.deepEqual(before.recovery.unknownOperations,[]);
+ await reconcileFixtureUsage(id);
+ const retry=await call('/runs/'+id+'/retry','POST',{resume:true},202);assert.deepEqual(retry.completedCheckpoints.sort(),['produce','review']);
+ const approval=await pendingApproval(retry.id);await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+ const restored=await stopped(retry.id);assert.equal(restored.status,'completed',JSON.stringify(restored.events.filter((event:any)=>['handoff/blocked','model/error'].includes(event.type))));
+ assert.deepEqual(restored.snapshot.tasks.map((task:any)=>task.id),['deliver']);assert.equal(restored.snapshot.approvedTasks.length,3);assert.equal(commands,3);
+ assert.ok(restored.events.filter((event:any)=>event.type==='model/wire-request'&&event.data.taskId).every((event:any)=>event.data.taskId==='deliver'));
+ assert.equal(restored.events.find((event:any)=>event.type==='handoff/accepted').data.inputs[0].sha256,before.events.findLast((event:any)=>event.type==='handoff/accepted'&&event.data.taskId==='produce').data.outputs[0].sha256);
 });
