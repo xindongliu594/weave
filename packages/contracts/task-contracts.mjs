@@ -46,6 +46,23 @@ export function taskContractErrors(tasks, agents = [], checkpoints = []) {
       if (kind === 'review' && (!['implementation', 'repair'].includes(source?.kind) || owner(task) === owner(source))) errors.push(`${task.id}: 需要另一位员工审查实现或修复任务`);
       if (kind === 'repair' && !task.sourceFindingIds?.length) errors.push(`${task.id}: 修复必须绑定问题编号`);
     }
+    if (task.maxReworkRounds !== undefined && (!Number.isInteger(task.maxReworkRounds) || task.maxReworkRounds < 0 || task.maxReworkRounds > 2))
+      errors.push(`${task.id}: 自动返工次数必须为 0 到 2`);
+    if (task.maxReworkRounds) {
+      const source = byId.get(task.reviewedTaskId);
+      if (kind !== 'review' || source?.kind !== 'implementation') errors.push(`${task.id}: 自动返工仅能由独立实现审查授权`);
+      if (source?.inputs === undefined || !source?.outputs?.length || task.outputs?.length !== 0)
+        errors.push(`${task.id}: 自动返工需要实现的显式输入输出，审查不得写文件`);
+      if (source?.outputs?.some(output => !task.inputs?.some(input => input.path === output.path && input.producerTaskId === source.id && !input.sha256)))
+        errors.push(`${task.id}: 自动复验必须读取实现的全部输出，不能固定旧哈希`);
+      if (tasks.some(other => other.id !== task.id && other.maxReworkRounds && other.reviewedTaskId === task.reviewedTaskId))
+        errors.push(`${task.id}: 同一实现只能有一个自动返工审查入口`);
+      for (const downstream of tasks) if (downstream.id !== task.id &&
+        (downstream.inputs?.some(input => input.producerTaskId === source?.id) || ancestors(downstream.id).has(source?.id)) && !ancestors(downstream.id).has(task.id))
+        errors.push(`${downstream.id}: 使用返工成果必须等待独立审查 ${task.id}`);
+      if (agents.length && !agents.find(agent => agent.id === owner(source))?.tools?.includes('filesystem'))
+        errors.push(`${task.id}: 原实现员工需读取旧文件版本后修复`);
+    }
     if (agents.length) {
       const employee = agents.find(a => a.id === owner(task));
       if (task.inputs?.length && !employee?.tools?.includes('filesystem')) errors.push(`${task.id}: 输入文件需要工作区读取权限`);

@@ -273,7 +273,7 @@ export function createApp() {
           dependencies: task.dependencies, taskPrompt: `项目需求：${project.requirement}\n\n任务目标：${task.objective}\n\n验收标准：\n${task.acceptanceCriteria.map((criterion: string, index: number) => `${index + 1}. ${criterion}`).join('\n')}`,
           acceptanceCriteria: task.acceptanceCriteria, estimatedInputTokens: task.estimatedInputTokens, estimatedOutputTokens: task.estimatedOutputTokens,
           maxBudget: task.maxBudget, maxModelCalls: task.maxModelCalls, objective: task.objective,
-          ...Object.fromEntries(['kind','inputs','outputs','inScope','outOfScope','verify','reviewedTaskId','sourceTaskId','sourceFindingIds'].filter(key=>task[key]!==undefined).map(key=>[key,task[key]])) }));
+          ...Object.fromEntries(['kind','inputs','outputs','inScope','outOfScope','verify','reviewedTaskId','sourceTaskId','sourceFindingIds','maxReworkRounds'].filter(key=>task[key]!==undefined).map(key=>[key,task[key]])) }));
         const routes = routeRows.map(row => {
           const model = requireRow(catalog.find(item => item.id === row.id));
           const assigned = project.plan.tasks.filter((task: any) => project.plan.agents.some((agent: any) => agent.id === task.assigneeId && (agent.modelId === row.id || agent.fallbackModelId === row.id)));
@@ -326,7 +326,7 @@ export function createApp() {
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
     const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, 300);
-    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), events, summaryEvents: run.events.filter(e => ['team/snapshot','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
+    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || ['team/snapshot','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);

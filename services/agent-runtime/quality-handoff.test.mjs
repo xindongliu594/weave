@@ -74,7 +74,7 @@ async function qualityScenario(mode) {
       assert.ok(results.some(r=>r.args.status==='completed'&&r.result.isError));
       if(mode==='forged-command')assert.equal(approvals,0);
     }else if(mode==='review-revision'){
-      assert.equal(seals.length,1);assert.equal(status.tasks[1].status,'in_progress');assert.ok(events.some(e=>e.type==='handoff/blocked'&&e.data.message.includes('REPLAN_REQUIRED')));
+      assert.equal(seals.length,1);assert.notEqual(status.tasks[1].status,'completed');assert.ok(events.some(e=>e.type==='handoff/blocked'&&e.data.message.includes('REPLAN_REQUIRED')));
     }else{
       assert.equal(status.deliverable,true);assert.equal(seals.length,2);assert.equal(approvals,1);
       assert.equal(status.tasks[0].kind,'implementation');assert.equal(status.tasks[1].kind,'review');assert.equal(status.tasks[1].verdict,'pass');

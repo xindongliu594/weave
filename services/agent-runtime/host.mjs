@@ -9,6 +9,7 @@ import { attachTrace } from './trace.mjs';
 import { installProductTools, employeeFor } from './product-tools.mjs';
 import { assignedTask } from './task-attribution.mjs';
 import { HandoffGate } from './handoff.mjs';
+import { ReworkGate } from './rework.mjs';
 import { EmployeeHostFactory } from './employee-hosts.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
@@ -29,11 +30,13 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const assignments=new Map();let teamId,workspaceRoot;
   let productDispose, captainId, locked = false;
   const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
+  const rework = handoff ? new ReworkGate({ snapshot: product.snapshot, handoff, archive, taskIds, state: teamState, onBlocked: product.onHandoffBlocked }) : undefined;
   function teamState() {
     if (!teamId || !workspaceRoot) throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
     return JSON.parse(readFileSync(join(workspaceRoot, '.agent-teams', teamId, 'team.json'), 'utf8'));
   }
   function taskFor(sessionId) {
+    rework?.check();
     if(sessionId===captainId)return undefined; // Coordination is charged to the project, not an arbitrary task.
     const employee=employeeFor(ctx.agents.get(sessionId),product.snapshot,captainId);
     if(!teamId||!workspaceRoot||!employee)throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
@@ -41,6 +44,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const task=assignedTask(state,sessionId,employee.id,assignments.get(sessionId));assignments.set(sessionId,task);return task;
   }
   function activeWork(agent, requested) {
+    rework?.check();
     const state = teamState(), employee = employeeFor(agent, product.snapshot, captainId);
     const task = requested ? state.tasks.find(t => t.id === requested) : state.tasks.find(t => t.assignee === employee?.id && ['claimed', 'in_progress'].includes(t.status));
     if (!task || !employee || task.assignee !== employee.id || !state.members.some(m => m.id === agent.id && m.name === employee.id) || !['claimed', 'in_progress'].includes(task.status)) throw Error('TASK_NOT_ACTIVE: 工具仅能用于当前分派的任务');
@@ -63,7 +67,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         (!assignments.has(agent.id) && !state.tasks.some(t => t.assignee === employee.id && ['claimed', 'in_progress'].includes(t.status) && t.attemptId)))
       return JSON.stringify({ ...base, status: '等待宿主确认任务分派' });
     const current = taskFor(agent.id), task = state.tasks.find(t => t.id === current.taskId);
-    const contract = product.snapshot.tasks.find(t => t.id === taskIds.get(current.taskId));
+    const contract = rework.contractFor(current.taskId);
     if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
     return JSON.stringify({ ...base, task: { ...contract, taskPrompt: undefined },
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
@@ -137,12 +141,13 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         if (args.attempt_id !== work.attemptId) throw Error('STALE_ATTEMPT: 完成交付物需要当前任务凭证');
         const contract = handoff.tasks.get(work.taskId);
         if (args.status === 'failed') {
-          // The plugin's needs_revision loop creates tasks internally. Stop it before
-          // it can bypass the approved product snapshot and its budget/permissions.
-          if (['review', 'requirements'].includes(contract.kind) && args.verdict === 'needs_revision') {
-            const blocked = handoff.block(work.taskId, work.attemptId, Error('REPLAN_REQUIRED: 审查需要修订，请重新批准修复方案'));
-            product.onHandoffBlocked?.(blocked); throw blocked;
-          }
+          if (['review', 'requirements'].includes(contract.kind) && ['needs_revision', 'reject'].includes(args.verdict))
+            return handoff.exclusive(exec.signal, async () => {
+              archive.append('quality/review-submitted', { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId, verdict: args.verdict, findings: args.findings }, { sessionId: exec.agent.id, taskId: work.taskId, attemptId: work.attemptId });
+              rework.prepare(work, args);
+              try { const result = await next(); rework.finish(result); return result; }
+              catch (error) { rework.pending = undefined; throw error; }
+            });
           return next();
         }
         return handoff.exclusive(exec.signal, async () => {
@@ -156,14 +161,17 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
           handoff.stage(record);
           try {
             const result = await next();
-            if (result.isError) handoff.rollback(record, previous); else handoff.commit(record);
+            if (result.isError) handoff.rollback(record, previous); else {
+              handoff.commit(record);
+              if (['review','requirements'].includes(contract.kind)) archive.append('quality/reviewed', { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId, verdict: args.verdict, findings: args.findings ?? [], reworkRound: contract.reworkRound ?? 0, inputs: record.inputs }, { sessionId: exec.agent.id, taskId: work.taskId, attemptId: work.attemptId });
+            }
             return result;
           } catch (error) { handoff.rollback(record, previous); throw error; }
         });
       });
     }
     if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined);
-    if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId);return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId:taskIds.get(request.taskId)??request.taskId};};
+    if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId),taskId=taskIds.get(request.taskId)??request.taskId;return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId,runtimeTaskId:request.taskId,reworkRound:rework?.contractFor(request.taskId)?.reworkRound};};
     await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: sessionRoot, compression: 'none' });
     // Idle continuable members can be disposed between assignments. Their next
     // task needs the public query service to read and resume the saved session.
@@ -186,12 +194,14 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       close,
       lockPlan() { locked = true; },
       handoffStatus() { return handoff?.summary() ?? []; },
+      hasBlockingFailure(tasks) { return rework ? rework.hasBlockingFailure(tasks) : tasks.some(task => task.status === 'failed'); },
       async verifyDeliverable(signal) {
         if (!handoff) return;
         await handoff.exclusive(signal, () => {
+          rework.check();
           const state = teamState();
           for (const contract of handoff.tasks.values()) {
-            const task = state.tasks.find(t => taskIds.get(t.id) === contract.id);
+            const task = state.tasks.findLast(t => taskIds.get(t.id) === contract.id);
             if (task?.status !== 'completed' || handoff.accepted.get(contract.id)?.attemptId !== task.attemptId)
               throw Error('HANDOFF_NOT_COMMITTED: ' + contract.id);
           }

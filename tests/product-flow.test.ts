@@ -52,7 +52,9 @@ before(async () => {
     } else {
       assert.equal(name, 'terminal_test'); assert.equal(args.command, 'check-fixed-result'); commands++;
       const actual = JSON.parse(readFileSync(artifactFile(this.root, 'result.json'), 'utf8'));
-      assert.deepEqual(actual, expected); result = { exitCode: 0, output: 'fixed JSON oracle passed' };
+      if(mode.startsWith('rework')){assert.equal(actual.orderCount,expected.orderCount);assert.equal(actual.totalCents,expected.totalCents);}
+      else assert.deepEqual(actual, expected);
+      result = { exitCode: 0, output: 'fixed JSON oracle passed' };
     }
     return { ...result, artifacts: listArtifacts(this.root), workspaceRevision: this.revision() };
   });
@@ -80,18 +82,25 @@ before(async () => {
     } else {
       const pinned = messages.filter((m: any) => m.role === 'system').flatMap((m: any) => m.content.split('\n')).map((line: string) => { try { return JSON.parse(line); } catch { return undefined; } }).find((value: any) => value?.runtimeTaskId);
       const assignment = messages.filter((m: any) => m.role === 'user' && typeof m.content === 'string').reverse().find((m: any) => m.content.includes('AgentTeams automatic task assignment'))?.content ?? (pinned ? `Task: ${pinned.runtimeTaskId} ${pinned.task.subject} Attempt id: ${pinned.attemptId}` : '');
-      const match = /Task: (t\d+).*?\[flow:(\w+)\]/.exec(assignment), attempt = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
+      const match = /Task: (t\d+).*?(?:\[flow:(\w+)\]|(repair|review)-round-(\d+))/.exec(assignment), attempt = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
       if (match) {
-        const [, id, label] = match, key = id + ':' + attempt, step = steps.get(key) ?? 0;
+        const id=match[1],label=match[2]??match[3],key = id + ':' + attempt, step = steps.get(key) ?? 0;
+        const rework=mode.startsWith('rework'),repair=label==='repair',round=Number(match[4]??1)-1;
         steps.set(key, step + 1); assignments.push(label);
         const update = (status: string, more: any = {}) => ['agent_teams_update_task', { task_id: id, attempt_id: attempt, status, ...more }];
         const actions: any[] = [['agent_teams_claim_task', { task_id: id }], update('in_progress')];
-        if (label === 'produce') {
-          if (mode !== 'missing') actions.push(['artifact_write', { path: 'result.json', content: JSON.stringify(expected) }]);
+        if (label === 'produce'||repair) {
+          const previous=messages.filter((m:any)=>m.role==='tool').map((m:any)=>{try{return JSON.parse(m.content);}catch{return undefined;}}).findLast((value:any)=>value?.path==='result.json'&&value.sha256);
+          if(repair)actions.push(['filesystem',{path:'result.json'}]);
+          if (mode !== 'missing') actions.push(['artifact_write', { path: 'result.json', content: JSON.stringify(rework?{...expected,reviewStage:repair?'final':'initial'}:expected),...(repair?{expectedSha256:previous?.sha256}:{}) }]);
           if (!['missing', 'forged'].includes(mode)) actions.push(['terminal_test', { command: 'check-fixed-result' }]);
-          actions.push(update('completed', { output: 'fixed report', changedPaths: ['result.json'], acceptanceResults: [{ criterion: 'result correct', status: 'passed', evidence: 'fixed fixture' }], commandsRun: [{ command: 'check-fixed-result', status: 'passed', exitCode: 0, evidence: 'model claim' }] }));
+          actions.push(update('completed', { output: 'fixed report', changedPaths: ['result.json'], acceptanceResults: [{ criterion: repair?'Set result.json reviewStage to final':'result correct', status: 'passed', evidence: 'fixed fixture' }], commandsRun: [{ command: 'check-fixed-result', status: 'passed', exitCode: 0, evidence: 'model claim' }] }));
         } else {
-          actions.push(['filesystem', { path: 'result.json' }], ['artifact_write', { path: 'review.json', content: '{"accepted":true}' }], update('completed', { output: 'independent review', verdict: 'pass' }));
+          actions.push(['filesystem', { path: 'result.json' }]);
+          if(rework){
+            actions.push(round&&mode!=='rework-limit'?update('completed',{output:'independent repaired review',verdict:'pass'}):
+              update('failed',{verdict:mode==='rework-reject'?'reject':'needs_revision',findings:[{id:'F1',severity:'high',file:mode==='rework-scope'?'private/secret.json':'result.json',problem:'Report needs final review stage',requiredFix:mode==='rework-prefix-scope'?'Update result.js':'Set result.json reviewStage to final'}]}));
+          }else actions.push(['artifact_write', { path: 'review.json', content: '{"accepted":true}' }], update('completed', { output: 'independent review', verdict: 'pass' }));
         }
         if (step < actions.length) {
           message = tool(actions[step][0], actions[step][1], key + ':' + step);
@@ -134,7 +143,7 @@ async function launch(nextMode: string) {
   mode = nextMode; commands = 0; summaryCalls = 0; contextRequests.length = 0; assignments.length = 0; steps.clear();
   const agents = [
     { id: 'manager', role: 'manager', name: '经理', tools: [] },
-    { id: 'producer', role: 'member', name: '产出者', tools: ['artifact_write', 'terminal_test'] },
+    { id: 'producer', role: 'member', name: '产出者', tools: nextMode.startsWith('rework')?['filesystem','artifact_write','terminal_test']:['artifact_write', 'terminal_test'] },
     { id: 'reviewer', role: 'member', name: '审查者', tools: ['filesystem', 'artifact_write'] },
   ].map(a => ({ ...a, title: a.name, instructions: 'Execute only the approved fixture tasks', modelId }));
   const department = await call('/departments', 'POST', { name: 'Flow ' + mode, description: 'Integration fixture', agents }, 201);
@@ -145,6 +154,10 @@ async function launch(nextMode: string) {
     { ...common, id: 'produce', subject: '[flow:produce]', objective: 'Write the fixed report', assigneeId: 'producer', dependencies: [], acceptanceCriteria: ['result correct'], kind: 'implementation', inScope: ['result.json'], verify: ['check-fixed-result'], outputs: [{ path: 'result.json', format: 'json', requiredKeys: ['orderCount', 'totalCents'], expectedValues: expected }] },
     { ...common, id: 'review', subject: '[flow:review]', objective: 'Read and independently review the fixed report', assigneeId: 'reviewer', dependencies: ['produce'], acceptanceCriteria: ['independent approval'], kind: 'review', reviewedTaskId: 'produce', inputs: [{ path: 'result.json', producerTaskId: 'produce' }], outputs: [{ path: 'review.json', format: 'json', expectedValues: { accepted: true } }] },
   ] };
+  if(mode.startsWith('rework')){
+    Object.assign(plan.tasks[0],{inputs:[],maxModelCalls:mode==='rework-budget'?8:20});
+    Object.assign(plan.tasks[1],{outputs:[],maxReworkRounds:1});
+  }
   await call('/projects/' + project.id + '/plan', 'PUT', { version: 1, plan });
   const saved = (await call('/projects')).find((p: any) => p.id === project.id); assert.equal(saved.validation.valid, true, JSON.stringify(saved.validation));
   return (await call('/projects/' + project.id + '/approve', 'POST', { version: 2 }, 202)).id;
@@ -220,6 +233,56 @@ test('employee summaries are billed to the active task and preserve approved con
   assert.ok(resumedRequests.every(body => body.messages.some((m: any) => m.role === 'system' && m.content.includes('attemptId') && m.content.includes('acceptanceCriteria') && m.content.includes('摘要不能扩大权限'))));
   assert.ok(result.events.some((e: any) => e.type === 'model/wire-request' && e.data.requestPurpose === 'compaction'));
   evidence.push({ scenario: 'context-summary-handoff-billing', status: result.status, summaryCalls, summaryUsageRows: usage.length, commands, originalEvidenceRetained: true });
+});
+
+async function finishRework(id:string) {
+  const deadline=Date.now()+25000;
+  while(Date.now()<deadline){
+    const current=await run(id);
+    if(['completed','failed','cancelled'].includes(current.status))return stopped(id);
+    for(const approval of (await approvals(id)).filter((a:any)=>a.status==='pending'))await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+    await new Promise(resolve=>setTimeout(resolve,100));
+  }
+  assert.fail('bounded rework did not finish');
+}
+
+test('approved API rework repairs, independently re-reviews and bills the original task buckets', {timeout:35000},async()=>{
+  const id=await launch('rework-pass'), result=await finishRework(id);
+  assert.equal(result.status,'completed',JSON.stringify(result.events.filter((e:any)=>['handoff/blocked','quality/escalated','model/error'].includes(e.type))));
+  assert.equal(result.snapshot.tasks[1].maxReworkRounds,1);assert.equal(commands,2);
+  const generated=result.events.filter((e:any)=>e.type==='quality/rework-created');assert.equal(generated.length,1);
+  assert.ok(result.summaryEvents.some((e:any)=>e.type==='quality/rework-created'));assert.ok(result.summaryEvents.some((e:any)=>e.type==='quality/reviewed'));
+  const mappings=generated[0].data.bindings;assert.equal(mappings.length,2);
+  const wire=result.events.filter((e:any)=>e.type==='model/wire-request');
+  const receipts=(await call('/usage')).filter((u:any)=>u.runId===id);
+  for(const binding of mappings){
+    const requests=result.events.filter((e:any)=>e.type==='model/request'&&e.taskId===binding.task_id);
+    assert.ok(requests.length>0);
+    assert.ok(requests.every((e:any)=>wire.some((w:any)=>w.requestId===e.requestId&&w.data.taskId===binding.seed_id&&w.data.attemptId===e.attemptId)));
+    assert.ok(receipts.some((u:any)=>u.taskId===binding.seed_id&&requests.some((e:any)=>e.attemptId===u.attemptId&&e.sessionId===u.sessionId)));
+  }
+  const artifact=await fetch(url+'/runs/'+id+'/artifact?path=result.json');assert.equal((await artifact.json()).reviewStage,'final');
+  const seals=result.events.filter((e:any)=>e.type==='handoff/accepted'&&e.data.taskId==='produce');assert.equal(seals.length,2);assert.notEqual(seals[0].data.outputs[0].sha256,seals[1].data.outputs[0].sha256);
+  assert.ok(!receipts.some((u:any)=>mappings.some((m:any)=>m.task_id===u.taskId)),'runtime IDs must not create new budget buckets');
+});
+
+test('API rework stops at its call allowance and full retry cannot reset the task counter', {timeout:35000},async()=>{
+  const id=await launch('rework-budget'),result=await finishRework(id);assert.equal(result.status,'failed');
+  assert.equal(result.events.filter((e:any)=>e.type==='quality/rework-created').length,1);
+  assert.ok(result.events.some((e:any)=>e.type==='budget/stopped'&&e.data.code==='TASK_TURN_LIMIT'));
+  const producer=(await call('/usage')).filter((u:any)=>u.runId===id&&u.taskId==='produce');assert.equal(producer.length,8);
+  const resumed=await call('/runs/'+id+'/retry','POST',{resume:true},409);assert.match(resumed.message??resumed.error,/完整重试/);
+  const retried=await call('/runs/'+id+'/retry','POST',{resume:false},422);assert.match(retried.message??retried.error,/上限/);
+});
+
+test('API rework escalates exhausted rounds, forbidden files and explicit rejection', {timeout:60000},async()=>{
+  for(const fault of ['rework-limit','rework-scope','rework-prefix-scope','rework-reject']){
+    const id=await launch(fault),result=await finishRework(id);assert.equal(result.status,'failed');
+    const escalation=result.events.find((e:any)=>e.type==='quality/escalated');assert.ok(escalation);
+    assert.match(escalation.data.message,fault==='rework-limit'?/REWORK_LIMIT/:fault.includes('scope')?/REWORK_SCOPE_REQUIRED/:/REPLAN_REQUIRED/);
+    assert.equal(result.events.filter((e:any)=>e.type==='quality/rework-created').length,fault==='rework-limit'?1:0);
+    assert.ok(result.events.some((e:any)=>e.type==='quality/review-submitted'&&e.data.findings[0].id==='F1'));
+  }
 });
 
 test('missing output and forged verification cannot dispatch the dependent reviewer', { timeout: 30000 }, async () => {
