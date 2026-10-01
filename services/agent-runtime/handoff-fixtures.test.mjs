@@ -122,11 +122,13 @@ async function runScenario(scenario) {
   async function until(predicate) {
     // Five persisted task handoffs include cold Host resumes. Windows fsync and
     // the per-employee context plugins must fit without relying on a fast disk.
-    const deadline = Date.now() + 15000;
+    const deadline = Date.now() + 20000;
     while (Date.now() < deadline) {
       if (errors.length) throw errors[0];
       if (await predicate()) return;
-      await new Promise(resolveWait => setTimeout(resolveWait, 10));
+      // Status probes also persist trace events. A tight poll loop competes
+      // with task and report fsync on Windows CI and can starve final delivery.
+      await new Promise(resolveWait => setTimeout(resolveWait, 100));
     }
     const last = readRun(root, archive.id);
     throw Error('FIXTURE_TIMEOUT: ' + scenario + ' ' + JSON.stringify({
@@ -244,9 +246,9 @@ async function runScenario(scenario) {
 
 test('fixture: valid files flow through independent sessions with the same model', { timeout: 30000 }, () => runScenario('happy'));
 test('fixture: real output 1798 fails the oracle, preapproved repair produces 4095', { timeout: 30000 }, () => runScenario('repair'));
-test('fixture: failed upstream task keeps all dependents pending', { timeout: 20000 }, () => runScenario('failed-upstream'));
-test('production handoff gate rejects missing output and never dispatches the dependent', { timeout: 20000 }, () => runScenario('missing-file'));
-test('production input gate stops a changed accepted file before the consumer model request', { timeout: 20000 }, () => runScenario('stale-input'));
+test('fixture: failed upstream task keeps all dependents pending', { timeout: 30000 }, () => runScenario('failed-upstream'));
+test('production handoff gate rejects missing output and never dispatches the dependent', { timeout: 30000 }, () => runScenario('missing-file'));
+test('production input gate stops a changed accepted file before the consumer model request', { timeout: 30000 }, () => runScenario('stale-input'));
 
 test('fixture oracle rejects a changed input version; this is not a production scheduling gate', async () => {
   const root = await mkdtemp(join(tmpdir(), 'handoff-version-'));
