@@ -69,6 +69,7 @@ export const taskSchema = z.object({
   reviewedTaskId: z.string().min(1).max(64).optional(),
   sourceTaskId: z.string().min(1).max(64).optional(),
   sourceFindingIds: z.array(z.string().min(1).max(100)).max(30).optional(),
+  maxReworkRounds: z.number().int().min(0).max(2).optional(),
 });
 export const runInputSchema = z.object({
   id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/),

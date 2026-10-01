@@ -118,7 +118,7 @@ export class ProductDshRuntime {
         status = await host.call(captain, 'agent_teams_status', {}, AbortSignal.any([job.controller.signal, AbortSignal.timeout(15_000)]));
         if (status.members.some(member => member.spawn_error)) throw new Error('AgentTeams member startup failed');
         if (status.deliverable) { await host.verifyDeliverable(job.controller.signal); break; }
-        if (status.tasks.some(task => task.status === 'failed')) throw new Error('前置任务失败，相关下游未执行；请检查记录后重新制定方案');
+        if (host.hasBlockingFailure(status.tasks)) throw new Error('前置任务失败，相关下游未执行；请检查记录后重新制定方案');
         const terminal = status.tasks.length > 0 && status.tasks.every(task => ['completed', 'failed', 'cancelled'].includes(task.status));
         if (terminal) throw new Error('Team finished without a deliverable');
         const parked = status.tasks.some(task => ['claimed', 'in_progress'].includes(task.status)) && status.members.every(member => member.status === 'idle');

@@ -103,7 +103,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const reservation = (inputUpperBound * route.inputRate + maxTokens * route.outputRate) / 1e6;
     const attribution={ ...(this.attribution?.(options.sessionId)??{sessionId:options.sessionId}), requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution' };
     let ticket;
-    try { ticket=this.budget.reserve(reservation,attribution,options.fallbackAttempted??false); }
+    try { ticket=this.budget.reserve(reservation,attribution,!!options.fallbackAttempted || !!attribution.reworkRound); }
     catch(error) { this.onError?.(error);throw error; }
     this.calls++;this.reserved+=reservation;
     let reservationHeld=true;

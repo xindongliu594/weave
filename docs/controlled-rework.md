@@ -1,0 +1,64 @@
+# 受控返工与独立复验
+
+2026-10-01。C2 接通批准范围内的原生 repair / review 闭环，不修改锁定的 DSH 或 AgentTeams 依赖。
+
+## 批准时配置
+
+在方案的独立审查任务中选择“允许自动返工”：0（默认，停止并交给用户处理）、1 或 2 轮。`maxReworkRounds` 随方案版本和运行快照保留；已有方案未填写时不获得自动返工授权。
+
+开启的审查必须绑定另一位员工负责的 implementation。实现要显式声明 `inputs`（无输入用 `[]`）、`outputs`、`inScope` 和 `verify`，原实现员工还需要 `filesystem` 来读取待修文件的 SHA256。审查必须只读（`outputs: []`），按 `producerTaskId` 读取实现的全部输出，不能固定这些可返工文件的旧哈希。同一实现只能有一个自动返工审查入口，所有依赖实现的后续任务必须等待这个审查；每轮所需命令检查放在实现的 `verify` 中。
+
+下面是两个任务的配置示例，负责人和模型需使用实际方案成员，终端命令必须适合工作区：
+
+```json
+[
+  {
+    "id": "build", "kind": "implementation", "subject": "生成报告",
+    "objective": "按批准资料生成报告", "assigneeId": "writer", "dependencies": [],
+    "acceptanceCriteria": ["报告结构完整"],
+    "estimatedInputTokens": 2000, "estimatedOutputTokens": 500,
+    "maxBudget": 0.15, "maxModelCalls": 20,
+    "inputs": [], "outputs": [{"path": "report.json", "format": "json"}],
+    "inScope": ["report.json"], "verify": ["node check-report.mjs"]
+  },
+  {
+    "id": "review", "kind": "review", "subject": "独立审查报告",
+    "objective": "核对报告结论与资料是否一致", "assigneeId": "reviewer",
+    "dependencies": ["build"], "reviewedTaskId": "build",
+    "acceptanceCriteria": ["事实与引用一致"],
+    "estimatedInputTokens": 2000, "estimatedOutputTokens": 500,
+    "maxBudget": 0.1, "maxModelCalls": 15, "maxReworkRounds": 2,
+    "inputs": [{"path": "report.json", "producerTaskId": "build"}], "outputs": []
+  }
+]
+```
+
+示例不会导入 `check-report.mjs`。文件必须已进入本次工作区，或来自前置任务并在实际合同中声明。
+
+## 执行与交付
+
+独立审查提交 `needs_revision` 时，需要结构化 `findings`：唯一的 `id`、`severity`（low / medium / high / blocker）、`problem`、`requiredFix`，以及可选 `file`、`line`。至少一个问题未解决，问题数量最多 30 个。
+
+AgentTeams 原生创建修复与下一轮审查，并调整仍待执行的下游依赖。产品在工具返回和员工准入时核对持久任务状态：原员工修复、原审查员工复验，任务来源、依赖、轮次、问题编号、验证命令、修改范围和禁止范围均须匹配批准合同。未通过准入的生成提案不能发出员工模型请求或操作文件。产品没有复制调度器或直接写团队状态文件。
+
+修复读取上一轮宿主已验收输出的实际版本，文件覆盖仍须条件 SHA256。每轮修复重新核验真实命令、工作区版本和实际修改路径，原实现的命令记录不能代替新一轮证据。复验通过之后，下游使用原产出任务 ID 读取最新已验收版本；旧文件哈希不被当作新结果。失败的历史审查保留，只有已授权且有完整后继图的失败会被视为已进入返工，其他失败仍阻止交付。
+
+锁定插件从修复要求提取路径时，可能在 `.json` 中额外匹配 `.js` 前缀。产品仅在文本明确指向批准的完整 JSON 路径、且没有单独要求 JS 路径时归一到完整路径；实际文件与终端审计仍只允许批准路径。明确要求改 `result.js` 不会因已批准 `result.json` 而获准。
+
+## 预算、停止和查看
+
+修复继续计入原实现任务，复验继续计入原审查任务；不创建新的费用或调用次数额度。摘要请求也共享这些上限。项目、任务、部门每日预算及模型和工具授权继续生效，达到项目或所属任务费用的 90% 时拒绝自动返工调用。终端仍逐次等待用户审批。
+
+超出批准轮次、明确 `reject`、未授权返工、需要新文件范围或原生提案不符合合同时停止，记录结构化问题与原因。费用/调用次数/期限限制也会停止后续执行，实际发生的费用保留。用户检查已有产物后，可以修改方案、权限或预算，保存新版本并重新批准。
+
+执行页显示审查问题、返工轮次、独立复验结果和升级原因；分页的摘要事件包含完整质量及交接状态。时间线与导出保留原生任务编号、批准任务编号、attempt、员工会话、文件版本、模型请求和费用预留。修复和复验账单仍归原任务，预留上下文另保存运行时任务编号与返工轮次。
+
+包含自动返工的运行暂不支持跳过任务检查点恢复，因为原生任务身份已变化；界面禁用对应恢复按钮，后端也拒绝。用户检查产物后可明确完整重试，继续累计原方案已用费用和模型调用次数，不能靠重试重置额度。这一限制留待 C3 恢复阶段处理。
+
+## 验证边界
+
+本地 Windows / Node 24.15.0：非 Docker 运行时 62/62、模拟 API 流程 18/18、规则 14/14、桌面连接 1/1、检查点 1/1，共 96 项，TypeScript/Vite 构建与依赖检查通过。新增实际 DSH 场景覆盖成功返工、两轮失败停止、范围拒绝、明确拒绝、共享调用上限、伪造命令拒绝、旧哈希覆盖拒绝、重复问题编号拒绝；适配器证明 90% 阈值在发送前拒绝。API/队列/持久计费场景验证费用归属、额度继承、复验和升级处理。
+
+实现提交 `66521543c58ab3e0da6f729c166f454064899e27` 的 [核心 CI run 36841752444](https://github.com/xindongliu594/agent-department/actions/runs/36841752444) 四项作业全部成功：Node 22.19.0 的 Windows/macOS/Linux 核心验证，真实 PostgreSQL/pgvector 后端 63/63 和真实 Docker 沙箱 2/2。
+
+自动化使用本地协议模型及固定文件执行器，证明流程和约束行为；独立模型的审查仍不能代替真实业务质量验收。本机无 Docker，由云端完成真实 PostgreSQL/Docker 验证；真实中转模型与远程部署继续待验收。

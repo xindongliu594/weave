@@ -13,7 +13,7 @@ export async function budgetHistory(db:Pick<pg.PoolClient,'query'>,traceRoot:str
       throw new AppError(409,'缺少此前执行档案，无法核对模型调用上限，请先恢复备份','BUDGET_HISTORY_MISSING');
     }
     if(archive.integrity!=='ok')throw new AppError(409,'此前执行档案不完整，不能重置模型调用上限','BUDGET_HISTORY_MISSING');
-    const mapping=new Map<string,string>((archive.events.find(e=>e.type==='run/task-mapping')?.data.tasks??[]).map((t:any)=>[t.task_id,t.seed_id]));
+    const mapping=new Map<string,string>(archive.events.filter(e=>e.type==='run/task-mapping').flatMap(e=>e.data.tasks??[]).map((t:any)=>[t.task_id,t.seed_id]));
     const sessions=new Map<string,string>();
     for(const event of archive.events) {
       if(event.type==='model/request'&&event.sessionId&&event.taskId)sessions.set(event.sessionId,mapping.get(event.taskId)??event.taskId);

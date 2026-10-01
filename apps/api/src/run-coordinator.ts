@@ -37,7 +37,7 @@ export class RunCoordinator {
     const agent=run.snapshot.agents.find((item:any)=>item.id===data.agentId||item.employeeId===data.employeeId)??(!data.agentId&&!data.employeeId?run.snapshot.agents[0]:undefined);
     if(!agent)throw new AppError(422,'调用员工不在批准快照中');
     const billingDepartmentId=agent.sourceDepartmentId??run.snapshot.departmentId;
-    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,authorize:async(db,row)=>{await assertRunAuthorization(row,db);await assertRunModels(row.snapshot,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
+    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,authorize:async(db,row)=>{await assertRunAuthorization(row,db);await assertRunModels(row.snapshot,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();

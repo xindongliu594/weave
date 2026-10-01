@@ -38,3 +38,23 @@ test('quality tasks require command grants, scope, valid references and an indep
   assert.equal(validatePlan(plan,policy,[model]).valid,true);
   plan.agents[0].tools=['artifact_write','filesystem'];assert.equal(validatePlan(plan,policy,[model]).valid,false);
 });
+
+test('automatic rework is explicit, bounded, read-only in review and gates all consumers',()=>{
+  const plan=structuredClone(base);
+  plan.tasks[0]={...plan.tasks[0],kind:'implementation',inputs:[],inScope:['data.json'],verify:['node check.mjs']};
+  plan.agents.push({...plan.agents[0],id:'reviewer',role:'member',tools:['filesystem']});
+  plan.tasks[1]={...plan.tasks[1],kind:'review',assigneeId:'reviewer',reviewedTaskId:'produce',outputs:[],maxReworkRounds:2};
+  assert.equal(planSchema.parse(plan).tasks[1].maxReworkRounds,2);assert.equal(validatePlan(plan,policy,[model]).valid,true);
+  for(const mutate of [
+    (p:Plan)=>{p.tasks[1].maxReworkRounds=3;},
+    (p:Plan)=>{p.tasks[1].kind='work';},
+    (p:Plan)=>{delete p.tasks[0].inputs;},
+    (p:Plan)=>{p.tasks[1].inputs=[];},
+    (p:Plan)=>{p.tasks[1].inputs![0].sha256='a'.repeat(64);},
+    (p:Plan)=>{p.tasks[1].outputs=[{path:'review.md'}];},
+    (p:Plan)=>{p.agents[0].tools=['artifact_write','terminal_test'];},
+    (p:Plan)=>{p.tasks.push({...base.tasks[1],id:'deliver'});},
+    (p:Plan)=>{p.tasks.push({...base.tasks[1],id:'textConsumer',inputs:undefined});},
+    (p:Plan)=>{p.tasks.push({...p.tasks[1],id:'otherReview'});},
+  ]){const invalid=structuredClone(plan);mutate(invalid);assert.equal(validatePlan(invalid,policy,[model]).valid,false);}
+});

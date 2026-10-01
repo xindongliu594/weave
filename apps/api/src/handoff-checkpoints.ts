@@ -3,6 +3,8 @@ import { taskContractErrors } from '../../../packages/contracts/task-contracts.m
 
 /** Retain only host seals belonging to the exact completed attempt in the archive. */
 export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string) {
+  if (events.some(event=>event.type==='quality/rework-created'))
+    throw Error('自动返工改变了原生任务身份，暂不能跳过检查点；请检查产物后完整重试，费用和调用上限继续累积');
   const records = new Map<string,any>((snapshot.handoffCheckpoints??[]).map((record:any)=>[record.taskId,record]));
   for (const [id, task] of completed) {
     const contract = snapshot.tasks.find((item:any)=>item.id===id);

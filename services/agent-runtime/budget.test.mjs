@@ -58,6 +58,17 @@ test('adapter counts fallback against the same task and refuses it before a seco
   await assert.rejects(consume(adapter),e=>e.code==='TASK_TURN_LIMIT');assert.equal(calls,1);assert.equal(adapter.reserved,0);assert.equal(adapter.budget.run.reserved,0);
  }finally{globalThis.fetch=original;}
 });
+
+test('automatic rework is refused at 90 percent of the original task budget before dispatch',async()=>{
+ const original=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;throw Error('must not fetch');};
+ try{
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:2,tasks:[{id:'task',assigneeId:'employee',maxBudget:1}],taskUsage:{task:{cost:.9,calls:3}}});
+  adapter.attribution=()=>({taskId:'task',employeeId:'employee',reworkRound:1});
+  await assert.rejects(consume(adapter),e=>e.code==='BUDGET_RETRY_DISABLED');
+  assert.equal(calls,0);assert.equal(adapter.budget.tasks.get('task').calls,3);assert.equal(adapter.budget.run.reserved,0);
+ }finally{globalThis.fetch=original;}
+});
 test('adapter persists an excessive actual receipt before stopping and does not emit its tool call',async()=>{
  const original=globalThis.fetch,usage=[],events=[];
  globalThis.fetch=async()=>Response.json({choices:[{message:{tool_calls:[{id:'call',function:{name:'artifact_write',arguments:'{}'}}]}}],usage:{prompt_tokens:0,completion_tokens:100}});
