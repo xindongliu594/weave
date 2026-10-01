@@ -43,3 +43,5 @@ Windows 在调用用户命令前把执行进程加入 kill-on-close Job Object�
 - `node apps/desktop/local.smoke.cjs`：真实 Electron、系统加密存储与原生命令；HTTP 协调端和目录选择对话框使用固定夹具。覆盖本地设置页授权、凭证加密、实际文件/命令、退出取消、重启不重放和停用。Windows 工作流同时运行打包版与安装版，macOS 运行本地 Electron 构建。
 
 真实模型业务质量、线上部署、浏览器/桌面应用控制、正式签名和自动升级留待后续，不由以上固定夹具验证代替。
+
+2026-10-01 实现提交 `f14b5f616bcb41986ae501c336288f502e675ad8` 已通过六项 CI：[核心三系统及真实 PostgreSQL/Docker](https://github.com/xindongliu594/agent-department/actions/runs/36866089649)、[Windows 打包版/安装版和 macOS 原生桌面](https://github.com/xindongliu594/agent-department/actions/runs/36866089346)。本地共 117 项测试和 4 项固定 API 的 Chrome 页面验证通过，详见 [完成度复核](completion-audit.md)。
