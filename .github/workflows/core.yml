@@ -1,0 +1,69 @@
+name: Core verification
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: core-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  portable:
+    name: Portable core (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.19.0
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            services/agent-runtime/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix services/agent-runtime
+      - run: npm run build
+      - run: npm run test:rules
+      - run: npm run runtime:inspect
+      - run: npm run runtime:test:portable
+      - run: npm run test:integration
+      - run: node --test apps/desktop/connection.test.cjs
+  backend:
+    name: PostgreSQL and Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.19.0
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            services/agent-runtime/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix services/agent-runtime
+      - name: Start isolated database and install sandbox image
+        run: |
+          docker compose -p agent-department-ci -f infra/compose.yml up -d --wait
+          docker pull node:22.19.0-bookworm-slim
+      - run: python3 scripts/install-embedding-model.py
+      - run: npm test
+      - run: node --test services/agent-runtime/sandbox.test.mjs
+      - name: Database diagnostics on failure
+        if: failure()
+        run: docker compose -p agent-department-ci -f infra/compose.yml logs
+      - name: Remove CI database
+        if: always()
+        run: docker compose -p agent-department-ci -f infra/compose.yml down --volumes

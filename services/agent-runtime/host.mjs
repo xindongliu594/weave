@@ -9,12 +9,13 @@ import { attachTrace } from './trace.mjs';
 import { installProductTools, employeeFor } from './product-tools.mjs';
 import { assignedTask } from './task-attribution.mjs';
 import { HandoffGate } from './handoff.mjs';
+import { EmployeeHostFactory } from './employee-hosts.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
 const baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
 
-/** Integration host, not yet the product execution adapter. Only team tools are mounted. */
+/** Department coordination Host; execution loops live in employee-owned Hosts. */
 export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product }) {
   if (!sessionRoot || !isAbsolute(sessionRoot)) throw new Error('An absolute, dedicated sessionRoot is required');
   const ctx = new Context();
@@ -22,6 +23,8 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const handles = [];
   let closing;
   let trace;
+  let employees;
+  let removeFactory;
   const taskIds = new Map();
   const assignments=new Map();let teamId,workspaceRoot;
   let productDispose, captainId, locked = false;
@@ -54,8 +57,14 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   function close() {
     return closing ??= (async () => {
       const failures = [];
-      for (const item of [...handles].reverse().concat([...fibers].reverse())) {
+      employees?.stopAdmission();
+      for (const item of [...handles].reverse()) {
         try { await item.dispose(); } catch (error) { failures.push(error); }
+      }
+      try { await employees?.close(); } catch (error) { failures.push(error); }
+      try { await removeFactory?.(); } catch (error) { failures.push(error); }
+      for (const fiber of [...fibers].reverse()) {
+        try { await fiber.dispose(); } catch (error) { failures.push(error); }
       }
       trace?.dispose();
       productDispose?.();
@@ -138,7 +147,11 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     // Idle continuable members can be disposed between assignments. Their next
     // task needs the public query service to read and resume the saved session.
     await mount('@deepseek-ai/dsh-session-query');
-    await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
+    employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
+      identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,
+      loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
+    removeFactory = ctx.agents.setFactory(employees);
+    archive?.append('runtime/architecture', { version: 'employee-host-v1', isolation: 'host', process: 'shared', coordinatorOwns: ['team', 'budget', 'permissions', 'handoff'] });
     await mount('@deepseek-ai/dsh-subagent');
     await mount('@deepseek-ai/dsh-subagent-spawn-in-process', { providerName: 'spawn' });
     const fiber = ctx.plugin(teams, { stateDir: '.agent-teams', memberProvider: 'spawn', memberMaxDepth: 0, maxMembers, slashCommand: false });
@@ -146,6 +159,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     await fiber.await();
     return {
       ctx,
+      employeeHosts() { return employees.list(); },
       close,
       lockPlan() { locked = true; },
       handoffStatus() { return handoff?.summary() ?? []; },
@@ -178,6 +192,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       async call(agent, name, args = {}, signal = AbortSignal.timeout(15_000)) {
         trace?.check();
         if (!agent) throw new Error('A live calling agent is required');
+        if (ctx.agents.get(agent.id) !== agent) throw new Error('EMPLOYEE_NOT_LIVE: 员工宿主已释放');
         const result = await agent.ctx.tools.execute({ callId: randomUUID(), name, arguments: args, agent, signal });
         if (result.isError) throw new Error(`${name}: ${JSON.stringify(result.error)}`);
         trace?.check();

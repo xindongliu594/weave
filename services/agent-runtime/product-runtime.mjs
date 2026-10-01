@@ -29,7 +29,7 @@ export class ProductDshRuntime {
   }
 
   async inspect() {
-    return { ready: true, reason: 'DSH + AgentTeams：受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。' };
+    return { ready: true, reason: 'DSH + AgentTeams：员工独立宿主、受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。' };
   }
 
   async start({ runId, approvedSnapshot, routes }) {

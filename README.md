@@ -40,6 +40,7 @@ API Key 使用本机生成的 AES-256-GCM 密钥加密保存。主密钥位于 `
 - [v0.2 验收与使用说明](docs/v0.2.md)
 - [功能清单](docs/completion-plan.md)
 - [下一阶段待办：员工运行时调整与桌面本机操作](docs/next-stage-plan.md)
+- [员工独立运行时与核心 CI](docs/employee-runtime.md)
 
 模型预算采用输入字节数与最大输出的保守预留，实际费用按返回 Token 和配置单价记录。价格以中转站实际账单为准。备用模型仅在明确 HTTP 429/503 后切换一次，必须提前配置；不自动重放结果未知的请求。规划、连接测试和执行共用持久费用预留及全局/部门每日限额；未知费用保留至用户核对。
 
@@ -64,6 +65,8 @@ npm run runtime:inspect
 npm run runtime:test
 scripts/verify-clean-install.sh
 ```
+
+无需 PostgreSQL、Docker 或付费模型的跨平台检查：`npm run test:rules`、`npm run runtime:test:portable`、`npm run test:integration`。核心 CI 自动在 Windows、macOS、Linux 检查这些路径，并以独立 Linux 作业验证真实 PostgreSQL、Docker 沙箱与本地嵌入模型；工作流与本地验证边界见 [员工独立运行时](docs/employee-runtime.md)。
 
 测试使用当前数据库内随机命名的独立 schema、临时凭证目录和本地协议测试服务器，完成后清理，不调用付费模型。语义测试使用真实本地模型，须先按上方命令下载约 136 MB 固定文件；下载完成后推理无需网络。数据库迁移需要有安装 pgvector 扩展的权限（默认开发数据库已满足）。干净安装脚本会重新安装锁定依赖并创建临时 Compose 卷；需联网、Docker 和可用磁盘空间。默认数据库/API/网页端口分别为 55432/4311/4310，可通过 `POSTGRES_PORT`、`API_PORT`、`WEB_PORT` 覆盖。真实中转站与多 Agent Todo API 验收尚未完成。
 

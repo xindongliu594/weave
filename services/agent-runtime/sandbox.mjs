@@ -39,11 +39,14 @@ else if(x.action==='read'){const file=safe(x.path);if(fs.statSync(file).size>104
 else {let files=[],total=0;function walk(dir){for(const name of fs.readdirSync(dir)){const file=p.join(dir,name),s=fs.lstatSync(file);if(s.isSymbolicLink())continue;if(s.isDirectory())walk(file);else if(s.isFile()){if(files.length>=128||s.size>5242880||(total+=s.size)>20971520)throw Error('Artifact quota exceeded');files.push({path:p.relative('/workspace',file),content:fs.readFileSync(file).toString('base64')});}}}walk('/workspace');console.log(JSON.stringify(files));}
 }catch(e){console.error(e.message);process.exitCode=1;}});`;
 export class RunSandbox {
+  static async assertReady(signal){
+    await command(['image','inspect',SANDBOX_IMAGE],{signal,limit:100000});
+  }
   constructor(id,root){this.name='agent-department-'+id;this.root=root;this.started=false;this.starting=undefined;this.mutex=new Semaphore(1);}
   async start(signal){
     if(this.started)return;
     return this.starting??=(async()=>{
-      await command(['image','inspect',SANDBOX_IMAGE],{signal,limit:100000});
+      await RunSandbox.assertReady(signal);
       this.started=true;
       await command(['run','-d','--name',this.name,'--network','none','--memory','512m','--cpus','1','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user','1000:1000','--tmpfs','/tmp:rw,noexec,nosuid,size=64m,uid=1000,gid=1000','--tmpfs','/workspace:rw,nosuid,size=128m,uid=1000,gid=1000','--workdir','/workspace',SANDBOX_IMAGE,'sleep','infinity'],{signal});
       this.started=true;mkdirSync(this.root,{recursive:true,mode:0o700});

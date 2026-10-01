@@ -70,6 +70,12 @@ test('real DSH host stages a team without model calls, then starts a dependency-
     assert.equal(blocked.tasks[1].status, 'pending');
     assert.equal(blocked.members[1].activity, 'unspawned');
     assert.ok(!requests.some(r => r.model === 'reviewer'));
+    const liveWriter = host.employeeHosts().find(item => item.agent?.options.model === 'writer').agent;
+    assert.notEqual(liveWriter.ctx.agents, captain.ctx.agents, 'each employee has its own Agent registry');
+    assert.notEqual(liveWriter.ctx.sessions, captain.ctx.sessions, 'each employee has its own Session service');
+    assert.deepEqual(liveWriter.ctx.agents.list().map(agent => agent.id), [liveWriter.id]);
+    assert.equal(liveWriter.ctx.sessions.get(captain.id), undefined);
+    await assert.rejects(host.call(liveWriter, 'agent_teams_create', { name: 'forbidden' }), /UNKNOWN_TOOL|not registered|already belong to team/);
     releaseWriter();
     let status;
     const deadline = Date.now() + 8_000;
@@ -90,7 +96,7 @@ test('real DSH host stages a team without model calls, then starts a dependency-
     assert.ok(!memberTools.includes('agent_teams_approve'));
     assert.ok(!memberTools.includes('agent_teams_create'));
     const writer = results.find(r => r.name === 'agent_teams_claim_task').agent;
-    await assert.rejects(host.call(writer, 'agent_teams_create', { name: 'forbidden' }), /already belong to team/);
+    await assert.rejects(host.call(writer, 'agent_teams_create', { name: 'forbidden' }), /EMPLOYEE_NOT_LIVE/);
     await host.close();
     const restored = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(cwd, 'sessions') });
     try {

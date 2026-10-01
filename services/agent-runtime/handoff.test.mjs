@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, rm } from 'node:fs/promises';
-import { writeFileSync, symlinkSync } from 'node:fs';
+import { mkdirSync, writeFileSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { HandoffGate, inspectArtifact } from './handoff.mjs';
@@ -70,9 +70,15 @@ test('file contracts prevent undeclared reads/writes and changedPaths must match
   gate.observe('implement','a','terminal_test',{command:'check'},{exitCode:0},afterViolation);
   assert.throws(()=>gate.prepare('implement','a',{changedPaths:['result.txt']}),/UNDECLARED_OUTPUT/);
 }));
-test('host file checks reject symlinks and binary text',()=>fixture([],({root})=>{
-  writeFileSync(join(root,'target'),'secret');symlinkSync(join(root,'target'),join(root,'link'));
-  assert.throws(()=>inspectArtifact(root,{path:'link'}),/INVALID_FILE/);
+test('host file checks reject linked directories before reading their contents',()=>fixture([],({root})=>{
+  const target=join(root,'target');mkdirSync(target);writeFileSync(join(target,'secret.txt'),'secret');
+  // Windows junctions exercise the same lstat boundary without requiring
+  // developer mode or administrator privileges to create a file symlink.
+  symlinkSync(target,join(root,'link'),process.platform==='win32'?'junction':'dir');
+  assert.throws(()=>inspectArtifact(root,{path:'link/secret.txt'}),/INVALID_FILE/);
+}));
+
+test('host file checks reject binary content declared as text',()=>fixture([],({root})=>{
   writeFileSync(join(root,'binary'),'text\0bytes');assert.throws(()=>inspectArtifact(root,{path:'binary',format:'text'}),/INVALID_TEXT/);
 }));
 test('optimistic writes reject a second editor using the same observed hash',()=>fixture([],({root})=>{

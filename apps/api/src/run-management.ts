@@ -11,7 +11,7 @@ import { budgetHistory } from './budget-history.ts';
 import { assertRunModels } from './model-capabilities.ts';
 import { resumeHandoff } from './handoff-checkpoints.ts';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
-import { listArtifacts, artifactFile, command, SANDBOX_IMAGE } from '../../../services/agent-runtime/sandbox.mjs';
+import { listArtifacts, artifactFile, command, SANDBOX_IMAGE, RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
 export function runManagementRouter(traceRoot:string){
  const router=Router();
  router.get('/approvals',async(req,res)=>res.json((await pool.query('SELECT id,run_id AS "runId",agent_id AS "agentId",tool,arguments,status,created_at AS "createdAt" FROM tool_approvals WHERE ($1::text IS NULL OR run_id=$1) ORDER BY created_at DESC LIMIT 200',[req.query.runId??null])).rows));
@@ -42,7 +42,7 @@ export function runManagementRouter(traceRoot:string){
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    const already=(await client.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];if(already){await client.query('COMMIT');return res.json({id:already.id,existing:true});}
    const run=readRun(traceRoot,id);if(run&&run.integrity!=='ok')throw new AppError(409,'档案不完整，先导出并检查，不能自动恢复');
-   const snapshot=structuredClone(old.snapshot);let done=new Map<string,any>();
+   const snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();
    if(input.resume&&run){
     const mapping=run.events.find(e=>e.type==='run/task-mapping')?.data.tasks??[];
     const latest=run.events.findLast(e=>e.type==='team/snapshot')?.data.tasks??[];
@@ -75,7 +75,7 @@ export function runManagementRouter(traceRoot:string){
    await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1 AND version=$2",[old.project_id,old.project_version]);await client.query('COMMIT');res.status(202).json({id:newId,completedCheckpoints:[...done.keys()]});
   }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
  });
- router.get('/diagnostics',async(_req,res)=>{let sandbox=false;try{await command(['image','inspect',SANDBOX_IMAGE],{signal:AbortSignal.timeout(5000),limit:100000});sandbox=true;}catch{}res.json({sandbox,sandboxImage:SANDBOX_IMAGE,worker:(await pool.query("SELECT status,count(*)::int FROM project_runs GROUP BY status")).rows,knowledge:(await pool.query('SELECT count(*)::int FROM knowledge_documents WHERE deleted_at IS NULL')).rows[0].count,node:process.versions.node,platform:process.platform});});
+ router.get('/diagnostics',async(_req,res)=>{let sandbox=false;try{await RunSandbox.assertReady(AbortSignal.timeout(5000));sandbox=true;}catch{}res.json({sandbox,sandboxImage:SANDBOX_IMAGE,worker:(await pool.query("SELECT status,count(*)::int FROM project_runs GROUP BY status")).rows,knowledge:(await pool.query('SELECT count(*)::int FROM knowledge_documents WHERE deleted_at IS NULL')).rows[0].count,node:process.versions.node,platform:process.platform});});
  router.post('/sandbox/install',async(_req,res)=>{await command(['pull',SANDBOX_IMAGE],{signal:AbortSignal.timeout(180000),limit:2000000});res.json({ok:true});});
  return router;
 }

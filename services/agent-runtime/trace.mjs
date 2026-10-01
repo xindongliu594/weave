@@ -15,10 +15,11 @@ export function attachTrace(ctx, archive,taskFor) {
     sessionId: session.id, ...links.get(session.id),
     sourceKey: `session:${session.id}:${session.header.version}:${event.seq}`, sourceSeq: event.seq, sourceTime: event.time,
   });
-  disposers.push(ctx.on('session/created', session => {
+  const sessionCreated = session => {
     write('session/created', session.header, { sessionId: session.id });
     for (const event of session.snapshotEvents()) sessionRecord(session, event);
-  }));
+  };
+  disposers.push(ctx.on('session/created', sessionCreated));
   disposers.push(ctx.on('session/event', sessionRecord));
   disposers.push(ctx.on('agent/created', ({ agent }) => write('agent/created', { model: agent.options.model, provider: agent.options.provider }, { sessionId: agent.id })));
   disposers.push(ctx.on('tools/pre-execute', async (exec, next) => {
@@ -64,5 +65,5 @@ export function attachTrace(ctx, archive,taskFor) {
       throw error;
     } finally { if(requests.get(options.sessionId)===ref)requests.delete(options.sessionId); }
   }));
-  return { check, request(sessionId) { return requests.get(sessionId); }, dispose() { for (const dispose of disposers.reverse()) dispose(); } };
+  return { check, sessionCreated, sessionRecord, request(sessionId) { return requests.get(sessionId); }, dispose() { for (const dispose of disposers.reverse()) dispose(); } };
 }
