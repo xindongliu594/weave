@@ -272,7 +272,16 @@ test('API rework stops at its call allowance and full retry cannot reset the tas
   assert.ok(result.events.some((e:any)=>e.type==='budget/stopped'&&e.data.code==='TASK_TURN_LIMIT'));
   const producer=(await call('/usage')).filter((u:any)=>u.runId===id&&u.taskId==='produce');assert.equal(producer.length,8);
   const resumed=await call('/runs/'+id+'/retry','POST',{resume:true},409);assert.match(resumed.message??resumed.error,/完整重试/);
-  const retried=await call('/runs/'+id+'/retry','POST',{resume:false},422);assert.match(retried.message??retried.error,/上限/);
+  const response=await fetch(url+'/runs/'+id+'/retry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({resume:false})}),retried=await response.json();
+  // Cancelling a sibling's in-flight request may leave an uncertain receipt.
+  // That accounting gate correctly runs before the exhausted task-call gate.
+  assert.ok(['COST_PENDING','TASK_BUDGET_EXHAUSTED'].includes(retried.code),JSON.stringify(retried));
+  assert.equal(response.status,retried.code==='COST_PENDING'?409:422);
+  const row=(await pool.query('SELECT project_id,project_version FROM project_runs WHERE id=$1',[id])).rows[0];
+  const {budgetHistory}=await import('../apps/api/src/budget-history.ts');
+  const history=await budgetHistory(pool,join(directory,'runs'),row.project_id,row.project_version);
+  assert.equal(history.tasks.produce.calls,8,'all original and repair calls must survive retry accounting');
+  assert.equal((await pool.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rowCount,0,'neither rejection may create a fresh task allowance');
 });
 
 test('API rework escalates exhausted rounds, forbidden files and explicit rejection', {timeout:60000},async()=>{

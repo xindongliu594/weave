@@ -97,6 +97,7 @@ async function scenario(mode, maxRounds = 1) {
     const deadline = Date.now() + 15000;
     while (Date.now() < deadline) {
       status = await host.call(captain, 'agent_teams_status');
+      if(mode==='pass')assert.equal(host.hasBlockingFailure(status.tasks),false,'a authorized failed review with native follow-up must not stop delivery');
       if (failure || status.deliverable || budgetEvents.some(event => event.kind === 'stopped') ||
           (['stale', 'forged', 'duplicate'].includes(mode) && results.some(item => item.result.isError))) break;
       await new Promise(resolve => setTimeout(resolve, 100));

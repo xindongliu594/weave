@@ -114,5 +114,5 @@ export class ReworkGate {
     }
     this.check();
   }
-  hasBlockingFailure(tasks) { return tasks.some(task => task.status === 'failed' && !this.superseded.has(task.task_id ?? task.id)); }
+  hasBlockingFailure(tasks) { this.check(); return tasks.some(task => task.status === 'failed' && !this.superseded.has(task.task_id ?? task.id)); }
 }
