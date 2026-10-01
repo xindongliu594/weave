@@ -40,4 +40,6 @@
 
 测试使用本地模型协议替身，不产生真实中转模型费用。真实模型的摘要质量、长任务完成质量及远程部署尚未验收。跨平台与真实 PostgreSQL/Docker 的结果以核心 CI 为准。
 
-本地 Windows / Node 24.15.0：运行时 52/52、模拟 API 流程 15/15、规则 13/13、桌面连接 1/1，TypeScript/Vite 构建和依赖检查通过。固定交接场景 7/7 已包含在运行时统计中。
+本地 Windows / Node 24.15.0：运行时 52/52、模拟 API 流程 15/15、规则 13/13、桌面连接 1/1、任务检查点恢复 1/1，共 82 项，TypeScript/Vite 构建和依赖检查通过。固定交接场景 7/7 已包含在运行时统计中。
+
+实现提交 `76010c68fa5276d2fdc3307671ac9f8bfc494895` 的 [核心 CI run 36832300281](https://github.com/xindongliu594/agent-department/actions/runs/36832300281) 四个作业全部通过：Node 22.19.0 的 Windows/macOS/Linux 核心验证，以及真实 PostgreSQL/pgvector 后端 59 项和真实 Docker 沙箱 2 项。模型协议仍使用本地替身；该结果不证明真实中转模型的业务质量。
