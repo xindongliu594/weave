@@ -40,6 +40,8 @@ Windows 本地验证覆盖独立注册表、角色与历史隔离、单员工取
 
 2026-10-01 在 Windows / Node 24.15.0 完成验证：非 Docker 运行时 43/43、模拟产品流程 14/14、规则 13/13、桌面连接 1/1、交接检查点恢复 1/1，共 72 项；TypeScript 检查与 Vite 构建通过。产品流程同时核对每条员工费用对应的 Host 身份，以及完成后每个 Host 的释放记录。CI 使用仓库支持的 Node 22.19.0；该版本和其他操作系统的结果须以云端作业为准。
 
-核心 CI 在 push 到 main、PR 和手动触发时执行。Windows、macOS、Linux 作业运行构建、规则、依赖检查、非 Docker 运行时与模拟产品流程；另一个 Linux 作业使用真实 PostgreSQL/pgvector、Docker 沙箱和固定本地嵌入模型。工作流已加入仓库，本地尚未触发云端作业；本机未验证真实 PostgreSQL 并发、Docker、真实中转模型或远程部署。
+核心 CI 在 push 到 main、PR 和手动触发时执行。Windows、macOS、Linux 作业运行构建、规则、依赖检查、非 Docker 运行时与模拟产品流程；另一个 Linux 作业使用真实 PostgreSQL/pgvector、Docker 沙箱和固定本地嵌入模型。
+
+2026-10-01，提交 `f3d62514109970e47d56606f9d1a9d95b400ed2e` 的 [云端验收 run 36823778150](https://github.com/xindongliu594/agent-department/actions/runs/36823778150) 四个作业全部通过：Windows、macOS、Linux 均通过构建与核心测试，Linux 后端的 58 项测试和 2 项真实 Docker 沙箱测试通过。该结果使用 Node 22.19.0、真实 PostgreSQL/pgvector 和固定本地嵌入模型；中转模型请求仍来自本地协议替身。真实中转模型业务质量及远程部署尚未复验。
 
 Windows 测试不再修改 PATH 或调用 Unix shell 模拟 Docker，就绪检查通过 `RunSandbox.assertReady` 边界替换；生产实现仍执行真实镜像检查。路径测试在 Windows 使用目录 junction，在其他系统使用目录符号链接，保持对链接路径与二进制正文的拒绝验证。
