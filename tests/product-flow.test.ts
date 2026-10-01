@@ -216,6 +216,8 @@ test('D1 API and actual DSH execute native device files and an approved command,
   await protocol('/result',{...stored.result,result:{...stored.result.result,exitCode:null}},422);
   await protocol('/result',{...stored.result,result:{...stored.result.result,output:'forged changed receipt'}},409);
   assert.equal((await pool.query('SELECT COUNT(*)::int AS count FROM local_operations WHERE approval_id=$1',[stored.approval_id])).rows[0].count,1);
+  const {LocalOperationService}=await import('../apps/api/src/local-execution.ts');
+  await assert.rejects(new LocalOperationService(join(directory,'runs'),stored.lease_owner).wait(stored.id),{code:'LOCAL_OPERATION_CANCELLED',notExecuted:false},'a stopped worker cannot adopt an old completed receipt');
   const usage=(await call('/usage')).filter((item:any)=>item.runId===id);assert.ok(usage.length>0);assert.ok(usage.every((item:any)=>item.agentId&&item.cost>0));
   assert.ok(usage.some((item:any)=>item.employeeId==='producer'&&item.taskId==='produce'));assert.ok(usage.some((item:any)=>item.employeeId==='reviewer'&&item.taskId==='review'));
   assert.equal(usage.length,result.events.filter((event:any)=>event.type==='billing/usage').length);

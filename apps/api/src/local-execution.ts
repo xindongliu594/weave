@@ -90,7 +90,8 @@ export class LocalOperationService {
    while(true){
     signal?.throwIfAborted();
     const state=await operationTransaction(id,async(db,row,run,device)=>{
-     if(['completed','failed','cancelled'].includes(row.status))return row;
+     if(row.status==='completed')return await executable(db,row,run,device)?row:{...row,status:'cancelled'};
+     if(['failed','cancelled'].includes(row.status))return row;
      if(!await executable(db,row,run,device)){
       await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[id]);return {...row,status:'cancelled'};
      }return row;
