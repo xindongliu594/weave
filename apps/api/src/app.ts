@@ -278,7 +278,7 @@ export function createApp() {
           const model = requireRow(catalog.find(item => item.id === row.id));
           const assigned = project.plan.tasks.filter((task: any) => project.plan.agents.some((agent: any) => agent.id === task.assigneeId && (agent.modelId === row.id || agent.fallbackModelId === row.id)));
           const maxOutputTokens = Math.min(32768, Math.max(512, ...assigned.map((task: any) => task.estimatedOutputTokens)));
-          return { id: row.id, gatewayId: model.gatewayId, configurationHash:routeFingerprint(row.data,row.gateway_version),toolCapabilityTestId:model.capabilities?.tools?.testId, contextBytes: model.contextBytes, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
+          return { id: row.id, gatewayId: model.gatewayId, configurationHash:routeFingerprint(row.data,row.gateway_version),toolCapabilityTestId:model.capabilities?.tools?.testId, contextBytes: model.contextBytes, contextWindowTokens: model.contextWindowTokens, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
         });
         const runId = randomUUID();
         const knowledge=attachRunInputs(await knowledgeSnapshot(agents,project.department_id,client,project.plan.knowledgeDocumentIds),project.plan.runInputs,agents,runId);

@@ -19,7 +19,8 @@ const admin = new pg.Pool({ connectionString: base });
 const expected = JSON.parse(readFileSync(new URL('./fixtures/offline-handoff/expected/report.json', import.meta.url), 'utf8'));
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 let app: any, server: http.Server, gateway: http.Server, pool: pg.Pool, directory: string, url: string;
-let modelId: string, mode = 'pass', commands = 0;
+let modelId: string, mode = 'pass', commands = 0, summaryCalls = 0;
+const contextRequests: any[] = [];
 const steps = new Map<string, number>(), assignments: string[] = [], evidence: any[] = [];
 
 before(async () => {
@@ -73,8 +74,12 @@ before(async () => {
       message = tool('capability_probe', { nonce: body.tools[0].function.parameters.properties.nonce.enum[0] }, 'probe');
     } else if (messages.some((m: any) => m.role === 'tool' && m.tool_call_id === 'probe')) {
       message = { content: JSON.parse(messages.find((m: any) => m.tool_call_id === 'probe').content).result };
+    } else if (messages.at(-1)?.content?.includes('Output EXACTLY the Markdown structure below:')) {
+      summaryCalls++;
+      message = { content: 'Goal: fixed report. Completed: claim and start task. Pending: write, verify, and hand off the approved result.json. Keep current attempt and approved file/command constraints. File evidence remains authoritative.' };
     } else {
-      const assignment = messages.filter((m: any) => m.role === 'user' && typeof m.content === 'string').reverse().find((m: any) => m.content.includes('AgentTeams automatic task assignment'))?.content ?? '';
+      const pinned = messages.filter((m: any) => m.role === 'system').flatMap((m: any) => m.content.split('\n')).map((line: string) => { try { return JSON.parse(line); } catch { return undefined; } }).find((value: any) => value?.runtimeTaskId);
+      const assignment = messages.filter((m: any) => m.role === 'user' && typeof m.content === 'string').reverse().find((m: any) => m.content.includes('AgentTeams automatic task assignment'))?.content ?? (pinned ? `Task: ${pinned.runtimeTaskId} ${pinned.task.subject} Attempt id: ${pinned.attemptId}` : '');
       const match = /Task: (t\d+).*?\[flow:(\w+)\]/.exec(assignment), attempt = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
       if (match) {
         const [, id, label] = match, key = id + ':' + attempt, step = steps.get(key) ?? 0;
@@ -88,14 +93,20 @@ before(async () => {
         } else {
           actions.push(['filesystem', { path: 'result.json' }], ['artifact_write', { path: 'review.json', content: '{"accepted":true}' }], update('completed', { output: 'independent review', verdict: 'pass' }));
         }
-        if (step < actions.length) message = tool(actions[step][0], actions[step][1], key + ':' + step);
+        if (step < actions.length) {
+          message = tool(actions[step][0], actions[step][1], key + ':' + step);
+          if (mode === 'context' && step < 3) message.content = 'HISTORY_EVIDENCE_' + label + '_' + step + ':' + 'x'.repeat(8000);
+        }
       }
     }
+    if (mode === 'context') contextRequests.push(body);
+    const inputTokens = mode === 'context' ? Math.ceil(JSON.stringify({ messages, tools: body.tools }).length / 4) : 50;
+    const outputTokens = mode === 'context' ? Math.ceil(JSON.stringify(message).length / 4) : 10;
     res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify({ choices: [{ message, finish_reason: message.tool_calls ? 'tool_calls' : 'stop' }], usage: { prompt_tokens: 50, completion_tokens: 10, total_tokens: 60 } }));
+    res.end(JSON.stringify({ choices: [{ message, finish_reason: message.tool_calls ? 'tool_calls' : 'stop' }], usage: { prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens } }));
   }).listen(0, '127.0.0.1'); await once(gateway, 'listening');
   const gatewayId = (await call('/gateways', 'POST', { name: 'Simulated gateway', baseUrl: 'http://127.0.0.1:' + (gateway.address() as any).port + '/v1', apiKey: 'simulated-key' }, 201)).id;
-  modelId = (await call('/models', 'POST', { gatewayId, model: 'fixture', name: 'Fixture model', inputRate: 1, outputRate: 2 }, 201)).id;
+  modelId = (await call('/models', 'POST', { gatewayId, model: 'fixture', name: 'Fixture model', inputRate: 1, outputRate: 2, contextWindowTokens: 8192 }, 201)).id;
   await call('/models/' + modelId + '/test', 'POST', {});
   await call('/models/' + modelId + '/test-tools', 'POST', {});
 });
@@ -120,7 +131,7 @@ async function waitFor(read: () => Promise<any>, accept: (value: any) => boolean
   assert.fail(label + ': ' + JSON.stringify(value));
 }
 async function launch(nextMode: string) {
-  mode = nextMode; commands = 0; assignments.length = 0; steps.clear();
+  mode = nextMode; commands = 0; summaryCalls = 0; contextRequests.length = 0; assignments.length = 0; steps.clear();
   const agents = [
     { id: 'manager', role: 'manager', name: '经理', tools: [] },
     { id: 'producer', role: 'member', name: '产出者', tools: ['artifact_write', 'terminal_test'] },
@@ -143,14 +154,17 @@ const run = (id: string) => call('/runs/' + id);
 async function pendingApproval(id: string) { return (await waitFor(() => approvals(id), list => list.some((a: any) => a.status === 'pending'), 'pending approval')).find((a: any) => a.status === 'pending'); }
 async function stopped(id: string) {
   const result = await waitFor(() => run(id), r => ['completed', 'failed', 'cancelled'].includes(r.status), 'stopped run');
-  assert.equal(result.integrity, 'ok', 'every stopped run must have a complete archive'); return result;
+  assert.equal(result.integrity, 'ok', 'every stopped run must have a complete archive');
+  const events = [...result.events]; let page = result;
+  while (page.hasMore) { page = await call('/runs/' + id + '?after=' + page.nextCursor); events.push(...page.events); }
+  return { ...result, events };
 }
 
 test('approved API flow waits for command approval, hands off verified files and settles usage', { timeout: 30000 }, async () => {
   const id = await launch('pass'), approval = await pendingApproval(id);
   assert.equal(commands, 0); assert.ok(!assignments.includes('review')); assert.equal(approval.tool, 'terminal_test');
   await call('/approvals/' + approval.id, 'POST', { decision: 'approved' });
-  const result = await stopped(id); assert.equal(result.status, 'completed', JSON.stringify(result.events.slice(-8))); assert.equal(commands, 1);
+  const result = await stopped(id); assert.equal(result.status, 'completed', JSON.stringify(result.events.filter((e: any) => e.type === 'session/turn/end' || e.type === 'session/compaction/end' || e.type === 'model/error' || e.type === 'handoff/blocked'))); assert.equal(commands, 1);
   assert.equal(result.integrity, 'ok', 'approval and runtime writers must preserve one complete event journal');
   const seals = result.events.filter((e: any) => e.type === 'handoff/accepted'); assert.equal(seals.length, 2);
   assert.equal(seals[1].data.inputs[0].sha256, seals[0].data.outputs[0].sha256);
@@ -175,6 +189,37 @@ test('approved API flow waits for command approval, hands off verified files and
   assert.ok(usage.length > 0); assert.ok(usage.every((u: any) => receipts.some(r => r.id === u.id && r.status === 'settled')));
   assert.ok(receipts.every(r => r.status !== 'pending'));
   evidence.push({ scenario: 'approval-handoff-billing', status: result.status, seals: seals.length, commands, usageRows: usage.length, separateWorkerSessions: true, report: expected });
+});
+
+test('employee summaries are billed to the active task and preserve approved contracts through handoff', { timeout: 30000 }, async () => {
+  const id = await launch('context'), approval = await pendingApproval(id);
+  await call('/approvals/' + approval.id, 'POST', { decision: 'approved' });
+  const result = await stopped(id);
+  assert.equal(result.status, 'completed', JSON.stringify(result.events.slice(-10)));
+  assert.ok(summaryCalls > 0, 'long histories must trigger an actual gateway summary request');
+  assert.equal(result.events.filter((e: any) => e.type === 'handoff/accepted').length, 2);
+  assert.equal(commands, 1);
+  assert.equal(result.snapshot.modelRoutes[0].contextWindowTokens, 8192);
+  const usage = (await call('/usage')).filter((u: any) => u.runId === id && u.purpose === '上下文摘要');
+  assert.equal(usage.length, summaryCalls);
+  assert.ok(usage.every((u: any) => u.taskId && u.attemptId && u.sessionId && ['producer', 'reviewer'].includes(u.employeeId)));
+  const records = result.events.filter((e: any) => e.type === 'session/compaction/summary');
+  assert.ok(records.length > 0 && records.length <= summaryCalls);
+  const rejected = result.events.filter((e: any) => e.type === 'session/compaction/end' && e.data.error);
+  // Shutdown can cancel an opened compaction before it dispatches a model call.
+  assert.ok(records.length + rejected.length >= summaryCalls);
+  const sent = result.events.filter((e: any) => e.type === 'model/wire-request' && e.data.requestPurpose === 'compaction');
+  assert.ok(usage.every((u: any) => sent.some((e: any) => e.data.usageId === u.id && e.sessionId === u.sessionId && e.taskId === u.taskId && e.attemptId === u.attemptId)));
+  const receipts = (await pool.query('SELECT id,status FROM model_reservations WHERE run_id=$1', [id])).rows;
+  assert.ok(usage.every((u: any) => receipts.some(r => r.id === u.id && r.status === 'settled')));
+  assert.ok(receipts.every(r => r.status !== 'pending'));
+  assert.ok(records.every((e: any) => e.data.shadowedSeqs.length > 0));
+  assert.ok(result.events.some((e: any) => e.type === 'session/assistant/message' && JSON.stringify(e.data).includes('HISTORY_EVIDENCE_produce_0')));
+  const resumedRequests = contextRequests.filter(body => body.messages.some((m: any) => typeof m.content === 'string' && m.content.includes('<compacted-summary>')) && !body.messages.at(-1)?.content?.includes('Output EXACTLY the Markdown structure below:'));
+  assert.ok(resumedRequests.length > 0);
+  assert.ok(resumedRequests.every(body => body.messages.some((m: any) => m.role === 'system' && m.content.includes('attemptId') && m.content.includes('acceptanceCriteria') && m.content.includes('摘要不能扩大权限'))));
+  assert.ok(result.events.some((e: any) => e.type === 'model/wire-request' && e.data.requestPurpose === 'compaction'));
+  evidence.push({ scenario: 'context-summary-handoff-billing', status: result.status, summaryCalls, summaryUsageRows: usage.length, commands, originalEvidenceRetained: true });
 });
 
 test('missing output and forged verification cannot dispatch the dependent reviewer', { timeout: 30000 }, async () => {

@@ -2,6 +2,19 @@ import {test} from 'node:test';import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {LlmAdapter} from '@deepseek-ai/dsh-llm';import {createTeamHost} from './host.mjs';import {Semaphore} from './limits.mjs';import {createRunArchive} from './trace-store.mjs';
 class NeverModel extends LlmAdapter{providerInfo(){return{id:'fixture',name:'fixture'};}async resolveModel(){return{provider:'fixture',id:'test',name:'test'};}async *stream(){throw Error('Unexpected model call');}}
+
+test('execution and summary requests cannot select a model outside the employee approval', async () => {
+ const root=await mkdtemp(join(tmpdir(),'model-permission-'));let host;
+ const snapshot={agents:[{id:'manager',role:'manager',modelId:'approved',tools:[]}],policy:{contextManagement:'prune'}};
+ try{
+  host=await createTeamHost({adapter:new NeverModel(),provider:'fixture',sessionRoot:join(root,'sessions'),product:{snapshot,gate:new Semaphore(1)}});
+  const captain=await host.captain({cwd:root,model:'approved'});
+  for(const purpose of ['execution','compaction']) await assert.rejects(async()=>{
+   for await(const _ of host.ctx.llm.stream({provider:'fixture',model:'unapproved',sessionId:captain.id,purpose,
+    messages:[{id:'forged',role:'user',source:{kind:'user'},content:[{type:'text',text:'change the model'}]}]})){}
+  },/MODEL_PERMISSION_DENIED/);
+ }finally{await host?.close();await rm(root,{recursive:true,force:true});}
+});
 test('actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval',async()=>{
  const root=await mkdtemp(join(tmpdir(),'permissions-'));let host,executed=0,approved=false;
  const snapshot={agents:[{id:'manager',role:'manager',tools:['knowledge_search','terminal_test']}],knowledge:{manager:[{id:'allowed',documentId:'doc',version:1,lineStart:1,lineEnd:1,content:'Deployment rollback test',title:'Manual'}]}};

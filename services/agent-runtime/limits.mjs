@@ -9,14 +9,15 @@ export class Semaphore {
     });
   }
 }
-export function fitMessages(messages, maxBytes) {
+export function fitMessages(messages, maxBytes, protectedIndexes = []) {
   const size=value=>Buffer.byteLength(JSON.stringify(value));
   if(size(messages)<=maxBytes)return {messages,removed:0};
   const groups=[];
   for(const message of messages){if(message.role==='tool'&&groups.length)groups.at(-1).push(message);else groups.push([message]);}
   const lastUser=groups.findLastIndex(g=>g[0].role==='user');
   let removed=0;
-  const keep=groups.map((group,i)=>({group,essential:group[0].role==='system'||i===lastUser||i===groups.length-1}));
+  const protectedMessages=new Set(protectedIndexes.map(index=>messages[index]));
+  const keep=groups.map((group,i)=>({group,essential:group[0].role==='system'||i===lastUser||i===groups.length-1||group.some(message=>protectedMessages.has(message))}));
   while(size(keep.flatMap(g=>g.group))>maxBytes){const index=keep.findIndex(g=>!g.essential);if(index<0)throw Error('CONTEXT_LIMIT: 岗位、当前任务与最新工具响应超过上下文上限');keep.splice(index,1);removed++;}
   return {messages:keep.flatMap(g=>g.group),removed};
 }

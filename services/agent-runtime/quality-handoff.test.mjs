@@ -20,6 +20,7 @@ async function qualityScenario(mode) {
     {id:'review',kind:'review',subject:'[quality:review]',assignee:'reviewer',objective:'Review the implementation independently',dependencies:['implement'],reviewedTaskId:'implement',acceptanceCriteria:['implementation meets goal']},
   ]};
   for(const task of snapshot.tasks) task.assigneeId='original-'+task.assignee;
+  for(const employee of snapshot.agents) employee.modelId=employee.role==='manager'?'captain':'same-model';
   const archive=createRunArchive(root,snapshot),steps=new Map(),results=[],requests=[],hash=bytes=>createHash('sha256').update(bytes).digest('hex');
   let approvals=0,host,status;
   // Test executor: only one fixed file and one recognized check. No shell or API.

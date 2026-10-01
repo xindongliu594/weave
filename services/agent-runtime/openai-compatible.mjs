@@ -67,7 +67,8 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
   async resolveModel(provider, model) {
     const route = this.routes.get(model);
     if (!route) throw new LlmError(`运行快照中不存在模型 ${model}`, 'UNKNOWN_MODEL');
-    return { provider, id: model, name: route.name, defaultMaxTokens: route.maxOutputTokens };
+    return { provider, id: model, name: route.name, defaultMaxTokens: route.maxOutputTokens,
+      ...(route.contextWindowTokens ? { context: { contextWindow: route.contextWindowTokens } } : {}) };
   }
 
   async *stream(options) {
@@ -77,11 +78,18 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     if (!route) throw new LlmError(`运行快照中不存在模型 ${options.model}`, 'UNKNOWN_MODEL');
     options.signal?.throwIfAborted();
     const original = [...(options.system ? [{ role: 'system', content: options.system }] : []), ...options.messages.map(toWireMessage)];
+    const limit = Math.min(this.contextBytes, route.contextBytes ?? this.contextBytes);
+    const checkpoint = options.messages.findLastIndex(message => message.source?.kind === 'plugin' && message.source.plugin === 'compact');
     let fitted;
-    try { fitted = fitMessages(original, Math.min(this.contextBytes, route.contextBytes ?? this.contextBytes)); }
+    try {
+      if (options.purpose === 'compaction') {
+        if (Buffer.byteLength(JSON.stringify(original)) > limit) throw new LlmError('CONTEXT_LIMIT: 摘要输入超过字节上限，保留原始历史，不能丢弃来源后生成摘要', 'CONTEXT_LIMIT');
+        fitted = { messages: original, removed: 0 };
+      } else fitted = fitMessages(original, limit, checkpoint < 0 ? [] : [checkpoint + (options.system ? 1 : 0)]);
+    }
     catch(e) { this.onError?.(e); throw e; }
     const messages = fitted.messages;
-    if(fitted.removed) this.onContext?.({ modelId: route.id, removedGroups: fitted.removed, beforeBytes: Buffer.byteLength(JSON.stringify(original)), afterBytes: Buffer.byteLength(JSON.stringify(messages)), note: '完整记录仍保存在追溯档案；仅从本次模型请求移除较早的完整对话组。' });
+    if(fitted.removed) this.onContext?.({ sessionId: options.sessionId, modelId: route.id, requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution', removedGroups: fitted.removed, beforeBytes: Buffer.byteLength(JSON.stringify(original)), afterBytes: Buffer.byteLength(JSON.stringify(messages)), note: '完整记录仍保存在追溯档案；仅从本次模型请求移除较早的完整对话组。' });
     const maxTokens = Math.max(1, Math.min(options.maxTokens ?? route.maxOutputTokens, route.maxOutputTokens));
     const tools = options.tools?.map(tool => ({ type: 'function', function: { name: tool.name, description: tool.description, parameters: tool.parameters } }));
     const body = {
@@ -93,7 +101,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     };
     const inputUpperBound = Buffer.byteLength(JSON.stringify({messages,tools})) + 1024;
     const reservation = (inputUpperBound * route.inputRate + maxTokens * route.outputRate) / 1e6;
-    const attribution=this.attribution?.(options.sessionId)??{sessionId:options.sessionId};
+    const attribution={ ...(this.attribution?.(options.sessionId)??{sessionId:options.sessionId}), requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution' };
     let ticket;
     try { ticket=this.budget.reserve(reservation,attribution,options.fallbackAttempted??false); }
     catch(error) { this.onError?.(error);throw error; }
