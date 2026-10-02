@@ -67,6 +67,8 @@ export class ProductDshRuntime {
     archive.append('runtime/supervision',{version:1,progressTimeoutSeconds:snapshot.policy.progressTimeoutSeconds??300,repeatActionLimit:snapshot.policy.repeatActionLimit??8,repeatErrorLimit:snapshot.policy.repeatErrorLimit??3,maxReadRetries:snapshot.policy.maxReadRetries??2});
     const gate = new Semaphore(snapshot.policy.maxConcurrentAgents);
     const timer = setTimeout(() => {
+      job.deadlineExceeded = true;
+      archive.append('run/deadline-exceeded', { deadlineSeconds: snapshot.policy.deadlineSeconds });
       job.controller.abort(new Error('Run deadline exceeded'));
       void job.host?.close();
     }, snapshot.policy.deadlineSeconds * 1000);
@@ -142,12 +144,15 @@ export class ProductDshRuntime {
       archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       return { status: 'completed', usages, summary };
     } catch (error) {
+      const message = job.deadlineExceeded
+        ? `运行达到已批准的 ${snapshot.policy.deadlineSeconds} 秒时限，已停止。已完成任务和文件保留；先核对待结算调用，再恢复未完成任务。`
+        : error instanceof Error ? error.message : String(error);
       try { await host?.close(); } finally {
         try { const checkpoint=host?.checkpointState();if(checkpoint)archive.append('team/checkpoint',checkpoint); } catch { /* Missing/incomplete evidence will refuse recovery. */ }
         const status = job.cancelled ? 'cancelled' : 'failed';
-        archive.append('run/finished', { status, message: error instanceof Error ? error.message : String(error), usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
+        archive.append('run/finished', { status, message, ...(job.deadlineExceeded ? { code: 'RUN_DEADLINE_EXCEEDED' } : {}), usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       }
-      return { status: job.cancelled ? 'cancelled' : 'failed', usages, message: error instanceof Error ? error.message : String(error) };
+      return { status: job.cancelled ? 'cancelled' : 'failed', usages, message };
     } finally {
       clearTimeout(timer);
       await sandbox.close();

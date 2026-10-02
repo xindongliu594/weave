@@ -1,0 +1,10 @@
+Final check 2026-10-03 Asia/Shanghai: start-local.cmd --help (stdin closed; no service/data access)
+为伍 · 一个想法，一支团队
+
+npm run local -- [--web-port=4310] [--data-dir="绝对路径"]
+npm run local:check
+npm run local -- --enable-device：明确重新授予本机执行权限
+--data-dir 沿用指定本机数据目录、配置和已有目录授权，须先停止使用该目录的服务；检查模式不接受此参数。
+本机持久数据库与实际文件/命令执行；在模型目录配置自己的 API。
+Press any key to continue . . .
+Exit code: 0

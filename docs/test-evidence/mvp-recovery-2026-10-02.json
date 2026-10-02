@@ -1,0 +1,132 @@
+{
+  "auditedAt": "2026-10-02T15:38:33.756Z",
+  "dataDirectory": "C:\\Users\\JJ\\Desktop\\la\\agent_department\\.data\\local",
+  "originalDataModifiedByAudit": false,
+  "employeeDeliverablesEditedByCodex": false,
+  "parentRunId": "1cc083f3-1ca0-4eec-8230-29a2fe7617f3",
+  "resumedRunId": "c9b1f703-b2a6-4bf0-8318-ad2b15ce911e",
+  "finalRunId": "c9b1f703-b2a6-4bf0-8318-ad2b15ce911e",
+  "recoveryMechanism": "passed",
+  "endToEndDelivery": "blocked",
+  "finalStatus": "failed",
+  "checks": [
+    {
+      "description": "All archives are intact; interruption preserved model calls, expenses, DAG state and file versions.",
+      "status": "passed"
+    },
+    {
+      "description": "The original approved DAG and policy remain unchanged after recovery.",
+      "status": "passed"
+    },
+    {
+      "description": "Completed development was restored without a new development model call or repeated acceptance.",
+      "status": "passed"
+    },
+    {
+      "description": "Accepted files and unfinished QA material retained the precise interrupted versions.",
+      "status": "passed"
+    },
+    {
+      "description": "Global and per-task call counters and all prior project costs were inherited.",
+      "status": "passed"
+    },
+    {
+      "description": "Unfinished QA verification and independent review actually continued with successful native commands.",
+      "status": "passed"
+    }
+  ],
+  "parentCalls": 25,
+  "inheritedCalls": 25,
+  "resumedCalls": 18,
+  "resumedBilledCalls": 17,
+  "resumedKnownCost": 0.0187921,
+  "priorProjectCost": 0.029906800000000004,
+  "executionBudget": 0.45009319999999997,
+  "originalPolicy": {
+    "mode": "recommended",
+    "maxAgents": 3,
+    "maxBudget": 0.48,
+    "preference": "balanced",
+    "allowedTools": [
+      "filesystem",
+      "artifact_write",
+      "terminal_test"
+    ],
+    "contextBytes": 192000,
+    "maxModelCalls": 80,
+    "allowedModelIds": [
+      "87f0a6ab-0c55-4f7c-9326-c5e570edf8a0"
+    ],
+    "deadlineSeconds": 1800,
+    "executionTarget": {
+      "kind": "local",
+      "grantId": "1623c09f-f70b-47ad-ac18-dc738c64e2a2",
+      "deviceId": "911a42a6-a0b1-45f8-a2dc-e71e149a4f59"
+    },
+    "maxTaskModelCalls": 35,
+    "maxConcurrentAgents": 1,
+    "allowedDepartmentIds": [
+      "e8928525-96bc-42f2-b566-677e44be4290"
+    ],
+    "allowedKnowledgeSpaceIds": []
+  },
+  "finalTasks": [
+    {
+      "id": "t1",
+      "subject": "实现 Todo API",
+      "status": "completed",
+      "assignee": "employee-2",
+      "output": "已实现 Node 内置模块 Todo API、CRUD/400/404 和测试；README 含 Windows 启动说明。node --test todo.test.mjs 实测 2 项通过。"
+    },
+    {
+      "id": "t2",
+      "subject": "编写并运行独立验收测试",
+      "status": "completed",
+      "assignee": "employee-3",
+      "output": "独立验收 acceptance.test.mjs 已通过 node --test：CLI 子进程启动服务，并通过 HTTP 验证创建、读取、更新、删除及 400/404 响应。"
+    },
+    {
+      "id": "t3",
+      "subject": "独立审查开发交付",
+      "status": "completed",
+      "assignee": "employee-3",
+      "output": "审查通过。server 使用 Node 内置 http、仅绑定 127.0.0.1，内存 Map 实现 Todo CRUD；无效请求 400、未知路由/资源 404；README 包含 Windows `node server.mjs` 启动说明及 API 文档。单元测试及独立 CLI/HTTP 验收均复验通过。未验证工作台后台中断/恢复流程；本轮合同未要求执行该演练。未发现阻塞问题。"
+    },
+    {
+      "id": "t4",
+      "subject": "经理文字验收与运行说明",
+      "status": "claimed",
+      "assignee": "employee-1"
+    }
+  ],
+  "files": [
+    {
+      "path": "acceptance.test.mjs",
+      "size": 3201,
+      "sha256": "f2f9e37c48edea4e814f41330033aeda8042588779029bb4b685f8ee86c2b1ac"
+    },
+    {
+      "path": "README.md",
+      "size": 737,
+      "sha256": "65d93d9ca2c211e41f6de02c6ba6ee67383324d2e81c6ee8a9b874f3e7e0ef1f"
+    },
+    {
+      "path": "server.mjs",
+      "size": 2928,
+      "sha256": "f169b3df6f315cd2f3ff80d784a32a43226ee81d11420d0319c35736ea616603"
+    },
+    {
+      "path": "todo.test.mjs",
+      "size": 1961,
+      "sha256": "660c3623f2f05088252678eff6641c62f0bd17170223583147b082013b927c6e"
+    }
+  ],
+  "unresolvedModelReceipts": [
+    {
+      "id": "f9752aa6-f045-4b96-9edb-43be3087b2ed",
+      "dispatched": true,
+      "code": "CALL_INTERRUPTED"
+    }
+  ],
+  "limitation": "Manager delivery has not completed. An interrupted real model receipt must be reconciled before another resume. No uncertain request is treated as zero or blindly replayed."
+}

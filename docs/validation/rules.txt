@@ -1,0 +1,44 @@
+Final check 2026-10-03 Asia/Shanghai: npm run test:rules
+
+> agent-department@0.2.0 test:rules
+> node --import tsx --test tests/policy.test.ts tests/task-contracts.test.ts tests/request-origin.test.ts tests/handoff-checkpoints.test.ts tests/model-catalog.test.ts
+
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (32.2537ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (13.1384ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (20.1292ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (16.0446ms)
+✔ catalog converts actual per-token prices, retains explicit free quotes and validates metadata (23.4164ms)
+✔ missing, blank, negative, nonfinite, partial and ambiguous quotes never become zero (1.0566ms)
+✔ fixed-call, tiered, unknown-currency, unit and out-of-range prices require manual reconciliation (2.3709ms)
+✔ New API returns group-specific quotes only for accessible models, without guessing this key's group (1.3262ms)
+✔ New API rejects incomplete ratios, duplicate quotes, fixed-call and missing group billing (0.8642ms)
+✔ unavailable price metadata cannot erase direct quotes or add unauthorised models (0.4661ms)
+✔ old gateways still validate and explicit price source is stored without accepting arbitrary URLs (1.6802ms)
+✔ official quotes match exact IDs, carry their verification date, and never borrow a similar model price (0.7115ms)
+✔ single manager is a valid one-agent department (6.0079ms)
+✔ legacy placeholder tasks cannot pass execution validation through configuration-only edits (9.2361ms)
+✔ an explicit one-person text plan remains executable without file tools (0.5098ms)
+✔ recovery policy cannot authorize unbounded retries or immediate false stall decisions (2.9809ms)
+✔ team protocol capability is required even without workspace tools and for fallback models (0.929ms)
+✔ cyclic dependencies and missing owners are rejected (0.4905ms)
+✔ unknown model, excessive concurrency and cost cannot pass validation (0.437ms)
+✔ manager count, duplicate agent IDs and empty acceptance are rejected (1.508ms)
+✔ task estimates and task turn limits must fit the approved policy (1.003ms)
+✔ run inputs require valid recipients, bounded text, unique IDs and a retrieval grant (4.772ms)
+✔ public deployment origins must be explicit canonical HTTPS origins (3.5549ms)
+✔ approved file contracts survive parsing and valid producer/consumer plans pass (13.8934ms)
+✔ missing source edges, unknown output and unordered writers/readers fail product validation (3.6658ms)
+✔ downstream cannot name an older writer after an upstream replacement (1.2767ms)
+✔ schema rejects unsafe paths, unpinned external files and incompatible JSON checks (8.2769ms)
+✔ quality tasks require command grants, scope, valid references and an independent reviewer (1.5564ms)
+✔ declared outputs must fit host file scopes before any employee executes (1.1566ms)
+✔ automatic rework is explicit, bounded, read-only in review and gates all consumers (3.742ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 855.5804
+Exit code: 0

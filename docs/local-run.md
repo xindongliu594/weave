@@ -24,7 +24,13 @@ npm run local
 
 ## 数据与停止
 
-数据固定保存在 `.data/local`，重启保留，不与 `.data/demo/<UUID>` 的演示数据混用：
+默认数据保存在 `.data/local`，重启保留，不与 `.data/demo/<UUID>` 的演示数据混用。需要从另一份代码启动已有本机空间时，可显式指定原数据目录的绝对路径，例如 Windows PowerShell：
+
+```powershell
+npm run local -- '--data-dir=C:\Users\JJ\Desktop\la\agent_department\.data\local'
+```
+
+先停止访问这个数据目录的原服务。启动锁会拒绝双开，不复制或覆盖数据库、密钥与设备凭证；项目工作区仍在原目录中，原目录授权继续核验。参数不能指向仅包含数据库的子目录，也不能用相对路径。`local:check` 禁止 `--data-dir`，始终在独立检查目录验证。数据目录包含：
 
 - `database`：模型目录、部门、项目、费用和操作记录。
 - `credentials`：用于加密模型 Key 和设备凭证的主密钥；`device.credential` 为加密后的设备配置。

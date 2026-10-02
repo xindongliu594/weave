@@ -1,0 +1,15 @@
+✔ approved deadline is retained as the stop reason when a tool wraps the abort (1088.0764ms)
+✔ an abort during durable reservation never dispatches a request or reports an unknown sent call (4.3426ms)
+✔ OpenAI compatible adapter translates tool calls, usage, routing and authorization (32.5583ms)
+✔ adapter refuses a request before fetch when its reservation exceeds the run budget (0.8951ms)
+✔ fallback is explicit, bounded, attributed and never retries ambiguous network failures (2.381ms)
+✔ summaries read every selected source message and refuse oversized input before dispatch (1.4219ms)
+✔ wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit (1.7415ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1480.0071

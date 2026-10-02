@@ -9,6 +9,7 @@ import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import pg from 'pg';
 import type {Model} from '../packages/contracts/index.ts';
+import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
 const base=process.env.DATABASE_URL??'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const admin=new pg.Pool({connectionString:base}),schema='cost_'+Date.now();
 let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,cost:typeof import('../apps/api/src/cost-control.ts');
@@ -47,16 +48,19 @@ test('parallel direct calls reserve globally before fetch and departmental caps 
 });
 
 test('runtime requests share the run reservation and uncertain costs survive completion and block retry',async()=>{
- const runId=randomUUID(),snapshot={projectId:'project',departmentId:'department',planVersion:1,policy,executionBudget:10,tasks:[{id:'task',subject:'任务',maxBudget:2}]};
+ const runId=randomUUID(),snapshot={projectId:'project',departmentId:'department',planVersion:1,policy,executionBudget:10,agents:[agent],tasks:[{id:'task',subject:'任务',maxBudget:2,assignee:'manager',dependencies:[]}]};
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES($1,'project',1,'running',$2)",[runId,snapshot]);
+ const archive=createRunArchive(join(dir,'runs'),snapshot,{id:runId});
  const input={model,amount:1,purpose:'项目执行',projectId:'project',runId,context:{taskId:'task'}};
  const first=await cost.reserveCall(input);assert.deepEqual(await cost.dailyTotals(pool),{spent:0,reserved:10});
  await cost.settleCall(first,0,25);assert.deepEqual(await cost.dailyTotals(pool),{spent:.25,reserved:9.75});
  const second=await cost.reserveCall(input);await cost.markCallUncertain(second,'connection lost');
  await assert.rejects(cost.reserveCall(input),e=>(e as any).code==='TASK_BUDGET_EXCEEDED');
  await pool.query("UPDATE project_runs SET status='failed' WHERE id=$1",[runId]);
+ archive.append('run/finished',{status:'failed',message:'Synthetic missing-receipt scenario; no real model execution.'});
  assert.deepEqual(await cost.dailyTotals(pool),{spent:.25,reserved:1});
  assert.equal((await call('/runs/'+runId+'/retry','POST',{resume:true})).data.code,'COST_PENDING');
+ assert.match((await call('/runs/'+runId)).data.recovery.costBlocked,/核对供应方账单/);
  await pool.query("UPDATE usage SET created_at=now()-interval '2 days'");assert.deepEqual(await cost.dailyTotals(pool),{spent:0,reserved:1});
 });
 

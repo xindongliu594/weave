@@ -1,0 +1,9 @@
+
+Final check 2026-10-03 Asia/Shanghai: npx tsc --noEmit
+Exit code: 0
+
+Final source after RunExtras preview/refresh fixes 2026-10-03 Asia/Shanghai: npx tsc --noEmit
+Final source exit code: 0
+
+Final source after narrow-window run-recovery layout fix 2026-10-03 Asia/Shanghai: npx tsc --noEmit
+Final layout source exit code: 0

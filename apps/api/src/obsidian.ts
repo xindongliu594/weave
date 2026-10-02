@@ -86,4 +86,4 @@ async function sync(){
  }
  lastSync={at:new Date().toISOString(),indexed,errors};return lastSync;
 }
-export function obsidianRouter(){const router=Router();router.get('/knowledge/vault',async(_req,res)=>res.json({root:obsidianRoot(),name:basename(obsidianRoot()),lastSync,mode:'obsidian-markdown',instructions:'在 Obsidian 中选择「打开本地仓库」，打开此目录。Windows 编辑的 Vault 需同步至此目录，可使用 Obsidian Sync 或自行同步文件；仅同步到 Mac 的文件会被索引。'}));router.post('/knowledge/vault/sync',async(_req,res)=>res.json(await syncObsidian()));return router;}
+export function obsidianRouter(){const router=Router();router.get('/knowledge/vault',async(_req,res)=>res.json({root:obsidianRoot(),name:basename(obsidianRoot()),lastSync,mode:'obsidian-markdown',instructions:'在 Obsidian 中选择「打开本地仓库」，打开此目录。在这里编辑的笔记会在同步索引后供授权员工检索；其他目录的笔记需先同步至此目录。'}));router.post('/knowledge/vault/sync',async(_req,res)=>res.json(await syncObsidian()));return router;}

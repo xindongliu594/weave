@@ -39,6 +39,19 @@ test('quality tasks require command grants, scope, valid references and an indep
   plan.agents[0].tools=['artifact_write','filesystem'];assert.equal(validatePlan(plan,policy,[model]).valid,false);
 });
 
+test('declared outputs must fit host file scopes before any employee executes',()=>{
+  const plan=structuredClone(base);plan.tasks[0].kind='implementation';plan.tasks[0].verify=['node check.mjs'];
+  plan.tasks[0].inScope=['只生成要求的文件'];
+  assert.equal(validatePlan(plan,policy,[model]).valid,false,'natural-language scope cannot authorize data.json');
+  plan.tasks[0].inScope=['data.json'];assert.equal(validatePlan(plan,policy,[model]).valid,true);
+  plan.tasks[0].outputs![0].path='src/data.json';plan.tasks[1].inputs![0].path='src/data.json';plan.tasks[0].inScope=['src'];
+  assert.equal(validatePlan(plan,policy,[model]).valid,true,'directory scopes include descendants');
+  plan.tasks[0].outOfScope=['src/data.json'];assert.equal(validatePlan(plan,policy,[model]).valid,false);
+  plan.tasks[0].outOfScope=['src'];assert.equal(validatePlan(plan,policy,[model]).valid,false,'denied directories override allowed paths');
+  plan.tasks[0].kind='verification';plan.tasks[0].outOfScope=[];plan.tasks[0].inScope=['src-old'];
+  assert.equal(validatePlan(plan,policy,[model]).valid,false,'verification writers have the same scope boundary');
+});
+
 test('automatic rework is explicit, bounded, read-only in review and gates all consumers',()=>{
   const plan=structuredClone(base);
   plan.tasks[0]={...plan.tasks[0],kind:'implementation',inputs:[],inScope:['data.json'],verify:['node check.mjs']};

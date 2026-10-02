@@ -1,0 +1,7 @@
+
+> agent-department@0.2.0 local:check
+> node scripts/local.mjs --check
+
+正在启动为伍本机真实 API 工作空间…
+本机执行授权已停用，保留配置页面；重新授权请使用 npm run local -- --enable-device。
+本机运行检查通过：外部 API 配置、本机执行、逐次审批和重启后配置/授权保留；未调用付费模型。

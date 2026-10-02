@@ -1,0 +1,36 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2137.3741ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (98.9018ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (61.9756ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (40.4587ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (221.7786ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (96.8335ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (83.7112ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (107.2876ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (228.624ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (53.0652ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (29.0983ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3656.8046
+✔ confirming a revised proposal updates the same team and draft project, records versions, and never executes (2152.9359ms)
+✔ execution state, archived teams and mismatched project ownership refuse an update without partial writes (102.3989ms)
+✔ all adopted planning charges count toward the updated budget and transfer only after successful confirmation (79.5843ms)
+✔ revisions still require preview identity and explicit tool permissions (40.6662ms)
+✔ pending and uncertain project charges block a revision before any budget or team change (89.6545ms)
+✔ a team participating in another active project cannot be changed through a saved conversation (90.6681ms)
+✔ employee prompt revisions advance role versions while replay and unchanged roles preserve them (85.5183ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3093.5825

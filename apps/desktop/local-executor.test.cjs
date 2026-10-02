@@ -81,3 +81,27 @@ test('lost operation receipt and process restart resend the receipt without repl
   loseReceipt=false;client=new LocalDeviceClient(options);await client.start();for(let i=0;i<100&&client.read(operation).phase!=='acknowledged';i++)await wait(20);assert.equal(phase,'completed');assert.equal(writes,1);assert.equal(client.read(operation).phase,'acknowledged');
  }finally{await client?.close();f.cleanup();}
 });
+
+test('transient Windows receipt rename failures do not repeat the underlying operation',async()=>{
+ const f=fixture(),rename=fs.promises.rename,id=randomUUID();let retries=0,writes=0;
+ const client=new LocalDeviceClient({connection:{server:'http://127.0.0.1:12345/'},device:{id:randomUUID(),token:randomBytes(32).toString('hex'),grant:f.grant},journalRoot:path.join(f.root,'journal')});
+ client.api=async()=>({ok:true});client.executor.execute=async()=>{writes++;return {ok:true};};
+ fs.promises.rename=async(source,target)=>{if(JSON.parse(fs.readFileSync(source,'utf8')).phase==='starting'&&retries++<2)throw Object.assign(Error('temporary scanner lock'),{code:'EPERM'});return rename(source,target);};
+ try{
+  client.run({id,runId:f.runId,claimToken:randomUUID()});await client.active.promise;
+  assert.equal(writes,1);assert.equal(client.read(id).phase,'acknowledged');assert.equal(retries,3);assert.equal(client.stopped,false);
+  assert.equal(fs.readdirSync(client.journalRoot).length,1,'temporary receipts are removed after replacement');
+ }finally{fs.promises.rename=rename;await client.close();f.cleanup();}
+});
+
+test('persistent receipt failure retains an unknown executed outcome and never replays on reopen',async()=>{
+ const f=fixture(),rename=fs.promises.rename,id=randomUUID(),options={connection:{server:'http://127.0.0.1:12345/'},device:{id:randomUUID(),token:randomBytes(32).toString('hex'),grant:f.grant},journalRoot:path.join(f.root,'journal')};let writes=0,attempts=0;
+ const client=new LocalDeviceClient(options);client.api=async()=>({ok:true});client.executor.execute=async()=>{writes++;return {ok:true};};
+ fs.promises.rename=async(source,target)=>{if(JSON.parse(fs.readFileSync(source,'utf8')).phase==='completed'){attempts++;throw Object.assign(Error('persistent receipt lock'),{code:'EPERM'});}return rename(source,target);};
+ try{
+  const job={id,runId:f.runId,claimToken:randomUUID()};client.run(job);await client.active.promise;
+  assert.equal(writes,1);assert.equal(attempts,6);assert.equal(client.stopped,true);assert.equal(client.read(id).phase,'executing');
+  fs.promises.rename=rename;const reopened=new LocalDeviceClient(options);reopened.executor.execute=async()=>{writes++;};
+  reopened.run(job);assert.equal(reopened.pending.get(id).error.code,'LOCAL_OUTCOME_UNKNOWN');assert.equal(reopened.pending.get(id).error.notExecuted,false);assert.equal(writes,1);await reopened.close();
+ }finally{fs.promises.rename=rename;await client.close();f.cleanup();}
+});

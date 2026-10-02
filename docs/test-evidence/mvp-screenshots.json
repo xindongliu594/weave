@@ -1,0 +1,106 @@
+{
+  "assembledAt": "2026-10-02T16:45:38.919Z",
+  "browser": "Codex In-app Browser (IAB)",
+  "images": [
+    {
+      "file": "screenshots/team-preview.jpg",
+      "runId": "requirements",
+      "description": "完整团队方案等待确认",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\team-preview.jpg",
+      "sourceModifiedAt": "2026-10-02T14:16:09.050Z",
+      "bytes": 153504,
+      "sha256": "4623ed472bce9acb6f8652d57948d6914c8d24bbabcfad2d2fe1a9fec2559c22",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/invalid-scope-blocked.jpg",
+      "runId": "project",
+      "description": "旧方案路径范围被拦截",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\invalid-scope-blocked.jpg",
+      "sourceModifiedAt": "2026-10-02T14:35:00.520Z",
+      "bytes": 434112,
+      "sha256": "b696e8eb540cb1c7772b5dda14f8aba170b10cdf8d05c083f7ed1b6a91941576",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/normal-completed.jpg",
+      "runId": "99551bf3-94f0-464a-8cd7-6935ad679ab8",
+      "description": "原真实 Todo 已完成及累计费用",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\normal-completed.jpg",
+      "sourceModifiedAt": "2026-10-02T15:51:52.033Z",
+      "bytes": 78985,
+      "sha256": "dc07bc026a9761428552862dab4fb452938dc39db660b92512a7e897ce6adb76",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/normal-native-tests.jpg",
+      "runId": "99551bf3-94f0-464a-8cd7-6935ad679ab8",
+      "description": "原真实 Todo 本机测试输出",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\normal-native-tests.jpg",
+      "sourceModifiedAt": "2026-10-02T15:52:06.162Z",
+      "bytes": 68667,
+      "sha256": "fd04db26073d38b4ea2ee5c9105a0ee440a17054b425b1ae972fb8ea3ebacf0f",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/normal-delivery-readme.jpg",
+      "runId": "99551bf3-94f0-464a-8cd7-6935ad679ab8",
+      "description": "原员工运行说明预览",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\normal-delivery-readme.jpg",
+      "sourceModifiedAt": "2026-10-02T16:24:11.920Z",
+      "bytes": 53321,
+      "sha256": "c690a8b15014eb284fa15bff9adb58a8e77bc64ce8fa6fbb18bc16eb4912f8c1",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/before-restart.jpg",
+      "runId": "1cc083f3-1ca0-4eec-8230-29a2fe7617f3",
+      "description": "受控中断前开发完成、QA 待审批",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\before-restart.jpg",
+      "sourceModifiedAt": "2026-10-02T14:50:15.693Z",
+      "bytes": 108125,
+      "sha256": "51beba3cd97c813104bd139e40267011bfc6bcef9c9ca5d0899ffa53e2cb8bd2",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/recovery-native-tests.jpg",
+      "runId": "c9b1f703-b2a6-4bf0-8318-ad2b15ce911e",
+      "description": "恢复后独立 CLI/HTTP 测试通过",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\recovery-native-tests.jpg",
+      "sourceModifiedAt": "2026-10-02T15:46:20.494Z",
+      "bytes": 54466,
+      "sha256": "7eddf1d26086f8a146d149ab1fd40bc1f6b67604b714dd7f0fc5d368812dbb81",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/recovery-delivery-readme.jpg",
+      "runId": "c9b1f703-b2a6-4bf0-8318-ad2b15ce911e",
+      "description": "恢复文件及员工运行说明",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\recovery-delivery-readme.jpg",
+      "sourceModifiedAt": "2026-10-02T15:45:58.887Z",
+      "bytes": 52331,
+      "sha256": "b243aaa8d83b3391ca354e07540ec0c458057d08a8227af3dfdea86c93f87801",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/recovery-cost-gate.jpg",
+      "runId": "c9b1f703-b2a6-4bf0-8318-ad2b15ce911e",
+      "description": "恢复 Run 最后状态和停止原因",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\recovery-cost-gate.jpg",
+      "sourceModifiedAt": "2026-10-02T15:43:49.548Z",
+      "bytes": 77083,
+      "sha256": "a374358f21ec4472572179403bf20f5658f62aae768dcd61c640c03b5d98aa0a",
+      "copyVerified": true
+    },
+    {
+      "file": "screenshots/recovery-cost-gate-controls.jpg",
+      "runId": "c9b1f703-b2a6-4bf0-8318-ad2b15ce911e",
+      "description": "费用待核对、两个恢复入口禁用、修后可读排版",
+      "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-evidence\\recovery-cost-gate-controls.jpg",
+      "sourceModifiedAt": "2026-10-02T16:34:45.164Z",
+      "bytes": 56726,
+      "sha256": "4989ebae4bc3af48c935fc3bdeeec9fb9855a9b5bcf5ce25a7291cdc124340a1",
+      "copyVerified": true
+    }
+  ]
+}

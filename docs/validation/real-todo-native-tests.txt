@@ -1,0 +1,324 @@
+Display copy: trailing whitespace normalized for the repository. Exact native output strings are preserved in docs/test-evidence/mvp-real-runs.json.
+
+Run ID: 99551bf3-94f0-464a-8cd7-6935ad679ab8
+Capture: 99551bf3-94f0-464a-8cd7-6935ad679ab8-normal.json
+Captured at: 2026-10-02T15:47:04.722Z
+Operation ID: 80dda1ac-e96d-4f58-a7fe-17888afb596d
+Employee / task: employee-2 / implement_todo
+Approval ID: 09986085-8ea6-40e4-b8af-42587fca512f
+Created at: 2026-10-02T09:07:25.969Z
+Command: node --test todo.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\99551bf3-94f0-464a-8cd7-6935ad679ab8
+Exit code: 1
+✖ health, CRUD and validation (86.7095ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 289.8611
+
+✖ failing tests:
+
+test at todo.test.mjs:15:1
+✖ health, CRUD and validation (86.7095ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   error: 'Not found'
+  -   completed: true,
+  -   id: '77263496-c2de-4e0d-8c2a-a7f12b4a2440',
+  -   title: 'Done'
+    }
+
+      at file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/99551bf3-94f0-464a-8cd7-6935ad679ab8/todo.test.mjs:30:10
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async withServer (file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/99551bf3-94f0-464a-8cd7-6935ad679ab8/todo.test.mjs:9:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { error: 'Not found' },
+    expected: { id: '77263496-c2de-4e0d-8c2a-a7f12b4a2440', title: 'Done', completed: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+
+========================================================================
+
+Run ID: 99551bf3-94f0-464a-8cd7-6935ad679ab8
+Capture: 99551bf3-94f0-464a-8cd7-6935ad679ab8-normal.json
+Captured at: 2026-10-02T15:47:04.722Z
+Operation ID: 0a31fffa-e128-44c0-b949-946530ad7a8e
+Employee / task: employee-2 / implement_todo
+Approval ID: a2f32d9d-117f-4258-acfa-854d99d57c1d
+Created at: 2026-10-02T09:09:07.948Z
+Command: node --test todo.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\99551bf3-94f0-464a-8cd7-6935ad679ab8
+Exit code: 1
+✖ health, CRUD and validation (96.5299ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 283.9069
+
+✖ failing tests:
+
+test at todo.test.mjs:14:1
+✖ health, CRUD and validation (96.5299ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  404 !== 400
+
+      at file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/99551bf3-94f0-464a-8cd7-6935ad679ab8/todo.test.mjs:36:12
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async withServer (file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/99551bf3-94f0-464a-8cd7-6935ad679ab8/todo.test.mjs:9:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+========================================================================
+
+Run ID: 99551bf3-94f0-464a-8cd7-6935ad679ab8
+Capture: 99551bf3-94f0-464a-8cd7-6935ad679ab8-normal.json
+Captured at: 2026-10-02T15:47:04.722Z
+Operation ID: 4bfcc28a-38dd-4e09-859a-4931441ea0d8
+Employee / task: employee-2 / implement_todo
+Approval ID: 217ae29e-98b8-4c50-aac5-050ff7449eb9
+Created at: 2026-10-02T09:10:46.133Z
+Command: node --test todo.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\99551bf3-94f0-464a-8cd7-6935ad679ab8
+Exit code: 0
+✔ health, CRUD and validation (96.7949ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 290.3201
+
+
+========================================================================
+
+Run ID: 99551bf3-94f0-464a-8cd7-6935ad679ab8
+Capture: 99551bf3-94f0-464a-8cd7-6935ad679ab8-normal.json
+Captured at: 2026-10-02T15:47:04.722Z
+Operation ID: 84748bff-1379-44e7-86f8-d9fbfa39d64c
+Employee / task: employee-3 / independent_acceptance
+Approval ID: d430ffd9-5852-46d3-a635-2a21edccbb22
+Created at: 2026-10-02T09:14:43.741Z
+Command: node --test acceptance.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\99551bf3-94f0-464a-8cd7-6935ad679ab8
+Exit code: 0
+✔ Windows-style CLI process and complete Todo HTTP contract (240.7555ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3405.029
+
+
+========================================================================
+
+Run ID: 99551bf3-94f0-464a-8cd7-6935ad679ab8
+Capture: 99551bf3-94f0-464a-8cd7-6935ad679ab8-normal.json
+Captured at: 2026-10-02T15:47:04.722Z
+Operation ID: bc598e4b-10ae-4e9d-a50e-2efacc3e6ccc
+Employee / task: employee-3 / independent_acceptance
+Approval ID: a9ebc528-020d-49a9-983b-eab692487ae6
+Created at: 2026-10-02T09:16:38.865Z
+Command: node --test acceptance.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\99551bf3-94f0-464a-8cd7-6935ad679ab8
+Exit code: 0
+✔ Windows-style CLI process and complete Todo HTTP contract (339.8426ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3496.1921
+
+
+========================================================================
+
+Run ID: 99551bf3-94f0-464a-8cd7-6935ad679ab8
+Capture: 99551bf3-94f0-464a-8cd7-6935ad679ab8-normal.json
+Captured at: 2026-10-02T15:47:04.722Z
+Operation ID: cbc667e3-344a-4448-bfe5-2471bd20b16a
+Employee / task: employee-3 / independent_acceptance
+Approval ID: 8f0decb6-2053-4f58-803b-17493c76bc40
+Created at: 2026-10-02T09:18:38.485Z
+Command: node --test acceptance.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\99551bf3-94f0-464a-8cd7-6935ad679ab8
+Exit code: 0
+✔ Windows-style CLI process and complete Todo HTTP contract (346.8174ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3510.175
+
+
+========================================================================
+
+Run ID: 1cc083f3-1ca0-4eec-8230-29a2fe7617f3
+Capture: 1cc083f3-1ca0-4eec-8230-29a2fe7617f3-before-restart.json
+Captured at: 2026-10-02T14:51:01.687Z
+Operation ID: 531ed120-5f7e-4251-82d2-dc7bd6cfc269
+Employee / task: employee-2 / dev
+Approval ID: 26e99617-3958-4586-bf47-fa335f119736
+Created at: 2026-10-02T14:41:48.587Z
+Command: node --test todo.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\1cc083f3-1ca0-4eec-8230-29a2fe7617f3
+Exit code: 1
+✖ CRUD lifecycle (65.2903ms)
+✔ invalid input yields 400 and missing routes/resources 404 (9.6719ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 290.8904
+
+✖ failing tests:
+
+test at todo.test.mjs:15:1
+✖ CRUD lifecycle (65.2903ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - true
+
+      at TestContext.<anonymous> (file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/1cc083f3-1ca0-4eec-8230-29a2fe7617f3/todo.test.mjs:24:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+========================================================================
+
+Run ID: 1cc083f3-1ca0-4eec-8230-29a2fe7617f3
+Capture: 1cc083f3-1ca0-4eec-8230-29a2fe7617f3-before-restart.json
+Captured at: 2026-10-02T14:51:01.687Z
+Operation ID: 1681ce06-429a-4d6b-b0dc-9debb263db82
+Employee / task: employee-2 / dev
+Approval ID: adf08fd1-f770-48b1-b0b3-2f2afda4c4f0
+Created at: 2026-10-02T14:45:43.131Z
+Command: node --test todo.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\1cc083f3-1ca0-4eec-8230-29a2fe7617f3
+Exit code: 0
+✔ CRUD lifecycle (65.0402ms)
+✔ invalid input yields 400 and missing routes/resources 404 (8.107ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 284.3855
+
+
+========================================================================
+
+Run ID: c9b1f703-b2a6-4bf0-8318-ad2b15ce911e
+Capture: c9b1f703-b2a6-4bf0-8318-ad2b15ce911e-stopped.json
+Captured at: 2026-10-02T15:42:26.480Z
+Operation ID: c8f782a5-7bd0-42e1-bab6-c69df014b3d1
+Employee / task: employee-3 / qa_verify
+Approval ID: 9e37531e-f9e2-46c9-9f6e-ae1f73b119ba
+Created at: 2026-10-02T14:56:47.435Z
+Command: node --test acceptance.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\c9b1f703-b2a6-4bf0-8318-ad2b15ce911e
+Exit code: 0
+✔ CLI-launched Todo API supports CRUD and reports invalid/missing resources (261.0064ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 425.7936
+
+
+========================================================================
+
+Run ID: c9b1f703-b2a6-4bf0-8318-ad2b15ce911e
+Capture: c9b1f703-b2a6-4bf0-8318-ad2b15ce911e-stopped.json
+Captured at: 2026-10-02T15:42:26.480Z
+Operation ID: 6b3083da-968d-482f-b9a1-98dc730a50f4
+Employee / task: employee-3 / qa_review
+Approval ID: 33a77d11-2477-4e3b-ab97-fb5b1bfd96d6
+Created at: 2026-10-02T15:02:22.811Z
+Command: node --test todo.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\c9b1f703-b2a6-4bf0-8318-ad2b15ce911e
+Exit code: 0
+✔ CRUD lifecycle (73.9513ms)
+✔ invalid input yields 400 and missing routes/resources 404 (10.2982ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 313.9286
+
+
+========================================================================
+
+Run ID: c9b1f703-b2a6-4bf0-8318-ad2b15ce911e
+Capture: c9b1f703-b2a6-4bf0-8318-ad2b15ce911e-stopped.json
+Captured at: 2026-10-02T15:42:26.480Z
+Operation ID: 157e8f7d-f7dd-43f7-a291-2e8980e7ed24
+Employee / task: employee-3 / qa_review
+Approval ID: 98314397-9ff7-4f8f-a561-c4221a9983cf
+Created at: 2026-10-02T15:21:47.962Z
+Command: node --test acceptance.test.mjs
+Workspace: C:\Users\JJ\Desktop\la\agent_department\.data\local\workspaces\c9b1f703-b2a6-4bf0-8318-ad2b15ce911e
+Exit code: 0
+✔ CLI-launched Todo API supports CRUD and reports invalid/missing resources (251.6651ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 403.6505

@@ -1,0 +1,15 @@
+✔ native workspace preserves file versions and rejects traversal, Windows aliases and links (32.2048ms)
+✔ native commands require capability, matching approval and current workspace version (2614.2972ms)
+✔ a command that changes files but exceeds receipt limits remains an executed mutation (2083.0477ms)
+✔ command completion and cancellation clean ordinary background descendants (5262.3945ms)
+✔ lost operation receipt and process restart resend the receipt without replaying a mutation (96.1533ms)
+✔ transient Windows receipt rename failures do not repeat the underlying operation (103.7811ms)
+✔ persistent receipt failure retains an unknown executed outcome and never replays on reopen (368.001ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10689.3122

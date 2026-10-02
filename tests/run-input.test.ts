@@ -37,7 +37,7 @@ test('approval intersects long-term scope, freezes per-employee run inputs and p
  let project=(await call('/projects')).data.find((p0:any)=>p0.id===p.id);
  const options=(await call('/projects/'+p.id+'/knowledge-options')).data;
  assert.deepEqual(options.find((x:any)=>x.id===secret.id).agentIds,['other']);
- const plan={...project.plan,knowledgeDocumentIds:[doc1.id,secret.id],runInputs:[{id:'brief',title:'本次专用简报',content:'inputneedle original private input',agentIds:['manager']}]};
+ const plan={...project.plan,tasks:project.plan.tasks.map((task:any)=>({...task,kind:'requirements',subject:'核对本次资料授权与版本',objective:'读取本次获授权的资料并整理版本和引用清单',acceptanceCriteria:['仅引用获授权的资料，并记录引用的固定版本']})),knowledgeDocumentIds:[doc1.id,secret.id],runInputs:[{id:'brief',title:'本次专用简报',content:'inputneedle original private input',agentIds:['manager']}]};
  assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan})).status,200);
  const approved=await call('/projects/'+p.id+'/approve','POST',{version:2});assert.equal(approved.status,202,JSON.stringify(approved.data));
  const runId=approved.data.id,snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;

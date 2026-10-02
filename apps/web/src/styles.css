@@ -49,6 +49,7 @@ input[type="checkbox"],input[type="radio"]{width:auto;flex:none;margin-right:6px
 .run-failure{display:grid;gap:12px;margin:20px 0;padding:18px;border:1px solid #edd9d1;border-radius:8px;background:#fff7f3;overflow-wrap:anywhere}
 .run-failure h3{color:#884c3c}.run-failure p{color:#865e51;font-size:12px;white-space:pre-wrap}
 .run-failure strong{font-size:12px;font-weight:500}.run-failure .text-button{justify-self:start}
+.run-recovery{display:block;overflow-wrap:anywhere}.run-recovery .banner{display:block;margin:12px 0}.run-recovery .banner a{display:inline-block;margin-left:6px}.run-recovery>button{margin:8px 8px 0 0}
 .planning-provenance{margin:12px 0;font-size:12px;line-height:1.8;color:var(--muted)}
 .planning-error{display:grid;gap:10px;margin:12px 0;padding:14px;border:1px solid #edd9d1;border-radius:8px;background:#fff7f3}
 .planning-error p{font-size:12px;color:#865e51}.planning-error .text-button{justify-self:start}

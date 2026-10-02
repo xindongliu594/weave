@@ -5,17 +5,22 @@ import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync, readFileSync, existsSync, unlinkSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
+import { isAbsolute, join, resolve } from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url)); process.chdir(root);
 const args = process.argv.slice(2), check = args.includes('--check');
-if (args.includes('--help')) { console.log('为伍 · 一个想法，一支团队\n\nnpm run local [-- --web-port=4310]\nnpm run local:check\nnpm run local -- --enable-device：明确重新授予本机执行权限\n本机持久数据库与实际文件/命令执行；在模型目录配置自己的 API。'); process.exit(0); }
-if (args.some(value => value !== '--check' && value !== '--enable-device' && !/^--web-port=\d+$/.test(value))) throw Error('未知参数；请使用 --help');
+if (args.includes('--help')) { console.log('为伍 · 一个想法，一支团队\n\nnpm run local -- [--web-port=4310] [--data-dir="绝对路径"]\nnpm run local:check\nnpm run local -- --enable-device：明确重新授予本机执行权限\n--data-dir 沿用指定本机数据目录、配置和已有目录授权，须先停止使用该目录的服务；检查模式不接受此参数。\n本机持久数据库与实际文件/命令执行；在模型目录配置自己的 API。'); process.exit(0); }
+if (args.some(value => value !== '--check' && value !== '--enable-device' && !/^--web-port=\d+$/.test(value) && !value.startsWith('--data-dir='))) throw Error('未知参数；请使用 --help');
 if(check&&args.includes('--enable-device'))throw Error('检查模式不接受 --enable-device');
+const dataDirs = args.filter(value => value.startsWith('--data-dir='));
+if (check && dataDirs.length) throw Error('检查模式不接受 --data-dir，检查只使用独立临时数据目录');
+if (dataDirs.length > 1) throw Error('--data-dir 只能指定一次');
+const dataDir = dataDirs[0]?.slice('--data-dir='.length);
+if (dataDir !== undefined && (!dataDir || !isAbsolute(dataDir))) throw Error('--data-dir 必须是绝对路径');
 const port = Number(args.find(value => value.startsWith('--web-port='))?.split('=')[1] ?? 4310);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw Error('网页端口必须在 1024–65535 之间');
 if (!existsSync(join(root, 'services/agent-runtime/node_modules/@deepseek-ai/dsh'))) throw Error('先运行 npm --prefix services/agent-runtime ci');
-const directory = check ? join(root, '.data', 'local-check', randomUUID()) : join(root, '.data', 'local');
+const directory = check ? join(root, '.data', 'local-check', randomUUID()) : dataDir ? resolve(dataDir) : join(root, '.data', 'local');
 mkdirSync(directory, { recursive: true, mode: 0o700 });
 const lockFile = join(directory, 'launcher.lock'), lock = { id: randomUUID(), pid: process.pid };
 if (existsSync(lockFile)) {

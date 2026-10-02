@@ -4,6 +4,8 @@ export function isArtifactPath(value) {
   return typeof value === 'string' && value.length > 0 && value.length <= 240 && !/[\\\0]/.test(value) &&
     !value.startsWith('/') && !value.split('/').some(p => !p || p === '.' || p === '..' || p.startsWith('.agent'));
 }
+// Match the host permission gate: an exact file or a directory subtree.
+const withinScope = (path, scopes) => scopes.some(scope => path === scope || path.startsWith(`${scope.replace(/\/$/, '')}/`));
 export function taskContractErrors(tasks, agents = [], checkpoints = []) {
   const errors = [], byId = new Map(tasks.map(t => [t.id, t]));
   const prior = new Map(checkpoints.map(t => [t.taskId, t]));
@@ -38,6 +40,8 @@ export function taskContractErrors(tasks, agents = [], checkpoints = []) {
     for (const output of task.outputs ?? []) {
       if (output.format !== undefined && !['text', 'json'].includes(output.format)) errors.push(`${task.id}: 未知文件格式`);
       if ((output.requiredKeys?.length || Object.keys(output.expectedValues ?? {}).length) && output.format !== 'json') errors.push(`${task.id}: 字段检查仅用于 JSON 输出`);
+      if (task.inScope?.length && !withinScope(output.path, task.inScope)) errors.push(`${task.id}: 输出 ${output.path} 不在允许修改的文件或目录范围内`);
+      if (task.outOfScope?.length && withinScope(output.path, task.outOfScope)) errors.push(`${task.id}: 输出 ${output.path} 位于禁止修改的文件或目录范围内`);
     }
     if (['implementation', 'repair'].includes(kind) && (!(task.inScope?.length) || !(task.verify?.length))) errors.push(`${task.id}: 实现和修复必须声明修改范围及验证命令`);
     if (kind === 'review' || kind === 'repair') {

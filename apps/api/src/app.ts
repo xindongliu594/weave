@@ -394,11 +394,13 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
     const id = z.uuid().parse(req.params.id);
     const run = readRun(traceRoot, id);
     const row = (await pool.query('SELECT snapshot,status,error,created_at FROM project_runs WHERE id=$1',[id])).rows[0];
-    if (!run) { if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,error:row.error,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false}); }
+    const costBlocked=row&&['failed','interrupted','cancelled'].includes(row.status)&&(await pool.query("SELECT id FROM model_reservations WHERE project_id=$1 AND status IN ('pending','uncertain') LIMIT 1",[row.snapshot.projectId])).rowCount
+      ? '项目有进行中或待核对的模型费用。请先在系统设置核对供应方账单，再恢复；费用和调用上限继续保留。' : undefined;
+    if (!run) { if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,error:row.error,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false,recovery:{unknownOperations:[],costBlocked}}); }
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
     const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, 300);
-    const recovery:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string}={unknownOperations:unresolvedOperations(run.events)};
+    const recovery:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string;costBlocked?:string}={unknownOperations:unresolvedOperations(run.events),costBlocked};
     if(hasUnplannedTasks({tasks:row?.snapshot.approvedTasks??run.snapshot.tasks}))recovery.planningBlocked=planningRequiredMessage;
     if(row&&['failed','interrupted','cancelled'].includes(row.status))try{resumeHandoff({...run.snapshot,tasks:run.snapshot.approvedTasks??run.snapshot.tasks},run.events,completedTasks(run.events,run.snapshot),resolve(traceRoot,id,'artifacts'));}catch(error){recovery.checkpointBlocked=(error as Error).message;}
     res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','team/snapshot','team/checkpoint','recovery/restored','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });

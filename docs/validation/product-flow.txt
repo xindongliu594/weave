@@ -1,0 +1,34 @@
+Product flow regression; final source 2026-10-03 Asia/Shanghai
+Command: node scripts/test-integration.mjs tests/product-flow.test.ts
+Boundary: fixed model/protocol fixtures; real API, persistent run records and native local commands. This is not paid model acceptance.
+Started UTC: 2026-10-02T16:36:31.1634628Z
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (12967.6657ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (9574.2122ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2567.1412ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (4924.8553ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (4892.16ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (6602.8338ms)
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (13650.491ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (7028.5759ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (28348.9361ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3397.1899ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (2891.8614ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (1815.7015ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (5799.6312ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (6059.0706ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (7206.453ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (11478.7529ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (22212.4433ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 152094.4844
+Finished UTC: 2026-10-02T16:39:05.8260792Z
+Elapsed seconds: 154.649
+Exit code: 0

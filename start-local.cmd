@@ -11,5 +11,5 @@ if not exist "node_modules\@electric-sql\pglite" (
   pause
   exit /b 1
 )
-node scripts/local.mjs
+node scripts/local.mjs %*
 pause

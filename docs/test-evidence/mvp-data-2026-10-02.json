@@ -1,0 +1,164 @@
+{
+  "kind": "isolated-local-data-validation",
+  "status": "passed",
+  "startedAt": "2026-10-02T14:20:34.981Z",
+  "finishedAt": "2026-10-02T14:21:00.141Z",
+  "command": "node scripts/verify-mvp-data.mjs",
+  "directory": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-data-2VcfFZ",
+  "originalDataOpened": false,
+  "modelHttpCalls": 0,
+  "originalCredentialsCopied": false,
+  "database": "Two independent persistent PGlite databases, with product API and schema; one connection per process.",
+  "scope": "Knowledge authorization, fixed revisions, checkpoint citation references, encrypted backup, nested files and reopen after process restart. Synthetic bookkeeping is not a real model execution result.",
+  "limitations": [
+    "Independent PostgreSQL backend locking and Docker isolation are not exercised by PGlite.",
+    "No paid model or Todo acceptance is claimed by this data fixture."
+  ],
+  "phases": [
+    {
+      "phase": "source",
+      "status": "passed",
+      "dataDirectory": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-data-2VcfFZ\\source",
+      "runId": "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d",
+      "resumedRunId": "e79d2e1c-578a-4dfd-abf3-003979d386be",
+      "databaseCounts": {
+        "departments": 1,
+        "projects": 1,
+        "project_runs": 2,
+        "usage": 1,
+        "knowledge_spaces": 2,
+        "knowledge_documents": 2,
+        "knowledge_revisions": 3,
+        "knowledge_chunks": 3
+      },
+      "traceFiles": {
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/artifacts/nested/data-fixture.txt": "70d0cca5f5475a8a5fbc0937352248a15e9ed31522d1e3e72d7bff8446790107",
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/events.jsonl": "514653bf3c8276175232534bd7be3c99087a6cb317265544ca6f379b6ff9bdad",
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/snapshot.json": "9ad2003058c64df0c0212a85a582eb98d9411517ba81f13f2650d7d548674d9a",
+        "e79d2e1c-578a-4dfd-abf3-003979d386be/events.jsonl": "01c2cc8674fa6a4986a540f94c9021dceb0ffff1f78e28a53e4e27a4faf17174",
+        "e79d2e1c-578a-4dfd-abf3-003979d386be/snapshot.json": "6ff6266dec4e386afb73c89728d57a67f4233c19335020eddb341db6f856b724"
+      },
+      "knowledgePaths": [
+        "employee/私有测试资料-af6891fd/授权隔离测试-a5545e69.md",
+        "company/共享测试资料-8d659492/固定版本测试-d9fe107d.md"
+      ],
+      "fixedCitation": {
+        "documentId": "d9fe107d-c95e-409c-acb6-d1c1e937c188",
+        "chunkId": "e63992bcac1e78c22743ea9a6aa5f5d9e9db7294629505502df8c0ab5ca041c2",
+        "version": 1,
+        "sha256": "83815b31027654c7ac6052468828ff914f1967e62f832f1a5b4c006cc2dd356f"
+      },
+      "syntheticBudgetHistory": {
+        "calls": 1,
+        "tasks": {
+          "research": {
+            "cost": 0.002,
+            "calls": 1
+          }
+        }
+      },
+      "checks": [
+        "Company, employee-private and run-input grants filter both search and direct reads; invalid grant rejected.",
+        "Task recovery context retains citation metadata; downstream context does not expose upstream private history.",
+        "Interactive retrieval sees version 2; approved run and citation API still return version 1."
+      ]
+    },
+    {
+      "phase": "restore",
+      "status": "passed",
+      "dataDirectory": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-data-2VcfFZ\\target",
+      "runId": "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d",
+      "resumedRunId": "e79d2e1c-578a-4dfd-abf3-003979d386be",
+      "databaseCounts": {
+        "departments": 1,
+        "projects": 1,
+        "project_runs": 2,
+        "usage": 1,
+        "knowledge_spaces": 2,
+        "knowledge_documents": 2,
+        "knowledge_revisions": 3,
+        "knowledge_chunks": 3
+      },
+      "traceFiles": {
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/artifacts/nested/data-fixture.txt": "70d0cca5f5475a8a5fbc0937352248a15e9ed31522d1e3e72d7bff8446790107",
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/events.jsonl": "514653bf3c8276175232534bd7be3c99087a6cb317265544ca6f379b6ff9bdad",
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/snapshot.json": "9ad2003058c64df0c0212a85a582eb98d9411517ba81f13f2650d7d548674d9a",
+        "e79d2e1c-578a-4dfd-abf3-003979d386be/events.jsonl": "01c2cc8674fa6a4986a540f94c9021dceb0ffff1f78e28a53e4e27a4faf17174",
+        "e79d2e1c-578a-4dfd-abf3-003979d386be/snapshot.json": "6ff6266dec4e386afb73c89728d57a67f4233c19335020eddb341db6f856b724"
+      },
+      "knowledgePaths": [
+        "employee/私有测试资料-af6891fd/授权隔离测试-a5545e69.md",
+        "company/共享测试资料-8d659492/固定版本测试-d9fe107d.md"
+      ],
+      "fixedCitation": {
+        "documentId": "d9fe107d-c95e-409c-acb6-d1c1e937c188",
+        "chunkId": "e63992bcac1e78c22743ea9a6aa5f5d9e9db7294629505502df8c0ab5ca041c2",
+        "version": 1,
+        "sha256": "83815b31027654c7ac6052468828ff914f1967e62f832f1a5b4c006cc2dd356f"
+      },
+      "syntheticBudgetHistory": {
+        "calls": 1,
+        "tasks": {
+          "research": {
+            "cost": 0.002,
+            "calls": 1
+          }
+        }
+      },
+      "checks": [
+        "Destination starts empty; wrong backup password rejected before replacement.",
+        "Product restore API loads source encrypted backup into a different database and directory.",
+        "Key row counts, complete DAG, synthetic budget/call bookkeeping, journal integrity, nested file and Vault SHA-256 hashes match source.",
+        "Recovered citation endpoint and task recovery context reference version 1; per-run input citation remains available."
+      ]
+    },
+    {
+      "phase": "reopen",
+      "status": "passed",
+      "dataDirectory": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\mvp-data-2VcfFZ\\target",
+      "runId": "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d",
+      "resumedRunId": "e79d2e1c-578a-4dfd-abf3-003979d386be",
+      "databaseCounts": {
+        "departments": 1,
+        "projects": 1,
+        "project_runs": 2,
+        "usage": 1,
+        "knowledge_spaces": 2,
+        "knowledge_documents": 2,
+        "knowledge_revisions": 3,
+        "knowledge_chunks": 3
+      },
+      "traceFiles": {
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/artifacts/nested/data-fixture.txt": "70d0cca5f5475a8a5fbc0937352248a15e9ed31522d1e3e72d7bff8446790107",
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/events.jsonl": "514653bf3c8276175232534bd7be3c99087a6cb317265544ca6f379b6ff9bdad",
+        "07d6bd05-10dd-4fa1-a00b-77f1b8a5cf4d/snapshot.json": "9ad2003058c64df0c0212a85a582eb98d9411517ba81f13f2650d7d548674d9a",
+        "e79d2e1c-578a-4dfd-abf3-003979d386be/events.jsonl": "01c2cc8674fa6a4986a540f94c9021dceb0ffff1f78e28a53e4e27a4faf17174",
+        "e79d2e1c-578a-4dfd-abf3-003979d386be/snapshot.json": "6ff6266dec4e386afb73c89728d57a67f4233c19335020eddb341db6f856b724"
+      },
+      "knowledgePaths": [
+        "employee/私有测试资料-af6891fd/授权隔离测试-a5545e69.md",
+        "company/共享测试资料-8d659492/固定版本测试-d9fe107d.md"
+      ],
+      "fixedCitation": {
+        "documentId": "d9fe107d-c95e-409c-acb6-d1c1e937c188",
+        "chunkId": "e63992bcac1e78c22743ea9a6aa5f5d9e9db7294629505502df8c0ab5ca041c2",
+        "version": 1,
+        "sha256": "83815b31027654c7ac6052468828ff914f1967e62f832f1a5b4c006cc2dd356f"
+      },
+      "syntheticBudgetHistory": {
+        "calls": 1,
+        "tasks": {
+          "research": {
+            "cost": 0.002,
+            "calls": 1
+          }
+        }
+      },
+      "checks": [
+        "Key row counts, complete DAG, synthetic budget/call bookkeeping, journal integrity, nested file and Vault SHA-256 hashes match source.",
+        "Recovered citation endpoint and task recovery context reference version 1; per-run input citation remains available.",
+        "A fresh process reopens the persisted target database and repeats all restored-data checks."
+      ]
+    }
+  ]
+}

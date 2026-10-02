@@ -1,0 +1,55 @@
+✔ local launcher documents the explicit data directory (186.7468ms)
+✔ local check refuses a data directory override before accessing it (168.1773ms)
+✔ local launcher refuses relative and empty data directories (339.9428ms)
+✔ local launcher refuses ambiguous duplicate data directory options (164.0173ms)
+✔ an absolute data directory with spaces retains its existing launch lock (205.5523ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.2175ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5548ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.3881ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.1895ms)
+✔ normal execution includes the saved planning cost in project spend (1.5306ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (10.6536ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.5662ms)
+✔ overlapping polling and manual pagination never duplicate or discard trace events (2.523ms)
+✔ stopped execution labels refer to the interruption point rather than a live employee (15.069ms)
+✔ unresolved model charges disable both recovery actions and expose the reconciliation entry (4.2236ms)
+✔ verification tasks expose existing scope for correction without making it mandatory (13.2233ms)
+✔ tasks with declared outputs can edit scope even when the task kind is work (1.7487ms)
+✔ implementation scope remains required and an unrestricted text task adds no scope fields (2.0958ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1461.6426
+
+Final check 2026-10-03 Asia/Shanghai: node --import tsx --test tests/run-events.test.ts tests/run-status.test.ts tests/run-cost.test.ts tests/task-contract-editor.test.ts tests/organization-draft.test.ts tests/local-launcher.test.ts
+✔ local launcher documents the explicit data directory (467.6315ms)
+✔ local check refuses a data directory override before accessing it (352.4661ms)
+✔ local launcher refuses relative and empty data directories (453.7381ms)
+✔ local launcher refuses ambiguous duplicate data directory options (177.5466ms)
+✔ an absolute data directory with spaces retains its existing launch lock (197.5941ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (3.3811ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.8982ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.6475ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.3615ms)
+✔ normal execution includes the saved planning cost in project spend (9.4654ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (22.791ms)
+✔ legacy archives without execution-budget evidence show only known current spend (4.3281ms)
+✔ overlapping polling and manual pagination never duplicate or discard trace events (5.3178ms)
+✔ stopped execution labels refer to the interruption point rather than a live employee (17.5739ms)
+✔ unresolved model charges disable both recovery actions and expose the reconciliation entry (1.8742ms)
+✔ verification tasks expose existing scope for correction without making it mandatory (34.5937ms)
+✔ tasks with declared outputs can edit scope even when the task kind is work (3.2421ms)
+✔ implementation scope remains required and an unrestricted text task adds no scope fields (3.8095ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2146.5046
+Exit code: 0

@@ -54,6 +54,6 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
     undoVault=restoreVaultFiles(value.vaultFiles??{},previousPaths);
     if(existsSync(traceRoot)){renameSync(traceRoot,rollback);movedOld=true;}renameSync(stage,traceRoot);swapped=true;
     if(value.master)writeFileSync(keyPath,Buffer.from(value.master,'base64'),{mode:0o600});else if(existsSync(keyPath))rmSync(keyPath);
-    await client.query('COMMIT');resetVaultCache();res.json({ok:true,message:'业务数据和执行档案已恢复；恢复前的档案已在 Mac 保留。'});
+    await client.query('COMMIT');resetVaultCache();res.json({ok:true,message:'业务数据和执行档案已恢复；恢复前的档案已在本机保留。'});
   }catch(e){await client.query('ROLLBACK');undoVault?.();if(swapped||movedOld){if(swapped)rmSync(traceRoot,{recursive:true,force:true});if(movedOld)renameSync(rollback,traceRoot);if(oldKey)writeFileSync(keyPath,oldKey,{mode:0o600});else if(existsSync(keyPath))rmSync(keyPath);}throw e;}finally{client.release();if(existsSync(stage))rmSync(stage,{recursive:true,force:true});}
  }));return router;}

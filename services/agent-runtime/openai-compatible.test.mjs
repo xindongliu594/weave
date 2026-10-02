@@ -5,6 +5,22 @@ import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 const route = { id: 'model-record', name: 'Relay model', wireModel: 'upstream-model', baseUrl: 'https://relay.invalid/v1', apiKey: 'not-a-real-key', inputRate: 1, outputRate: 2, maxOutputTokens: 1000 };
 const message = { id: 'message-1', role: 'user', source: { kind: 'user' }, content: [{ type: 'text', text: 'Do the task' }] };
 
+test('an abort during durable reservation never dispatches a request or reports an unknown sent call', async () => {
+  const original = globalThis.fetch, controller = new AbortController(), failures = [], requests = [];
+  let fetched = false;
+  globalThis.fetch = async () => { fetched = true; throw Error('must not send'); };
+  try {
+    const adapter = new OpenAiCompatibleAdapter({ routes: [route], maxBudget: 1, signal: controller.signal,
+      beforeRequest: async () => { controller.abort(Error('approved deadline')); },
+      onRequest: event => requests.push(event), onCallError: event => failures.push(event),
+    });
+    await assert.rejects(async () => { for await (const _ of adapter.stream({ model: route.id, messages: [message] })) {} }, /approved deadline/);
+    assert.equal(fetched, false); assert.equal(requests.length, 0);
+    assert.equal(failures.length, 1); assert.equal(failures[0].dispatched, false);
+    assert.equal(adapter.reserved, 0);
+  } finally { globalThis.fetch = original; }
+});
+
 test('OpenAI compatible adapter translates tool calls, usage, routing and authorization', async () => {
   const original = globalThis.fetch;
   const usages = [];

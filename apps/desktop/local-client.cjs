@@ -11,11 +11,22 @@ class LocalDeviceClient {
   this.executor=new LocalExecutor(device.grant);this.controller=new AbortController();this.pending=new Map();this.active=null;this.stopped=false;
   fs.mkdirSync(journalRoot,{recursive:true,mode:0o700});if(fs.lstatSync(journalRoot).isSymbolicLink())throw Error('本机回执目录不能是链接');
  }
- record(id,value){
+ async record(id,value){
   if(!/^[a-f0-9-]{36}$/.test(id))throw Error('本机操作编号不正确');
   const file=path.join(this.journalRoot,id+'.json'),temporary=file+'.'+randomUUID();
   if(fs.existsSync(file)&&fs.lstatSync(file).isSymbolicLink())throw Error('本机回执文件不能是链接');
-  fs.writeFileSync(temporary,JSON.stringify(value),{flag:'wx',mode:0o600});fs.renameSync(temporary,file);
+  fs.writeFileSync(temporary,JSON.stringify(value),{flag:'wx',mode:0o600});
+  try{
+   for(let attempt=0;;attempt++){
+    try{await fs.promises.rename(temporary,file);break;}
+    catch(error){
+     // Windows scanners may briefly hold a receipt file. Retry only this
+     // atomic journal replacement, never the command or file operation.
+     if(!['EPERM','EBUSY','EACCES'].includes(error.code)||attempt>=5)throw error;
+     await pause(20*(attempt+1));
+    }
+   }
+  }finally{if(fs.existsSync(temporary))fs.unlinkSync(temporary);}
  }
  read(id){const file=path.join(this.journalRoot,id+'.json');if(!fs.existsSync(file))return null;if(fs.lstatSync(file).isSymbolicLink()||fs.statSync(file).size>32*1024*1024)throw Error('本机回执格式不正确');return JSON.parse(fs.readFileSync(file,'utf8'));}
  async api(endpoint,body){
@@ -29,7 +40,7 @@ class LocalDeviceClient {
  }
  async deliver(id,receipt){
   await this.api(this.device.id+'/operations/'+id+'/result',receipt);
-  this.record(id,{phase:'acknowledged',claimToken:receipt.claimToken});this.pending.delete(id);
+  await this.record(id,{phase:'acknowledged',claimToken:receipt.claimToken});this.pending.delete(id);
  }
  run(job){
   const previous=this.read(job.id);
@@ -40,13 +51,13 @@ class LocalDeviceClient {
   active.promise=(async()=>{
    let executing=false,receipt;
    try{
-    this.record(job.id,{phase:'claimed',claimToken:job.claimToken,runId:job.runId});
-    this.record(job.id,{phase:'starting',claimToken:job.claimToken,runId:job.runId});
+    await this.record(job.id,{phase:'claimed',claimToken:job.claimToken,runId:job.runId});
+    await this.record(job.id,{phase:'starting',claimToken:job.claimToken,runId:job.runId});
     await this.api(this.device.id+'/operations/'+job.id+'/start',{claimToken:job.claimToken});signal.throwIfAborted();
-    this.record(job.id,{phase:'executing',claimToken:job.claimToken,runId:job.runId});executing=true;
+    await this.record(job.id,{phase:'executing',claimToken:job.claimToken,runId:job.runId});executing=true;
     const result=await this.executor.execute(job,signal);receipt={claimToken:job.claimToken,ok:true,result};
    }catch(error){receipt={claimToken:job.claimToken,ok:false,error:{code:error.code??'LOCAL_OPERATION_FAILED',message:String(error.message).slice(0,500),notExecuted:!executing||!!error.notExecuted}};}
-   this.record(job.id,{phase:'completed',claimToken:job.claimToken,runId:job.runId,receipt});this.pending.set(job.id,receipt);
+   await this.record(job.id,{phase:'completed',claimToken:job.claimToken,runId:job.runId,receipt});this.pending.set(job.id,receipt);
    try{if(!this.stopped)await this.deliver(job.id,receipt);}catch{}
   })().catch(error=>{this.stopped=true;this.controller.abort(error);this.onState({status:'offline',message:'本机回执无法持久保存：'+error.message});}).finally(()=>{if(this.active===active)this.active=null;});
  }
@@ -58,7 +69,7 @@ class LocalDeviceClient {
     if(reply.cancel)this.active?.controller.abort(Error('服务端取消或设备授权失效'));
     if(reply.orphan&&!this.active){
      const previous=this.read(reply.orphan.id),receipt=previous?.receipt??{claimToken:reply.orphan.claimToken,ok:false,error:{code:'LOCAL_OUTCOME_UNKNOWN',message:'桌面进程中断，操作不自动重放，请核对本机工作区',notExecuted:!reply.orphan.started&&(!previous||previous.phase==='claimed')}};
-     this.record(reply.orphan.id,{phase:'completed',receipt});this.pending.set(reply.orphan.id,receipt);
+     await this.record(reply.orphan.id,{phase:'completed',receipt});this.pending.set(reply.orphan.id,receipt);
     }
     if(reply.job&&!this.active)this.run(reply.job);
     this.onState({status:this.active?'running':'connected',operationId:this.active?.id});

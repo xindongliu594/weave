@@ -113,6 +113,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const usageId=randomUUID();let registered=false,dispatched=false,accounted=false;
     try {
       await this.beforeRequest?.({id:usageId,...attribution,modelId:route.id,reservation});registered=!!this.beforeRequest;
+      options.signal?.throwIfAborted();
       this.onRequest?.({usageId,...attribution,modelId:route.id,body,reservation});
       dispatched=true;
       response = await fetch(route.baseUrl.replace(/\/$/, '') + '/chat/completions', {
