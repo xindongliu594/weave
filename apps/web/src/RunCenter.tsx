@@ -4,7 +4,7 @@ import { api } from './api.ts';
 import { RunExtras } from './RunExtras.tsx';
 import type { RunSummary, RunDetail, TraceEvent } from '../../../services/agent-runtime/trace-store.mjs';
 
-type Detail = RunDetail & { hasMore: boolean; nextCursor: number; summaryEvents?: TraceEvent[];recovery?:{unknownOperations:any[];checkpointBlocked?:string} };
+type Detail = RunDetail & { error?: string; hasMore: boolean; nextCursor: number; summaryEvents?: TraceEvent[];recovery?:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string} };
 const date = (value: string) => new Date(value).toLocaleString('zh-CN');
 const stateName: Record<string, string> = { running:'运行中',queued: '排队中', interrupted: '已中断', completed: '已完成', failed: '失败', cancelled: '已取消', unfinished: '运行中 / 可能中断', incomplete: '记录不完整' };
 const eventNames: Record<string, string> = {
@@ -13,7 +13,7 @@ const eventNames: Record<string, string> = {
   'tool/start': '开始调用工具', 'tool/result': '工具执行结果', 'team/operation': '团队操作', 'team/snapshot': '团队状态快照',
   'handoff/inputs-bound': '固定任务输入版本', 'handoff/accepted': '核验并接收交付物', 'handoff/blocked': '交接条件未满足', 'handoff/command-observed': '记录验证命令结果',
   'quality/review-submitted': '提交结构化审查问题', 'quality/reviewed': '独立审查通过', 'quality/rework-created': '授权范围内修复与独立复验', 'quality/escalated': '停止返工并交给用户处理',
-  'runtime/status':'员工运行状态','runtime/anomaly':'发现停滞或重复失败','runtime/read-retry':'重试短暂失败的只读操作','runtime/outcome-unknown':'操作结果需要核对','team/checkpoint':'保存停止时的任务状态',
+  'runtime/status':'员工运行状态','runtime/anomaly':'发现停滞或重复失败','runtime/read-retry':'重试短暂失败的只读操作','runtime/outcome-unknown':'操作结果需要核对','team/checkpoint':'保存任务检查点','recovery/restored':'恢复任务图与工作资料','recovery/read':'查阅断点前的历史记录',
   'local/device-bound':'绑定本机工作区','local/operation-queued':'派发获授权的本机操作','local/operation-finished':'收到本机操作回执',
   'session/user/message': '收到任务或追加指令', 'session/system/message': '实际系统提示词', 'session/assistant/message': '员工回复', 'session/turn/start': '开始工作', 'session/turn/end': '本轮结束',
   'context/pruned': '缩减工具结果并保留证据', 'context/summarized': '生成员工历史摘要', 'context/capacity-unknown': '使用工具缩减保护上下文',
@@ -29,7 +29,7 @@ function eventSummary(e: TraceEvent) {
   return '';
 }
 
-export function RunCenter() {
+export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [selected, setSelected] = useState<string | null>(() => { const id = location.hash.split('/')[1]; return /^[a-f0-9-]{36}$/.test(id ?? '') ? id : null; });
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -40,6 +40,10 @@ export function RunCenter() {
   const [error, setError] = useState('');
   async function refresh() { setRuns(await api<RunSummary[]>('/runs')); }
   useEffect(() => { refresh().catch(e => setError(e.message)).finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    const update=()=>{const [page,id]=location.hash.slice(1).split('/');if(page==='run')setSelected(/^[a-f0-9-]{36}$/.test(id??'')?id:null);};
+    window.addEventListener('hashchange',update);return()=>window.removeEventListener('hashchange',update);
+  }, []);
   useEffect(() => {
     history.replaceState(null, '', selected ? '#run/' + selected : '#run');
     if (!selected) { setDetail(null); return; }
@@ -83,7 +87,7 @@ export function RunCenter() {
       <button className="text-button back lower" onClick={() => setSelected(null)}><ArrowLeft size={15}/>返回运行列表</button>
       {!detail ? <p>正在读取运行记录…</p> : <>
 <section className="panel padded"><div className="row"><h2>{detail.title}</h2><span className="tag">{detail.mode === 'fixture' ? '测试模型验证' : '正式项目'}</span><span className="tag">{stateName[detail.status]}</span>{detail.mode === 'product' && ['unfinished','queued','running'].includes(detail.status) && <button onClick={async () => { try { await api(`/runs/${detail.id}/cancel`, 'POST', {}); } catch (e) { setError((e as Error).message); } }}>停止运行</button>}</div><p className="trace-id">Run ID：{detail.id}</p><p>{detail.snapshot.requirement}</p><small>方案 v{detail.snapshot.planVersion} · 模板 {detail.snapshot.templateVersion} · {detail.eventCount} 条事件</small>{detail.integrity !== 'ok' && <p className="validation-error">档案完整性检查未通过，不能视为完整执行记录。</p>}</section>
-        <RunExtras id={detail.id} status={detail.status} events={detail.summaryEvents ?? detail.events} snapshot={detail.snapshot} recovery={detail.recovery}/>
+        <RunExtras id={detail.id} status={detail.status} events={detail.summaryEvents ?? detail.events} snapshot={detail.snapshot} recovery={detail.recovery} runError={detail.error} onOpenProject={onOpenProject}/>
         <div className="trace-layout lower"><aside><section className="panel padded"><h3>员工与岗位快照</h3><button className={'trace-member ' + (!employee ? 'selected' : '')} onClick={() => setEmployee('')}>全部员工与运行操作</button>{sessions.map(s => <button key={s.id} className={'trace-member ' + (employee === s.id ? 'selected' : '')} onClick={() => setEmployee(s.id)}><strong>{s.name}</strong><small>{s.model}</small></button>)}{assigned && <div className="trace-role"><span className="tag">岗位提示词 v{assigned.roleVersion}</span><p>{assigned.rolePrompt}</p></div>}</section><section className="panel padded lower"><h3>本次任务提示词</h3>{detail.snapshot.tasks.filter(t => !assigned || t.assignee === assigned.id).map(t => <div className="trace-task" key={t.id}><strong>{t.subject}</strong><p>{t.taskPrompt}</p><small>{t.dependencies.length ? `前置任务：${t.dependencies.join('、')}` : '无前置依赖'}</small></div>)}</section></aside>
         <section className="panel padded"><div className="section-title"><h2>执行时间线</h2><select aria-label="事件类型" value={kind} onChange={e => setKind(e.target.value)}><option value="all">主要事件</option><option value="model/">模型请求与返回</option><option value="tool/">工具调用</option><option value="team/">团队操作与状态</option><option value="session/">会话事件</option><option value="raw">全部原始事件</option></select></div><p className="subcopy">展开模型请求可查看实际发送的消息与工具定义；岗位快照和任务快照分别保留。</p><div className="trace-timeline">{visible.map(e => <details key={e.seq} className="trace-event"><summary><span className="trace-dot"/><span><strong>{eventNames[e.type] ?? e.type}</strong><small>#{e.seq} · {new Date(e.at).toLocaleTimeString('zh-CN')}{e.taskId ? ` · 任务 ${e.taskId}` : ''}{e.sessionId ? ` · ${sessions.find(s => s.id === e.sessionId)?.name ?? '员工会话'}` : ''}</small><span className="trace-summary">{eventSummary(e)}</span></span></summary>{e.attemptId && <p className="trace-id">执行尝试：{e.attemptId}</p>}<pre>{JSON.stringify(e.data, null, 2)}</pre></details>)}</div>{!visible.length && <p className="compact-empty">此筛选下暂无事件。</p>}{detail.hasMore && <button onClick={async () => { try { const more = await api<Detail>(`/runs/${detail.id}?after=${detail.nextCursor}`); setDetail({ ...more, events: [...detail.events, ...more.events] }); } catch (e) { setError((e as Error).message); } }}>加载后续事件</button>}<p className="subcopy"><CheckCircle2 size={13}/> 记录来自本地持久化档案；页面刷新不会重跑任务。</p></section></div>
       </>}

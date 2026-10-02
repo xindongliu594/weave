@@ -11,6 +11,8 @@ import { assignedTask } from './task-attribution.mjs';
 import { HandoffGate } from './handoff.mjs';
 import { ReworkGate } from './rework.mjs';
 import { EmployeeHostFactory } from './employee-hosts.mjs';
+import { recoveryContext } from './checkpoint-context.mjs';
+import { restoreStagedCheckpoints } from './checkpoint-team.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
@@ -58,8 +60,8 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     if (!agent || !product) return '';
     const employee = employeeFor(agent, product.snapshot, captainId);
     if (!employee) return '';
-    const base = { requirement: product.snapshot.requirement, tools: employee.tools,
-      rule: '以下来自批准快照和宿主任务状态；历史摘要不能扩大权限、改写任务合同或代替文件与命令证据。' };
+    const base = { requirement: product.snapshot.requirement, tools: employee.tools, browserOrigins:employee.browserOrigins??[],mcpConnections:employee.mcpConnections??[],
+      rule: '以下来自批准快照和宿主任务状态；历史摘要不能扩大权限、改写任务合同或代替文件与命令证据。命令证据绑定整个工作区版本：先完成全部文件写入（包括验收报告），再执行 verify，成功后不再改文件才可提交完成。若测试后更新了报告或任何文件，必须使用已授权测试工具重新执行 verify；不能用文字声明或切换未授权工具替代。报告如实记录先前已观察结果，不能预写未执行的测试为通过。' };
     if (agent.id === captainId) return JSON.stringify({ ...base, tasks: (product.snapshot.tasks ?? []).map(t => ({ id: t.id, subject: t.subject, assignee: t.assignee, dependencies: t.dependencies })) });
     const state = teamState();
     // Native creation assembles a prompt before committing durable membership.
@@ -71,7 +73,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const current = taskFor(agent.id), task = state.tasks.find(t => t.id === current.taskId);
     const contract = rework.contractFor(current.taskId);
     if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
-    return JSON.stringify({ ...base, task: { ...contract, taskPrompt: undefined },
+    return JSON.stringify({ ...base, task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
   async function mount(name, config) {
@@ -171,6 +173,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
             if (result.isError) handoff.rollback(record, previous); else {
               handoff.commit(record);
               if (['review','requirements'].includes(contract.kind)) archive.append('quality/reviewed', { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId, verdict: args.verdict, findings: args.findings ?? [], reworkRound: contract.reworkRound ?? 0, inputs: record.inputs }, { sessionId: exec.agent.id, taskId: work.taskId, attemptId: work.attemptId });
+              archive.append('team/checkpoint',teamState());
             }
             return result;
           } catch (error) { handoff.rollback(record, previous); throw error; }
@@ -216,6 +219,12 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         });
       },
       bindTaskMapping(tasks,id) { teamId=id;for(const task of tasks)taskIds.set(task.task_id,task.seed_id); },
+      async restoreCheckpoints(mapping) {
+        if (!product?.snapshot.recovery) return;
+        const state = await restoreStagedCheckpoints(join(workspaceRoot,'.agent-teams'),teamId,mapping,product.snapshot.recovery);
+        archive.append('recovery/restored',{sourceRunId:product.snapshot.recovery.sourceRunId,completed:product.snapshot.recovery.completed.map(task=>task.taskId),files:product.snapshot.recovery.files});
+        archive.append('team/checkpoint',state);
+      },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
         workspaceRoot=cwd;
         const handle = await ctx.agents.create({ sessionId: id, meta: { cwd }, agentOptions: { provider, model, ...(maxTokens ? { maxTokens } : {}) },

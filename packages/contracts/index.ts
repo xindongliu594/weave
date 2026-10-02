@@ -5,7 +5,9 @@ export const agentSchema = z.object({
   id: z.string().min(1).max(180), name: z.string().trim().min(1).max(80),
   role: z.enum(['manager', 'member']), title: z.string().trim().min(1).max(100),
   instructions: z.string().trim().min(1).max(10000), modelId: z.string().max(100),
-  tools: z.array(z.enum(['artifact_write', 'filesystem', 'terminal_test', 'terminal', 'knowledge_search', 'knowledge_read'])).max(6),
+  tools: z.array(z.enum(['artifact_write', 'filesystem', 'terminal_test', 'terminal', 'knowledge_search', 'knowledge_read', 'browser_read', 'mcp_call_readonly'])).max(8),
+  browserOrigins: z.array(z.string().url().max(500).refine(value => { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && url.origin === value && !url.username && !url.password; }, '请填写精确网站来源，如 https://example.com')).max(10).optional(),
+  mcpConnections: z.array(z.object({ connectionId: z.string().min(1).max(100), version: z.number().int().positive(), tools: z.array(z.string().min(1).max(200)).max(30) })).max(10).optional(),
   roleVersion: z.number().int().positive().optional(), templateId: z.string().max(100).optional(),
   systemConstraints: z.string().max(5000).optional(), outputFormat: z.string().max(2000).optional(),
   reasoningEffort: z.enum(['low', 'medium', 'high']).optional(),
@@ -73,7 +75,7 @@ export const taskSchema = z.object({
   outputs: z.array(artifactOutputSchema).max(40).optional(),
   inScope: z.array(artifactPathSchema).max(40).optional(),
   outOfScope: z.array(artifactPathSchema).max(40).optional(),
-  verify: z.array(z.string().trim().min(1).max(5000)).max(20).optional(),
+  verify: z.array(z.string().trim().min(1).max(5000).describe('需要实际执行的精确 shell 命令，例如 node --test todo.test.mjs。不得添加说明前缀、执行步骤或结果描述；说明写入 objective 或 acceptanceCriteria。')).max(20).optional(),
   reviewedTaskId: z.string().min(1).max(64).optional(),
   sourceTaskId: z.string().min(1).max(64).optional(),
   sourceFindingIds: z.array(z.string().min(1).max(100)).max(30).optional(),
@@ -91,6 +93,7 @@ export const planSchema = z.object({
   tasks: z.array(taskSchema).min(1).max(50),
   knowledgeDocumentIds: z.array(z.string().min(1).max(100)).max(1000).optional(),
   runInputs: z.array(runInputSchema).max(20).optional(),
+  workFileSelections: z.array(z.object({ snapshotId: z.string().uuid(), paths: z.array(artifactPathSchema).min(1).max(100), agentIds: z.array(z.string().min(1).max(180)).min(1).max(6), mode: z.enum(['reference','workspace']).optional() })).max(10).optional(),
 }).superRefine((plan,ctx)=>{
   const inputs=plan.runInputs??[];
   if(new Set(inputs.map(i=>i.id)).size!==inputs.length)ctx.addIssue({code:'custom',message:'本次资料 ID 不能重复'});
@@ -104,6 +107,7 @@ export const gatewaySchema = z.object({
     return !u.username && !u.password && !u.search && !u.hash && (u.protocol === 'https:' || (u.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(u.hostname)));
   }, '使用 HTTPS 地址，本机服务可使用 HTTP；地址不能包含凭证或查询参数'),
   apiKey: z.string().trim().max(2000).optional(),
+  pricingSource: z.enum(['official', 'auto', 'models', 'new-api']).optional(),
 });
 export const modelSchema = z.object({
   name: z.string().trim().min(1).max(100), gatewayId: z.string().min(1).max(100),
@@ -116,6 +120,24 @@ export type Agent = z.infer<typeof agentSchema>;
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type Department = DepartmentInput & { id: string; version: number; createdAt: string; updatedAt: string; runCount: number };
 export type Gateway = Omit<z.infer<typeof gatewaySchema>, 'apiKey'> & { id: string; hasCredential: boolean; version: number };
+export type GatewayServiceCheck = {
+  status: 'available' | 'empty' | 'failed';
+  checkedAt: string; durationMs: number; gatewayVersion: number;
+  modelCount?: number; upstreamStatus?: number; code?: string; message: string;
+};
+export type CatalogRate = { inputRate: number; outputRate: number };
+export type CatalogPrice = {
+  status: 'available' | 'missing' | 'unsupported' | 'group_required';
+  source?: string; note?: string; inputRate?: number; outputRate?: number;
+  basis?: 'official'; verifiedAt?: string; longContext?: CatalogRate; inputTokenLimit?: number;
+  groups?: (CatalogRate & { name: string; ratio: number })[];
+};
+export type CatalogModel = { id: string; name: string; contextWindowTokens?: number; pricing: CatalogPrice };
+export type GatewayCatalog = {
+  models: string[]; catalog: CatalogModel[]; fetchedAt: string; gatewayVersion: number;
+  modelSource: string; pricingSource?: string; warnings: string[];
+  pricingVerifiedAt?: string;
+};
 export type Model = z.infer<typeof modelSchema> & { id: string; version: number; status: 'untested' | 'available' | 'error'; checkedAt?: string; capabilities?:{tools?:{status:'supported'|'failed';checkedAt:string;testId:string;probeVersion:string}} };
 export type Policy = z.infer<typeof policySchema>;
 /** Missing fields inherit the existing team once; an explicit empty list grants nothing. */
@@ -138,11 +160,21 @@ export type Project = { id: string; departmentId: string; departmentVersion: num
 export type Activity = { id: string; kind: string; title: string; createdAt: string };
 export type Usage = { runId?: string|null; agentId?: string|null; employeeId?: string|null; agentName?: string|null; departmentId?:string|null; sessionId?: string|null; taskId?: string|null; attemptId?: string|null; requestId?: string|null; durationMs?: number|null; id: string; modelId: string; projectId: string | null; inputTokens: number; outputTokens: number; cost: number; purpose: string; createdAt: string };
 
+export const placeholderTaskSubject = '完成需求并提交验收材料';
+export const placeholderTaskCriterion = '交付内容覆盖用户需求，并提供可核验的结果';
+export const planningRequiredMessage = '当前仍有默认占位任务。请先生成 AI 方案，或编辑任务的具体目标、负责人和验收标准，再批准运行。';
+// Match the legacy seed as well as new drafts. Changing models, budgets or
+// tools does not turn the automatically inserted task into an executable plan.
+export function hasUnplannedTasks(plan: { tasks: readonly { subject?: string; acceptanceCriteria?: readonly string[] }[] }): boolean {
+  return plan.tasks.some(task => task.subject === placeholderTaskSubject && task.acceptanceCriteria?.length === 1 && task.acceptanceCriteria[0] === placeholderTaskCriterion);
+}
+
 /** Validation runs on the server again on every state-changing operation. */
 export function validatePlan(plan: Plan, policy: Policy, models: Model[],requireToolSupport=true): Validation {
   const errors: string[] = [];
   const checks: Validation['checks'] = [];
   const check = (label: string, pass: boolean, message: string) => { checks.push({ label, pass }); if (!pass) errors.push(message); };
+  check('任务已规划', !hasUnplannedTasks(plan), planningRequiredMessage);
   for(const item of permissionChecks(plan.agents,bindPolicy(policy,plan.agents)))check(item.label,item.pass,item.label+'不包含方案请求的权限，请调整策略或员工配置');
   const ids = new Set(plan.agents.map(a => a.id));
   check('组织与人数', ids.size === plan.agents.length && plan.agents.filter(a => a.role === 'manager').length === 1 && plan.agents.length <= policy.maxAgents,
@@ -152,6 +184,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   check('备用模型可用性', plan.agents.every(a => !a.fallbackModelId || models.some(m => m.id === a.fallbackModelId && m.status === 'available')), '备用模型也必须存在且可用');
   if(requireToolSupport)check('团队工具协议能力',plan.agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>models.find(m=>m.id===id)?.capabilities?.tools?.status==='supported')),'团队调度本身需要工具调用；所有主模型和备用模型必须通过工具往返测试');
   check('本次资料授权', (plan.runInputs??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '本次资料的授权员工必须在方案中，并开启知识检索工具');
+  check('导入资料授权', (plan.workFileSelections??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '导入资料的接收员工必须在方案中，并开启知识检索工具');
   const taskIds = new Set(plan.tasks.map(t => t.id));
   const referencesOK = taskIds.size === plan.tasks.length && plan.tasks.every(t => ids.has(t.assigneeId) && t.dependencies.every(id => taskIds.has(id)));
   check('任务负责人和引用', referencesOK, '任务 ID 重复、负责人不存在或依赖任务不存在');

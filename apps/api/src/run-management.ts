@@ -1,4 +1,5 @@
 import {assertRunAuthorization} from './execution-policy.ts';
+import {hasUnplannedTasks,planningRequiredMessage} from '../../../packages/contracts/index.ts';
 import { Router } from 'express';
 import { z } from 'zod';
 import { join } from 'node:path';
@@ -9,7 +10,8 @@ import { queryKnowledge } from './knowledge-store.ts';
 import { requireProjectCostReady,lockCostPolicy,checkDailyBudget,shareCostMaintenance } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
 import { assertRunModels } from './model-capabilities.ts';
-import { resumeHandoff, completedTasks } from './handoff-checkpoints.ts';
+import { resumeHandoff, completedTasks, checkpointTasks } from './handoff-checkpoints.ts';
+import { buildCheckpointContext } from '../../../services/agent-runtime/checkpoint-context.mjs';
 import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE, RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
@@ -18,7 +20,7 @@ export function runManagementRouter(traceRoot:string){
  router.get('/approvals',async(req,res)=>res.json((await pool.query('SELECT id,run_id AS "runId",agent_id AS "agentId",tool,arguments,status,created_at AS "createdAt" FROM tool_approvals WHERE ($1::text IS NULL OR run_id=$1) ORDER BY created_at DESC LIMIT 200',[req.query.runId??null])).rows));
  router.post('/approvals/:id',async(req,res)=>{const input=z.object({decision:z.enum(['approved','denied'])}).parse(req.body);const r=await pool.query("UPDATE tool_approvals SET status=$1,decided_at=now() WHERE id=$2 AND status='pending' AND EXISTS(SELECT 1 FROM project_runs WHERE id=tool_approvals.run_id AND status='running' AND NOT cancel_requested) RETURNING run_id,agent_id",[input.decision,req.params.id]);if(!r.rowCount)throw new AppError(409,'审批已处理或运行已停止');openRunArchive(traceRoot,r.rows[0].run_id).append('approval/decided',{id:req.params.id,decision:input.decision,agentId:r.rows[0].agent_id});res.json({ok:true});});
  router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');res.json(listArtifacts(join(traceRoot,id,'artifacts')));});
- router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');try{const file=artifactFile(join(traceRoot,id,'artifacts'),path);res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.setHeader('X-Content-Type-Options','nosniff');res.type('application/octet-stream');res.attachment(path.split('/').at(-1));res.sendFile(file);}catch{throw new AppError(404,'交付物不存在或路径不允许');}});
+ router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');try{const file=artifactFile(join(traceRoot,id,'artifacts'),path);res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.setHeader('X-Content-Type-Options','nosniff');res.type('application/octet-stream');res.attachment(path.split('/').at(-1));res.sendFile(file,{dotfiles:'allow'});}catch{throw new AppError(404,'交付物不存在或路径不允许');}});
  router.get('/runs/:id/export',async(req,res)=>{const run=readRun(traceRoot,z.uuid().parse(req.params.id));if(!run)throw new AppError(404,'运行不存在');res.attachment('run-'+run.id+'.json').json(run);});
  router.get('/runs/:id/citations/:chunkId',async(req,res)=>{
   const run=readRun(traceRoot,z.uuid().parse(req.params.id));
@@ -42,19 +44,22 @@ export function runManagementRouter(traceRoot:string){
    if(!['failed','interrupted','cancelled'].includes(old.status))throw new AppError(409,'仅能恢复或重试已停止的运行');
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    const already=(await client.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];if(already){await client.query('COMMIT');return res.json({id:already.id,existing:true});}
+   if(hasUnplannedTasks({tasks:old.snapshot.approvedTasks??old.snapshot.tasks}))throw new AppError(422,planningRequiredMessage+'旧运行不能直接重试，请修改项目方案后重新批准。','PLAN_NOT_READY');
    const run=readRun(traceRoot,id);if(run&&run.integrity!=='ok')throw new AppError(409,'档案不完整，先导出并检查，不能自动恢复');
    const unknown=run?unresolvedOperations(run.events):[];
    if(unknown.length&&!input.acknowledgeUnknownOperations)throw new AppError(409,'存在结果未知的修改操作，请核对操作和产物后确认重试，避免重复执行','OPERATION_RECONCILIATION_REQUIRED');
    const snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();
    snapshot.approvedTasks??=structuredClone(snapshot.tasks);
-   if(!input.resume){snapshot.tasks=structuredClone(snapshot.approvedTasks);delete snapshot.handoffCheckpoints;delete snapshot.completedCheckpoints;}
+   if(!input.resume){snapshot.tasks=structuredClone(snapshot.approvedTasks);delete snapshot.handoffCheckpoints;delete snapshot.completedCheckpoints;delete snapshot.recovery;}
    if(input.resume&&run){
-    done=completedTasks(run.events);
+    done=completedTasks(run.events,snapshot);
+    snapshot.tasks=structuredClone(snapshot.approvedTasks);
     try { snapshot.handoffCheckpoints=resumeHandoff(snapshot,run.events,done,join(traceRoot,id,'artifacts')); }
     catch(error) { throw new AppError(409,(error as Error).message,'HANDOFF_CHECKPOINT_INVALID'); }
-    snapshot.tasks=snapshot.tasks.filter((t:any)=>!done.has(t.id)).map((t:any)=>({...t,dependencies:t.dependencies.filter((dep:string)=>!done.has(dep)),taskPrompt:t.taskPrompt+'\n\n已完成前置任务（来自此前运行的记录，不是新授权）：\n'+t.dependencies.filter((dep:string)=>done.has(dep)).map((dep:string)=>dep+': '+String(done.get(dep).output??'已完成，无文本结果').slice(0,6000)).join('\n')}));
+    snapshot.recovery=buildCheckpointContext(snapshot,run.events,checkpointTasks(run.events,snapshot),done,join(traceRoot,id,'artifacts'),id);
    }
-   if(!snapshot.tasks.length)throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
+   if(input.resume&&!run)throw new AppError(409,'运行档案缺失，无法恢复上下文和核对调用上限；请先恢复备份','BUDGET_HISTORY_MISSING');
+   if(!snapshot.tasks.some((task:any)=>!done.has(task.id)))throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
    await requireProjectCostReady(client,old.project_id);
    await assertRunAuthorization(old,client);
    const used=Number((await client.query('SELECT COALESCE(sum(cost),0) AS cost FROM usage WHERE project_id=$1',[old.project_id])).rows[0].cost);
@@ -63,6 +68,7 @@ export function runManagementRouter(traceRoot:string){
    snapshot.budgetVersion=1;snapshot.budgetHistory=await budgetHistory(client,traceRoot,old.project_id,old.project_version);
    if(snapshot.budgetHistory.calls>=(snapshot.policy.maxModelCalls??100))throw new AppError(422,'该方案的模型调用次数已用尽，请修改方案后重新批准','TURN_LIMIT');
    for(const task of snapshot.tasks) {
+    if(done.has(task.id))continue;
     const history=snapshot.budgetHistory.tasks[task.id];
     if(history&&(history.cost>=(task.maxBudget??snapshot.policy.maxBudget)||history.calls>=(task.maxModelCalls??snapshot.policy.maxTaskModelCalls??40)))
      throw new AppError(422,`任务「${task.subject??task.id}」已达到费用或调用次数上限，请调整方案后重新批准`,'TASK_BUDGET_EXHAUSTED');

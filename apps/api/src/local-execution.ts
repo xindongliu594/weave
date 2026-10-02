@@ -141,7 +141,17 @@ export function localDeviceRouter(traceRoot:string){
   await pool.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[id]);
   if(input.active){const cancel=await operationTransaction(input.active.id,async(db,row,run,current)=>{if(row.device_id!==id||row.claim_token!==input.active!.claimToken)throw new AppError(403,'操作领取凭证不正确');const valid=['claimed','started'].includes(row.status)&&await executable(db,row,run,current);if(!valid&&['claimed','started'].includes(row.status))await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[row.id]);return !valid;});return res.json({cancel});}
   const orphan=(await pool.query("SELECT id,claim_token,started FROM local_operations WHERE device_id=$1 AND status IN ('claimed','started') ORDER BY created_at LIMIT 1",[id])).rows[0];
-  if(orphan)return res.json({orphan:{id:orphan.id,claimToken:orphan.claim_token,started:orphan.started}});
+  if(orphan){
+   // A poll reply may be lost after claiming but before the device receives it.
+   // Re-offer only an unstarted claim. /start still transitions atomically once;
+   // a started operation must keep its unknown-outcome reconciliation path.
+   const recovered=await operationTransaction(orphan.id,async(db,row,run,current)=>{
+    if(row.status==='claimed'&&!row.started&&await executable(db,row,run,current))return {job:{id:row.id,...row.payload,claimToken:row.claim_token}};
+    if(['claimed','started'].includes(row.status))return {orphan:{id:row.id,claimToken:row.claim_token,started:row.started}};
+    return {job:null};
+   });
+   return res.json(recovered);
+  }
   const pending=(await pool.query("SELECT id FROM local_operations WHERE device_id=$1 AND status='queued' ORDER BY created_at LIMIT 1",[id])).rows[0];if(!pending)return res.json({job:null});
   const job=await operationTransaction(pending.id,async(db,row,run,current)=>{
    if(row.status!=='queued')return null;

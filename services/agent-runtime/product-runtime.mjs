@@ -6,7 +6,7 @@ import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 import { RunSandbox, listArtifacts } from './sandbox.mjs';
 import { RuntimeSupervisor } from './supervisor.mjs';
 import { Semaphore } from './limits.mjs';
-import { teamTaskPlan, stageApprovedTeam } from './handoff.mjs';
+import { teamTaskPlan, stageApprovedTeam, inspectArtifact } from './handoff.mjs';
 import { employeeContextPolicy } from './employee-context.mjs';
 
 const provider = 'department-relay';
@@ -23,10 +23,11 @@ function lastAssistantText(agent) {
 }
 
 export class ProductDshRuntime {
-  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, beforeRequest,onCallError,createExecutor }) {
+  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, externalTool, beforeRequest,onCallError,createExecutor }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
     this.queryKnowledge = queryKnowledge; this.onUsage = onUsage; this.requestApproval = requestApproval;
+    this.externalTool=externalTool;
     this.beforeRequest=beforeRequest;this.onCallError=onCallError;this.createExecutor=createExecutor;
   }
 
@@ -71,6 +72,9 @@ export class ProductDshRuntime {
     }, snapshot.policy.deadlineSeconds * 1000);
     try {
       await sandbox.prepare?.(job.controller.signal);
+      for (const file of snapshot.recovery?.files ?? []) {
+        if (inspectArtifact(sandbox.root,file).sha256 !== file.sha256) throw Error('RECOVERY_FILE_CHANGED: ' + file.path);
+      }
       const adapter = new OpenAiCompatibleAdapter({
         routes,
         maxBudget: snapshot.executionBudget,
@@ -95,7 +99,7 @@ export class ProductDshRuntime {
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
-        product: { snapshot, sandbox, gate, supervisor, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
+        product: { snapshot, sandbox, gate, supervisor, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');
@@ -112,6 +116,7 @@ export class ProductDshRuntime {
       }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(30_000)]));
       archive.append('run/task-mapping', { tasks: created.tasks });
       host.bindTaskMapping(created.tasks,created.team_id);
+      await host.restoreCheckpoints(created.tasks);
       archive.append('run/approved', snapshot.approval);
       await host.call(captain, 'agent_teams_approve', { confirmation: `执行已批准项目 ${snapshot.projectId} 方案 v${snapshot.planVersion}` }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(30_000)]));
       host.lockPlan();

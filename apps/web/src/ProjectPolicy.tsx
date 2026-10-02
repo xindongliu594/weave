@@ -4,8 +4,8 @@ import {api} from './api.ts';
 import {ContextPolicy} from './ContextPolicy.tsx';
 import {RecoveryPolicy} from './RecoveryPolicy.tsx';
 import {ExecutionTarget} from './LocalDevices.tsx';
-const tools=[['artifact_write','交付物写入'],['filesystem','工作区文件'],['terminal','开发终端'],['terminal_test','测试终端'],['knowledge_search','知识检索'],['knowledge_read','知识原文']] as const;
-export function ProjectPolicy({policy,models,departmentId,departmentIds,onChange}:{policy:Policy;models:Model[];departmentId:string;departmentIds?:string[];onChange?:(value:Policy)=>void}){
+const tools=[['artifact_write','交付物写入'],['filesystem','工作区文件'],['terminal','开发终端'],['terminal_test','测试终端'],['knowledge_search','知识检索'],['knowledge_read','知识原文'],['browser_read','网页读取'],['mcp_call_readonly','只读 MCP']] as const;
+export function ProjectPolicy({policy,models,departmentId,departmentIds,onChange,demo=false}:{policy:Policy;models:Model[];departmentId:string;departmentIds?:string[];onChange?:(value:Policy)=>void;demo?:boolean}){
  const [spaces,setSpaces]=useState<any[]>([]),[error,setError]=useState('');
  useEffect(()=>{api<any[]>('/knowledge/spaces').then(setSpaces).catch(e=>setError(e.message));},[]);
  const groups=[
@@ -17,7 +17,7 @@ export function ProjectPolicy({policy,models,departmentId,departmentIds,onChange
   {error&&<p role="alert" className="form-error">{error}</p>}
   {onChange&&<div className="form-grid">{([['maxBudget','项目预算（USD）',.000001,10000],['maxAgents','策略最多员工',1,6],['maxConcurrentAgents','策略并发上限',1,6],['deadlineSeconds','策略执行时限（秒）',60,86400],['maxModelCalls','策略调用上限',1,1000],['maxTaskModelCalls','策略每员工每任务调用上限',1,1000],['contextBytes','策略上下文上限（字节）',4096,1000000]] as const).map(([key,label,min,max])=><label className="field" key={key}>{label}<input type="number" required min={min} max={max} step={key==='maxBudget'?'any':1} value={policy[key]??({maxModelCalls:100,maxTaskModelCalls:40,contextBytes:64000} as any)[key]} onChange={e=>onChange({...policy,[key]:e.target.valueAsNumber})}/></label>)}</div>}
   <ContextPolicy policy={policy} onChange={onChange}/>
-  <ExecutionTarget policy={policy} onChange={onChange}/>
+  {demo?<div className="lower-small"><label className="field">文件与命令执行位置<strong>本机独立演示工作区</strong></label><p className="subcopy">仅执行预置 Todo 示例和两条 Node 测试命令；每条命令都需要逐次批准。</p></div>:<ExecutionTarget policy={policy} onChange={onChange}/>}
   <RecoveryPolicy policy={policy} onChange={onChange}/>
   {groups.map(group=>{const selected=policy[group.key]??[];const options=[...group.options,...selected.filter(id=>!group.options.some(o=>o.id===id)).map(id=>({id,name:id+'（当前目录不可用）'}))];return <fieldset className="lower-small" key={group.key}><legend>{group.title}</legend><div className="tool-options">{options.filter(option=>onChange||selected.some(id=>id===option.id)).map(option=>onChange?<label key={option.id}><input type="checkbox" aria-label={'策略允许：'+option.name} checked={selected.some(id=>id===option.id)} onChange={e=>onChange({...policy,[group.key]:e.target.checked?[...selected,option.id]:selected.filter(id=>id!==option.id)})}/>{option.name}</label>:<span key={option.id}>{option.name}</span>)}</div>{!selected.length&&<small>未授权任何{group.key==='allowedModelIds'?'模型':group.key==='allowedTools'?'工具':'知识空间'}。</small>}</fieldset>;})}
  </section>;

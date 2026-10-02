@@ -87,7 +87,7 @@ test('expired runs require explicit checkpoint resume and cancelled queue entrie
  assert.equal((await pool.query("SELECT count(*)::int AS n FROM project_runs WHERE status='queued'")).rows[0].n,0);
  const resumed=await call('/runs/'+archive.id+'/retry','POST',{resume:true});assert.equal(resumed.status,202,JSON.stringify(resumed.data));assert.deepEqual(resumed.data.completedCheckpoints,['first']);
  const next=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[resumed.data.id])).rows[0].snapshot;
- assert.equal(next.tasks.length,1);assert.deepEqual(next.tasks[0].dependencies,[]);assert.match(next.tasks[0].taskPrompt,/verified checkpoint output/);
+ assert.equal(next.tasks.length,2);assert.deepEqual(next.tasks[1].dependencies,['first']);assert.match(next.recovery.nodes.first.output,/verified checkpoint output/);
  await coordinator.cancel(resumed.data.id);
  assert.equal((await call('/runs')).data.find((r:any)=>r.id===resumed.data.id).status,'cancelled');
  assert.equal((await call('/runs/'+resumed.data.id)).data.status,'cancelled');

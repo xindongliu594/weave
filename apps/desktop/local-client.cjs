@@ -19,7 +19,7 @@ class LocalDeviceClient {
  }
  read(id){const file=path.join(this.journalRoot,id+'.json');if(!fs.existsSync(file))return null;if(fs.lstatSync(file).isSymbolicLink()||fs.statSync(file).size>32*1024*1024)throw Error('本机回执格式不正确');return JSON.parse(fs.readFileSync(file,'utf8'));}
  async api(endpoint,body){
-  const response=await this.request(new URL('api/local-devices/'+endpoint,this.connection.server),{method:'POST',redirect:'error',signal:AbortSignal.any([this.controller.signal,AbortSignal.timeout(5000)]),headers:{'Content-Type':'application/json','X-Local-Device-Key':this.device.token,...(this.connection.username?{Authorization:'Basic '+Buffer.from(this.connection.username+':'+this.connection.password).toString('base64')}:{})},body:JSON.stringify(body)});
+  const response=await this.request(new URL('api/local-devices/'+endpoint,this.connection.server),{method:'POST',redirect:'error',signal:AbortSignal.any([this.controller.signal,AbortSignal.timeout(15000)]),headers:{'Content-Type':'application/json','X-Local-Device-Key':this.device.token,...(this.connection.username?{Authorization:'Basic '+Buffer.from(this.connection.username+':'+this.connection.password).toString('base64')}:{})},body:JSON.stringify(body)});
   const data=await response.json();if(!response.ok)throw Object.assign(Error(data.message||'本机设备连接失败'),{code:data.code,status:response.status});return data;
  }
  async start(){

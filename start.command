@@ -13,5 +13,5 @@ fi
 docker compose -p agent-department -f infra/compose.yml up -d --wait
 if [[ ! -d node_modules ]]; then npm ci; fi
 if [[ ! -d services/agent-runtime/node_modules ]]; then npm --prefix services/agent-runtime ci; fi
-print '打开 http://127.0.0.1:4310 使用 Agent Department'
+print '打开 http://127.0.0.1:4310 使用为伍 · 一个想法，一支团队'
 npm run dev

@@ -134,15 +134,16 @@ export async function settleCall(id:string,inputTokens:number,outputTokens:numbe
  });
 }
 
-export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;maxCost?:number;context?:Record<string,any>},request:CompletionOptions={}) {
+export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;maxCost?:number;context?:Record<string,any>;timeoutMs?:number},request:CompletionOptions={}) {
  const amount=((Buffer.byteLength(JSON.stringify({messages,...request}))+1024)*model.inputRate+maxTokens*model.outputRate)/1e6;
- const id=await reserveCall({model,amount,...options});
+ const {timeoutMs,...reservation}=options;
+ const id=await reserveCall({model,amount,...reservation});
  let received=false;
  try{
   const response=await complete(model,messages,maxTokens,async usage=>{
    const receipt=await settleCall(id,usage.prompt_tokens,usage.completion_tokens);received=true;
    if(greater(receipt.cost,amount))throw new AppError(422,'实际费用超过本次保守预留，已记录用量并停止后续操作','CALL_BUDGET_EXCEEDED');
-  },request);
+  },request,{timeoutMs});
   if(!response.usage)throw new AppError(502,'中转站未返回用量，费用预留保留为待核对','USAGE_MISSING');
   return {...response,usageId:id};
  }catch(error){if(!received)await markCallUncertain(id,error instanceof AppError?error.code:'CALL_INTERRUPTED');throw error;}

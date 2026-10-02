@@ -1,8 +1,8 @@
 import {claimExpiredRun,finishRun,terminalStatus} from './run-state.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
+import { executeBrowserMcpTool } from './work-tools-browser.ts';
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
-import { cpSync, existsSync } from 'node:fs';
+import { prepareImportedWorkspace } from './work-files.ts';
 import { pool } from './db.ts';
 import { unseal } from './vault.ts';
 import { AppError } from './provider.ts';
@@ -18,9 +18,9 @@ import {LocalOperationService,LocalRunExecutor} from './local-execution.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 export class RunCoordinator {
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;
-  constructor(public traceRoot:string){
+  constructor(public traceRoot:string,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor']){
     const local=new LocalOperationService(traceRoot,this.owner);
-    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,createExecutor:(archive,snapshot)=>snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined,onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data)=>this.reserve(id,data),onCallError:data=>markCallUncertain(data.id,data.code,data.dispatched)});
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined),onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data)=>this.reserve(id,data),onCallError:data=>markCallUncertain(data.id,data.code,data.dispatched)});
     this.timer=setInterval(()=>void this.tick(),1000);this.timer.unref();void this.tick();
   }
   async recordUsage(runId:string,u:RuntimeUsage){
@@ -108,7 +108,7 @@ export class RunCoordinator {
         if(!gateway||routeFingerprint(gateway.data,gateway.version)!==route.configurationHash)throw Error('运行快照的模型或中转站配置已变化');routes.push({...route,apiKey:gateway.credential?unseal(gateway.credential):''});
       }
       if(this.stopped)throw new AppError(409,'工作进程已关闭，任务未启动','WORKER_STOPPED');
-      if(row.parent_run_id&&existsSync(join(this.traceRoot,row.parent_run_id,'artifacts')))cpSync(join(this.traceRoot,row.parent_run_id,'artifacts'),join(this.traceRoot,row.id,'artifacts'),{recursive:true});
+      prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind);
       const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes});
       const result=await started.completion;
       for(const usage of result.usages)await this.recordUsage(row.id,usage);

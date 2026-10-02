@@ -31,7 +31,7 @@ export function renderNote(doc:any,existingRaw=''){
  return '---\n'+[...kept,...Object.entries(managed).map(([key,value])=>key+': '+JSON.stringify(value))].join('\n')+'\n---\n'+doc.content;
 }
 function safe(path:string){if(!path||path.startsWith('/')||path.includes('\\')||path.split('/').some(p=>!p||p==='.'||p==='..'))throw new AppError(422,'Vault 路径不合法');let current=obsidianRoot();for(const part of path.split('/')){current=join(current,part);if(existsSync(current)&&lstatSync(current).isSymbolicLink())throw new AppError(422,'Vault 中不索引符号链接');}return current;}
-export function ensureVault(){const root=obsidianRoot();mkdirSync(root,{recursive:true,mode:0o700});if(!existsSync(join(root,'.obsidian')))mkdirSync(join(root,'.obsidian'),{mode:0o700});const welcome=join(root,'知识库说明.md');if(!existsSync(welcome))writeFileSync(welcome,'# Agent Department 知识库\n\n这是普通 Obsidian Vault，资料以 Markdown 文件保存。\n\n- 请在工作台创建公司、部门或员工知识空间；对应目录会自动建立。\n- 在这些目录中编辑或新建 Markdown，点击同步索引即可供授权员工检索。\n- `ad_document_id` 标识文档，移动文件时请保留；不要复制该 ID 到其他文档。\n- Wiki 链接和标签会保留，引用依据每次索引的文档版本及行号。\n- 删除或移出已授权文件夹的笔记会从当前检索中移除；历史引用仍保留。\n- 员工访问权限由工作台管理，修改 Markdown 属性不会扩大授权。\n',{mode:0o600});return root;}
+export function ensureVault(){const root=obsidianRoot();mkdirSync(root,{recursive:true,mode:0o700});if(!existsSync(join(root,'.obsidian')))mkdirSync(join(root,'.obsidian'),{mode:0o700});const welcome=join(root,'知识库说明.md');if(!existsSync(welcome))writeFileSync(welcome,'# 为伍知识库\n\n这是普通 Obsidian Vault，资料以 Markdown 文件保存。\n\n- 请在工作台创建公司、部门或员工知识空间；对应目录会自动建立。\n- 在这些目录中编辑或新建 Markdown，点击同步索引即可供授权员工检索。\n- `ad_document_id` 标识文档，移动文件时请保留；不要复制该 ID 到其他文档。\n- Wiki 链接和标签会保留，引用依据每次索引的文档版本及行号。\n- 删除或移出已授权文件夹的笔记会从当前检索中移除；历史引用仍保留。\n- 员工访问权限由工作台管理，修改 Markdown 属性不会扩大授权。\n',{mode:0o600});return root;}
 export async function ensureSpaceFolder(id:string){
  const space=(await pool.query('SELECT * FROM knowledge_spaces WHERE id=$1',[id])).rows[0];if(!space)throw new AppError(404,'知识空间不存在');
  const folder=space.vault_folder??`${space.scope}/${space.name.replace(/[<>:"/\\|?*\x00-\x1f]/g,'-').slice(0,60)}-${space.id.slice(0,8)}`;
@@ -62,7 +62,7 @@ async function sync(){
   for(const doc of (await pool.query('SELECT id FROM knowledge_documents WHERE space_id=$1 AND vault_path IS NULL AND deleted_at IS NULL',[space.id])).rows)await writeVaultDocument(doc.id);
   const folder=await ensureSpaceFolder(space.id),root=safe(folder),seen=new Set<string>(),ids=new Set<string>();
   const files:string[]=[];function walk(dir:string){for(const name of readdirSync(dir)){if(name.startsWith('.'))continue;const file=join(dir,name),stat=lstatSync(file);if(stat.isSymbolicLink())continue;if(stat.isDirectory())walk(file);else if(/\.md$/i.test(name)&&stat.size<=500000)files.push(file);if(files.length>1000)throw new AppError(422,'单空间笔记超过 1000 份');}}walk(root);
-  for(const file of files){const path=relative(obsidianRoot(),file),raw=readFileSync(file,'utf8'),hash=sha(raw),note=parseNote(raw);
+  for(const file of files){const path=relative(obsidianRoot(),file).replaceAll('\\','/'),raw=readFileSync(file,'utf8'),hash=sha(raw),note=parseNote(raw);
    try{
     if(!note.content.trim()||note.content.length>250000)continue;
     const match=(await pool.query('SELECT * FROM knowledge_documents WHERE (id=$1 OR vault_path=$2) AND space_id=$3 ORDER BY (id=$1) DESC LIMIT 1',[note.fields.ad_document_id??'',path,space.id])).rows[0];

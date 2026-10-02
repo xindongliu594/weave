@@ -19,11 +19,38 @@ test('resume uses exact accepted attempt and rejects missing evidence or a chang
   } finally { await rm(root,{recursive:true,force:true}); }
 });
 
+test('completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'resume-review-'));
+ try{
+  await writeFile(join(root,'code.txt'),'done');
+  const tasks=[{id:'build',assignee:'developer',kind:'implementation',dependencies:[],outputs:[{path:'code.txt'}],inScope:['code.txt'],verify:['check']},{id:'review',assignee:'tester',kind:'review',reviewedTaskId:'build',dependencies:['build'],inputs:[{path:'code.txt',producerTaskId:'build'}],outputs:[]}];
+  const record={taskId:'build',attemptId:'a',outputs:[inspectArtifact(root,{path:'code.txt'})]};
+  const snapshot={tasks,agents:[],handoffCheckpoints:[record],recovery:{completed:[{taskId:'build',attemptId:'a',output:'finished'}]}};
+  const done=completedTasks([],snapshot);assert.equal(done.size,1);
+  assert.equal(resumeHandoff(snapshot,[],done,root).length,1);assert.equal(tasks.length,2);assert.equal(tasks[1].reviewedTaskId,'build');
+  const events=[{type:'run/task-mapping',data:{tasks:[{task_id:'t1',seed_id:'build'}]}},{type:'team/checkpoint',data:{tasks:[{id:'t1',status:'completed'}]}},{type:'team/snapshot',data:{tasks:[{id:'t1',status:'in_progress'}]}}];
+  assert.equal(completedTasks(events,snapshot).size,0,'a newer unfinished state supersedes an older checkpoint');
+  await writeFile(join(root,'code.txt'),'tampered');assert.throws(()=>resumeHandoff(snapshot,[],done,root),/已变化/);
+ }finally{await rm(root,{recursive:true,force:true});}
+});
+
+test('authorized later writers retain earlier checkpoints while recovery validates the latest file version',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'resume-versions-'));
+ try{
+  const tasks=[{id:'initial',assignee:'developer',kind:'implementation',dependencies:[],outputs:[{path:'data.json',format:'json',expectedValues:{version:1}}],inScope:['data.json'],verify:['check']},{id:'update',assignee:'developer',kind:'implementation',dependencies:['initial'],inputs:[{path:'data.json',producerTaskId:'initial'}],outputs:[{path:'data.json',format:'json',expectedValues:{version:2}}],inScope:['data.json'],verify:['check']},{id:'review',assignee:'tester',kind:'review',reviewedTaskId:'update',dependencies:['update'],inputs:[{path:'data.json',producerTaskId:'update'}],outputs:[]}];
+  await writeFile(join(root,'data.json'),'{"version":1}');const first={taskId:'initial',attemptId:'a',outputs:[inspectArtifact(root,{path:'data.json'})]};
+  await writeFile(join(root,'data.json'),'{"version":2}');const second={taskId:'update',attemptId:'b',outputs:[inspectArtifact(root,{path:'data.json'})]};
+  const snapshot={tasks,agents:[],handoffCheckpoints:[first,second]},done=new Map([['initial',{attemptId:'a'}],['update',{attemptId:'b'}]]);
+  assert.equal(resumeHandoff(snapshot,[],done,root).length,2);
+  await writeFile(join(root,'data.json'),'{"version":3}');assert.throws(()=>resumeHandoff(snapshot,[],done,root),/ACCEPTANCE_FAILED|已变化/);
+ }finally{await rm(root,{recursive:true,force:true});}
+});
+
 test('rework recovery uses the newest mapping and requires independent acceptance of the complete pair',async()=>{
  const root=await mkdtemp(join(tmpdir(),'resume-rework-'));
  try{
   await writeFile(join(root,'data.json'),'{"count":2}');
-  const snapshot={agents:[],tasks:[{id:'build',kind:'implementation',dependencies:[],inputs:[],outputs:[{path:'data.json',format:'json',expectedValues:{count:2}}],inScope:['data.json'],verify:['check']},{id:'review',kind:'review',reviewedTaskId:'build',dependencies:['build'],inputs:[{path:'data.json',producerTaskId:'build'}],outputs:[],maxReworkRounds:1},{id:'deliver',dependencies:['review'],inputs:[{path:'data.json',producerTaskId:'build'}]}]};
+  const snapshot={agents:[],tasks:[{id:'build',assignee:'developer',kind:'implementation',dependencies:[],inputs:[],outputs:[{path:'data.json',format:'json',expectedValues:{count:2}}],inScope:['data.json'],verify:['check']},{id:'review',assignee:'tester',kind:'review',reviewedTaskId:'build',dependencies:['build'],inputs:[{path:'data.json',producerTaskId:'build'}],outputs:[],maxReworkRounds:1},{id:'deliver',dependencies:['review'],inputs:[{path:'data.json',producerTaskId:'build'}]}]};
   const output=inspectArtifact(root,{path:'data.json'});
   const events:any[]=[{type:'run/task-mapping',data:{tasks:[{task_id:'t1',seed_id:'build'},{task_id:'t2',seed_id:'review'}]}},{type:'quality/rework-created',data:{reviewTaskId:'review',round:1}},{type:'run/task-mapping',data:{tasks:[{task_id:'t3',seed_id:'build'},{task_id:'t4',seed_id:'review'}]}},{type:'handoff/accepted',data:{taskId:'build',attemptId:'repair',outputs:[output]}},{type:'handoff/accepted',data:{taskId:'review',attemptId:'recheck',outputs:[]}},{type:'quality/reviewed',data:{taskId:'review',attemptId:'recheck',verdict:'pass'}},{type:'team/checkpoint',data:{tasks:[{id:'t1',status:'completed',attemptId:'initial'},{id:'t2',status:'failed'},{id:'t3',status:'completed',attemptId:'repair'},{id:'t4',status:'completed',attemptId:'recheck',verdict:'pass'}]}}];
   const done=completedTasks(events);assert.equal(done.get('build').attemptId,'repair');assert.equal(resumeHandoff(snapshot,events,done,root).length,2);

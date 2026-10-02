@@ -1,6 +1,6 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 
-export const READ_ONLY_TOOLS = new Set(['filesystem', 'knowledge_read', 'knowledge_search', 'agent_teams_status']);
+export const READ_ONLY_TOOLS = new Set(['filesystem', 'knowledge_read', 'knowledge_search', 'recovery_read', 'agent_teams_status']);
 const transient = new Set(['EAGAIN', 'EBUSY', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED']);
 
 /** Only repeat free, read-only operations. A dispatched model or mutation with

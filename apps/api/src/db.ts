@@ -1,5 +1,9 @@
 import pg from 'pg';
 import { migrateProduct } from './product-schema.ts';
+import { migrateManagerChat } from './manager-chat.ts';
+import { migrateBrowserMcp } from './work-tools-browser.ts';
+import { migrateWorkFiles } from './work-files.ts';
+import { migrateAutomationLearning } from './automation-learning.ts';
 export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL ?? 'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department' });
 export async function migrate() {
   await pool.query(`
@@ -43,4 +47,8 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS project_runs_project ON project_runs(project_id, created_at DESC);
   `);
   await migrateProduct(pool);
+  await migrateManagerChat(pool);
+  await migrateBrowserMcp(pool);
+  await migrateWorkFiles(pool);
+  await migrateAutomationLearning(pool);
 }

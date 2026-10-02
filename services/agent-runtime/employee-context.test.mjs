@@ -9,6 +9,7 @@ import { createTeamHost } from './host.mjs';
 import { createRunArchive, readRun } from './trace-store.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 import { defineTool } from '@deepseek-ai/dsh-tools';
+import { employeeContextPolicy } from './employee-context.mjs';
 
 const prompt = text => createUserMessage({ content: [{ type: 'text', text }], source: { kind: 'user' } });
 const reply = text => [
@@ -22,6 +23,27 @@ function setup(role) { return ctx => {
   ctx.tools.restrict({ allow: [] });
   ctx.systemPrompt.section({ name: 'role', order: 120, text: role });
 }; }
+
+test('default byte policy admits a detailed task with a large fixed prompt and tool schema', { timeout: 10000 }, async () => {
+  const root = await mkdtemp(join(tmpdir(), 'context-fixed-prompt-')); const requests = [];
+  const adapter = new class extends LlmAdapter {
+    async resolveModel(provider, id) { return { provider, id, name: id, context: { contextWindow: 272000 } }; }
+    async *stream(options) { requests.push(options); yield* reply(options.purpose === 'compaction' ? 'prior work retained' : 'work continued'); }
+  }();
+  const context = employeeContextPolicy({ contextBytes: 64000 }, [{ id: 'a', contextWindowTokens: 272000, maxOutputTokens: 6000 }], 'fixture');
+  const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), context });
+  try {
+    host.ctx.tools.register(defineTool({ name: 'large_contract', description: 'Tool protocol '.repeat(1400), parameters: {}, output: { schema: { type: 'json' }, render: () => [] }, async execute() { return {}; } }));
+    const a = await host.ctx.agents.create({ sessionId: randomUUID(), agentOptions: { provider: 'fixture', model: 'a' }, setup: ctx => {
+      ctx.systemPrompt.section({ name: 'approved-task', order: 120, text: 'Fixed approved requirements. '.repeat(550) });
+    } });
+    await seed(a.agent, 'task details '); await turn(a.agent, 'write the implementation');
+    const events = a.agent.session.snapshotEvents();
+    assert.equal(requests.filter(r => r.purpose !== 'compaction').length, 3, JSON.stringify(events.filter(e => e.type === 'turn/end').map(e => e.data)));
+    assert.equal(requests.filter(r => r.purpose === 'compaction').length, 0, 'fixed prompt must not cause a futile paid summary');
+    assert.ok(events.some(e => e.type === 'assistant/message' && JSON.stringify(e).includes('work continued')));
+  } finally { await host.close(); await rm(root, { recursive: true, force: true }); }
+});
 
 test('automatic employee summaries retain source records, isolate history and survive resume', { timeout: 15000 }, async () => {
   const root = await mkdtemp(join(tmpdir(), 'context-summary-'));

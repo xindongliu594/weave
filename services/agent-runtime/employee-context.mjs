@@ -35,9 +35,11 @@ export function employeeContextPolicy(policy, routes, provider) {
   return { mode: policy.contextManagement ?? 'summary', pruning: {
     thresholdChars, headChars: Math.floor(thresholdChars * 0.3), tailChars: Math.floor(thresholdChars * 0.1),
   }, compaction: { modelPolicies: routes.filter(route => route.contextWindowTokens).map(route => {
-    // The meter estimates four UTF-16 code units per token. Twelve UTF-8 bytes
-    // per estimated token bounds ordinary multilingual text before wire clipping.
-    const budget = Math.min(route.contextWindowTokens, Math.floor(Math.min(bytes, route.contextBytes ?? bytes) / 12));
+    // This is a soft trigger in the meter's four-characters-per-token units.
+    // Dividing bytes by twelve made the threshold smaller than ordinary fixed
+    // prompts and tool schemas, which no history summary can remove. The wire
+    // adapter independently enforces the actual UTF-8 byte limit for all scripts.
+    const budget = Math.min(route.contextWindowTokens, Math.floor(Math.min(bytes, route.contextBytes ?? bytes) * 0.7 / 4));
     return { provider, model: route.id, thresholdRatio: Math.min(0.7, budget / route.contextWindowTokens),
       retainTokens: Math.max(1, Math.floor(budget * 0.24)),
       maxTokens: Math.max(64, Math.min(1024, route.maxOutputTokens, Math.floor(budget * 0.22))),

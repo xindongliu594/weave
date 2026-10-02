@@ -36,6 +36,8 @@ jobs:
       - run: npm run runtime:inspect
       - run: npm run runtime:test:portable
       - run: npm run test:integration
+      - run: npm run demo:check
+      - run: npm run local:check
       - run: npm test --prefix apps/desktop
   backend:
     name: PostgreSQL and Docker

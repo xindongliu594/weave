@@ -11,6 +11,22 @@ export { knowledgeSnapshot, validateKnowledgeGrants } from './knowledge-store.ts
 import { searchAvailableKnowledge } from './knowledge-store.ts';
 import { knowledgeIndexStatus,startKnowledgeIndex } from './knowledge-vector.ts';
 import { embedTexts } from '../../../services/embedding/local.mjs';
+async function saveKnowledgeDocumentUnlocked(input:z.infer<typeof documentSchema>, id:string, isNew:boolean) {
+  await syncObsidian();
+  const client=await pool.connect();let version=1;
+  try {
+    await client.query('BEGIN');
+    if(!(await client.query('SELECT id FROM knowledge_spaces WHERE id=$1 AND deleted_at IS NULL FOR SHARE',[input.spaceId])).rowCount)throw new AppError(404,'知识库不存在');
+    if(isNew)await client.query('INSERT INTO knowledge_documents(id,space_id,title) VALUES($1,$2,$3)',[id,input.spaceId,input.title]);
+    else {const result=await client.query('UPDATE knowledge_documents SET title=$1,version=version+1 WHERE id=$2 AND version=$3 AND space_id=$4 AND deleted_at IS NULL RETURNING version',[input.title,id,input.version,input.spaceId]);if(!result.rowCount)throw new AppError(409,'文档已更新，请刷新');version=result.rows[0].version;}
+    await client.query('INSERT INTO knowledge_revisions(document_id,version,content,sha256,source) VALUES($1,$2,$3,$4,$5)',[id,version,input.content,createHash('sha256').update(input.content).digest('hex'),input.source]);
+    for(const c of chunkDocument(id,version,input.content))await client.query('INSERT INTO knowledge_chunks(id,document_id,version,line_start,line_end,content,tokens) VALUES($1,$2,$3,$4,$5,$6,$7)',[c.id,id,version,c.lineStart,c.lineEnd,c.content,JSON.stringify(c.tokens)]);
+    await client.query('COMMIT');
+  }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
+  await writeVaultDocument(id);return {id,version};
+}
+export const saveKnowledgeDocument=(input:unknown,id:string=randomUUID(),isNew=true)=>withVaultLock(()=>saveKnowledgeDocumentUnlocked(documentSchema.parse(input),id,isNew));
+
 export function knowledgeRouter() {
   const router=Router();
   router.get('/knowledge/retrieval',async(_req,res)=>{const row=(await pool.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];res.json({mode:row.data.knowledgeSearchMode??'keyword',version:row.version,...await knowledgeIndexStatus()});});
@@ -34,21 +50,7 @@ export function knowledgeRouter() {
   });
   router.delete('/knowledge/spaces/:id',async(req,res)=>{const result=await pool.query('UPDATE knowledge_spaces SET deleted_at=now(),version=version+1 WHERE id=$1 AND version=$2 AND deleted_at IS NULL',[req.params.id,z.number().int().positive().parse(req.body.version)]);if(!result.rowCount)throw new AppError(409,'知识库版本已变化');res.json({ok:true});});
   router.get('/knowledge/documents',async(req,res)=>res.json((await pool.query(`SELECT d.id,d.space_id AS "spaceId",d.title,d.version,r.sha256,r.content,r.source,d.vault_path AS "vaultPath",d.created_at AS "createdAt" FROM knowledge_documents d JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=d.version WHERE d.deleted_at IS NULL AND ($1::text IS NULL OR d.space_id=$1) ORDER BY d.created_at DESC`,[req.query.spaceId??null])).rows));
-  async function saveUnlocked(input:z.infer<typeof documentSchema>, id:string, isNew:boolean) {
-    await syncObsidian();
-    const client=await pool.connect();
-    try {
-      await client.query('BEGIN');
-      if(!(await client.query('SELECT id FROM knowledge_spaces WHERE id=$1 AND deleted_at IS NULL FOR SHARE',[input.spaceId])).rowCount)throw new AppError(404,'知识库不存在');
-      let version=1;
-      if(isNew)await client.query('INSERT INTO knowledge_documents(id,space_id,title) VALUES($1,$2,$3)',[id,input.spaceId,input.title]);
-      else {const result=await client.query('UPDATE knowledge_documents SET title=$1,version=version+1 WHERE id=$2 AND version=$3 AND space_id=$4 AND deleted_at IS NULL RETURNING version',[input.title,id,input.version,input.spaceId]);if(!result.rowCount)throw new AppError(409,'文档已更新，请刷新');version=result.rows[0].version;}
-      await client.query('INSERT INTO knowledge_revisions(document_id,version,content,sha256,source) VALUES($1,$2,$3,$4,$5)',[id,version,input.content,createHash('sha256').update(input.content).digest('hex'),input.source]);
-      for(const c of chunkDocument(id,version,input.content))await client.query('INSERT INTO knowledge_chunks(id,document_id,version,line_start,line_end,content,tokens) VALUES($1,$2,$3,$4,$5,$6,$7)',[c.id,id,version,c.lineStart,c.lineEnd,c.content,JSON.stringify(c.tokens)]);
-      await client.query('COMMIT');await writeVaultDocument(id);return {id,version};
-    }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
-  }
-  const save=(input:z.infer<typeof documentSchema>,id:string,isNew:boolean)=>withVaultLock(()=>saveUnlocked(input,id,isNew));
+  const save=saveKnowledgeDocument;
   router.post('/knowledge/documents',async(req,res)=>res.status(201).json(await save(documentSchema.parse(req.body),randomUUID(),true)));
   router.put('/knowledge/documents/:id',async(req,res)=>res.json(await save(documentSchema.parse(req.body),String(req.params.id),false)));
   router.get('/knowledge/documents/:id/versions',async(req,res)=>res.json((await pool.query('SELECT version,content,sha256,source,created_at AS "createdAt" FROM knowledge_revisions WHERE document_id=$1 ORDER BY version DESC',[req.params.id])).rows));

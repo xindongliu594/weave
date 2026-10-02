@@ -2,8 +2,8 @@
   "name": "agent-department-desktop",
   "version": "0.2.0",
   "private": true,
-  "description": "Agent Department desktop workspace",
-  "author": "Agent Department",
+  "description": "为伍桌面工作台 · 一个想法，一支团队",
+  "author": "为伍",
   "main": "main.cjs",
   "scripts": {
     "start": "electron .",
@@ -17,7 +17,8 @@
   },
   "build": {
     "appId": "com.agentdepartment.desktop",
-    "productName": "Agent Department",
+    "productName": "为伍",
+    "executableName": "Agent Department",
     "directories": {
       "output": "../../dist/desktop"
     },

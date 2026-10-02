@@ -13,7 +13,7 @@ let authAttempts = 0;
 const settingsURL = pathToFileURL(path.join(__dirname, 'settings.html')).href;
 function settings() {
   if (settingsWindow) { settingsWindow.focus(); return; }
-  settingsWindow = new BrowserWindow({ width: 600, height: 780, resizable: true, show:process.env.AGENT_DESKTOP_TEST_HIDDEN!=='1', title: '连接与本机执行设置', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
+  settingsWindow = new BrowserWindow({ width: 600, height: 780, resizable: true, show:process.env.AGENT_DESKTOP_TEST_HIDDEN!=='1', title: '为伍 · 连接与本机执行设置', webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false } });
   settingsWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   settingsWindow.webContents.on('will-navigate', e => e.preventDefault());
   settingsWindow.on('closed', () => { settingsWindow = null; });
@@ -22,7 +22,7 @@ function settings() {
 function workspace() {
   const previous = window;
   authAttempts = 0;
-  window = new BrowserWindow({ width: 1380, height: 900, minWidth: 900, minHeight: 620, show:process.env.AGENT_DESKTOP_TEST_HIDDEN!=='1', title: 'Agent Department', webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, partition: 'persist:workspace' } });
+  window = new BrowserWindow({ width: 1380, height: 900, minWidth: 900, minHeight: 620, show:process.env.AGENT_DESKTOP_TEST_HIDDEN!=='1', title: '为伍', webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false, partition: 'persist:workspace' } });
   window.webContents.on('will-navigate', (e, url) => { if (!isWorkspaceURL(url, config.server)) e.preventDefault(); });
   window.webContents.on('will-redirect', (e, url) => { if (!isWorkspaceURL(url, config.server)) e.preventDefault(); });
   window.webContents.setWindowOpenHandler(({ url }) => { if (isWorkspaceURL(url, config.server)) void shell.openExternal(url); return { action: 'deny' }; });
@@ -106,10 +106,10 @@ else {
     });
     ipcMain.handle('local:disable',async event=>{trusted(event);await localClient?.disable();localClient=null;if(localPair){localPair.enabled=false;persistLocal();}localState={status:'disabled'};return {ok:true};});
     Menu.setApplicationMenu(Menu.buildFromTemplate([
-      ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
+      ...(process.platform === 'darwin' ? [{ role: 'appMenu', label: '为伍' }] : []),
       { label: '工作空间', submenu: [{ label: '连接设置', click: settings }, {label:'本机执行设置',click:settings}, { label: '重新连接', accelerator: 'CmdOrCtrl+R', click: workspace }, { label: '在浏览器打开', click: () => shell.openExternal(config.server) }, { type: 'separator' }, { role: 'quit' }] },
       { role: 'editMenu' }, { role: 'viewMenu' },
-      { label: '帮助', submenu: [{ label: '关于', click: () => dialog.showMessageBox({ message: 'Agent Department ' + app.getVersion(), detail: '后端协调模型、预算与运行档案。桌面端可在用户选择的目录下执行获授权的文件和逐次批准的本机命令。' }) }] },
+      { label: '帮助', submenu: [{ label: '关于为伍', click: () => dialog.showMessageBox({ title: '关于为伍', message: '为伍 ' + app.getVersion(), detail: '一个想法，一支团队。\n\n后端协调模型、预算与运行档案。桌面端可在用户选择的目录下执行获授权的文件和逐次批准的本机命令。' }) }] },
     ]));
     config.username && config.password ? workspace() : settings();
     app.on('activate', () => { if (!window && !settingsWindow) settings(); });

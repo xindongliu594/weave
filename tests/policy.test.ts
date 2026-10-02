@@ -6,6 +6,22 @@ const model: Model = { id: 'model', name: 'Test', gatewayId: 'gateway', model: '
 const policy: Policy = { maxBudget: 1, maxAgents: 2, maxConcurrentAgents: 2, deadlineSeconds: 600 };
 const base: Plan = { rationale: '测试方案', agents: [{ id: 'manager', name: '经理', role: 'manager', title: '经理', instructions: '协调', modelId: 'model', tools: ['artifact_write'] }], tasks: [{ id: 'a', subject: '实现', objective: '完成需求', assigneeId: 'manager', dependencies: [], acceptanceCriteria: ['通过测试'], estimatedInputTokens: 1000, estimatedOutputTokens: 1000 }] };
 test('single manager is a valid one-agent department', () => { assert.equal(validatePlan(base, policy, [model]).valid, true); });
+
+test('legacy placeholder tasks cannot pass execution validation through configuration-only edits', () => {
+ const plan=structuredClone(base);
+ plan.tasks=[{...plan.tasks[0],id:'deliver',subject:'完成需求并提交验收材料',acceptanceCriteria:['交付内容覆盖用户需求，并提供可核验的结果']}];
+ for(const candidate of [plan,planSchema.parse(plan),{...plan,rationale:'更新了模型和预算'}, {...plan,tasks:[...plan.tasks,base.tasks[0]]}]) {
+  const result=validatePlan(candidate,{...policy,maxBudget:10},[model]);
+  assert.equal(result.valid,false);assert.equal(result.checks.find(check=>check.label==='任务已规划')?.pass,false);
+  assert.ok(result.errors.some(error=>error.includes('默认占位任务')));
+ }
+});
+
+test('an explicit one-person text plan remains executable without file tools', () => {
+ const plan=structuredClone(base);plan.agents[0].tools=[];
+ plan.tasks[0]={...plan.tasks[0],id:'deliver',subject:'整理需求说明',objective:'列出 Todo 接口、范围和待确认事项',kind:'requirements',acceptanceCriteria:['逐项列出接口和 HTTP 状态码','列出未确认的需求']};
+ assert.equal(validatePlan(plan,policy,[model]).valid,true);
+});
 test('recovery policy cannot authorize unbounded retries or immediate false stall decisions',()=>{
  assert.equal(policySchema.safeParse({...policy,maxReadRetries:3}).success,false);
  assert.equal(policySchema.safeParse({...policy,progressTimeoutSeconds:0}).success,false);

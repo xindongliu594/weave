@@ -32,7 +32,7 @@ before(async () => {
   const dbURL = new URL(base); dbURL.searchParams.set('options', '-c search_path=' + schema);
   process.env.DATABASE_URL = dbURL.toString();
   directory = await mkdtemp(join(tmpdir(), 'product-flow-'));
-  process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs');
+  process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, '.data', 'runs');
   // Replace the readiness boundary directly on every OS. No shell shim or
   // PATH mutation; accidental real container operations must fail loudly.
   mock.method(RunSandbox, 'assertReady', async (signal?: AbortSignal) => { signal?.throwIfAborted(); });
@@ -111,15 +111,24 @@ before(async () => {
           if(rework){
             actions.push(round&&mode!=='rework-limit'?update('completed',{output:'independent repaired review',verdict:'pass'}):
               update('failed',{verdict:mode==='rework-reject'?'reject':'needs_revision',findings:[{id:'F1',severity:'high',file:mode==='rework-scope'?'private/secret.json':'result.json',problem:'Report needs final review stage',requiredFix:mode==='rework-prefix-scope'?'Update result.js':'Set result.json reviewStage to final'}]}));
-          }else actions.push(['artifact_write', { path: 'review.json', content: '{"accepted":true}' }], update('completed', { output: 'independent review', verdict: 'pass' }));
+          }else {
+            if(mode==='resume-review'){
+              if(pinned?.recovery){actions.push(['recovery_read',{taskId:'review'}],['recovery_read',{taskId:'produce'}],['filesystem',{path:'review.json'}]);}
+              else actions.push(['artifact_write',{path:'review.json',content:'{"accepted":false,"note":"partial review"}'}]);
+              actions.push(['terminal_test',{command:'check-fixed-result'}]);
+            }
+            const previous=messages.filter((m:any)=>m.role==='tool').map((m:any)=>{try{return JSON.parse(m.content);}catch{return undefined;}}).findLast((value:any)=>value?.path==='review.json'&&value.sha256);
+            actions.push(['artifact_write', { path: 'review.json', content: '{"accepted":true}',...(mode==='resume-review'?{expectedSha256:previous?.sha256}:{}) }], update('completed', { output: 'independent review', verdict: 'pass' }));
+          }
         }
         if (step < actions.length) {
           message = tool(actions[step][0], actions[step][1], key + ':' + step);
           if (mode === 'context' && step < 3) message.content = 'HISTORY_EVIDENCE_' + label + '_' + step + ':' + 'x'.repeat(8000);
+          if(mode==='resume-review'&&label==='review'&&step===2)message.content='RECOVERY_NOTE: input read; verify the fixed report next. This is a work note, not acceptance.';
         }
       }
     }
-    if (mode === 'context') contextRequests.push(body);
+    if (mode === 'context'||mode==='resume-review') contextRequests.push(body);
     const inputTokens = mode === 'context' ? Math.ceil(JSON.stringify({ messages, tools: body.tools }).length / 4) : 50;
     const outputTokens = mode === 'context' ? Math.ceil(JSON.stringify(message).length / 4) : 10;
     res.setHeader('content-type', 'application/json');
@@ -142,11 +151,15 @@ after(async () => {
 
 function tool(name: string, args: any, id: string) { return { content: null, tool_calls: [{ id, type: 'function', function: { name, arguments: JSON.stringify(args) } }] }; }
 async function call(path: string, method = 'GET', body?: any, status = 200) {
-  const response = await fetch(url + path, { method, headers: { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
+  let response:Response|undefined;
+  // Polling may race a closed keep-alive socket after a busy Windows fsync or
+  // service restart. Retry reads only; never replay approvals or mutations.
+  for(let attempt=0;!response;attempt++)try{response=await fetch(url + path, { method, headers: { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });}
+  catch(error){if(method!=='GET'||attempt>=2||!['ECONNRESET','UND_ERR_SOCKET'].includes((error as any).cause?.code))throw error;await new Promise(resolve=>setTimeout(resolve,100));}
   const data = await response.json(); assert.equal(response.status, status, path + ': ' + JSON.stringify(data)); return data;
 }
-async function waitFor(read: () => Promise<any>, accept: (value: any) => boolean, label: string) {
-  const deadline = Date.now() + 20000; let value: any;
+async function waitFor(read: () => Promise<any>, accept: (value: any) => boolean, label: string, timeoutMs=20000) {
+  const deadline = Date.now() + timeoutMs; let value: any;
   while (Date.now() < deadline) { value = await read(); if (accept(value)) return value; await new Promise(resolve => setTimeout(resolve, 50)); }
   assert.fail(label + ': ' + JSON.stringify(value));
 }
@@ -157,7 +170,7 @@ async function launch(nextMode: string,executionTarget?:any) {
   const agents = [
     { id: 'manager', role: 'manager', name: '经理', tools: [] },
     { id: 'producer', role: 'member', name: '产出者', tools: nextMode.startsWith('rework')||nextMode.startsWith('c3-')?['filesystem','artifact_write','terminal_test']:['artifact_write', 'terminal_test'] },
-    { id: 'reviewer', role: 'member', name: '审查者', tools: nextMode==='rework-checkpoint'?['filesystem','artifact_write','terminal_test']:['filesystem', 'artifact_write'] },
+    { id: 'reviewer', role: 'member', name: '审查者', tools: ['rework-checkpoint','resume-review'].includes(nextMode)?['filesystem','artifact_write','terminal_test']:['filesystem', 'artifact_write'] },
   ].map(a => ({ ...a, title: a.name, instructions: 'Execute only the approved fixture tasks', modelId }));
   const department = await call('/departments', 'POST', { name: 'Flow ' + mode, description: 'Integration fixture', agents }, 201);
   const project = await call('/projects', 'POST', { departmentId: department.id, requirement: '生成固定测试报告并由另一位员工独立审查，核对文件版本和审批。', policy: { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 60,...(executionTarget?{executionTarget}:{}) } }, 201);
@@ -172,20 +185,24 @@ async function launch(nextMode: string,executionTarget?:any) {
     Object.assign(plan.tasks[1],{outputs:[],maxReworkRounds:1});
   }
   if(mode==='rework-checkpoint')plan.tasks.push({...common,id:'deliver',subject:'[flow:consume]',objective:'Deliver after independent review',assigneeId:'reviewer',dependencies:['review'],acceptanceCriteria:['delivery correct'],kind:'work',inputs:[{path:'result.json',producerTaskId:'produce'}],outputs:[{path:'review.json',format:'json',expectedValues:{accepted:true}}]});
+  if(mode==='resume-review')plan.tasks[1].maxModelCalls=40;
   if(mode==='local-long'){plan.tasks[0].inScope.push('command-started.txt');plan.tasks[0].outputs.push({path:'command-started.txt',format:'text',nonEmpty:true});}
   await call('/projects/' + project.id + '/plan', 'PUT', { version: 1, plan });
   const saved = (await call('/projects')).find((p: any) => p.id === project.id); assert.equal(saved.validation.valid, true, JSON.stringify(saved.validation));
   return (await call('/projects/' + project.id + '/approve', 'POST', { version: 2 }, 202)).id;
 }
 const approvals = (id: string) => call('/approvals?runId=' + id);
-async function localFixture(){
+async function localFixture(request=globalThis.fetch){
  const root=join(directory,'local-workspaces-'+randomUUID()),journalRoot=join(directory,'local-journal-'+randomUUID());mkdirSync(root,{recursive:true});
  const device={id:randomUUID(),token:randomBytes(32).toString('hex'),name:'真实本机测试设备',grant:{id:randomUUID(),root,allowCommands:true}};
- const input={connection:{server:url.replace(/api$/,''),username:'fixture',password:'fixture'},device,journalRoot,pollMs:50};
+ const input={connection:{server:url.replace(/api$/,''),username:'fixture',password:'fixture'},device,journalRoot,pollMs:50,fetch:request};
  const client=new LocalDeviceClient(input);await client.start();return {root,device,input,client,target:{kind:'local',deviceId:device.id,grantId:device.grant.id}};
 }
 const run = (id: string) => call('/runs/' + id);
-async function pendingApproval(id: string) { return (await waitFor(() => approvals(id), list => list.some((a: any) => a.status === 'pending'), 'pending approval')).find((a: any) => a.status === 'pending'); }
+async function pendingApproval(id: string) {
+ try{return (await waitFor(() => approvals(id), list => list.some((a: any) => a.status === 'pending'), 'pending approval',40000)).find((a: any) => a.status === 'pending');}
+ catch(error){const file=join(directory,'.data','runs',id,'events.jsonl');const events=existsSync(file)?readFileSync(file,'utf8').trim().split('\n').map(line=>JSON.parse(line)):[];throw Error((error as Error).message+'; runtime evidence: '+JSON.stringify(events.filter((event:any)=>['run/finished','model/error','handoff/blocked','runtime/anomaly','quality/escalated','team/checkpoint'].includes(event.type)).slice(-5)));}
+}
 async function stopped(id: string) {
   const result = await waitFor(() => run(id), r => ['completed', 'failed', 'cancelled'].includes(r.status), 'stopped run');
   assert.equal(result.integrity, 'ok', 'every stopped run must have a complete archive');
@@ -205,7 +222,7 @@ test('D1 API and actual DSH execute native device files and an approved command,
   assert.equal(commands,0,'the Docker test double was never used');assert.equal(mutations,0);
   assert.equal(result.snapshot.executionTarget.deviceId,local.device.id);assert.equal(result.snapshot.executionTarget.grantId,local.device.grant.id);
   assert.ok(result.events.some((event:any)=>event.type==='local/device-bound'));assert.ok(result.events.some((event:any)=>event.type==='handoff/command-observed'&&event.data.exitCode===0));
-  assert.deepEqual(JSON.parse(readFileSync(join(local.root,id,'review.json'),'utf8')),{accepted:true});assert.deepEqual(JSON.parse(readFileSync(join(directory,'runs',id,'artifacts','result.json'),'utf8')),expected);
+  assert.deepEqual(JSON.parse(readFileSync(join(local.root,id,'review.json'),'utf8')),{accepted:true});assert.deepEqual(JSON.parse(readFileSync(join(directory,'.data','runs',id,'artifacts','result.json'),'utf8')),expected);
   const operations=await call('/runs/'+id+'/local-operations');assert.ok(operations.every((job:any)=>job.status==='completed'));assert.equal(operations.filter((job:any)=>job.payload.name==='terminal_test').length,1);
   assert.ok(operations.find((job:any)=>job.payload.name==='terminal_test').result.output.includes('local validation passed'));assert.equal(result.recovery.unknownOperations.length,0);
   const stored=(await pool.query("SELECT * FROM local_operations WHERE run_id=$1 AND approval_id IS NOT NULL",[id])).rows[0];
@@ -217,12 +234,36 @@ test('D1 API and actual DSH execute native device files and an approved command,
   await protocol('/result',{...stored.result,result:{...stored.result.result,output:'forged changed receipt'}},409);
   assert.equal((await pool.query('SELECT COUNT(*)::int AS count FROM local_operations WHERE approval_id=$1',[stored.approval_id])).rows[0].count,1);
   const {LocalOperationService}=await import('../apps/api/src/local-execution.ts');
-  await assert.rejects(new LocalOperationService(join(directory,'runs'),stored.lease_owner).wait(stored.id),{code:'LOCAL_OPERATION_CANCELLED',notExecuted:false},'a stopped worker cannot adopt an old completed receipt');
+  await assert.rejects(new LocalOperationService(join(directory,'.data','runs'),stored.lease_owner).wait(stored.id),{code:'LOCAL_OPERATION_CANCELLED',notExecuted:false},'a stopped worker cannot adopt an old completed receipt');
   const usage=(await call('/usage')).filter((item:any)=>item.runId===id);assert.ok(usage.length>0);assert.ok(usage.every((item:any)=>item.agentId&&item.cost>0));
   assert.ok(usage.some((item:any)=>item.employeeId==='producer'&&item.taskId==='produce'));assert.ok(usage.some((item:any)=>item.employeeId==='reviewer'&&item.taskId==='review'));
   assert.equal(usage.length,result.events.filter((event:any)=>event.type==='billing/usage').length);
  }finally{await local.client.disable();}
 });
+test('D1 lost poll response recovers an unstarted claim and executes it exactly once',{timeout:40000},async()=>{
+ let lostId:string|undefined,claims=0,starts=0;
+ const local=await localFixture(async(input,options)=>{
+  const response=await fetch(input,options),endpoint=new URL(String(input)).pathname;
+  if(endpoint.endsWith('/poll')){
+   const body=await response.clone().json() as any;
+   if(body.job&&(!lostId||body.job.id===lostId)){
+    claims++;if(!lostId){lostId=body.job.id;throw Error('fixture: claim committed, poll response lost');}
+   }
+  }
+  if(endpoint.endsWith('/operations/'+lostId+'/start')&&response.ok)starts++;
+  return response;
+ });
+ try{
+  const id=await launch('local-pass',local.target),approval=await pendingApproval(id);
+  await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+  const result=await stopped(id);assert.equal(result.status,'completed',JSON.stringify(result.events.at(-1)));
+  assert.equal(claims,2);assert.equal(starts,1);assert.deepEqual(result.recovery.unknownOperations,[]);
+  const operations=await call('/runs/'+id+'/local-operations');
+  assert.equal(operations.filter((job:any)=>job.id===lostId).length,1);
+  assert.ok(operations.every((job:any)=>job.status==='completed'));
+ }finally{await local.client.disable();}
+});
+
 test('D1 revoked device grants reject dispatch after approval and do not become unknown mutations',{timeout:35000},async()=>{
  const local=await localFixture();try{
   const id=await launch('local-pass',local.target),approval=await pendingApproval(id);
@@ -251,6 +292,9 @@ test('approved API flow waits for command approval, hands off verified files and
   const seals = result.events.filter((e: any) => e.type === 'handoff/accepted'); assert.equal(seals.length, 2);
   assert.equal(seals[1].data.inputs[0].sha256, seals[0].data.outputs[0].sha256);
   const artifact = await fetch(url + '/runs/' + id + '/artifact?path=result.json'); assert.equal(artifact.status, 200); assert.deepEqual(await artifact.json(), expected);
+  assert.match(artifact.headers.get('content-disposition')??'',/attachment/);
+  assert.equal(artifact.headers.get('x-content-type-options'),'nosniff');
+  await call('/runs/'+id+'/artifact?path=..%2F..%2Fsnapshot.json','GET',undefined,404);
   assert.deepEqual((await call('/runs/' + id + '/artifacts')).map((f: any) => f.path).sort(), ['result.json', 'review.json']);
   const exported = await call('/runs/' + id + '/export'); assert.equal(exported.integrity, 'ok'); assert.ok(!JSON.stringify(exported).includes('simulated-key'));
   const usage = (await call('/usage')).filter((u: any) => u.runId === id);
@@ -348,7 +392,7 @@ test('API rework stops at its call allowance and full retry cannot reset the tas
   assert.equal(response.status,retried.code==='COST_PENDING'?409:422);
   const row=(await pool.query('SELECT project_id,project_version FROM project_runs WHERE id=$1',[id])).rows[0];
   const {budgetHistory}=await import('../apps/api/src/budget-history.ts');
-  const history=await budgetHistory(pool,join(directory,'runs'),row.project_id,row.project_version);
+  const history=await budgetHistory(pool,join(directory,'.data','runs'),row.project_id,row.project_version);
   assert.equal(history.tasks.produce.calls,8,'all original and repair calls must survive retry accounting');
   assert.equal((await pool.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rowCount,0,'neither rejection may create a fresh task allowance');
 });
@@ -432,7 +476,42 @@ test('C3 never replays an uncertain write; explicit reconciliation is recorded b
  assert.equal(restored.snapshot.budgetHistory.tasks.produce.calls,result.events.filter((event:any)=>event.type==='model/wire-request'&&event.data.taskId==='produce').length);
 });
 
-test('C3 restores an independently passed rework pair and runs only its remaining consumer', {timeout:45000},async()=>{
+test('checkpoint recovery preserves the DAG, unfinished files and history across two interruptions', {timeout:90000},async()=>{
+ const id=await launch('resume-review'),first=await pendingApproval(id);
+ await call('/approvals/'+first.id,'POST',{decision:'approved'});
+ await pendingApproval(id);await call('/runs/'+id+'/cancel','POST',{},202);
+ const original=await stopped(id);assert.equal(original.recovery.checkpointBlocked,undefined);
+ const seal=original.events.find((event:any)=>event.type==='handoff/accepted'&&event.data.taskId==='produce').data;
+ await reconcileFixtureUsage(id);
+ // Recreate the API/coordinator/runtime so recovery cannot use a live Host or
+ // in-memory employee context from the original run.
+ await app.locals.shutdown();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));
+ const {createApp}=await import('../apps/api/src/app.ts');app=createApp();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
+ let parent=id;
+ for(let attempt=0;attempt<2;attempt++){
+  const retry=await call('/runs/'+parent+'/retry','POST',{resume:true},202);
+  assert.deepEqual(retry.completedCheckpoints,['produce']);
+  const approval=await pendingApproval(retry.id),running=await run(retry.id);
+  assert.deepEqual(running.snapshot.tasks.map((task:any)=>task.id),['produce','review']);
+  assert.deepEqual(running.snapshot.tasks[1].dependencies,['produce']);assert.equal(running.snapshot.tasks[1].reviewedTaskId,'produce');
+  assert.equal(running.snapshot.recovery.files.find((file:any)=>file.path==='result.json').state,'accepted');
+  assert.equal(running.snapshot.recovery.files.find((file:any)=>file.path==='review.json').state,'unverified');
+  assert.match(running.snapshot.recovery.nodes.review.lastMessage,/RECOVERY_NOTE/);
+  if(attempt===0){await call('/runs/'+retry.id+'/cancel','POST',{},202);}
+  else await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+  const result=await stopped(retry.id);assert.equal(result.status,attempt===0?'cancelled':'completed',JSON.stringify(result.events.at(-1)));
+  assert.ok(result.events.filter((event:any)=>event.type==='model/wire-request'&&event.data.taskId).every((event:any)=>event.data.taskId==='review'));
+  assert.ok(result.events.some((event:any)=>event.type==='recovery/read'));
+  assert.equal(result.snapshot.handoffCheckpoints.find((record:any)=>record.taskId==='produce').outputs[0].sha256,seal.outputs[0].sha256);
+  if(attempt===0)await reconcileFixtureUsage(retry.id);
+  parent=retry.id;
+ }
+ assert.equal(commands,2,'only original developer verification and final reviewer verification execute');
+ assert.equal(mutations,3,'developer output, interrupted review draft and final review only');
+ assert.ok(contextRequests.some(body=>body.messages.some((message:any)=>message.role==='system'&&String(message.content).includes('RECOVERY_NOTE')&&String(message.content).includes('sourceRunId'))));
+});
+
+test('C3 restores an independently passed rework pair and runs only its remaining consumer', {timeout:90000},async()=>{
  const id=await launch('rework-checkpoint');
  for(let count=0;count<2;count++){const approval=await pendingApproval(id);await call('/approvals/'+approval.id,'POST',{decision:'approved'});}
  const downstream=await pendingApproval(id);assert.equal(commands,2);assert.equal(downstream.agentId,(await run(id)).snapshot.agents.find((agent:any)=>agent.employeeId==='reviewer').id);
@@ -443,7 +522,7 @@ test('C3 restores an independently passed rework pair and runs only its remainin
  const retry=await call('/runs/'+id+'/retry','POST',{resume:true},202);assert.deepEqual(retry.completedCheckpoints.sort(),['produce','review']);
  const approval=await pendingApproval(retry.id);await call('/approvals/'+approval.id,'POST',{decision:'approved'});
  const restored=await stopped(retry.id);assert.equal(restored.status,'completed',JSON.stringify(restored.events.filter((event:any)=>['handoff/blocked','model/error'].includes(event.type))));
- assert.deepEqual(restored.snapshot.tasks.map((task:any)=>task.id),['deliver']);assert.equal(restored.snapshot.approvedTasks.length,3);assert.equal(commands,3);
+ assert.deepEqual(restored.snapshot.tasks.map((task:any)=>task.id),['produce','review','deliver']);assert.equal(restored.snapshot.approvedTasks.length,3);assert.equal(commands,3);
  assert.ok(restored.events.filter((event:any)=>event.type==='model/wire-request'&&event.data.taskId).every((event:any)=>event.data.taskId==='deliver'));
  assert.equal(restored.events.find((event:any)=>event.type==='handoff/accepted').data.inputs[0].sha256,before.events.findLast((event:any)=>event.type==='handoff/accepted'&&event.data.taskId==='produce').data.outputs[0].sha256);
 });

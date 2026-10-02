@@ -24,7 +24,7 @@ export class ReworkGate {
   constructor({ snapshot, handoff, archive, taskIds, state, onBlocked }) {
     Object.assign(this, { snapshot, handoff, archive, taskIds, state, onBlocked });
     this.original = new Map(snapshot.tasks.map(task => [task.id, task]));
-    this.rounds = new Map(); this.superseded = new Set(); this.contracts = new Map();
+    this.rounds = new Map(Object.entries(snapshot.recovery?.reworkRounds??{})); this.superseded = new Set(); this.contracts = new Map();
   }
   check() { this.reconcile(); if (this.failure) throw this.failure; }
   contractFor(runtimeTaskId) { return this.contracts.get(runtimeTaskId) ?? this.original.get(this.taskIds.get(runtimeTaskId)); }

@@ -64,7 +64,7 @@ if 'location ^~ /agent-department/' not in text:
         raise
     print('Edge backup:', backup)
 else:
-    print('Existing Agent Department edge route retained')
+    print('已保留为伍现有边缘代理路由')
 PY
 podman ps --filter name=agent-department-web --format '{{.Names}} {{.Status}}'
 '''

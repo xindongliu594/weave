@@ -7,12 +7,16 @@
     "node": "^22.19.0 || >=24"
   },
   "scripts": {
+    "demo": "node scripts/demo.mjs",
+    "demo:check": "node scripts/demo.mjs --check",
+    "local": "node scripts/local.mjs",
+    "local:check": "node scripts/local.mjs --check",
     "dev": "tsx scripts/dev.ts",
     "dev:api": "tsx watch apps/api/src/index.ts",
     "dev:web": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "test": "tsx --test tests/*.test.ts",
-    "test:rules": "node --import tsx --test tests/policy.test.ts tests/task-contracts.test.ts tests/request-origin.test.ts tests/handoff-checkpoints.test.ts",
+    "test:rules": "node --import tsx --test tests/policy.test.ts tests/task-contracts.test.ts tests/request-origin.test.ts tests/handoff-checkpoints.test.ts tests/model-catalog.test.ts",
     "db:migrate": "tsx apps/api/src/migrate.ts",
     "runtime:inspect": "node scripts/runtime-inspect.mjs",
     "runtime:test": "node --test services/agent-runtime/*.test.mjs",
@@ -22,9 +26,11 @@
   },
   "dependencies": {
     "@huggingface/transformers": "4.3.0",
+    "adm-zip": "0.6.1",
     "express": "5.1.0",
     "lucide-react": "0.468.0",
     "pg": "8.16.3",
+    "playwright-core": "1.63.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "zod": "4.1.5"
