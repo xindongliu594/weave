@@ -3,6 +3,7 @@ import { mkdirSync, readdirSync, lstatSync, readFileSync, writeFileSync, existsS
 import { join, resolve, relative, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { Semaphore } from './limits.mjs';
+import { canonicalManifest } from '../../apps/desktop/local-executor.cjs';
 export const SANDBOX_IMAGE='node:22.19.0-bookworm-slim';
 export function validArtifactPath(value) {
   if(typeof value!=='string'||!value||value.length>240||value.includes('\\')||value.includes('\0')||value.startsWith('/')||value.split('/').some(p=>!p||p==='.'||p==='..'||p.startsWith('.agent')))throw Error('非法工作区路径');
@@ -61,7 +62,7 @@ export class RunSandbox {
     for(const file of files){validArtifactPath(file.path);const target=join(this.root,file.path);mkdirSync(dirname(target),{recursive:true,mode:0o700});writeFileSync(target,Buffer.from(file.content,'base64'),{mode:0o600});}
     return listArtifacts(this.root);
   }
-  revision(){return createHash('sha256').update(JSON.stringify(listArtifacts(this.root).sort((a,b)=>a.path.localeCompare(b.path)))).digest('hex');}
+  revision(){return createHash('sha256').update(JSON.stringify(canonicalManifest(listArtifacts(this.root)))).digest('hex');}
   async execute(name,args,signal){
     const release=await this.mutex.acquire(signal);
     const abort=()=>{void this.close();};signal?.addEventListener('abort',abort,{once:true});

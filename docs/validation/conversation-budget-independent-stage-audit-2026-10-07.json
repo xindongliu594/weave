@@ -1,0 +1,157 @@
+{
+  "kind": "independent-new-conversation-accounting-stage-review",
+  "checkedAt": "2026-10-07T05:59:17.717Z",
+  "status": "engineering-review-passed-no-p0-p1-found-no-new-real-model-acceptance",
+  "scope": "Read-only source, regression logs and tests; no DB opening, API/model/browser or source/old report changes.",
+  "findings": [],
+  "semantics": {
+    "onlyExplicitServerConversationModeExempt": true,
+    "dedicatedIdentityGuard": true,
+    "contextModeSpoofOverwritten": true,
+    "legacyAbsentModeBudgeted": true,
+    "legacyZeroAmountNotConversation": true,
+    "newPreviewNoProjectAdoptionOnlyExplicitMarker": true,
+    "legacyPreviewAdoptionPreserved": true,
+    "targetProjectReadinessVersionAndActiveRunGuardsPreserved": true,
+    "executionProbeProjectPlanningDailyAndTaskBudgetsPreserved": true,
+    "noStoredBudgetSettingsOrHistoricalReceiptMigration": true,
+    "actualNativeUsageAndPricesRecorded": true,
+    "unknownNoNativeUsageStillUncertainWithoutZeroBillInference": true,
+    "noHiddenPaidRetry": true,
+    "executionStillRequiresSeparateApproval": true
+  },
+  "verification": {
+    "costTests": {
+      "pass": 10,
+      "source": "conversation-budget-api-regression-2026-10-07.txt"
+    },
+    "organizationChat": {
+      "pass": 16,
+      "source": "conversation-budget-api-recheck-2026-10-07.txt"
+    },
+    "legacyUpdate": {
+      "pass": 7,
+      "source": "conversation-budget-compatibility-regression-2026-10-07.txt"
+    },
+    "web": {
+      "pass": 31,
+      "source": "conversation-budget-web-regression-2026-10-07.txt"
+    },
+    "types": {
+      "savedOutputEmpty": true
+    },
+    "build": {
+      "viteCompleted": true,
+      "bundleWarningOnly": true
+    },
+    "preservedOriginalFailure": {
+      "expected": "DAILY_BUDGET_EXCEEDED",
+      "actual": "PLAN_NOT_READY",
+      "classification": "Extremely small execution allocation was correctly rejected earlier by execution readiness quote. Corrected test asserts this safe pre-dispatch refusal; does not falsely claim this case tested the daily gate."
+    },
+    "provider": "local fixed protocol engineering doubles; not a real relay model acceptance"
+  },
+  "limitations": [
+    "Future home demand conversations are intentionally excluded from execution daily/project budget limits; their actual spend remains separately shown and the old daily policy is not a cap on these conversations.",
+    "Conversation amount=0 means no estimated reservation, not no supplier charge.",
+    "No real provider call, new-mode live browser acceptance, or existing-production-data verification is claimed by this independent review.",
+    "Previously frozen source ZIP and paid Todo acceptance remain evidence for their original code version; a new release copy must separately include these later changes."
+  ],
+  "sources": [
+    {
+      "file": "apps/api/src/cost-control.ts",
+      "bytes": 25196,
+      "sha256": "92e4469078e40d4970753eccc9db784866e4b611d7f6c7c05f6f6ba2f8f85145"
+    },
+    {
+      "file": "apps/api/src/organization-chat.ts",
+      "bytes": 20446,
+      "sha256": "237a50bd392cf3ec6d4b383733227dc4f8d5437cb82a7f4435ed9bca98eb7214"
+    },
+    {
+      "file": "apps/api/src/product.ts",
+      "bytes": 15966,
+      "sha256": "987937e633e2e7771fbd4c5eb02780ed60013899f17e2c1311d11326437caecc"
+    },
+    {
+      "file": "apps/api/src/cost-router.ts",
+      "bytes": 3579,
+      "sha256": "4a6c0fd141a94a7f7a55aa559d8c7b83ce63e301bc67b24479fbf46985dee6ca"
+    },
+    {
+      "file": "apps/web/src/organization-draft.ts",
+      "bytes": 5171,
+      "sha256": "77feb2052132cd45c8127a2840d908d33928b565cac97859a81edb2a5d0230f6"
+    },
+    {
+      "file": "apps/web/src/OrganizationChat.tsx",
+      "bytes": 28173,
+      "sha256": "57415c3f904e89f1ead209c78f71bddfdae523d09b45d2759c91568bcae8d645"
+    },
+    {
+      "file": "apps/web/src/CostControl.tsx",
+      "bytes": 13013,
+      "sha256": "ccd431e1e6f39e2dc16fe0ee2f56ac0e0a5a2eaeb7e1183a36162072cecce56c"
+    },
+    {
+      "file": "tests/cost.test.ts",
+      "bytes": 18528,
+      "sha256": "02c266db778466792bb6779cb17bdbfeb6b59813f769da123119f4bc92554ee7"
+    },
+    {
+      "file": "tests/organization-chat.test.ts",
+      "bytes": 38178,
+      "sha256": "4cd47966a9862414e3b649b14a128361cd393ff2730f0ed45c1af903b564314d"
+    },
+    {
+      "file": "tests/organization-update.test.ts",
+      "bytes": 14323,
+      "sha256": "c88ad48364637bf008fca9fd7546cbae930c887457116affc22706043a5731dd"
+    },
+    {
+      "file": "tests/organization-conversation-ui.test.ts",
+      "bytes": 10789,
+      "sha256": "c857c807e260774a259ef445dbc578e0af5285d40150524f885cd83077dacfde"
+    },
+    {
+      "file": "tests/organization-draft.test.ts",
+      "bytes": 8061,
+      "sha256": "2a5f4e0c34be216aa7fa7185a0ee3e876258bf8d018a7b37727c7175926c53cb"
+    },
+    {
+      "file": "tests/organization-reset-ui.test.ts",
+      "bytes": 11269,
+      "sha256": "866ab839cd2d481037e6780146a620c386483708fc7dbcd233e60ccabbe50e53"
+    },
+    {
+      "file": "docs/validation/conversation-budget-api-regression-2026-10-07.txt",
+      "bytes": 5482,
+      "sha256": "f74ae998c1575bda5053f1d514861966bda3d158619bdf90115c0159fb0fe85c"
+    },
+    {
+      "file": "docs/validation/conversation-budget-api-recheck-2026-10-07.txt",
+      "bytes": 2377,
+      "sha256": "50b6529a369f5928d2a8a9869b906e69df0402d57429e65e16c9c1b6ce45cd67"
+    },
+    {
+      "file": "docs/validation/conversation-budget-compatibility-regression-2026-10-07.txt",
+      "bytes": 3787,
+      "sha256": "5130d26243b9196bf9753d3b790726ae7bc6e7fea384032cdc70b7709d520ee5"
+    },
+    {
+      "file": "docs/validation/conversation-budget-web-regression-2026-10-07.txt",
+      "bytes": 3765,
+      "sha256": "cbb3ae349e796af9f092a300f31d647f10ef4452c643ba4a5d6efccb7113e09a"
+    },
+    {
+      "file": "docs/validation/conversation-budget-types-2026-10-07.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "docs/validation/conversation-budget-build-2026-10-07.txt",
+      "bytes": 728,
+      "sha256": "fbbd98178e8d4f1b20c0ee891557c11530b3456d0e68f2574a15ba9de4371225"
+    }
+  ]
+}

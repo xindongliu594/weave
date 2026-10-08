@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Activity, LoaderCircle } from 'lucide-react';
 import type { Gateway, GatewayServiceCheck } from '../../../packages/contracts/index.ts';
 import { api } from './api.ts';
+import { GatewayBilling } from './GatewayBilling.tsx';
 
 // The parent keys this component by connection version so edits discard old results.
 export function GatewayServiceTest({ gateway }: { gateway: Gateway }) {
@@ -13,7 +14,7 @@ export function GatewayServiceTest({ gateway }: { gateway: Gateway }) {
     catch (error) { setError((error as Error).message); }
     finally { setBusy(false); }
   }
-  return <div className="gateway-service-test">
+  return <><div className="gateway-service-test">
     <div className="gateway-test-actions"><button disabled={busy} onClick={() => void test()}>{busy ? <LoaderCircle size={15} className="spin"/> : <Activity size={15}/>} {busy ? '正在测试 API…' : '测试 API 服务'}</button><small>检查当前连接的模型目录，不发起模型推理。</small></div>
     <div aria-live="polite" aria-atomic="true">
       {result && <div className={'gateway-test-result ' + result.status}>
@@ -24,5 +25,5 @@ export function GatewayServiceTest({ gateway }: { gateway: Gateway }) {
       </div>}
     </div>
     {error && <p className="banner error" role="alert">{error}</p>}
-  </div>;
+  </div><GatewayBilling gateway={gateway}/></>;
 }

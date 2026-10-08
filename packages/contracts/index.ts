@@ -53,8 +53,8 @@ export const policySchema = z.object({
 export const artifactPathSchema = z.string().refine(isArtifactPath, '需要工作区相对路径，不能包含越界或团队状态目录');
 export const artifactInputSchema = z.object({
   path: artifactPathSchema,
-  producerTaskId: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/).optional(),
-  sha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  producerTaskId: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/).optional().describe('本次产出该文件的前置任务 ID；仅与 path 一起填写，不填写 sha256。宿主使用该任务本次 accepted seal 中的 SHA256 绑定输入，不能复制历史运行的文件 SHA。'),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/).optional().describe('仅用于用户选定的外部固定资料的真实 SHA256；此类输入不填写 producerTaskId。本次任务产物使用 producerTaskId，由宿主绑定本次验收版本。'),
 }).refine(v => !!v.producerTaskId || !!v.sha256, '输入必须绑定来源任务或固定 SHA256');
 export const artifactOutputSchema = z.object({
   path: artifactPathSchema, format: z.enum(['text', 'json']).optional(),
@@ -68,6 +68,7 @@ export const taskSchema = z.object({
   acceptanceCriteria: z.array(z.string().trim().min(1).max(2000)).min(1).max(20),
   estimatedInputTokens: z.number().int().min(0).max(2000000),
   estimatedOutputTokens: z.number().int().min(1).max(200000),
+  maxOutputTokens: z.number().int().min(1).max(32768).optional().describe('当前任务每次模型请求的输出 Token 上限，独立于整项任务累计 estimatedOutputTokens；省略时保留原批准模型路线的单次上限。'),
   maxBudget: z.number().finite().positive().max(10000).optional(),
   maxModelCalls: z.number().int().min(1).max(1000).optional(),
   kind: z.enum(['work', 'requirements', 'implementation', 'verification', 'review', 'repair', 'integration']).optional(),
@@ -105,17 +106,24 @@ export const gatewaySchema = z.object({
   baseUrl: z.string().url().max(500).refine(v => {
     const u = new URL(v);
     return !u.username && !u.password && !u.search && !u.hash && (u.protocol === 'https:' || (u.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(u.hostname)));
-  }, '使用 HTTPS 地址，本机服务可使用 HTTP；地址不能包含凭证或查询参数'),
+  }, '使用 HTTPS 地址，本机服务可使用 HTTP；地址不能包含凭证或查询参数').transform(value => {
+    const url = new URL(value);
+    if (url.pathname === '/') url.pathname = '/v1';
+    return url.href.replace(/\/$/, '');
+  }),
   apiKey: z.string().trim().max(2000).optional(),
   pricingSource: z.enum(['official', 'auto', 'models', 'new-api']).optional(),
 });
 export const modelSchema = z.object({
   name: z.string().trim().min(1).max(100), gatewayId: z.string().min(1).max(100),
   model: z.string().trim().min(1).max(200),
+  protocol: z.enum(['chat-completions', 'responses']).optional(),
+  thinkingMode: z.literal('disabled').optional(),
   inputRate: z.number().finite().min(0).max(10000), outputRate: z.number().finite().min(0).max(10000),
   contextBytes: z.number().int().min(4096).max(2000000).optional(),
   contextWindowTokens: z.number().int().min(2048).max(2000000).optional(),
-});
+}).refine(value => value.protocol !== 'responses' || value.thinkingMode === undefined,
+  { message: '关闭 thinking 仅适用于 Chat Completions，切换 Responses 时请清除此选项', path: ['thinkingMode'] });
 export type Agent = z.infer<typeof agentSchema>;
 export type DepartmentInput = z.infer<typeof departmentSchema>;
 export type Department = DepartmentInput & { id: string; version: number; createdAt: string; updatedAt: string; runCount: number };
@@ -202,15 +210,21 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   check('文件交接与质量合同', contracts.length === 0, contracts.join('；'));
   let estimate = 0;
   let taskBudgetsOK = true;
+  const taskBudgetErrors: string[] = [];
   for (const task of plan.tasks) {
     const a = plan.agents.find(a => a.id === task.assigneeId), m = models.find(m => m.id === a?.modelId);
     if (m) {
       const cost=(task.estimatedInputTokens * m.inputRate + task.estimatedOutputTokens * m.outputRate) / 1e6;
       estimate += cost;
-      if(task.maxBudget!==undefined&&Math.ceil(cost*1.2*1e6)/1e6>task.maxBudget)taskBudgetsOK=false;
+      const bufferedCost = Math.ceil(cost * 1.2 * 1e6) / 1e6;
+      if (task.maxBudget !== undefined && bufferedCost > task.maxBudget) {
+        taskBudgetsOK = false;
+        taskBudgetErrors.push(`任务「${task.subject}」（${task.id}）：执行估算（含 20% 预留）$${bufferedCost.toFixed(6)} 超过任务费用上限 $${task.maxBudget}。`);
+      }
     }
   }
   check('任务费用上限',taskBudgetsOK,'任务执行估算（含 20% 预留）超过该任务的费用上限');
+  errors.push(...taskBudgetErrors);
   check('员工每任务调用上限',plan.tasks.every(t=>t.maxModelCalls===undefined||t.maxModelCalls<=(policy.maxTaskModelCalls??40)),'任务调用上限不能超过策略允许的每任务调用次数');
   estimate = Math.ceil(estimate * 1.2 * 1e6) / 1e6;
   const pricesKnown = plan.tasks.every(t => models.some(m => m.id === plan.agents.find(a => a.id === t.assigneeId)?.modelId));

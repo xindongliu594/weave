@@ -4,3 +4,7 @@ dist/
 .data
 *.log
 .DS_Store
+
+# Generated delivery copies and machine-local acceptance archives.
+source-delivery-*/
+docs/test-evidence/

@@ -7,6 +7,7 @@ import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {recoveryModel} from './model-fixture.ts';
+import {withProjectStatusFailure} from './run-transaction-fixture.ts';
 import {createRunArchive,openRunArchive,readRun} from '../services/agent-runtime/trace-store.mjs';
 const base=process.env.DATABASE_URL??'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const admin=new pg.Pool({connectionString:base}),schema='run_state_'+Date.now();
@@ -22,16 +23,20 @@ after(async()=>{await app?.locals.shutdown();if(server)await new Promise<void>(r
 async function running(){
  const department=(await call('/departments','POST',{name:'状态测试',description:'',agents:[{id:'employee',role:'manager',name:'经理',title:'经理',instructions:'协调',modelId:'recovery-model',tools:[]}]})).data;
  const project=(await call('/projects','POST',{departmentId:department.id,requirement:'验证运行终态不会覆盖后继运行',policy:{maxBudget:1,maxAgents:1,maxConcurrentAgents:1,deadlineSeconds:300}})).data;
- const approved=await call('/projects/'+project.id+'/approve','POST',{version:1});assert.equal(approved.status,202,JSON.stringify(approved.data));
+ const draft=(await call('/projects')).data.find((item:any)=>item.id===project.id);
+ const plan={...draft.plan,tasks:[{...draft.plan.tasks[0],subject:'整理终态与后继运行状态核对清单',objective:'列出终态原子提交、过期owner隔离和后继运行保留的核对项',kind:'requirements',acceptanceCriteria:['核对清单包含三项明确状态判定且不执行工具']}]};
+ const edited=await call('/projects/'+project.id+'/plan','PUT',{version:1,plan});assert.equal(edited.status,200,JSON.stringify(edited.data));
+ const approved=await call('/projects/'+project.id+'/approve','POST',{version:2});assert.equal(approved.status,202,JSON.stringify(approved.data));
  const row=(await pool.query("UPDATE project_runs SET status='running',lease_owner='worker',lease_until=now()+interval '1 minute' WHERE id=$1 RETURNING *",[approved.data.id])).rows[0];
  await pool.query("UPDATE projects SET status='RUNNING' WHERE id=$1",[project.id]);createRunArchive(join(dir,'runs'),row.snapshot,{id:row.id});return row;
 }
 
 test('terminal state is atomic with project state and closes pending tool approvals',async()=>{
  const row=await running();await pool.query("INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments) VALUES($1,$2,'employee-1','terminal','{}')",[randomUUID(),row.id]);
- await pool.query("CREATE FUNCTION fail_terminal_project() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.status='COMPLETED' THEN RAISE EXCEPTION 'injected commit failure'; END IF; RETURN NEW; END $$;CREATE TRIGGER fail_terminal_project BEFORE UPDATE ON projects FOR EACH ROW EXECUTE FUNCTION fail_terminal_project()");
- try{await assert.rejects(state.finishRun(row.id,'worker','completed'));assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[row.id])).rows[0].status,'running');assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[row.project_id])).rows[0].status,'RUNNING');assert.equal((await pool.query('SELECT status FROM tool_approvals WHERE run_id=$1',[row.id])).rows[0].status,'pending');}
- finally{await pool.query('DROP TRIGGER fail_terminal_project ON projects;DROP FUNCTION fail_terminal_project()');}
+ const pglite=process.env.SIMULATED_INTEGRATION==='pglite';
+ if(!pglite)await pool.query("CREATE FUNCTION fail_terminal_project() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.status='COMPLETED' THEN RAISE EXCEPTION 'injected commit failure'; END IF; RETURN NEW; END $$;CREATE TRIGGER fail_terminal_project BEFORE UPDATE ON projects FOR EACH ROW EXECUTE FUNCTION fail_terminal_project()");
+ try{if(pglite)await withProjectStatusFailure(pool,()=>assert.rejects(state.finishRun(row.id,'worker','completed'),/injected project status persistence failure/));else await assert.rejects(state.finishRun(row.id,'worker','completed'));assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[row.id])).rows[0].status,'running');assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[row.project_id])).rows[0].status,'RUNNING');assert.equal((await pool.query('SELECT status FROM tool_approvals WHERE run_id=$1',[row.id])).rows[0].status,'pending');}
+ finally{if(!pglite)await pool.query('DROP TRIGGER fail_terminal_project ON projects;DROP FUNCTION fail_terminal_project()');}
  assert.equal(await state.finishRun(row.id,'worker','completed'),true);
  assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[row.project_id])).rows[0].status,'COMPLETED');assert.equal((await pool.query('SELECT status FROM tool_approvals WHERE run_id=$1',[row.id])).rows[0].status,'cancelled');
 });

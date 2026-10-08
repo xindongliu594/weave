@@ -77,7 +77,8 @@ export function applyNewApiPrices(catalog: CatalogModel[], data: unknown, source
     if (row.quota_type === 1) { model.pricing = unsupported(source, '该模型按次收费，不能换算为固定 Token 单价。'); continue; }
     const modelRatio = number(row.model_ratio), completionRatio = number(row.completion_ratio);
     if (row.quota_type !== 0 || modelRatio === undefined || completionRatio === undefined) { model.pricing = { ...missing(), source }; continue; }
-    const names = Array.isArray(row.enable_group) ? row.enable_group.filter((v): v is string => typeof v === 'string') : [];
+    const enabled = row.enable_groups ?? row.enable_group;
+    const names = Array.isArray(enabled) ? enabled.filter((v): v is string => typeof v === 'string') : [];
     const groups: NonNullable<CatalogPrice['groups']> = [];
     for (const name of [...new Set(names)].slice(0, 100)) {
       if (!Object.hasOwn(ratios, name)) continue;

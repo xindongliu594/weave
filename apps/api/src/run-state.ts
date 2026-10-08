@@ -15,9 +15,9 @@ async function lockedRun<T>(id:string,work:(client:pg.PoolClient,row:any)=>Promi
  }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
 }
 /** Recovery retains a live reservation and excludes retry until archive reconciliation is finished. */
-export async function claimExpiredRun(id:string){
+export async function claimExpiredRun(id:string,exclude?:(row:any)=>boolean){
  return lockedRun(id,async(client,row)=>{
-  if(!row||row.status!=='running'||(row.lease_until&&new Date(row.lease_until).getTime()>Date.now()))return null;
+  if(!row||row.status!=='running'||(row.lease_until&&new Date(row.lease_until).getTime()>Date.now())||exclude?.(row))return null;
   const owner='recovery:'+randomUUID();
   const updated=(await client.query("UPDATE project_runs SET lease_owner=$1,lease_until=clock_timestamp()+interval '5 minutes' WHERE id=$2 RETURNING *",[owner,id])).rows[0];
   return updated;

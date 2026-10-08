@@ -15,7 +15,7 @@ export class RuntimeSupervisor {
     this.timeout = (policy.progressTimeoutSeconds ?? 300) * 1000;
     this.actionLimit = policy.repeatActionLimit ?? 8;
     this.errorLimit = policy.repeatErrorLimit ?? 3;
-    this.sessions = new Map(); this.mapping = new Map(); this.calls = new Map(); this.commands = new Set();
+    this.sessions = new Map(); this.mapping = new Map(); this.calls = new Map(); this.commands = new Set(); this.coordinatorRequests = new Set(); this.coordinatorTools = new Set();
     this.manifest = digest(artifacts); this.lastSummary = '';
   }
   session(id, ref = {}) {
@@ -43,19 +43,25 @@ export class RuntimeSupervisor {
   }
   observe(event) {
     const { type, data = {}, sessionId, callId } = event;
-    if (type === 'run/captain') { this.captainId = data.sessionId; this.sessions.delete(data.sessionId); return; }
+    if (type === 'run/captain') { this.captainId = data.sessionId; this.sessions.delete(data.sessionId); this.coordinatorRequests.clear(); this.coordinatorTools.clear(); return; }
     if (type === 'run/task-mapping') { for (const row of data.tasks) this.mapping.set(row.task_id, row.seed_id); return; }
     if (type === 'runtime/outcome-unknown') { this.fail(this.session(sessionId), 'OUTCOME_UNKNOWN', '修改操作未取得确认结果，需要核对后再恢复'); return; }
     if (type === 'model/request') {
+      if (sessionId === this.captainId) { this.coordinatorRequests.add(event.requestId ?? sessionId); return; }
       const item = this.session(sessionId, event); if (item) { item.phase = 'waiting_model'; item.waitStarted = this.now(); } return;
     }
     if (type === 'model/finish' || type === 'model/error') {
+      if (sessionId === this.captainId) {
+        this.coordinatorRequests.delete(event.requestId ?? sessionId);
+        for (const item of this.sessions.values()) delete item.idleSince;
+        return;
+      }
       const item = this.sessions.get(sessionId); if (item) {
         item.lastProgressAt = Math.min(this.now(),item.lastProgressAt + Math.max(0, this.now() - (item.waitStarted ?? this.now()))); item.phase = 'working'; delete item.waitStarted;
       } return;
     }
     if (type === 'tool/start') {
-      if (sessionId === this.captainId) return;
+      if (sessionId === this.captainId) { if (callId && data.name !== 'agent_teams_status') this.coordinatorTools.add(callId); return; }
       // A requested task_id is model input. Only the trusted model admission
       // and native assignment can change the monitored task/attempt identity.
       const item = this.sessions.get(sessionId) ?? this.session(sessionId);
@@ -72,6 +78,7 @@ export class RuntimeSupervisor {
       } return;
     }
     if (type !== 'tool/result') return;
+    if (this.coordinatorTools.delete(callId)) { for (const item of this.sessions.values()) delete item.idleSince; return; }
     const call = this.calls.get(callId); this.calls.delete(callId); if (!call) return;
     const { item, name, args } = call, result = data.result;
     item.phase = 'working';
@@ -90,6 +97,7 @@ export class RuntimeSupervisor {
     this.onFailure?.(this.failure);
   }
   check() { if (this.failure) throw this.failure; }
+  stop(error) { this.failure ??= error; }
   public(item = {}) { const { actions, errorKey, waitStarted, ...rest } = item; return rest; }
   tick(status) {
     const rows = [];
@@ -100,10 +108,12 @@ export class RuntimeSupervisor {
       const item = existing ?? this.session(id, { taskId: task.id, attemptId: task.attempt_id ?? task.attemptId });
       if (!item) continue;
       const idle = member?.status === 'idle' && !waiting.has(item.phase);
-      item.idleSince = idle ? item.idleSince ?? this.now() : undefined;
-      if (idle && this.now() - item.idleSince > 10000) this.fail(item, 'EMPLOYEE_IDLE', '员工已空闲，但任务尚未完成');
+      const coordinatorWorking = this.coordinatorRequests.size > 0 || this.coordinatorTools.size > 0;
+      // Wait for the coordinator's actual response, without crediting it as file/test progress.
+      item.idleSince = idle && !coordinatorWorking ? item.idleSince ?? this.now() : undefined;
+      if (idle && !coordinatorWorking && this.now() - item.idleSince > 10000) this.fail(item, 'EMPLOYEE_IDLE', '员工已空闲，但任务尚未完成');
       else if (!waiting.has(item.phase) && this.now() - item.lastProgressAt > this.timeout) this.fail(item, 'NO_PROGRESS', '持续工作期间未观察到文件变化、新验证证据或任务完成');
-      rows.push({ ...this.public(item), phase: idle ? 'idle_unfinished' : item.phase, agentId: task.assignee });
+      rows.push({ ...this.public(item), phase: idle ? coordinatorWorking ? 'waiting_coordinator' : 'idle_unfinished' : item.phase, agentId: task.assignee });
     }
     // Persist transitions rather than flooding the trace with timer ticks.
     const signature = digest(rows.map(({ lastProgressAt, idleSince, ...row }) => row));

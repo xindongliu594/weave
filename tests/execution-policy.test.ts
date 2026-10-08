@@ -4,7 +4,7 @@ import {once} from 'node:events';
 import http from 'node:http';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
-import {join} from 'node:path';
+import {join,resolve,sep} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {toolEvidence} from './model-fixture.ts';
@@ -15,9 +15,15 @@ let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,requests=0
 async function call(path:string,method='GET',body?:any){const response=await fetch(url+path,{method,headers:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});return {status:response.status,data:await response.json() as any};}
 const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[] as string[],knowledgeSpaceIds:[] as string[]};
 const policy={maxBudget:1,maxAgents:2,maxConcurrentAgents:1,deadlineSeconds:300};
-async function project(agents=[agent]){
+async function project(agents=[agent],requirement='验证所有执行权限限制和版本记录'){
  const department=(await call('/departments','POST',{name:'权限测试',description:'',agents})).data;
- const created=await call('/projects','POST',{departmentId:department.id,requirement:'验证所有执行权限限制和版本记录',policy});assert.equal(created.status,201,JSON.stringify(created.data));
+ const created=await call('/projects','POST',{departmentId:department.id,requirement,policy});assert.equal(created.status,201,JSON.stringify(created.data));
+ // These isolated policy fixtures need a concrete plan at v1. Placeholder
+ // readiness is exercised through the public API in plan-readiness.test.ts.
+ const draft=(await call('/projects')).data.find((p:any)=>p.id===created.data.id);
+ const plan={...draft.plan,tasks:draft.plan.tasks.map((task:any)=>({...task,subject:'整理执行权限验收清单',objective:'列出允许的模型、工具和知识范围，提交权限验收清单。',acceptanceCriteria:['清单包含允许的模型、工具和知识范围。']}))};
+ await pool.query('UPDATE projects SET plan=$1 WHERE id=$2',[plan,created.data.id]);
+ await pool.query('UPDATE plan_versions SET plan=$1 WHERE project_id=$2 AND version=1',[plan,created.data.id]);
  return (await call('/projects')).data.find((p:any)=>p.id===created.data.id);
 }
 before(async()=>{
@@ -28,7 +34,30 @@ before(async()=>{
  await pool.query("INSERT INTO gateways(id,data) VALUES('gateway',$1)",[{name:'Local fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);
  for(const id of ['model','outside'])await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[id,{name:id,gatewayId:'gateway',model:id,inputRate:1,outputRate:1},toolEvidence]);
 });
-after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s)await new Promise<void>(r=>s.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
+after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s)await new Promise<void>(r=>s.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir){assert.ok(resolve(dir).startsWith(resolve(tmpdir())+sep+'execution-policy-'));await rm(dir,{recursive:true,force:true});}});
+
+test('approval freezes an execution phase while preserving earlier planning dialogue as quoted background',async()=>{
+ const history='先讨论一个 Todo API，只生成草案，暂不保存，等待确认。\n\n增加独立测试，并按实际终端结果验收。';
+ const p=await project([agent],history),before=requests;
+ const task={...p.plan.tasks[0],subject:'执行已确认的验收报告',objective:'核对实际独立测试证据并交付验收报告。',acceptanceCriteria:['使用批准的资料和真实测试记录。']};
+ const plan={...p.plan,tasks:[task]};
+ assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan})).status,200);
+ const approved=await call('/projects/'+p.id+'/approve','POST',{version:2});assert.equal(approved.status,202,JSON.stringify(approved.data));
+ const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].snapshot;
+ assert.equal(snapshot.requirement,history,'the full original dialogue remains auditable');
+ assert.ok(snapshot.tasks[0].taskPrompt.startsWith('当前处于用户已批准后的正式执行阶段。'));
+ assert.match(snapshot.tasks[0].taskPrompt,/当前任务目标：核对实际独立测试证据/);
+ assert.ok(snapshot.tasks[0].taskPrompt.indexOf(task.objective)<snapshot.tasks[0].taskPrompt.indexOf(JSON.stringify({requirement:history})));
+ assert.equal(JSON.parse(snapshot.tasks[0].taskPrompt.split('：\n').at(-1)).requirement,history);
+ assert.match(snapshot.executionDescription,/已批准方案 v2/);assert.ok(snapshot.executionDescription.includes(task.objective));
+ assert.ok(!snapshot.executionDescription.includes(history),'team descriptions cannot reactivate the raw historical planning request');
+ assert.ok(snapshot.agents.every((a:any)=>a.rolePrompt.startsWith('当前处于用户已批准后的正式执行阶段。')));
+ assert.deepEqual(snapshot.agents[0].tools,[]);assert.equal(snapshot.policy.maxBudget,policy.maxBudget);
+ assert.equal(snapshot.tasks[0].maxOutputTokens,undefined,'old plans are not assigned a new per-call limit');
+ assert.equal(snapshot.modelRoutes[0].maxOutputTokens,task.estimatedOutputTokens,'legacy route limits remain pinned');
+ assert.equal(requests,before,'approval and context construction do not add a model call');
+ assert.equal((await call('/runs/'+approved.data.id+'/cancel','POST',{})).status,202);
+});
 
 test('manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it',async()=>{
  const p=await project();assert.deepEqual(p.policy.allowedModelIds,['model']);assert.deepEqual(p.policy.allowedTools,[]);assert.deepEqual(p.policy.allowedKnowledgeSpaceIds,[]);
@@ -52,11 +81,81 @@ test('manual scope expansion requires explicit policy; generated plans and plann
  assert.equal((await call('/runs/'+selected.data.id+'/retry','POST',{resume:false})).data.code,'RUN_REAPPROVAL_REQUIRED');
 });
 
+test('planner receives the project net budget and generated validation deducts the newly billed planning call',async()=>{
+ const p=await project(),before=requests;
+ await pool.query('INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,0,0,$4,$5)',[randomUUID(),'model',p.id,.9,'prior-execution-fixture']);
+ candidate={...p.plan,tasks:p.plan.tasks.map((task:any)=>({...task,estimatedInputTokens:1500000,estimatedOutputTokens:200}))};
+ const generated=await call('/projects/'+p.id+'/generate','POST',{version:1,modelId:'model',maxPlanningCost:.1});
+ assert.equal(generated.status,200,JSON.stringify(generated.data));assert.equal(requests,before+1,'budget feedback requires no extra provider call');
+ const budget=JSON.parse(lastInput.messages[0].content.split('\n').at(-1));
+ assert.equal(budget.kind,'planning_budget');assert.equal(budget.totalLimit,1);assert.equal(budget.recordedCost,.9);
+ assert.equal(budget.retainedReservations,0);assert.ok(Math.abs(budget.availableForPlanningAndExecution-.1)<1e-8);
+ const actual=Number((await pool.query('SELECT sum(cost) AS cost FROM usage WHERE project_id=$1',[p.id])).rows[0].cost);
+ assert.ok(actual>.9,'the actual planning receipt is retained');
+ assert.equal(generated.data.validation.valid,false,'a candidate fitting the original total but exceeding the net cannot appear affordable');
+ assert.ok(generated.data.validation.errors.some((message:string)=>message.includes('剩余预算')));
+ const unchanged=(await call('/projects')).data.find((item:any)=>item.id===p.id);
+ assert.equal(unchanged.version,1);assert.deepEqual(unchanged.plan,p.plan,'a generated candidate cannot replace the saved plan before confirmation');
+ assert.equal((await call('/projects/'+p.id+'/generated-plan/confirm','POST',{version:1,previewId:generated.data.previewId})).status,200);
+ const current=(await call('/projects')).data.find((item:any)=>item.id===p.id);
+ assert.equal(current.policy.maxBudget,1,'the AI candidate cannot raise the user cap');assert.equal(current.validation.valid,false);
+});
+
+test('project list validation includes open cost holds without modifying the ledger or starting execution',async()=>{
+ const before=requests;
+ for(const status of ['pending','uncertain']){
+  const p=await project();
+  const plan={...p.plan,tasks:p.plan.tasks.map((task:any)=>({...task,estimatedInputTokens:500000,estimatedOutputTokens:1000}))};
+  assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan})).status,200);
+  await pool.query('INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,0,0,.2,$4)',[randomUUID(),'model',p.id,'recorded-cost-fixture']);
+  const receiptId=randomUUID();
+  await pool.query(`INSERT INTO model_reservations(id,model_id,project_id,purpose,amount,input_rate,output_rate,status,history,expires_at)
+   VALUES($1,'model',$2,'open-cost-fixture',.4,1,1,$3,$4,now()-interval '1 hour')`,[receiptId,p.id,status,JSON.stringify([{source:'local-fixture',note:'No provider request was dispatched'}])]);
+  const ledgerBefore=(await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receiptId])).rows[0];
+  const readiness=(await call('/projects/'+p.id+'/cost-readiness')).data;
+  const listed=(await call('/projects')).data.find((item:any)=>item.id===p.id);
+  assert.equal(listed.planningCost,.2,'the existing field remains the full recorded cost');
+  assert.ok(Math.abs(readiness.availableBudget-.4)<1e-8);assert.equal(readiness.reserved,.4);
+  assert.equal(listed.validation.estimate,.6012);assert.equal(listed.validation.valid,false);
+  assert.ok(listed.validation.errors.some((message:string)=>message.includes('剩余预算')));
+  assert.equal(listed.policy.maxBudget,1);
+  assert.deepEqual((await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receiptId])).rows[0],ledgerBefore,'read-only validation cannot expire or settle a receipt');
+  const approved=await call('/projects/'+p.id+'/approve','POST',{version:2,retainUncertainCosts:true});
+  assert.equal(approved.data.code,status==='pending'?'COST_PENDING':'PLAN_NOT_READY');
+  assert.equal((await pool.query('SELECT id FROM project_runs WHERE project_id=$1',[p.id])).rowCount,0);
+  assert.deepEqual((await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receiptId])).rows[0],ledgerBefore);
+  // This isolated fixture created no external request. Close only its test
+  // receipt so subsequent backup tests do not inherit a live fixture hold.
+  await pool.query("UPDATE model_reservations SET status='released' WHERE id=$1",[receiptId]);
+ }
+ assert.equal(requests,before,'budget validation and rejected approval add no model call');
+});
+
+test('approval freezes per-call output limits separately from the cumulative task estimates',async()=>{
+ const p=await project(),before=requests;
+ const plan={...p.plan,tasks:[
+  {...p.plan.tasks[0],id:'first',estimatedOutputTokens:9000,maxOutputTokens:128},
+  {...p.plan.tasks[0],id:'second',dependencies:['first'],estimatedOutputTokens:16000,maxOutputTokens:1024}
+ ]};
+ assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan})).status,200);
+ const approved=await call('/projects/'+p.id+'/approve','POST',{version:2});assert.equal(approved.status,202,JSON.stringify(approved.data));
+ const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].snapshot;
+ assert.deepEqual(snapshot.tasks.map((task:any)=>[task.estimatedOutputTokens,task.maxOutputTokens]),[[9000,128],[16000,1024]]);
+ assert.equal(snapshot.modelRoutes[0].maxOutputTokens,1024,'a route cannot inherit an entire multi-round estimate when explicit limits exist');
+ assert.deepEqual((await call('/projects/'+p.id+'/versions')).data[0].plan.tasks,plan.tasks);assert.equal(snapshot.policy.maxBudget,1);
+ assert.equal(requests,before,'freezing output limits is local and does not probe a real model');
+ assert.equal((await call('/runs/'+approved.data.id+'/cancel','POST',{})).status,202);
+});
+
 test('archived departments and revoked private knowledge grants block approval or retry without changing old snapshots',async()=>{
  const space=(await call('/knowledge/spaces','POST',{name:'可撤回知识',scope:'company'})).data;
  const p=await project([{...agent,tools:['knowledge_search'],knowledgeSpaceIds:[space.id]}]);
  const run=await call('/projects/'+p.id+'/approve','POST',{version:1});assert.equal(run.status,202,JSON.stringify(run.data));await call('/runs/'+run.data.id+'/cancel','POST',{});
  const original=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[run.data.id])).rows[0].snapshot;
+ const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
+ // The coordinator is stopped in this fixture, so record its zero-call archive
+ // before exercising resume. Missing archive admission has separate coverage.
+ createRunArchive(join(dir,'runs'),original,{id:run.data.id}).append('run/finished',{status:'cancelled'});
  await call('/knowledge/spaces/'+space.id,'DELETE',{version:1});
  assert.equal((await call('/runs/'+run.data.id+'/retry','POST',{resume:true})).data.code,'KNOWLEDGE_GRANT_INVALID');
  assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[run.data.id])).rows[0].snapshot,original);
@@ -69,7 +168,7 @@ test('archived departments and revoked private knowledge grants block approval o
  assert.equal((await call('/projects/'+p.id+'/approve','POST',{version:2})).data.code,'KNOWLEDGE_GRANT_INVALID','project allowlist never grants access to another department');
 });
 
-test('request admission fences stale lease owners and rechecks current run authorization transactionally',async()=>{
+test('request admission fences stale lease owners and rechecks current run authorization transactionally',{skip:process.env.SIMULATED_INTEGRATION==='pglite'?'requires independent PostgreSQL backends and row locks':false},async()=>{
  const p=await project(),approved=await call('/projects/'+p.id+'/approve','POST',{version:1});assert.equal(approved.status,202);
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
  await pool.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=now()+interval '1 minute' WHERE id=$2",[worker.owner,approved.data.id]);
@@ -93,7 +192,7 @@ test('request admission fences stale lease owners and rechecks current run autho
  await pool.query("UPDATE project_runs SET status='failed',lease_owner=NULL,lease_until=NULL WHERE id=$1",[approved.data.id]);
 });
 
-test('queue skips locked projects and simultaneous retries create at most one successor',async()=>{
+test('queue skips locked projects and simultaneous retries create at most one successor',{skip:process.env.SIMULATED_INTEGRATION==='pglite'?'requires independent PostgreSQL backends and row locks':false},async()=>{
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
  const p=await project(),approved=await call('/projects/'+p.id+'/approve','POST',{version:1});assert.equal(approved.status,202);
  const gate=await pool.connect();await gate.query('BEGIN');await gate.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[p.id]);

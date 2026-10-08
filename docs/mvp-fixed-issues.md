@@ -1,8 +1,22 @@
 # 为伍 MVP 已修复问题与验证边界
 
+> 最新汇总：[2026-10-07 修复清单](mvp-fixed-issues-2026-10-07.md)与[最终验收报告](mvp-acceptance-2026-10-07.md)。下文保留早期修复记录和当时的验证边界。
+
 2026-10-03，基于 `0befc094953880b6b3ede88506f6fa3e41088e85`。保留原有代码、历史运行、凭据、权限和员工交付。此清单区分代码修复、实际验证和仍受阻的交付，不表示全部 MVP 验收完成。
 
 ## 已修复
+
+2026-10-05 补充（原条目和证据继续保留）：
+
+| 问题 | 修复后的行为 | 证据 |
+| --- | --- | --- |
+| 项目 AI 生成直接保存，用户没有候选确认；规划单次费用与真实输入不清楚 | 同源只读费用检查、独立候选、明确确认后保存一次，生成/丢弃/失败保留原方案和费用；输出上限明示 | [阶段实际验证](validation/project-planning-candidate-stage-2026-10-05.md)，API 47 pass/2 skipped、实际 Edge 交互、0 原项目写入 |
+| 规划模型没有原完整方案、完成节点及实际调用历史，可能重复规划已完成开发 | 原完整方案与只读核验历史纳入相同规划请求；包含实际文件 SHA、完整合同和固定资料来源，档案不可用不补零；历史改变使费用检查失效 | [历史模块 11/11](validation/planning-execution-context-2026-10-05.md)、[原 v6 真实只读 GET](test-evidence/project-planning-live-web-2026-10-05.json)，21 调用/dev/四 SHA 保留 |
+| 本机完整 filesystem 结果因含 localWorkspace 而无法获得源端读证明 | 接受执行器定义的有界目录字段并纳入完整结果哈希；不同目录、权限、任务、attempt 或内容仍不等价 | [真实 DSH Host/Windows 文件竞争与证据](validation/product-concurrency-2026-10-05.md)，4/4 集成、10/10 上下文回归；[扩展相关回归](validation/concurrency-context-runtime-regression-2026-10-05.txt) 86/86 |
+| 用户点击恢复前不能只读检查最新费用/次数/授权/检查点 | 恢复条件检查与 POST 共享门禁；确认条件变化使旧检查失效，发送时再核对；明确未检查具体 native 请求 | [恢复 UI/API](validation/budget-recovery-preflight-ui-review-2026-10-05.md)、[实际 Edge 页面](test-evidence/context-recovery-service-web-2026-10-05.json) |
+| 只能付费试探具体请求能否通过预算 | prepareRequest 与发送路径同源，纯检查不创建收据/预留/计数；保留必须证据的最低预留可审查 | [最新恢复原生预检](validation/fresh-recovery-native-preflight-2026-10-05.md)，完整四文件阶段仍阻断，未改预算或冒充 QA 完成 |
+
+已有的文件 SHA、任务凭证、队列和 lease 保护本轮新增 [7/7 API 竞争实测](validation/multi-agent-operation-concurrency-2026-10-05.md)，没有把迟到 HTTP200 留审计误认为完成。多进程/外部编辑器以及独立 PostgreSQL 多连接仍未验收。
 
 | 问题 | 修复后的行为 | 证据 |
 | --- | --- | --- |

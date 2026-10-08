@@ -56,6 +56,9 @@ test('selected imports reach planning and approval with exact path/SHA while uns
   current=await savePlan(current,{...current.plan,workFileSelections:selections,tasks:current.plan.tasks.map((task:any)=>({...task,inputs:[{path:'todo/src/index.ts',sha256:hash(source)}],outputs:[]}))});
   plannedResponse={...current.plan,rationale:'固定规划回复',workFileSelections:[]};
   const generated=await call('/projects/'+current.id+'/generate','POST',{version:current.version,modelId,maxPlanningCost:.1});assert.equal(generated.status,200,JSON.stringify(generated.data));
+  assert.equal((await project(current.id)).version,current.version,'only an explicit confirmation saves the generated plan');
+  assert.deepEqual(generated.data.plan.workFileSelections,selections,'the unconfirmed candidate must retain user-owned grants too');
+  assert.equal((await call('/projects/'+current.id+'/generated-plan/confirm','POST',{version:current.version,previewId:generated.data.previewId})).status,200);
   const planning=JSON.parse(plannedRequest.messages.find((message:any)=>message.role==='user').content);assert.deepEqual(planning.importedMaterials.workspaceFiles,[{path:'todo/src/index.ts',sha256:hash(source),agentIds:['manager','developer']}]);assert.ok(planning.importedMaterials.references.some((entry:any)=>entry.excerpt===reference&&entry.agentIds.join()==='manager'));assert.ok(!JSON.stringify(planning).includes(unselected));assert.ok(!JSON.stringify(planning).includes('omitted.txt'));
   current=await project(current.id);assert.deepEqual(current.plan.workFileSelections,selections,'planner cannot remove user-owned grants');
   const approved=await call('/projects/'+current.id+'/approve','POST',{version:current.version});assert.equal(approved.status,202,JSON.stringify(approved.data));

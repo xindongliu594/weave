@@ -4,8 +4,14 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
 import { LlmAdapter, LlmError, createUserMessage } from '@deepseek-ai/dsh-llm';
 import { createTeamHost } from './host.mjs';
+import { EmployeeHostFactory } from './employee-hosts.mjs';
+import { installProductTools, employeeFor, PRODUCT_TOOL_NAMES } from './product-tools.mjs';
+import { Semaphore } from './limits.mjs';
+import { createRunArchive, readRun } from './trace-store.mjs';
 
 const textReply = text => [
   { type: 'block-start', index: 0, blockType: 'text' },
@@ -107,4 +113,99 @@ test('closing coordination cancels an unpublished employee setup and drains its 
     await host.close(); await rejected;
     assert.equal(host.employeeHosts().length, 0); assert.equal(modelCalls, 0);
   } finally { releaseSetup.resolve(); await host.close(); await rm(root, { recursive: true, force: true }); }
+});
+
+test('approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume', { timeout: 10000 }, async () => {
+  const root = await mkdtemp(join(tmpdir(), 'employee-granted-tools-'));
+  const captainId = randomUUID(), readerId = randomUUID(), writerId = randomUUID(), requests = [], sandboxCalls = [], approvals = [];
+  const revisions = new Map([['captain', 1], ['reader', 1], ['writer', 1]]);
+  const snapshot = { agents: [
+    { id: 'captain', role: 'manager', tools: ['filesystem'] },
+    { id: 'reader', role: 'member', tools: ['filesystem', 'knowledge_search'] },
+    { id: 'writer', role: 'member', tools: ['artifact_write', 'terminal_test'] },
+  ], knowledge: { reader: [{ id: 'fixed-chunk', documentId: 'fixed-doc', version: 3, sha256: 'a'.repeat(64), content: '固定授权版本资料', lineStart: 1, lineEnd: 1 }] } };
+  const archive = createRunArchive(join(root, 'runs'), snapshot);
+  const adapter = new class extends LlmAdapter {
+    async *stream(options) { requests.push(options); yield* textReply('local schema fixture'); }
+  }();
+  const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions') });
+  const localRequire = createRequire(import.meta.url), baseRequire = createRequire(localRequire.resolve('@deepseek-ai/dsh-base/package.json'));
+  let removeTools, factory;
+  const names = agent => agent.ctx.tools.schemas(agent).map(tool => tool.name);
+  const domain = agent => names(agent).filter(name => PRODUCT_TOOL_NAMES.includes(name)).sort();
+  try {
+    removeTools = installProductTools(host.ctx, { snapshot, archive, captainId: () => captainId, gate: new Semaphore(1),
+      sandbox: { revision: () => 'fixed-workspace', async execute(name, args) { sandboxCalls.push({ name, args }); return { path: 'fixed.mjs', sha256: 'b'.repeat(64), content: '完整固定文件', artifacts: [] }; } },
+      requestApproval: async (...args) => { approvals.push(args); return 'approved-command'; } });
+    factory = new EmployeeHostFactory({ coordinator: host.ctx, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
+      identify: agent => agent.session.header.parentSession ? employeeFor(agent, snapshot, captainId) : snapshot.agents[0],
+      protectedContext: agent => {
+        const employee = agent.session.header.parentSession ? employeeFor(agent, snapshot, captainId) : snapshot.agents[0];
+        return JSON.stringify({ fixtureContract: 'APPROVED_DYNAMIC_' + employee.id, revision: revisions.get(employee.id),
+          task: { runtimeTaskId: 'task-' + employee.id, objective: 'approved contract for ' + employee.id },
+          budget: { occupied: revisions.get(employee.id) / 10, callsRemaining: 20 - revisions.get(employee.id) } });
+      },
+      loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
+    const captain = await factory.createAgent(host.ctx, { sessionId: captainId, meta: { cwd: root }, agentOptions: { provider: 'fixture', model: 'captain-model' } });
+    const childOptions = (sessionId, employeeId) => ({ sessionId, parentAgent: captain.agent, meta: { cwd: root, parentSession: captainId },
+      agentOptions: { provider: 'fixture', model: employeeId + '-model' }, setup(_ctx, agent) {
+        agent.session.append('subagent/descriptor', { version: 3, mode: 'continuable', provider: 'spawn', label: 'fixture:' + employeeId, agentProvider: 'fixture', agentModel: employeeId + '-model' });
+      } });
+    let reader = await factory.createAgent(host.ctx, childOptions(readerId, 'reader'));
+    const writer = await factory.createAgent(host.ctx, childOptions(writerId, 'writer'));
+    assert.deepEqual(domain(captain.agent), ['filesystem']);
+    assert.deepEqual(domain(reader.agent), ['filesystem', 'knowledge_search']);
+    assert.deepEqual(domain(writer.agent), ['artifact_write', 'terminal_test']);
+    assert.deepEqual(host.ctx.tools.schemas().filter(tool => PRODUCT_TOOL_NAMES.includes(tool.name)).map(tool => tool.name).sort(), [...PRODUCT_TOOL_NAMES].sort());
+    for (const agent of [captain.agent, reader.agent, writer.agent]) {
+      for (const name of ['agent_teams_claim_task', 'agent_teams_update_task', 'agent_teams_send_message', 'agent_teams_status']) assert.ok(names(agent).includes(name), name);
+      agent.followup(prompt('Inspect approved capabilities')); await agent.whenIdle();
+    }
+    for (const [agent, allowed] of [[reader.agent, snapshot.agents[1].tools], [writer.agent, snapshot.agents[2].tools]]) {
+      const request = requests.find(item => item.sessionId === agent.id);
+      assert.ok(request); assert.deepEqual(request.tools.filter(tool => PRODUCT_TOOL_NAMES.includes(tool.name)).map(tool => tool.name).sort(), [...allowed].sort());
+    }
+    const checkCurrentContext = (sessionId, employeeId, revision) => {
+      const request = requests.filter(item => item.sessionId === sessionId).at(-1);
+      const context = request.messages.findLast(message => message.source?.kind === 'plugin' &&
+        message.source.plugin === '@deepseek-ai/dsh-system-prompt' && message.source.form === 'snapshot');
+      assert.ok(context, 'the native model request carries a fresh runtime-context snapshot');
+      const section = context.source.sections.find(item => item.name === 'department:approved-context');
+      assert.ok(section);
+      const contract = JSON.parse(section.text);
+      assert.equal(contract.fixtureContract, 'APPROVED_DYNAMIC_' + employeeId); assert.equal(contract.revision, revision);
+      assert.equal(contract.task.runtimeTaskId, 'task-' + employeeId);
+      assert.equal(contract.budget.occupied, revision / 10); assert.equal(contract.budget.callsRemaining, 20 - revision);
+      assert.ok(!JSON.stringify(context).includes('APPROVED_DYNAMIC_' + (employeeId === 'reader' ? 'writer' : 'reader')));
+      assert.ok(!request.system?.includes('APPROVED_DYNAMIC_'), 'dynamic approved context is not cached in the request header');
+    };
+    checkCurrentContext(readerId, 'reader', 1); checkCurrentContext(writerId, 'writer', 1);
+    revisions.set('reader', 2);
+    reader.agent.followup(prompt('Use updated approved task and remaining budget')); await reader.agent.whenIdle();
+    checkCurrentContext(readerId, 'reader', 2); checkCurrentContext(writerId, 'writer', 1);
+    await assert.rejects(host.call(reader.agent, 'artifact_write', { path: 'fixed.mjs', content: 'not permitted' }), /UNKNOWN_TOOL/);
+    const denied = await host.ctx.tools.execute({ callId: randomUUID(), name: 'artifact_write', arguments: { path: 'fixed.mjs', content: 'not permitted' }, agent: reader.agent, signal: AbortSignal.timeout(1000) });
+    assert.equal(denied.isError, true); assert.match(denied.error.message, /TOOL_PERMISSION_DENIED/); assert.equal(sandboxCalls.length, 0);
+    const file = await host.call(reader.agent, 'filesystem', { path: 'fixed.mjs' });
+    assert.equal(file.content, '完整固定文件'); assert.equal(file.sha256, 'b'.repeat(64));
+    const knowledge = await host.call(reader.agent, 'knowledge_search', { query: '授权版本' });
+    assert.equal(knowledge[0].version, 3); assert.equal(knowledge[0].content, '固定授权版本资料');
+    await host.call(writer.agent, 'terminal_test', { command: 'fixture-test' });
+    assert.equal(approvals.length, 1); assert.equal(sandboxCalls.filter(call => call.name === 'terminal_test').length, 1);
+    const firstCtx = reader.agent.ctx;
+    await reader.dispose();
+    assert.deepEqual(domain(writer.agent), ['artifact_write', 'terminal_test']); assert.deepEqual(domain(captain.agent), ['filesystem']);
+    revisions.set('reader', 3);
+    reader = await factory.resume(host.ctx, { resumeSessionId: readerId, parentAgent: captain.agent, agentOptions: { provider: 'fixture', model: 'reader-model' } });
+    assert.notEqual(reader.agent.ctx, firstCtx); assert.deepEqual(domain(reader.agent), ['filesystem', 'knowledge_search']);
+    assert.ok(reader.agent.session.snapshotEvents().some(event => event.type === 'subagent/descriptor' && event.data.label === 'fixture:reader'));
+    reader.agent.followup(prompt('Resume with the same approved grants')); await reader.agent.whenIdle();
+    checkCurrentContext(readerId, 'reader', 3); checkCurrentContext(writerId, 'writer', 1);
+    assert.deepEqual(requests.filter(item => item.sessionId === readerId).at(-1).tools.filter(tool => PRODUCT_TOOL_NAMES.includes(tool.name)).map(tool => tool.name).sort(), ['filesystem', 'knowledge_search']);
+    await assert.rejects(host.call(reader.agent, 'terminal', { command: 'unapproved' }), /UNKNOWN_TOOL/);
+    assert.deepEqual(domain(writer.agent), ['artifact_write', 'terminal_test']); assert.deepEqual(domain(captain.agent), ['filesystem']);
+    const records = readRun(join(root, 'runs'), archive.id).events.filter(event => event.type === 'runtime/tool-schema-filtered' && event.data.agentId === 'reader');
+    assert.deepEqual(records.map(event => event.data.resumed), [false, true]);
+    assert.ok(records.every(event => event.data.removed.includes('terminal') && !event.data.removed.includes('filesystem')));
+  } finally { await factory?.close(); removeTools?.(); await host.close(); await rm(root, { recursive: true, force: true }); }
 });

@@ -1,0 +1,107 @@
+{
+  "kind": "independent-all-node-manager-result-and-project-lifecycle-audit",
+  "status": "passed-local-gates-real-archive-preview",
+  "checkedAt": "2026-10-07T03:49:57.503Z",
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-project-lifecycle-result-ui-manifest-2026-10-07.json",
+      "bytes": 2817,
+      "sha256": "19ebc60542060e349c35c8d403a36dc908eddb2eee8451e48ce486c9372f9af8"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "bytes": 66414,
+      "sha256": "7f5b4afccc164a05e61cb31894954287c7d53e24f3fac2543aa4871347a1a766"
+    },
+    {
+      "path": "apps/web/src/ProjectStatusTag.tsx",
+      "bytes": 1089,
+      "sha256": "9b4307abaa69a40f69a0bfac0cfd23ed2fed96180e62763ca1264a328e084ca9"
+    },
+    {
+      "path": "apps/web/src/RunCenter.tsx",
+      "bytes": 14447,
+      "sha256": "74da467fbe68cc0c8c1e034b43994e8800c1be49704622d722a098e72177925f"
+    },
+    {
+      "path": "apps/web/src/RunExtras.tsx",
+      "bytes": 23989,
+      "sha256": "5d2b5b7a8ac50fc2add6a44329d666b251123a314cf19cd7a56d63da399fe194"
+    },
+    {
+      "path": "apps/web/src/run-result-view.ts",
+      "bytes": 5408,
+      "sha256": "2e2092e0296c0ca91014e4154af8cfb669fad34dc799848a30a793a5b70c72ba"
+    },
+    {
+      "path": "tests/project-status-ui.test.ts",
+      "bytes": 2277,
+      "sha256": "9f38c43a44c5d2b824a06fd23ac77f7de60907161f4edcd6dab16c1e7be0c05b"
+    },
+    {
+      "path": "tests/run-result-view.test.ts",
+      "bytes": 8420,
+      "sha256": "c3ed2989da217be9b8370f01010f2d25bd0878d636e6a2e573a472314ae37d70"
+    },
+    {
+      "path": "docs/test-evidence/go-project-lifecycle-result-ui-tests-2026-10-07-final-v2.txt",
+      "bytes": 7529,
+      "sha256": "6a59ee5a2971f350d069bbcbe604d923af0b9551eed099d39351431d21ba4237"
+    },
+    {
+      "path": "docs/test-evidence/go-project-lifecycle-result-ui-types-2026-10-07-final-v2.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/test-evidence/go-project-lifecycle-result-ui-build-2026-10-07-final-v2.txt",
+      "bytes": 728,
+      "sha256": "c6e30686dfaac109b259c3085e144c806146309b75980be8a6f9eb279488d252"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v14-project-result-local-render-final-2026-10-07.json",
+      "bytes": 1026,
+      "sha256": "d3a9f1d61336d97fc37ff9568d591549297db9cd310c0d1a5be4beb55c3b73eb"
+    },
+    {
+      "path": "dist/web/index.html",
+      "bytes": 563,
+      "sha256": "f0f940c397592d811b2866a9f73e87128108eed9d5e0324c50a646955052c9c9"
+    },
+    {
+      "path": "dist/web/assets/index-DobGv_PR.js",
+      "bytes": 538608,
+      "sha256": "12b43a86c01be499a24961c35c5ef44cceb937698afc0ca041400a9c7870d646"
+    },
+    {
+      "path": "docs/validation/go-project-lifecycle-result-ui-2026-10-07.md",
+      "bytes": 3395,
+      "sha256": "09632c10adcd68cb2469904bb3bf95200e07519aa0506e8668968e1d9fbbd0f7"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v14-completed-2026-10-07/archive.json",
+      "bytes": 83173248,
+      "sha256": "8c5df105bda3ddf6bdf229aa2986d1e60fc48436e17c95141c66518a58962d91"
+    },
+    {
+      "path": "apps/web/src/RunExtras.tsx",
+      "bytes": 23989,
+      "sha256": "5d2b5b7a8ac50fc2add6a44329d666b251123a314cf19cd7a56d63da399fe194"
+    }
+  ],
+  "checks": [
+    "旧负例dev.outputs=[]现fallback runtime，真实正常v14完整原archive仍经理accepted6999/report SHA正确，原数据未改",
+    "所有批准节点exact task/attempt/(present version)/run验证，inputs/outputs数量与uniquepath、完整SHA/size校验",
+    "fixed input SHA和producerTaskId/输出SHA/size明确匹配；复审unexpected输出与缺证据不升级",
+    "深层继承只接受明确sourceRunId或node.historyRunId，同时completed sameattempt与accepted库存producer/SHA/size绑定；无锚fallback",
+    "failed/interrupted/cancelled/running/incomplete不显示accepted；原协调回复折叠保留",
+    "知识沉淀使用同一result.text作为primary；completed标签先于未来预算validationfalse，审批guards未变",
+    "63/63 pure UI回归、types0/build0，manifest与全部源码日志build SHA一致"
+  ],
+  "limitations": [
+    "最终新build尚待Root真实浏览器fresh验证；旧截图可以证实之前主结果6999显示，不替代新build验收",
+    "前端展示宿主seal证据，不在浏览器重新读取每份文件验证字节；字节校验由实际交付审核另提供",
+    "此次不调用API/Cua/DB/model，不修改员工文件，完整MVP仍有恢复/备份/交付必须项"
+  ],
+  "sourceStableAfterReview": true
+}

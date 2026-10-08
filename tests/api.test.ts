@@ -127,6 +127,9 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   const callsBefore = requests;
   const parallel = await Promise.all([1, 2].map(() => call(`/projects/${p.data.id}/generate`, 'POST', { modelId: m.data.id, version: 1, maxPlanningCost: 1 })));
   assert.deepEqual(parallel.map(p => p.status).sort(), [200, 409]); assert.equal(requests - callsBefore, 1);
+  assert.equal((await call('/projects')).data[0].version, 1, 'generation is only a candidate until explicitly confirmed');
+  const draft=parallel.find(result=>result.status===200)!.data;
+  assert.equal((await call(`/projects/${p.data.id}/generated-plan/confirm`, 'POST', {previewId:draft.previewId,version:1})).status,200);
   project = (await call('/projects')).data[0]; assert.equal(project.version, 2); assert.equal(project.source, 'model');
   assert.equal((await call(`/projects/${p.data.id}/plan`, 'PUT', { version: 1, plan: project.plan })).status, 409);
   // Tool execution and permission checks have their own sandbox contract tests.
@@ -188,7 +191,9 @@ test('model planning preserves user input scope and refuses to remove an input r
  const plan={...project.plan,tasks:project.plan.tasks.map((task:any)=>({...task,subject:'分析用户简报',acceptanceCriteria:['列出简报的需求与约束']})),knowledgeDocumentIds:[],runInputs:[{id:'brief',title:'用户简报',content:'user-owned-input',agentIds:['manager']}]};
  assert.equal((await call('/projects/'+created.id+'/plan','PUT',{version:1,plan})).status,200);
  plannedResponse={...plan,knowledgeDocumentIds:['invented-document'],runInputs:[]};
- assert.equal((await call('/projects/'+created.id+'/generate','POST',{version:2,modelId:model.id,maxPlanningCost:.1})).status,200);
+ const candidate=await call('/projects/'+created.id+'/generate','POST',{version:2,modelId:model.id,maxPlanningCost:.1});assert.equal(candidate.status,200);
+ assert.equal((await call('/projects')).data.find((p:any)=>p.id===created.id).version,2);
+ assert.equal((await call('/projects/'+created.id+'/generated-plan/confirm','POST',{version:2,previewId:candidate.data.previewId})).status,200);
  const saved=(await call('/projects')).data.find((p:any)=>p.id===created.id);
  assert.deepEqual(saved.plan.knowledgeDocumentIds,[]);assert.deepEqual(saved.plan.runInputs,plan.runInputs);
  plannedResponse={...plan,runInputs:[],agents:[{...agent,id:'replacement'}],tasks:plan.tasks.map((t:any)=>({...t,assigneeId:'replacement'}))};

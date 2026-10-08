@@ -25,13 +25,45 @@ before(async()=>{
  dir=await mkdtemp(join(tmpdir(),'cost-'));process.env.DATA_DIR=dir;process.env.TRACE_ROOT=join(dir,'runs');process.env.OBSIDIAN_VAULT=join(dir,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();cost=await import('../apps/api/src/cost-control.ts');
  const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
- gateway=http.createServer(async(req:any,res:any)=>{for await(const _ of req){}requests++;if(mode==='drop'){req.socket.destroy();return;}res.setHeader('content-type','application/json');res.end(JSON.stringify({choices:mode==='bad-message'?[]:[{message:{content:'OK'}}],...(mode==='missing'?{}:{usage:{prompt_tokens:0,completion_tokens:mode==='overrun'?200:25}})}));});gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
+ gateway=http.createServer(async(req:any,res:any)=>{for await(const _ of req){}requests++;if(mode==='drop'){req.socket.destroy();return;}res.setHeader('content-type','application/json');if(mode==='denied'){res.setHeader('x-oneapi-request-id','relay-forbidden-403');res.setHeader('x-upstream-request-id','upstream-forbidden-403');res.setHeader('x-request-id','response-forbidden-403');res.writeHead(403);res.end(JSON.stringify({error:'Synthetic access denied'}));return;}res.end(JSON.stringify({choices:mode==='bad-message'?[]:[{message:{content:'OK'}}],...(mode==='missing'?{}:{usage:{prompt_tokens:0,completion_tokens:mode==='overrun'?200:25}})}));});gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
  await pool.query('INSERT INTO gateways(id,data) VALUES($1,$2)',['gateway',{name:'Fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[model.id,model,toolEvidence]);
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'测试部门',description:'',agents:[agent]}]);
  await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES('project','department',1,'测试部门','核对所有模型调用的预算上限',$1,$2,'manual')",[policy,plan]);
 });
 beforeEach(async()=>{await pool.query('TRUNCATE model_reservations,usage,project_runs,request_keys CASCADE');await pool.query('UPDATE product_settings SET data=$1 WHERE id=1',[settings()]);await pool.query("UPDATE departments SET data=data-'dailyBudget'");requests=0;mode='ok';});
 after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s)await new Promise<void>(r=>s.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
+
+test('demand discussion records actual usage without estimating or reserving an execution budget',async()=>{
+ await pool.query('UPDATE product_settings SET data=$1 WHERE id=1',[settings(.01)]);
+ mode='overrun';
+ const result=await cost.completeOrganizationConversation(model,[{role:'user',content:'先聊需求，不执行项目'}],100,{sessionId:'organization:fixture'});
+ assert.equal(requests,1);
+ const receipt=(await pool.query('SELECT * FROM model_reservations WHERE id=$1',[result.usageId])).rows[0];
+ assert.equal(Number(receipt.amount),0);assert.equal(receipt.status,'settled');assert.equal(receipt.context.accountingMode,'conversation');
+ assert.equal(Number((await pool.query('SELECT cost FROM usage WHERE id=$1',[result.usageId])).rows[0].cost),2);
+ assert.deepEqual(await cost.dailyTotals(pool),{spent:0,reserved:0});
+ const totals=(await call('/costs')).data;
+ assert.equal(totals.conversationSpent,2);assert.equal(totals.recordedSpent,2);assert.equal(totals.spent,0);
+ await assert.rejects(cost.reserveCall({model,amount:.02,purpose:'执行测试',context:{accountingMode:'conversation'}}),e=>(e as any).code==='DAILY_BUDGET_EXCEEDED');
+ await assert.rejects(cost.completeBudgeted(model,[{role:'user',content:'执行预算仍有效'}],100,{purpose:'连接测试',maxCost:.1}),e=>(e as any).code==='CALL_BUDGET_EXCEEDED');
+ assert.equal(requests,1,'budgeted failures cannot dispatch another wire');
+});
+
+test('usage-only accounting cannot be applied to execution or project identities',async()=>{
+ for(const patch of [{purpose:'项目执行'},{projectId:'project'},{runId:'run'},{billingDepartmentId:'department'},{maxCost:1},{amount:1}]){
+  await assert.rejects(cost.reserveCall({model,amount:0,purpose:'组织需求对话',accountingMode:'conversation',...patch}),e=>(e as any).code==='INVALID_CONVERSATION_ACCOUNTING');
+ }
+ assert.equal(requests,0);assert.equal((await pool.query('SELECT count(*)::int AS n FROM model_reservations')).rows[0].n,0);
+});
+
+test('missing conversation usage stays unknown without claiming zero supplier charge',async()=>{
+ mode='missing';
+ await assert.rejects(cost.completeOrganizationConversation(model,[{role:'user',content:'需求讨论'}],100,{sessionId:'organization:missing'}),e=>(e as any).code==='USAGE_MISSING');
+ const data=(await call('/costs')).data;
+ assert.equal(data.calls.length,1);assert.equal(data.calls[0].status,'uncertain');assert.equal(data.calls[0].accountingMode,'conversation');assert.equal(data.calls[0].amount,0);
+ assert.equal(data.spent,0);assert.equal(data.conversationSpent,0);assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage')).rows[0].n,0);
+ assert.equal(requests,1);
+});
 
 test('parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission',async()=>{
  await pool.query('UPDATE product_settings SET data=$1 WHERE id=1',[settings(1.5)]);
@@ -89,6 +121,48 @@ test('known receipts are recorded despite malformed output or excessive usage; l
  await cost.settleCall(id,0,10);await cost.settleCall(id,0,10);
  const row=(await pool.query('SELECT * FROM model_reservations WHERE id=$1',[id])).rows[0];assert.equal(row.history.filter((h:any)=>h.source==='provider').length,1);
  assert.equal((await pool.query('SELECT output_tokens FROM usage WHERE id=$1',[id])).rows[0].output_tokens,10);
+});
+
+test('403 response identifiers remain public after a failed bill query without releasing fees or replaying the model',async()=>{
+ mode='denied';await assert.rejects(cost.completeBudgeted(model,[{role:'user',content:'Synthetic response evidence'}],100,{purpose:'连接测试'}),(error:any)=>error.code==='GATEWAY_REJECTED'&&error.upstreamStatus===403);
+ assert.equal(requests,1);
+ const response=(await call('/costs')).data,receipt=response.calls[0],id=receipt.id;
+ const metadata={providerRequestId:'relay-forbidden-403',upstreamRequestId:'upstream-forbidden-403',responseRequestId:'response-forbidden-403',providerStatus:403};
+ for(const [key,value] of Object.entries(metadata))assert.equal(receipt[key],value);
+ assert.equal(receipt.status,'uncertain');assert.equal(response.reserved,1);assert.equal(response.spent,0);assert.equal(requests,1);
+ const query=await call('/costs/'+id+'/query-provider','POST',{});assert.equal(query.data.status,'failed');assert.equal(query.data.requestId,undefined);assert.equal(requests,4);
+ const beforeRead=(await pool.query('SELECT status,amount,context,history FROM model_reservations WHERE id=$1',[id])).rows[0];
+ for(let read=0;read<2;read++){
+  const costs=(await call('/costs')).data;
+  assert.equal(costs.calls[0].status,'uncertain');assert.equal(costs.reserved,1);assert.equal(costs.spent,0);
+  for(const [key,value] of Object.entries(metadata))assert.equal(costs.calls[0][key],value);
+ }
+ assert.deepEqual((await pool.query('SELECT status,amount,context,history FROM model_reservations WHERE id=$1',[id])).rows[0],beforeRead);
+ assert.equal(requests,4);assert.equal((await pool.query('SELECT id FROM usage')).rowCount,0);
+ await cost.settleCall(id,0,10,{},'Synthetic independently confirmed receipt');
+ const recent=(await call('/costs')).data.recent.find((item:any)=>item.id===id);
+ assert.equal(recent.status,'settled');for(const [key,value] of Object.entries(metadata))assert.equal(recent[key],value);
+ assert.equal(requests,4);
+});
+
+test('cost response selects only safe response fields and preserves absent IDs without exposing reservation context',async()=>{
+ const id=await cost.reserveCall({model,amount:1,purpose:'Synthetic metadata boundary'});
+ await cost.recordProviderResponse(id,{providerRequestId:'sk-synthetic-rejected-key',upstreamRequestId:'contains whitespace',responseRequestId:'x'.repeat(129),providerStatus:999});
+ await cost.markCallUncertain(id,'Synthetic missing identifiers');
+ const secrets={apiKey:'SYNTHETIC-CONTEXT-KEY',billingRoute:{baseUrl:'https://synthetic-private-route.invalid/v1',secret:'SYNTHETIC-ROUTE-SECRET'},unrelated:{private:'SYNTHETIC-PRIVATE-CONTEXT'}};
+ await pool.query('UPDATE model_reservations SET context=context||$2::jsonb WHERE id=$1',[id,JSON.stringify(secrets)]);
+ const beforeRead=(await pool.query('SELECT status,amount,context,history FROM model_reservations WHERE id=$1',[id])).rows[0];
+ const response=(await call('/costs')).data,receipt=response.calls[0],serialized=JSON.stringify(response);
+ for(const key of ['providerRequestId','upstreamRequestId','responseRequestId','providerStatus'])assert.equal(Object.hasOwn(receipt,key),false);
+ assert.equal(receipt.status,'uncertain');assert.equal(response.reserved,1);assert.equal(response.spent,0);
+ for(const value of ['context','apiKey','billingRoute','SYNTHETIC-CONTEXT-KEY','synthetic-private-route','SYNTHETIC-ROUTE-SECRET','SYNTHETIC-PRIVATE-CONTEXT'])assert.equal(serialized.includes(value),false,value);
+ assert.deepEqual((await pool.query('SELECT status,amount,context,history FROM model_reservations WHERE id=$1',[id])).rows[0],beforeRead);
+ // Defend the response boundary even if an older or malformed record bypassed
+ // today's recordProviderResponse validation.
+ await pool.query('UPDATE model_reservations SET context=context||$2::jsonb WHERE id=$1',[id,JSON.stringify({providerRequestId:{secret:'SYNTHETIC-NESTED-KEY'},upstreamRequestId:'sk-INVALID',responseRequestId:'bad\nidentifier',providerStatus:'403'})]);
+ const malformed=(await call('/costs')).data.calls[0];
+ for(const key of ['providerRequestId','upstreamRequestId','responseRequestId','providerStatus'])assert.equal(Object.hasOwn(malformed,key),false);
+ assert.equal(JSON.stringify(malformed).includes('SYNTHETIC-NESTED-KEY'),false);assert.equal(requests,0);assert.equal((await pool.query('SELECT id FROM usage')).rowCount,0);
 });
 
 test('backup refuses live calls and restores unresolved reservations without inventing a zero charge',async()=>{

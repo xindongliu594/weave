@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { finishOrganizationReply, hasUnconfirmedOrganizationChanges, type ChatRequest, type Draft, type Preview } from '../apps/web/src/organization-draft.ts';
+import { createOrganizationChatRequest, finishOrganizationReply, hasUnconfirmedOrganizationChanges, normalizeOrganizationSettings, organizationSettingsFingerprint, type ChatRequest, type Draft, type Preview } from '../apps/web/src/organization-draft.ts';
 
 const policy = { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 300 };
 const initial = (): Draft => ({ messages: [], modelId: 'model', policy, maxPlanningCost: .1, input: '' });
@@ -63,4 +63,36 @@ test('unsent changes and requests with unknown results prevent confirmation even
   assert.equal(hasUnconfirmedOrganizationChanges({ ...previous, input: '新需求' }, false), true);
   assert.equal(hasUnconfirmedOrganizationChanges(previous, true), true);
   assert.equal(hasUnconfirmedOrganizationChanges({ ...previous, pendingRequest: request(previous, '修改方案') }, false), true);
+});
+
+test('new conversation requests omit the deprecated fee limit without changing execution policy or legacy metadata', t => {
+  const network = t.mock.method(globalThis, 'fetch', async () => { throw Error('preparing a request cannot send it'); });
+  const draft = { ...initial(), conversationId: '00000000-0000-4000-8000-000000000001', preview: preview('previous') };
+  const before = JSON.stringify(draft), settings = organizationSettingsFingerprint(draft);
+  const next = createOrganizationChatRequest(draft, '补充验收要求', settings);
+  assert.equal(Object.hasOwn(next.body, 'maxPlanningCost'), false);
+  assert.equal(JSON.stringify(next.body).includes('maxPlanningCost'), false);
+  assert.deepEqual(next.body.policy, draft.policy); assert.equal(next.body.previousPreviewId, 'previous');
+  assert.equal(next.body.conversationId, draft.conversationId); assert.equal(next.settings, settings);
+  assert.equal(JSON.stringify(draft), before); assert.equal(network.mock.calls.length, 0);
+});
+
+test('new settings ignore legacy fee fields but preserve model, execution budget and permission changes', () => {
+  const draft = initial(), current = organizationSettingsFingerprint(draft);
+  assert.equal(current.includes('maxPlanningCost'), false);
+  for (const fee of [.1, .75, 0, 100]) assert.equal(normalizeOrganizationSettings(JSON.stringify({ policy, maxPlanningCost: fee, modelId: draft.modelId })), current);
+  assert.equal(organizationSettingsFingerprint({ ...draft, maxPlanningCost: 100 } as Draft), current);
+  for (const changed of [{ ...draft, modelId: 'another-model' }, { ...draft, policy: { ...policy, maxBudget: 2 } },
+    { ...draft, policy: { ...policy, allowedModelIds: ['model', 'worker'] } }, { ...draft, policy: { ...policy, allowedTools: ['filesystem' as const] } }])
+    assert.notEqual(organizationSettingsFingerprint(changed), current);
+  assert.equal(normalizeOrganizationSettings('unrecognized-old-settings'), 'unrecognized-old-settings');
+});
+
+test('retrieving an old pending reply preserves its exact key, body and settings while normalizing only preview comparison', () => {
+  const draft = initial(), settings = JSON.stringify({ modelId: draft.modelId, maxPlanningCost: .1, policy });
+  const pending = request(draft, '原需求', settings), before = JSON.stringify(pending);
+  const next = finishOrganizationReply({ ...draft, pendingRequest: pending }, pending, { reply: '旧方案仍可确认', preview: preview('legacy') });
+  assert.equal(next.previewSettings, organizationSettingsFingerprint(draft));
+  assert.equal(JSON.stringify(pending), before, 'the original idempotency payload is never rewritten');
+  assert.equal(next.pendingRequest, undefined); assert.equal(next.saved, undefined); assert.equal(next.projectId, undefined);
 });

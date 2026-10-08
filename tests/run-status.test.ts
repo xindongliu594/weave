@@ -14,7 +14,7 @@ test('stopped execution labels refer to the interruption point rather than a liv
 
 test('unresolved model charges disable both recovery actions and expose the reconciliation entry',()=>{
  const html=renderToStaticMarkup(React.createElement(RunExtras,{id:'test-run',status:'failed',snapshot,events,recovery:{unknownOperations:[],costBlocked:'请先核对供应方账单'},onOpenProject:()=>{}}));
- assert.match(html,/核对供应方账单/);assert.match(html,/href="#settings"/);
+ assert.match(html,/核对供应方账单/);assert.match(html,/href="#usage"/);
  assert.match(html,/<button disabled="">恢复未完成任务<\/button>/);
  assert.match(html,/<button disabled="">完整重试<\/button>/);
 });

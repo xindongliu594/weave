@@ -11,6 +11,7 @@ import { join, dirname } from 'node:path';
 import pg from 'pg';
 import { RunSandbox, listArtifacts, artifactFile } from '../services/agent-runtime/sandbox.mjs';
 import { HandoffGate } from '../services/agent-runtime/handoff.mjs';
+import { fixtureTaskContext, fixtureRuntimeContextPrefix } from './model-fixture.ts';
 
 // The API, queue, billing and DSH host are real. Only the model and Docker
 // boundary are test doubles in legacy scenarios. D1 uses a real desktop helper,
@@ -19,6 +20,7 @@ const base = process.env.DATABASE_URL ?? 'postgres://agent_department:local-deve
 const schema = 'flow_' + Date.now();
 const admin = new pg.Pool({ connectionString: base });
 const expected = JSON.parse(readFileSync(new URL('./fixtures/offline-handoff/expected/report.json', import.meta.url), 'utf8'));
+const fixtureContextWindowTokens = 16384;
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 let app: any, server: http.Server, gateway: http.Server, pool: pg.Pool, directory: string, url: string;
 let modelId: string, mode = 'pass', commands = 0, summaryCalls = 0,readFaults=0,mutations=0;
@@ -85,10 +87,15 @@ before(async () => {
       message = { content: JSON.parse(messages.find((m: any) => m.tool_call_id === 'probe').content).result };
     } else if (messages.at(-1)?.content?.includes('Output EXACTLY the Markdown structure below:')) {
       summaryCalls++;
-      message = { content: 'Goal: fixed report. Completed: claim and start task. Pending: write, verify, and hand off the approved result.json. Keep current attempt and approved file/command constraints. File evidence remains authoritative.' };
+      message = { content: 'Task unchanged. Continue from approved context and observed tool results.' };
     } else {
-      const pinned = messages.filter((m: any) => m.role === 'system').flatMap((m: any) => m.content.split('\n')).map((line: string) => { try { return JSON.parse(line); } catch { return undefined; } }).find((value: any) => value?.runtimeTaskId);
-      const assignment = messages.filter((m: any) => m.role === 'user' && typeof m.content === 'string').reverse().find((m: any) => m.content.includes('AgentTeams automatic task assignment'))?.content ?? (pinned ? `Task: ${pinned.runtimeTaskId} ${pinned.task.subject} Attempt id: ${pinned.attemptId}` : '');
+      const pinned = fixtureTaskContext(messages);
+      // Rework contracts keep the original subject; native follow-up labels use
+      // the approved reworkRound and must not select the original write branch.
+      const subject = pinned?.task.kind === 'repair' ? `repair-round-${pinned.task.reworkRound + 1}` :
+        pinned?.task.kind === 'review' && pinned.task.reworkRound ? `review-round-${pinned.task.reworkRound + 1}` : pinned?.task.subject;
+      const hasCurrentSnapshot = messages.some((m: any) => m.role === 'user' && typeof m.content === 'string' && m.content.startsWith(fixtureRuntimeContextPrefix));
+      const assignment = pinned ? `Task: ${pinned.runtimeTaskId} ${subject} Attempt id: ${pinned.attemptId}` : hasCurrentSnapshot ? '' : messages.filter((m: any) => m.role === 'user' && typeof m.content === 'string').reverse().find((m: any) => m.content.includes('AgentTeams automatic task assignment'))?.content ?? '';
       const match = /Task: (t\d+).*?(?:\[flow:(\w+)\]|(repair|review)-round-(\d+))/.exec(assignment), attempt = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
       if (match) {
         const id=match[1],label=match[2]??match[3],key = id + ':' + attempt, step = steps.get(key) ?? 0;
@@ -135,7 +142,9 @@ before(async () => {
     res.end(JSON.stringify({ choices: [{ message, finish_reason: message.tool_calls ? 'tool_calls' : 'stop' }], usage: { prompt_tokens: inputTokens, completion_tokens: outputTokens, total_tokens: inputTokens + outputTokens } }));
   }).listen(0, '127.0.0.1'); await once(gateway, 'listening');
   const gatewayId = (await call('/gateways', 'POST', { name: 'Simulated gateway', baseUrl: 'http://127.0.0.1:' + (gateway.address() as any).port + '/v1', apiKey: 'simulated-key' }, 201)).id;
-  modelId = (await call('/models', 'POST', { gatewayId, model: 'fixture', name: 'Fixture model', inputRate: 1, outputRate: 2, contextWindowTokens: 8192 }, 201)).id;
+  // The current native schemas and protected context must fit below the soft
+  // compaction threshold. Large synthetic history still exercises summaries.
+  modelId = (await call('/models', 'POST', { gatewayId, model: 'fixture', name: 'Fixture model', inputRate: 1, outputRate: 2, contextWindowTokens: fixtureContextWindowTokens }, 201)).id;
   await call('/models/' + modelId + '/test', 'POST', {});
   await call('/models/' + modelId + '/test-tools', 'POST', {});
 });
@@ -325,7 +334,7 @@ test('employee summaries are billed to the active task and preserve approved con
   assert.ok(summaryCalls > 0, 'long histories must trigger an actual gateway summary request');
   assert.equal(result.events.filter((e: any) => e.type === 'handoff/accepted').length, 2);
   assert.equal(commands, 1);
-  assert.equal(result.snapshot.modelRoutes[0].contextWindowTokens, 8192);
+  assert.equal(result.snapshot.modelRoutes[0].contextWindowTokens, fixtureContextWindowTokens);
   const usage = (await call('/usage')).filter((u: any) => u.runId === id && u.purpose === '上下文摘要');
   assert.equal(usage.length, summaryCalls);
   assert.ok(usage.every((u: any) => u.taskId && u.attemptId && u.sessionId && ['producer', 'reviewer'].includes(u.employeeId)));
@@ -343,7 +352,10 @@ test('employee summaries are billed to the active task and preserve approved con
   assert.ok(result.events.some((e: any) => e.type === 'session/assistant/message' && JSON.stringify(e.data).includes('HISTORY_EVIDENCE_produce_0')));
   const resumedRequests = contextRequests.filter(body => body.messages.some((m: any) => typeof m.content === 'string' && m.content.includes('<compacted-summary>')) && !body.messages.at(-1)?.content?.includes('Output EXACTLY the Markdown structure below:'));
   assert.ok(resumedRequests.length > 0);
-  assert.ok(resumedRequests.every(body => body.messages.some((m: any) => m.role === 'system' && m.content.includes('attemptId') && m.content.includes('acceptanceCriteria') && m.content.includes('摘要不能扩大权限'))));
+  assert.ok(resumedRequests.every(body => {
+    const context = fixtureTaskContext(body.messages);
+    return context?.attemptId && Array.isArray(context.task.acceptanceCriteria) && JSON.stringify(context).includes('摘要不能扩大权限');
+  }));
   assert.ok(result.events.some((e: any) => e.type === 'model/wire-request' && e.data.requestPurpose === 'compaction'));
   evidence.push({ scenario: 'context-summary-handoff-billing', status: result.status, summaryCalls, summaryUsageRows: usage.length, commands, originalEvidenceRetained: true });
 });
@@ -371,7 +383,8 @@ test('approved API rework repairs, independently re-reviews and bills the origin
   for(const binding of mappings){
     const requests=result.events.filter((e:any)=>e.type==='model/request'&&e.taskId===binding.task_id);
     assert.ok(requests.length>0);
-    assert.ok(requests.every((e:any)=>wire.some((w:any)=>w.requestId===e.requestId&&w.data.taskId===binding.seed_id&&w.data.attemptId===e.attemptId)));
+    const unmapped=requests.filter((e:any)=>!wire.some((w:any)=>w.requestId===e.requestId&&w.data.taskId===binding.seed_id&&w.data.attemptId===e.attemptId));
+    assert.equal(unmapped.length,0,JSON.stringify({binding,unmapped:unmapped.map((e:any)=>({seq:e.seq,requestId:e.requestId,sessionId:e.sessionId,taskId:e.taskId,attemptId:e.attemptId,purpose:e.data.purpose,wire:wire.filter((w:any)=>w.requestId===e.requestId).map((w:any)=>({seq:w.seq,usageId:w.data.usageId,taskId:w.data.taskId,runtimeTaskId:w.data.runtimeTaskId,attemptId:w.data.attemptId})),terminal:result.events.filter((t:any)=>t.requestId===e.requestId&&['model/error','model/finish'].includes(t.type)).map((t:any)=>({seq:t.seq,type:t.type,data:t.data}))}))}));
     assert.ok(receipts.some((u:any)=>u.taskId===binding.seed_id&&requests.some((e:any)=>e.attemptId===u.attemptId&&e.sessionId===u.sessionId)));
   }
   const artifact=await fetch(url+'/runs/'+id+'/artifact?path=result.json');assert.equal((await artifact.json()).reviewStage,'final');
@@ -476,6 +489,43 @@ test('C3 never replays an uncertain write; explicit reconciliation is recorded b
  assert.equal(restored.snapshot.budgetHistory.tasks.produce.calls,result.events.filter((event:any)=>event.type==='model/wire-request'&&event.data.taskId==='produce').length);
 });
 
+test('checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard', {timeout:45000},async()=>{
+ const parent=await launch('resume-review'),first=await pendingApproval(parent);
+ await call('/approvals/'+first.id,'POST',{decision:'approved'});
+ await pendingApproval(parent);await call('/runs/'+parent+'/cancel','POST',{},202);
+ const original=await stopped(parent);await reconcileFixtureUsage(parent);
+ let child:string|undefined;
+ try{
+  const created=await call('/runs/'+parent+'/retry','POST',{resume:true},202);child=String(created.id);
+  await pendingApproval(child);
+  assert.equal((await run(child)).status,'running');
+  const projectId=original.snapshot.projectId;
+  const rowCount=async()=>Number((await pool.query('SELECT count(*)::int AS count FROM project_runs WHERE project_id=$1',[projectId])).rows[0].count);
+  const wireCount=()=>readFileSync(join(directory,'.data','runs',child!,'events.jsonl'),'utf8').trim().split('\n').map(line=>JSON.parse(line)).filter(event=>event.type==='model/wire-request').length;
+  const rowsBefore=await rowCount(),callsBefore=wireCount();
+  const repeated=await call('/runs/'+parent+'/retry','POST',{resume:true});
+  assert.deepEqual(repeated,{id:child,existing:true});
+  assert.equal(await rowCount(),rowsBefore,'repeating a recovery cannot create another successor');
+  assert.equal(wireCount(),callsBefore,'returning an existing successor cannot dispatch another model request');
+  assert.equal((await run(child)).status,'running');
+  // A stopped alternate attempt without a successor exists only in this fresh
+  // fixture DB. It must still hit the active-project guard before any creation.
+  const alternate=randomUUID();
+  await pool.query(`INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,department_ids)
+    SELECT $1,project_id,project_version,'cancelled',snapshot,
+      (SELECT max(attempt)+1 FROM project_runs WHERE project_id=$3),department_ids
+    FROM project_runs WHERE id=$2`,[alternate,parent,projectId]);
+  const guardedRows=await rowCount();
+  const denied=await call('/runs/'+alternate+'/retry','POST',{resume:true},409);
+  assert.match(denied.message??denied.error,/此项目已有运行/);
+  assert.equal(await rowCount(),guardedRows,'a new parent cannot create a second active project run');
+  assert.equal(wireCount(),callsBefore);
+  evidence.push({scenario:'checkpoint-recovery-idempotency',parentRunId:parent,childRunId:child,existing:true,rowsBefore,rowsAfter:rowsBefore,modelCallsBefore:callsBefore,modelCallsAfter:callsBefore,newParentBlocked:true});
+ }finally{
+  if(child){await call('/runs/'+child+'/cancel','POST',{},202);await stopped(child);}
+ }
+});
+
 test('checkpoint recovery preserves the DAG, unfinished files and history across two interruptions', {timeout:90000},async()=>{
  const id=await launch('resume-review'),first=await pendingApproval(id);
  await call('/approvals/'+first.id,'POST',{decision:'approved'});
@@ -508,7 +558,10 @@ test('checkpoint recovery preserves the DAG, unfinished files and history across
  }
  assert.equal(commands,2,'only original developer verification and final reviewer verification execute');
  assert.equal(mutations,3,'developer output, interrupted review draft and final review only');
- assert.ok(contextRequests.some(body=>body.messages.some((message:any)=>message.role==='system'&&String(message.content).includes('RECOVERY_NOTE')&&String(message.content).includes('sourceRunId'))));
+ assert.ok(contextRequests.some(body=>{
+  const context=fixtureTaskContext(body.messages),text=JSON.stringify(context);
+  return context&&text.includes('RECOVERY_NOTE')&&text.includes('sourceRunId');
+ }));
 });
 
 test('C3 restores an independently passed rework pair and runs only its remaining consumer', {timeout:90000},async()=>{

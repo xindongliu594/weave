@@ -1,15 +1,17 @@
 import { Context } from '@deepseek-ai/cordis';
 import { emitAgentEvent } from '@deepseek-ai/dsh-agent';
 import { LlmAdapter, HarnessError } from '@deepseek-ai/dsh-llm';
+import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
 import { randomUUID } from 'node:crypto';
 import { installEmployeeContext } from './employee-context.mjs';
+import { PRODUCT_TOOL_NAMES } from './product-tools.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -74,10 +76,13 @@ export class EmployeeHostFactory {
       await mount('@deepseek-ai/dsh-tools', { mode: 'native' });
       await mount('@deepseek-ai/dsh-agent');
       await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: this.sessionRoot, compression: 'none' });
+      // Captain and members both own their session in this Host. Reuse the
+      // official durability barriers before requests and top-level tool bodies.
+      await mount('@deepseek-ai/dsh-session-checkpoint-policy');
       await mount('@deepseek-ai/dsh-session-query');
       await mount('@deepseek-ai/dsh-agent-loop', { agents: [] });
       if (this.context) await installEmployeeContext(ctx, mount, { ...this.context, archive: this.archive });
-      if (this.protectedContext) ctx.systemPrompt.section({ name: 'department:approved-context', order: 119,
+      if (this.protectedContext) ctx.systemPrompt.context({ name: 'department:approved-context', order: 119,
         text: context => this.protectedContext(context.agent) });
       for (const schema of coordinator.tools.schemas()) {
         const definition = coordinator.tools.get(schema.name);
@@ -102,6 +107,37 @@ export class EmployeeHostFactory {
       }
       const setup = async (agentCtx, agent) => {
         const prepared = await options.setup?.(agentCtx, agent);
+        if (this.protectedContext) agentCtx.on('agent/pre-step', async (event, next) => {
+          // Assembly precedes native membership admission. Refresh only the
+          // admitted snapshot, before the loop durably appends these messages.
+          const decision = await next();
+          if (decision.kind !== 'enter' || event.signal.aborted) return decision;
+          // A native completion may schedule this member before its host seal
+          // commits. Fence the late refresh, not merely the later model fetch.
+          await this.waitForProtectedContext?.(event.agent, event.signal);
+          event.signal.throwIfAborted();
+          const index = decision.messages.findLastIndex(message => message.source?.kind === 'plugin' &&
+            message.source.plugin === '@deepseek-ai/dsh-system-prompt' && message.source.form === 'snapshot' &&
+            message.source.sections?.some(section => section.name === 'department:approved-context'));
+          if (index < 0) return decision;
+          const message = decision.messages[index], text = this.protectedContext(event.agent);
+          const sections = message.source.sections.map(section => section.name === 'department:approved-context' ? { ...section, text } : section);
+          const messages = [...decision.messages];
+          messages[index] = { ...message, source: { ...message.source, sections }, content: [{ type: 'text', text: joinContextSections(sections) }] };
+          return { ...decision, messages };
+        }, { prepend: true });
+        const employee = this.identify?.(agent);
+        if (employee) {
+          // Child setup installs the durable descriptor first. Restrict only
+          // this known employee's domain schemas before publication/assembly;
+          // the coordinator's execution permission checks remain authoritative.
+          if (!Array.isArray(employee.tools)) throw new HarnessError('无法核对员工已批准的工具权限', 'TOOL_PERMISSION_IDENTITY');
+          const known = new Set(ctx.tools.schemas().map(schema => schema.name));
+          const granted = PRODUCT_TOOL_NAMES.filter(name => known.has(name) && employee.tools.includes(name));
+          const denied = PRODUCT_TOOL_NAMES.filter(name => known.has(name) && !employee.tools.includes(name));
+          if (denied.length) agentCtx.tools.restrict({ deny: denied });
+          this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, granted, removed: denied, resumed: resume }, { sessionId: agent.id });
+        }
         return { commit: () => {
           signal.throwIfAborted(); prepared?.commit();
           detachAgent = coordinator.agents.enter(agent, options.parentAgent);

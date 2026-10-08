@@ -2,18 +2,21 @@ import { defineTool } from '@deepseek-ai/dsh-tools';
 import { searchKnowledge } from './knowledge.mjs';
 import { retryRead, classifyFailure } from './recovery.mjs';
 import { readRecoveryContext } from './checkpoint-context.mjs';
+// Domain capabilities are explicit employee grants. Native collaboration and
+// recovery plumbing are separate and must retain their existing policies.
+export const PRODUCT_TOOL_NAMES = Object.freeze(['artifact_write','filesystem','terminal','terminal_test','knowledge_search','knowledge_read','browser_read','mcp_call_readonly']);
 export function employeeFor(agent,snapshot,captainId){
   if(agent?.id===captainId)return snapshot.agents.find(a=>a.role==='manager');
   const descriptor=agent?.session.snapshotEvents().find(e=>e.type==='subagent/descriptor');
   const name=descriptor?.data?.label?.split(':').at(-1);
   return snapshot.agents.find(a=>a.id===name);
 }
-export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,externalTool,handoff,activeWork,supervisor}){
+export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,externalTool,handoff,activeWork,supervisor,captureReadScope,onReadEvidence,onWriteEvidence}){
   const string={type:'string',required:true};
   const local=snapshot.executionTarget?.kind==='local';
   const demo=Boolean(snapshot.demo?.fixture);
   const tools=[
-    ['artifact_write','写入文本交付物。新文件可直接写；修改已有文件必须先 filesystem 读取，再传入读取时的 sha256 为 expectedSha256，冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
+    ['artifact_write','写入文本交付物。创建新文件必须省略 expectedSha256。修改已有文件必须先 filesystem 读取，再传读取结果的 sha256 为 expectedSha256；它是旧文件版本，不是本次内容的哈希，不得猜测。冲突时重新读取合并。',{path:string,content:string,expectedSha256:{type:'string'}}],
     ['filesystem',local?'读取已授权本机运行工作区中的文件，只接受工作区相对路径。':demo?'读取本机独立 Todo 演示目录中的文件。':'读取隔离工作区中的文件，不能读取宿主机。',{path:string}],
     ['terminal',local?'申请在已授权本机工作区运行命令；Windows 使用 PowerShell，macOS 使用 sh，等待用户逐次批准。':demo?'演示只允许两条预置 Node 测试命令，等待用户逐次批准。':'申请在无网络、无宿主机挂载的受限容器内运行命令，等待用户批准。',{command:string}],
     ['terminal_test',local?'申请在本机工作区执行测试命令，等待用户逐次批准。':demo?'申请在本机独立 Todo 演示目录执行预置 Node 测试，等待用户逐次批准。':'申请在受限容器内执行测试命令，等待用户批准。',{command:string}],
@@ -27,12 +30,15 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     if(!employee||!employee.tools.includes(name))throw Error('TOOL_PERMISSION_DENIED: 此员工没有该工具权限');
     supervisor?.check();
     const ref={sessionId:exec.agent.id,callId:exec.callId};
+    let readScope;
+    if (['filesystem','knowledge_search','knowledge_read','artifact_write'].includes(name)) try { readScope=captureReadScope?.(exec.agent); } catch { /* No proof: retain the complete group. */ }
+    const attestRead=value=>{if(readScope)try{onReadEvidence?.({name,args,value,scope:readScope,agent:exec.agent,callId:exec.callId});}catch{/* Optional optimization fails closed; the read result is unchanged. */}};
     const readOptions={signal:exec.signal,maxRetries:snapshot.policy?.maxReadRetries??2,onRetry:data=>archive.append('runtime/read-retry',data,ref)};
     if(name==='browser_read'||name==='mcp_call_readonly'){
       if(!externalTool)throw Error('EXTERNAL_TOOL_UNAVAILABLE');
       const waiting=supervisor?.enter(exec.agent.id,'waiting_capacity');let release;
       try{release=await gate.acquire(exec.signal);}finally{waiting?.();}
-      try{archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
+      try{supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
       catch(error){archive.append('external/tool-failed',{name,agentId:employee.id,message:error.message},ref);throw error;}
       finally{release();}
     }
@@ -42,7 +48,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       const result=queryKnowledge?await retryRead(name,()=>queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000)),readOptions):
         name==='knowledge_search'?searchKnowledge(chunks,String(args.query).slice(0,1000)):chunks.find(c=>c.id===args.chunkId);
       if(!result)throw Error('知识切片不存在或未授权');
-      archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});return result;
+      archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});attestRead(result);return result;
     }
     let approvalId;
     if(name==='terminal'||name==='terminal_test'){
@@ -67,8 +73,10 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
           const result = await retryRead(name,()=>sandbox.execute(name,args,exec.signal,{agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,approvalId,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}),readOptions);
           outcomeKnown=true;
           if(name!=='filesystem')archive.append('runtime/operation-finished',{name},ref);
-          if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before);
-          archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}); return result;
+          if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before, { ...ref, approvalId });
+          archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})});if(name==='filesystem')attestRead(result);
+          if(name==='artifact_write'&&readScope)try{onWriteEvidence?.({args,value:result,scope:readScope,agent:exec.agent,callId:exec.callId});}catch{/* Optional optimization fails closed; preserve full old evidence. */}
+          return result;
         } catch (error) {
           if(error.notExecuted&&name!=='filesystem')archive.append('runtime/operation-finished',{name,notExecuted:true},ref);
           const classification=classifyFailure(name,error,dispatched&&!outcomeKnown&&!error.notExecuted);

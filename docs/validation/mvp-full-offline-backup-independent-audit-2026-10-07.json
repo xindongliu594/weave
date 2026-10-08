@@ -1,0 +1,393 @@
+{
+  "kind": "independent-actual-offline-backup-and-original-return-audit",
+  "checkedAt": "2026-10-07T04:53:27.501Z",
+  "status": "passed-business-data-and-ten-deliverables-restore-credentials-migration-unverified",
+  "scope": "Saved actual evidence and ten restored employee files only; no DB opening, API/provider, credential read, or employee modifications.",
+  "copy": {
+    "startedAt": "2026-10-07T04:23:43.419Z",
+    "copiedAt": "2026-10-07T04:24:50.251Z",
+    "source": "C:\\Users\\JJ\\Desktop\\la\\agent_department\\.data\\local",
+    "snapshot": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\snapshot",
+    "restore": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore",
+    "sourceLockAbsent": true,
+    "sourceStableDuringCopy": true,
+    "sourceDatabaseNeverOpened": true,
+    "sourceFiles": 1963,
+    "sourceBytes": 752356226,
+    "opaqueFiles": 2,
+    "opaqueBytes": 480,
+    "opaqueContentsReadOrHashed": false,
+    "credentialUnsealOrReuseAttempted": false,
+    "businessAndDatabaseFilesExactSha256": true,
+    "contentManifestSha256": "b2d4e138db19cee74b14168b4ab0737ac2561c7347e5f531315904b9e764b0ab",
+    "exclusions": [
+      "launcher.lock",
+      "session.json",
+      "database/postmaster.pid",
+      "database/postmaster.opts"
+    ],
+    "originalCanRestart": true
+  },
+  "logical": {
+    "tables": 34,
+    "consistentReadOnlyAuditOutputs": 3,
+    "usageCount": 637,
+    "knowledgeVersionRows": 14,
+    "reservationsRetained": 11,
+    "uncertainReceipt": {
+      "id": "c55a3d36-f662-48ef-a69e-baf1ecf26c40",
+      "runId": "6e860c3c-113c-4245-b400-df85b950769e",
+      "status": "uncertain",
+      "amount": "0.0516951",
+      "historyEntries": 1,
+      "historyDigest": "7174e852dd524cb0559e08062eb65748"
+    }
+  },
+  "snapshots": [
+    {
+      "id": "88aa22a9-f887-467c-bf12-91bb57d42361",
+      "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+      "status": "completed",
+      "snapshotSha256": "6e1ff63176737d57e18d22efcc48fe9d1de63ef1ab0c73031c63892b0f967552",
+      "dagSha256": "7828794a9e3b5d90a1bd694e94949475cc10611e2dab2e80ddee892b65c3b588",
+      "costCarryoverSha256": "60929f6a8fdf2c6f104efca738460818ba1165d21d6106d00682ba9a0339c25a",
+      "executionBudget": 2.0621962000000007,
+      "carryoverReserved": 0.096526,
+      "policyMaxBudget": 4.1797,
+      "archiveFormat": 1
+    },
+    {
+      "id": "6e860c3c-113c-4245-b400-df85b950769e",
+      "projectId": "3e101c24-87e6-43ea-80f9-a2c4b0b410f4",
+      "status": "completed",
+      "snapshotSha256": "f67fa8da69d612b9f2012423f338639f9b2d18acd4e9df85a34d455318133e25",
+      "dagSha256": "5377c1ae4b1cabdda7ed57ddc939249c085dedd0d3a3b04bc90421774fc92297",
+      "costCarryoverSha256": "584ebbc6b18188fd216cba09e7845ad634f7a07f6ac4b68fdc08714d7df3f5e7",
+      "executionBudget": 3.7488539000000003,
+      "carryoverReserved": 0,
+      "policyMaxBudget": 4.77489,
+      "archiveFormat": 1
+    }
+  ],
+  "strictEnvelopeComparison": {
+    "identityCreatedAtAndOwnFormatVerified": true,
+    "removedOnly": [
+      "id",
+      "createdAt",
+      "formatVersion"
+    ],
+    "businessFieldsUnchanged": true
+  },
+  "files": [
+    {
+      "runId": "88aa22a9-f887-467c-bf12-91bb57d42361",
+      "file": "acceptance-report.md",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\acceptance-report.md",
+      "bytes": 17620,
+      "sha256": "342915788d0570634a86450e650cddefa83115fe85394950f94bbb4f2269c24b"
+    },
+    {
+      "runId": "88aa22a9-f887-467c-bf12-91bb57d42361",
+      "file": "acceptance.test.mjs",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\acceptance.test.mjs",
+      "bytes": 15722,
+      "sha256": "120f4502e7ce13db5e82bed0ebfdb85617c57eedc9638c59355fbff064342b23"
+    },
+    {
+      "runId": "88aa22a9-f887-467c-bf12-91bb57d42361",
+      "file": "README.md",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\README.md",
+      "bytes": 4755,
+      "sha256": "d4c747dfa91e9f85747dc28c113e720b35bf4e9d1a25551df5f47849d4c123a3"
+    },
+    {
+      "runId": "88aa22a9-f887-467c-bf12-91bb57d42361",
+      "file": "server.mjs",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\server.mjs",
+      "bytes": 6486,
+      "sha256": "6cd1b8c7427029f33e953c9be6da6f9d1f4ff9ca1fcb94443631a98614330d54"
+    },
+    {
+      "runId": "88aa22a9-f887-467c-bf12-91bb57d42361",
+      "file": "todo.test.mjs",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\todo.test.mjs",
+      "bytes": 8145,
+      "sha256": "bb9b044924cdbffeddce0c297d914638e16a52a296dd8c2406810564a689001f"
+    },
+    {
+      "runId": "6e860c3c-113c-4245-b400-df85b950769e",
+      "file": "acceptance-report.md",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\acceptance-report.md",
+      "bytes": 16175,
+      "sha256": "9aef7001407cef0ede7bf3e71c3ebd3e9f360632beaa26276ad9c2daf0d5a593"
+    },
+    {
+      "runId": "6e860c3c-113c-4245-b400-df85b950769e",
+      "file": "acceptance.test.mjs",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\acceptance.test.mjs",
+      "bytes": 15488,
+      "sha256": "78391203baeffc61f1bd1b253f9ac0b0b3db8e6fa076cfea8094a03aa616fec1"
+    },
+    {
+      "runId": "6e860c3c-113c-4245-b400-df85b950769e",
+      "file": "README.md",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\README.md",
+      "bytes": 4247,
+      "sha256": "9d947b799f93979553b44fdd6093521248594d54ccefbaf54f024d69dacaa2ff"
+    },
+    {
+      "runId": "6e860c3c-113c-4245-b400-df85b950769e",
+      "file": "server.mjs",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\server.mjs",
+      "bytes": 6471,
+      "sha256": "28272315887d234ddaac4767ff0baf5e2849716588c5e9bb3a84e4af9a52705c"
+    },
+    {
+      "runId": "6e860c3c-113c-4245-b400-df85b950769e",
+      "file": "todo.test.mjs",
+      "restorePath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\todo.test.mjs",
+      "bytes": 10537,
+      "sha256": "84478b2669325f3568eda78245d09a08e0801fa89154b6292da07a1d4d6f4d44"
+    }
+  ],
+  "employeeTest": {
+    "command": "node --test todo.test.mjs",
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "exitCode": 0,
+    "paidAcceptance": false
+  },
+  "originalReturn": {
+    "launcherPid": 51376,
+    "apiPid": 43484,
+    "healthConnected": true,
+    "usageProjectsRunsCostsEqual": true,
+    "equivalentIsoFractionTrailingZerosOnly": true,
+    "activeRuns": 0,
+    "providerCalls": 0
+  },
+  "sources": [
+    {
+      "file": "docs/test-evidence/mvp-full-offline-backup-original-output-2026-10-07.json",
+      "bytes": 31638,
+      "sha256": "9f08435b8c3d780dcce64c62cefdd7e58df1b6df0e5092e2c5960dd9983b808d"
+    },
+    {
+      "file": "docs/test-evidence/mvp-full-offline-both-runs-restored-2026-10-07.json",
+      "bytes": 13943,
+      "sha256": "1f3401212ea436b8563f34f12b2776b75080b97b74667b44776c889e3454783c"
+    },
+    {
+      "file": "docs/test-evidence/mvp-restored-snapshot-basis-diagnostic-2026-10-07.json",
+      "bytes": 1978,
+      "sha256": "9bbad72fb8ba930c78c5f0873212745eca1fbe8175c8648da84de88e6515c7f0"
+    },
+    {
+      "file": "docs/test-evidence/go-owned-service-20261007-122211-ede8f66e.json",
+      "bytes": 1822910,
+      "sha256": "5b36c3503c8ddea42ad1bdb7e6c964b159a8abc03564fff51dde0120f0e69d22"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/sources.json",
+      "bytes": 2876,
+      "sha256": "d8e11c3995b774617011c50a6739a0e483d55d8af7a2d3d1cf733183b0b97b92"
+    },
+    {
+      "file": ".data/final-full-backup-audit-20261007-162f4895/docs/test-evidence/my-gateway-full-backup-2026-10-05.json",
+      "bytes": 31638,
+      "sha256": "9f08435b8c3d780dcce64c62cefdd7e58df1b6df0e5092e2c5960dd9983b808d"
+    },
+    {
+      "file": "docs/test-evidence/mvp-full-offline-backup-original-output-2026-10-07.json",
+      "bytes": 31638,
+      "sha256": "9f08435b8c3d780dcce64c62cefdd7e58df1b6df0e5092e2c5960dd9983b808d"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\copy-proof.json",
+      "bytes": 1133,
+      "sha256": "db17eb36071e408a0217297754fdd53a4bf0f3a2bdcff558b11501cf71a77bc4"
+    },
+    {
+      "file": "scripts/verify-mvp-full-offline-backup.mjs",
+      "bytes": 21057,
+      "sha256": "d244812c9139e4df270f1f37cf49a2f1f56540c4f62fdb9b9747128709e6a163"
+    },
+    {
+      "file": "scripts/verify-mvp-full-offline-backup.mjs",
+      "bytes": 21057,
+      "sha256": "d244812c9139e4df270f1f37cf49a2f1f56540c4f62fdb9b9747128709e6a163"
+    },
+    {
+      "file": ".data/final-full-backup-audit-20261007-162f4895/scripts/verify-mvp-full-offline-backup.mjs",
+      "bytes": 21057,
+      "sha256": "d244812c9139e4df270f1f37cf49a2f1f56540c4f62fdb9b9747128709e6a163"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/sources.json",
+      "bytes": 4428,
+      "sha256": "bf769fcc65eec6b10b194ddca5f779d7e0d3ee919a3741b8306f6a483164f103"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/archive.json",
+      "bytes": 83173248,
+      "sha256": "8c5df105bda3ddf6bdf229aa2986d1e60fc48436e17c95141c66518a58962d91"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\acceptance-report.md",
+      "bytes": 17620,
+      "sha256": "342915788d0570634a86450e650cddefa83115fe85394950f94bbb4f2269c24b"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/acceptance-report.md",
+      "bytes": 17620,
+      "sha256": "342915788d0570634a86450e650cddefa83115fe85394950f94bbb4f2269c24b"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\acceptance.test.mjs",
+      "bytes": 15722,
+      "sha256": "120f4502e7ce13db5e82bed0ebfdb85617c57eedc9638c59355fbff064342b23"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/acceptance.test.mjs",
+      "bytes": 15722,
+      "sha256": "120f4502e7ce13db5e82bed0ebfdb85617c57eedc9638c59355fbff064342b23"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\README.md",
+      "bytes": 4755,
+      "sha256": "d4c747dfa91e9f85747dc28c113e720b35bf4e9d1a25551df5f47849d4c123a3"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/README.md",
+      "bytes": 4755,
+      "sha256": "d4c747dfa91e9f85747dc28c113e720b35bf4e9d1a25551df5f47849d4c123a3"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\server.mjs",
+      "bytes": 6486,
+      "sha256": "6cd1b8c7427029f33e953c9be6da6f9d1f4ff9ca1fcb94443631a98614330d54"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/server.mjs",
+      "bytes": 6486,
+      "sha256": "6cd1b8c7427029f33e953c9be6da6f9d1f4ff9ca1fcb94443631a98614330d54"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\88aa22a9-f887-467c-bf12-91bb57d42361\\todo.test.mjs",
+      "bytes": 8145,
+      "sha256": "bb9b044924cdbffeddce0c297d914638e16a52a296dd8c2406810564a689001f"
+    },
+    {
+      "file": "docs/test-evidence/go-normal-v14-completed-2026-10-07/todo.test.mjs",
+      "bytes": 8145,
+      "sha256": "bb9b044924cdbffeddce0c297d914638e16a52a296dd8c2406810564a689001f"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/sources.json",
+      "bytes": 4429,
+      "sha256": "b9d3b1684f0802d9fdb6ec2f5e98eefec1b448965db01482da294d005aa09bc2"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/archive.json",
+      "bytes": 57008183,
+      "sha256": "ef78ede0c817ad8557b933878139897ef1c307aff059533e74d0826cd5cbe87c"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\acceptance-report.md",
+      "bytes": 16175,
+      "sha256": "9aef7001407cef0ede7bf3e71c3ebd3e9f360632beaa26276ad9c2daf0d5a593"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/acceptance-report.md",
+      "bytes": 16175,
+      "sha256": "9aef7001407cef0ede7bf3e71c3ebd3e9f360632beaa26276ad9c2daf0d5a593"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\acceptance.test.mjs",
+      "bytes": 15488,
+      "sha256": "78391203baeffc61f1bd1b253f9ac0b0b3db8e6fa076cfea8094a03aa616fec1"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/acceptance.test.mjs",
+      "bytes": 15488,
+      "sha256": "78391203baeffc61f1bd1b253f9ac0b0b3db8e6fa076cfea8094a03aa616fec1"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\README.md",
+      "bytes": 4247,
+      "sha256": "9d947b799f93979553b44fdd6093521248594d54ccefbaf54f024d69dacaa2ff"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/README.md",
+      "bytes": 4247,
+      "sha256": "9d947b799f93979553b44fdd6093521248594d54ccefbaf54f024d69dacaa2ff"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\server.mjs",
+      "bytes": 6471,
+      "sha256": "28272315887d234ddaac4767ff0baf5e2849716588c5e9bb3a84e4af9a52705c"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/server.mjs",
+      "bytes": 6471,
+      "sha256": "28272315887d234ddaac4767ff0baf5e2849716588c5e9bb3a84e4af9a52705c"
+    },
+    {
+      "file": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee\\restore\\workspaces\\6e860c3c-113c-4245-b400-df85b950769e\\todo.test.mjs",
+      "bytes": 10537,
+      "sha256": "84478b2669325f3568eda78245d09a08e0801fa89154b6292da07a1d4d6f4d44"
+    },
+    {
+      "file": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/todo.test.mjs",
+      "bytes": 10537,
+      "sha256": "84478b2669325f3568eda78245d09a08e0801fa89154b6292da07a1d4d6f4d44"
+    },
+    {
+      "file": "docs/validation/mvp-full-offline-backup-original-output-2026-10-07.txt",
+      "bytes": 1036,
+      "sha256": "d65001980e9f232c7cc9d0987a56366e7bb353663f943cd7c38724d9d82854bf"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/health.json",
+      "bytes": 512,
+      "sha256": "081594346950d5f09c8d8565f43792ba9484c9081d2a9045cea87fd4c9b481e1"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/usage.json",
+      "bytes": 386683,
+      "sha256": "0c5144242d0239ed295508a2bff79928878d30b8dfc3952601400c0de1f1206c"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/projects.json",
+      "bytes": 113931,
+      "sha256": "90a817766f1e705e66a245c54f6227394c07c32643cc4e872512a3d9a0871af6"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/runs.json",
+      "bytes": 18846,
+      "sha256": "d73f8869db827f4609ce5f859fd4531d0b84b010d22d97c3f63a3c96e2726df2"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/costs.json",
+      "bytes": 19251,
+      "sha256": "0cfe4e1eee6c2b179fb791eb44d72e3cbc93cec3067738fa8e3753135b4c1ac0"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/normal-readiness.json",
+      "bytes": 273,
+      "sha256": "2dda0c2f51bcb654ecdf7371d5b494a7e0c20be48f00f8c6f54d7f4d4de06c8d"
+    },
+    {
+      "file": "docs/test-evidence/mvp-final-original-service-return-2026-10-07/recovery-readiness.json",
+      "bytes": 275,
+      "sha256": "77baf68eae289b029f165afdeab956d7148399e0af100aa5e7993439fd75bee6"
+    }
+  ],
+  "limitations": [
+    "Credentials authentication migration remains untested; no opaque content read/hash/unseal.",
+    "Logical checks are actual preserved helper read-only results; independent reviewer did not reopen a database.",
+    "Uncertain c55 receipt amount 0.0516951 preserved; no claimed complete fee reconciliation.",
+    "Frozen helper filename 10/5 and static QA limitation are historical helper scope; checkedAt 10/7 and separate completed run audits govern acceptance."
+  ]
+}

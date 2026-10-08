@@ -3,6 +3,9 @@ import { createHash } from 'node:crypto';
 import { pool } from './db.ts';
 export const idempotency:RequestHandler=async(req,res,next)=>{
  if(['GET','HEAD'].includes(req.method)||!req.get('Idempotency-Key'))return next();
+ // Planning quotes inspect a read-only snapshot, including long JSON bodies.
+ // They never reserve/dispatch or need a cached mutation result.
+ if(req.method==='POST'&&/^\/projects\/[^/]+\/planning-quote\/?$/.test(req.path))return next();
  // Backup payloads and passphrases must never enter a response cache.
  if(req.path.startsWith('/backup/'))return next();
  // Device claims and receipts use their durable operation IDs, never a cached claim response.

@@ -10,6 +10,7 @@ import {pool} from './db.ts';
 import {AppError} from './provider.ts';
 import {shareCostMaintenance} from './cost-control.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
+import {withFreshLocalAdmission} from './local-admission.ts';
 import {openRunArchive} from '../../../services/agent-runtime/trace-store.mjs';
 const {decodeFiles,exportFiles,mirrorFiles,revision}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
 const digest=(value:string)=>createHash('sha256').update(value).digest();
@@ -32,8 +33,8 @@ export async function localTarget(policy:any,agents:any[],db:Pick<pg.PoolClient,
  if(target?.kind!=='local')return {kind:'server',platform:'linux'};
  const row=(await db.query("SELECT *,last_seen>clock_timestamp()-interval '15 seconds' AS online FROM local_devices WHERE id=$1",[target.deviceId])).rows[0];
  if(!row?.enabled||row.grant_id!==target.grantId)throw new AppError(422,'本机设备或目录授权已变化，请重新选择设备并批准方案','LOCAL_GRANT_CHANGED');
- if(online&&!row.online)throw new AppError(422,'本机设备离线，请打开桌面端并启用本机执行','LOCAL_DEVICE_OFFLINE');
  if(!row.allow_commands&&agents.some(agent=>agent.tools?.some((tool:string)=>tool==='terminal'||tool==='terminal_test')))throw new AppError(422,'此设备没有开放本机命令，请在桌面端授权或移除终端工具','LOCAL_COMMAND_DENIED');
+ if(online&&!row.online)throw new AppError(422,'本机执行器状态未刷新，请确认本机服务仍在运行，然后检查恢复条件','LOCAL_DEVICE_OFFLINE');
  return {kind:'local',deviceId:row.id,grantId:row.grant_id,name:row.name,platform:row.platform,label:row.label,allowCommands:row.allow_commands};
 }
 async function proof(id:string,key:unknown,db:Pick<pg.PoolClient,'query'>=pool){
@@ -57,19 +58,27 @@ async function operationTransaction<T>(id:string,fn:(db:pg.PoolClient,row:any,ru
 }
 async function executable(db:pg.PoolClient,row:any,run:any,device:any){
  if(!device?.enabled||row.grant_id!==device.grant_id||run.status!=='running'||run.cancel_requested||run.lease_owner!==row.lease_owner||!(await db.query('SELECT id FROM project_runs WHERE id=$1 AND lease_until>clock_timestamp()',[run.id])).rowCount||!(await db.query('SELECT id FROM local_operations WHERE id=$1 AND deadline>clock_timestamp()',[row.id])).rowCount)return false;
- await assertRunAuthorization(run,db);return true;
+ // A started operation can return its authenticated receipt while polling is
+ // delayed. Heartbeat freshness is admission evidence, not grant withdrawal;
+ // the device, run, lease, deadline and full authorization checks still apply.
+ await assertRunAuthorization(run,db,{requireLocalOnline:row.started!==true});return true;
 }
 export class LocalOperationService {
  constructor(public traceRoot:string,public owner:string){}
- async enqueue(runId:string,name:string,args:any,context:any,files?:any[]){
+ async enqueue(runId:string,name:string,args:any,context:any,files?:any[],signal?:AbortSignal){
+  try{return await withFreshLocalAdmission(()=>this.enqueueAttempt(runId,name,args,context,files,signal),signal);}
+  catch(error){throw Object.assign(error as object,{notExecuted:(error as any).notExecuted??true});}
+ }
+ private async enqueueAttempt(runId:string,name:string,args:any,context:any,files?:any[],signal?:AbortSignal){
   const db=await pool.connect(),id=randomUUID();let committing=false;
   try{
+   signal?.throwIfAborted();
    await db.query('BEGIN');await shareCostMaintenance(db);
    const identity=(await db.query('SELECT project_id FROM project_runs WHERE id=$1',[runId])).rows[0];if(!identity)throw Error('运行不存在');
    await db.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
    const run=(await db.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[runId])).rows[0];
    if(run.status!=='running'||run.cancel_requested||run.lease_owner!==this.owner||!(await db.query('SELECT id FROM project_runs WHERE id=$1 AND lease_until>clock_timestamp()',[runId])).rowCount)throw new AppError(409,'本机操作的运行租约已失效','LOCAL_LEASE_DENIED');
-   await assertRunAuthorization(run,db);const target=await localTarget(run.snapshot.policy,run.snapshot.agents,db);
+   await assertRunAuthorization(run,db,{requireLocalOnline:false});const target=await localTarget(run.snapshot.policy,run.snapshot.agents,db,false);
    if(target.kind!=='local')throw new AppError(422,'此运行没有批准本机设备','LOCAL_TARGET_DENIED');
    const employee=run.snapshot.agents.find((agent:any)=>agent.id===context.agentId);
    if(name!=='prepare'&&(!employee?.tools.includes(name)||!context.callId||!context.sessionId))throw new AppError(422,'本机操作不属于获授权员工','LOCAL_EMPLOYEE_DENIED');
@@ -80,8 +89,12 @@ export class LocalOperationService {
     approvalId=z.uuid().parse(context.approvalId);
     if(!(await db.query("SELECT id FROM tool_approvals WHERE id=$1 AND run_id=$2 AND agent_id=$3 AND tool=$4 AND arguments=$5::jsonb AND status='approved' FOR UPDATE",[approvalId,runId,employee.id,name,JSON.stringify(args)])).rowCount)throw new AppError(422,'本机命令缺少相符的逐次批准','LOCAL_APPROVAL_DENIED');
    }
+   signal?.throwIfAborted();
+   await localTarget(run.snapshot.policy,run.snapshot.agents,db);
+   signal?.throwIfAborted();
    const payload={runId,grantId:target.grantId,name,arguments:args,context,approvalId,...(files?{files}:{}),deviceId:target.deviceId};
    await db.query('INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,approval_id) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,target.deviceId,runId,target.grantId,this.owner,payload,approvalId]);
+   signal?.throwIfAborted();
    openRunArchive(this.traceRoot,runId).append('local/operation-queued',{operationId:id,name,deviceId:target.deviceId,...context});committing=true;await db.query('COMMIT');return id;
   }catch(error){await db.query('ROLLBACK');throw Object.assign(error as object,{notExecuted:!committing});}finally{db.release();}
  }
@@ -112,12 +125,12 @@ export class LocalRunExecutor {
   return this.preparing??=(async()=>{
    const callId='local-prepare-'+this.archive.id,ref={callId};
    this.archive.append('runtime/operation-start',{name:'local_workspace',arguments:{deviceId:this.snapshot.executionTarget.deviceId}},ref);
-   try{const id=await this.service.enqueue(this.archive.id,'prepare',{}, {},exportFiles(this.root));const result=await this.service.wait(id,signal);mirrorFiles(this.root,result.files);this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);this.archive.append('local/device-bound',{...this.snapshot.executionTarget,localWorkspace:result.localWorkspace});}
+   try{const id=await this.service.enqueue(this.archive.id,'prepare',{}, {},exportFiles(this.root),signal);const result=await this.service.wait(id,signal);mirrorFiles(this.root,result.files);this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);this.archive.append('local/device-bound',{...this.snapshot.executionTarget,localWorkspace:result.localWorkspace});}
    catch(error){if((error as any).notExecuted)this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);else this.archive.append('runtime/outcome-unknown',{name:'local_workspace',callId,arguments:{deviceId:this.snapshot.executionTarget.deviceId},message:(error as Error).message},ref);throw error;}
   })();
  }
  async execute(name:string,args:any,signal:AbortSignal,context:any){
-  await this.prepare(signal);const id=await this.service.enqueue(this.archive.id,name,args,context);const result=await this.service.wait(id,signal);
+  await this.prepare(signal);const id=await this.service.enqueue(this.archive.id,name,args,context,undefined,signal);const result=await this.service.wait(id,signal);
   const metadata=mirrorFiles(this.root,result.files);const {files:_files,...visible}=result;
   this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace});return {...visible,...metadata};
  }
@@ -182,6 +195,9 @@ export function localDeviceRouter(traceRoot:string){
     await db.query("UPDATE local_operations SET status='cancelled',late_result=$1,finished_at=now() WHERE id=$2",[input,row.id]);return;
    }
    await db.query('UPDATE local_operations SET status=$1,result=$2,finished_at=now() WHERE id=$3',[input.ok?'completed':'failed',input,row.id]);
+   // Only a valid started claim reaching the durable-result branch proves this
+   // device is currently reachable. Cancelled/expired late receipts stay above.
+   if(row.started)await db.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[id]);
   });res.json({ok:true});
  });
  router.delete('/local-devices/:id',async(req,res)=>{await pool.query('UPDATE local_devices SET enabled=false WHERE id=$1',[z.uuid().parse(req.params.id)]);res.json({ok:true});});

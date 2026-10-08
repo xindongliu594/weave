@@ -26,7 +26,7 @@ export async function probeTools(model:Model,maxCost=.1){
   const unchanged=async()=>{if(!(await pool.query("SELECT id FROM models WHERE id=$1 AND version=$2 AND status='available' AND deleted_at IS NULL",[model.id,model.version])).rowCount)throw new AppError(409,'测试期间模型或中转站配置已变化，请重新测试','MODEL_CONFIG_CHANGED');};
   const options={purpose:'工具能力测试',maxCost:maxCost/2,context:{probeId:id,capability:'tools'}};
   await unchanged();
-  const first=await completeBudgeted(model,messages,256,options,{tools:[{type:'function',function:{name:'capability_probe',description:'Harmless local protocol check; returns a verification value.',parameters:{type:'object',properties:{nonce:{type:'string',enum:[challenge]}},required:['nonce'],additionalProperties:false}}}],tool_choice:{type:'function',function:{name:'capability_probe'}}});
+  const first=await completeBudgeted(model,messages,256,options,{tools:[{type:'function',function:{name:'capability_probe',description:'Harmless local protocol check; returns a verification value.',parameters:{type:'object',properties:{nonce:{type:'string',enum:[challenge]}},required:['nonce'],additionalProperties:false}}}],tool_choice:model.thinkingMode==='disabled'?'auto':{type:'function',function:{name:'capability_probe'}}});
   const message=first.choices[0].message,calls=message.tool_calls;
   let args:any;try{args=JSON.parse(calls?.[0]?.function.arguments??'');}catch{}
   if(calls?.length!==1||calls[0].function.name!=='capability_probe'||args?.nonce!==challenge||Object.keys(args??{}).length!==1)throw new AppError(422,'模型未返回正确的工具名称和参数，本次工具能力测试未通过','TOOL_PROBE_FAILED');

@@ -6,7 +6,7 @@ export function isArtifactPath(value) {
 }
 // Match the host permission gate: an exact file or a directory subtree.
 const withinScope = (path, scopes) => scopes.some(scope => path === scope || path.startsWith(`${scope.replace(/\/$/, '')}/`));
-export function taskContractErrors(tasks, agents = [], checkpoints = []) {
+export function taskContractErrors(tasks, agents = [], checkpoints = [], { allowHistoricalPinnedProducerInputs = false } = {}) {
   const errors = [], byId = new Map(tasks.map(t => [t.id, t]));
   const prior = new Map(checkpoints.map(t => [t.taskId, t]));
   // Approved snapshots use runtime names in assignee while retaining the
@@ -26,6 +26,8 @@ export function taskContractErrors(tasks, agents = [], checkpoints = []) {
       if (files.some(f => !isArtifactPath(f.path))) errors.push(`${task.id}: 非法文件路径`);
     }
     for (const input of task.inputs ?? []) {
+      if (input.producerTaskId && input.sha256 !== undefined && !allowHistoricalPinnedProducerInputs)
+        errors.push(`${task.id}: 任务产物输入不能同时指定 producerTaskId 和固定 SHA256；请仅绑定来源任务，由宿主使用本次验收版本`);
       if (!input.producerTaskId) {
         if (!/^[a-f0-9]{64}$/.test(input.sha256 ?? '')) errors.push(`${task.id}: 固定输入必须指定 SHA256`);
         continue;

@@ -21,6 +21,13 @@ const get = async endpoint => {
 const [state, approvals, operations, usage, costs] = await Promise.all([
   get(`/runs/${runId}`), get(`/approvals?runId=${runId}`), get(`/runs/${runId}/local-operations`), get('/usage'), get('/costs'),
 ]);
+const costReadiness = state.recovery?.costReadiness;
+const openModelReceipts = costs.calls.filter(call => call.projectId === run.snapshot.projectId)
+  .map(({id,modelName,status,amount,createdAt,runId}) => ({id,modelName,status,amount,createdAt,runId}));
+const approvedCarry = run.snapshot.costCarryover?.retained === true && run.snapshot.approval?.retainUncertainCosts === true;
+const carriedIds = new Set(openModelReceipts.filter(call => call.status === 'uncertain' && call.runId !== runId && approvedCarry &&
+  run.snapshot.costCarryover.receipts.some(original => original.id === call.id && original.amount === call.amount &&
+    (original.runId ?? undefined) === (call.runId ?? undefined))).map(call => call.id));
 const requests = run.events.filter(e => e.type === 'model/wire-request');
 const billing = run.events.filter(e => e.type === 'billing/usage');
 const tasks = run.events.findLast(e => ['team/checkpoint', 'team/snapshot'].includes(e.type))?.data.tasks ?? [];
@@ -38,6 +45,7 @@ const result = {
   capturedAt: new Date().toISOString(), dataDirectory: directory, runId, projectId: run.snapshot.projectId,
   status: state.status, archiveStatus: run.status, integrity: run.integrity, eventCount: run.eventCount,
   policy: run.snapshot.policy, executionBudget: run.snapshot.executionBudget, budgetHistory: run.snapshot.budgetHistory,
+  costCarryover: run.snapshot.costCarryover, costReadiness,
   resumedFrom: run.snapshot.resumedFrom, completedCheckpoints: run.snapshot.completedCheckpoints,
   approvedTasks: run.snapshot.approvedTasks ?? run.snapshot.tasks, recovery: run.snapshot.recovery,
   tasks: tasks.map(({ id, subject, status, assignee, dependencies, attempt_id, output, verdict }) =>
@@ -51,7 +59,11 @@ const result = {
   unknownOperations: state.recovery?.unknownOperations ?? [],
   checkpointBlocked: state.recovery?.checkpointBlocked,
   costBlocked: state.recovery?.costBlocked,
-  pendingModelReceipts: costs.calls.filter(call => call.projectId === run.snapshot.projectId).map(({id,modelName,status,amount,createdAt,runId}) => ({id,modelName,status,amount,createdAt,runId})),
+  openModelReceipts,
+  // Explicitly retained unknown costs are still visible and reserved. They do
+  // not disguise an in-flight request or an unconfirmed cost from this run.
+  pendingModelReceipts: openModelReceipts.filter(call => call.status === 'pending' || !carriedIds.has(call.id)),
+  carriedModelReceipts: openModelReceipts.filter(call => call.status === 'uncertain' && carriedIds.has(call.id)),
   runtime: run.events.findLast(e => e.type === 'runtime/status')?.data,
   handoffs: run.events.filter(e => e.type === 'handoff/accepted').map(e => ({ seq: e.seq, ...e.data })),
   commands: run.events.filter(e => e.type === 'handoff/command-observed').map(e => ({ seq: e.seq, ...e.data })),

@@ -1,0 +1,80 @@
+{
+  "kind": "independent-successful-delivery-settlement-source-audit",
+  "status": "passed-engineering-only-no-new-real-model-acceptance",
+  "checkedAt": "2026-10-07T04:41:36.769Z",
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-delivery-settlement-manifest-2026-10-07.json",
+      "bytes": 1966,
+      "sha256": "dae4b7717a7013c8cc9870be019e58b390aaa6df0b0e84c3f8de34ef3598c674"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "bytes": 13095,
+      "sha256": "ec863d82a5625ef258e279e292522311ca763a3f81e13dca6ea4929e2c0efeae"
+    },
+    {
+      "path": "services/agent-runtime/delivery-settlement.test.mjs",
+      "bytes": 6725,
+      "sha256": "3355aa409acf25a8c040e1580d6ea7b651d8b3c77d789bd928924e0a82152aa2"
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "bytes": 40077,
+      "sha256": "e86e14d5f7e456f1119ac5469e607a90cf9e28615cd05d131a746b068e814510"
+    },
+    {
+      "path": "services/agent-runtime/model-settlement.test.mjs",
+      "bytes": 13237,
+      "sha256": "f181bc77eee00e094b43a9710f8c9d8c1c9eaec9ce31c2490685b08528d736f8"
+    },
+    {
+      "path": "docs/test-evidence/go-delivery-settlement-tests-2026-10-07.txt",
+      "bytes": 2689,
+      "sha256": "dd33ff5ce1c93ef3bc2acbc4bb7e57b5f863d785b58bd0e057f34bc6dabc66c1"
+    },
+    {
+      "path": "docs/test-evidence/go-delivery-settlement-types-2026-10-07.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-tail-interruption-readonly-2026-10-07.json",
+      "bytes": 3980,
+      "sha256": "9dbb92df32e0b1d9a7f2eff06c982d90215800b3784e5699af68f02c4f09baaa"
+    },
+    {
+      "path": "docs/validation/go-delivery-settlement-2026-10-07.md",
+      "bytes": 3608,
+      "sha256": "5c22d42bb7cd3d9674b356a95fb8d4e3a8d7ea07cb5acc9397fe8d3cfcd6f0ab"
+    },
+    {
+      "path": "docs/test-evidence/go-delivery-settlement-tests-2026-10-07.txt",
+      "bytes": 2689,
+      "sha256": "dd33ff5ce1c93ef3bc2acbc4bb7e57b5f863d785b58bd0e057f34bc6dabc66c1"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-completed-2026-10-07/archive.json",
+      "bytes": 57008183,
+      "sha256": "ef78ede0c817ad8557b933878139897ef1c307aff059533e74d0826cd5cbe87c"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "bytes": 13095,
+      "sha256": "ec863d82a5625ef258e279e292522311ca763a3f81e13dca6ea4929e2c0efeae"
+    }
+  ],
+  "checks": [
+    "全批准节点已host核验后，success branch复用stopAdmission挡新模型，再drain原已dispatch请求至多30秒，之后close Hosts",
+    "原响应真实usage仍可结算，停止后的late tool/fallback/newwire被adapter现有stopReason阻止，不产生替代请求",
+    "用户取消/deadline signal结束等待并在completed写入前抛出；未等满30秒不能覆盖用户取消为completed",
+    "超时/中断调用unknown留账，不把无用量当0、不重放；原c55真实receipt及.0516951未知未改",
+    "24/24 tests/types0 SHA证据一致，包含真实安装DSH native Host+task transition+loopback延迟HTTP收尾、取消、30秒界限和未派发入场负例"
+  ],
+  "limitations": [
+    "loopback固定响应用于shutdown顺序工程回归，不是新真实模型/Todo验收，actualAcceptanceRerun=false明确保持",
+    "修复不追溯替换原35wire/34usage结果，也不能知道旧c55供应商是否扣费",
+    "本审核只读保存源码/日志/档案，没有调用API/Cua/原DB/模型或员工写入"
+  ],
+  "sourceStableAfterReview": true
+}

@@ -19,6 +19,14 @@ test('local launcher documents the explicit data directory', () => {
   const result = launch('--help');
   assert.equal(result.status, 0);
   assert.match(result.output, /--data-dir/);
+  assert.match(result.output, /--production/);
+  assert.match(result.output, /npm run build/);
+});
+
+test('API-only local check cannot be presented as a production static-web check', () => {
+  const result = launch('--check', '--production');
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /静态网页须单独验证/);
 });
 
 test('local check refuses a data directory override before accessing it', () => {

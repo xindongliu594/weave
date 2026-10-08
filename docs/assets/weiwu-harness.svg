@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080" role="img" aria-labelledby="title desc">
+  <title id="title">为伍 Harness 最终设计：从目标到可验证交付</title>
+  <desc id="desc">用户、事件与日程产生工作；部门经理规划并派发任务；按权限组装上下文；员工协作调用沙箱内工具；独立测试、评测和经理验收后交付并沉淀经验。追踪、预算、版本与检查点贯穿执行。此图为最终目标架构。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7faf7"/><stop offset="1" stop-color="#eef4ef"/>
+    </linearGradient>
+    <linearGradient id="harness" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f8faf8"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-15%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#21392b" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1 L8 5 L1 9" fill="none" stroke="#688473" stroke-width="1.7" stroke-linejoin="round"/>
+    </marker>
+    <marker id="lightArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M1 1 L8 5 L1 9" fill="none" stroke="#a2b5a8" stroke-width="1.7" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', 'Arial', sans-serif; }
+      .heading { fill: #213a2d; font-size: 46px; font-weight: 700; }
+      .subheading { fill: #62776a; font-size: 23px; }
+      .eyebrow { fill: #6b8776; font-size: 16px; letter-spacing: 3px; font-weight: 600; }
+      .card-title { fill: #243d2f; font-size: 26px; font-weight: 700; }
+      .body { fill: #627369; font-size: 20px; }
+      .small { fill: #819186; font-size: 17px; }
+      .number { fill: #557564; font-size: 17px; font-weight: 600; }
+      .card { fill: #ffffff; stroke: #dfe8e0; stroke-width: 1.5; }
+      .connector { fill: none; stroke: #688473; stroke-width: 2.4; marker-end: url(#arrow); }
+      .support { fill: none; stroke: #a2b5a8; stroke-width: 1.8; stroke-dasharray: 5 7; marker-end: url(#lightArrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1080" rx="30" fill="url(#background)"/>
+  <rect x="58" y="57" width="48" height="48" rx="15" fill="#274836"/>
+  <path d="M72 72 H91 V91 H72 Z M81.5 72 V91 M72 81.5 H91" fill="none" stroke="#ecf4ec" stroke-width="2"/>
+  <text x="122" y="91" class="eyebrow">WEIWU / AGENT HARNESS</text>
+  <text x="58" y="153" class="heading">让目标成为可验证的工作</text>
+  <text x="60" y="194" class="subheading">长期部门 · 按需唤醒 · 独立协作 · 持续交付</text>
+  <rect x="1277" y="70" width="263" height="40" rx="20" fill="#e8eee7"/>
+  <text x="1300" y="96" fill="#668171" font-size="16" font-weight="600">TARGET DESIGN / 最终设计</text>
+
+  <rect x="337" y="232" width="1203" height="710" rx="27" fill="url(#harness)" stroke="#d9e4db" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="365" y="271" class="eyebrow">HARNESS / 任务编排与运行控制</text>
+
+  <rect x="58" y="298" width="243" height="220" rx="20" fill="#e7f0e8" stroke="#d1e0d3" stroke-width="1.5"/>
+  <circle cx="88" cy="331" r="15" fill="#d5e5d7"/><text x="78" y="337" class="number">01</text>
+  <text x="81" y="386" class="card-title">工作入口</text>
+  <text x="81" y="424" class="body">用户需求 / 业务事件</text>
+  <text x="81" y="455" class="body">定期检查 / 后续待办</text>
+  <text x="81" y="490" class="small">无工作时待命</text>
+
+  <rect x="365" y="298" width="248" height="220" rx="20" class="card"/>
+  <circle cx="395" cy="331" r="15" fill="#edf3ed"/><text x="385" y="337" class="number">02</text>
+  <text x="389" y="386" class="card-title">部门经理</text>
+  <text x="389" y="424" class="body">理解目标 · 判断优先级</text>
+  <text x="389" y="455" class="body">拆解任务 · DAG 派发</text>
+  <text x="389" y="490" class="small">职责与授权范围内规划</text>
+
+  <rect x="666" y="298" width="248" height="220" rx="20" class="card"/>
+  <circle cx="696" cy="331" r="15" fill="#edf3ed"/><text x="686" y="337" class="number">03</text>
+  <text x="690" y="386" class="card-title">任务上下文</text>
+  <text x="690" y="424" class="body">岗位 · 合同 · 当前状态</text>
+  <text x="690" y="455" class="body">按需检索 · 来源与版本</text>
+  <text x="690" y="490" class="small">隔离会话与有界记忆</text>
+
+  <rect x="967" y="298" width="248" height="220" rx="20" class="card"/>
+  <circle cx="997" cy="331" r="15" fill="#edf3ed"/><text x="987" y="337" class="number">04</text>
+  <text x="991" y="386" class="card-title">员工协作</text>
+  <text x="991" y="424" class="body">分析 → 调用 → 观察</text>
+  <text x="991" y="455" class="body">开发 · 测试 · 复核</text>
+  <text x="991" y="490" class="small">独立 Host / 任务交接</text>
+
+  <rect x="1268" y="298" width="248" height="220" rx="20" class="card"/>
+  <circle cx="1298" cy="331" r="15" fill="#edf3ed"/><text x="1288" y="337" class="number">05</text>
+  <text x="1292" y="386" class="card-title">验证与验收</text>
+  <text x="1292" y="424" class="body">真实测试 · 质量 Eval</text>
+  <text x="1292" y="455" class="body">经理验收 · 发布审批</text>
+  <text x="1292" y="490" class="small">结果绑定实际文件版本</text>
+
+  <path d="M301 408 H350" class="connector"/>
+  <path d="M613 408 H651" class="connector"/>
+  <path d="M914 408 H952" class="connector"/>
+  <path d="M1215 408 H1253" class="connector"/>
+
+  <rect x="58" y="598" width="243" height="207" rx="20" fill="#f3f2e8" stroke="#e1e1d2" stroke-width="1.5"/>
+  <text x="81" y="641" fill="#737759" font-size="23" font-weight="700">人的位置</text>
+  <text x="81" y="681" class="body">设定目标与预算</text>
+  <text x="81" y="713" class="body">批准权限与关键操作</text>
+  <text x="81" y="745" class="body">查看成果与异常</text>
+  <text x="81" y="783" class="small">管理边界，掌握决策</text>
+
+  <rect x="365" y="594" width="248" height="207" rx="20" class="card"/>
+  <text x="389" y="638" class="card-title">权限与预算</text>
+  <text x="389" y="679" class="body">模型路由 · 工具授权</text>
+  <text x="389" y="711" class="body">费用预留 · 并发限流</text>
+  <text x="389" y="743" class="body">审批 · 超限暂停</text>
+  <text x="389" y="780" class="small">程序执行硬边界</text>
+
+  <rect x="666" y="594" width="248" height="207" rx="20" class="card"/>
+  <text x="690" y="638" class="card-title">知识与经验</text>
+  <text x="690" y="679" class="body">公司 / 部门 / 员工资料</text>
+  <text x="690" y="711" class="body">授权检索 · 固定版本</text>
+  <text x="690" y="743" class="body">审核后的 SOP 与经验</text>
+  <text x="690" y="780" class="small">事实、摘要与证据分开</text>
+
+  <rect x="967" y="594" width="248" height="207" rx="20" fill="#edf4ef" stroke="#d4e3d7" stroke-width="1.5"/>
+  <text x="991" y="638" class="card-title">沙箱与工具</text>
+  <text x="991" y="679" class="body">MCP · 文件 · 测试命令</text>
+  <text x="991" y="711" class="body">文件 / 网络 / 资源隔离</text>
+  <text x="991" y="743" class="body">临时目录 · 生命周期</text>
+  <text x="991" y="780" class="small">实际操作留下回执</text>
+
+  <rect x="1268" y="594" width="248" height="207" rx="20" class="card"/>
+  <text x="1292" y="638" class="card-title">交付与沉淀</text>
+  <text x="1292" y="679" class="body">代码 · 文档 · 验收记录</text>
+  <text x="1292" y="711" class="body">复盘 · 审核 · 经验发布</text>
+  <text x="1292" y="743" class="body">归档 · 工作区回收</text>
+  <text x="1292" y="780" class="small">完成一项，积累一项</text>
+
+  <path d="M489 594 V535" class="support"/>
+  <path d="M790 594 V535" class="support"/>
+  <path d="M1091 518 V576" class="connector"/>
+  <path d="M1392 518 V576" class="connector"/>
+  <path d="M301 701 H350" class="support"/>
+
+  <rect x="365" y="840" width="1151" height="72" rx="16" fill="#284937"/>
+  <text x="389" y="869" fill="#d5e5d8" font-size="15" letter-spacing="2">OBSERVABILITY &amp; RELIABILITY</text>
+  <text x="389" y="896" fill="#f0f6f0" font-size="21">追踪与 Eval　·　检查点与恢复　·　文件版本　·　费用收据　·　工作区生命周期</text>
+
+  <path d="M1392 943 V985 Q1392 1010 1367 1010 H205 Q179 1010 179 984 V824" class="support"/>
+  <rect x="515" y="985" width="543" height="48" rx="24" fill="#eef4ef"/>
+  <text x="548" y="1015" fill="#718677" font-size="20">验收反馈与经验更新 · 有实际工作时再唤醒</text>
+  <text x="61" y="1062" class="small">愿景架构 · 当前实现与验证状态见 README</text>
+</svg>

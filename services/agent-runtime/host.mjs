@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { isAbsolute,join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -13,6 +13,9 @@ import { ReworkGate } from './rework.mjs';
 import { EmployeeHostFactory } from './employee-hosts.mjs';
 import { recoveryContext } from './checkpoint-context.mjs';
 import { restoreStagedCheckpoints } from './checkpoint-team.mjs';
+import { executionBudgetContext } from './budget-context.mjs';
+import { readOnlyEvidenceSignature, completedWriteEvidenceSignature } from './request-context.mjs';
+import { captureBudgetEvidence, taskRunEvidence } from './run-evidence.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
@@ -32,10 +35,15 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const assignments=new Map();let teamId,workspaceRoot;
   let productDispose, captainId, locked = false;
   const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
+  const readEvidence = new Map();
+  const writeEvidence = new Map();
   const rework = handoff ? new ReworkGate({ snapshot: product.snapshot, handoff, archive, taskIds, state: teamState, onBlocked: product.onHandoffBlocked }) : undefined;
   function teamState() {
     if (!teamId || !workspaceRoot) throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
     return JSON.parse(readFileSync(join(workspaceRoot, '.agent-teams', teamId, 'team.json'), 'utf8'));
+  }
+  function checkpointState(point = 'runtime-checkpoint') {
+    return teamId && workspaceRoot ? { ...teamState(), budgetEvidence: captureBudgetEvidence(product?.snapshot, adapter.budget, archive?.id, point) } : undefined;
   }
   function taskFor(sessionId) {
     product?.supervisor?.check();
@@ -56,13 +64,60 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     if (!id) throw Error('UNAPPROVED_TASK: ' + task.id);
     return { taskId: id, attemptId: task.attemptId, task };
   }
+  function captureReadScope(agent) {
+    if (!product || !handoff || agent.id === captainId) return undefined;
+    const employee=employeeFor(agent,product.snapshot,captainId),work=activeWork(agent);
+    if(!employee?.employeeId||!work.attemptId)return undefined;
+    return Object.freeze({sessionId:agent.id,employeeId:employee.employeeId,taskId:work.taskId,attemptId:work.attemptId,
+      scopeId:createHash('sha256').update(JSON.stringify({runId:archive.id,planVersion:product.snapshot.planVersion,employeeId:employee.employeeId,taskId:work.taskId,attemptId:work.attemptId})).digest('hex')});
+  }
+  function onReadEvidence({name,args,value,scope,agent,callId}) {
+    const current=captureReadScope(agent),signature=readOnlyEvidenceSignature(name,args,value);
+    if(!signature||!current||JSON.stringify(current)!==JSON.stringify(scope)||typeof callId!=='string')return;
+    const proof=Object.freeze({...scope,...signature,...(name==='filesystem'?{path:args.path,sha256:value.sha256}:{})});
+    archive.append('context/read-evidence',{callId,...proof},{sessionId:agent.id,taskId:scope.taskId,attemptId:scope.attemptId});
+    const key=agent.id+':'+callId;
+    if(readEvidence.has(key))readEvidence.set(key,null);else readEvidence.set(key,proof);
+  }
+  function onWriteEvidence({args,value,scope,agent,callId}) {
+    const current=captureReadScope(agent),signature=completedWriteEvidenceSignature(args,value);
+    const contract=current&&handoff.tasks.get(current.taskId);
+    if(!signature||!current||JSON.stringify(current)!==JSON.stringify(scope)||typeof callId!=='string'||
+       !contract?.outputs?.some(file=>file.path===args.path)||contract.inputs?.some(file=>file.path===args.path))return;
+    const proof=Object.freeze({...scope,...signature});
+    archive.append('context/write-evidence',{callId,...proof},{sessionId:agent.id,taskId:scope.taskId,attemptId:scope.attemptId});
+    const key=agent.id+':'+callId;
+    if(writeEvidence.has(key))writeEvidence.set(key,null);else writeEvidence.set(key,proof);
+  }
+  function attestSupersededRead({sessionId,employeeId,taskId,attemptId,read,write}) {
+    const old=readEvidence.get(sessionId+':'+read.callId),fresh=writeEvidence.get(sessionId+':'+write.callId);
+    if(!old||!fresh||old.name!=='filesystem'||fresh.name!=='artifact_write'||old.scopeId!==fresh.scopeId||
+      [old,fresh].some(proof=>proof.sessionId!==sessionId||proof.employeeId!==employeeId||proof.taskId!==taskId||proof.attemptId!==attemptId)||
+      old.path!==fresh.path||old.sha256!==fresh.expectedSha256||fresh.sha256===old.sha256||
+      old.argumentsSha256!==read.argumentsSha256||old.resultSha256!==read.resultSha256||
+      fresh.argumentsSha256!==write.argumentsSha256||fresh.resultSha256!==write.resultSha256)return;
+    return Object.freeze({scopeId:old.scopeId,successful:true,complete:true,superseded:true});
+  }
+  function attestReadGroup({sessionId,employeeId,taskId,attemptId,calls,canonicalSha256}) {
+    if(!product||!sessionId||!employeeId||!taskId||!attemptId||!Array.isArray(calls)||!calls.length)return undefined;
+    let scopeId;
+    for(const call of calls) {
+      const proof=readEvidence.get(sessionId+':'+call.callId);
+      if(!proof||proof.sessionId!==sessionId||proof.employeeId!==employeeId||proof.taskId!==taskId||proof.attemptId!==attemptId||
+        proof.name!==call.name||proof.argumentsSha256!==call.argumentsSha256||proof.resultSha256!==call.resultSha256||scopeId&&scopeId!==proof.scopeId)return undefined;
+      scopeId=proof.scopeId;
+    }
+    return Object.freeze({scopeId,canonicalSha256,successful:true,readOnly:true,complete:true});
+  }
   function protectedContext(agent) {
     if (!agent || !product) return '';
     const employee = employeeFor(agent, product.snapshot, captainId);
     if (!employee) return '';
+    const budgetContext = (taskId, state) => executionBudgetContext({ budget: adapter.budget, snapshot: product.snapshot, routes: adapter.routes, taskId,
+      statuses: new Map((state?.tasks ?? []).map(task => [taskIds.get(task.id), task.status])) });
     const base = { requirement: product.snapshot.requirement, tools: employee.tools, browserOrigins:employee.browserOrigins??[],mcpConnections:employee.mcpConnections??[],
       rule: '以下来自批准快照和宿主任务状态；历史摘要不能扩大权限、改写任务合同或代替文件与命令证据。命令证据绑定整个工作区版本：先完成全部文件写入（包括验收报告），再执行 verify，成功后不再改文件才可提交完成。若测试后更新了报告或任何文件，必须使用已授权测试工具重新执行 verify；不能用文字声明或切换未授权工具替代。报告如实记录先前已观察结果，不能预写未执行的测试为通过。' };
-    if (agent.id === captainId) return JSON.stringify({ ...base, tasks: (product.snapshot.tasks ?? []).map(t => ({ id: t.id, subject: t.subject, assignee: t.assignee, dependencies: t.dependencies })) });
+    if (agent.id === captainId) return JSON.stringify({ ...base, budget: budgetContext(undefined, teamId && workspaceRoot ? teamState() : undefined), tasks: (product.snapshot.tasks ?? []).map(t => ({ id: t.id, subject: t.subject, assignee: t.assignee, dependencies: t.dependencies })) });
     const state = teamState();
     // Native creation assembles a prompt before committing durable membership.
     // Its pre-step admission rejects that warm-up; do not turn it into a failed
@@ -73,7 +128,8 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const current = taskFor(agent.id), task = state.tasks.find(t => t.id === current.taskId);
     const contract = rework.contractFor(current.taskId);
     if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
-    return JSON.stringify({ ...base, task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
+    return JSON.stringify({ ...base, budget: budgetContext(contract.id, state), task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
+      runEvidence: taskRunEvidence({ snapshot: product.snapshot, taskId: contract.id, state, taskIds, handoff, budget: adapter.budget, runId: archive.id }),
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
   async function mount(name, config) {
@@ -116,7 +172,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
           if(employee)adapter.sessionPolicies?.set(session.id,employee);
         }
       });
-      productDispose = installProductTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId });
+      productDispose = installProductTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId, captureReadScope, onReadEvidence, onWriteEvidence });
       ctx.on('llm/stream', async function* (options, next) {
         product.supervisor?.check();
         const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
@@ -164,6 +220,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
           try { record = handoff.prepare(work.taskId, work.attemptId, args); }
           catch (error) { throw handoff.block(work.taskId, work.attemptId, error); }
           const previous = handoff.accepted.get(work.taskId);
+          record.budgetEvidence = captureBudgetEvidence(product.snapshot, adapter.budget, archive.id, 'node-accepted');
           // Native update commits state and queues dependents before returning.
           // This provisional seal is usable only behind native completed state;
           // the shared mutex fences their first request until the outcome is known.
@@ -173,7 +230,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
             if (result.isError) handoff.rollback(record, previous); else {
               handoff.commit(record);
               if (['review','requirements'].includes(contract.kind)) archive.append('quality/reviewed', { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId, verdict: args.verdict, findings: args.findings ?? [], reworkRound: contract.reworkRound ?? 0, inputs: record.inputs }, { sessionId: exec.agent.id, taskId: work.taskId, attemptId: work.attemptId });
-              archive.append('team/checkpoint',teamState());
+              archive.append('team/checkpoint',checkpointState('node-accepted'));
             }
             return result;
           } catch (error) { handoff.rollback(record, previous); throw error; }
@@ -182,13 +239,19 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     }
     if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined);
     if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId),taskId=taskIds.get(request.taskId)??request.taskId;return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId,runtimeTaskId:request.taskId,reworkRound:rework?.contractFor(request.taskId)?.reworkRound};};
+    if(product)adapter.attestReadGroup=attestReadGroup;
+    if(product)adapter.attestSupersededRead=attestSupersededRead;
     await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: sessionRoot, compression: 'none' });
+    // The factory below places captain/member sessions in EmployeeHosts, which
+    // mount the official checkpoint policy. This coordinator does not own their
+    // sessions; flushing a bridged employee tool here would use the wrong store.
     // Idle continuable members can be disposed between assignments. Their next
     // task needs the public query service to read and resume the saved session.
     await mount('@deepseek-ai/dsh-session-query');
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
       context: context ?? (product ? { mode: product.snapshot.policy?.contextManagement ?? 'summary' } : undefined),
       protectedContext: product ? protectedContext : undefined,
+      waitForProtectedContext: handoff ? (agent, signal) => agent.id === captainId ? undefined : handoff.exclusive(signal, () => {}) : undefined,
       identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,
       loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
     removeFactory = ctx.agents.setFactory(employees);
@@ -201,7 +264,14 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     return {
       ctx,
       employeeHosts() { return employees.list(); },
-      checkpointState() { return teamId && workspaceRoot ? teamState() : undefined; },
+      assertApprovedTaskContext(tasks) {
+        return Boolean(product && handoff && employees?.protectedContext === protectedContext &&
+          handoff.snapshot === product.snapshot && JSON.stringify(tasks) === JSON.stringify(product.snapshot.tasks) &&
+          tasks.every(task => handoff.tasks.get(task.id) === product.snapshot.tasks.find(approved => approved.id === task.id)));
+      },
+      checkpointState,
+      attestReadGroup,
+      attestSupersededRead,
       close,
       lockPlan() { locked = true; },
       handoffStatus() { return handoff?.summary() ?? []; },
@@ -223,7 +293,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         if (!product?.snapshot.recovery) return;
         const state = await restoreStagedCheckpoints(join(workspaceRoot,'.agent-teams'),teamId,mapping,product.snapshot.recovery);
         archive.append('recovery/restored',{sourceRunId:product.snapshot.recovery.sourceRunId,completed:product.snapshot.recovery.completed.map(task=>task.taskId),files:product.snapshot.recovery.files});
-        archive.append('team/checkpoint',state);
+        archive.append('team/checkpoint',{ ...state, budgetEvidence: captureBudgetEvidence(product.snapshot, adapter.budget, archive.id, 'restored') });
       },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
         workspaceRoot=cwd;

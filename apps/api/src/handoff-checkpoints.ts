@@ -51,7 +51,9 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
     }
   }
   const checkpoints=[...records.values()];
-  const errors=taskContractErrors(snapshot.tasks,snapshot.agents,checkpoints);
+  // Recovery keeps the approved snapshot's pinned inputs and the exact SHA
+  // comparisons above; only new plan validation rejects producer + fixed SHA.
+  const errors=taskContractErrors(snapshot.tasks,snapshot.agents,checkpoints,{allowHistoricalPinnedProducerInputs:true});
   if(errors.length)throw Error(errors.join('；'));
   return checkpoints;
 }

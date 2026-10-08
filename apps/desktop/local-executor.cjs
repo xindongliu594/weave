@@ -3,6 +3,10 @@ const path = require('node:path');
 const {createHash,randomUUID} = require('node:crypto');
 const {spawn} = require('node:child_process');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const compareArtifactPaths=(a,b)=>a.path<b.path?-1:a.path>b.path?1:0;
+// Preserve the local executor's established hash basis across every host:
+// fixed metadata fields and UTF-16 code-unit path order, never locale collation.
+function canonicalManifest(files){return files.map(({path,size,sha256})=>({path,size,sha256})).sort(compareArtifactPaths);}
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 function denied(message,code='LOCAL_SCOPE_DENIED'){return Object.assign(Error(message),{code,notExecuted:true});}
 function validPath(value){
@@ -28,7 +32,7 @@ function decodeFiles(files){
   names.add(key);const bytes=Buffer.from(file.content,'base64');total+=bytes.length;
   if(bytes.length>5*1024*1024||total>20*1024*1024)throw denied('文件大小超过限制','LOCAL_FILE_LIMIT');
   return {path:file.path,bytes};
- }).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+ }).sort(compareArtifactPaths);
 }
 function exportFiles(root){
  const files=[];let total=0,entries=0;
@@ -43,7 +47,7 @@ function exportFiles(root){
   }else throw denied('工作区中出现非普通文件');
  }}walk(root);return files;
 }
-function manifest(files){return decodeFiles(files).map(file=>({path:file.path,size:file.bytes.length,sha256:hash(file.bytes)}));}
+function manifest(files){return canonicalManifest(decodeFiles(files).map(file=>({path:file.path,size:file.bytes.length,sha256:hash(file.bytes)})));}
 function revision(files){return hash(JSON.stringify(manifest(files)));}
 function writeVersion(root,value,bytes,expected){
  const file=checkedPath(root,value);
@@ -151,4 +155,4 @@ class LocalExecutor {
  }
 }
 function mirrorMetadata(files){return {artifacts:manifest(files),workspaceRevision:revision(files)};}
-module.exports={LocalExecutor,validPath,decodeFiles,exportFiles,manifest,revision,mirrorFiles,runCommand};
+module.exports={LocalExecutor,validPath,decodeFiles,exportFiles,canonicalManifest,manifest,revision,mirrorFiles,runCommand};

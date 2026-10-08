@@ -10,18 +10,36 @@ import { ProductDshRuntime } from '../../../services/agent-runtime/product-runti
 import { readRun, createRunArchive, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { command } from '../../../services/agent-runtime/sandbox.mjs';
 import { queryKnowledge } from './knowledge-store.ts';
-import { reserveCall,settleCall,markCallUncertain,expireReservations } from './cost-control.ts';
+import { reserveCall,settleCall,markCallUncertain,expireReservations,recordProviderResponse } from './cost-control.ts';
 import { settings } from './product.ts';
 import { assertRunModels,routeFingerprint } from './model-capabilities.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
 import {LocalOperationService,LocalRunExecutor} from './local-execution.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
+type Heartbeat={ids:string[];held:string[]};
+async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
+  signal?.throwIfAborted();if(!signal)return work;
+  let abort:()=>void;const cancelled=new Promise<never>((_resolve,reject)=>{abort=()=>reject(signal.reason);signal.addEventListener('abort',abort,{once:true});});
+  try{return await Promise.race([work,cancelled]);}finally{signal.removeEventListener('abort',abort!);}
+}
 export class RunCoordinator {
-  owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;
+  owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
   constructor(public traceRoot:string,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor']){
     const local=new LocalOperationService(traceRoot,this.owner);
-    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined),onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data)=>this.reserve(id,data),onCallError:data=>markCallUncertain(data.id,data.code,data.dispatched)});
-    this.timer=setInterval(()=>void this.tick(),1000);this.timer.unref();void this.tick();
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined),onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data,signal)=>this.reserve(id,data,signal),onResponse:data=>recordProviderResponse(data.id,data),onCallError:async data=>{await recordProviderResponse(data.id,data);await markCallUncertain(data.id,data.code,data.dispatched);}});
+    this.timer=setInterval(()=>{void this.heartbeat().catch(e=>{if(!this.stopped)console.error('Run heartbeat:',e instanceof Error?e.name:'error');});void this.tick();},1000);this.timer.unref();void this.tick();
+  }
+  async heartbeat(){
+    if(this.stopped)return {ids:[],held:[]};if(this.heartbeatWork)return this.heartbeatWork;
+    const ids=[...this.active.keys()];if(!ids.length)return {ids,held:[]};
+    this.heartbeatWork=(async()=>{
+      const held=(await pool.query("UPDATE project_runs SET lease_until=clock_timestamp()+interval '30 seconds' WHERE id=ANY($1::text[]) AND lease_owner=$2 AND status='running' RETURNING id",[ids,this.owner])).rows.map(r=>r.id);
+      // Cancellation may wait for model settlement; it must not hold the shared
+      // heartbeat promise that an admission callback itself is awaiting.
+      for(const id of ids)if(!held.includes(id))void this.runtime.cancel(id).catch(e=>{if(!this.stopped)console.error('Run lease cancellation:',e instanceof Error?e.name:'error');});
+      return {ids,held};
+    })();
+    try{return await this.heartbeatWork;}finally{this.heartbeatWork=undefined;}
   }
   async recordUsage(runId:string,u:RuntimeUsage){
     if((await pool.query('SELECT id FROM model_reservations WHERE id=$1',[u.id])).rowCount){await settleCall(u.id,u.inputTokens,u.outputTokens,u);return;}
@@ -31,7 +49,15 @@ export class RunCoordinator {
     await pool.query(`INSERT INTO usage(id,model_id,project_id,department_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
       SELECT $1,$2,project_id,$7,id,$3,$4,$5,$15,$8,$9,$10,$11,$12,$13,$14 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,departmentId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null,u.requestPurpose==='compaction'?'上下文摘要':'项目执行']);
   }
-  async reserve(runId:string,data:any){
+  async reserve(runId:string,data:any,signal?:AbortSignal){
+    signal?.throwIfAborted();
+    if(this.active.has(runId)){
+      let heartbeat=await heartbeatForCaller(this.heartbeat(),signal);signal?.throwIfAborted();
+      // A newly started job can join active while a heartbeat for earlier jobs
+      // is queued. Renew once for this uncovered job; a covered lost owner fails.
+      if(!heartbeat.ids.includes(runId)&&this.active.has(runId)){heartbeat=await heartbeatForCaller(this.heartbeat(),signal);signal?.throwIfAborted();}
+      if(!heartbeat.held.includes(runId))throw new AppError(409,'工作进程已失去运行租约','LEASE_LOST');
+    }
     const run=(await pool.query('SELECT project_id,snapshot FROM project_runs WHERE id=$1 AND lease_owner=$2',[runId,this.owner])).rows[0];
     if(!run)throw new AppError(409,'工作进程已失去运行租约');
     await assertRunModels(run.snapshot);
@@ -39,7 +65,7 @@ export class RunCoordinator {
     const agent=run.snapshot.agents.find((item:any)=>item.id===data.agentId||item.employeeId===data.employeeId)??(!data.agentId&&!data.employeeId?run.snapshot.agents[0]:undefined);
     if(!agent)throw new AppError(422,'调用员工不在批准快照中');
     const billingDepartmentId=agent.sourceDepartmentId??run.snapshot.departmentId;
-    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,authorize:async(db,row)=>{await assertRunAuthorization(row,db);await assertRunModels(row.snapshot,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
+    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,signal,authorize:async(db,row)=>{await assertRunModels(row.snapshot,db);await assertRunAuthorization(row,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();
@@ -52,7 +78,9 @@ export class RunCoordinator {
     await expireReservations();
     const stale=(await pool.query("SELECT id FROM project_runs WHERE status='running' AND (lease_until IS NULL OR lease_until<clock_timestamp())")).rows;
     for(const candidate of stale){
-      const row=await claimExpiredRun(candidate.id);if(!row)continue;
+      // Recheck under the existing project/run locks. An event-loop or pool
+      // stall cannot turn this coordinator's still-active job into a dead one.
+      const row=await claimExpiredRun(candidate.id,current=>current.lease_owner===this.owner&&this.active.has(current.id));if(!row)continue;
       await pool.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE run_id=$1 AND status IN ('queued','claimed','started')",[row.id]);
       if(row.snapshot.executionTarget?.kind!=='local'&&/^[a-f0-9-]{36}$/.test(row.id))try{await command(['rm','-f','agent-department-'+row.id],{signal:AbortSignal.timeout(5000)});}catch{}
       const archived=readRun(this.traceRoot,row.id);
@@ -72,7 +100,7 @@ export class RunCoordinator {
     if(this.ticking||this.stopped)return;this.ticking=true;
     try{
       // Heartbeats precede recovery. A dead worker eventually loses its lease.
-      if(this.active.size){const held=(await pool.query("UPDATE project_runs SET lease_until=now()+interval '30 seconds' WHERE id=ANY($1::text[]) AND lease_owner=$2 AND status='running' RETURNING id",[[...this.active.keys()],this.owner])).rows.map(r=>r.id);for(const id of this.active.keys())if(!held.includes(id))await this.runtime.cancel(id);}
+      await this.heartbeat();
       const cancel=(await pool.query("SELECT id FROM project_runs WHERE lease_owner=$1 AND cancel_requested=true AND status='running'",[this.owner])).rows;
       for(const row of cancel)await this.runtime.cancel(row.id);
       await this.recover();
@@ -91,7 +119,7 @@ export class RunCoordinator {
           // All operations lock project before run; skip an in-flight edit instead of inverting that order.
           if(candidate&&(await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE SKIP LOCKED',[candidate.project_id])).rowCount)
             job=(await client.query("SELECT * FROM project_runs WHERE id=$1 AND status='queued' AND NOT cancel_requested FOR UPDATE SKIP LOCKED",[candidate.id])).rows[0];
-          if(job){await client.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=now()+interval '30 seconds',started_at=now() WHERE id=$2",[this.owner,job.id]);await client.query("UPDATE projects SET status='RUNNING' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);}
+          if(job){await client.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=clock_timestamp()+interval '30 seconds',started_at=now() WHERE id=$2",[this.owner,job.id]);await client.query("UPDATE projects SET status='RUNNING' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);}
         }
         await client.query('COMMIT');
       }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
@@ -128,5 +156,5 @@ export class RunCoordinator {
     }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
     await this.runtime.cancel(id);
   }
-  async close(){this.stopped=true;clearInterval(this.timer);await Promise.all([...this.active.keys()].map(id=>this.runtime.cancel(id)));while(this.active.size||this.ticking)await sleep(50);}
+  async close(){this.stopped=true;clearInterval(this.timer);await Promise.all([...this.active.keys()].map(id=>this.runtime.cancel(id)));while(this.active.size||this.ticking||this.heartbeatWork)await sleep(50);}
 }

@@ -2,7 +2,9 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { artifactFile, listArtifacts } from './sandbox.mjs';
 import { Semaphore } from './limits.mjs';
+import { commandEvidence } from './run-evidence.mjs';
 import { taskContractErrors } from '../../packages/contracts/task-contracts.mjs';
+import { canonicalManifest } from '../../apps/desktop/local-executor.cjs';
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export function inspectArtifact(root, declaration) {
@@ -27,7 +29,7 @@ function sameVersion(root, expected) {
   return actual;
 }
 export function workspaceRevision(root) {
-  return hash(JSON.stringify(listArtifacts(root).sort((a, b) => a.path.localeCompare(b.path))));
+  return hash(JSON.stringify(canonicalManifest(listArtifacts(root))));
 }
 const scoped = (path, patterns = []) => patterns.some(pattern => path === pattern || path.startsWith(pattern.replace(/\/$/, '') + '/'));
 
@@ -37,9 +39,14 @@ export class HandoffGate {
     this.snapshot = snapshot; this.sandbox = sandbox; this.archive = archive;
     this.tasks = new Map((snapshot.tasks ?? []).map(t => [t.id, t]));
     this.accepted = new Map((snapshot.handoffCheckpoints ?? []).map(t => [t.taskId, t]));
+    // Provisional seals unblock native scheduling behind the mutex, but they
+    // are not yet durable cross-employee evidence.
+    this.committed = new Map(this.accepted);
     this.bindings = new Map(); this.commands = new Map(); this.writes = new Map(); this.blocked = new Map(); this.scopeViolations = new Map();
     this.mutex = new Semaphore(1);
-    const errors = taskContractErrors(snapshot.tasks ?? [], snapshot.agents, snapshot.handoffCheckpoints);
+    // Archived approvals may pin both fields. Keep their exact SHA checks in
+    // begin/sameVersion; new approvals reject the ambiguous contract in validatePlan.
+    const errors = taskContractErrors(snapshot.tasks ?? [], snapshot.agents, snapshot.handoffCheckpoints, { allowHistoricalPinnedProducerInputs: true });
     if (errors.length) throw Error('INVALID_HANDOFF_CONTRACT: ' + errors.join('；'));
   }
   async exclusive(signal, work) {
@@ -86,7 +93,7 @@ export class HandoffGate {
     if (name === 'artifact_write' && ((task.inScope?.length && !scoped(args.path, task.inScope)) || scoped(args.path, task.outOfScope))) throw Error('OUT_OF_SCOPE: ' + args.path);
     return listArtifacts(this.sandbox.root);
   }
-  observe(taskId, attemptId, name, args, result, before) {
+  observe(taskId, attemptId, name, args, result, before, context = {}) {
     const task = this.tasks.get(taskId), key = this.key(taskId, attemptId);
     const previous = new Map(before.map(f => [f.path, f.sha256]));
     const current = new Map(listArtifacts(this.sandbox.root).map(f => [f.path, f.sha256]));
@@ -104,9 +111,11 @@ export class HandoffGate {
     }
     if (name === 'terminal' || name === 'terminal_test') {
       const entries = this.commands.get(key) ?? []; this.commands.set(key, entries);
-      const observation = { command: args.command, exitCode: result.exitCode, workspaceRevision: workspaceRevision(this.sandbox.root) };
+      const observation = { command: args.command, exitCode: result.exitCode, workspaceRevision: workspaceRevision(this.sandbox.root),
+        evidence: commandEvidence({ archive: this.archive, name, taskId, attemptId, args, result, context }) };
       entries.push(observation);
-      this.archive.append('handoff/command-observed', { taskId, attemptId, ...observation });
+      const event = this.archive.append('handoff/command-observed', { taskId, attemptId, ...observation }, { sessionId: context.sessionId, callId: context.callId, taskId, attemptId });
+      if (Number.isSafeInteger(event?.seq)) observation.observationSeq = event.seq;
     }
     this.assertInputs(taskId, attemptId);
   }
@@ -123,13 +132,14 @@ export class HandoffGate {
       const actual = [...(this.writes.get(key)?.keys() ?? [])].sort();
       if (JSON.stringify([...(update.changedPaths ?? [])].sort()) !== JSON.stringify(actual)) throw Error('CHANGED_PATHS_MISMATCH: 必须提交实际修改的路径');
     }
-    return { taskId, attemptId, inputs: this.bindings.get(key) ?? [], outputs, commands: observed, acceptedAt: new Date().toISOString() };
+    return { taskId, attemptId, runId: this.archive.id, workspaceRevision: revision, inputs: this.bindings.get(key) ?? [], outputs, commands: observed, acceptedAt: new Date().toISOString() };
   }
   stage(record) { this.accepted.set(record.taskId, record); }
   invalidateCommands(taskId, attemptId) { this.commands.delete(this.key(taskId, attemptId)); }
   commit(record) {
     this.accepted.set(record.taskId, record); this.blocked.delete(record.taskId);
     this.archive.append('handoff/accepted', record);
+    this.committed.set(record.taskId, record);
   }
   rollback(record, previous) {
     if (previous) this.accepted.set(record.taskId, previous); else this.accepted.delete(record.taskId);
@@ -138,10 +148,21 @@ export class HandoffGate {
 }
 
 /** The same mapping is used by production and offline runtime regression tests. */
-export function teamTaskPlan(tasks) {
+export function teamTaskPlan(tasks, { hostContext = false, assertHostContext } = {}) {
+  const compact = hostContext === true;
+  if (compact) {
+    let ready = false;
+    try { ready = typeof assertHostContext === 'function' && assertHostContext(tasks) === true; } catch {}
+    if (!ready) {
+      const error = Error('APPROVED_TASK_CONTEXT_REQUIRED: 紧凑任务说明需要绑定原批准合同的受保护宿主上下文');
+      error.code = 'APPROVED_TASK_CONTEXT_REQUIRED';
+      throw error;
+    }
+  }
   // Profile task aliases resolve dependencies/review references inside AgentTeams.
   return tasks.map(task => ({ id: task.id, subject: task.subject, assignee: task.assignee, dependencies: task.dependencies,
-    description: (task.taskPrompt ?? task.objective ?? '') + '\n\n文件合同（由宿主核验；未就绪不得完成）：\n' + JSON.stringify({ inputs: task.inputs ?? [], outputs: task.outputs ?? [] }),
+    description: (compact ? '完整需求、当前批准合同、恢复记录和预算见最新 department:approved-context；按当前任务及原生 attempt 执行。' : (task.taskPrompt ?? task.objective ?? '')) +
+      '\n\n文件合同（由宿主核验；未就绪不得完成）：\n' + JSON.stringify({ inputs: task.inputs ?? [], outputs: task.outputs ?? [] }),
     kind: task.kind ?? 'work', objective: task.objective ?? task.taskPrompt ?? task.subject,
     acceptance: task.acceptanceCriteria ?? [],
     ...Object.fromEntries(['inScope', 'outOfScope', 'verify', 'reviewedTaskId', 'sourceTaskId', 'sourceFindingIds'].filter(k => task[k] !== undefined).map(k => [k, task[k]])),

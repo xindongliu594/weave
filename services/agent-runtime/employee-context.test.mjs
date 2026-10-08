@@ -9,7 +9,7 @@ import { createTeamHost } from './host.mjs';
 import { createRunArchive, readRun } from './trace-store.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 import { defineTool } from '@deepseek-ai/dsh-tools';
-import { employeeContextPolicy } from './employee-context.mjs';
+import { employeeContextPolicy, EvidencePruner } from './employee-context.mjs';
 
 const prompt = text => createUserMessage({ content: [{ type: 'text', text }], source: { kind: 'user' } });
 const reply = text => [
@@ -88,10 +88,10 @@ test('automatic employee summaries retain source records, isolate history and su
   } finally { await host.close(); await rm(root, { recursive: true, force: true }); }
 });
 
-test('large structured tool output is reduced without losing hashes or full original evidence', { timeout: 10000 }, async () => {
+test('large structured non-file tool output is reduced without losing hashes or full original evidence', { timeout: 10000 }, async () => {
   const root = await mkdtemp(join(tmpdir(), 'context-tool-'));
   const archive = createRunArchive(root, { title: 'tool evidence' }); let step = 0;
-  const output = { path: 'result.txt', sha256: 'a'.repeat(64), exitCode: 0, content: 'BEGIN ' + 'evidence '.repeat(3000) + ' END', source: { documentId: 'doc', version: 4, lineStart: 8 } };
+  const output = { path: 'result.txt', sha256: 'a'.repeat(64), exitCode: 0, output: 'BEGIN ' + 'evidence '.repeat(3000) + ' END', source: { documentId: 'doc', version: 4, lineStart: 8 } };
   const adapter = new class extends LlmAdapter {
     async *stream(options) {
       if (step++ === 0) {
@@ -103,8 +103,9 @@ test('large structured tool output is reduced without losing hashes or full orig
         const visible = JSON.parse(result.content[0].text);
         assert.equal(visible.sha256, output.sha256); assert.equal(visible.path, output.path);
         assert.deepEqual(visible.source, output.source); assert.equal(visible.exitCode, 0);
-        assert.ok(visible.content.startsWith('BEGIN ')); assert.ok(visible.content.endsWith(' END'));
-        assert.ok(visible.content.length < 3000); yield* reply('verified metadata');
+        assert.ok(visible.output.startsWith('BEGIN ')); assert.ok(visible.output.endsWith(' END'));
+        assert.match(visible.output, /text omitted; this text is incomplete/);
+        assert.ok(visible.output.length < 3000); yield* reply('verified metadata');
       }
     }
   }();
@@ -116,10 +117,127 @@ test('large structured tool output is reduced without losing hashes or full orig
     assert.equal(step, 2);
     const results = a.agent.session.snapshotEvents().filter(e => e.type === 'tool/result');
     assert.equal(results.length, 2);
-    assert.equal(JSON.parse(results[0].data.message.content[0].content[0].text).content, output.content);
+    assert.equal(JSON.parse(results[0].data.message.content[0].content[0].text).output, output.output);
     assert.ok(results[1].sourceEventSeqs.includes(results[0].seq));
     assert.ok(readRun(root, archive.id).events.some(e => e.type === 'context/pruned'));
   } finally { await host.close(); await rm(root, { recursive: true, force: true }); }
+});
+
+const purePruner = () => Object.assign(Object.create(EvidencePruner.prototype), {
+  config: { thresholdChars: 6000, headChars: 1800, tailChars: 600 },
+});
+const jsonBlock = value => ({ type: 'text', text: JSON.stringify(value) });
+
+test('structured text below 6000 characters is safely shortened when serialized JSON exceeds the threshold', () => {
+  const output = 'BEGIN "quoted"\\\n'.repeat(400).slice(0, 5453) + ' END';
+  assert.ok(output.length < 6000);
+  const value = { path: 'test.log', sha256: 'a'.repeat(64), output, exitCode: 0 };
+  const block = jsonBlock(value);
+  assert.ok(block.text.length > 6000);
+  const pruner = purePruner(), pruned = pruner.pruneContent([block]);
+  assert.ok(pruned);
+  const visible = JSON.parse(pruned[0].text);
+  assert.equal(visible.path, value.path); assert.equal(visible.sha256, value.sha256);
+  assert.equal(visible.exitCode, 0);
+  assert.ok(visible.output.startsWith('BEGIN ')); assert.ok(visible.output.endsWith(' END'));
+  assert.match(visible.output, /text omitted; this text is incomplete/);
+  assert.ok(pruner.measureContent(pruned) <= 6000);
+  assert.equal(JSON.parse(block.text).output, output, 'the source block is never modified');
+});
+
+test('escaped structured text uses serialized size and retains full metadata without a raw JSON fallback', () => {
+  const value = { path: 'escaped.log', sha256: 'b'.repeat(64), output: '\u0001'.repeat(2000), source: { documentId: 'doc', version: 2 } };
+  assert.ok(value.output.length < 2400);
+  const pruner = purePruner(), pruned = pruner.pruneContent([jsonBlock(value)]);
+  assert.ok(pruned);
+  const visible = JSON.parse(pruned[0].text);
+  assert.deepEqual(visible.source, value.source);
+  assert.equal(visible.sha256, value.sha256); assert.equal(visible.path, value.path);
+  assert.match(visible.output, /text omitted; this text is incomplete/);
+  assert.ok(pruner.measureContent(pruned) <= 6000);
+});
+
+test('oversized metadata remains valid and complete and already shortened results do not create repeated replacements', () => {
+  const value = { artifacts: Array.from({ length: 70 }, (_, index) => ({ path: `long-reference-name-${index}.txt`, sha256: 'c'.repeat(64) })), output: 'x'.repeat(10000) };
+  const pruner = purePruner(), pruned = pruner.pruneContent([jsonBlock(value)]);
+  assert.ok(pruned);
+  const visible = JSON.parse(pruned[0].text);
+  assert.deepEqual(visible.artifacts, value.artifacts);
+  assert.match(visible.output, /text omitted; this text is incomplete/);
+  assert.ok(pruner.measureContent(pruned) > 6000, 'complete metadata can exceed the soft per-tool threshold');
+  assert.equal(pruner.pruneContent(pruned), null, 'metadata does not cause repeated prune events');
+  const metadataOnly = jsonBlock({ artifacts: value.artifacts });
+  assert.equal(pruner.pruneContent([metadataOnly]), null);
+  assert.deepEqual(JSON.parse(metadataOnly.text).artifacts, value.artifacts);
+});
+
+test('mixed structured and plain text preserves JSON, rich block order and explicit omission markers', () => {
+  const file = { path: 'source.mjs', sha256: 'd'.repeat(64), content: 'full-source '.repeat(1000) };
+  const structured = { path: 'results.log', sha256: 'e'.repeat(64), output: 'x'.repeat(12000) };
+  const image = { type: 'image', source: { kind: 'url', url: 'https://fixture.invalid/image.png' } };
+  const blocks = [jsonBlock(file), image, { type: 'text', text: 'plain '.repeat(2000) }, jsonBlock(structured)];
+  const pruned = purePruner().pruneContent(blocks);
+  assert.ok(pruned); assert.equal(pruned.length, blocks.length);
+  assert.equal(pruned[0], blocks[0], 'a complete file read is retained byte for byte');
+  assert.equal(pruned[1], image);
+  assert.match(pruned[2].text, /tool result middle pruned/);
+  assert.equal(JSON.parse(pruned[3].text).sha256, structured.sha256);
+  assert.match(JSON.parse(pruned[3].text).output, /this text is incomplete/);
+});
+
+test('complete filesystem reads survive the actual employee pruning pipeline and retain original trace evidence', { timeout: 10000 }, async () => {
+  const root = await mkdtemp(join(tmpdir(), 'context-file-complete-'));
+  const archive = createRunArchive(root, { title: 'complete authorized file read' }); let step = 0;
+  const content = 'const text = "complete";\\\n'.repeat(250).slice(0, 5453);
+  const output = { path: 'todo.test.mjs', sha256: 'f'.repeat(64), content, artifacts: [{ path: 'todo.test.mjs', size: content.length, sha256: 'f'.repeat(64) }] };
+  assert.ok(content.length < 6000); assert.ok(JSON.stringify(output).length > 6000);
+  const adapter = new class extends LlmAdapter {
+    async *stream(options) {
+      if (step++ === 0) {
+        yield { type: 'block-start', index: 0, blockType: 'tool-call' };
+        yield { type: 'block-end', index: 0, block: { type: 'tool-call', id: 'file-read', name: 'filesystem', arguments: JSON.stringify({ path: output.path }) } };
+        yield { type: 'finish', reason: { kind: 'tool-calls' } };
+      } else {
+        const result = options.messages.flatMap(message => message.content).find(block => block.type === 'tool-result');
+        const visible = JSON.parse(result.content[0].text);
+        assert.deepEqual(visible, output);
+        yield* reply('complete file available');
+      }
+    }
+  }();
+  const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
+    context: { ...employeeContextPolicy({ contextBytes: 192000 }, [], 'fixture'), mode: 'prune' } });
+  try {
+    host.ctx.tools.register(defineTool({ name: 'filesystem', description: 'complete fixture read', parameters: { path: { type: 'string', required: true } },
+      output: { schema: { type: 'json' }, render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }] }, async execute() { return output; } }));
+    const employee = await host.ctx.agents.create({ sessionId: randomUUID(), agentOptions: { provider: 'fixture', model: 'a' } });
+    await turn(employee.agent, 'read the approved file');
+    assert.equal(step, 2);
+    const history = employee.agent.session.snapshotEvents();
+    const results = history.filter(event => event.type === 'tool/result');
+    assert.equal(results.length, 1, 'complete file reads do not acquire a clipped replacement');
+    assert.deepEqual(JSON.parse(results[0].data.message.content[0].content[0].text), output);
+    assert.equal(history.filter(event => event.type === 'compaction/prune').length, 0);
+    const run = readRun(root, archive.id);
+    assert.equal(run.integrity, 'ok'); assert.equal(run.events.filter(event => event.type === 'context/pruned').length, 0);
+  } finally { await host.close(); await rm(root, { recursive: true, force: true }); }
+});
+
+test('a complete file larger than 192000 context bytes fails before model dispatch and budget reservation', async () => {
+  const file = { path: 'large.txt', sha256: 'a'.repeat(64), content: '中'.repeat(70000) }, blocks = [jsonBlock(file)];
+  assert.equal(purePruner().pruneContent(blocks), null, 'an unpageable file is not silently truncated');
+  assert.ok(Buffer.byteLength(blocks[0].text) > 192000);
+  let fetched = 0, reserved = 0;
+  const fetchMock = mock.method(globalThis, 'fetch', async () => { fetched++; throw Error('must not dispatch oversized input'); });
+  const adapter = new OpenAiCompatibleAdapter({ routes: [{ id: 'a', name: 'fixture', wireModel: 'fixture', baseUrl: 'http://127.0.0.1', inputRate: 0.4, outputRate: 1.6, maxOutputTokens: 32 }],
+    contextBytes: 192000, maxBudget: 0.48, maxModelCalls: 45, beforeRequest: () => { reserved++; } });
+  const messages = [prompt('read the approved large file'), { role: 'assistant', content: [{ type: 'tool-call', id: 'read-large', name: 'filesystem', arguments: '{"path":"large.txt"}' }] },
+    { role: 'tool', content: [{ type: 'tool-result', toolCallId: 'read-large', content: blocks }] }];
+  try {
+    await assert.rejects(async () => { for await (const _ of adapter.stream({ model: 'a', messages })) {} }, error => error.code === 'CONTEXT_LIMIT' && error.message.startsWith('CONTEXT_LIMIT:'));
+    assert.equal(adapter.contextBytes, 192000); assert.equal(fetched, 0); assert.equal(reserved, 0);
+    assert.equal(adapter.calls, 0); assert.equal(adapter.spent, 0);
+  } finally { fetchMock.mock.restore(); }
 });
 
 test('summary admission shares the execution call allowance and rejection preserves source history', { timeout: 10000 }, async () => {

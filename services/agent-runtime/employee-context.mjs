@@ -2,29 +2,54 @@ import BasicCompactionEngine from '@deepseek-ai/dsh-compaction-basic';
 import ToolResultPruner from '@deepseek-ai/dsh-compaction-tool-result-pruner';
 
 const TEXT_KEYS = new Set(['content', 'output', 'text', 'snippet']);
+const OMITTED_TEXT = '\n[... text omitted; this text is incomplete; original retained in session evidence ...]\n';
+const completeFileRead = value => value && typeof value === 'object' && !Array.isArray(value) &&
+  typeof value.path === 'string' && /^[a-f0-9]{64}$/.test(value.sha256 ?? '') && typeof value.content === 'string';
 
 /** Keep structured file hashes, paths, status and citations around large text. */
 export class EvidencePruner extends ToolResultPruner {
   pruneContent(blocks) {
     if (this.measureContent(blocks) <= this.config.thresholdChars) return null;
-    let changed = false;
-    const shorten = (value, key) => {
-      const points = typeof value === 'string' ? Array.from(value) : undefined;
-      if (points && TEXT_KEYS.has(key) && points.length > this.config.thresholdChars) {
-        changed = true;
-        return points.slice(0, this.config.headChars).join('') + '\n[... text omitted; original retained in session evidence ...]\n' + (this.config.tailChars ? points.slice(-this.config.tailChars).join('') : '');
-      }
-      if (Array.isArray(value)) return value.map(item => shorten(item, key));
-      if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([name, item]) => [name, shorten(item, name)]));
-      return value;
-    };
-    const structured = blocks.map(block => {
-      if (block.type !== 'text') return block;
-      try { return { ...block, text: JSON.stringify(shorten(JSON.parse(block.text), '')) }; }
-      catch { return block; }
+    const parsed = blocks.map(block => {
+      if (block.type !== 'text') return { block };
+      try { return { block, json: true, value: JSON.parse(block.text) }; }
+      catch { return { block }; }
     });
-    if (changed && this.measureContent(structured) <= this.config.thresholdChars) return structured;
-    return super.pruneContent(blocks);
+    if (!parsed.some(item => item.json)) return super.pruneContent(blocks);
+    const structured = parsed.map(({ block, json, value }) => {
+      if (!json) return block.type === 'text' ? super.pruneContent([block])?.[0] ?? block : block;
+      // filesystem has no offset/limit read contract. Repeated reads would be
+      // clipped again, so retain complete file text rather than giving an editor
+      // a fragment that cannot be recovered through the authorized tool. The
+      // adapter still enforces the unchanged total UTF-8 context byte limit.
+      if (completeFileRead(value)) return block;
+      let head = this.config.headChars, tail = this.config.tailChars, candidate = block;
+      while (true) {
+        let changed = false;
+        const shorten = (item, key) => {
+          if (typeof item === 'string' && TEXT_KEYS.has(key) && !item.includes(OMITTED_TEXT)) {
+            const points = Array.from(item);
+            if (points.length > head + tail + Array.from(OMITTED_TEXT).length) {
+              changed = true;
+              return points.slice(0, head).join('') + OMITTED_TEXT + (tail ? points.slice(-tail).join('') : '');
+            }
+          }
+          if (Array.isArray(item)) return item.map(entry => shorten(entry, key));
+          if (item && typeof item === 'object') return Object.fromEntries(Object.entries(item).map(([name, entry]) => [name, shorten(entry, name)]));
+          return item;
+        };
+        const shortened = shorten(value, '');
+        if (changed) candidate = { ...block, text: JSON.stringify(shortened) };
+        // Escaped text and surrounding metadata count toward the serialized
+        // budget even when an individual text value is below that threshold.
+        if (this.measureContent([candidate]) <= this.config.thresholdChars || !head && !tail) break;
+        head = Math.floor(head / 2); tail = Math.floor(tail / 2);
+      }
+      return candidate;
+    });
+    // Metadata may itself exceed the soft per-tool threshold. Retain its valid
+    // structure and full hashes instead of cutting JSON syntax or identifiers.
+    return this.measureContent(structured) < this.measureContent(blocks) ? structured : null;
   }
 }
 

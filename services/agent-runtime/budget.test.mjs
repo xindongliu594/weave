@@ -46,6 +46,22 @@ test('retry counters are retained and a task cannot exceed the policy turn cap',
  assert.equal(budget.tasks.get('a').spent,.1);
 });
 
+test('restored task holds remain occupied without charging the global carryover twice or releasing an older request',()=>{
+ const actor={taskId:'a',employeeId:'e'};
+ const budget=new ExecutionBudget({maxBudget:.65,priorSpend:.35,priorModelCalls:2,tasks:[{id:'a',assigneeId:'e',maxBudget:.4}],taskUsage:{a:{cost:.1,reserved:.25,calls:2}}});
+ assert.ok(Math.abs(budget.available(actor)-.05)<1e-8);
+ assert.equal(budget.run.spent,.35);assert.equal(budget.run.reserved,0);assert.equal(budget.tasks.get('a').spent,.1);
+ assert.equal(budget.tasks.get('a').reserved,.25);
+ assert.throws(()=>budget.reserve(.051,actor),e=>e.code==='TASK_BUDGET_EXCEEDED');
+ assert.equal(budget.run.calls,2);assert.equal(budget.tasks.get('a').calls,2);
+ const request=budget.reserve(.04,actor);request.settle(.01);request.check();
+ assert.ok(Math.abs(budget.tasks.get('a').reserved-.25)<1e-10,'a new receipt cannot release an older unknown hold');
+ assert.ok(Math.abs(budget.run.spent-.36)<1e-8);assert.equal(budget.run.reserved,0);
+ assert.ok(Math.abs(budget.available(actor)-.04)<1e-8);
+ const next=budget.reserve(.03,actor);next.release();next.release();
+ assert.ok(Math.abs(budget.tasks.get('a').reserved-.25)<1e-10);assert.equal(budget.run.reserved,0);
+});
+
 const route={id:'m',name:'fixture',wireModel:'fixture',baseUrl:'https://fixture.invalid/v1',inputRate:0,outputRate:1,maxOutputTokens:10};
 const options={model:'m',sessionId:'session',messages:[{role:'user',content:[{type:'text',text:'work'}]}]};
 const consume=async adapter=>{const chunks=[];for await(const c of adapter.stream(options))chunks.push(c);return chunks;};

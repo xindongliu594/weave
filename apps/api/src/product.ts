@@ -61,6 +61,7 @@ export function productRouter(){
     const client=await pool.connect();try{await client.query('BEGIN');await shareCostMaintenance(client);
       const preview=input.previewId?(await client.query('SELECT * FROM organization_previews WHERE id=$1 FOR UPDATE',[input.previewId])).rows[0]:null;
       if(input.previewId&&!preview)throw new AppError(404,'组织预览不存在');
+      if(preview?.data.kind==='project-plan')throw new AppError(409,'这是项目方案候选，请在原项目中确认','PLANNING_PREVIEW_MISMATCH');
       dId=preview?.department_id??dId;
       input.policy=bindPolicy(input.policy,input.department.agents,dId);assertPolicy(plan.agents,input.policy);
       if(preview?.project_id){
@@ -85,7 +86,8 @@ export function productRouter(){
         plan.agents=input.department.agents;
         departmentVersion=currentDepartment.version+1;projectVersion=currentProject.version+1;
       }
-      const planningCost=input.previewId?Number((await client.query('SELECT COALESCE(sum(cost),0) AS total FROM usage WHERE planning_preview_id=$1',[input.previewId])).rows[0].total):0;
+      const conversationCost=preview?.data.costAccounting==='conversation';
+      const planningCost=input.previewId&&!conversationCost?Number((await client.query('SELECT COALESCE(sum(cost),0) AS total FROM usage WHERE planning_preview_id=$1',[input.previewId])).rows[0].total):0;
       const priorCost=input.target?Number((await client.query('SELECT COALESCE(sum(cost),0) AS total FROM usage WHERE project_id=$1',[pId])).rows[0].total):0;
       if(planningCost+priorCost>=input.policy.maxBudget)throw new AppError(422,'已保存方案的规划费用达到项目预算，请调整预算后保存');
       if(input.target){
@@ -97,8 +99,8 @@ export function productRouter(){
         if(preview?.data.source==='model')await client.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,0,$2,$3)',[pId,preview.data.plan,preview.data.policy]);
       }
       await client.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,$2,$3,$4)',[pId,projectVersion,plan,input.policy]);
-      if(input.previewId){await client.query('UPDATE organization_previews SET project_id=$1,department_id=$2 WHERE id=$3',[pId,dId,input.previewId]);await client.query('UPDATE usage SET project_id=$1 WHERE planning_preview_id=$2',[pId,input.previewId]);await client.query('UPDATE model_reservations SET project_id=$1,department_id=$2 WHERE id IN (SELECT id FROM usage WHERE planning_preview_id=$3)',[pId,dId,input.previewId]);}
-      await checkDailyBudget(client,costConfig??await lockCostPolicy(client),dId,0);
+      if(input.previewId){await client.query('UPDATE organization_previews SET project_id=$1,department_id=$2 WHERE id=$3',[pId,dId,input.previewId]);if(!conversationCost){await client.query('UPDATE usage SET project_id=$1 WHERE planning_preview_id=$2',[pId,input.previewId]);await client.query('UPDATE model_reservations SET project_id=$1,department_id=$2 WHERE id IN (SELECT id FROM usage WHERE planning_preview_id=$3)',[pId,dId,input.previewId]);}}
+      if(!conversationCost)await checkDailyBudget(client,costConfig??await lockCostPolicy(client),dId,0);
       await client.query('COMMIT');}catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}res.status(input.target?200:201).json({departmentId:dId,projectId:pId,departmentVersion,projectVersion});
   });
   return router;

@@ -90,6 +90,14 @@ test('old gateways still validate and explicit price source is stored without ac
   assert.equal(gatewaySchema.safeParse(gateway).success, true);
   for (const pricingSource of ['official', 'auto', 'models', 'new-api']) assert.equal(gatewaySchema.safeParse({ ...gateway, pricingSource }).success, true);
   assert.equal(gatewaySchema.safeParse({ ...gateway, pricingSource: 'https://other.example/pricing' }).success, false);
+  assert.equal(gatewaySchema.parse({...gateway,baseUrl:'https://gateway.example'}).baseUrl,'https://gateway.example/v1');
+  assert.equal(gatewaySchema.parse({...gateway,baseUrl:'https://gateway.example/custom/v1'}).baseUrl,'https://gateway.example/custom/v1');
+});
+
+test('New API deployments exposing enable_groups retain their group-specific prices',()=>{
+ const catalog=parseModelCatalog({data:[{id:'fixture-model'}]},source)!;
+ applyNewApiPrices(catalog,{success:true,group_ratio:{default:1,codex:.5},data:[{model_name:'fixture-model',quota_type:0,model_ratio:.625,completion_ratio:8,enable_groups:['codex','default']}]},pricingSource);
+ assert.deepEqual(catalog[0].pricing.groups,[{name:'codex',ratio:.5,inputRate:.625,outputRate:5},{name:'default',ratio:1,inputRate:1.25,outputRate:10}]);
 });
 
 test('official quotes match exact IDs, carry their verification date, and never borrow a similar model price', () => {

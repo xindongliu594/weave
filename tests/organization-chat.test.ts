@@ -13,6 +13,7 @@ const base = process.env.DATABASE_URL ?? 'postgres://agent_department:local-deve
 const schema = 'organization_chat_' + Date.now(), admin = new pg.Pool({ connectionString: base });
 let pool: pg.Pool, app: any, server: http.Server, gateway: http.Server, url: string, directory: string, modelId: string, otherModelId: string;
 let response: unknown, wire: any, requests = 0;
+let timeoutMode: 'normal' | 'headers' | 'body' = 'normal';
 const policy = { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 300 };
 const firstMessage = { role: 'user', content: '我想做一个适合团队使用的工具。' };
 const input = (patch: any = {}) => ({ modelId, policy, messages: [firstMessage], ...patch });
@@ -32,7 +33,10 @@ before(async () => {
   await admin.query('CREATE SCHEMA ' + schema); const connection = new URL(base); connection.searchParams.set('options', '-c search_path=' + schema); process.env.DATABASE_URL = connection.toString();
   directory = await mkdtemp(join(tmpdir(), 'organization-chat-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs'); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown(); server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as AddressInfo).port + '/api';
-  gateway = http.createServer(async (req, res) => { assert.equal(req.url, '/v1/chat/completions'); let raw = ''; for await (const chunk of req) raw += chunk; wire = JSON.parse(raw); requests++; assert.equal(wire.model, 'fixture-model'); assert.equal(wire.tools, undefined); res.setHeader('content-type', 'application/json'); res.end(JSON.stringify({ choices: [{ message: { content: typeof response === 'string' ? response : JSON.stringify(response) } }], usage: { prompt_tokens: 40, completion_tokens: 15 } })); });
+  gateway = http.createServer(async (req, res) => { assert.equal(req.url, '/v1/chat/completions'); let raw = ''; for await (const chunk of req) raw += chunk; wire = JSON.parse(raw); requests++; assert.ok(['fixture-model', 'fixture-team-astra', 'gpt-4.1-mini'].includes(wire.model)); assert.equal(wire.tools, undefined); res.setHeader('content-type', 'application/json');
+    if (timeoutMode === 'headers') return;
+    if (timeoutMode === 'body') { res.writeHead(200); res.flushHeaders(); res.write('{"choices":'); return; }
+    res.end(JSON.stringify({ choices: [{ message: { content: typeof response === 'string' ? response : JSON.stringify(response) } }], usage: { prompt_tokens: 40, completion_tokens: 15 } })); });
   gateway.listen(0, '127.0.0.1'); await once(gateway, 'listening');
   const saved = await call('/gateways', { name: '组织对话固定服务', baseUrl: 'http://127.0.0.1:' + (gateway.address() as AddressInfo).port + '/v1' });
   for (const name of ['selected', 'other']) { const added = await call('/models', { name, model: name === 'selected' ? 'fixture-model' : 'fixture-other', gatewayId: saved.data.id, inputRate: .1, outputRate: .2 }); assert.equal(added.status, 201, JSON.stringify(added.data)); if (name === 'selected') modelId = added.data.id; else otherModelId = added.data.id; }
@@ -47,6 +51,22 @@ test('clarification replies retain global billed usage and do not create departm
   assert.equal((await pool.query('SELECT status FROM model_reservations WHERE id=$1', [usage.id])).rows[0].status, 'settled');
 });
 
+test('documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output', async () => {
+  const original = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
+  const before = await counts(), beforeCalls = requests;
+  try {
+    await pool.query('UPDATE models SET data=$1 WHERE id=$2', [{ ...original, model: 'gpt-4.1-mini' }, modelId]);
+    response = '{"reply":"待继续整理","candidate":';
+    const result = await call('/organizations/chat', input({ maxPlanningCost: .1 }));
+    assert.equal(result.status, 200); assert.equal(result.data.preview, undefined);
+    assert.deepEqual(wire.response_format, { type: 'json_object' });
+    assert.equal(wire.max_tokens, 4000);
+    assert.equal(requests, beforeCalls + 1); assert.deepEqual(await counts(), before);
+  } finally { await pool.query('UPDATE models SET data=$1 WHERE id=$2', [original, modelId]); }
+  response = { reply: '继续讨论' }; await call('/organizations/chat', input());
+  assert.equal(wire.response_format, undefined);
+});
+
 test('second round uses conversation context but only user messages become the saved requirement; preview saves idempotently', async () => {
   response = { reply: '已整理一份待确认的需求团队草案，保存后可继续配置。', candidate: candidate() };
   const messages = [firstMessage, { role: 'assistant', content: 'ASSISTANT_CONTEXT_ONLY：谁来使用？' }, { role: 'user', content: '团队内部用，希望有 Todo 增删改查，先整理接口和验收需求。' }];
@@ -56,8 +76,36 @@ test('second round uses conversation context but only user messages become the s
   const billed = (await pool.query('SELECT id FROM usage WHERE planning_preview_id=$1', [preview.previewId])).rows; assert.equal(billed.length, 1);
   const priorRequests = requests, repeated = await call('/organizations/chat', input({ messages }), key); assert.equal(repeated.data.preview.previewId, preview.previewId); assert.equal(requests, priorRequests);
   const created = await call('/organizations', preview); assert.equal(created.status, 201, JSON.stringify(created.data)); const savedAgain = await call('/organizations', preview); assert.equal(savedAgain.status, 200); assert.equal(savedAgain.data.existing, true); assert.equal(savedAgain.data.projectId, created.data.projectId);
-  const project = (await pool.query('SELECT * FROM projects WHERE id=$1', [created.data.projectId])).rows[0]; assert.equal(project.status, 'DRAFT'); assert.equal(project.source, 'model'); assert.equal((await pool.query('SELECT project_id FROM usage WHERE id=$1', [billed[0].id])).rows[0].project_id, project.id); assert.equal((await pool.query('SELECT * FROM plan_versions WHERE project_id=$1', [project.id])).rowCount, 2);
+  const project = (await pool.query('SELECT * FROM projects WHERE id=$1', [created.data.projectId])).rows[0]; assert.equal(project.status, 'DRAFT'); assert.equal(project.source, 'model'); assert.equal(preview.costAccounting, 'conversation'); assert.equal((await pool.query('SELECT project_id FROM usage WHERE id=$1', [billed[0].id])).rows[0].project_id, null); assert.equal((await pool.query('SELECT project_id FROM model_reservations WHERE id=$1', [billed[0].id])).rows[0].project_id, null); assert.equal((await pool.query('SELECT * FROM plan_versions WHERE project_id=$1', [project.id])).rowCount, 2);
   after = await counts(); assert.equal(after.departments, before.departments + 1); assert.equal(after.projects, before.projects + 1); assert.equal(after.runs, before.runs);
+});
+
+test('legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects',async()=>{
+ const settings=(await pool.query('SELECT data FROM product_settings WHERE id=1')).rows[0].data;
+ const modelData=(await pool.query('SELECT data FROM models WHERE id=$1',[modelId])).rows[0].data;
+ const historicalId=randomUUID();
+ try{
+  await pool.query('UPDATE product_settings SET data=$1 WHERE id=1',[{...settings,dailyBudgetLimit:.001}]);
+  await pool.query('UPDATE models SET data=$1 WHERE id=$2',[{...modelData,inputRate:10,outputRate:50},modelId]);
+  await pool.query("INSERT INTO usage(id,model_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,1,1,1,'旧执行费用')",[historicalId,modelId]);
+  const proposal=candidate();for(const task of proposal.tasks){task.estimatedInputTokens=1;task.estimatedOutputTokens=1;}
+  response={reply:'先讨论并保存方案，执行需另行批准。',candidate:proposal};
+  const body=input({maxPlanningCost:.00000001,policy:{...policy,maxBudget:.00008}}),key=randomUUID();
+  const before=requests;const result=await call('/organizations/chat',body,key);
+  assert.equal(result.status,200,JSON.stringify(result.data));assert.equal(result.data.preview?.validation.valid,true,JSON.stringify(result.data));
+  assert.equal(result.data.preview.costAccounting,'conversation');assert.equal(requests,before+1);
+  const receipt=(await pool.query('SELECT c.*,u.cost FROM model_reservations c JOIN usage u ON u.id=c.id WHERE u.planning_preview_id=$1',[result.data.preview.previewId])).rows[0];
+  assert.equal(Number(receipt.amount),0);assert.ok(Number(receipt.cost)>body.policy.maxBudget);assert.equal(receipt.context.accountingMode,'conversation');
+  const repeated=await call('/organizations/chat',body,key);assert.deepEqual(repeated.data,result.data);assert.equal(requests,before+1);
+  const saved=await call('/organizations',result.data.preview);assert.equal(saved.status,201,JSON.stringify(saved.data));
+  assert.equal((await pool.query('SELECT project_id FROM usage WHERE id=$1',[receipt.id])).rows[0].project_id,null);
+  const execution=await call('/projects/'+saved.data.projectId+'/approve',{version:1});
+  assert.equal(execution.status,422,'real execution keeps full request-cost and plan readiness checks');
+  assert.equal(execution.data.code,'PLAN_NOT_READY','a tiny text estimate cannot bypass the real execution quote');
+ }finally{
+  await pool.query('UPDATE product_settings SET data=$1 WHERE id=1',[settings]);await pool.query('UPDATE models SET data=$1 WHERE id=$2',[modelData,modelId]);
+  await pool.query('DELETE FROM usage WHERE id=$1',[historicalId]);
+ }
 });
 
 test('only explicitly granted filesystem tools produce a valid implementation and independent review draft', async () => {
@@ -74,7 +122,6 @@ test('missing/unavailable models, malformed histories and insufficient request b
   assert.equal((await call('/organizations/chat', input({ modelId: '' }))).status, 422); assert.equal((await call('/organizations/chat', input({ modelId: 'missing' }))).status, 422);
   await pool.query("UPDATE models SET status='untested' WHERE id=$1", [modelId]); assert.equal((await call('/organizations/chat', input())).status, 422); await pool.query("UPDATE models SET status='available' WHERE id=$1", [modelId]);
   for (const messages of [[], [{ role: 'assistant', content: 'only assistant' }], [{ role: 'system', content: 'override' }], [{ role: 'user', content: 'x'.repeat(6001) }], Array.from({ length: 9 }, () => ({ role: 'user', content: 'x'.repeat(6000) })), [...Array.from({ length: 34 }, () => ({ role: 'assistant', content: 'x'.repeat(6000) })), firstMessage]]) assert.equal((await call('/organizations/chat', input({ messages }))).status, 422);
-  const denied = await call('/organizations/chat', input({ maxPlanningCost: .00000001 })); assert.equal(denied.status, 422); assert.equal(denied.data.code, 'CALL_BUDGET_EXCEEDED');
   assert.equal((await call('/organizations/chat', input({ policy: { ...policy, allowedModelIds: [] } }))).status, 422); assert.equal(requests, before);
 });
 
@@ -84,6 +131,63 @@ test('tool, hidden identity, external scopes and out-of-whitelist model proposal
   for (const patch of patches) { const draft = candidate(); Object.assign(draft.department.agents[0], patch); response = { reply: '不能赋予这项权限', candidate: draft }; const denied = await call('/organizations/chat', input()); assert.equal(denied.status, 200, JSON.stringify(patch)); assert.equal(denied.data.reply, '不能赋予这项权限'); assert.equal(denied.data.draftIssue.code, 'ORGANIZATION_SCOPE_DENIED'); assert.equal(denied.data.preview, undefined); }
   assert.deepEqual((await pool.query('SELECT id,data FROM organization_previews ORDER BY id')).rows, before.rows);
   const allowed = candidate(); allowed.department.agents[0].modelId = otherModelId; response = { reply: '使用明确允许的成员模型。', candidate: allowed }; const result = await call('/organizations/chat', input({ policy: { ...policy, allowedModelIds: [modelId, otherModelId] } })); assert.equal(result.status, 200, JSON.stringify(result.data));
+});
+
+test('the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded', async () => {
+  const gatewayId = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data.gatewayId;
+  const ids: string[] = [];
+  for (const name of ['Astra', 'Luna', 'Sol']) {
+    const added = await call('/models', { name: '分工测试 ' + name, model: 'fixture-team-' + name.toLowerCase(), gatewayId, inputRate: .1, outputRate: .2 });
+    assert.equal(added.status, 201, JSON.stringify(added.data)); ids.push(added.data.id);
+  }
+  await pool.query("UPDATE models SET status='available' WHERE id=ANY($1::text[])", [ids]);
+  const [plannerId, lunaId, solId] = ids;
+  const allowedPolicy = { ...policy, allowedModelIds: ids, allowedTools: ['filesystem', 'artifact_write', 'terminal_test'] };
+  const proposed = implementationCandidate();
+  proposed.department.agents[0].modelId = lunaId;
+  proposed.department.agents[1].modelId = lunaId;
+  proposed.department.agents[2].modelId = solId;
+  const body = input({ modelId: plannerId, policy: allowedPolicy, messages: [{ role: 'user', content: 'Astra 只负责本轮规划，经理和开发用 Luna，独立 QA 用 Sol。' }] });
+  const before = await counts(), beforeCalls = requests;
+  const previous = (await pool.query('SELECT id,data FROM organization_previews ORDER BY id')).rows;
+  response = { reply: '按允许范围分别安排岗位模型，方案待你确认。', candidate: proposed };
+  const result = await call('/organizations/chat', body);
+  assert.equal(result.status, 200, JSON.stringify(result.data));
+  assert.equal(result.data.preview.validation.valid, true);
+  assert.deepEqual(result.data.preview.department.agents.map((employee: any) => employee.modelId), [lunaId, lunaId, solId]);
+  assert.equal(wire.model, 'fixture-team-astra', 'the actual planning HTTP request still uses the selected planner');
+  assert.equal(wire.max_tokens, 4000);
+  assert.equal(requests, beforeCalls + 1);
+  assert.match(wire.messages[0].content, new RegExp('本轮负责需求规划的模型 ID 是 ' + plannerId));
+  assert.match(wire.messages[0].content, /不要求经理或其他员工使用同一模型/);
+  assert.match(wire.messages[0].content, /每位员工的 modelId 应按用户分工/);
+  assert.match(wire.messages[0].content, /不扩大允许的模型范围/);
+  assert.doesNotMatch(wire.messages[0].content, /本次选定模型的 ID/);
+  const constraints = JSON.parse(wire.messages[1].content);
+  assert.deepEqual(constraints.policy.allowedModelIds, ids);
+  assert.deepEqual(new Set(constraints.availableModels.map((entry: any) => entry.id)), new Set(ids));
+  assert.deepEqual(result.data.preview.policy.allowedModelIds, ids);
+  assert.equal(result.data.preview.policy.maxBudget, policy.maxBudget);
+  assert.deepEqual(await counts(), { ...before, previews: before.previews + 1 }, 'a mixed-model proposal remains a draft and cannot create or execute a team');
+  assert.deepEqual((await pool.query('SELECT id,data FROM organization_previews WHERE id<>$1 ORDER BY id', [result.data.preview.previewId])).rows, previous);
+
+  const ungranted = structuredClone(proposed); ungranted.department.agents[1].modelId = otherModelId;
+  response = { reply: '目录里存在的未授权模型不能分配给员工。', candidate: ungranted };
+  const denied = await call('/organizations/chat', body);
+  assert.equal(denied.data.draftIssue.code, 'ORGANIZATION_SCOPE_DENIED');
+  assert.equal(denied.data.preview, undefined);
+  assert.ok(!JSON.parse(wire.messages[1].content).availableModels.some((entry: any) => entry.id === otherModelId));
+  try {
+    await pool.query("UPDATE models SET status='untested' WHERE id=$1", [solId]);
+    response = { reply: '未通过连接测试的模型不能加入员工方案。', candidate: proposed };
+    const unavailable = await call('/organizations/chat', body);
+    assert.equal(unavailable.data.draftIssue.code, 'ORGANIZATION_SCOPE_DENIED');
+    assert.equal(unavailable.data.preview, undefined);
+    const narrowed = JSON.parse(wire.messages[1].content);
+    assert.deepEqual(narrowed.policy.allowedModelIds, ids, 'catalog availability cannot rewrite the authorization');
+    assert.deepEqual(new Set(narrowed.availableModels.map((entry: any) => entry.id)), new Set([plannerId, lunaId]));
+    assert.deepEqual(await counts(), { ...before, previews: before.previews + 1 });
+  } finally { await pool.query("UPDATE models SET status='available' WHERE id=$1", [solId]); }
 });
 
 test('invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts', async () => {
@@ -127,6 +231,9 @@ test('partial candidates preserve useful replies, never render JSON fragments, a
   const reply = '可以先从日程整理和材料归档两个方向讨论。';
   response = { reply, candidate: { department: { name: '个人助理部' } } }; const key = randomUUID();
   const partial = await call('/organizations/chat', input(), key); assert.equal(partial.status, 200); assert.equal(partial.data.reply, reply); assert.equal(partial.data.draftIssue.code, 'ORGANIZATION_CHAT_PLAN_INVALID'); assert.equal(partial.data.preview, undefined);
+  assert.match(partial.data.draftIssue.message, /待修正字段/);
+  assert.match(partial.data.draftIssue.message, /department\.description/);
+  assert.match(partial.data.draftIssue.message, /department\.agents/);
   const retried = await call('/organizations/chat', input(), key); assert.deepEqual(retried.data, partial.data); assert.equal(requests, beforeCalls + 1);
   for (const candidate of [false, 0, '']) { response = { reply, candidate }; const malformed = await call('/organizations/chat', input()); assert.equal(malformed.status, 200); assert.equal(malformed.data.reply, reply); assert.equal(malformed.data.draftIssue.code, 'ORGANIZATION_CHAT_PLAN_INVALID'); assert.equal(malformed.data.preview, undefined); }
   response = '{"reply":' + JSON.stringify(reply) + ',"candidate":{"department":'; const truncated = await call('/organizations/chat', input()); assert.equal(truncated.status, 200); assert.equal(truncated.data.reply, reply); assert.equal(truncated.data.draftIssue.code, 'ORGANIZATION_CHAT_INVALID');
@@ -152,4 +259,54 @@ test('oversized prior previews use a marked bounded reference without sending tr
   await pool.query('INSERT INTO organization_previews(id,data) VALUES($1,$2)', [previewId, previous]); response = { reply: '原方案内容较多，我们先明确这次要调整的岗位。' };
   const result = await call('/organizations/chat', input({ previousPreviewId: previewId })); assert.equal(result.status, 200); assert.equal(result.data.preview, undefined);
   const reference = JSON.parse(wire.messages[2].content); assert.equal(reference.detailsOmitted, true); assert.deepEqual(reference.taskIds, ['requirements']); assert.equal(reference.agents[0].id, 'manager'); assert.ok(wire.messages[2].content.length < 32000); assert.deepEqual((await pool.query('SELECT data FROM organization_previews WHERE id=$1', [previewId])).rows[0].data, previous);
+});
+
+for (const mode of ['headers', 'body'] as const) test(`organization planning ${mode} timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt`, async t => {
+  const timeout = AbortSignal.timeout.bind(AbortSignal), configured: number[] = [];
+  t.mock.method(AbortSignal, 'timeout', (milliseconds: number) => {
+    configured.push(milliseconds);
+    return timeout(milliseconds === 180_000 ? 200 : milliseconds);
+  });
+  const beforeCounts = await counts(), beforeCalls = requests;
+  const beforeUsage = (await pool.query('SELECT * FROM usage ORDER BY id')).rows;
+  const beforePreviews = (await pool.query('SELECT id,data FROM organization_previews ORDER BY id')).rows;
+  const beforeReceipts = (await pool.query('SELECT * FROM model_reservations ORDER BY id')).rows;
+  const key = randomUUID(), body = input();
+  timeoutMode = mode;
+  try {
+    const result = await call('/organizations/chat', body, key);
+    assert.equal(result.status, 502);
+    assert.equal(result.data.code, 'PLANNING_TIMEOUT');
+    assert.match(result.data.message, /最长 3 分钟/);
+    assert.match(result.data.message, /现有部门和方案未改变/);
+    assert.match(result.data.message, /费用待核对/);
+    assert.match(result.data.message, /核对中转站账单后再重试/);
+    assert.ok(configured.includes(180_000), 'the real route must configure the dedicated planning transport deadline');
+    assert.equal(configured.includes(90_000), false, 'organization planning must not fall back to the shorter generic deadline');
+    assert.equal(requests, beforeCalls + 1, 'timeout cannot trigger a second upstream request');
+    assert.equal(wire.max_tokens, 4000);
+    assert.equal(wire.stream, false);
+    assert.equal(wire.timeoutMs, undefined, 'the local deadline is not a provider request field');
+    assert.deepEqual(await counts(), beforeCounts, 'timeout cannot create a team, project, preview or run');
+    assert.deepEqual((await pool.query('SELECT id,data FROM organization_previews ORDER BY id')).rows, beforePreviews);
+    assert.deepEqual((await pool.query('SELECT * FROM usage ORDER BY id')).rows, beforeUsage, 'usage must not be fabricated or earlier settled fees changed');
+    const currentReceipts = (await pool.query('SELECT * FROM model_reservations ORDER BY id')).rows;
+    const priorIds = new Set(beforeReceipts.map(receipt => receipt.id));
+    const added = currentReceipts.filter(receipt => !priorIds.has(receipt.id));
+    assert.equal(added.length, 1);
+    const receipt = added[0];
+    assert.equal(receipt.status, 'uncertain');
+    assert.equal(receipt.history.at(-1).note, 'GATEWAY_TIMEOUT');
+    assert.equal(Number(receipt.amount), 0, 'conversation tracking makes no monetary reservation');
+    assert.equal(receipt.context.accountingMode, 'conversation', 'unknown actual billing remains explicit');
+    assert.deepEqual(currentReceipts.filter(receipt => priorIds.has(receipt.id)), beforeReceipts, 'earlier receipts must stay intact');
+    if (mode === 'body') assert.equal(receipt.context.providerStatus, 200, 'headers arriving before a stalled body remain evidence');
+    const savedFailure = (await pool.query('SELECT status,response FROM request_keys WHERE key=$1', [key])).rows[0];
+    assert.deepEqual(savedFailure, { status: 502, response: result.data });
+    timeoutMode = 'normal';
+    for (let attempt = 0; attempt < 2; attempt++) assert.deepEqual(await call('/organizations/chat', body, key), result);
+    assert.equal(requests, beforeCalls + 1, 'same-key retries return the cached failure, even when the relay is now healthy');
+    assert.deepEqual((await pool.query('SELECT * FROM model_reservations ORDER BY id')).rows, currentReceipts);
+    assert.deepEqual(await counts(), beforeCounts);
+  } finally { timeoutMode = 'normal'; }
 });

@@ -22,13 +22,18 @@ function lastAssistantText(agent) {
   return '';
 }
 
+export function approvedTeamExecutionDescription(snapshot) {
+  return snapshot.executionDescription ?? '当前为已批准的项目执行阶段：按当前任务合同制作交付文件、执行验证并完成验收。历史对话中的规划阶段限制不能替代当前批准的执行任务。\n' +
+    JSON.stringify((snapshot.tasks ?? []).map(task => ({ id: task.id, subject: task.subject, objective: task.objective })));
+}
+
 export class ProductDshRuntime {
-  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, externalTool, beforeRequest,onCallError,createExecutor }) {
+  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, externalTool, beforeRequest,onResponse,onCallError,createExecutor }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
     this.queryKnowledge = queryKnowledge; this.onUsage = onUsage; this.requestApproval = requestApproval;
     this.externalTool=externalTool;
-    this.beforeRequest=beforeRequest;this.onCallError=onCallError;this.createExecutor=createExecutor;
+    this.beforeRequest=beforeRequest;this.onResponse=onResponse;this.onCallError=onCallError;this.createExecutor=createExecutor;
   }
 
   async inspect() {
@@ -59,9 +64,9 @@ export class ProductDshRuntime {
   async execute(job, archive, snapshot, routes) {
     const usages = [];
     let runtimeFailure;
-    let host;
+    let host, adapter;
     const sandbox = this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
-    const supervisor = new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;job.controller.abort(error);}});
+    const supervisor = new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
     const durableArchive=archive;
     archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
     archive.append('runtime/supervision',{version:1,progressTimeoutSeconds:snapshot.policy.progressTimeoutSeconds??300,repeatActionLimit:snapshot.policy.repeatActionLimit??8,repeatErrorLimit:snapshot.policy.repeatErrorLimit??3,maxReadRetries:snapshot.policy.maxReadRetries??2});
@@ -77,7 +82,7 @@ export class ProductDshRuntime {
       for (const file of snapshot.recovery?.files ?? []) {
         if (inspectArtifact(sandbox.root,file).sha256 !== file.sha256) throw Error('RECOVERY_FILE_CHANGED: ' + file.path);
       }
-      const adapter = new OpenAiCompatibleAdapter({
+      adapter = new OpenAiCompatibleAdapter({
         routes,
         maxBudget: snapshot.executionBudget,
         priorSpend: Math.max(0,snapshot.policy.maxBudget-snapshot.executionBudget),
@@ -86,7 +91,8 @@ export class ProductDshRuntime {
         tasks: snapshot.tasks,
         maxTaskModelCalls: snapshot.policy.maxTaskModelCalls??40,
         onBudget: data=>archive.append('budget/'+data.kind,data,{taskId:data.taskId}),
-        beforeRequest:this.beforeRequest?data=>this.beforeRequest(archive.id,data):undefined,
+        beforeRequest:this.beforeRequest?(data,signal)=>this.beforeRequest(archive.id,data,signal):undefined,
+        onResponse:async data=>{archive.append('billing/provider-response',data);await this.onResponse?.(data);},
         onCallError:async data=>{archive.append('billing/unconfirmed',data);await this.onCallError?.(data);},
         maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
         contextBytes: snapshot.policy.contextBytes ?? 64000,
@@ -95,7 +101,7 @@ export class ProductDshRuntime {
         onRequest: data => archive.append('model/wire-request', data, {sessionId:data.sessionId,requestId:data.requestId,taskId:data.taskId,attemptId:data.attemptId}),
         onFallback: data => archive.append('model/fallback', data, {sessionId:data.sessionId}),
         onUsage: async usage => { usages.push(usage); archive.append('billing/usage', usage, {sessionId:usage.sessionId,requestId:usage.requestId,taskId:usage.taskId,attemptId:usage.attemptId}); await this.onUsage?.(archive.id, usage); },
-        onError: error => { runtimeFailure ??= error; },
+        onError: error => { runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error); },
       });
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
@@ -111,10 +117,10 @@ export class ProductDshRuntime {
       archive.append('run/captain', { agentId: manager.id, employeeId: manager.employeeId, sessionId: captain.id });
       const plan = {
         members: snapshot.agents.map(agent => ({ name: agent.id, role: agent.rolePrompt, provider, model: agent.modelId, ...(agent.reasoningEffort ? { reasoning_effort: agent.reasoningEffort } : {}) })),
-        tasks: teamTaskPlan(snapshot.tasks),
+        tasks: teamTaskPlan(snapshot.tasks, { hostContext: true, assertHostContext: () => host.assertApprovedTaskContext(snapshot.tasks) }),
       };
       const created = await stageApprovedTeam(host, captain, {
-        name: `run-${archive.id.slice(0, 8)}`, description: snapshot.requirement, ...plan,
+        name: `run-${archive.id.slice(0, 8)}`, description: approvedTeamExecutionDescription(snapshot), ...plan,
       }, AbortSignal.any([job.controller.signal, AbortSignal.timeout(30_000)]));
       archive.append('run/task-mapping', { tasks: created.tasks });
       host.bindTaskMapping(created.tasks,created.team_id);
@@ -127,7 +133,10 @@ export class ProductDshRuntime {
       while (true) {
         job.controller.signal.throwIfAborted();
         if (runtimeFailure) throw runtimeFailure;
-        status = await host.call(captain, 'agent_teams_status', {}, AbortSignal.any([job.controller.signal, AbortSignal.timeout(15_000)]));
+        // Native status also schedules ready members and can await a cold Host
+        // resume. Keep the approved run deadline/cancellation, not a short poll
+        // deadline that can invalidate an otherwise successful task transition.
+        status = await host.call(captain, 'agent_teams_status', {}, job.controller.signal);
         if (status.members.some(member => member.spawn_error)) throw new Error('AgentTeams member startup failed');
         if (status.deliverable) { await host.verifyDeliverable(job.controller.signal); break; }
         if (host.hasBlockingFailure(status.tasks)) throw new Error('前置任务失败，相关下游未执行；请检查记录后重新制定方案');
@@ -136,7 +145,17 @@ export class ProductDshRuntime {
         supervisor.tick({...status,members:status.members.map(member=>({...member,member_id:host.employeeHosts().find(slot=>slot.agentId===member.name)?.sessionId}))});
         await delay(500);
       }
-      await captain.whenIdle();
+      // Every approved node is already host-accepted. Stop new admissions, but
+      // let original dispatched requests settle their real usage before closing
+      // employee Hosts. Waiting only for the captain can abort a member's tail
+      // request and unnecessarily leave its provider fee unknown.
+      adapter.stopAdmission(Object.assign(Error('交付已核验，正在收尾原有模型调用'), { code: 'DELIVERY_FINALIZING' }));
+      if (adapter.pendingRequests) {
+        archive.append('runtime/model-settling', { reason: 'delivery-completed', maxWaitMs: 30000, pendingRequests: adapter.pendingRequests });
+        const settlement = await adapter.drain(30000, job.controller.signal);
+        archive.append('runtime/model-settled', { reason: 'delivery-completed', ...settlement });
+      }
+      job.controller.signal.throwIfAborted();
       const summary = lastAssistantText(captain);
       archive.append('team/checkpoint',host.checkpointState());
       await host.close();
@@ -144,6 +163,15 @@ export class ProductDshRuntime {
       archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       return { status: 'completed', usages, summary };
     } catch (error) {
+      supervisor.stop(error); adapter?.stopAdmission(error);
+      try {
+        if (!job.cancelled && !job.deadlineExceeded && !job.controller.signal.aborted && adapter?.pendingRequests) {
+          archive.append('runtime/model-settling', { maxWaitMs: 30000, pendingRequests: adapter.pendingRequests });
+          const settlement = await adapter.drain(30000, job.controller.signal);
+          archive.append('runtime/model-settled', settlement);
+        }
+      } catch (settlementError) { error = settlementError; }
+      finally { if (!job.controller.signal.aborted) job.controller.abort(error); }
       const message = job.deadlineExceeded
         ? `运行达到已批准的 ${snapshot.policy.deadlineSeconds} 秒时限，已停止。已完成任务和文件保留；先核对待结算调用，再恢复未完成任务。`
         : error instanceof Error ? error.message : String(error);

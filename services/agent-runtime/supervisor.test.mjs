@@ -47,6 +47,38 @@ test('status with no attempt credential does not discard a known assignment; idl
   s.supervisor.observe({type:'tool/result',callId:'c',data:{result:{value:{}}}});s.supervisor.tick(s.status);s.advance(10001);
   assert.throws(()=>s.supervisor.tick(s.status),/EMPLOYEE_IDLE/);
 });
+
+test('idle employees wait for an active coordinator response and receive a full idle window afterward', () => {
+  const s = setup(); s.status.members[0].status = 'idle';
+  s.supervisor.observe({ type: 'run/captain', data: { sessionId: 'captain' } });
+  s.supervisor.tick(s.status); s.advance(9000);
+  s.supervisor.observe({ type: 'model/request', sessionId: 'captain', requestId: 'coordinator-1' });
+  s.advance(45000); assert.equal(s.supervisor.tick(s.status)[0].phase, 'waiting_coordinator');
+  assert.equal(s.supervisor.failure, undefined);
+  s.supervisor.observe({ type: 'model/finish', sessionId: 'captain', requestId: 'coordinator-1' });
+  s.supervisor.tick(s.status); s.advance(9999); s.supervisor.tick(s.status);
+  s.advance(2); assert.throws(() => s.supervisor.tick(s.status), /EMPLOYEE_IDLE/);
+});
+
+test('coordinator model waits cannot hide the approved progress timeout or arbitrary polling', () => {
+  const s = setup({ progressTimeoutSeconds: 60 }); s.status.members[0].status = 'idle';
+  s.supervisor.observe({ type: 'run/captain', data: { sessionId: 'captain' } });
+  s.supervisor.observe({ type: 'model/request', sessionId: 'captain', requestId: 'coordinator-1' });
+  s.advance(61000); assert.throws(() => s.supervisor.tick(s.status), /NO_PROGRESS/);
+  const p = setup(); p.status.members[0].status = 'idle';
+  p.supervisor.observe({ type: 'run/captain', data: { sessionId: 'captain' } }); p.supervisor.tick(p.status);
+  for (let index = 0; index < 20; index++) p.supervisor.observe({ type: 'tool/start', sessionId: 'captain', callId: 'poll-' + index, data: { name: 'agent_teams_status', arguments: {} } });
+  p.advance(10001); assert.throws(() => p.supervisor.tick(p.status), /EMPLOYEE_IDLE/);
+});
+
+test('a coordinator handling a real tool reply is distinguished from idle polling', () => {
+  const s = setup(); s.status.members[0].status = 'idle';
+  s.supervisor.observe({ type: 'run/captain', data: { sessionId: 'captain' } }); s.supervisor.tick(s.status);
+  s.supervisor.observe({ type: 'tool/start', sessionId: 'captain', callId: 'send-work', data: { name: 'agent_teams_send_message', arguments: {} } });
+  s.advance(20000); assert.equal(s.supervisor.tick(s.status)[0].phase, 'waiting_coordinator');
+  s.supervisor.observe({ type: 'tool/result', sessionId: 'captain', callId: 'send-work', data: { result: { value: {} } } });
+  s.supervisor.tick(s.status); s.advance(10001); assert.throws(() => s.supervisor.tick(s.status), /EMPLOYEE_IDLE/);
+});
 test('transient read retry is bounded and cancellation/mutations never replay',async()=>{
   let calls=0,retries=[];const busy=Object.assign(Error('busy'),{code:'EBUSY'});
   assert.equal(await retryRead('filesystem',async()=>{if(++calls<3)throw busy;return 'ok';},{wait:async()=>{},onRetry:x=>retries.push(x)}),'ok');assert.equal(calls,3);assert.equal(retries.length,2);
