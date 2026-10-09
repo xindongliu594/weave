@@ -9,7 +9,7 @@ const storageKey = 'agent-department:organization-chat:v1';
 export const organizationPendingHistoryStorageKey = 'agent-department:organization-chat:pending-history:v1';
 export type OrganizationPendingRequestHistory = { archivedAt: string; result: 'unknown'; request: ChatRequest; conversationId?: string; projectId?: string; saved?: SavedTeam };
 type DraftStorage = Pick<Storage, 'getItem' | 'setItem'>;
-const defaults: Policy = { maxBudget: 1, maxAgents: 4, maxConcurrentAgents: 2, deadlineSeconds: 3600, mode: 'recommended', preference: 'balanced', maxModelCalls: 100, maxTaskModelCalls: 40, contextBytes: 64000, allowedTools: ['filesystem', 'artifact_write', 'terminal_test'] };
+const defaults: Policy = { maxBudget: 1, maxAgents: 4, maxConcurrentAgents: 2, deadlineSeconds: 3600, mode: 'recommended', preference: 'balanced', maxModelCalls: 100, maxTaskModelCalls: 40, contextBytes: 128000, allowedTools: ['filesystem', 'artifact_write', 'terminal_test'] };
 const toolNames: Record<string, string> = { filesystem: '读取项目文件', artifact_write: '制作与修改文件', terminal_test: '申请运行测试' };
 const examples = [
   ['开发一个项目', '我想开发一个 Todo API，支持任务的新增、查询、修改和删除，并安排独立测试和验收。请帮我组建合适的团队。'],

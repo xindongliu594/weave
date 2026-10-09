@@ -3,6 +3,7 @@ import { ArrowLeft, CheckCircle2, Clock3, Play, RefreshCw, Search, ShieldCheck }
 import { api } from './api.ts';
 import { RunExtras } from './RunExtras.tsx';
 import { mergeRunDetailPage } from './run-detail-view.ts';
+import { visibleRunTraceEvents } from './run-events.ts';
 import type { RunSummary, RunDetail, TraceEvent } from '../../../services/agent-runtime/trace-store.mjs';
 
 type Detail = RunDetail & { error?: string; hasMore: boolean; nextCursor: number; summaryEvents?: TraceEvent[];recovery?:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string;costBlocked?:string} };
@@ -21,15 +22,31 @@ const eventNames: Record<string, string> = {
   'context/pruned': '缩减工具结果并保留证据', 'context/summarized': '生成员工历史摘要', 'context/capacity-unknown': '使用工具缩减保护上下文',
   'session/compaction/summary': '摘要内容、来源和用量', 'session/compaction/prune': '工具缩减来源', 'session/compaction/end': '历史整理结束',
 };
-function eventSummary(e: TraceEvent) {
+export function eventSummary(e: TraceEvent) {
   if (e.type === 'model/request') return `${e.data.provider} / ${e.data.model}`;
   if (typeof e.data.name === 'string') return e.data.name;
   if (e.type === 'team/snapshot') return `${e.data.phase} · ${e.data.tasks?.filter((t: any) => t.status === 'completed').length ?? 0}/${e.data.tasks?.length ?? 0} 项完成`;
   const value = e.data.description ?? e.data.message;
   if (typeof value === 'string') return value.slice(0, 180);
-  if (Array.isArray(value?.content)) return value.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join(' ').slice(0, 180);
+  if (Array.isArray(value?.content)) {
+    let summary = '';
+    for(const block of value.content) {
+      if(summary.length >= 180) break;
+      if(block.type === 'text' && typeof block.text === 'string') summary += (summary ? ' ' : '') + block.text.slice(0, 180 - summary.length);
+    }
+    return summary.slice(0, 180);
+  }
   return '';
 }
+export function RunTraceEventBody({event,open}:{event:TraceEvent;open:boolean}) {
+  const text = useMemo(() => open ? JSON.stringify(event.data, null, 2) : undefined, [open, event.data]);
+  return open ? <>{event.attemptId && <p className="trace-id">执行尝试：{event.attemptId}</p>}<pre>{text}</pre></> : null;
+}
+export function RunTraceEvent({event,employeeName}:{event:TraceEvent;employeeName?:string}) {
+  const [open,setOpen]=useState(false);
+  return <details className="trace-event" onToggle={e=>setOpen(e.currentTarget.open)}><summary><span className="trace-dot"/><span><strong>{eventNames[event.type] ?? event.type}</strong><small>#{event.seq} · {new Date(event.at).toLocaleTimeString('zh-CN')}{event.taskId ? ` · 任务 ${event.taskId}` : ''}{event.sessionId ? ` · ${employeeName ?? '员工会话'}` : ''}</small><span className="trace-summary">{eventSummary(event)}</span></span></summary>{open&&<RunTraceEventBody event={event} open/>}</details>;
+}
+const namedEventTypes = new Set(Object.keys(eventNames));
 
 export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
   const [runs, setRuns] = useState<RunSummary[]>([]);
@@ -96,19 +113,19 @@ export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
     }
     return [...unique.values()];
   }, [detail]);
-  const visible = detail?.events.filter(e => (!employee || e.sessionId === employee) && (kind === 'raw' || (kind === 'all' ? !!eventNames[e.type] && e.type !== 'team/operation' : e.type.startsWith(kind)))) ?? [];
+  const visible = useMemo(()=>visibleRunTraceEvents(detail?.events??[],kind,employee,namedEventTypes),[detail?.events,kind,employee]);
   const assigned = detail?.snapshot.agents.find(a => a.id === sessions.find(s => s.id === employee)?.agentId);
   return <>
     <div className="page-head"><div><div className="eyebrow">EXECUTION HISTORY</div><h1>执行记录</h1><p>查看当时的职责、任务指令和实际操作。历史快照独立保留。</p></div><button className="primary" disabled={busy} onClick={verify}><Play size={16}/>{busy ? '正在验证…' : '运行追溯验证'}</button></div>
     <div className="notice-box"><ShieldCheck size={18}/><p>工具执行受岗位授权约束；文件与终端按批准的执行位置操作，终端需要逐次审批。追溯验证使用测试模型，不会调用真实 API。</p></div>
     {error && <div className="banner error" role="alert">{error}</div>}
-    {!selected ? <section className="panel lower"><div className="trace-list-head"><h2>历史运行</h2><button onClick={() => refresh().catch(e => setError(e.message))}><RefreshCw size={14}/>刷新</button></div>{loading ? <p className="compact-empty">正在读取本地档案…</p> : runs.length ? runs.map(run => <button className="project-row" key={run.id} onClick={() => setSelected(run.id)}><Clock3 size={20}/><span><strong>{run.title}</strong><small>{date(run.createdAt)} · {run.eventCount} 条事件</small></span><span className="tag">{run.mode === 'fixture' ? '测试模型' : run.mode}</span><span className={'tag ' + (run.status === 'completed' ? 'green' : 'amber')}>{stateName[run.status] ?? run.status}</span></button>) : <div className="empty"><Search size={28}/><h3>还没有执行记录</h3><p>运行一次追溯验证，查看真实采集的团队过程。</p></div>}</section> : <>
+    {!selected ? <section className="panel lower"><div className="trace-list-head"><h2>历史运行</h2><button onClick={() => refresh().catch(e => setError(e.message))}><RefreshCw size={14}/>刷新</button></div>{loading ? <p className="compact-empty">正在读取本地档案…</p> : runs.length ? runs.map(run => <button className="project-row run-list-row" key={run.id} onClick={() => setSelected(run.id)}><Clock3 size={20}/><span><strong>{run.title}</strong><small>{date(run.createdAt)} · {run.eventCount} 条事件</small></span><span className="tag">{run.mode === 'fixture' ? '测试模型' : run.mode}</span><span className={'tag ' + (run.status === 'completed' ? 'green' : 'amber')}>{stateName[run.status] ?? run.status}</span></button>) : <div className="empty"><Search size={28}/><h3>还没有执行记录</h3><p>运行一次追溯验证，查看真实采集的团队过程。</p></div>}</section> : <>
       <button className="text-button back lower" onClick={() => setSelected(null)}><ArrowLeft size={15}/>返回运行列表</button>
       {!detail ? <p>正在读取运行记录…</p> : <>
-<section className="panel padded"><div className="row"><h2 title={detail.title}>{detail.title.length>96?detail.title.slice(0,96)+'…':detail.title}</h2><span className="tag">{detail.mode === 'fixture' ? '测试模型验证' : '正式项目'}</span><span className="tag">{stateName[detail.status]}</span>{detail.mode === 'product' && ['unfinished','queued','running'].includes(detail.status) && <button onClick={async () => { try { await api(`/runs/${detail.id}/cancel`, 'POST', {}); } catch (e) { setError((e as Error).message); } }}>停止运行</button>}</div><p className="trace-id">Run ID：{detail.id}</p>{detail.snapshot.requirement.length>400?<details><summary>查看完整需求</summary><p>{detail.snapshot.requirement}</p></details>:<p>{detail.snapshot.requirement}</p>}<small>方案 v{detail.snapshot.planVersion} · 模板 {detail.snapshot.templateVersion} · {detail.eventCount} 条事件</small>{detail.integrity !== 'ok' && <p className="validation-error">档案完整性检查未通过，不能视为完整执行记录。</p>}</section>
+<section className="panel padded run-overview"><div className="run-detail-heading"><h2 className="run-detail-title" title={detail.title}>{detail.title}</h2><div className="run-detail-actions"><span className="tag">{detail.mode === 'fixture' ? '测试模型验证' : '正式项目'}</span><span className="tag">{stateName[detail.status]}</span>{detail.mode === 'product' && ['unfinished','queued','running'].includes(detail.status) && <button onClick={async () => { try { await api(`/runs/${detail.id}/cancel`, 'POST', {}); } catch (e) { setError((e as Error).message); } }}>停止运行</button>}</div></div><p className="trace-id">Run ID：{detail.id}</p><details className="run-requirement"><summary>查看完整需求</summary><div className="project-requirement-full">{detail.snapshot.requirement}</div></details><small>方案 v{detail.snapshot.planVersion} · 模板 {detail.snapshot.templateVersion} · {detail.eventCount} 条事件</small>{detail.integrity !== 'ok' && <p className="validation-error">档案完整性检查未通过，不能视为完整执行记录。</p>}</section>
         <RunExtras key={detail.id} id={detail.id} status={detail.status} integrity={detail.integrity} events={detail.summaryEvents ?? detail.events} traceEvents={detail.events} snapshot={detail.snapshot} recovery={detail.recovery} runError={detail.error} onOpenProject={onOpenProject} onRefreshDetail={refreshDetail}/>
         <div className="trace-layout lower"><aside><section className="panel padded"><h3>员工与岗位快照</h3><button className={'trace-member ' + (!employee ? 'selected' : '')} onClick={() => setEmployee('')}>全部员工与运行操作</button>{sessions.map(s => <button key={s.id} className={'trace-member ' + (employee === s.id ? 'selected' : '')} onClick={() => setEmployee(s.id)}><strong>{s.name}</strong><small>{s.model}</small></button>)}{assigned && <div className="trace-role"><span className="tag">岗位提示词 v{assigned.roleVersion}</span><p>{assigned.rolePrompt}</p></div>}</section><section className="panel padded lower"><h3>本次任务提示词</h3>{detail.snapshot.tasks.filter(t => !assigned || t.assignee === assigned.id).map(t => <details className="trace-task trace-task-prompt" key={t.id}><summary><strong>{t.subject}</strong><small>查看完整任务提示词</small></summary><p className="trace-prompt-content">{t.taskPrompt}</p><small>{t.dependencies.length ? `前置任务：${t.dependencies.join('、')}` : '无前置依赖'}</small></details>)}</section></aside>
-        <section className="panel padded"><div className="section-title"><h2>执行时间线</h2><select aria-label="事件类型" value={kind} onChange={e => setKind(e.target.value)}><option value="all">主要事件</option><option value="model/">模型请求与返回</option><option value="tool/">工具调用</option><option value="team/">团队操作与状态</option><option value="session/">会话事件</option><option value="raw">全部原始事件</option></select></div><p className="subcopy">展开模型请求可查看实际发送的消息与工具定义；岗位快照和任务快照分别保留。</p><div className="trace-timeline">{visible.map(e => <details key={e.seq} className="trace-event"><summary><span className="trace-dot"/><span><strong>{eventNames[e.type] ?? e.type}</strong><small>#{e.seq} · {new Date(e.at).toLocaleTimeString('zh-CN')}{e.taskId ? ` · 任务 ${e.taskId}` : ''}{e.sessionId ? ` · ${sessions.find(s => s.id === e.sessionId)?.name ?? '员工会话'}` : ''}</small><span className="trace-summary">{eventSummary(e)}</span></span></summary>{e.attemptId && <p className="trace-id">执行尝试：{e.attemptId}</p>}<pre>{JSON.stringify(e.data, null, 2)}</pre></details>)}</div>{!visible.length && <p className="compact-empty">此筛选下暂无事件。</p>}{detail.hasMore && <button onClick={async () => { try { await refreshDetail(); } catch (e) { setError((e as Error).message); } }}>加载后续事件</button>}<p className="subcopy"><CheckCircle2 size={13}/> 记录来自本地持久化档案；页面刷新不会重跑任务。</p></section></div>
+        <section className="panel padded"><div className="section-title"><h2>执行时间线</h2><select aria-label="事件类型" value={kind} onChange={e => setKind(e.target.value)}><option value="all">主要事件</option><option value="model/">模型请求与返回</option><option value="tool/">工具调用</option><option value="team/">团队操作与状态</option><option value="session/">会话事件</option><option value="raw">全部原始事件</option></select></div><p className="subcopy">主要事件默认省略例行团队状态快照和成功轮询；可切换团队、工具或全部原始事件查看。展开事件才渲染正文，实际消息与工具定义保持完整。</p><div className="trace-timeline">{visible.map(e => <RunTraceEvent key={e.seq} event={e} employeeName={sessions.find(s => s.id === e.sessionId)?.name}/>)}</div>{!visible.length && <p className="compact-empty">此筛选下暂无事件。</p>}{detail.hasMore && <button onClick={async () => { try { await refreshDetail(); } catch (e) { setError((e as Error).message); } }}>加载后续事件</button>}<p className="subcopy"><CheckCircle2 size={13}/> 记录来自本地持久化档案；页面刷新不会重跑任务。</p></section></div>
       </>}
     </>}
   </>;

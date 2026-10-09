@@ -1,0 +1,36 @@
+✖ actual router uses production TEXT identifiers to read the bound operation and immutable source evidence (2773.8304ms)
+✔ cross-run database operation cannot be substituted by a matching ID (20.4267ms)
+✔ formal row identity, unknown IDs and strict query validation stay enforced (36.8047ms)
+✔ missing or different database workspace revision cannot produce a verified QA card (33.2661ms)
+✔ tampered ancestor snapshot and oversized archive return explicit unavailable evidence (32.2104ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4802.2303
+
+✖ failing tests:
+
+test at tests\run-lineage-evidence-api.test.ts:1:3971
+✖ actual router uses production TEXT identifiers to read the bound operation and immutable source evidence (2773.8304ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'partial'
+  - 'verified'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-lineage-evidence-api.test.ts:50:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'partial',
+    expected: 'verified',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+exitCode=1

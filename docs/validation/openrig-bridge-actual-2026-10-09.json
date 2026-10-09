@@ -1,0 +1,582 @@
+{
+  "kind": "real-openrig-bridge-module",
+  "version": "0.6.6",
+  "probeRoot": "/home/jj/.local/share/weiwu/openrig/probes/bridge-20261009T073004Z-4080bb4a-4850-4368-9a34-cf47a6575176",
+  "db": "/home/jj/.local/share/weiwu/openrig/probes/bridge-20261009T073004Z-4080bb4a-4850-4368-9a34-cf47a6575176/state/probe.sqlite",
+  "port": 57405,
+  "sourceSha256": "1c819be01ac66122593aa8635e1e26e100ea7340c153297f844d5ab047a3c2a3",
+  "transpiledSha256": "98f54f631cf38b614eea09cfe0dd4a09f3b93bdbb45c4a753b1de6fa7dca521c",
+  "clientSha256": "33f9ae2f1396389374540d5d4e38e3879ba81a9af43da9f248bede5f20f8ee55",
+  "installedSourceHashes": {
+    "dist/bin-wrapper.js": "dd76e3f0cc2776c2dc10791cbbb95de7978b4963c995fe321d8bcf454df6b2f3",
+    "dist/commands/import.js": "72179d64dc9d0b444897e373dce3bd1ac9de75e9a1d7dd3cd357ec089ee35ca9",
+    "dist/commands/queue.js": "d4aed0bb04bc8e611e9760a00f9b862878758a369131ded5c08622ce63dd714c",
+    "dist/daemon-lifecycle.js": "19f2bce6a4195e39f7ec177042a52c64d45cf93d0865621d0e1db1246f6b2fef",
+    "daemon/dist/domain/queue-repository.js": "e3b7f51059001f51ed7f904ead0235f0637cc3bfd74fe19e3d1cd286846d8e00"
+  },
+  "rigId": "01M4FS3HCS8KAAHE0CDM7H2BKE",
+  "previousModuleSha256": "923d4283cefb51a9f04418a68f21a26ec3992a2a756d76f6db69bab2252cd28b",
+  "priorFailuresRetained": [
+    "evidence/result.json",
+    "evidence/result-continued.json"
+  ],
+  "continuationReason": "Readonly SQLite proved zero qitems; the old module only issued two GET requests. Correct the observed official detail envelope {rig,nodes,edges}; retain original module and failed evidence.",
+  "modelCallsRequested": 0,
+  "startedHarnesses": false,
+  "employeeDevelopmentAcceptance": false,
+  "steps": [
+    {
+      "label": "start-explicit-terminal-auth",
+      "exit": 0
+    },
+    {
+      "label": "module-initial",
+      "exit": 0
+    },
+    {
+      "label": "before-transitions-0",
+      "exit": 0
+    },
+    {
+      "label": "before-transitions-1",
+      "exit": 0
+    },
+    {
+      "label": "stop-first",
+      "exit": 0
+    },
+    {
+      "label": "restart",
+      "exit": 0
+    },
+    {
+      "label": "module-reopened",
+      "exit": 0
+    },
+    {
+      "label": "after-transitions-0",
+      "exit": 0
+    },
+    {
+      "label": "after-transitions-1",
+      "exit": 0
+    },
+    {
+      "label": "close-metadata-0",
+      "exit": 0
+    },
+    {
+      "label": "close-metadata-1",
+      "exit": 0
+    },
+    {
+      "label": "module-closed",
+      "exit": 0
+    },
+    {
+      "label": "cleanup-owned-daemon",
+      "exit": 0
+    }
+  ],
+  "checks": {
+    "before-module": {
+      "noSessions": true,
+      "noKernelAgents": true,
+      "noKernelEnv": true,
+      "noProviderEnv": true,
+      "explicitTerminalBearerConfigured": true,
+      "loopbackOnly": true,
+      "pid": 3019300
+    },
+    "before-restart": {
+      "noSessions": true,
+      "noKernelAgents": true,
+      "noKernelEnv": true,
+      "noProviderEnv": true,
+      "explicitTerminalBearerConfigured": true,
+      "loopbackOnly": true,
+      "pid": 3019300
+    },
+    "after-restart": {
+      "noSessions": true,
+      "noKernelAgents": true,
+      "noKernelEnv": true,
+      "noProviderEnv": true,
+      "explicitTerminalBearerConfigured": true,
+      "loopbackOnly": true,
+      "pid": 3020044
+    },
+    "final": {
+      "noSessions": true,
+      "noKernelAgents": true,
+      "noKernelEnv": true,
+      "noProviderEnv": true,
+      "explicitTerminalBearerConfigured": true,
+      "loopbackOnly": true,
+      "pid": 3020044
+    },
+    "moduleRealHttp": true,
+    "concurrentCreateSinglePost": true,
+    "twoUniquePostsTotal": true,
+    "responseLossReconciledWithoutReplay": true,
+    "sameQitemsAndSeatsAfterDaemonRestart": true,
+    "readonlyReconciliationUnchangedHistory": true,
+    "queueClosureNotBusinessAcceptance": true,
+    "weiwuRemainsExecutionAndAcceptanceAuthority": true
+  },
+  "status": "passed",
+  "productionServiceBefore": {
+    "exit": 0,
+    "output": "ActiveState=active\nSubState=running\nMainPID=2969369"
+  },
+  "productionUsageBefore": {
+    "rows": 184,
+    "recordedCost": 0.9332805
+  },
+  "departmentId": "a04f6db3-bd04-4913-867f-34e68999279a",
+  "projectIds": [
+    "515f335a-73ca-43bf-9f5a-70b94ec94369",
+    "8aa62631-de19-4580-86d4-92a9e5616a2c"
+  ],
+  "qitemIds": [
+    "qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6",
+    "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"
+  ],
+  "postCount": 2,
+  "cleanup": {
+    "officialStop": true,
+    "ownedPidExited": true,
+    "loopbackListenerClosed": true,
+    "dataRetained": true
+  },
+  "productionServiceAfter": {
+    "exit": 0,
+    "output": "ActiveState=active\nSubState=running\nMainPID=2969369"
+  },
+  "productionUsageAfter": {
+    "rows": 185,
+    "recordedCost": 0.9355283999999999
+  },
+  "productionServiceUnchanged": true,
+  "productionUsageObservation": "May change because the root agent is independently running authorized employee acceptance; this isolated probe requests no models.",
+  "evidenceFiles": [
+    {
+      "path": "evidence/00-spec-validate.json",
+      "sha256": "09dbe5787724076f85fa8d14ccdd07bf1c87056c295c77a86586a932dfa10ca4",
+      "bytes": 463
+    },
+    {
+      "path": "evidence/01-start.json",
+      "sha256": "e529716c1300b7ae16e327619666a2a4d83d8ca8177b7edf80d9df92cd5895a2",
+      "bytes": 643
+    },
+    {
+      "path": "evidence/02-materialize.json",
+      "sha256": "360d99a3e97e7176d9de9d0146c07c34cfe1d4424bd9539b4b58d7fd1e1edb19",
+      "bytes": 863
+    },
+    {
+      "path": "evidence/03-module-initial.json",
+      "sha256": "9ad2434e6141596f5df989c55059e2b9c602f0f944cad75dadc90f6ce66f4544",
+      "bytes": 1511
+    },
+    {
+      "path": "evidence/04-cleanup-owned-daemon.json",
+      "sha256": "3eb9f87427679ce6ea30e621b47f4dd7e181a59c453285512d87f6415748c25e",
+      "bytes": 338
+    },
+    {
+      "path": "evidence/actual-row-before-discard.json",
+      "sha256": "e5ae30280a3d5572db26cff0e1f055e72fe2d8049dcd647095b0d7fddc316df2",
+      "bytes": 2018
+    },
+    {
+      "path": "evidence/before-module-kernel.json",
+      "sha256": "358e2da3c8e65f3fe06b22059a17474eadc20e15b663ae217c904c5a2c71a594",
+      "bytes": 176
+    },
+    {
+      "path": "evidence/before-module-nodes.json",
+      "sha256": "6ef3856e6ca7fa9b758445cff170474cf9f9fabdbfb4739c73470eaa37ebc9ec",
+      "bytes": 6831
+    },
+    {
+      "path": "evidence/before-module-sessions.json",
+      "sha256": "edc5c571b0066ac38222e6d3276e8a385a6d428b29bcbf342d485ebc02e7a9b0",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/bridge-initial-http.jsonl",
+      "sha256": "8f2937558c8fe5cb0b6ad1ba3daeec6644e7bfb86193087a50e1770191224a9b",
+      "bytes": 434
+    },
+    {
+      "path": "evidence/bridge-v2-closed-http.jsonl",
+      "sha256": "ec20ce546ce0bc935f27197887843b9f98f928b4cc384419bbfbf27fc386d5dd",
+      "bytes": 3556
+    },
+    {
+      "path": "evidence/bridge-v2-closed-result.json",
+      "sha256": "93ca51f97eda3a4a0b877ade4fad58cae389c04d23e6e457a3cb08fd7b97597a",
+      "bytes": 7084
+    },
+    {
+      "path": "evidence/bridge-v2-initial-http.jsonl",
+      "sha256": "924b6db6f9b37657898bf35e1bcefbf5a5b71234c7ef98ad109294c7f50828da",
+      "bytes": 7635
+    },
+    {
+      "path": "evidence/bridge-v2-initial-result.json",
+      "sha256": "0d6e89199db0f8c2ba577eec93a37dbee403765c65aaad3151ef9ccfa7ba41d8",
+      "bytes": 4820
+    },
+    {
+      "path": "evidence/bridge-v2-reopened-http.jsonl",
+      "sha256": "55c8c38d4e37846bcb5a9f8a2e9abd7af2c44a3c84bc4d15bba0aec059b30468",
+      "bytes": 3556
+    },
+    {
+      "path": "evidence/bridge-v2-reopened-result.json",
+      "sha256": "1ce584a4b3521a73f89d1b89c6d6d8eb95d71cc431756add4df366cc58712de7",
+      "bytes": 7094
+    },
+    {
+      "path": "evidence/continued-00-start-explicit-terminal-auth.json",
+      "sha256": "0865270bc48e66f26e226638f1135defe9f861f3f2e2a5d095173c7a01b79d14",
+      "bytes": 666
+    },
+    {
+      "path": "evidence/continued-01-module-initial.json",
+      "sha256": "b171aec65742c465e61629ab641df7728e7e86b6a4ac6a56cccf70482695bcd8",
+      "bytes": 1576
+    },
+    {
+      "path": "evidence/continued-02-cleanup-owned-daemon.json",
+      "sha256": "3eb9f87427679ce6ea30e621b47f4dd7e181a59c453285512d87f6415748c25e",
+      "bytes": 338
+    },
+    {
+      "path": "evidence/continued-before-module-kernel.json",
+      "sha256": "358e2da3c8e65f3fe06b22059a17474eadc20e15b663ae217c904c5a2c71a594",
+      "bytes": 176
+    },
+    {
+      "path": "evidence/continued-before-module-nodes.json",
+      "sha256": "508abd126305af8857055239b9b0cf4b74d070b20479e5e5cb849f480c40f071",
+      "bytes": 6831
+    },
+    {
+      "path": "evidence/continued-before-module-sessions.json",
+      "sha256": "edc5c571b0066ac38222e6d3276e8a385a6d428b29bcbf342d485ebc02e7a9b0",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/continued-health.json",
+      "sha256": "30fc63abcffbd316f277aa22a31fa4974c2b994377389639905f4000f6cc2340",
+      "bytes": 1081
+    },
+    {
+      "path": "evidence/contract-v2-00-start-explicit-terminal-auth.json",
+      "sha256": "4f870ef4f2860b7646bb1f48828e37706bc9180b6d982d59f57e888e1b04f86b",
+      "bytes": 666
+    },
+    {
+      "path": "evidence/contract-v2-01-module-initial.json",
+      "sha256": "de3237462f7b867f6e4be99d5c6ee1f2d9a23a3673bfdc070382e214ed9a681a",
+      "bytes": 612
+    },
+    {
+      "path": "evidence/contract-v2-02-before-transitions-0.json",
+      "sha256": "7f7ef6fe673a6035631fea30375ce292d6c3af260aa6ccfd6fc0b44993691712",
+      "bytes": 842
+    },
+    {
+      "path": "evidence/contract-v2-03-before-transitions-1.json",
+      "sha256": "c87e1073a128bbe34d764e2401638c01511eda06bc87ca040e27bb486db2e333",
+      "bytes": 842
+    },
+    {
+      "path": "evidence/contract-v2-04-stop-first.json",
+      "sha256": "6456a6292a4d5f39b84fc965d332c369522c2455293ddef6b2040e22a85b63a2",
+      "bytes": 328
+    },
+    {
+      "path": "evidence/contract-v2-05-restart.json",
+      "sha256": "ac341dcbeeb8e9bcfde8726c3ddb90a50c0dff50f73b4e29753b04043103ba9c",
+      "bytes": 645
+    },
+    {
+      "path": "evidence/contract-v2-06-module-reopened.json",
+      "sha256": "8f2a585932c91d721680189abc4e32f7f64a088cecc526e87a9b76ca67b29c8e",
+      "bytes": 615
+    },
+    {
+      "path": "evidence/contract-v2-07-after-transitions-0.json",
+      "sha256": "818d8c8e7ffef37aa573e86cc0c8cc1dbce43869a84fce9f7dd4f466eaaf287f",
+      "bytes": 841
+    },
+    {
+      "path": "evidence/contract-v2-08-after-transitions-1.json",
+      "sha256": "196b3e7f1f4271c8d9c9c9b0a6e8b85aa1a3461cfbc8b50415154114c4280d2d",
+      "bytes": 841
+    },
+    {
+      "path": "evidence/contract-v2-09-close-metadata-0.json",
+      "sha256": "86875fbede818f441d000a1172d93f9e60705480e3757a9047f96e3875dbbee5",
+      "bytes": 2443
+    },
+    {
+      "path": "evidence/contract-v2-10-close-metadata-1.json",
+      "sha256": "0170f3ce01c815fe079c60259d2a24a5bacb35e3da753f5da3f88520e168579b",
+      "bytes": 2462
+    },
+    {
+      "path": "evidence/contract-v2-11-module-closed.json",
+      "sha256": "9717d988d66c35934ee4986c4e245486a7beb22a0130218492b34509e744b48a",
+      "bytes": 609
+    },
+    {
+      "path": "evidence/contract-v2-12-cleanup-owned-daemon.json",
+      "sha256": "3eb9f87427679ce6ea30e621b47f4dd7e181a59c453285512d87f6415748c25e",
+      "bytes": 338
+    },
+    {
+      "path": "evidence/contract-v2-after-restart-kernel.json",
+      "sha256": "358e2da3c8e65f3fe06b22059a17474eadc20e15b663ae217c904c5a2c71a594",
+      "bytes": 176
+    },
+    {
+      "path": "evidence/contract-v2-after-restart-nodes.json",
+      "sha256": "69f5b99662219b4bc2a2f2e34f3140193f2db744cf9f665a78f39dfd94da98d1",
+      "bytes": 6830
+    },
+    {
+      "path": "evidence/contract-v2-after-restart-sessions.json",
+      "sha256": "edc5c571b0066ac38222e6d3276e8a385a6d428b29bcbf342d485ebc02e7a9b0",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/contract-v2-after-row-0.json",
+      "sha256": "ceaa9954d4780f966bc05258689dfdd0070e1ed6ca23c4255de701cf3a1f1878",
+      "bytes": 2162
+    },
+    {
+      "path": "evidence/contract-v2-after-row-1.json",
+      "sha256": "9402c5a030c87330e986699a5dc5d9eb555e7279899b98faeafb97db4abf4f2f",
+      "bytes": 2181
+    },
+    {
+      "path": "evidence/contract-v2-before-module-kernel.json",
+      "sha256": "358e2da3c8e65f3fe06b22059a17474eadc20e15b663ae217c904c5a2c71a594",
+      "bytes": 176
+    },
+    {
+      "path": "evidence/contract-v2-before-module-nodes.json",
+      "sha256": "b40dccf46485c271eb8f03b48bd3e057f2d3a3da64c2cde9eefa3dffbae8dbba",
+      "bytes": 6831
+    },
+    {
+      "path": "evidence/contract-v2-before-module-sessions.json",
+      "sha256": "edc5c571b0066ac38222e6d3276e8a385a6d428b29bcbf342d485ebc02e7a9b0",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/contract-v2-before-restart-kernel.json",
+      "sha256": "358e2da3c8e65f3fe06b22059a17474eadc20e15b663ae217c904c5a2c71a594",
+      "bytes": 176
+    },
+    {
+      "path": "evidence/contract-v2-before-restart-nodes.json",
+      "sha256": "f99f1a1acd92b1fc032cd9146a5230650ae0d016b05102973bd9af7b7d819b71",
+      "bytes": 6830
+    },
+    {
+      "path": "evidence/contract-v2-before-restart-sessions.json",
+      "sha256": "edc5c571b0066ac38222e6d3276e8a385a6d428b29bcbf342d485ebc02e7a9b0",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/contract-v2-before-row-0.json",
+      "sha256": "ceaa9954d4780f966bc05258689dfdd0070e1ed6ca23c4255de701cf3a1f1878",
+      "bytes": 2162
+    },
+    {
+      "path": "evidence/contract-v2-before-row-1.json",
+      "sha256": "9402c5a030c87330e986699a5dc5d9eb555e7279899b98faeafb97db4abf4f2f",
+      "bytes": 2181
+    },
+    {
+      "path": "evidence/contract-v2-final-kernel.json",
+      "sha256": "358e2da3c8e65f3fe06b22059a17474eadc20e15b663ae217c904c5a2c71a594",
+      "bytes": 176
+    },
+    {
+      "path": "evidence/contract-v2-final-nodes.json",
+      "sha256": "23c8824e19d3b6b778b03fca50a900b62c26125079ae93047d9664d4e9abfe8c",
+      "bytes": 6831
+    },
+    {
+      "path": "evidence/contract-v2-final-sessions.json",
+      "sha256": "edc5c571b0066ac38222e6d3276e8a385a6d428b29bcbf342d485ebc02e7a9b0",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/contract-v2-health.json",
+      "sha256": "202cd18690d7809ca3ca29e2db2104099a227181a9bb1d405c90cbc06468ff55",
+      "bytes": 1070
+    },
+    {
+      "path": "evidence/health-before.json",
+      "sha256": "a7451efde7a01f5f063acc6c7741a93b21b14fe06cf574a494aa0f035fbeee0d",
+      "bytes": 1071
+    },
+    {
+      "path": "evidence/result-continued.json",
+      "sha256": "88fefa85c59110038a4c7e7f35a69bb3d34037b8bf15090bad14a2a78b6bcb2d",
+      "bytes": 6152
+    },
+    {
+      "path": "evidence/result.json",
+      "sha256": "74c0bdaecb083797c6085ed60514d52960d03887a842fba69ba37f46549a2371",
+      "bytes": 4310
+    },
+    {
+      "path": "evidence/rigs.json",
+      "sha256": "894f4be6d18ef4e7f8c3f7aee0eff526fc8130ac73dd122abdcf66bcdae7010b",
+      "bytes": 211
+    }
+  ],
+  "verificationScope": "Actual new bridge module against isolated official OpenRig 0.6.6 HTTP and SQLite; not employee/model acceptance",
+  "fixedProblems": [
+    {
+      "problem": "The official loopback daemon does not create terminal-token by default",
+      "resolution": "Explicit private terminal bearer configured through the supported OPENRIG_TERMINAL_BEARER_TOKEN environment variable; no production credential reused",
+      "evidence": "evidence/result.json"
+    },
+    {
+      "problem": "The initial module expected a bare rig from the detail endpoint; the actual response is {rig,nodes,edges}",
+      "resolution": "Corrected module and protocol regression fixture using pinned installed source and actual HTTP failure; zero queue mutations before correction",
+      "evidence": "evidence/result-continued.json"
+    }
+  ],
+  "actualStages": {
+    "initial": {
+      "exit": 0,
+      "stage": "initial",
+      "passed": true,
+      "requestCount": 26,
+      "postCount": 2,
+      "qitemIds": [
+        "qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6",
+        "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"
+      ],
+      "modelCallsRequested": 0
+    },
+    "reopened": {
+      "exit": 0,
+      "stage": "reopened",
+      "passed": true,
+      "requestCount": 14,
+      "postCount": 0,
+      "qitemIds": [
+        "qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6",
+        "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"
+      ],
+      "modelCallsRequested": 0
+    },
+    "closed": {
+      "exit": 0,
+      "stage": "closed",
+      "passed": true,
+      "requestCount": 14,
+      "postCount": 0,
+      "qitemIds": [
+        "qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6",
+        "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"
+      ],
+      "modelCallsRequested": 0
+    }
+  },
+  "actualCreateRequests": [
+    {
+      "at": "2026-10-09T07:36:00.933Z",
+      "method": "POST",
+      "route": "/api/queue/create",
+      "qitemId": "qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6",
+      "nudge": false,
+      "payloadSha256": "a561762381fc8336b67698743f37f02dcaf4972a593de6d8ec66fc8e38bce0fa",
+      "phase": "dispatched"
+    },
+    {
+      "at": "2026-10-09T07:36:01.011Z",
+      "method": "POST",
+      "route": "/api/queue/create",
+      "qitemId": "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd",
+      "nudge": false,
+      "payloadSha256": "cfabe01badbeb18a7f8d064a9fb9b8eb3ca6a9c6d121093deb5bbf845f061505",
+      "phase": "dispatched"
+    }
+  ],
+  "controlledResponseLoss": [
+    {
+      "at": "2026-10-09T07:36:01.011Z",
+      "method": "POST",
+      "route": "/api/queue/create",
+      "qitemId": "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd",
+      "nudge": false,
+      "payloadSha256": "cfabe01badbeb18a7f8d064a9fb9b8eb3ca6a9c6d121093deb5bbf845f061505",
+      "phase": "injected-response-loss-after-real-commit"
+    }
+  ],
+  "finalQueueRows": [
+    {
+      "qitem_id": "qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd",
+      "source_session": "probe-manager@bridge-cf47a6575176",
+      "destination_session": "probe-dev@bridge-cf47a6575176",
+      "state": "done",
+      "closure_reason": "no-follow-on"
+    },
+    {
+      "qitem_id": "qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6",
+      "source_session": "probe-manager@bridge-cf47a6575176",
+      "destination_session": "probe-dev@bridge-cf47a6575176",
+      "state": "done",
+      "closure_reason": "no-follow-on"
+    }
+  ],
+  "mappingFiles": [
+    {
+      "path": "mapping/department-a04f6db3-bd04-4913-867f-34e68999279a.json",
+      "sha256": "6caf1e15af38aa2841498a5044b8f29c595590913ec33fafcd7cf8eea8c27f11",
+      "bytes": 762
+    },
+    {
+      "path": "mapping/project-515f335a-73ca-43bf-9f5a-70b94ec94369.json",
+      "sha256": "7d944ead835572ee71a2cd61191de54371e8dd867446b964e8538581457a40de",
+      "bytes": 521
+    },
+    {
+      "path": "mapping/project-8aa62631-de19-4580-86d4-92a9e5616a2c.json",
+      "sha256": "268b86678db90106864c67196cfb171a6fccd58af7c7c92cae325bfd1307ce56",
+      "bytes": 521
+    }
+  ],
+  "independentFinalStoppedCheck": true,
+  "localChecks": {
+    "protocolTests": {
+      "passed": 12,
+      "failed": 0,
+      "command": "node --import tsx --test tests/openrig-bridge.test.ts"
+    },
+    "typecheck": {
+      "exit": 0,
+      "command": "node node_modules/typescript/bin/tsc --noEmit --pretty false"
+    }
+  },
+  "productionBridgeEnabled": false,
+  "remaining": [
+    "API and web workbench integration",
+    "Link official claim/closure to actual RunCoordinator lifecycle",
+    "Versioned mapping changes for edited approved plans and changed department seats"
+  ]
+}

@@ -1,0 +1,49 @@
+# Derived from NVIDIA/OpenShell v0.1.2 deploy/docker/docker-compose.yml.
+# SPDX-License-Identifier: Apache-2.0
+# REVIEWABLE DRAFT. No employee container and no model call are created here.
+name: weiwu-openshell-v012
+services:
+  gateway:
+    image: ghcr.io/nvidia/openshell/gateway:0.1.2@sha256:2fe4dad9118e14ab80a8258b545ea6e6cd74c3469e24ad4e6610f964d98913a2
+    platform: linux/amd64
+    user: "0"
+    restart: unless-stopped
+    command: ["--bind-address", "0.0.0.0", "--port", "18770"]
+    ports:
+      - "127.0.0.1:18770:18770"
+      - "127.0.0.1:18771:18771"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "host.openshell.internal:host-gateway"
+    volumes:
+      # This trusted administrator gateway has root-equivalent Docker authority.
+      # Never expose this socket, state tree, or Compose management to employees.
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        bind:
+          create_host_path: false
+      # Same absolute host/container path is required by the Docker driver.
+      - type: bind
+        source: /var/lib/weiwu-openshell-v012
+        target: /var/lib/weiwu-openshell-v012
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./gateway.toml
+        target: /etc/openshell/gateway.toml
+        read_only: true
+        bind:
+          create_host_path: false
+    environment:
+      OPENSHELL_GATEWAY_CONFIG: /etc/openshell/gateway.toml
+      OPENSHELL_DB_URL: "sqlite:/var/lib/weiwu-openshell-v012/gateway.db?mode=rwc"
+      XDG_DATA_HOME: /var/lib/weiwu-openshell-v012
+      XDG_STATE_HOME: /var/lib/weiwu-openshell-v012
+      XDG_CONFIG_HOME: /var/lib/weiwu-openshell-v012/config
+      HOME: /var/lib/weiwu-openshell-v012
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

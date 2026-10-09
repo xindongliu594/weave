@@ -1,0 +1,257 @@
+{
+  "kind": "independent-openrig-production-deployment-audit",
+  "readOnly": true,
+  "status": "passed",
+  "sourceEvidence": "/home/jj/.local/share/weiwu/data/pilot/openrig/evidence/deployment-4fbd1ccf-4364-4f44-b2c2-cd015df135f4.json",
+  "sourceEvidenceSha256": "63f0ea1b411d9a5e16b883d7862b2365ae8718e7bf136245e8ea90982169f0eb",
+  "appliedSteps": [
+    {
+      "command": [
+        "systemd-analyze",
+        "--user",
+        "verify",
+        "/home/jj/.local/share/weiwu/data/pilot/openrig/admin/weiwu-openrig.service"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "daemon-reload"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "enable",
+        "--now",
+        "weiwu-openrig.service"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "weiwu-openrig.service",
+        "-p",
+        "LoadState",
+        "-p",
+        "ActiveState",
+        "-p",
+        "MainPID",
+        "-p",
+        "FragmentPath"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "ss",
+        "-H",
+        "-ltn"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node",
+        "/home/jj/.local/share/weiwu/runtime/openrig-v0.6.6/node_modules/@openrig/cli/dist/bin-wrapper.js",
+        "spec",
+        "validate",
+        "/home/jj/.local/share/weiwu/data/pilot/openrig/rig.yaml"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node",
+        "/home/jj/.local/share/weiwu/runtime/openrig-v0.6.6/node_modules/@openrig/cli/dist/bin-wrapper.js",
+        "import",
+        "/home/jj/.local/share/weiwu/data/pilot/openrig/rig.yaml",
+        "--materialize-only",
+        "--rig-root",
+        "/home/jj/.local/share/weiwu/data/pilot/openrig",
+        "--cwd",
+        "/home/jj/.local/share/weiwu/data/pilot/openrig/workspace"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "weiwu-openrig.service",
+        "-p",
+        "LoadState",
+        "-p",
+        "ActiveState",
+        "-p",
+        "MainPID",
+        "-p",
+        "FragmentPath"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "ss",
+        "-H",
+        "-ltn"
+      ],
+      "exit": 0,
+      "outcome": null
+    },
+    {
+      "command": [
+        "systemctl",
+        "--user",
+        "show",
+        "weiwu-jj.service",
+        "-p",
+        "LoadState",
+        "-p",
+        "ActiveState",
+        "-p",
+        "MainPID",
+        "-p",
+        "FragmentPath"
+      ],
+      "exit": 0,
+      "outcome": null
+    }
+  ],
+  "precheck": {
+    "readOnly": true,
+    "runtimePinned": true,
+    "identity": {
+      "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+      "projectVersion": 12,
+      "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+      "departmentVersion": 1,
+      "employeeIds": [
+        "mgr-1",
+        "dev-1",
+        "qa-1"
+      ]
+    },
+    "port": 57415,
+    "dataExists": true,
+    "service": {
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "FragmentPath": "/home/jj/.config/systemd/user/weiwu-openrig.service",
+      "MainPID": "3130076"
+    },
+    "weiwuService": {
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "FragmentPath": "/home/jj/.config/systemd/user/weiwu-jj.service",
+      "MainPID": "3041376"
+    },
+    "configPath": "/home/jj/.local/share/weiwu/data/pilot/openrig/bridge-config.json",
+    "modelCalls": 0,
+    "queueWrites": 0,
+    "daemon": {
+      "pid": 3130076,
+      "selfHostId": "host-91ecbc4f",
+      "noKernel": true,
+      "loopbackOnly": true,
+      "noProviderEnvironment": true
+    }
+  },
+  "configuration": {
+    "schema": 1,
+    "enabled": true,
+    "version": "0.6.6",
+    "endpoint": "http://127.0.0.1:57415",
+    "expectedSelfHostId": "host-91ecbc4f",
+    "tokenFile": "/home/jj/.local/share/weiwu/data/pilot/openrig/terminal-token",
+    "tokenPrivatePermissions": true,
+    "tokenValueExported": false,
+    "stateDirectory": "/home/jj/.local/share/weiwu/data/pilot/openrig/mapping",
+    "departments": [
+      {
+        "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+        "rigId": "01M4FVAV12PXXFXH4Q9XJY00K2",
+        "rigName": "weiwu-pilot-3c0cb5ee",
+        "seats": [
+          {
+            "employeeId": "mgr-1",
+            "logicalId": "dev.manager",
+            "nodeId": "01M4FVAV13XCQSDBX8NR8CQFA3",
+            "role": "manager"
+          },
+          {
+            "employeeId": "dev-1",
+            "logicalId": "dev.dev",
+            "nodeId": "01M4FVAV1464J022EM1GNAM5Z1",
+            "role": "developer"
+          },
+          {
+            "employeeId": "qa-1",
+            "logicalId": "dev.qa",
+            "nodeId": "01M4FVAV15MTQMS90ZP7A9Q7E5",
+            "role": "qa"
+          }
+        ],
+        "sourceEmployeeId": "mgr-1",
+        "destinationEmployeeId": "dev-1"
+      }
+    ]
+  },
+  "configSha256": "680ec1bbd1a1d3861fa775af07c634b42702613eb2f9e372341baacf619a9abb",
+  "nodes": [
+    {
+      "nodeId": "01M4FVAV1464J022EM1GNAM5Z1",
+      "logicalId": "dev.dev",
+      "role": "developer",
+      "runtime": "stub",
+      "sessionStatus": null,
+      "canonicalSessionName": null
+    },
+    {
+      "nodeId": "01M4FVAV13XCQSDBX8NR8CQFA3",
+      "logicalId": "dev.manager",
+      "role": "manager",
+      "runtime": "stub",
+      "sessionStatus": null,
+      "canonicalSessionName": null
+    },
+    {
+      "nodeId": "01M4FVAV15MTQMS90ZP7A9Q7E5",
+      "logicalId": "dev.qa",
+      "role": "qa",
+      "runtime": "stub",
+      "sessionStatus": null,
+      "canonicalSessionName": null
+    }
+  ],
+  "checks": {
+    "officialDetailEnvelope": true,
+    "emptySessions": true,
+    "noKernelAgents": true,
+    "exactPersistedSeatMapping": true,
+    "bridgeConfigContract": true,
+    "emptyBridgeMappings": true,
+    "queueItems": 0
+  },
+  "modelCallsRequested": 0,
+  "queueWritesRequested": 0,
+  "serviceMutationsRequested": 0,
+  "serviceUnitSha256": "21e16203630dd79e5c6fd55f6d08097358caf9d9c9be7c71483c93b13f053b52",
+  "runnerSha256": "e018ab811b1ae5ac5385cdae2623d99bbf2b2ed39e4e922d00c8ebf3485f8f4b"
+}

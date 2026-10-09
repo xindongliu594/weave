@@ -1,0 +1,21 @@
+isolated-linux-regression: exit 0
+test_existing_foreign_installation_is_not_adopted (__main__.DeploymentGuards.test_existing_foreign_installation_is_not_adopted) ... ok
+test_node_sessions_and_runtime_are_verified_before_config_publication (__main__.DeploymentGuards.test_node_sessions_and_runtime_are_verified_before_config_publication) ... ok
+test_owned_config_never_silently_overwrites_changes (__main__.DeploymentGuards.test_owned_config_never_silently_overwrites_changes) ... ok
+test_reconcile_existing_rig_and_reject_foreign_or_duplicate_topology (__main__.DeploymentGuards.test_reconcile_existing_rig_and_reject_foreign_or_duplicate_topology) ... ok
+test_rollback_refuses_changed_unit_without_signaling_anything (__main__.DeploymentGuards.test_rollback_refuses_changed_unit_without_signaling_anything) ... ok
+test_runner_environment_drops_all_provider_credentials_and_proxy (__main__.DeploymentGuards.test_runner_environment_drops_all_provider_credentials_and_proxy) ... ok
+test_unknown_materialization_cannot_import_again (__main__.DeploymentGuards.test_unknown_materialization_cannot_import_again) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.005s
+
+OK
+
+read-only-preflight: exit 0
+{"readOnly": true, "runtimePinned": true, "identity": {"projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2", "projectVersion": 12, "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a", "departmentVersion": 1, "employeeIds": ["mgr-1", "dev-1", "qa-1"]}, "port": 57415, "dataExists": false, "service": {"LoadState": "not-found", "ActiveState": "inactive", "FragmentPath": "", "MainPID": "0"}, "weiwuService": {"LoadState": "loaded", "ActiveState": "active", "FragmentPath": "/home/jj/.config/systemd/user/weiwu-jj.service", "MainPID": "3041376"}, "configPath": "/home/jj/.local/share/weiwu/data/pilot/openrig/bridge-config.json", "modelCalls": 0, "queueWrites": 0}
+
+write-unit-preview: exit 0
+
+systemd-verify-only: exit 0
+/usr/lib/systemd/user/spice-vdagent.service:23: Unknown key 'StandardError' in section [Install], ignoring.

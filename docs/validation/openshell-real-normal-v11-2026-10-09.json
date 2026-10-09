@@ -1,0 +1,533 @@
+{
+  "runId": "6197cb6e-d63b-41e9-808e-3666bc376b84",
+  "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+  "planVersion": 11,
+  "status": "completed",
+  "scope": "Normal real OpenShell employee execution; controlled recovery and physical policy-negative probes are separate",
+  "auditStatus": "passed",
+  "capturedAt": "20261009T073223.703581Z",
+  "eventCount": 2082,
+  "checks": {
+    "stable_complete_terminal_trace": {
+      "passed": true,
+      "detail": null
+    },
+    "captured_bytes_match_http_hashes": {
+      "passed": true,
+      "detail": null
+    },
+    "fixed_approved_version_and_budget": {
+      "passed": true,
+      "detail": null
+    },
+    "three_distinct_employees_and_complete_dag": {
+      "passed": true,
+      "detail": [
+        {
+          "id": "T1",
+          "dependencies": [],
+          "assigneeId": "dev-1",
+          "kind": "implementation",
+          "inputs": [],
+          "outputs": [
+            {
+              "path": "cli.mjs",
+              "format": "text"
+            },
+            {
+              "path": "README.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "T2",
+          "dependencies": [
+            "T1"
+          ],
+          "assigneeId": "qa-1",
+          "kind": "verification",
+          "inputs": [
+            {
+              "path": "cli.mjs",
+              "producerTaskId": "T1"
+            },
+            {
+              "path": "README.md",
+              "producerTaskId": "T1"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "cli.test.mjs",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "T3",
+          "dependencies": [
+            "T1",
+            "T2"
+          ],
+          "assigneeId": "mgr-1",
+          "kind": "review",
+          "inputs": [
+            {
+              "path": "cli.mjs",
+              "producerTaskId": "T1"
+            },
+            {
+              "path": "README.md",
+              "producerTaskId": "T1"
+            },
+            {
+              "path": "cli.test.mjs",
+              "producerTaskId": "T2"
+            }
+          ],
+          "outputs": []
+        }
+      ]
+    },
+    "three_tasks_completed_and_accepted": {
+      "passed": true,
+      "detail": null
+    },
+    "real_provider_and_output_limit": {
+      "passed": true,
+      "detail": null
+    },
+    "downloaded_three_artifacts_match_sha": {
+      "passed": true,
+      "detail": null
+    },
+    "all_business_writes_proven_employee_tools": {
+      "passed": true,
+      "detail": [
+        {
+          "path": "README.md",
+          "producerTaskId": "T1",
+          "finalSha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+          "finalBytes": 1849,
+          "candidates": [
+            {
+              "callId": "call_01_AHFKCqJSDQU5RThe4h1R3677",
+              "sessionId": "39a67e28-09bf-4476-9d0f-acb3a7021429",
+              "employee": "employee-2",
+              "attemptId": "9f347615-6f91-4dc6-8ea0-08d31a80c49a",
+              "nativeSeqs": [
+                162
+              ],
+              "startSeq": 163,
+              "resultSeqs": [
+                175
+              ],
+              "operationIds": [
+                "d48662c5-d9ec-4ac8-916d-d11ee72dc963"
+              ],
+              "wireIds": [
+                "92d31100-1988-47da-ad11-3ba82cfd0ea4",
+                "5ae69c36-e24e-4cce-81eb-55b82e8d4198",
+                "8e3c8c9b-c7d9-41fb-9d14-c93a50606525"
+              ],
+              "flags": {
+                "unique_native_start_result_operation": true,
+                "native_model_arguments_equal_execution": true,
+                "model_content_exact_final_bytes": true,
+                "successful_exact_write_receipt": true,
+                "actual_started_completed_operation": true,
+                "current_assigned_employee_attempt": true,
+                "same_run_current_accepted_output": true,
+                "ordered_source_execution_acceptance": true,
+                "approved_real_employee_wire_before_native_call": true
+              },
+              "passed": true,
+              "writeMode": "creation"
+            }
+          ],
+          "passed": true
+        },
+        {
+          "path": "cli.mjs",
+          "producerTaskId": "T1",
+          "finalSha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+          "finalBytes": 2083,
+          "candidates": [
+            {
+              "callId": "call_00_qTaZO3hc5EG2tnYweIeu6344",
+              "sessionId": "39a67e28-09bf-4476-9d0f-acb3a7021429",
+              "employee": "employee-2",
+              "attemptId": "9f347615-6f91-4dc6-8ea0-08d31a80c49a",
+              "nativeSeqs": [
+                146
+              ],
+              "startSeq": 147,
+              "resultSeqs": [
+                160
+              ],
+              "operationIds": [
+                "adef8163-9662-435e-801f-98ebd19ea33e"
+              ],
+              "wireIds": [
+                "92d31100-1988-47da-ad11-3ba82cfd0ea4",
+                "5ae69c36-e24e-4cce-81eb-55b82e8d4198",
+                "8e3c8c9b-c7d9-41fb-9d14-c93a50606525"
+              ],
+              "flags": {
+                "unique_native_start_result_operation": true,
+                "native_model_arguments_equal_execution": true,
+                "model_content_exact_final_bytes": true,
+                "successful_exact_write_receipt": true,
+                "actual_started_completed_operation": true,
+                "current_assigned_employee_attempt": true,
+                "same_run_current_accepted_output": true,
+                "ordered_source_execution_acceptance": true,
+                "approved_real_employee_wire_before_native_call": true
+              },
+              "passed": true,
+              "writeMode": "creation"
+            }
+          ],
+          "passed": true
+        },
+        {
+          "path": "cli.test.mjs",
+          "producerTaskId": "T2",
+          "finalSha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df",
+          "finalBytes": 7232,
+          "candidates": [
+            {
+              "callId": "call_00_rD3wQLksAIaaGuidRxAJ6072",
+              "sessionId": "eab1a686-8665-4f97-87fd-a1cc44d71fbc",
+              "employee": "employee-3",
+              "attemptId": "2c72b7f7-2f40-4647-99cd-6caee79616c1",
+              "nativeSeqs": [
+                929
+              ],
+              "startSeq": 930,
+              "resultSeqs": [
+                943
+              ],
+              "operationIds": [
+                "2c0cdffb-2c15-489c-bdd2-fc9fbdb5dbe7"
+              ],
+              "wireIds": [
+                "4a26bc0a-6430-482e-8e33-efafe9a6d598",
+                "fe5f9161-fb12-402d-8d1c-a6ca096465fd",
+                "3891e45c-5299-4d57-a5a0-2eb35cb06080",
+                "d6902092-f2ad-43ca-b099-7afce7c3d0eb"
+              ],
+              "flags": {
+                "unique_native_start_result_operation": true,
+                "native_model_arguments_equal_execution": true,
+                "model_content_exact_final_bytes": true,
+                "successful_exact_write_receipt": true,
+                "actual_started_completed_operation": true,
+                "current_assigned_employee_attempt": true,
+                "same_run_current_accepted_output": true,
+                "ordered_source_execution_acceptance": true,
+                "approved_real_employee_wire_before_native_call": true
+              },
+              "passed": true,
+              "writeMode": "creation"
+            }
+          ],
+          "passed": true
+        }
+      ]
+    },
+    "development_not_modified_after_handoff": {
+      "passed": true,
+      "detail": null
+    },
+    "all_actual_operations_bound_to_one_openshell": {
+      "passed": true,
+      "detail": null
+    },
+    "only_approved_syntax_and_qa_commands": {
+      "passed": true,
+      "detail": null
+    },
+    "qa_result_exact_17_and_full_output": {
+      "passed": true,
+      "detail": {
+        "tests": 17,
+        "suites": 0,
+        "pass": 17,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "qa_bound_to_approval_employee_attempt_and_final_bytes": {
+      "passed": true,
+      "detail": null
+    },
+    "qa_seal_contains_actual_test_operation": {
+      "passed": true,
+      "detail": null
+    },
+    "manager_formal_native_review_pass": {
+      "passed": true,
+      "detail": null
+    },
+    "manager_read_all_three_exact_files_and_wrote_none": {
+      "passed": true,
+      "detail": [
+        {
+          "operationId": "f2c959c0-4e74-4736-b2fa-79f530b6a453",
+          "path": "cli.mjs",
+          "seq": 1659,
+          "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+          "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+          "passed": true
+        },
+        {
+          "operationId": "6c7a105d-384f-46b4-8ea5-442b039919bb",
+          "path": "README.md",
+          "seq": 1887,
+          "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+          "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+          "passed": true
+        },
+        {
+          "operationId": "cb37116a-3f39-42f8-8a16-67756192097a",
+          "path": "cli.test.mjs",
+          "seq": 1973,
+          "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df",
+          "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+          "passed": true
+        }
+      ]
+    },
+    "qa_manager_handoffs_bind_current_versions": {
+      "passed": true,
+      "detail": null
+    },
+    "qa_real_search_and_read_pinned_v2": {
+      "passed": true,
+      "detail": [
+        {
+          "name": "knowledge_search",
+          "callId": "call_01_5ecsvyBbL8ZUnpX72iJd9524",
+          "startSeq": 405,
+          "resultSeq": 412,
+          "passed": true,
+          "sources": [
+            {
+              "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+              "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+              "version": 2,
+              "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+              "lineStart": 7,
+              "lineEnd": 11
+            }
+          ]
+        },
+        {
+          "name": "knowledge_read",
+          "callId": "call_00_pj3DNoiqqi51atuCGQ631819",
+          "startSeq": 476,
+          "resultSeq": 484,
+          "passed": true,
+          "sources": [
+            {
+              "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+              "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+              "version": 2,
+              "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+              "lineStart": 7,
+              "lineEnd": 11
+            }
+          ]
+        }
+      ]
+    },
+    "every_real_wire_has_settled_usage": {
+      "passed": true,
+      "detail": null
+    },
+    "three_employees_really_called_models": {
+      "passed": true,
+      "detail": null
+    },
+    "old_unknown_preserved_no_new_pending_fees": {
+      "passed": true,
+      "detail": null
+    },
+    "known_costs_and_authorized_envelope": {
+      "passed": true,
+      "detail": null
+    }
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 1849,
+      "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b"
+    },
+    {
+      "path": "cli.mjs",
+      "size": 2083,
+      "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75"
+    },
+    {
+      "path": "cli.test.mjs",
+      "size": 7232,
+      "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+    }
+  ],
+  "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+  "openshell": {
+    "cpu": [
+      100000,
+      100000
+    ],
+    "gid": 1000,
+    "uid": 1000,
+    "kind": "openshell",
+    "node": "v24.19.0",
+    "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+    "memory": "536870912",
+    "gateway": "weiwu-openshell-v012",
+    "version": "0.1.2",
+    "sandboxId": "73ebdec2-4ffb-4235-89c6-301ddb3db409",
+    "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+    "sandboxName": "wwe-457e5b8a911a",
+    "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+    "effectivePolicyHash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5"
+  },
+  "operationCount": 11,
+  "qa": {
+    "operationId": "6ed7c1e2-f35d-4816-a64e-f0e6b20eb7c2",
+    "callId": "call_00_0b8e85xXluwAQGHTICiw5073",
+    "approvalId": "79175621-a3e7-4cb2-acab-55563a8d3629",
+    "counts": {
+      "tests": 17,
+      "suites": 0,
+      "pass": 17,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "exitCode": 0,
+    "outputSha256": "6b5e2917b701c35f251b868549bd39e559bd5d8a3f9f8dea96cf3875418f090f",
+    "outputBytes": 1366,
+    "outputLayout": "combined stdout/stderr; separate streams not available"
+  },
+  "manager": {
+    "acceptedSeq": 2057,
+    "reviewSeq": 2058,
+    "formalUpdateSeqs": [
+      2061
+    ],
+    "formalOutput": "验收结论：通过。只读复审未修改任何文件、未写交付文档。\n\n逐条判断依据：\n1) 结论明确：通过（pass）。\n2) 逐条对应验收标准：换算正确性——cli.mjs 实为 (celsius*9)/5+32，与 F=C*9/5+32 一致；0→32、100→212、-40→-40 由 T2 用例覆盖。输出格式——stdout 仅 JSON.stringify({celsius,fahrenheit})，恰两字段。参数规则——仅取 process.argv.slice(2)，缺失=1、多参数=2、空/空白/非数字=3，均经 process.stderr.write 说明并以非零退出。边界（重点）——parseCelsius 在调用 Number(raw) 之前先判 raw.trim()===''，空字符串与纯空白（含 '\\t'）必然走拒绝分支，无法落到 Number('')===0，旧缺陷已在实现层面修复而非仅文档声明。小数容差——EPSILON=1e-9 对照量级≤212，assertSuccess 校验类型/字段/容差且要求 stderr 为空，断言未被放宽。\n3) 引用 T2 真实运行记录：宿主 runEvidence 记录 node --test cli.test.mjs，exitCode=0，nodeTests=17 tests / 17 pass / 0 fail / 0 skipped（format=spec），observedAt 2026-10-09T07:30:06.389Z，callId call_00_0b8e85xXluwAQGHTICiw5073，workspaceRevision ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992。该 revision 与我读到的 cli.mjs/README.md/cli.test.mjs 的 workspaceRevision 及哈希（51b1b9e7…、ab601b39…、33a65144…）完全一致，即受审字节就是被测字节。首轮即全通过，故无“测试自身浮点断言失败”记录可引，我如实按无此记录陈述。\n4) 未完成项与风险：无阻塞性未完成项。风险（低）：T1 的 node --check cli.mjs 退出码 0 但宿主标注 stdout/stderr 未分离（EXECUTOR_STREAM_NOT_SEPARATE），\"无诊断输出\"仅有输出 sha256=e3b0c44…（空内容）间接支持；tests 在比对 JSON.parse(r.stdout) 整串，未单独断言末尾换行之外的多余输出；README 退出码表为客户约定，超出现需求但仍准确。\n5) 文件与权限：仅调用只读 filesystem 读取三份输入，未执行 terminal_test，未写任何文件（inScope/outputs 为空，保持只读），未扩大授权、工具或预算。\n\n独立性与覆盖核对：cli.test.mjs 仅用 node:test/node:assert/strict/node:child_process/node:url/node:path，spawnSync 黑盒调用子进程，期望值由自身 expectedFahrenheit() 按公式独立重算，不 import 实现内部；assertRejected 同时校验非零退出、stderr 非空、stdout 为空三项，非法输入断言未被改成允许通过。reviewedTaskId=T1 与 assignee 非 T1 开发员工，满足独立复审要求。",
+    "readProof": [
+      {
+        "operationId": "f2c959c0-4e74-4736-b2fa-79f530b6a453",
+        "path": "cli.mjs",
+        "seq": 1659,
+        "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+        "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+        "passed": true
+      },
+      {
+        "operationId": "6c7a105d-384f-46b4-8ea5-442b039919bb",
+        "path": "README.md",
+        "seq": 1887,
+        "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+        "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+        "passed": true
+      },
+      {
+        "operationId": "cb37116a-3f39-42f8-8a16-67756192097a",
+        "path": "cli.test.mjs",
+        "seq": 1973,
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df",
+        "workspaceRevision": "ec700fddaf87d7c8bf0f5ec22f7e501447ce7be83b1f2bb045a85c8e59e83992",
+        "passed": true
+      }
+    ]
+  },
+  "fees": {
+    "runKnown": 0.18696839999999998,
+    "projectKnown": 0.8839623,
+    "pilotKnown": 0.8953413,
+    "legacyUnknownRetained": 0.0192111,
+    "projectAvailableAtCapture": 0.9968266,
+    "runWireCalls": 30,
+    "runUsageRows": 30,
+    "legacyUnknownReceipts": [
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "amount": 0.0192111,
+        "status": "uncertain",
+        "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+      }
+    ],
+    "projectLimit": 1.9,
+    "pilotLimit": 2
+  },
+  "knowledge": [
+    {
+      "name": "knowledge_search",
+      "callId": "call_01_5ecsvyBbL8ZUnpX72iJd9524",
+      "startSeq": 405,
+      "resultSeq": 412,
+      "passed": true,
+      "sources": [
+        {
+          "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+          "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+          "version": 2,
+          "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+          "lineStart": 7,
+          "lineEnd": 11
+        }
+      ]
+    },
+    {
+      "name": "knowledge_read",
+      "callId": "call_00_pj3DNoiqqi51atuCGQ631819",
+      "startSeq": 476,
+      "resultSeq": 484,
+      "passed": true,
+      "sources": [
+        {
+          "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+          "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+          "version": 2,
+          "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+          "lineStart": 7,
+          "lineEnd": 11
+        }
+      ]
+    }
+  ],
+  "privateEvidence": {
+    "remoteDirectory": "/home/jj/.local/share/weiwu/metadata/openshell-normal-v11-20261009T073223.703581Z-786dd865",
+    "localDirectory": ".data\\research\\jj-simple-task-2026-10-08\\openshell-normal-v11-captured",
+    "archiveSha256": "997767837e5dafd14795a4e683f8787e46b84ee028011b35e3c8700ab54e6230",
+    "exportSha256": "cf4c86d8f7fd6a84b6ac6175b23558125a78e4b25740e529b07e9c0a2b5105ef",
+    "exportBytes": 20356281
+  },
+  "limitations": [
+    "This is a normal run, not controlled interruption/resume.",
+    "Approved command output combines stdout/stderr; only the complete combined-output hash is proven.",
+    "The final coordinator prose says its own filesystem access was TASK_NOT_ACTIVE; the separate formal T3 reviewer actually read all three files. Formal T3 receipts and acceptance are the evidence, not that coordinator prose.",
+    "Metadata is runtime provenance checked by the product, not cryptographic remote attestation."
+  ],
+  "auditor": {
+    "methods": [
+      "GET",
+      "offline evidence analysis"
+    ],
+    "modelCalls": 0,
+    "employeeArtifactEdits": 0,
+    "employeeCommandsExecuted": 0,
+    "sourceHelperSha256": "3e7e18277278211494fb1dd0583615b1706d36a91f82d4bc196383ce48c4bce3"
+  }
+}

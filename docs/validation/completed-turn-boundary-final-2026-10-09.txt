@@ -1,0 +1,21 @@
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (632.635ms)
+✔ failed employee setup leaves no published Agent or resident Host (68.7906ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (71.1948ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (426.7671ms)
+✔ native quality contracts receive actual file and command evidence before independent review (1531.7713ms)
+✔ model claims of a passed command cannot unlock native quality work (518.7161ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (658.8705ms)
+✔ review revision cannot create an unapproved automatic repair graph (1126.6702ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (1169.1042ms)
+✔ a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate (1118.3536ms)
+✔ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (1167.6942ms)
+✔ review and requirements have a compact native completion guide while all contracts remain unchanged (4.8177ms)
+✔ the guide invents no numeric output cap and unrelated task kinds receive no review instructions (0.692ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7868.529

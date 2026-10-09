@@ -101,6 +101,31 @@ test('a stale successful preview cannot admit a later request after another empl
   }finally{competing.release();globalThis.fetch=beforeFetch;}
 });
 
+test('retained original history cannot be shortened at dispatch after a concurrent budget hold invalidates its successful preview',async()=>{
+  const {adapter,callbacks}=create({maxBudget:.2,priorSpend:0,taskUsage:{qa:{cost:0,calls:0,reserved:0}}});
+  adapter.requireCompleteContext=sessionId=>sessionId===actor.sessionId;
+  const options={...request,messages:[
+    {role:'user',content:[{type:'text',text:'COMPLETE_ORIGINAL_CONTEXT '.repeat(1000)}]},
+    {role:'assistant',content:[{type:'text',text:'original pending decisions'}]},
+    ...request.messages,
+  ]};
+  const originalHash=createHash('sha256').update(JSON.stringify(options)).digest('hex');
+  const preview=adapter.prepareRequest(options);
+  assert.equal(preview.fitted.removed,0);assert.equal(preview.body.messages.length,options.messages.length+1);
+  const messageHash=createHash('sha256').update(JSON.stringify(preview.body.messages)).digest('hex');
+  const hold=adapter.budget.reserve(.2-preview.reservation/2,{}),before=state(adapter),originalFetch=globalThis.fetch;
+  let dispatched=0;globalThis.fetch=async()=>{dispatched++;throw Error('must not dispatch a shortened original-history request');};
+  try{
+    await assert.rejects(consume(adapter,options),error=>error.code==='BUDGET_CONTEXT_LIMIT');
+    assert.equal(dispatched,0);assert.equal(callbacks.filter(([kind])=>kind==='receipt').length,0);
+    assert.equal(adapter.calls,before.calls);assert.equal(adapter.budget.run.calls,before.run.calls);
+    assert.equal(adapter.budget.run.reserved,before.run.reserved);
+    assert.equal(createHash('sha256').update(JSON.stringify(options)).digest('hex'),originalHash);
+    hold.release();
+    assert.equal(createHash('sha256').update(JSON.stringify(adapter.prepareRequest(options).body.messages)).digest('hex'),messageHash);
+  }finally{hold.release();globalThis.fetch=originalFetch;}
+});
+
 test('fallback and rework previews keep the approved 90% stop gate and never alter warning sets',()=>{
   const {adapter,callbacks}=create({maxBudget:.08,priorSpend:.92}),before=state(adapter);
   assert.throws(()=>adapter.prepareRequest({...request,fallbackAttempted:true}),error=>error.code==='BUDGET_RETRY_DISABLED');
@@ -176,6 +201,22 @@ test('summary source retains all original read groups even when execution can de
   assert.equal(adapter.prepareRequest(options).fitted.deduplicatedGroups,1);
   const summary=adapter.prepareRequest({...options,purpose:'compaction'});
   assert.equal(summary.fitted.deduplicatedGroups,0);assert.equal(summary.body.messages.filter(message=>message.role==='tool').length,2);
+});
+
+test('retained original-history execution preserves every source-attested duplicate group and its wire hash',()=>{
+  const {adapter}=create(),options=reads();adapter.attestReadGroup=attestFixture;
+  const ordinary=adapter.prepareRequest(options);
+  assert.equal(ordinary.fitted.deduplicatedGroups,1,'fixture proves ordinary execution can remove an attested duplicate');
+  const nativeHash=createHash('sha256').update(JSON.stringify(options)).digest('hex');
+  const complete=adapter.prepareRequest({...options,purpose:'compaction'});
+  adapter.requireCompleteContext=sessionId=>sessionId===actor.sessionId;
+  const retained=adapter.prepareRequest(options);
+  assert.equal(retained.attribution.requestPurpose,'execution');assert.equal(retained.body.max_tokens,1400);
+  assert.equal(retained.fitted.removed,0);assert.equal(retained.fitted.deduplicatedGroups,0);
+  assert.equal(retained.fitted.supersededReads.length,0);
+  assert.equal(createHash('sha256').update(JSON.stringify(retained.body.messages)).digest('hex'),
+    createHash('sha256').update(JSON.stringify(complete.body.messages)).digest('hex'));
+  assert.equal(createHash('sha256').update(JSON.stringify(options)).digest('hex'),nativeHash);
 });
 
 test('official DSH user-role tool results qualify without accepting malformed source or failed results',()=>{

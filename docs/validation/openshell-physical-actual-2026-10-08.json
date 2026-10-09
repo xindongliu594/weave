@@ -1,0 +1,76 @@
+{
+  "kind": "actual-openshell-physical-trial",
+  "recordedDate": "2026-10-08",
+  "status": "blocked",
+  "scope": "Standalone component trial, no business employee acceptance",
+  "version": "0.1.2",
+  "name": "wwp-57ef585b3a37",
+  "sandboxId": "22a0fa90-8a07-4b0a-a921-373f0d7571bd",
+  "probeRoot": "/home/jj/.local/share/weiwu/probes/wwp-57ef585b3a37",
+  "createdAt": "2026-10-08 14:32:49",
+  "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+  "imageProofSource": "humanActualAdminRead",
+  "imageProofSha256": "90fcc0829ee7ee688f762b2132c2c143cbda606d1ce5ba8243edb35e674ed2c3",
+  "imageIdentityKind": "containerd-manifest-digest",
+  "sourceSha256": "1aa74adb41f26e18a742757aa6ef61eddcdbd0fff332c4e4d204aae3c1bd4d58",
+  "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+  "creates": 1,
+  "phase": "Error",
+  "failureConditions": [
+    {
+      "last_transition_time": "",
+      "message": "Docker supervisor exited before becoming ready; log tail: 2026-10-08T14:32:49.442Z INFO openshell_supervisor: Starting sandbox supervision\nopenshell: log push connect failed: failed to connect to OpenShell server\n2026-10-08T14:32:49.545Z INFO openshell_supervisor: Fetching sandbox policy via gRPC\n2026-10-08T14:32:49.555Z WARN openshell_supervisor: Startup configuration fetch failed, retrying\nopenshell: log push connect failed: failed to connect to OpenShell server\n2026-10-08T14:32:50.569Z WARN openshell_supervisor: Startup configuration fetch failed, retrying\nopenshell: log push connect failed: failed to connect to OpenShell server\n2026-10-08T14:32:52.582Z WARN openshell_supervisor: Startup configuration fetch failed, retrying\nopenshell: log push connect failed: failed to connect to OpenShell server\n2026-10-08T14:32:56.593Z WARN openshell_supervisor: Startup configuration fetch failed, retrying\nError:   × Startup configuration fetch failed after 5 attempts: failed to connect to\n  │ OpenShell server; sandbox log tail: 2026-10-08T14:32:49.247Z INFO openshell_sandbox::boundary_server::linux: Boundary control listener ready",
+      "reason": "ControlSupervisorStartFailed",
+      "status": "False",
+      "type": "Ready"
+    },
+    {
+      "last_transition_time": "",
+      "message": "Waiting for effective configuration validation before workload activation",
+      "reason": "ConfigurationPending",
+      "status": "False",
+      "type": "ConfigurationReady"
+    }
+  ],
+  "createExit": 1,
+  "workloadStarted": false,
+  "employeeAcceptance": false,
+  "modelCallsRequested": 0,
+  "originalWeiwuServiceUnchanged": true,
+  "originalWeiwuService": "ActiveState=active\nMainPID=1890583",
+  "usageRows": 146,
+  "recordedModelCost": 0.7083729,
+  "ledgerUnchanged": true,
+  "ledgerSha256": "e44bd0de62d1bde9276f83e38725c16c5511ba531f587d05340699ba761a0ee6",
+  "projectReadiness": {
+    "recordedCost": 0.6969938999999999,
+    "reserved": 0.0192111,
+    "availableBudget": 1.1837950000000002,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "amount": 0.0192111,
+        "status": "uncertain",
+        "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+      }
+    ]
+  },
+  "unverified": [
+    "Actual workload Node identity and process",
+    "Landlock filesystem denial",
+    "Resource enforcement",
+    "Workspace upload/download",
+    "Sandbox stop/start file persistence",
+    "Network enforcement",
+    "DSH integration",
+    "Employee acceptance"
+  ],
+  "preservedOriginalImagePullFailure": {
+    "name": "weiwu-probe-0e69d0d",
+    "sandboxId": "297d673e-400e-4e3f-9c73-fc4fe474964a"
+  },
+  "rawLocalEvidenceSha256": "b3552202ceccc7c59005a85a289649c4a9afa03d5326c61056396a9ed5027d10",
+  "rawReadonlyReconciliationSha256": "862d783a5caaa5e941ed0fc86f8f36a358286aff6c28efc45f6e2c3ef0f515c5"
+}

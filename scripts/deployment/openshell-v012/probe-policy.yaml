@@ -1,0 +1,13 @@
+# Minimal zero-model probe on stock node:24.19.0-bookworm-slim.
+version: 1
+filesystem_policy:
+  include_workdir: false
+  read_only: [/bin, /usr, /lib, /lib64, /etc, /proc, /dev/urandom, /var/tmp, /sandbox]
+  read_write: [/tmp, /dev/null]
+landlock:
+  compatibility: hard_requirement
+process:
+  run_as_user: "1000"
+  run_as_group: "1000"
+network_policies: {}
+network_middlewares: {}

@@ -4,12 +4,13 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { runResultView } from '../apps/web/src/run-result-view.ts';
 import { RunExtras } from '../apps/web/src/RunExtras.tsx';
+import type {RunLineageEvidence} from '../packages/contracts/run-lineage-evidence.ts';
 
 // Native mapping/checkpoint/seal structure mirrors actual completed Go runs;
 // these strings are isolated UI fixtures, not employee acceptance evidence.
 const runId='ui-fixture-run',managerOutput='经理任务原文：接受，附限制与未验证项。';
 const oldReply='captain old reply: t4 claimed; no report produced';
-const snapshot={requirement:'UI fixture',planVersion:14,policy:{maxBudget:5},
+const snapshot={requirement:'UI fixture',projectId:'ui-fixture-project',planVersion:14,policy:{maxBudget:5},
   agents:[{id:'developer',role:'member',name:'开发'},{id:'qa',role:'member',name:'QA'},{id:'manager',role:'manager',name:'经理'}],
   approvedTasks:[{id:'dev',assignee:'developer',subject:'开发',dependencies:[],inputs:[],outputs:[{path:'server.mjs'}]},
     {id:'qa_verify',assignee:'qa',subject:'独立测试',dependencies:['dev'],inputs:[{path:'server.mjs',producerTaskId:'dev'}],outputs:[{path:'acceptance.test.mjs'}]},
@@ -47,16 +48,24 @@ test('every approved node needs complete output and input seals, including exact
   events[1].data.inputs[0].sha256='c'.repeat(64);assert.equal(runResultView(runId,'completed','ok',fixed,events).kind,'runtime');
 });
 
-test('inherited seals bind immediate or explicitly recorded ancestor run, completed attempt and accepted file inventory',()=>{
+test('inherited seals require server-verified ancestry, completed attempt and accepted file inventory',()=>{
   const events=evidence(),seal={...events[1].data,runId:'original-dev-run'};events.splice(1,1);
   const restored={...snapshot,handoffCheckpoints:[seal],recovery:{sourceRunId:'immediate-parent',nodes:{dev:{historyRunId:'original-dev-run'}},
     completed:[{taskId:'dev',attemptId:'attempt-dev'}],files:[{path:'server.mjs',state:'accepted',producerTaskId:'dev',sha256:'a'.repeat(64),size:42}]}};
-  assert.equal(runResultView(runId,'completed','ok',restored,events).kind,'accepted-manager');
+  const lineage:RunLineageEvidence={version:1,runId,projectId:snapshot.projectId,planVersion:14,sourceRunId:'immediate-parent',status:'verified',
+   receipts:[{taskId:'dev',attemptId:'attempt-dev',sourceRunId:'original-dev-run',acceptanceSeq:2,receipt:seal}],tests:[],issues:[]};
+  assert.equal(runResultView(runId,'completed','ok',restored,events,[],lineage).kind,'accepted-manager');
+  assert.equal(runResultView(runId,'completed','ok',restored,events).kind,'runtime','a local snapshot/history summary alone is not ancestry proof');
+  const rewrittenHistory=structuredClone(restored);rewrittenHistory.recovery.nodes.dev.historyRunId='immediate-parent';
+  assert.equal(runResultView(runId,'completed','ok',rewrittenHistory,events,[],lineage).kind,'accepted-manager','verified ancestry handles historyRunId rewritten by repeated recovery');
   for(const mutate of [
-    (s:any)=>{delete s.recovery.nodes.dev.historyRunId;},(s:any)=>{s.recovery.completed[0].attemptId='foreign';},
+    (s:any)=>{s.recovery.sourceRunId='foreign-parent';},(s:any)=>{s.recovery.completed[0].attemptId='foreign';},
     (s:any)=>{s.recovery.files[0].sha256='b'.repeat(64);},(s:any)=>{s.recovery.files[0].producerTaskId='qa';},
     (s:any)=>{s.recovery.files[0].state='unverified';},(s:any)=>{s.handoffCheckpoints[0].runId='foreign-run';},
-  ]){const copy=structuredClone(restored);mutate(copy);assert.equal(runResultView(runId,'completed','ok',copy,events).kind,'runtime');}
+  ]){const copy=structuredClone(restored);mutate(copy);assert.equal(runResultView(runId,'completed','ok',copy,events,[],lineage).kind,'runtime');}
+  for(const alter of [(x:any)=>{x.runId='foreign';},(x:any)=>{x.status='unavailable';},(x:any)=>{x.projectId='foreign';},(x:any)=>{x.planVersion=13;},(x:any)=>{x.receipts[0].receipt.outputs=[];}]){
+   const copy=structuredClone(lineage);alter(copy);assert.equal(runResultView(runId,'completed','ok',restored,events,[],copy).kind,'runtime');
+  }
 });
 
 test('failed, interrupted, incomplete or unverified status never becomes an accepted delivery result',()=>{

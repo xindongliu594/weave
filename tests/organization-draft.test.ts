@@ -88,6 +88,19 @@ test('new settings ignore legacy fee fields but preserve model, execution budget
   assert.equal(normalizeOrganizationSettings('unrecognized-old-settings'), 'unrecognized-old-settings');
 });
 
+test('only an explicit new turn carries bounded validation context, without rewriting user messages or an old pending request', () => {
+  const base = initial(), pending = request(base, '原请求'), pendingBefore = JSON.stringify(pending);
+  const issue = { code: 'ORGANIZATION_CHAT_PLAN_INVALID', message: '实现缺少范围或验证命令。'.repeat(500) };
+  const failed: Draft = { ...base, pendingRequest: pending, draftIssue: issue };
+  const failedBefore = JSON.stringify(failed);
+  const next = createOrganizationChatRequest(failed, '请继续完善方案', 'settings');
+  assert.deepEqual(next.body.previousDraftIssue, { code: issue.code, message: issue.message.slice(0, 4000), truncated: true });
+  assert.deepEqual(next.body.messages, [...base.messages, { role: 'user', content: '请继续完善方案' }]);
+  assert.equal(JSON.stringify(failed), failedBefore); assert.equal(JSON.stringify(pending), pendingBefore);
+  const clarified = finishOrganizationReply(failed, next, { reply: '继续讨论' });
+  assert.equal(createOrganizationChatRequest(clarified, '下一条需求', 'settings').body.previousDraftIssue, undefined);
+});
+
 test('retrieving an old pending reply preserves its exact key, body and settings while normalizing only preview comparison', () => {
   const draft = initial(), settings = JSON.stringify({ modelId: draft.modelId, maxPlanningCost: .1, policy });
   const pending = request(draft, '原需求', settings), before = JSON.stringify(pending);

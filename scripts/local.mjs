@@ -1,6 +1,6 @@
 import { PGlite } from '@electric-sql/pglite';
 import { vector } from '@electric-sql/pglite-pgvector';
-import { PGLiteSocketServer } from '@electric-sql/pglite-socket';
+import { createLocalDatabaseSocket } from './local-database-socket.mjs';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync, readFileSync, existsSync, unlinkSync, appendFileSync } from 'node:fs';
@@ -9,9 +9,10 @@ import { isAbsolute, join, resolve } from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url)); process.chdir(root);
 const args = process.argv.slice(2), check = args.includes('--check'), production = args.includes('--production');
-if (args.includes('--help')) { console.log('为伍 · 一个想法，一支团队\n\nnpm run local -- [--web-port=4310] [--data-dir="绝对路径"] [--production]\nnpm run local:check\nnpm run build 然后 npm run local -- --production：使用已构建网页，无开发热更新\nnpm run local -- --enable-device：明确重新授予本机执行权限\n--data-dir 沿用指定本机数据目录、配置和已有目录授权，须先停止使用该目录的服务；检查模式不接受此参数。\n本机持久数据库与实际文件/命令执行；在模型目录配置自己的 API。'); process.exit(0); }
-if (args.some(value => value !== '--check' && value !== '--enable-device' && value !== '--production' && !/^--web-port=\d+$/.test(value) && !value.startsWith('--data-dir='))) throw Error('未知参数；请使用 --help');
+if (args.includes('--help')) { console.log('为伍 · 一个想法，一支团队\n\nnpm run local -- [--web-port=4310] [--data-dir="绝对路径"] [--production]\nnpm run local:check\nnpm run build 然后 npm run local -- --production：使用已构建网页，无开发热更新\nnpm run local -- --enable-device：明确重新授予原本机执行权限\nLOCAL_OPENSHELL_CONFIG 指向管理员已审核的独立 OpenShell JSON 配置，才启用新隔离执行设备；在项目策略中明确选择。\n--enable-openshell-device：仅在同一 OpenShell 配置下明确重新授予该隔离设备权限，不改变原本机设备。\n--data-dir 沿用指定本机数据目录、配置和已有目录授权，须先停止使用该目录的服务；检查模式不接受此参数。\n本机持久数据库与实际文件/命令执行；在模型目录配置自己的 API。'); process.exit(0); }
+if (args.some(value => value !== '--check' && value !== '--enable-device' && value !== '--enable-openshell-device' && value !== '--production' && !/^--web-port=\d+$/.test(value) && !value.startsWith('--data-dir='))) throw Error('未知参数；请使用 --help');
 if(check&&args.includes('--enable-device'))throw Error('检查模式不接受 --enable-device');
+if(check&&args.includes('--enable-openshell-device'))throw Error('检查模式不接受 --enable-openshell-device');
 if(check&&production)throw Error('检查模式不接受 --production；静态网页须单独验证，local:check 只验证本机 API 与执行器。');
 const dataDirs = args.filter(value => value.startsWith('--data-dir='));
 if (check && dataDirs.length) throw Error('检查模式不接受 --data-dir，检查只使用独立临时数据目录');
@@ -36,7 +37,7 @@ if (existsSync(lockFile)) {
 }
 writeFileSync(lockFile, JSON.stringify(lock), { flag: 'wx', mode: 0o600 });
 const diagnosticFile = join(directory, 'launcher-events.jsonl'), expectedChildStops = new WeakSet(), forcedChildStops = new WeakSet();
-let db, socket, child, childExit, web, shutdown, stopping = false, resolveStopped, apiPort, stage = 'database-starting';
+let db, socket, child, childExit, web, shutdown, stopping = false, checkPassed = false, resolveStopped, apiPort, stage = 'database-starting';
 const stopped = new Promise(resolve => { resolveStopped = resolve; });
 function recordEvent(event, details = {}) {
   // Only lifecycle metadata is saved; never capture the environment, IPC error messages or child output.
@@ -61,7 +62,11 @@ function stopChild() {
     if (!apiChild?.pid || apiChild.exitCode !== null || apiChild.signalCode !== null) return;
     expectedChildStops.add(apiChild);
     if (apiChild.connected) sendStop(apiChild); else if (apiChild.kill('SIGTERM')) forcedChildStops.add(apiChild);
-    const kill = setTimeout(() => { if (apiChild.kill('SIGKILL')) { forcedChildStops.add(apiChild); recordEvent('api-force-stopped', { apiPid: apiChild.pid, signal: 'SIGKILL' }); } }, 10000);
+    // The OpenShell adapter journals and stops its known sandboxes within a
+    // bounded 60-second close. Allow that cleanup to finish before forcing the
+    // API down; native/check mode keeps its existing ten-second deadline.
+    const shutdownGraceMs = !check && process.env.LOCAL_OPENSHELL_CONFIG ? 90000 : 10000;
+    const kill = setTimeout(() => { if (apiChild.kill('SIGKILL')) { forcedChildStops.add(apiChild); recordEvent('api-force-stopped', { apiPid: apiChild.pid, signal: 'SIGKILL' }); } }, shutdownGraceMs);
     await exited; clearTimeout(kill);
   })();
 }
@@ -69,8 +74,16 @@ function stop() {
   return shutdown ??= (async () => {
     if (!stopping) recordEvent('shutdown-requested', { reason: process.exitCode ? 'launcher-failed' : check ? 'check-completed' : 'requested' });
     stopping = true;
-    try { await web?.close(); await stopChild(); await socket?.stop(); await db?.close(); }
-    finally { if (existsSync(lockFile) && JSON.parse(readFileSync(lockFile, 'utf8')).id === lock.id) unlinkSync(lockFile); recordEvent('launcher-stopped'); resolveStopped(); }
+    try {
+      await web?.close(); await stopChild(); await socket?.stop(); await db?.close();
+      if (existsSync(lockFile) && JSON.parse(readFileSync(lockFile, 'utf8')).id === lock.id) unlinkSync(lockFile);
+      recordEvent('launcher-stopped');
+    } catch (error) {
+      // Keep the owned lock when cleanup fails. A later launch may recover it
+      // only after its PID is dead; incomplete shutdown is never a clean stop.
+      recordEvent('launcher-shutdown-failed', errorMetadata(error));
+      throw error;
+    } finally { resolveStopped(); }
   })();
 }
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => requestStop('signal-' + signal));
@@ -80,12 +93,13 @@ recordEvent('launcher-start');
 try {
   console.log('正在启动为伍本机真实 API 工作空间…');
   db = await PGlite.create({ dataDir: join(directory, 'database'), extensions: { vector } }); ensureActive();
-  socket = new PGLiteSocketServer({ db, host: '127.0.0.1', port: 0, maxConnections: 8 });
+  socket = createLocalDatabaseSocket({ db, host: '127.0.0.1', port: 0, maxConnections: 8 });
   let dbPort; socket.addEventListener('listening', event => { dbPort = event.detail.port; }); await socket.start(); ensureActive();
   const launchApi = async () => {
     stage = 'api-starting'; apiPort = undefined;
-    const env = { ...process.env, AGENT_DEPARTMENT_LOCAL: 'isolated', LOCAL_ENABLE_DEVICE: args.includes('--enable-device')?'explicit':'', LOCAL_WORKSPACE_ROOT: directory, DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${dbPort}/postgres`, DATA_DIR: join(directory, 'credentials'), TRACE_ROOT: join(directory, 'runs'), OBSIDIAN_VAULT: join(directory, 'obsidian-vault'), ALLOWED_ORIGINS: '' };
+    const env = { ...process.env, AGENT_DEPARTMENT_LOCAL: 'isolated', LOCAL_ENABLE_DEVICE: args.includes('--enable-device')?'explicit':'', LOCAL_ENABLE_OPENSHELL_DEVICE:args.includes('--enable-openshell-device')?'explicit':'', LOCAL_WORKSPACE_ROOT: directory, DATABASE_URL: `postgresql://postgres:postgres@127.0.0.1:${dbPort}/postgres`, DATA_DIR: join(directory, 'credentials'), TRACE_ROOT: join(directory, 'runs'), OBSIDIAN_VAULT: join(directory, 'obsidian-vault'), ALLOWED_ORIGINS: '' };
     delete env.NODE_OPTIONS; delete env.NODE_PATH; delete env.AGENT_DEPARTMENT_DEMO;
+    if(check)delete env.LOCAL_OPENSHELL_CONFIG;
     const apiChild = spawn(process.execPath, ['--import', 'tsx', 'scripts/local-api.ts'], { cwd: root, env, stdio: ['ignore', 'inherit', 'inherit', 'ipc'], windowsHide: true });
     child = apiChild;
     const metadata = { apiPid: apiChild.pid ?? null, apiPort: null };
@@ -113,6 +127,7 @@ try {
       apiChild.on('message', value => { if (value?.type === 'ready') { clearTimeout(timeout); resolve(value); } else if (value?.type === 'error') { clearTimeout(timeout); reject(Error(value.message)); } });
     });
     metadata.apiPort = apiPort = ready.apiPort; stage = 'api-ready'; recordEvent('api-ready', metadata);
+    if(ready.openshell?.status!=='not-configured')recordEvent('openshell-device-status',{status:ready.openshell?.status??'unavailable',...(ready.openshell?.deviceId?{deviceId:ready.openshell.deviceId}:{}),...(ready.openshell?.code?{errorCode:ready.openshell.code}:{})});
     ensureActive(); return ready;
   };
   const ready = await launchApi();
@@ -127,7 +142,7 @@ try {
     await fetch(`http://127.0.0.1:${reopened.apiPort}/api/local-devices/${saved.deviceId}`,{method:'DELETE',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(5000)}).then(response=>{if(!response.ok)throw Error('停用设备检查失败：'+response.status);});
     await stopChild(); const disabled = await launchApi();
     await verifyLocal(`http://127.0.0.1:${disabled.apiPort}/api`, directory, {...saved,disabled:true});
-    console.log('本机运行检查通过：外部 API 配置、本机执行、逐次审批和重启后配置/授权保留；未调用付费模型。');
+    checkPassed = true;
   } else {
     stage = 'web-starting';
     if (production) web = await staticWeb.createLocalStaticWeb({ buildRoot: join(root, 'dist/web'), apiPort: ready.apiPort, webPort: port });
@@ -140,3 +155,4 @@ try {
   }
 } catch (error) { if (!stopping) { recordEvent('launcher-failed', errorMetadata(error)); console.error('本机启动或检查失败：' + error.message + '\n诊断记录：' + diagnosticFile); process.exitCode = 1; } }
 finally { await stop(); }
+if (checkPassed && !process.exitCode) console.log('本机运行检查通过：外部 API 配置、本机执行、逐次审批和重启后配置/授权保留；未调用付费模型。');

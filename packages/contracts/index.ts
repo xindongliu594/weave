@@ -26,6 +26,13 @@ export const departmentSchema = z.object({
   if (new Set(d.agents.map(a => a.id)).size !== d.agents.length)
     ctx.addIssue({ code: 'custom', message: '员工 ID 不能重复' });
 });
+export const executionBackendSchema = z.discriminatedUnion('kind',[
+  z.object({kind:z.literal('native')}),
+  z.object({kind:z.literal('openshell'),version:z.literal('0.1.2'),gateway:z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/),
+    image:z.string().max(300).regex(/^[a-zA-Z0-9./:_-]+@sha256:[a-f0-9]{64}$/),
+    policySha256:z.string().regex(/^[a-f0-9]{64}$/),fingerprint:z.string().regex(/^[a-f0-9]{64}$/)}),
+]);
+export type ExecutionBackend = z.infer<typeof executionBackendSchema>;
 export const policySchema = z.object({
   maxBudget: z.number().finite().positive().max(10000),
   maxAgents: z.number().int().min(1).max(6),
@@ -41,7 +48,7 @@ export const policySchema = z.object({
   maxReadRetries: z.number().int().min(0).max(2).optional(),
   executionTarget: z.discriminatedUnion('kind',[
     z.object({kind:z.literal('server')}),
-    z.object({kind:z.literal('local'),deviceId:z.uuid(),grantId:z.uuid()}),
+    z.object({kind:z.literal('local'),deviceId:z.uuid(),grantId:z.uuid(),backend:executionBackendSchema.optional()}),
   ]).optional(),
   mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
   preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
@@ -171,6 +178,13 @@ export type Usage = { runId?: string|null; agentId?: string|null; employeeId?: s
 export const placeholderTaskSubject = '完成需求并提交验收材料';
 export const placeholderTaskCriterion = '交付内容覆盖用户需求，并提供可核验的结果';
 export const planningRequiredMessage = '当前仍有默认占位任务。请先生成 AI 方案，或编辑任务的具体目标、负责人和验收标准，再批准运行。';
+// The compatible adapter currently advertises no DSH reasoning-effort metadata.
+// Text/tool probes do not establish support for this separate configuration.
+export const agentReasoningPlanningInstructions = '当前执行适配器尚未声明主模型或备用模型支持显式 reasoningEffort。所有员工必须省略 reasoningEffort，使用模型默认；不能因模型名称、文本/工具测试通过或 thinkingMode 推测支持 low/medium/high。保存方案中的显式强度仅是旧配置参考，不代表当前支持；候选应明确说明需改为模型默认，不能声称已修改员工配置。';
+export function agentReasoningErrors(agents: readonly Pick<Agent, 'name' | 'modelId' | 'fallbackModelId' | 'reasoningEffort'>[]): string[] {
+  return agents.filter(agent => agent.reasoningEffort !== undefined).map(agent =>
+    `员工「${agent.name}」指定了推理强度 ${agent.reasoningEffort}；当前执行适配器尚未声明主模型 ${agent.modelId}${agent.fallbackModelId ? ` 和备用模型 ${agent.fallbackModelId}` : ''} 支持显式推理强度。请在员工设置中选择「使用模型默认（不指定）」后重新检查并确认方案；不会自动删除配置或更换模型。`);
+}
 // Match the legacy seed as well as new drafts. Changing models, budgets or
 // tools does not turn the automatically inserted task into an executable plan.
 export function hasUnplannedTasks(plan: { tasks: readonly { subject?: string; acceptanceCriteria?: readonly string[] }[] }): boolean {
@@ -190,6 +204,8 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   check('并发上限', policy.maxConcurrentAgents <= policy.maxAgents, '并发数不能超过 Agent 人数上限');
   check('模型可用性', plan.agents.every(a => models.some(m => m.id === a.modelId && m.status === 'available')), '请为所有员工选择连接测试通过的模型');
   check('备用模型可用性', plan.agents.every(a => !a.fallbackModelId || models.some(m => m.id === a.fallbackModelId && m.status === 'available')), '备用模型也必须存在且可用');
+  const reasoningErrors = agentReasoningErrors(plan.agents);
+  check('员工推理强度兼容性', reasoningErrors.length === 0, reasoningErrors.join('；'));
   if(requireToolSupport)check('团队工具协议能力',plan.agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>models.find(m=>m.id===id)?.capabilities?.tools?.status==='supported')),'团队调度本身需要工具调用；所有主模型和备用模型必须通过工具往返测试');
   check('本次资料授权', (plan.runInputs??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '本次资料的授权员工必须在方案中，并开启知识检索工具');
   check('导入资料授权', (plan.workFileSelections??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '导入资料的接收员工必须在方案中，并开启知识检索工具');

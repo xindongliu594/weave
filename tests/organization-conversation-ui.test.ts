@@ -41,6 +41,40 @@ const preview = (): Preview => ({ previewId: 'legacy-preview', source: 'model', 
     dependencies: [], acceptanceCriteria: ['保存真实验收结果'], estimatedInputTokens: 100, estimatedOutputTokens: 100 }] }, validation: { valid: true, errors: [] } });
 const draft = (): Draft => ({ messages: [{ role: 'user', content: '原始需求' }, { role: 'assistant', content: '旧回复完整保留' }], modelId: 'planner', policy, maxPlanningCost: .1, input: '',
   preview: preview(), previewSettings: JSON.stringify({ modelId: 'planner', policy, maxPlanningCost: .1 }) });
+test('first conversation gets a 128000-byte context policy without changing the execution budget', () => {
+  const storage = new MemoryStorage(), first = ui.readOrganizationDraft(storage);
+  assert.equal(first.policy.contextBytes, 128000);
+  assert.equal(first.policy.maxBudget, 1); assert.equal(first.policy.maxModelCalls, 100);
+  assert.deepEqual(first.messages, []); assert.equal(first.preview, undefined); assert.equal(first.pendingRequest, undefined);
+  assert.equal(storage.writes, 0);
+});
+
+test('valid legacy explicit 64000 and absent context policies reload without migration or preview changes', () => {
+  for (const legacyPolicy of [{ ...policy, contextBytes: 64000 }, { ...policy }]) {
+    const value = draft(); value.policy = legacyPolicy; value.preview!.policy = legacyPolicy;
+    const original = JSON.stringify(value), storage = new MemoryStorage(); storage.values.set(storageKey, original);
+    const read = ui.readOrganizationDraft(storage);
+    assert.deepEqual(read.policy, legacyPolicy); assert.deepEqual(read.preview, value.preview);
+    assert.equal(read.policy.contextBytes, legacyPolicy.contextBytes);
+    assert.equal(storage.getItem(storageKey), original); assert.equal(storage.writes, 0);
+    const reset = ui.resetOrganizationDraft(read, { confirm: () => true });
+    assert.deepEqual(reset?.draft.policy, legacyPolicy, 'explicit new dialogue retains the user-selected policy');
+  }
+});
+
+test('legacy pending policy bytes remain exact when new conversations have a larger default', t => {
+  const fetch = t.mock.method(globalThis, 'fetch', async () => { throw Error('reload must not call a model'); });
+  for (const legacyPolicy of [{ ...policy, contextBytes: 64000 }, { ...policy }]) {
+    const value = draft(); value.policy = legacyPolicy; value.preview!.policy = legacyPolicy;
+    value.pendingRequest = { key: 'legacy-context-key', settings: value.previewSettings!, body: {
+      messages: [...value.messages, { role: 'user', content: '保留原请求' }], modelId: value.modelId, policy: legacyPolicy, templateId: 'software', previousPreviewId: value.preview!.previewId } };
+    const original = JSON.stringify(value.pendingRequest), storage = new MemoryStorage(); storage.values.set(storageKey, JSON.stringify(value));
+    const read = ui.readOrganizationDraft(storage);
+    assert.equal(JSON.stringify(read.pendingRequest), original); assert.deepEqual(read.preview, value.preview);
+    assert.equal(JSON.stringify(JSON.parse(storage.getItem(storageKey)!).pendingRequest), original);
+    assert.equal(storage.writes, 0); assert.equal(fetch.mock.calls.length, 0);
+  }
+});
 const models: Model[] = [{ id: 'planner', name: 'Planner fixture', model: 'fixture', gatewayId: 'local-fixture', inputRate: 1, outputRate: 2, version: 1, status: 'available' }];
 function markup(storage: MemoryStorage) {
   const previous = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');

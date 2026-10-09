@@ -1,0 +1,58 @@
+{
+  "before": {
+    "basis": "Offline captured real three-run evidence; mutation only of in-memory operation copies",
+    "sourceSha256": "b05f945c036b97a9704f619eda5d3302fc59934bf47edfa35aa740109c1365d6",
+    "results": [
+      {
+        "scenario": "unchanged",
+        "status": "verified",
+        "qaShown": true,
+        "issueCodes": []
+      },
+      {
+        "scenario": "mismatched-workspace",
+        "status": "verified",
+        "qaShown": true,
+        "issueCodes": []
+      },
+      {
+        "scenario": "missing-workspace",
+        "status": "verified",
+        "qaShown": true,
+        "issueCodes": []
+      }
+    ],
+    "modelCalls": 0,
+    "productionMutations": 0
+  },
+  "after": {
+    "basis": "Offline captured real three-run evidence; mutation only of in-memory operation copies",
+    "sourceSha256": "bd901862895f17eb0d22d636b2f23f1c29db82f709c64217b9d98b5edf5e9858",
+    "results": [
+      {
+        "scenario": "unchanged",
+        "status": "verified",
+        "qaShown": true,
+        "issueCodes": []
+      },
+      {
+        "scenario": "mismatched-workspace",
+        "status": "partial",
+        "qaShown": false,
+        "issueCodes": [
+          "COMMAND_UNAVAILABLE"
+        ]
+      },
+      {
+        "scenario": "missing-workspace",
+        "status": "partial",
+        "qaShown": false,
+        "issueCodes": [
+          "COMMAND_UNAVAILABLE"
+        ]
+      }
+    ],
+    "modelCalls": 0,
+    "productionMutations": 0
+  }
+}

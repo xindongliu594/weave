@@ -28,8 +28,10 @@ function decodeFiles(files){
  return files.map(file=>{
   validPath(file?.path);
   const key=file.path.toLowerCase();
-  if(names.has(key)||[...names].some(name=>name.startsWith(key+'/')||key.startsWith(name+'/'))||typeof file.content!=='string'||file.content.length>7*1024*1024||! /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(file.content))throw denied('回传文件格式不正确');
-  names.add(key);const bytes=Buffer.from(file.content,'base64');total+=bytes.length;
+  if(names.has(key)||[...names].some(name=>name.startsWith(key+'/')||key.startsWith(name+'/'))||typeof file.content!=='string'||file.content.length>7*1024*1024||file.content.length%4!==0||! /^[A-Za-z0-9+/]*={0,2}$/.test(file.content))throw denied('回传文件格式不正确');
+  // Avoid a repeated-group regex stack overflow at the supported 5 MiB limit.
+  const bytes=Buffer.from(file.content,'base64');if(bytes.toString('base64')!==file.content)throw denied('回传文件格式不正确');
+  names.add(key);total+=bytes.length;
   if(bytes.length>5*1024*1024||total>20*1024*1024)throw denied('文件大小超过限制','LOCAL_FILE_LIMIT');
   return {path:file.path,bytes};
  }).sort(compareArtifactPaths);

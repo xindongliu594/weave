@@ -1,0 +1,24 @@
+{
+  "version": "0.1.2",
+  "verifiedDate": "2026-10-08",
+  "method": "Anonymous HTTPS OCI registry manifest GET through jj's explicitly configured HTTP proxy; no image layers pulled",
+  "status": "all three tags returned HTTP 200; linux/amd64 and linux/arm64 present",
+  "images": {
+    "gateway": "ghcr.io/nvidia/openshell/gateway:0.1.2@sha256:2fe4dad9118e14ab80a8258b545ea6e6cd74c3469e24ad4e6610f964d98913a2",
+    "sandbox": "ghcr.io/nvidia/openshell/sandbox:0.1.2@sha256:bf4797b6c511f2d8ba02955dbba4bf76c1f0dd6d83531420c5408d5f1fb9d72f",
+    "supervisor": "ghcr.io/nvidia/openshell/supervisor:0.1.2@sha256:d7b5264bb6bc56f4796e6fa3617b8e4a8d785be0b7293542efd8cc250b0fb67a"
+  },
+  "sources": [
+    "https://github.com/NVIDIA/OpenShell/releases/tag/v0.1.2",
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/deploy/docker/docker-compose.yml",
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/deploy/docker/gateway.toml",
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/docs/how-it-works/gateways/configuration.mdx",
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/docs/how-it-works/gateways/authentication.mdx",
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/crates/openshell-server/src/certgen.rs"
+  ],
+  "notVerified": [
+    "Docker daemon registry connectivity/image pulls",
+    "OpenShell binary config preflight",
+    "Gateway startup, protected API authentication and sandbox execution"
+  ]
+}

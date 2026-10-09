@@ -84,6 +84,45 @@ test('valid JSON exactly at the cap remains a tool call for explicit and legacy 
   });
 });
 
+test('execution text length failure settles known usage before MAX_TOKENS and never emits partial work or fallback', async () => {
+  const partial = { choices: [{ message: { content: 'Truncated review ends in Inf' }, finish_reason: 'length' }], usage: { prompt_tokens: 17, completion_tokens: 800 } };
+  await withFixture(partial, async ({ wires, fixtureRoute }) => {
+    const usage = [], errors = [], failures = [], fallbacks = [], chunks = [], saved = Promise.withResolvers();
+    const adapter = new OpenAiCompatibleAdapter({ routes: [fixtureRoute, { ...fixtureRoute, id: 'backup' }], tasks: [task], maxBudget: 1,
+      onUsage: async item => { await saved.promise; usage.push(item); }, onError: error => { assert.equal(usage.length, 1); errors.push(error); },
+      beforeRequest: async () => {}, onCallError: error => failures.push(error), onFallback: item => fallbacks.push(item) });
+    adapter.attribution = () => ({ sessionId: options.sessionId, taskId: task.id, employeeId: task.assigneeId });
+    adapter.sessionPolicies.set(options.sessionId, { fallbackModelId: 'backup' });
+    const done = assert.rejects(consume(adapter, chunks), error => error.code === 'MAX_TOKENS' && /800 Token/.test(error.message) && !error.message.includes('Truncated review'));
+    while (!wires.length) await new Promise(resolve => setTimeout(resolve, 1));
+    assert.deepEqual(chunks, []); assert.deepEqual(errors, []);
+    saved.resolve(); await done;
+    assert.equal(wires.length, 1); assert.equal(usage.length, 1); assert.equal(usage[0].cost, 1617 / 1e6);
+    assert.equal(adapter.spent, usage[0].cost); assert.equal(adapter.reserved, 0); assert.equal(adapter.pendingRequests, 0);
+    assert.deepEqual(chunks, []); assert.deepEqual(failures, []); assert.deepEqual(fallbacks, []); assert.equal(errors.length, 1);
+  });
+});
+
+test('length text cannot bypass the gate through an apparently complete tool JSON or smaller reported output', async () => {
+  await withFixture(reply([call('{"path":"fixture.txt","content":"complete"}')], 7, 'length'), async ({ fixtureRoute, wires }) => {
+    const usage = [], chunks = [];
+    const adapter = new OpenAiCompatibleAdapter({ routes: [fixtureRoute], tasks: [task], maxBudget: 1, onUsage: item => usage.push(item) });
+    adapter.attribution = () => ({ taskId: task.id, employeeId: task.assigneeId });
+    await assert.rejects(consume(adapter, chunks), error => error.code === 'MAX_TOKENS');
+    assert.deepEqual(chunks, []); assert.equal(wires.length, 1); assert.equal(usage[0].outputTokens, 7); assert.equal(adapter.reserved, 0);
+  });
+});
+
+test('compaction retains native max-tokens signalling and normal stop text never implies task completion', async () => {
+  for (const purpose of ['compaction', 'execution']) await withFixture({ choices: [{ message: { content: 'local text only' }, finish_reason: purpose === 'compaction' ? 'length' : 'stop' }], usage: { prompt_tokens: 17, completion_tokens: 5 } }, async ({ fixtureRoute, wires }) => {
+    const usage = [], chunks = [], adapter = new OpenAiCompatibleAdapter({ routes: [fixtureRoute], maxBudget: 1, onUsage: item => usage.push(item) });
+    for await (const chunk of adapter.stream({ ...options, purpose, tools: undefined })) chunks.push(chunk);
+    assert.equal(chunks.at(-1).reason.kind, purpose === 'compaction' ? 'max-tokens' : 'stop');
+    assert.equal(wires.length, 1); assert.equal(usage.length, 1); assert.equal(adapter.reserved, 0);
+    assert.ok(chunks.every(chunk => chunk.type !== 'block-end' || chunk.block.type !== 'tool-call'));
+  });
+});
+
 test('invalid JSON below the cap or without upstream tool_calls does not invent a truncation diagnosis', async () => {
   const incomplete = '{"path":"unfinished';
   for (const [outputTokens, finishReason] of [[799, 'tool_calls'], [800, 'stop']]) {

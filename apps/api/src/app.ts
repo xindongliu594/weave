@@ -1,4 +1,7 @@
 import {employeeHistoryRouter} from './employee-history.ts';
+import { departmentWorkbenchRouter } from './department-workbench.ts';
+import { openRigRouter } from './openrig-router.ts';
+import { runLineageEvidenceRouter } from './run-lineage-evidence.ts';
 import {bindPolicy,assertPolicy,assertPlanningModel} from './execution-policy.ts';
 import { probeTools,routeFingerprint } from './model-capabilities.ts';
 import { startKnowledgeIndex,waitKnowledgeIndex } from './knowledge-vector.ts';
@@ -114,6 +117,9 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.use('/api', knowledgeRouter());
   app.use('/api', productRouter());
   app.use('/api', employeeHistoryRouter());
+  app.use('/api', departmentWorkbenchRouter(pool));
+  app.use('/api', openRigRouter(pool));
+  app.use('/api', runLineageEvidenceRouter(pool,traceRoot));
   app.use('/api', costRouter());
   app.use('/api', runManagementRouter(traceRoot));
   app.use('/api', backupRouter(traceRoot));

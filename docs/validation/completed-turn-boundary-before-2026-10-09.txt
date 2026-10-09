@@ -1,0 +1,28 @@
+✖ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (2319.7031ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2787.5717
+
+✖ failing tests:
+
+test at services\agent-runtime\quality-handoff.test.mjs:108:1
+✖ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (2319.7031ms)
+  AssertionError [ERR_ASSERTION]: accepted handoff must end its turn before another model request
+  
+  2 !== 0
+  
+      at qualityScenario (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/quality-handoff.test.mjs:85:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

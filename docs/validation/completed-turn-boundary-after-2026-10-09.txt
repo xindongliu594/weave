@@ -1,0 +1,26 @@
+✔ native quality contracts receive actual file and command evidence before independent review (2000.8423ms)
+✔ model claims of a passed command cannot unlock native quality work (1106.0854ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (1412.8738ms)
+✔ review revision cannot create an unapproved automatic repair graph (2074.7521ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (2113.798ms)
+✔ a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate (1947.1758ms)
+✔ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (1922.5439ms)
+✔ review and requirements have a compact native completion guide while all contracts remain unchanged (3.5565ms)
+✔ the guide invents no numeric output cap and unrelated task kinds receive no review instructions (0.7651ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (4988.2132ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (5812.1486ms)
+✔ out-of-scope finding cannot create a repair task (1892.1209ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (1721.2749ms)
+✔ explicit reject stops the loop even with spare rework allowance (1624.3742ms)
+✔ repair model calls share the original task allowance (2574.7416ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (2117.2256ms)
+✔ repair cannot overwrite a changed file with a stale hash (3367.4227ms)
+✔ duplicate finding IDs cannot authorize a repair graph (2582.1992ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27372.1223

@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "basis": "Existing captured real archives and local-operation API receipts; no model or production mutation",
+  "runId": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+  "inputArchiveHashes": [
+    {
+      "name": "openshell-v12-manager-final-captured",
+      "sha256": "b5f694129b749de82d2f840ace4e730b2788d1f61f6f1d7f871cd7f96128e7f4"
+    },
+    {
+      "name": "openshell-v12-child-final-captured",
+      "sha256": "b74224f8397f20c90228ecfd4534663401b4bd7e0571fefae36a3622397731fb"
+    },
+    {
+      "name": "openshell-v12-parent-captured",
+      "sha256": "7e472113d46f3f32affa5605d161cb0f9046031a31aeb64f45925f176708e8ee"
+    }
+  ],
+  "lineageStatus": "verified",
+  "issues": [],
+  "receipts": [
+    {
+      "taskId": "T1",
+      "attemptId": "fc3d5e14-2362-480e-8500-b0a3aae080f4",
+      "sourceRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+      "acceptanceSeq": 497
+    },
+    {
+      "taskId": "T2",
+      "attemptId": "fb98dfd4-2e21-4bbf-84c5-22bea1fe9b4b",
+      "sourceRunId": "7da3c44b-d8fa-4b0e-9c15-e9130ed0772a",
+      "acceptanceSeq": 2248
+    }
+  ],
+  "tests": [
+    {
+      "taskId": "T1",
+      "attemptId": "fc3d5e14-2362-480e-8500-b0a3aae080f4",
+      "sourceRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+      "operationId": "41fbfe3f-d06c-4a06-9a50-2b0276a58ab4",
+      "command": "node --check cli.mjs",
+      "exitCode": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "workspaceRevision": "c9b7ecb8300086a06a9f2c30b46ad31b729ab9096a6cda01d728ab80c53b7d4f",
+      "observationSeq": 429,
+      "acceptanceSeq": 497,
+      "nodeTests": {
+        "status": "unknown",
+        "reason": "NOT_SINGLE_NODE_TEST_COMMAND"
+      },
+      "outputTextOmitted": true
+    },
+    {
+      "taskId": "T2",
+      "attemptId": "fb98dfd4-2e21-4bbf-84c5-22bea1fe9b4b",
+      "sourceRunId": "7da3c44b-d8fa-4b0e-9c15-e9130ed0772a",
+      "operationId": "ac15d4f2-d455-45ae-85de-44b8c19cde0d",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "outputSha256": "f9ba46fb6bd156e379dd4a75b2725d7f34bfd48ce7c0495c18e705c2cff53eeb",
+      "workspaceRevision": "4acc637e320b4b040956383ab220354710e86f106d9055d172cbf8d51d4be16b",
+      "observationSeq": 2099,
+      "acceptanceSeq": 2248,
+      "nodeTests": {
+        "status": "available",
+        "format": "spec",
+        "tests": 10,
+        "suites": 0,
+        "pass": 10,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputTextOmitted": true
+    }
+  ],
+  "managerView": {
+    "kind": "accepted-manager",
+    "taskId": "T3",
+    "acceptanceSeq": 260
+  },
+  "modelCalls": 0,
+  "productionMutations": 0
+}

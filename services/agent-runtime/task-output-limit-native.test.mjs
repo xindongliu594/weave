@@ -16,7 +16,7 @@ const contextName = 'department:approved-context';
 const route = { id: 'shared', name: 'local-only fixture', wireModel: 'no-network', baseUrl: 'https://fixture.invalid/v1',
   inputRate: 1, outputRate: 2, maxOutputTokens: 4096 };
 
-async function nativeScenario(resume) {
+async function nativeScenario(resume, truncated = false) {
   const root = await mkdtemp(join(tmpdir(), 'task-cap-native-')), originalFetch = globalThis.fetch;
   const contents = 'local fixed-version reference\n', sha256 = digest(contents);
   writeFileSync(join(root, 'server.mjs'), contents);
@@ -62,7 +62,7 @@ async function nativeScenario(resume) {
     calls++;
     return Response.json({ choices: [{ message: calls === 1 ? { tool_calls: [{ id: randomUUID(), type: 'function',
       function: { name: 'agent_teams_claim_task', arguments: JSON.stringify({ task_id: current.runtimeTaskId }) } }] } : { content: 'local inspection only' },
-    finish_reason: calls === 1 ? 'tool_calls' : 'stop' }], usage: { prompt_tokens: 17, completion_tokens: 4 } });
+    finish_reason: calls === 1 ? 'tool_calls' : truncated ? 'length' : 'stop' }], usage: { prompt_tokens: 17, completion_tokens: calls > 1 && truncated ? 321 : 4 } });
   };
   try {
     host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
@@ -89,14 +89,24 @@ async function nativeScenario(resume) {
     for (const current of admitted) {
       assert.deepEqual(current.contract.task.inputs, check.inputs); assert.equal(current.contract.requirement, snapshot.requirement);
       assert.equal(current.contract.task.estimatedOutputTokens, 9000); assert.equal(current.contract.task.maxOutputTokens, 321);
-      const session = host.ctx.agents.get(current.sessionId).session;
-      assert.ok(session.snapshotEvents().some(event => event.type === 'user/message' && JSON.stringify(event.data) === JSON.stringify(current.message)),
+      const sessionEvents = readRun(join(root,'runs'),archive.id).events.filter(event=>event.sessionId===current.sessionId);
+      assert.ok(sessionEvents.some(event => event.type === 'session/user/message' && JSON.stringify(event.data) === JSON.stringify(current.message)),
         'the cap and full contract supplied to the model are durably archived as the same native user snapshot');
       if (resume) {
         assert.equal(current.contract.recovery.sourceRunId, 'local-fixture-parent');
         assert.equal(current.contract.recovery.files[0].sha256, sha256);
         assert.equal(current.contract.budget.task.retainedTaskReservations, .03);
       }
+    }
+    if(truncated){
+      const deadline=Date.now()+5000;let run;
+      do{run=readRun(join(root,'runs'),archive.id);if(run.events.some(event=>event.type==='session/turn/end'&&event.data.reason?.kind==='error'))break;await new Promise(resolve=>setTimeout(resolve,10));}while(Date.now()<deadline);
+      const status=host.checkpointState();
+      assert.notEqual(status.tasks.at(-1).status,'completed');
+      assert.ok(run.events.some(event=>event.type==='session/turn/end'&&event.data.reason?.kind==='error'&&event.data.reason.error?.code==='MAX_TOKENS'&&event.data.reason.error.message.includes('截断')));
+      assert.equal(run.events.filter(event=>event.type==='handoff/accepted').length,0);assert.equal(calls,2);assert.equal(usage.length,2);assert.equal(adapter.reserved,0);
+    }else if(!resume){
+      const status=host.checkpointState();assert.notEqual(status.tasks[0].status,'completed','ordinary final text is not a completion tool');assert.ok(!readRun(join(root,'runs'),archive.id).events.some(event=>event.type==='handoff/accepted'));
     }
     assert.equal(adapter.budget.run.calls, (resume ? 4 : 0) + 2);
     assert.equal(adapter.budget.tasks.get('check').calls, (resume ? 2 : 0) + 2);
@@ -115,3 +125,4 @@ async function nativeScenario(resume) {
 
 test('first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch', { timeout: 10000 }, () => nativeScenario(false));
 test('cold native restore retains completed attempts, fixed SHA, unknown task holds and the original per-call cap without producer replay', { timeout: 10000 }, () => nativeScenario(true));
+test('an independently owned employee capped final text records MAX_TOKENS and known fees without a handoff or automatic continuation', { timeout: 15000 }, () => nativeScenario(false,true));

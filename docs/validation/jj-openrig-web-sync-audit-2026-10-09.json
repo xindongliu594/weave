@@ -1,0 +1,240 @@
+{
+  "date": "2026-10-09",
+  "scope": "Real browser-created OpenRig metadata item, independent read-only audit and isolated SQLite backup/restore; no employee/model completion claim",
+  "beforeBackup": {
+    "kind": "independent-openrig-web-sync-audit",
+    "readOnly": true,
+    "status": "passed",
+    "projectId": "c547e45b-393a-4848-b707-defa6005a26f",
+    "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+    "queueItemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+    "officialQueueState": "pending",
+    "sourceSession": "dev-manager@weiwu-pilot-3c0cb5ee",
+    "destinationSession": "dev-dev@weiwu-pilot-3c0cb5ee",
+    "metadataVersion": 1,
+    "metadataFields": [
+      "source",
+      "projectId",
+      "projectVersion",
+      "departmentId",
+      "departmentName",
+      "requirementSummary",
+      "sourceEmployeeId",
+      "destinationEmployeeId",
+      "executionAuthority",
+      "acceptanceAuthority"
+    ],
+    "payloadSha256": "95baed7576452afc4908f0fab0f345a282decea49353a60556439d0f9ad0b5c8",
+    "localReceipt": {
+      "schema": 1,
+      "endpointFingerprint": "af82618b696748b81bc3fe56dcd5195b82a2206eba2404871e58cc8f79f3d321",
+      "projectId": "c547e45b-393a-4848-b707-defa6005a26f",
+      "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+      "sourceEmployeeId": "mgr-1",
+      "destinationEmployeeId": "dev-1",
+      "qitemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+      "payloadSha256": "95baed7576452afc4908f0fab0f345a282decea49353a60556439d0f9ad0b5c8",
+      "outcome": "confirmed"
+    },
+    "departmentSeats": [
+      {
+        "employeeId": "mgr-1",
+        "logicalId": "dev.manager",
+        "role": "manager",
+        "nodeId": "01M4FVAV13XCQSDBX8NR8CQFA3",
+        "session": "dev-manager@weiwu-pilot-3c0cb5ee"
+      },
+      {
+        "employeeId": "dev-1",
+        "logicalId": "dev.dev",
+        "role": "developer",
+        "nodeId": "01M4FVAV1464J022EM1GNAM5Z1",
+        "session": "dev-dev@weiwu-pilot-3c0cb5ee"
+      },
+      {
+        "employeeId": "qa-1",
+        "logicalId": "dev.qa",
+        "role": "qa",
+        "nodeId": "01M4FVAV15MTQMS90ZP7A9Q7E5",
+        "session": "dev-qa@weiwu-pilot-3c0cb5ee"
+      }
+    ],
+    "publicApiStatus": {
+      "enabled": true,
+      "status": "ready",
+      "acceptanceAuthority": "weiwu"
+    },
+    "publicApiMapping": {
+      "projectId": "c547e45b-393a-4848-b707-defa6005a26f",
+      "enabled": true,
+      "status": "synced",
+      "queueItemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+      "queueState": null,
+      "acceptanceAuthority": "weiwu"
+    },
+    "queueItemCount": 1,
+    "matchingQueueItemCount": 1,
+    "process": {
+      "pid": 3186171,
+      "selfHostId": "host-91ecbc4f",
+      "noKernel": true,
+      "loopbackOnly": true,
+      "noProviderEnvironment": true
+    },
+    "businessProject": {
+      "id": "c547e45b-393a-4848-b707-defa6005a26f",
+      "version": 1,
+      "status": "DRAFT",
+      "currentRun": null,
+      "completedRun": null,
+      "projectUsageRows": 0,
+      "projectRecordedCost": 0,
+      "globalUsageRows": 202,
+      "globalRecordedCost": "1.0346369999999999670"
+    },
+    "checks": {
+      "exactPersistedRequestAndPayload": true,
+      "metadataOnly": true,
+      "noKernelOrSessions": true,
+      "officialQueueAndLocalMappingAgree": true,
+      "businessAcceptanceAuthority": "weiwu"
+    },
+    "modelCallsRequested": 0,
+    "queueWritesRequested": 0,
+    "serviceMutationsRequested": 0
+  },
+  "afterBackup": {
+    "kind": "independent-openrig-web-sync-audit",
+    "readOnly": true,
+    "status": "passed",
+    "projectId": "c547e45b-393a-4848-b707-defa6005a26f",
+    "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+    "queueItemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+    "officialQueueState": "pending",
+    "sourceSession": "dev-manager@weiwu-pilot-3c0cb5ee",
+    "destinationSession": "dev-dev@weiwu-pilot-3c0cb5ee",
+    "metadataVersion": 1,
+    "metadataFields": [
+      "source",
+      "projectId",
+      "projectVersion",
+      "departmentId",
+      "departmentName",
+      "requirementSummary",
+      "sourceEmployeeId",
+      "destinationEmployeeId",
+      "executionAuthority",
+      "acceptanceAuthority"
+    ],
+    "payloadSha256": "95baed7576452afc4908f0fab0f345a282decea49353a60556439d0f9ad0b5c8",
+    "localReceipt": {
+      "schema": 1,
+      "endpointFingerprint": "af82618b696748b81bc3fe56dcd5195b82a2206eba2404871e58cc8f79f3d321",
+      "projectId": "c547e45b-393a-4848-b707-defa6005a26f",
+      "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+      "sourceEmployeeId": "mgr-1",
+      "destinationEmployeeId": "dev-1",
+      "qitemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+      "payloadSha256": "95baed7576452afc4908f0fab0f345a282decea49353a60556439d0f9ad0b5c8",
+      "outcome": "confirmed"
+    },
+    "departmentSeats": [
+      {
+        "employeeId": "mgr-1",
+        "logicalId": "dev.manager",
+        "role": "manager",
+        "nodeId": "01M4FVAV13XCQSDBX8NR8CQFA3",
+        "session": "dev-manager@weiwu-pilot-3c0cb5ee"
+      },
+      {
+        "employeeId": "dev-1",
+        "logicalId": "dev.dev",
+        "role": "developer",
+        "nodeId": "01M4FVAV1464J022EM1GNAM5Z1",
+        "session": "dev-dev@weiwu-pilot-3c0cb5ee"
+      },
+      {
+        "employeeId": "qa-1",
+        "logicalId": "dev.qa",
+        "role": "qa",
+        "nodeId": "01M4FVAV15MTQMS90ZP7A9Q7E5",
+        "session": "dev-qa@weiwu-pilot-3c0cb5ee"
+      }
+    ],
+    "publicApiStatus": {
+      "enabled": true,
+      "status": "ready",
+      "acceptanceAuthority": "weiwu"
+    },
+    "publicApiMapping": {
+      "projectId": "c547e45b-393a-4848-b707-defa6005a26f",
+      "enabled": true,
+      "status": "synced",
+      "queueItemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+      "queueState": null,
+      "acceptanceAuthority": "weiwu"
+    },
+    "queueItemCount": 1,
+    "matchingQueueItemCount": 1,
+    "mappedProjectCount": 1,
+    "process": {
+      "pid": 3186171,
+      "selfHostId": "host-91ecbc4f",
+      "noKernel": true,
+      "loopbackOnly": true,
+      "noProviderEnvironment": true
+    },
+    "businessProject": {
+      "id": "c547e45b-393a-4848-b707-defa6005a26f",
+      "version": 1,
+      "status": "DRAFT",
+      "currentRun": null,
+      "completedRun": null,
+      "projectUsageRows": 0,
+      "projectRecordedCost": 0,
+      "globalUsageRows": 204,
+      "globalRecordedCost": "1.0437929999999999670"
+    },
+    "checks": {
+      "exactPersistedRequestAndPayload": true,
+      "metadataOnly": true,
+      "noKernelOrSessions": true,
+      "officialQueueAndLocalMappingAgree": true,
+      "businessAcceptanceAuthority": "weiwu"
+    },
+    "modelCallsRequested": 0,
+    "queueWritesRequested": 0,
+    "serviceMutationsRequested": 0
+  },
+  "concurrentUsageAttribution": {
+    "readOnly": true,
+    "rows": 205,
+    "backlogProjectUsageRows": 0,
+    "recordsAddedSince202RowSnapshot": [
+      {
+        "id": "42e5f174-6104-4f61-89bc-f6b175e1a20a",
+        "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+        "runId": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+        "purpose": "项目执行",
+        "cost": 0.0105474,
+        "createdAt": "2026-10-09T08:27:18.883Z"
+      },
+      {
+        "id": "1682e89f-1361-4713-82ed-e706f9d58a25",
+        "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+        "runId": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+        "purpose": "项目执行",
+        "cost": 0.0057708,
+        "createdAt": "2026-10-09T08:26:59.120Z"
+      },
+      {
+        "id": "405e08ce-682d-4392-b7fe-d84f0113a695",
+        "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+        "runId": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+        "purpose": "项目执行",
+        "cost": 0.0033852,
+        "createdAt": "2026-10-09T08:26:55.818Z"
+      }
+    ]
+  }
+}

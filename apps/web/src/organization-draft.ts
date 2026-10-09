@@ -3,7 +3,7 @@ import {ApiError} from './api.ts';
 
 export type Message = { role: 'user' | 'assistant'; content: string };
 export type Preview = { previewId: string; department: DepartmentInput; plan: Plan; policy: Policy; requirement: string; source: string; costAccounting?: 'conversation'; validation: { valid: boolean; errors: string[]; warnings?: string[] } };
-export type ChatRequest = { key: string; settings: string; body: { messages: Message[]; modelId: string; policy: Policy; templateId: string; maxPlanningCost?: number; previousPreviewId?: string; conversationId?: string } };
+export type ChatRequest = { key: string; settings: string; body: { messages: Message[]; modelId: string; policy: Policy; templateId: string; maxPlanningCost?: number; previousPreviewId?: string; conversationId?: string; previousDraftIssue?: DraftIssue & { truncated?: boolean } } };
 export type SavedTeam = { departmentId: string; projectId: string; departmentVersion: number; projectVersion: number; previewId: string };
 export type DraftIssue = { code: string; message: string };
 export type Draft = { messages: Message[]; modelId: string; policy: Policy; maxPlanningCost?: number; input: string; conversationId?: string; preview?: Preview; previewSettings?: string; projectId?: string; saved?: SavedTeam; draftIssue?: DraftIssue; previousPreviewId?: string; pendingRequest?: ChatRequest; awaitingPlan?: boolean };
@@ -48,6 +48,7 @@ export function createOrganizationChatRequest(draft: Draft, content: string, set
     messages: [...draft.messages, { role: 'user', content }], modelId: draft.modelId, policy: draft.policy,
     templateId: 'software',
     previousPreviewId: draft.preview?.previewId ?? draft.previousPreviewId, conversationId: current.conversationId,
+    ...(draft.draftIssue ? { previousDraftIssue: { code: draft.draftIssue.code.slice(0, 100), message: draft.draftIssue.message.slice(0, 4000), ...(draft.draftIssue.message.length > 4000 ? { truncated: true } : {}) } } : {}),
   } };
 }
 

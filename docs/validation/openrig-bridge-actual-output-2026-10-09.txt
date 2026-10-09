@@ -1,0 +1,35 @@
+Actual OpenRigBridge module probe — 2026-10-09
+Source SHA256: 1c819be01ac66122593aa8635e1e26e100ea7340c153297f844d5ab047a3c2a3
+Probe: /home/jj/.local/share/weiwu/openrig/probes/bridge-20261009T073004Z-4080bb4a-4850-4368-9a34-cf47a6575176
+
+[initial] exit=0
+{"stage":"initial","passed":true,"requestCount":26,"postCount":2,"qitemIds":["qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6","qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"],"modelCallsRequested":0}
+stderr=""
+
+[reopened] exit=0
+{"stage":"reopened","passed":true,"requestCount":14,"postCount":0,"qitemIds":["qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6","qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"],"modelCallsRequested":0}
+stderr=""
+
+[closed] exit=0
+{"stage":"closed","passed":true,"requestCount":14,"postCount":0,"qitemIds":["qitem-weiwu-ccbde67d15d81870a533d9804bd26ed48dc86a950a5e67ea7e8eadd4e0ec33b6","qitem-weiwu-918832654aea9e3d44da10033bb3823243773ce8092c1a7030781ea2c278f0fd"],"modelCallsRequested":0}
+stderr=""
+
+Actual official CLI/module steps:
+start-explicit-terminal-auth: exit=0
+module-initial: exit=0
+before-transitions-0: exit=0
+before-transitions-1: exit=0
+stop-first: exit=0
+restart: exit=0
+module-reopened: exit=0
+after-transitions-0: exit=0
+after-transitions-1: exit=0
+close-metadata-0: exit=0
+close-metadata-1: exit=0
+module-closed: exit=0
+cleanup-owned-daemon: exit=0
+
+Independent final verification: PID 3020044 exited; loopback port 57405 closed; SQLite and mappings retained.
+Two distinct queue-create POSTs in total; zero additional POSTs after daemon/client restart.
+The second real HTTP 201 response was deliberately discarded after commit; recovery queried the same qitem.
+No model/harness sessions or kernel agents were launched. Queue closure is not employee QA or manager acceptance.

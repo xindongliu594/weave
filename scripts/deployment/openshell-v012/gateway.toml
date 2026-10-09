@@ -1,0 +1,53 @@
+# NVIDIA/OpenShell v0.1.2 configuration schema 2; operator-owned draft.
+# Sources: deploy/docker/gateway.toml and docs/how-it-works/gateways/configuration.mdx.
+[openshell]
+version = 2
+
+[openshell.gateway]
+name = "weiwu-openshell-v012"
+# Docker forwards to the container IP, not its loopback. Compose publishes both
+# ports on HOST loopback only. The trusted supervisor uses host networking and
+# connects through that loopback publication; the primary API requires mTLS.
+bind_address = "0.0.0.0:18770"
+health_bind_address = "0.0.0.0:18771"
+compute_driver = "docker"
+log_level = "info"
+disable_tls = false
+enable_loopback_service_http = false
+server_sans = ["localhost", "127.0.0.1", "::1", "host.openshell.internal"]
+guest_tls_ca = "/var/lib/weiwu-openshell-v012/tls/ca.crt"
+guest_tls_cert = "/var/lib/weiwu-openshell-v012/tls/client/tls.crt"
+guest_tls_key = "/var/lib/weiwu-openshell-v012/tls/client/tls.key"
+
+[openshell.gateway.tls]
+cert_path = "/var/lib/weiwu-openshell-v012/tls/server/tls.crt"
+key_path = "/var/lib/weiwu-openshell-v012/tls/server/tls.key"
+client_ca_path = "/var/lib/weiwu-openshell-v012/tls/ca.crt"
+
+[openshell.gateway.auth]
+allow_unauthenticated_users = false
+
+[openshell.gateway.mtls_auth]
+enabled = true
+
+[openshell.gateway.gateway_jwt]
+signing_key_path = "/var/lib/weiwu-openshell-v012/tls/jwt/signing.pem"
+public_key_path = "/var/lib/weiwu-openshell-v012/tls/jwt/public.pem"
+kid_path = "/var/lib/weiwu-openshell-v012/tls/jwt/kid"
+gateway_id = "weiwu-openshell-v012"
+ttl_secs = 3600
+
+[openshell.drivers.docker]
+socket_path = "/var/run/docker.sock"
+sandbox_runtime_image = "ghcr.io/nvidia/openshell/sandbox:0.1.2@sha256:bf4797b6c511f2d8ba02955dbba4bf76c1f0dd6d83531420c5408d5f1fb9d72f"
+supervisor_image = "ghcr.io/nvidia/openshell/supervisor:0.1.2@sha256:d7b5264bb6bc56f4796e6fa3617b8e4a8d785be0b7293542efd8cc250b0fb67a"
+image_pull_policy = "if_not_present"
+sandbox_label = "weiwu-openshell-v012"
+# v0.1.2 supervisors use host networking. Compose's extra_hosts belongs only to
+# the gateway container, so use the published loopback endpoint (covered by SAN).
+grpc_endpoint = "https://127.0.0.1:18770"
+enable_bind_mounts = false
+# Matches the official supervisor-compatible default. The workload still relies
+# on OpenShell policy, Landlock/seccomp and non-root identity; not an AppArmor claim.
+app_armor_profile = "Unconfined"
+# Deliberately no default_image: first employee image/policy needs separate review.

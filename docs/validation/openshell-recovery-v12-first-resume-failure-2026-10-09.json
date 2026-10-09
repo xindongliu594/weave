@@ -1,0 +1,450 @@
+{
+  "auditEvidenceStatus": "passed",
+  "acceptanceStatus": "failed",
+  "runStatus": "failed",
+  "reason": "QA was formally accepted; its leftover model loop reached TASK_TURN_LIMIT and aborted manager review. Full recovery acceptance remains incomplete.",
+  "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+  "planVersion": 12,
+  "parentRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+  "resumedRunId": "7da3c44b-d8fa-4b0e-9c15-e9130ed0772a",
+  "capturedAt": "20261009T075838.685561Z",
+  "eventCount": 2439,
+  "taskStates": {
+    "T1": "completed",
+    "T2": "completed",
+    "T3": "failed"
+  },
+  "checks": {
+    "stable_terminal_failed_trace": {
+      "passed": true,
+      "detail": null
+    },
+    "capture_bytes_match_saved_http_hashes": {
+      "passed": true,
+      "detail": null
+    },
+    "real_service_restart_preserved_checkpoint": {
+      "passed": true,
+      "detail": {
+        "passed": true,
+        "checks": {
+          "trace": true,
+          "files": true,
+          "cost": true,
+          "usage": true,
+          "approvals": true,
+          "snapshot": true,
+          "sameParentTrace": true,
+          "pidChanged": true,
+          "stopped": true,
+          "reportedCredentialHashesUnchanged": true,
+          "traceDigest": true
+        },
+        "sourceEvidenceSha256": {
+          "before.json": "fb0a8210d1005aca76aca6993647381a964c65689f32be7178485e63a5ee1d69",
+          "after.json": "fb0a8210d1005aca76aca6993647381a964c65689f32be7178485e63a5ee1d69",
+          "result.json": "d48dbd7b390d221c6c5c0796fef6e4debfdc5b2558eb026fde9c31bd052f0e89"
+        },
+        "oldPid": "2969369",
+        "newPid": "3041376",
+        "archiveSha256": "abf09885261eb23809e6be1b820799b1aabbe47527a61c7080a9f7b7eb418c75",
+        "credentialEvidenceBoundary": "Restart helper reports direct file hashes matched; before/after JSON deliberately do not export key bytes or credential hashes."
+      }
+    },
+    "parent_stopped_at_qa_approval_before_execution": {
+      "passed": true,
+      "detail": null
+    },
+    "original_version_dag_policy_and_model_routes_preserved": {
+      "passed": true,
+      "detail": null
+    },
+    "all_prior_calls_and_task_costs_inherited": {
+      "passed": true,
+      "detail": {
+        "parentCalls": {
+          "T1": 8,
+          "T2": 6,
+          "no-task": 3
+        },
+        "budgetHistory": {
+          "calls": 17,
+          "tasks": {
+            "T1": {
+              "cost": 0.0443238,
+              "calls": 8
+            },
+            "T2": {
+              "cost": 0.0317856,
+              "calls": 6
+            }
+          },
+          "callsBasis": "durable-admissions-and-archived-wire-requests"
+        }
+      }
+    },
+    "same_known_and_unknown_budget_carried_forward": {
+      "passed": true,
+      "detail": {
+        "receipts": [
+          {
+            "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+            "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a",
+            "amount": 0.0192111
+          }
+        ],
+        "reserved": 0.0192111,
+        "retained": true,
+        "recordedCost": 0.9705978,
+        "availableBudget": 0.9101910999999999
+      }
+    },
+    "all_three_correct_file_versions_restored": {
+      "passed": true,
+      "detail": {
+        "files": [
+          {
+            "path": "README.md",
+            "size": 1663,
+            "sha256": "332431ab557d2af9585e8bb7c29c8c9bb116df7deed8517f90f439b0be2c572b"
+          },
+          {
+            "path": "cli.mjs",
+            "size": 1420,
+            "sha256": "6653657ab76d9f2a3ff6697c257d6ef48632e49236a082110c0a43ad3c8df97b"
+          },
+          {
+            "path": "cli.test.mjs",
+            "size": 5640,
+            "sha256": "45428f6c5a1f6c4ceeb3d6f66e3ef2a8ff346ac29b47bab3196b16ebbe4dfe7a"
+          }
+        ],
+        "revision": "4acc637e320b4b040956383ab220354710e86f106d9055d172cbf8d51d4be16b"
+      }
+    },
+    "t1_context_and_handoff_retained_without_reexecution": {
+      "passed": true,
+      "detail": null
+    },
+    "three_deliverables_created_by_real_employees_no_auditor_edits": {
+      "passed": true,
+      "detail": [
+        {
+          "path": "README.md",
+          "taskId": "T1",
+          "employee": "dev-1",
+          "sourceRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+          "callId": "call_01_Q5hmfCAy28JZ7PGK922L6819",
+          "operationId": "f288421f-c180-4e1f-adf2-604f73621767",
+          "startSeq": 127,
+          "resultSeq": 139,
+          "creationSha256": "332431ab557d2af9585e8bb7c29c8c9bb116df7deed8517f90f439b0be2c572b",
+          "passed": true
+        },
+        {
+          "path": "cli.mjs",
+          "taskId": "T1",
+          "employee": "dev-1",
+          "sourceRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+          "callId": "call_00_lFSCpFsxv78rawivR1T94979",
+          "operationId": "2942ea6a-bb57-4500-a75b-7b12ac7391c5",
+          "startSeq": 114,
+          "resultSeq": 124,
+          "creationSha256": "6653657ab76d9f2a3ff6697c257d6ef48632e49236a082110c0a43ad3c8df97b",
+          "passed": true
+        },
+        {
+          "path": "cli.test.mjs",
+          "taskId": "T2",
+          "employee": "qa-1",
+          "sourceRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+          "callId": "call_00_48xrDxm723P2Ip8G57QK9554",
+          "operationId": "3c86177b-a8b1-47d9-a8bc-57197486b1d3",
+          "startSeq": 882,
+          "resultSeq": 899,
+          "creationSha256": "45428f6c5a1f6c4ceeb3d6f66e3ef2a8ff346ac29b47bab3196b16ebbe4dfe7a",
+          "passed": true
+        }
+      ]
+    },
+    "all_actual_child_operations_have_valid_openshell_metadata": {
+      "passed": true,
+      "detail": null
+    },
+    "first_real_qa_execution_has_new_exact_approval": {
+      "passed": true,
+      "detail": null
+    },
+    "real_qa_10_of_10_and_output_hash_matches": {
+      "passed": true,
+      "detail": {
+        "tests": 10,
+        "suites": 0,
+        "pass": 10,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "qa_formal_acceptance_retained_at_failure": {
+      "passed": true,
+      "detail": null
+    },
+    "real_retrieval_still_v2_after_catalog_became_v3": {
+      "passed": true,
+      "detail": [
+        {
+          "name": "knowledge_search",
+          "startSeq": 121,
+          "resultSeq": 124,
+          "callId": "call_01_r3PBdq3pomJTwIxxIhYB4585",
+          "sources": [
+            {
+              "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+              "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+              "version": 2,
+              "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+              "lineStart": 7,
+              "lineEnd": 11
+            }
+          ],
+          "passed": true
+        },
+        {
+          "name": "knowledge_read",
+          "startSeq": 164,
+          "resultSeq": 167,
+          "callId": "call_00_3pYmm9AcNsVc8enIYJtX4824",
+          "sources": [
+            {
+              "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+              "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+              "version": 2,
+              "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+              "lineStart": 7,
+              "lineEnd": 11
+            }
+          ],
+          "passed": true
+        }
+      ]
+    },
+    "department_and_project_authorization_difference_identified": {
+      "passed": true,
+      "detail": {
+        "departmentGrants": {
+          "mgr-1": null,
+          "dev-1": null,
+          "qa-1": null
+        },
+        "uiAuthorizationPositiveCase": "not verified: both original department roles lack a binding"
+      }
+    },
+    "every_child_model_wire_settled_and_old_unknown_unchanged": {
+      "passed": true,
+      "detail": {
+        "newTaskCallCounts": {
+          "T2": 6,
+          "T3": 2,
+          "no-task": 1
+        }
+      }
+    },
+    "no_authorized_budget_increase_or_reset": {
+      "passed": true,
+      "detail": null
+    },
+    "failure_is_completed_qa_followup_then_correct_call_limit_denial": {
+      "passed": true,
+      "detail": {
+        "acceptanceSeq": 2248,
+        "unneededFollowupWireSeq": 2300,
+        "messageToolSeq": 2331,
+        "deniedRequestSeq": 2397,
+        "stopSeq": 2398,
+        "stop": {
+          "kind": "stopped",
+          "scope": "task",
+          "taskId": "T2",
+          "spent": 0.07370879999999999,
+          "reserved": 0,
+          "limit": 0.2,
+          "calls": 12,
+          "maxCalls": 12,
+          "code": "TASK_TURN_LIMIT",
+          "message": "此员工在该任务的模型调用次数已达上限"
+        }
+      }
+    },
+    "manager_not_falsely_accepted": {
+      "passed": true,
+      "detail": {
+        "failedReadSeqs": [
+          2405,
+          2411,
+          2417
+        ],
+        "localOperations": 0,
+        "formalReviews": 0
+      }
+    }
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 1663,
+      "sha256": "332431ab557d2af9585e8bb7c29c8c9bb116df7deed8517f90f439b0be2c572b"
+    },
+    {
+      "path": "cli.mjs",
+      "size": 1420,
+      "sha256": "6653657ab76d9f2a3ff6697c257d6ef48632e49236a082110c0a43ad3c8df97b"
+    },
+    {
+      "path": "cli.test.mjs",
+      "size": 5640,
+      "sha256": "45428f6c5a1f6c4ceeb3d6f66e3ef2a8ff346ac29b47bab3196b16ebbe4dfe7a"
+    }
+  ],
+  "workspaceRevision": "4acc637e320b4b040956383ab220354710e86f106d9055d172cbf8d51d4be16b",
+  "qa": {
+    "operationId": "ac15d4f2-d455-45ae-85de-44b8c19cde0d",
+    "approvalId": "a50f1d87-1cb5-410f-83d0-4a82cc3812fb",
+    "callId": "call_01_5ekonXQ5Z81onjRZ3Du23601",
+    "acceptedSeq": 2248,
+    "counts": {
+      "tests": 10,
+      "suites": 0,
+      "pass": 10,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "exitCode": 0,
+    "outputBytes": 853,
+    "outputSha256": "f9ba46fb6bd156e379dd4a75b2725d7f34bfd48ce7c0495c18e705c2cff53eeb",
+    "outputLayout": "complete combined stdout/stderr"
+  },
+  "openshell": {
+    "cpu": [
+      100000,
+      100000
+    ],
+    "gid": 1000,
+    "uid": 1000,
+    "kind": "openshell",
+    "node": "v24.19.0",
+    "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+    "memory": "536870912",
+    "gateway": "weiwu-openshell-v012",
+    "version": "0.1.2",
+    "sandboxId": "67349260-b65f-4406-8b7d-268905bd0e4e",
+    "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+    "sandboxName": "wwe-9d409256cd05",
+    "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+    "effectivePolicyHash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5"
+  },
+  "knowledge": {
+    "fixedVersion": 2,
+    "catalogVersionAtRecovery": 3,
+    "catalogSha256": "397b891281cd24d72aae4f31423c5e6e7e42191064091eb40a08f737f641d7ce",
+    "calls": [
+      {
+        "name": "knowledge_search",
+        "startSeq": 121,
+        "resultSeq": 124,
+        "callId": "call_01_r3PBdq3pomJTwIxxIhYB4585",
+        "sources": [
+          {
+            "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+            "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+            "version": 2,
+            "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+            "lineStart": 7,
+            "lineEnd": 11
+          }
+        ],
+        "passed": true
+      },
+      {
+        "name": "knowledge_read",
+        "startSeq": 164,
+        "resultSeq": 167,
+        "callId": "call_00_3pYmm9AcNsVc8enIYJtX4824",
+        "sources": [
+          {
+            "id": "fb4251400884420deb0ad16a328f4d7be65c3152e43de1ead121d7395662b972",
+            "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+            "version": 2,
+            "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+            "lineStart": 7,
+            "lineEnd": 11
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "departmentRolesHaveNoBindings": {
+      "mgr-1": null,
+      "dev-1": null,
+      "qa-1": null
+    },
+    "departmentUiAuthorizationPositiveCase": "unverified; zero results for both roles cannot prove a positive authorized retrieval"
+  },
+  "fees": {
+    "parentCalls": {
+      "T1": 8,
+      "T2": 6,
+      "no-task": 3
+    },
+    "childCalls": {
+      "T2": 6,
+      "T3": 2,
+      "no-task": 1
+    },
+    "parentKnown": 0.0866355,
+    "childKnown": 0.05266019999999999,
+    "projectKnown": 1.023258,
+    "pilotKnown": 1.0346370000000005,
+    "oldUnknownRetained": 0.0192111,
+    "projectLimit": 1.9,
+    "pilotLimit": 2,
+    "unknownReceipts": [
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "amount": 0.0192111,
+        "status": "uncertain",
+        "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+      }
+    ]
+  },
+  "privateEvidence": {
+    "parentDirectory": "/home/jj/.local/share/weiwu/metadata/openshell-recovery-v12-parent-20261009T074246.324810Z-5828971d",
+    "parentArchiveSha256": "67b6f9761bd6d4d4cfcb9438870ab1f1fb90adc853b06385d3e32260e3ca27f3",
+    "childDirectory": "/home/jj/.local/share/weiwu/metadata/openshell-recovery-v12-child-final-20261009T075838.685561Z-53629749",
+    "childArchiveSha256": "905cbac2cc355c1cb0c7a074a04ba7088566699351fb069e09e5780e93facb61",
+    "childExportSha256": "b74224f8397f20c90228ecfd4534663401b4bd7e0571fefae36a3622397731fb",
+    "childExportBytes": 22977182,
+    "localParent": ".data\\research\\jj-simple-task-2026-10-08\\openshell-v12-parent-captured",
+    "localChild": ".data\\research\\jj-simple-task-2026-10-08\\openshell-v12-child-final-captured",
+    "restartArchiveSha256": "abf09885261eb23809e6be1b820799b1aabbe47527a61c7080a9f7b7eb418c75"
+  },
+  "limits": [
+    "The first resumed run failed and has no formal manager review.",
+    "The controlled stop occurred before an external QA command started. It does not demonstrate recovery of an ambiguous external operation; separate API regression rejects replay of started orphan operations.",
+    "OpenShell metadata is verified runtime provenance, not cryptographic remote attestation or a complete sandbox escape test.",
+    "Department-page positive authorized search remains unverified because stored department role bindings differ from this approved project.",
+    "Restart credential preservation is backed by helper file-hash comparison, without exporting credential bytes."
+  ],
+  "auditor": {
+    "networkMethods": [
+      "GET",
+      "SSH read-only metadata capture"
+    ],
+    "modelCalls": 0,
+    "businessCommands": 0,
+    "employeeArtifactEdits": 0
+  }
+}

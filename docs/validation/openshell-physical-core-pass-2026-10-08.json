@@ -1,0 +1,195 @@
+{
+  "kind": "actual-openshell-physical-continuation",
+  "version": "0.1.2",
+  "name": "wwp-43170b8e3257",
+  "sandboxId": "67e64e45-7302-4fb9-ac33-cb050825baef",
+  "evidence": "/home/jj/.local/share/weiwu/probes/wwp-43170b8e3257/evidence/continuation-physical",
+  "reason": "Prior ENOENT was before any write; readonly actual filesystem proved the upload directory and absence of output files",
+  "status": "physical-core-passed",
+  "creates": 0,
+  "uploadReplays": 0,
+  "modelCalls": 0,
+  "employeeAcceptance": false,
+  "steps": [
+    {
+      "label": "known-ready-get-0",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "policy-before",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "physical-corrected",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "download",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "stop",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "stopped-get-0",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "start",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "restarted-get-0",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "policy-after",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "restored-readonly",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "final-stop",
+      "exit": 0,
+      "unknown": false
+    },
+    {
+      "label": "retained-stopped-get-0",
+      "exit": 0,
+      "unknown": false
+    }
+  ],
+  "unverified": [
+    "gateway restart with running sandbox",
+    "command cancellation",
+    "DNS policy enforcement",
+    "DSH employee integration"
+  ],
+  "sourceSha256": "3265a378cb4106dea570d2621c5f0c175c6874cd844f4fb9ba8604354606ec96",
+  "originalWeiwuServiceBefore": "ActiveState=active\nMainPID=1890583",
+  "effectivePolicyHash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5",
+  "configurationAdmissionBefore": {
+    "config_revision": 14383708804041880000,
+    "error": "",
+    "policy_hash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5",
+    "policy_version": 1,
+    "provider_env_revision": 3176606324465211400,
+    "state": "accepted"
+  },
+  "physical": {
+    "uid": 1000,
+    "gid": 1000,
+    "node": "v24.19.0",
+    "fixtureSha256": "81c1cdd4a793f1aa0159cc8939ebd8b856ca5b952ae4e988819110b28a937e6b",
+    "artifactSha256": "b78c7499be2c0b2b57db2bef713c1e03b0cdf220e035e69459ff309a67ac5a5e",
+    "cpu": [
+      100000,
+      100000
+    ],
+    "memory": "536870912",
+    "varTmpMode": "1777",
+    "deniedCode": "EACCES",
+    "network": {
+      "outcome": "error",
+      "code": "EACCES",
+      "policyVerified": true
+    }
+  },
+  "networkVerified": true,
+  "fileRoundtripVerified": true,
+  "stopStartFilesPolicyIdentityVerified": true,
+  "configurationAdmissionAfter": {
+    "config_revision": 14383708804041880000,
+    "error": "",
+    "policy_hash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5",
+    "policy_version": 1,
+    "provider_env_revision": 3176606324465211400,
+    "state": "accepted"
+  },
+  "originalWeiwuServiceAfter": "ActiveState=active\nMainPID=1890583",
+  "originalWeiwuServiceUnchanged": true,
+  "scope": "Actual standalone OpenShell component; no DSH or business employee acceptance",
+  "finalPhase": "Stopped",
+  "ledgerComparison": {
+    "kind": "component-ledger-comparison",
+    "unchanged": true,
+    "sourceSha256": "3265a378cb4106dea570d2621c5f0c175c6874cd844f4fb9ba8604354606ec96",
+    "metadata": "/home/jj/.local/share/weiwu/metadata/physical-continuation-5662a859-a396-4b23-900a-91143dd7d679-ledger.json",
+    "usageRowsBefore": 146,
+    "usageRowsAfter": 146,
+    "recordedCostAfter": 0.7083729,
+    "projectReadinessAfter": {
+      "recordedCost": 0.6969938999999999,
+      "reserved": 0.0192111,
+      "availableBudget": 1.1837950000000002,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+          "amount": 0.0192111,
+          "status": "uncertain",
+          "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+        }
+      ]
+    },
+    "fullLedgerStored": true
+  },
+  "componentImage": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+  "containerdImageProofSource": "humanActualAdminRead",
+  "imageProofSha256": "90fcc0829ee7ee688f762b2132c2c143cbda606d1ce5ba8243edb35e674ed2c3",
+  "originalCreateSourceSha256": "1aa74adb41f26e18a742757aa6ef61eddcdbd0fff332c4e4d204aae3c1bd4d58",
+  "originalProbeCreateCount": 1,
+  "priorProbeResultPreserved": true,
+  "knownFailureBeforeContinuation": "ENOENT reading /sandbox/fixture.txt; uploaded directory was /sandbox/upload",
+  "endpointAdminApply": {
+    "source": "humanActualAdministratorReply",
+    "passed": true,
+    "evidence": "/var/lib/weiwu-openshell-v012/supervisor-endpoint-20261008T145544.566406Z-95625258",
+    "gatewayContainerId": "9bb792c44df7e0577acc1f14afc940e2285cbb4d5a565915f95ac24b4d96a0fa",
+    "endpoint": "https://127.0.0.1:18770",
+    "modelCalls": 0
+  },
+  "independentlyVerifiedGateway": {
+    "metadata": "gateway-post-recovery-20261008T145713.json",
+    "at": "2026-10-08T14:57:13Z",
+    "exit": 0,
+    "status": {
+      "authentication": {
+        "provider": "mTLS transport",
+        "status": "authenticated"
+      },
+      "gateway": "weiwu-openshell-v012",
+      "server": "https://127.0.0.1:18770",
+      "status": "connected",
+      "version": "0.1.2"
+    },
+    "stderr": "",
+    "modelCalls": 0,
+    "health": {
+      "status": "healthy",
+      "version": "0.1.2",
+      "checks": {
+        "database": {
+          "status": "healthy",
+          "latency_ms": 0
+        }
+      }
+    }
+  },
+  "rawPhysicalResultSha256": "699681c9f855a0afda8c2c02961578ff8aaf5f4750dd55513c33054e14838df7",
+  "rawOriginalProbeSha256": "765e7c0575f6a043ed14e68dd0dcce534077bd6d56849b3948a20b6911d73eed"
+}

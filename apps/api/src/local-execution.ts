@@ -12,6 +12,8 @@ import {shareCostMaintenance} from './cost-control.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
 import {openRunArchive} from '../../../services/agent-runtime/trace-store.mjs';
+import {executionBackendSchema} from '../../../packages/contracts/index.ts';
+import {executionBackend,assertExecutionBackendBinding,assertExecutionBackendReceipt} from './execution-backend.ts';
 const {decodeFiles,exportFiles,mirrorFiles,revision}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
 const digest=(value:string)=>createHash('sha256').update(value).digest();
 function validateResult(row:any,result:any){
@@ -27,15 +29,16 @@ function validateResult(row:any,result:any){
  }
 }
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
-const publicDevice=(row:any)=>({id:row.id,name:row.name,platform:row.platform,grantId:row.grant_id,label:row.label,allowCommands:row.allow_commands,enabled:row.enabled,lastSeen:row.last_seen,online:row.online});
+const publicDevice=(row:any)=>({id:row.id,name:row.name,platform:row.platform,grantId:row.grant_id,label:row.label,allowCommands:row.allow_commands,enabled:row.enabled,lastSeen:row.last_seen,online:row.online,backend:executionBackend(row.backend)});
 export async function localTarget(policy:any,agents:any[],db:Pick<pg.PoolClient,'query'>=pool,online=true){
  const target=policy.executionTarget;
  if(target?.kind!=='local')return {kind:'server',platform:'linux'};
  const row=(await db.query("SELECT *,last_seen>clock_timestamp()-interval '15 seconds' AS online FROM local_devices WHERE id=$1",[target.deviceId])).rows[0];
  if(!row?.enabled||row.grant_id!==target.grantId)throw new AppError(422,'本机设备或目录授权已变化，请重新选择设备并批准方案','LOCAL_GRANT_CHANGED');
+ const backend=executionBackend(row.backend);assertExecutionBackendBinding(backend,target.backend);
  if(!row.allow_commands&&agents.some(agent=>agent.tools?.some((tool:string)=>tool==='terminal'||tool==='terminal_test')))throw new AppError(422,'此设备没有开放本机命令，请在桌面端授权或移除终端工具','LOCAL_COMMAND_DENIED');
  if(online&&!row.online)throw new AppError(422,'本机执行器状态未刷新，请确认本机服务仍在运行，然后检查恢复条件','LOCAL_DEVICE_OFFLINE');
- return {kind:'local',deviceId:row.id,grantId:row.grant_id,name:row.name,platform:row.platform,label:row.label,allowCommands:row.allow_commands};
+ return {kind:'local',deviceId:row.id,grantId:row.grant_id,name:row.name,platform:row.platform,label:row.label,allowCommands:row.allow_commands,backend};
 }
 async function proof(id:string,key:unknown,db:Pick<pg.PoolClient,'query'>=pool){
  if(typeof key!=='string'||!/^[a-f0-9]{64}$/.test(key))throw new AppError(403,'本机设备凭证无效','LOCAL_DEVICE_DENIED');
@@ -125,25 +128,26 @@ export class LocalRunExecutor {
   return this.preparing??=(async()=>{
    const callId='local-prepare-'+this.archive.id,ref={callId};
    this.archive.append('runtime/operation-start',{name:'local_workspace',arguments:{deviceId:this.snapshot.executionTarget.deviceId}},ref);
-   try{const id=await this.service.enqueue(this.archive.id,'prepare',{}, {},exportFiles(this.root),signal);const result=await this.service.wait(id,signal);mirrorFiles(this.root,result.files);this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);this.archive.append('local/device-bound',{...this.snapshot.executionTarget,localWorkspace:result.localWorkspace});}
+   try{const id=await this.service.enqueue(this.archive.id,'prepare',{}, {},exportFiles(this.root),signal);const result=await this.service.wait(id,signal);mirrorFiles(this.root,result.files);this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);this.archive.append('local/device-bound',{...this.snapshot.executionTarget,localWorkspace:result.localWorkspace,...(result.execution?{execution:result.execution}:{})});}
    catch(error){if((error as any).notExecuted)this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);else this.archive.append('runtime/outcome-unknown',{name:'local_workspace',callId,arguments:{deviceId:this.snapshot.executionTarget.deviceId},message:(error as Error).message},ref);throw error;}
   })();
  }
  async execute(name:string,args:any,signal:AbortSignal,context:any){
   await this.prepare(signal);const id=await this.service.enqueue(this.archive.id,name,args,context,undefined,signal);const result=await this.service.wait(id,signal);
   const metadata=mirrorFiles(this.root,result.files);const {files:_files,...visible}=result;
-  this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace});return {...visible,...metadata};
+  this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace,...(result.execution?{execution:result.execution}:{})});return {...visible,...metadata};
  }
  async close(){await pool.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE run_id=$1 AND lease_owner=$2 AND status IN ('queued','claimed','started')",[this.archive.id,this.service.owner]);}
 }
 export function localDeviceRouter(traceRoot:string){
- const router=Router(),registration=z.object({id:z.uuid(),token:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().trim().min(1).max(100),platform:z.enum(['win32','darwin','linux']),grant:z.object({id:z.uuid(),label:z.string().min(1).max(200),allowCommands:z.boolean()})});
+ const router=Router(),registration=z.object({id:z.uuid(),token:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().trim().min(1).max(100),platform:z.enum(['win32','darwin','linux']),grant:z.object({id:z.uuid(),label:z.string().min(1).max(200),allowCommands:z.boolean()}),backend:executionBackendSchema.default({kind:'native'})});
  router.get('/local-devices',async(_req,res)=>res.json((await pool.query("SELECT *,last_seen>clock_timestamp()-interval '15 seconds' AS online FROM local_devices ORDER BY name")).rows.map(publicDevice)));
  router.post('/local-devices/register',async(req,res)=>{
   const input=registration.parse(req.body),db=await pool.connect();
+  if(input.backend.kind==='openshell'&&input.platform!=='linux'){db.release();throw new AppError(422,'当前 OpenShell 执行环境需要 Linux','LOCAL_BACKEND_INVALID');}
   try{await db.query('BEGIN');await shareCostMaintenance(db);const existing=(await db.query('SELECT * FROM local_devices WHERE id=$1 FOR UPDATE',[input.id])).rows[0];
-   if(existing){await proof(input.id,req.get('X-Local-Device-Key'),db);if(!existing.enabled||existing.grant_id!==input.grant.id||existing.label!==input.grant.label||existing.allow_commands!==input.grant.allowCommands||existing.platform!==input.platform)throw new AppError(403,'设备授权已撤回或改变，请在桌面端重新启用','LOCAL_GRANT_CHANGED');await db.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[input.id]);}
-   else await db.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands) VALUES($1,$2,$3,$4,$5,$6,$7)',[input.id,digest(input.token).toString('hex'),input.name,input.platform,input.grant.id,input.grant.label,input.grant.allowCommands]);
+   if(existing){await proof(input.id,req.get('X-Local-Device-Key'),db);if(!existing.enabled||existing.grant_id!==input.grant.id||existing.label!==input.grant.label||existing.allow_commands!==input.grant.allowCommands||existing.platform!==input.platform||!isDeepStrictEqual(executionBackend(existing.backend),input.backend))throw new AppError(403,'设备授权已撤回或改变，请在启动器中重新启用','LOCAL_GRANT_CHANGED');await db.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[input.id]);}
+   else await db.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[input.id,digest(input.token).toString('hex'),input.name,input.platform,input.grant.id,input.grant.label,input.grant.allowCommands,input.backend]);
    await db.query('COMMIT');res.json({ok:true,id:input.id});
   }catch(error){await db.query('ROLLBACK');throw error;}finally{db.release();}
  });
@@ -187,7 +191,7 @@ export function localDeviceRouter(traceRoot:string){
   else if(!input.error)throw new AppError(422,'缺少操作错误详情');
   await operationTransaction(z.uuid().parse(req.params.operation),async(db,row,run,device)=>{
    if(row.device_id!==id||row.claim_token!==input.claimToken)throw new AppError(403,'操作领取凭证不正确');
-   if(input.ok)validateResult(row,input.result);
+   if(input.ok){validateResult(row,input.result);assertExecutionBackendReceipt(executionBackend(device.backend),input.result);}
    if(row.result){if(!isDeepStrictEqual(row.result,input))throw new AppError(409,'已有不同操作回执');return;}
    if(input.ok&&!row.started)throw new AppError(409,'操作尚未确认开始');
    if(!['claimed','started'].includes(row.status)||!await executable(db,row,run,device)){
@@ -202,6 +206,6 @@ export function localDeviceRouter(traceRoot:string){
  });
  router.delete('/local-devices/:id',async(req,res)=>{await pool.query('UPDATE local_devices SET enabled=false WHERE id=$1',[z.uuid().parse(req.params.id)]);res.json({ok:true});});
  router.post('/local-devices/:id/disable',async(req,res)=>{const id=z.uuid().parse(req.params.id);await proof(id,req.get('X-Local-Device-Key'));await pool.query('UPDATE local_devices SET enabled=false WHERE id=$1',[id]);res.json({ok:true});});
- router.get('/runs/:id/local-operations',async(req,res)=>res.json((await pool.query('SELECT id,status,started,payload,result,late_result AS "lateResult",created_at AS "createdAt" FROM local_operations WHERE run_id=$1 ORDER BY created_at',[z.uuid().parse(req.params.id)])).rows.map(row=>({...row,payload:{name:row.payload.name,context:row.payload.context,arguments:row.payload.arguments},result:row.result?{ok:row.result.ok,error:row.result.error,localWorkspace:row.result.result?.localWorkspace,exitCode:row.result.result?.exitCode,output:row.result.result?.output}:null,lateResult:row.lateResult?{ok:row.lateResult.ok,error:row.lateResult.error,localWorkspace:row.lateResult.result?.localWorkspace,exitCode:row.lateResult.result?.exitCode,output:row.lateResult.result?.output}:null}))));
+ router.get('/runs/:id/local-operations',async(req,res)=>res.json((await pool.query('SELECT id,status,started,payload,result,late_result AS "lateResult",created_at AS "createdAt" FROM local_operations WHERE run_id=$1 ORDER BY created_at',[z.uuid().parse(req.params.id)])).rows.map(row=>({...row,payload:{name:row.payload.name,context:row.payload.context,arguments:row.payload.arguments},result:row.result?{ok:row.result.ok,error:row.result.error,localWorkspace:row.result.result?.localWorkspace,exitCode:row.result.result?.exitCode,output:row.result.result?.output,...(row.result.result?.execution?{execution:row.result.result.execution}:{})}:null,lateResult:row.lateResult?{ok:row.lateResult.ok,error:row.lateResult.error,localWorkspace:row.lateResult.result?.localWorkspace,exitCode:row.lateResult.result?.exitCode,output:row.lateResult.result?.output,...(row.lateResult.result?.execution?{execution:row.lateResult.result.execution}:{})}:null}))));
  return router;
 }

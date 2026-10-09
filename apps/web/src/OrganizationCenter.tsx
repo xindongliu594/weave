@@ -6,7 +6,7 @@ import type { Department, Model, Policy } from '../../../packages/contracts/inde
 export function OrganizationCenter({departments,models,onSaved,onStart}:{departments:Department[];models:Model[];onSaved:()=>Promise<void>;onStart:()=>void}){
  const [templates,setTemplates]=useState<any>({departments:[],roles:[]}),[archived,setArchived]=useState<any[]>([]),[history,setHistory]=useState<any[]>([]);
  const [requirement,setRequirement]=useState(''),[templateId,setTemplateId]=useState('software'),[modelId,setModelId]=useState(''),[preview,setPreview]=useState<any>(null),[json,setJson]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
- const [policy,setPolicy]=useState<Policy>({maxBudget:1,maxAgents:4,maxConcurrentAgents:2,deadlineSeconds:3600,mode:'recommended',preference:'balanced',maxModelCalls:100,maxTaskModelCalls:40,contextBytes:64000});
+ const [policy,setPolicy]=useState<Policy>({maxBudget:1,maxAgents:4,maxConcurrentAgents:2,deadlineSeconds:3600,mode:'recommended',preference:'balanced',maxModelCalls:100,maxTaskModelCalls:40,contextBytes:128000});
  async function refresh(){setTemplates(await api('/templates'));setArchived(await api<any[]>('/departments/archived'));}
  useEffect(()=>{refresh().catch(e=>setError(e.message));},[]);
  async function act(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn();await refresh();await onSaved();}catch(e){setError((e as Error).message);}finally{setBusy(false);}}

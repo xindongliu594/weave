@@ -1,0 +1,349 @@
+{
+  "schema": 1,
+  "kind": "jj3-release-actual-evidence",
+  "date": "2026-10-09",
+  "collectedAt": "2026-10-09T08:23:57.679058+00:00",
+  "scope": "Release activation and offline backup checkpoint only. Subsequent browser queue sync and grandchild manager acceptance are separate evidence.",
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-jj3-20261009",
+  "baseRelease": "/home/jj/.local/share/weiwu/releases/weiwu-jj2-20261009",
+  "activationId": "jj3-activation-20261009T082149.744203Z-7117f0fb",
+  "passed": true,
+  "metadata": {
+    "path": "/home/jj/.local/share/weiwu/metadata/jj3-stage-20261009.json",
+    "sha256": "f6c979bf04ad300d5145a9b79e6bfdf64ac4741d24099f208bbe158d5d085238"
+  },
+  "sourceOverlay": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "59e57400e1cd4516acbde0b6378d9640988a2afd93c763a8e9c3dbaca0a62e45"
+    },
+    {
+      "path": "apps/api/src/openrig-bridge.ts",
+      "sha256": "f9dc28a60583587119796d01b452d91eee585bb3ce819174e9916701903554de"
+    },
+    {
+      "path": "apps/api/src/openrig-router.ts",
+      "sha256": "cdbc23605ce61a80dcc47916d873849270bdae532878f29910898323d71d4016"
+    },
+    {
+      "path": "apps/web/src/DepartmentWorkbench.css",
+      "sha256": "44b3129e375703d03ebab010d5e6653a3c479266729c495dcd35896721dffdcf"
+    },
+    {
+      "path": "apps/web/src/DepartmentWorkbench.tsx",
+      "sha256": "1e72cd0327543ea2fd5e8ebf7cce36e86fbba3616677ce6751f69099afffb688"
+    },
+    {
+      "path": "apps/web/src/OpenRigWorkbench.tsx",
+      "sha256": "06cc6265d6f49da7926b5bd74b9a208e4d75a418eb9845f52851c6e235cc901e"
+    },
+    {
+      "path": "apps/web/src/ProjectRequirement.tsx",
+      "sha256": "5806305287d2f45571f532f973b5fef819b11e4fb656682a2c5b5838bff6d896"
+    },
+    {
+      "path": "apps/web/src/RunCenter.tsx",
+      "sha256": "c5bc3fbcccc9c324253bb016966351a76a93d908bfb169620e615afee43bb0df"
+    },
+    {
+      "path": "apps/web/src/RunExtras.tsx",
+      "sha256": "f4702725fdb077244b82c5f97b214523b8e3e1cdf8b66f31f54554d07c72da87"
+    },
+    {
+      "path": "apps/web/src/openrig-workbench.ts",
+      "sha256": "a6bb2b000b27acce18083478ed2086d8db4586c649dd7dbd472388439ef360bf"
+    },
+    {
+      "path": "apps/web/src/run-recovery-confirmation.ts",
+      "sha256": "9f1b4f511921e8652d7641848d7e64237c6acc6e633e880c9dc2d170328bd981"
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256": "64fc2c97338e72bba6e4c400a41be8936d7e18c296381fdef9e68c30340685c7"
+    },
+    {
+      "path": "docs/openrig-integration.md",
+      "sha256": "05ea55cf0e2abe9daed30de201b02f4b53c47b00225b316e334ba8939ae29eab"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256": "c29f9760ce666878dd9f64a3f5b419b033cbdd4e70c45c4eecedec167ba92896"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "sha256": "752d0ac27d04319dc488b8b4a53b6779a2c550d83f8ad9357f4571f0062e09f1"
+    },
+    {
+      "path": "services/agent-runtime/quality-handoff.test.mjs",
+      "sha256": "cbd1f8137243e877b5dfbbd3617aa6b14e59b14d5693767befc389b0ad6d3f64"
+    },
+    {
+      "path": "tests/openrig-bridge.test.ts",
+      "sha256": "ac248a7077dc0dd5124a37f1915f9d8f5b45075c75967f5bdd1cd37775a26d05"
+    },
+    {
+      "path": "tests/openrig-router.test.ts",
+      "sha256": "c34cbe8a622c718bea40b36970251ad2db106d98a6bbb471fc24d1419f3f505f"
+    },
+    {
+      "path": "tests/openrig-workbench-ui.test.ts",
+      "sha256": "a5c9f800c5ac509e9be4de788c56f27f17e8c6a1def2918edb1714ca77231fca"
+    },
+    {
+      "path": "tests/run-recovery-confirmation.test.ts",
+      "sha256": "2e684c4481a34ccb39d3313271320c940080009e605f9a869c4a776529c2449a"
+    }
+  ],
+  "dependencyManifests": [
+    {
+      "path": "package.json",
+      "sha256": "1b27ece7356b25fa7bfd1d8e5480ab7032ea7e8c0db0222dd92de6ed17071c80"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "017065ee531426b8ff93e1f33c26a92a3ed6e64dfef3b263ab07d79cbd502ddc"
+    },
+    {
+      "path": "services/agent-runtime/package.json",
+      "sha256": "6c14a3845b8df79bb9468998bbe6fc590c533f5e885c44d9054669239935a994"
+    },
+    {
+      "path": "services/agent-runtime/package-lock.json",
+      "sha256": "c2e74a3afbc4b844d09da2cbcb75b0cf7a14057a77a40ad90cea97c77fd1bbdf"
+    }
+  ],
+  "dependencyLinks": [
+    {
+      "path": "node_modules",
+      "target": "/home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/node_modules",
+      "resolved": "/home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/node_modules"
+    },
+    {
+      "path": "services/agent-runtime/node_modules",
+      "target": "/home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/services/agent-runtime/node_modules",
+      "resolved": "/home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/services/agent-runtime/node_modules"
+    }
+  ],
+  "builtAssets": [
+    {
+      "path": "dist/web/assets/index-CzCbk_YO.css",
+      "sha256": "51932f4c987a372505465411953b8b09e84760345140c32699bbc477d5d4e2d5",
+      "bytes": 52486
+    },
+    {
+      "path": "dist/web/assets/index-DRaaSSyr.js",
+      "sha256": "4dcfa562f50a8921b123b22c00a200c57c77897c099c7108a33c5fa15392073a",
+      "bytes": 563339
+    },
+    {
+      "path": "dist/web/index.html",
+      "sha256": "3b4a79b9d39c2409faf21d1e992c6f256a0dfe52401b3e23e95a2c76fdeb58e3",
+      "bytes": 563
+    }
+  ],
+  "checks": [
+    {
+      "label": "openrig",
+      "passed": true,
+      "exitCode": 0,
+      "seconds": 3.37,
+      "testTotals": {
+        "tests": 31,
+        "pass": 31,
+        "fail": 0,
+        "skipped": 0
+      },
+      "fullLog": "jj3-openrig-linux-2026-10-09.txt",
+      "bytes": 7610,
+      "sha256": "69c2c7c989e0a12d3a80e6365273eb703423deabb3871fbca36531592fd1bbe7",
+      "remoteLog": "/home/jj/.local/share/weiwu/logs/jj3-openrig-20261009.txt",
+      "remoteSha256": "69c2c7c989e0a12d3a80e6365273eb703423deabb3871fbca36531592fd1bbe7",
+      "redactions": 0
+    },
+    {
+      "label": "workbench-recovery",
+      "passed": true,
+      "exitCode": 0,
+      "seconds": 3.22,
+      "testTotals": {
+        "tests": 42,
+        "pass": 42,
+        "fail": 0,
+        "skipped": 0
+      },
+      "fullLog": "jj3-workbench-recovery-linux-2026-10-09.txt",
+      "bytes": 11434,
+      "sha256": "6bc1f9e18fa7f6b2a95df36798d1270e06ff6bf34d02227d51ed1d3115e13437",
+      "remoteLog": "/home/jj/.local/share/weiwu/logs/jj3-workbench-recovery-20261009.txt",
+      "remoteSha256": "6bc1f9e18fa7f6b2a95df36798d1270e06ff6bf34d02227d51ed1d3115e13437",
+      "redactions": 0
+    },
+    {
+      "label": "runtime-handoff",
+      "passed": true,
+      "exitCode": 0,
+      "seconds": 7.78,
+      "testTotals": {
+        "tests": 32,
+        "pass": 32,
+        "fail": 0,
+        "skipped": 0
+      },
+      "fullLog": "jj3-runtime-handoff-linux-2026-10-09.txt",
+      "bytes": 7871,
+      "sha256": "cd3f0275d77625ae8cf38d6479d07e28f0736901453d8928519cc1edbb4bb2cc",
+      "remoteLog": "/home/jj/.local/share/weiwu/logs/jj3-runtime-handoff-20261009.txt",
+      "remoteSha256": "cd3f0275d77625ae8cf38d6479d07e28f0736901453d8928519cc1edbb4bb2cc",
+      "redactions": 0
+    },
+    {
+      "label": "types",
+      "passed": true,
+      "exitCode": 0,
+      "seconds": 7.28,
+      "fullLog": "jj3-types-linux-2026-10-09.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "remoteLog": "/home/jj/.local/share/weiwu/logs/jj3-types-20261009.txt",
+      "remoteSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "redactions": 0
+    },
+    {
+      "label": "web-build",
+      "passed": true,
+      "exitCode": 0,
+      "seconds": 2.27,
+      "fullLog": "jj3-web-build-linux-2026-10-09.txt",
+      "bytes": 714,
+      "sha256": "b33c1290c7935b40bcf5669912d3c30f8daf984d45329d7dc022d53ad75c54cd",
+      "remoteLog": "/home/jj/.local/share/weiwu/logs/jj3-web-build-20261009.txt",
+      "remoteSha256": "b33c1290c7935b40bcf5669912d3c30f8daf984d45329d7dc022d53ad75c54cd",
+      "redactions": 0
+    },
+    {
+      "label": "local-check",
+      "passed": true,
+      "exitCode": 0,
+      "seconds": 11.44,
+      "fullLog": "jj3-local-check-linux-2026-10-09.txt",
+      "bytes": 293,
+      "sha256": "d47edbeca7600d6891b93ea53801d88463f4aad4a3600602b2a01e48287797e2",
+      "remoteLog": "/home/jj/.local/share/weiwu/logs/jj3-local-check-20261009.txt",
+      "remoteSha256": "d47edbeca7600d6891b93ea53801d88463f4aad4a3600602b2a01e48287797e2",
+      "redactions": 0
+    }
+  ],
+  "totalPassingTests": 105,
+  "services": {
+    "weiwu": {
+      "active": true,
+      "pid": 3186304,
+      "workingDirectory": "/home/jj/.local/share/weiwu/releases/weiwu-jj3-20261009",
+      "beforeUnitSha256": "a3bb9f8e2c59489d69b36c15741293f5d028fca00c15c71788ad2319a4baed1e",
+      "afterUnitSha256": "9e828e8d1f0bd8ba2cc0bd5a37b6dd7dc5307a65771c36390187169b3c471498"
+    },
+    "openrig": {
+      "active": true,
+      "pid": 3186171,
+      "previousPid": 3130076,
+      "cleanDrain": "clean",
+      "rigId": "01M4FVAV12PXXFXH4Q9XJY00K2",
+      "selfHostId": "host-91ecbc4f",
+      "seats": [
+        {
+          "employeeId": "mgr-1",
+          "logicalId": "dev.manager",
+          "nodeId": "01M4FVAV13XCQSDBX8NR8CQFA3",
+          "role": "manager"
+        },
+        {
+          "employeeId": "dev-1",
+          "logicalId": "dev.dev",
+          "nodeId": "01M4FVAV1464J022EM1GNAM5Z1",
+          "role": "developer"
+        },
+        {
+          "employeeId": "qa-1",
+          "logicalId": "dev.qa",
+          "nodeId": "01M4FVAV15MTQMS90ZP7A9Q7E5",
+          "role": "qa"
+        }
+      ],
+      "noKernel": true,
+      "noProviderEnvironment": true
+    },
+    "bridgeConfiguration": {
+      "enabled": true,
+      "status": "ready",
+      "acceptanceAuthority": "weiwu"
+    }
+  },
+  "backup": {
+    "path": "/home/jj/.local/share/weiwu/backups/jj3-activation-20261009T082149.744203Z-7117f0fb/pilot-before.tar.gz",
+    "sha256": "bce4c2198a6769d2426b77b03890779b2e42a5e54f7e32125aa2162925f207d5",
+    "bytes": 22899243,
+    "files": 1558,
+    "servicesStoppedBeforeArchive": true,
+    "allFileBytesVerified": true,
+    "restoredFromArchive": true,
+    "isolatedRestoreDirectory": "/home/jj/.local/share/weiwu/backups/jj3-activation-20261009T082149.744203Z-7117f0fb/isolated/pilot",
+    "pglite": {
+      "passed": true,
+      "readOnly": true,
+      "counts": {
+        "usage_count": 202,
+        "cost": 1.034637,
+        "pending_approvals": 0,
+        "active_operations": 0,
+        "active_model_calls": 0
+      },
+      "runs": 15,
+      "projects": 2,
+      "openedOriginal": false
+    },
+    "openrigSqlite": {
+      "passed": true,
+      "readOnly": true,
+      "integrity": "ok",
+      "rigId": "01M4FVAV12PXXFXH4Q9XJY00K2",
+      "selfHostId": "host-91ecbc4f",
+      "counts": {
+        "rigs": 1,
+        "pods": 1,
+        "nodes": 3,
+        "sessions": 0,
+        "queue_items": 0,
+        "schema_migrations": 94
+      }
+    },
+    "coverage": "Checkpoint before subsequent browser qitem synchronization and before final grandchild manager acceptance; those later changes are not claimed to be in this archive."
+  },
+  "preservation": {
+    "sameOriginalApiData": true,
+    "sameOriginalCredentials": true,
+    "originalDatabaseOverwritten": false,
+    "openrigConfigurationChanged": false
+  },
+  "actions": {
+    "releaseModelCalls": 0,
+    "stageModelCalls": 0,
+    "stageServiceActions": 0,
+    "collectionModelCalls": 0,
+    "collectionServiceActions": 0
+  },
+  "priorAttempt": {
+    "stageV1": "Blocked before destination creation because the frozen JJ2 baseline predated the already-deployed three-file recovery UI hotfix. Original failure receipt retained privately.",
+    "resolution": "Stage v2 verifies exact bytes of the successful hotfix payload against current frozen sources; all other JJ2 baseline hashes remain unchanged."
+  },
+  "limitations": [
+    "Vite reports a 563.34 kB JavaScript bundle above its 500 kB warning threshold; build succeeds.",
+    "local --check runs in an isolated clean environment with real device execution disabled; it is not evidence of production OpenShell execution.",
+    "OpenRig readiness here validates local bridge configuration and established metadata service identity; it is not queue completion or Weiwu project acceptance.",
+    "Historical costs and unknown-fee records remain unchanged; the reported $1.034637 is the recorded-cost sum at this backup checkpoint."
+  ],
+  "privacy": {
+    "publishedData": "Synthetic local regression output, hashes, numeric checkpoint totals and service identities only.",
+    "excluded": "No API keys, private keys, credential bodies, project requirements, model messages, database files, archive contents or original user context.",
+    "fullLogsUnmodified": true
+  }
+}

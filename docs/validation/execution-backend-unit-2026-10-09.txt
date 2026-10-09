@@ -1,0 +1,11 @@
+✔ legacy native policies and receipts remain valid without added metadata (1.7891ms)
+✔ an OpenShell selection must bind the approved environment fingerprint (2.3347ms)
+✔ sandbox receipts reject missing, changed or privileged execution identities (3.0495ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1119.8409

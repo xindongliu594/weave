@@ -1,0 +1,33 @@
+{
+  "kind": "isolated-openrig-sqlite-backup-restore",
+  "trial": "/home/jj/.local/share/weiwu/backups/openrig-isolated-20261009T082638Z-462a4b78-10df-48f4-87f3-88a039e5df80",
+  "productionReadOnly": true,
+  "restoredServiceStarted": false,
+  "modelCallsRequested": 0,
+  "queueWritesRequested": 0,
+  "checks": {
+    "sqliteBackupApi": true,
+    "sourceConnectionReadOnly": true,
+    "bothIntegrityChecks": "ok",
+    "identicalLogicalDatabase": true,
+    "identicalQitem": true,
+    "sourceQitemUnchangedDuringBackup": true,
+    "sourceMetadataUnchanged": true,
+    "tokenExactPrivateCopy": true,
+    "tokenValueExported": false,
+    "restoredReceiptConfirmed": true,
+    "restoredConfigDisabled": true,
+    "isolatedRestoredPaths": true,
+    "serviceNotStarted": true
+  },
+  "status": "passed",
+  "backupDatabase": "/home/jj/.local/share/weiwu/backups/openrig-isolated-20261009T082638Z-462a4b78-10df-48f4-87f3-88a039e5df80/backup/state/openrig.sqlite",
+  "restoredDatabase": "/home/jj/.local/share/weiwu/backups/openrig-isolated-20261009T082638Z-462a4b78-10df-48f4-87f3-88a039e5df80/restore/state/openrig.sqlite",
+  "queueItemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+  "restoredQueueItems": 1,
+  "queueState": "pending",
+  "logicalDatabaseDumpSha256": "f625fff0e1f73a0d638eaf6b233e91c530ca4a65fe9e9cffbf65d8bac3fa36ae",
+  "copiedMetadataFileCount": 112,
+  "copiedMetadataBytes": 879150,
+  "configTransform": "Only isolated restore config disabled and token/mapping paths rebound; exact original retained privately."
+}

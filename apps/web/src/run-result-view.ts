@@ -1,14 +1,15 @@
 import { runTaskView } from './run-detail-view.ts';
+import {verifiedRecoveredReceipt,type RunLineageEvidence,type RecoveredReceipt} from '../../../packages/contracts/run-lineage-evidence.ts';
 
 type Event = { type: string; seq?: number; data: any };
-type Snapshot = { planVersion?: number; agents?: any[]; tasks?: any[]; approvedTasks?: any[]; recovery?: any; handoffCheckpoints?: any[] };
+type Snapshot = { projectId?:string;planVersion?: number; agents?: any[]; tasks?: any[]; approvedTasks?: any[]; recovery?: any; handoffCheckpoints?: any[] };
 export type RunResult = { kind: 'accepted-manager' | 'runtime'; text: string; originalSummary: string;
-  taskId?: string; taskSubject?: string; acceptanceSeq?: number; receipt?: any; reason?: string };
+  taskId?: string; taskSubject?: string; acceptanceSeq?: number; receipt?: any; reason?: string;inheritedSources?:RecoveredReceipt[] };
 
 /** The coordinator's last conversational reply can precede delivery. Display
  * the actual accepted terminal manager task without rewriting that transcript. */
 export function runResultView(runId: string, status: string, integrity: string | undefined, snapshot: Snapshot,
-  events: Event[], traceEvents: Event[] = []): RunResult {
+  events: Event[], traceEvents: Event[] = [],lineage?:RunLineageEvidence): RunResult {
   const ordered = [...traceEvents, ...events].map((event, index) => ({ event, index }))
     .sort((left, right) => (left.event.seq ?? left.index) - (right.event.seq ?? right.index)).map(item => item.event);
   const finished = ordered.findLast(event => event.type === 'run/finished')?.data;
@@ -20,6 +21,7 @@ export function runResultView(runId: string, status: string, integrity: string |
   const unverified = { ...fallback, reason: '尚未核对全部批准节点的完整交接证据，以下保留原始运行回复。' };
   if (!contracts.length || tasks.length !== contracts.length || tasks.some(task => task.unapproved || task.status !== 'completed')) return unverified;
   const receipts = new Map<string, { receipt: any; seq?: number }>();
+  const inheritedSources:RecoveredReceipt[]=[];
   const completeFile = (file: any) => typeof file?.path === 'string' && /^[a-f0-9]{64}$/i.test(file.sha256 ?? '') &&
     Number.isSafeInteger(file.size) && file.size >= 0;
   for (const task of tasks) {
@@ -27,11 +29,8 @@ export function runResultView(runId: string, status: string, integrity: string |
       (receipt.planVersion === undefined || receipt.planVersion === snapshot.planVersion);
     const accepted = ordered.findLast(event => event.type === 'handoff/accepted' && event.data.runId === runId && same(event.data));
     const recovery = snapshot.recovery;
-    const inherited = typeof recovery?.sourceRunId === 'string' && (recovery.completed ?? []).some((done: any) => done.taskId === task.id &&
-      (done.attemptId ?? done.attempt_id) === task.attemptId)
-      ? snapshot.handoffCheckpoints?.find(receipt => same(receipt) && typeof receipt.runId === 'string' &&
-        (receipt.runId === recovery.sourceRunId || receipt.runId === recovery.nodes?.[task.id]?.historyRunId)) : undefined;
-    const receipt = accepted?.data ?? inherited;
+    const inherited = !accepted ? verifiedRecoveredReceipt(lineage,runId,snapshot,task.id,task.attemptId):undefined;
+    const receipt = accepted?.data ?? inherited?.receipt;
     const outputs = task.outputs ?? [], inputs = task.inputs ?? [];
     if (!receipt || !Array.isArray(outputs) || !Array.isArray(inputs) || !Array.isArray(receipt.outputs) || !Array.isArray(receipt.inputs) ||
       receipt.outputs.length !== outputs.length || receipt.inputs.length !== inputs.length ||
@@ -42,6 +41,7 @@ export function runResultView(runId: string, status: string, integrity: string |
     if (!accepted && !receipt.outputs.every((output: any) => recovery.files?.some((file: any) => file.state === 'accepted' &&
       file.producerTaskId === task.id && file.path === output.path && file.sha256 === output.sha256 && file.size === output.size))) return unverified;
     receipts.set(task.id, { receipt, seq: accepted?.seq });
+    if(inherited)inheritedSources.push(inherited);
   }
   for (const task of tasks) for (const input of task.inputs ?? []) {
     const observed = receipts.get(task.id)!.receipt.inputs.find((file: any) => file.path === input.path);
@@ -59,5 +59,5 @@ export function runResultView(runId: string, status: string, integrity: string |
   if (typeof task.output !== 'string' || !task.output.trim()) return fallback;
   const { receipt, seq } = receipts.get(task.id)!;
   return { kind: 'accepted-manager', text: task.output, originalSummary, taskId: task.id,
-    taskSubject: task.subject, acceptanceSeq: seq, receipt };
+    taskSubject: task.subject, acceptanceSeq: seq, receipt,inheritedSources };
 }

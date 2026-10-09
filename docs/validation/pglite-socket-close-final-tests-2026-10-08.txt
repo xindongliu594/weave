@@ -1,0 +1,29 @@
+✔ real pg disconnect drains its transaction and preserves committed data after disk reopen (6781.7491ms)
+✔ real socket cleanup failure is surfaced while the database remains open (5485.4085ms)
+✔ local launcher documents the explicit data directory (214.2387ms)
+✔ API-only local check cannot be presented as a production static-web check (200.9537ms)
+✔ local check refuses a data directory override before accessing it (235.9256ms)
+✔ local launcher refuses relative and empty data directories (553.2068ms)
+✔ local launcher refuses ambiguous duplicate data directory options (248.8713ms)
+✔ an absolute data directory with spaces retains its existing launch lock (267.1171ms)
+✔ static page, assets and HEAD use correct MIME without a development server (68.281ms)
+✔ API proxy retains bytes, query, status, end-to-end headers and original idempotency key (13.1535ms)
+✔ upstream permission failure and API 404 remain API responses (9.0061ms)
+✔ successive API reads use a fresh upstream socket for every request (35.2386ms)
+✔ upstream disconnect after receiving a GET or mutation dispatches once and never replays an unknown result (194.6693ms)
+✔ Host and browser Origin guards reject both HTML and API before upstream operations (17.0462ms)
+✔ SPA fallback excludes API, missing assets, encoded traversal and non-read methods (13.7531ms)
+✔ static serving refuses a directory link outside the build root (10.8614ms)
+✔ streamed API response starts before the upstream completes (5.2714ms)
+✔ unavailable API returns an explicit 502 and never falls through to the SPA (9.8942ms)
+✔ closing static host aborts an outstanding API stream, releases the port and is idempotent (11.1551ms)
+✔ missing build fails with a build instruction and does not create a data directory (3.5281ms)
+✔ existing built product index and assets are served unchanged (16.4101ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12692.9441

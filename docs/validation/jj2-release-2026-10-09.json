@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-09",
+  "scope": "JJ release staging and activation; employee execution acceptance is separate",
+  "passed": true,
+  "sourceEvidence": {
+    "staging": {
+      "path": ".data/research/jj-deployment-2026-10-08/stage-release-result-2026-10-09.json",
+      "sha256": "6f6156bf4a4fe796ae2a8124ed94a000b63d00a29d7ce77a35a9ee86c0788ee4"
+    },
+    "activation": {
+      "path": ".data/research/jj-deployment-2026-10-08/activation-result-2026-10-09.json",
+      "sha256": "835f47dd8e58658c0f71f249bafa1057a8a6cf28b2a60eba045436eddb88b19b"
+    }
+  },
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-jj2-20261009",
+  "sourceFileCount": 347,
+  "stagingMetadata": "/home/jj/.local/share/weiwu/metadata/jj2-stage-20261009.json",
+  "regression": {
+    "total": 58,
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "checks": [
+      {
+        "name": "adapter-bootstrap",
+        "exit": 0,
+        "seconds": 2.47,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj2-adapter-bootstrap-20261009.txt",
+        "tests": 27,
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "name": "api-integration",
+        "exit": 0,
+        "seconds": 3.77,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj2-api-integration-20261009.txt",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "name": "workbench-and-recovery",
+        "exit": 0,
+        "seconds": 3.12,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj2-workbench-and-recovery-20261009.txt",
+        "tests": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "name": "local-check",
+        "exit": 0,
+        "seconds": 11.5,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj2-local-check-20261009.txt"
+      },
+      {
+        "name": "types",
+        "exit": 0,
+        "seconds": 7.08,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj2-types-20261009.txt"
+      },
+      {
+        "name": "web-build",
+        "exit": 0,
+        "seconds": 2.47,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj2-web-build-20261009.txt"
+      }
+    ]
+  },
+  "build": {
+    "typesPassed": true,
+    "webBuildPassed": true,
+    "webJs": "dist/web/assets/index-87-g23DV.js",
+    "webCss": "dist/web/assets/index-M1fEtHtS.css",
+    "warning": "Vite warns that one minified JS chunk exceeds 500 kB (556.76 kB); build exited 0."
+  },
+  "activation": {
+    "id": "jj2-activation-20261009T072022Z",
+    "backupDirectory": "/home/jj/.local/share/weiwu/backups/jj2-activation-20261009T072022Z",
+    "offlineBackup": {
+      "path": "/home/jj/.local/share/weiwu/backups/jj2-activation-20261009T072022Z/pilot-before.tar.gz",
+      "sha256": "154b987d6fd5c040d296b210c36b635a52f8514acd446685fb589164abe4e898",
+      "bytes": 19180290,
+      "files": 1372,
+      "allFileBytesVerified": true
+    },
+    "oldServiceSha256": "8a4526fc4b04cc4d10d3723fdb360e7ac19a9beb69bbe88b2793a10e7faff786",
+    "newServiceSha256": "a3bb9f8e2c59489d69b36c15741293f5d028fca00c15c71788ad2319a4baed1e",
+    "sameOriginalApiData": true,
+    "sameOriginalCredentials": true,
+    "databaseRestoredOverOriginal": false,
+    "serviceStateAtActivation": "ActiveState=active\nMainPID=2969369\nWorkingDirectory=/home/jj/.local/share/weiwu/releases/weiwu-jj2-20261009"
+  },
+  "openshellDevice": {
+    "id": "14b3b6f9-a109-4396-a8cc-8691fa33458a",
+    "grantId": "d75b2a15-c862-4de4-a363-5afd3e3428ea",
+    "name": "OpenShell 隔离执行设备",
+    "platform": "linux",
+    "backend": {
+      "kind": "openshell",
+      "version": "0.1.2",
+      "gateway": "weiwu-openshell-v012",
+      "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+      "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+      "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104"
+    },
+    "enabled": true,
+    "online": true
+  },
+  "workbenchSummaryAtActivation": {
+    "total": 1,
+    "backlog": 0,
+    "running": 0,
+    "attention": 1,
+    "completed": 1,
+    "recordedCost": 0.6969938999999999,
+    "pendingApprovals": 0
+  },
+  "modelCallsDuringStagingAndActivation": 0,
+  "acceptanceBoundaries": {
+    "stagingAndActivationVerified": true,
+    "productionCredentialsExported": false,
+    "actualEmployeeDevelopmentQaManagerVerifiedByThisEvidence": false,
+    "controlledEmployeeRestartRecoveryVerifiedByThisEvidence": false,
+    "physicalIsolationVerifiedByThisEvidence": false
+  },
+  "notes": [
+    "58 engineering regressions ran on the staged Linux release; adapter tests include CLI fixtures, and API tests use an isolated PGlite database.",
+    "local-check validates isolated startup, per-call approval, restart configuration and grant retention without paid model calls.",
+    "The offline backup verifies all 1372 original files against archive bytes; the original database was not overwritten by a restore.",
+    "Service/device/workbench fields describe activation time, before subsequent employee work; they are not a live status report.",
+    "Physical OpenShell trial and isolated SQL backup restore have separate prior evidence. New real employee execution and controlled recovery still need their own run evidence."
+  ]
+}

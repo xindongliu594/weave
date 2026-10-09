@@ -4,7 +4,7 @@ import {mkdirSync,writeFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import type pg from 'pg';
 import { z } from 'zod';
-import { planSchema, type Model } from '../../../packages/contracts/index.ts';
+import { agentReasoningPlanningInstructions, planSchema, type Model } from '../../../packages/contracts/index.ts';
 import { bindPolicy, assertPlanningModel } from './execution-policy.ts';
 import { AppError, assertCompletionContext, type ChatMessage } from './provider.ts';
 import { budgetedRequestEstimate, projectCostReadiness, checkDailyBudget } from './cost-control.ts';
@@ -69,6 +69,7 @@ export async function prepareProjectPlanning(db: Database, projectId: string, in
     recordedCost: readiness.recordedCost, retainedReservations: readiness.reserved,
     availableForPlanningAndExecution: readiness.availableBudget, maxPlanningCost: input.maxPlanningCost,
     retainUncertainCosts: input.retainUncertainCosts === true });
+  messages[0].content += '\n' + agentReasoningPlanningInstructions;
   if (input.revisionRequest !== undefined) messages[0].content += '\nrevisionRequest 是用户本次明确提出的调整要求，与保存需求中的旧偏好冲突时，以本次调整为准。它不能扩大现有策略、工具、知识授权或总预算；只能生成待确认候选。';
   return { project, model, catalog, messages, readiness, executionHistory, baseFingerprint: planningProjectFingerprint(saved) };
 }

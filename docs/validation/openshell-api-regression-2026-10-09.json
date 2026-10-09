@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-09",
+  "scope": "Isolated PGlite and loopback HTTP API engineering regression; no real model/sandbox/employee execution",
+  "passed": true,
+  "integration": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "command": "node scripts/test-integration.mjs tests/openshell-api-admission.test.ts",
+    "output": "openshell-api-integration-2026-10-09.txt",
+    "sha256": "4aa64dfc2e4433daa89e8feaa606308abdd99343224ab0a9fd6f29a41a12592b"
+  },
+  "unit": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "command": "node --import tsx --test tests/execution-backend.test.ts",
+    "output": "execution-backend-unit-2026-10-09.txt",
+    "sha256": "24393ffc0468e5ccde94f8912025f26be00fb31a59fae06e53fc119a3e6c2bb7"
+  },
+  "sourceSha256": {
+    "tests/openshell-api-admission.test.ts": "1a2ca196dcd43f695afe74f1681d6225142fa511c134355c4f26db8d888724c3",
+    "tests/execution-backend.test.ts": "1d235d029c018e85757a56949e57fc116ccc60cc9c55b3c48efa63b860d820e3",
+    "apps/api/src/execution-backend.ts": "d5ba97df9d5d1e15cbc04b303e6eb652d65110e5089caf114d03c0aaf3f425e8",
+    "apps/api/src/local-execution.ts": "5a90faf01de2392edbb88406d454ef79e3b9cf420b7cc1f5f3b9262da763f3ba",
+    "apps/api/src/product-schema.ts": "72a250d78080f1599a8420114f900b38a58befa521e77d67f17676370fd31c8a",
+    "packages/contracts/index.ts": "73ddd9a8307da40fb9924cc3b1a38b3cf524829653804fa06c66778539c62b98"
+  },
+  "realModelCalls": 0,
+  "productionDataAccess": false,
+  "sandboxProcesses": 0,
+  "limits": [
+    "Declared receipt fixtures do not prove physical isolation or cryptographic attestation.",
+    "Independent PostgreSQL backend lock behavior excluded.",
+    "Repeated approval unique-constraint path excluded after PGlite socket protocol desynchronization; original failed output retained."
+  ],
+  "priorAttempts": [
+    {
+      "outcome": "blocked-environment",
+      "reason": "Windows sandbox loopback EACCES",
+      "privateOutput": "openshell-api-integration-2026-10-09.txt"
+    },
+    {
+      "outcome": "failed-harness",
+      "reason": "PGlite socket desynchronization after unique constraint error",
+      "privateOutput": "openshell-api-integration-2026-10-09-approved.txt"
+    }
+  ]
+}

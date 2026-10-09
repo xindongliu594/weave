@@ -1,0 +1,196 @@
+TAP version 13
+# Subtest: default-disabled bridge performs no filesystem or network setup
+ok 1 - default-disabled bridge performs no filesystem or network setup
+  ---
+  duration_ms: 1.8996
+  type: 'test'
+  ...
+# Subtest: only explicit loopback endpoints and the pinned version are admitted
+ok 2 - only explicit loopback endpoints and the pinned version are admitted
+  ---
+  duration_ms: 1.790532
+  type: 'test'
+  ...
+# Subtest: department binds immutable real topology; no materialization or harness startup requests exist
+ok 3 - department binds immutable real topology; no materialization or harness startup requests exist
+  ---
+  duration_ms: 34.806356
+  type: 'test'
+  ...
+# Subtest: concurrent callers and reopened instances persist one official qitem with one POST
+ok 4 - concurrent callers and reopened instances persist one official qitem with one POST
+  ---
+  duration_ms: 23.450249
+  type: 'test'
+  ...
+# Subtest: lost successful create response is reconciled by ID after restart without replay
+ok 5 - lost successful create response is reconciled by ID after restart without replay
+  ---
+  duration_ms: 13.971056
+  type: 'test'
+  ...
+# Subtest: missing qitem after unknown write stays unknown and never automatically sends another create
+ok 6 - missing qitem after unknown write stays unknown and never automatically sends another create
+  ---
+  duration_ms: 19.402806
+  type: 'test'
+  ...
+# Subtest: same project with changed payload is refused before new network I/O
+ok 7 - same project with changed payload is refused before new network I/O
+  ---
+  duration_ms: 10.613124
+  type: 'test'
+  ...
+# Subtest: source/destination/body mismatches are not accepted as a successful write or later reconciliation
+ok 8 - source/destination/body mismatches are not accepted as a successful write or later reconciliation
+  ---
+  duration_ms: 9.113987
+  type: 'test'
+  ...
+# Subtest: truncated response keeps durable identity and a later query can confirm its actual row
+ok 9 - truncated response keeps durable identity and a later query can confirm its actual row
+  ---
+  duration_ms: 11.196477
+  type: 'test'
+  ...
+# Subtest: instance replacement, upgraded daemon, active harness or changed node blocks queue mutations
+ok 10 - instance replacement, upgraded daemon, active harness or changed node blocks queue mutations
+  ---
+  duration_ms: 22.144181
+  type: 'test'
+  ...
+# Subtest: current queue state is read from OpenRig and terminal closure does not imply Weiwu acceptance
+ok 11 - current queue state is read from OpenRig and terminal closure does not imply Weiwu acceptance
+  ---
+  duration_ms: 11.830712
+  type: 'test'
+  ...
+# Subtest: corrupt receipt and cross-instance persistent bindings fail closed
+ok 12 - corrupt receipt and cross-instance persistent bindings fail closed
+  ---
+  duration_ms: 10.801067
+  type: 'test'
+  ...
+# Subtest: default-disabled router has no OpenRig I/O; missing real projects still return 404
+ok 13 - default-disabled router has no OpenRig I/O; missing real projects still return 404
+  ---
+  duration_ms: 1902.592671
+  type: 'test'
+  ...
+# Subtest: bad optional configuration cannot crash the router and never exposes private configuration
+ok 14 - bad optional configuration cannot crash the router and never exposes private configuration
+  ---
+  duration_ms: 17.21511
+  type: 'test'
+  ...
+# Subtest: unmapped reads and batch lists do not reserve or contact OpenRig; foreign IDs are excluded
+ok 15 - unmapped reads and batch lists do not reserve or contact OpenRig; foreign IDs are excluded
+  ---
+  duration_ms: 29.156035
+  type: 'test'
+  ...
+# Subtest: HTTP cannot override endpoint, token or seats; stale versions reject before network activity
+ok 16 - HTTP cannot override endpoint, token or seats; stale versions reject before network activity
+  ---
+  duration_ms: 18.681175
+  type: 'test'
+  ...
+# Subtest: actual project employees and department provenance are checked before queue writes
+ok 17 - actual project employees and department provenance are checked before queue writes
+  ---
+  duration_ms: 7.633834
+  type: 'test'
+  ...
+# Subtest: concurrent HTTP requests create one metadata item; batch remains local; queue done never accepts the project
+ok 18 - concurrent HTTP requests create one metadata item; batch remains local; queue done never accepts the project
+  ---
+  duration_ms: 56.288396
+  type: 'test'
+  ...
+# Subtest: lost create response and process reopen reconcile the same receipt using GET only
+ok 19 - lost create response and process reopen reconcile the same receipt using GET only
+  ---
+  duration_ms: 26.174545
+  type: 'test'
+  ...
+# Subtest: unknown receipt plus remote 404 remains query-only across repeated POST and restart
+ok 20 - unknown receipt plus remote 404 remains query-only across repeated POST and restart
+  ---
+  duration_ms: 33.322087
+  type: 'test'
+  ...
+# Subtest: remote failures are sanitized and remain confined to optional integration routes
+ok 21 - remote failures are sanitized and remain confined to optional integration routes
+  ---
+  duration_ms: 21.188855
+  type: 'test'
+  ...
+# Subtest: disabled integration renders nothing; unbound departments expose no synchronization action
+ok 22 - disabled integration renders nothing; unbound departments expose no synchronization action
+  ---
+  duration_ms: 8.943373
+  type: 'test'
+  ...
+# Subtest: queue done is shown as queue state and never as Weiwu acceptance
+ok 23 - queue done is shown as queue state and never as Weiwu acceptance
+  ---
+  duration_ms: 1.051001
+  type: 'test'
+  ...
+# Subtest: explicit synchronization saves identity before the sole POST and clears it only after confirmation
+ok 24 - explicit synchronization saves identity before the sole POST and clears it only after confirmation
+  ---
+  duration_ms: 2.835207
+  type: 'test'
+  ...
+# Subtest: lost responses survive remounts; absent remote items allow GET reconciliation only, never a new POST
+ok 25 - lost responses survive remounts; absent remote items allow GET reconciliation only, never a new POST
+  ---
+  duration_ms: 0.827654
+  type: 'test'
+  ...
+# Subtest: simultaneous clicks from repeated project cards cannot issue a second POST
+ok 26 - simultaneous clicks from repeated project cards cannot issue a second POST
+  ---
+  duration_ms: 0.330535
+  type: 'test'
+  ...
+# Subtest: only explicit preflight rejection codes release intent; an in-flight idempotency 409 stays unknown
+ok 27 - only explicit preflight rejection codes release intent; an in-flight idempotency 409 stays unknown
+  ---
+  duration_ms: 0.543234
+  type: 'test'
+  ...
+# Subtest: unknown, invalid identities and unexpected acceptance authorities cannot clear an unresolved write
+ok 28 - unknown, invalid identities and unexpected acceptance authorities cannot clear an unresolved write
+  ---
+  duration_ms: 1.02786
+  type: 'test'
+  ...
+# Subtest: only a consistent explicit POST notSubmitted receipt can release a preflight failure
+ok 29 - only a consistent explicit POST notSubmitted receipt can release a preflight failure
+  ---
+  duration_ms: 0.522407
+  type: 'test'
+  ...
+# Subtest: unavailable browser bookkeeping stops writes before any request
+ok 30 - unavailable browser bookkeeping stops writes before any request
+  ---
+  duration_ms: 0.265707
+  type: 'test'
+  ...
+# Subtest: batch reads deduplicate IDs, stay bounded and preserve previously reconciled queue state
+ok 31 - batch reads deduplicate IDs, stay bounded and preserve previously reconciled queue state
+  ---
+  duration_ms: 1.17667
+  type: 'test'
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3320.211325

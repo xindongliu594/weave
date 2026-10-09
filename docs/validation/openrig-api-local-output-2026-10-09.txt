@@ -1,0 +1,29 @@
+✔ default-disabled bridge performs no filesystem or network setup (2.9492ms)
+✔ only explicit loopback endpoints and the pinned version are admitted (6.4443ms)
+✔ department binds immutable real topology; no materialization or harness startup requests exist (102.0552ms)
+✔ concurrent callers and reopened instances persist one official qitem with one POST (76.2984ms)
+✔ lost successful create response is reconciled by ID after restart without replay (59.9348ms)
+✔ missing qitem after unknown write stays unknown and never automatically sends another create (89.3991ms)
+✔ same project with changed payload is refused before new network I/O (50.8957ms)
+✔ source/destination/body mismatches are not accepted as a successful write or later reconciliation (52.4361ms)
+✔ truncated response keeps durable identity and a later query can confirm its actual row (55.9044ms)
+✔ instance replacement, upgraded daemon, active harness or changed node blocks queue mutations (120.5778ms)
+✔ current queue state is read from OpenRig and terminal closure does not imply Weiwu acceptance (50.3199ms)
+✔ corrupt receipt and cross-instance persistent bindings fail closed (43.1363ms)
+✔ default-disabled router has no OpenRig I/O; missing real projects still return 404 (2415.9871ms)
+✔ bad optional configuration cannot crash the router and never exposes private configuration (43.2189ms)
+✔ unmapped reads and batch lists do not reserve or contact OpenRig; foreign IDs are excluded (93.6725ms)
+✔ HTTP cannot override endpoint, token or seats; stale versions reject before network activity (90.8487ms)
+✔ actual project employees and department provenance are checked before queue writes (30.1842ms)
+✔ concurrent HTTP requests create one metadata item; batch remains local; queue done never accepts the project (190.0319ms)
+✔ lost create response and process reopen reconcile the same receipt using GET only (98.1506ms)
+✔ unknown receipt plus remote 404 remains query-only across repeated POST and restart (104.2627ms)
+✔ remote failures are sanitized and remain confined to optional integration routes (82.5642ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5118.342

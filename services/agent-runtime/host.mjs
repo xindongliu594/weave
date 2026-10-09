@@ -20,6 +20,12 @@ import { captureBudgetEvidence, taskRunEvidence } from './run-evidence.mjs';
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
 const baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
+const completeContextGuards = new WeakMap();
+export function reviewCompletionGuidance(contract, outputLimit) {
+  if (!['review', 'requirements'].includes(contract?.kind)) return undefined;
+  const cap = Number.isSafeInteger(outputLimit) && outputLimit > 0 ? `单次输出最多 ${outputLimit} Token，实际请求或备用路线可更小。` : '单次输出遵守本次请求已批准的 Token 上限。';
+  return `${cap}你在本节点是执行员工，即使职位是经理，也不能以协调回复代替交接。依据建议不超过600中文字；逐项用紧凑完整句，不写长表、不重复源码或完整测试日志，仍核对全部验收。工作完成先调用原生 agent_teams_update_task，提交完整JSON：task_id用runtimeTaskId、attempt_id用当前attemptId，status/output/verdict按真实结果填写。仅全部满足时status=completed、verdict=pass；needs_revision/reject用status=failed，并提交findings每项id、severity、problem、requiredFix及必要定位。合同/工具要求的acceptanceResults、commandsRun等字段仍须完整如实填写，不省略必需证据或编造测试。普通最终文字、send_message均不能完成节点；正式交接成功后由宿主结束当前回合，结论写在output中，不再额外调用模型重述。outputs为空时保持只读，不写报告文件。不能提高输出、预算、权限或调用上限。`;
+}
 
 /** Department coordination Host; execution loops live in employee-owned Hosts. */
 export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product, context }) {
@@ -37,6 +43,22 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
   const readEvidence = new Map();
   const writeEvidence = new Map();
+  let employeeContext = context ?? (product ? { mode: product.snapshot.policy?.contextManagement ?? 'summary' } : undefined);
+  if (employeeContext && typeof adapter.prepareRequest === 'function') {
+    let guard = completeContextGuards.get(adapter);
+    if (!guard) {
+      guard = { sessions: new Set(), previous: adapter.requireCompleteContext };
+      completeContextGuards.set(adapter, guard);
+      adapter.requireCompleteContext = sessionId => guard.sessions.has(sessionId) ||
+        (typeof guard.previous === 'function' && guard.previous.call(adapter, sessionId) === true);
+    }
+    const notifyRetained = employeeContext.onRetainOriginal;
+    employeeContext = { ...employeeContext, requestPreview: options => adapter.prepareRequest(options),
+      onRetainOriginal(sessionId, retained) {
+        if (retained) guard.sessions.add(sessionId); else guard.sessions.delete(sessionId);
+        notifyRetained?.(sessionId, retained);
+      } };
+  }
   const rework = handoff ? new ReworkGate({ snapshot: product.snapshot, handoff, archive, taskIds, state: teamState, onBlocked: product.onHandoffBlocked }) : undefined;
   function teamState() {
     if (!teamId || !workspaceRoot) throw Error('TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪');
@@ -128,7 +150,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const current = taskFor(agent.id), task = state.tasks.find(t => t.id === current.taskId);
     const contract = rework.contractFor(current.taskId);
     if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
-    return JSON.stringify({ ...base, budget: budgetContext(contract.id, state), task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
+    const budget = budgetContext(contract.id, state);
+    return JSON.stringify({ ...base, budget, task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
+      completionGuidance: reviewCompletionGuidance(contract, budget?.task?.configuredOutputLimit ?? contract.maxOutputTokens),
       runEvidence: taskRunEvidence({ snapshot: product.snapshot, taskId: contract.id, state, taskIds, handoff, budget: adapter.budget, runId: archive.id }),
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
@@ -249,7 +273,17 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     // task needs the public query service to read and resume the saved session.
     await mount('@deepseek-ai/dsh-session-query');
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
-      context: context ?? (product ? { mode: product.snapshot.policy?.contextManagement ?? 'summary' } : undefined),
+      context: employeeContext,
+      concludesAcceptedTask: handoff ? exec => {
+        if (exec.name !== 'agent_teams_update_task' || exec.arguments.status !== 'completed' || exec.agent.id === captainId) return false;
+        const task = teamState().tasks.find(item => item.id === exec.arguments.task_id);
+        const employee = employeeFor(exec.agent, product.snapshot, captainId);
+        const accepted = handoff.committed.get(taskIds.get(task?.id));
+        const concluded = Boolean(task?.status === 'completed' && task.assignee === employee?.id &&
+          task.attemptId === exec.arguments.attempt_id && accepted?.attemptId === task.attemptId);
+        if (concluded) archive.append('handoff/turn-concluded', { taskId: accepted.taskId, runtimeTaskId: task.id, attemptId: task.attemptId }, { sessionId: exec.agent.id });
+        return concluded;
+      } : undefined,
       protectedContext: product ? protectedContext : undefined,
       waitForProtectedContext: handoff ? (agent, signal) => agent.id === captainId ? undefined : handoff.exclusive(signal, () => {}) : undefined,
       identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,

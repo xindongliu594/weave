@@ -1,0 +1,97 @@
+{
+  "status": "passed",
+  "date": "2026-10-09",
+  "scope": "Published SQL type correction and existing completed-run lineage API verification; no new employee execution",
+  "id": "jj4-sql-hotfix-20261009T090744Z-4474e94c",
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-jj4-20261009",
+  "privateHelperBackupDirectory": "/home/jj/.local/share/weiwu/metadata/jj4-sql-hotfix-20261009T090744Z-4474e94c",
+  "originalFailure": {
+    "apiStatus": "partial",
+    "cause": "Production local_operations.id is text, but the query used ANY(uuid[]) and the API test fixture incorrectly used uuid.",
+    "correction": "Query changed to ANY(text[]); fixture aligned to the actual text column. Evidence-binding rules are unchanged."
+  },
+  "files": [
+    {
+      "path": "apps/api/src/run-lineage-evidence.ts",
+      "beforeSha256": "bd901862895f17eb0d22d636b2f23f1c29db82f709c64217b9d98b5edf5e9858",
+      "sha256": "6c71ac31ada1d3adf1781661419abc60a5bb3ebc53130a7974d535cc24f9b443"
+    },
+    {
+      "path": "tests/run-lineage-evidence-api.test.ts",
+      "beforeSha256": "fc7ada8f0a999018d0b86465b2e3c97969eb8c25005c01d909781f356ebbf324",
+      "sha256": "4b8125003139601a25617f16c6ccd47a2c828681f472817e71c54167e8709e79"
+    }
+  ],
+  "service": {
+    "activeState": "active",
+    "mainPid": 3341617,
+    "workingDirectory": "/home/jj/.local/share/weiwu/releases/weiwu-jj4-20261009"
+  },
+  "sameOriginalApiData": true,
+  "sameOriginalCredentials": true,
+  "databaseOverwritten": false,
+  "openrigRestarted": false,
+  "modelCalls": 0,
+  "liveApi": {
+    "status": "verified",
+    "runId": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+    "planVersion": 12,
+    "receipts": [
+      {
+        "taskId": "T1",
+        "sourceRunId": "15c79ce8-58cc-48df-93e6-11b8f54d21f3",
+        "acceptanceSeq": 497
+      },
+      {
+        "taskId": "T2",
+        "sourceRunId": "7da3c44b-d8fa-4b0e-9c15-e9130ed0772a",
+        "acceptanceSeq": 2248
+      }
+    ],
+    "qa": {
+      "taskId": "T2",
+      "sourceRunId": "7da3c44b-d8fa-4b0e-9c15-e9130ed0772a",
+      "operationId": "ac15d4f2-d455-45ae-85de-44b8c19cde0d",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "nodeTests": {
+        "status": "available",
+        "format": "spec",
+        "tests": 10,
+        "suites": 0,
+        "pass": 10,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputSha256": "f9ba46fb6bd156e379dd4a75b2725d7f34bfd48ce7c0495c18e705c2cff53eeb",
+      "workspaceRevision": "4acc637e320b4b040956383ab220354710e86f106d9055d172cbf8d51d4be16b"
+    }
+  },
+  "browserObservation": {
+    "source": "Root agent reported one read-only browser check; not performed independently by this report author",
+    "reportedVisible": [
+      "manager acceptance heading",
+      "two inherited completed handoffs",
+      "QA 10/10"
+    ],
+    "screenshot": "screenshots/openshell-v12-final-recovered-qa-2026-10-09.png"
+  },
+  "sourceReceipt": {
+    "path": ".data/research/jj-deployment-2026-10-09/jj4/sql-hotfix-result-2026-10-09.json",
+    "sha256": "2d8139886f2a589654167d63126ba4245cde935da39f7cc1e15202c37c5ba24d"
+  },
+  "reportPreparation": {
+    "existingReceiptsOnly": true,
+    "newProductionQueries": 0,
+    "newModelCalls": 0,
+    "productionChanges": 0,
+    "credentialBytesOrHashesPublished": false
+  },
+  "limitations": [
+    "The original JJ4 stage/activation results are preserved; they did not detect the SQL type mismatch.",
+    "Live API verification reads prior accepted operations and original QA stdout; this hotfix did not rerun QA or the employee project.",
+    "This is a recorded verification snapshot, not continuous availability or 24x7 autonomous-execution evidence."
+  ]
+}

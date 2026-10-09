@@ -105,6 +105,7 @@ test('HTTP quote is read-only, uses the exact generation body and shares its res
   assert.equal(inspected.data.executionHistory.budget.calls, 0);
   const generated = await call('/projects/' + id + '/generate', 'POST', input()); assert.equal(generated.status, 200, JSON.stringify(generated.data));
   assert.equal(requests, 1); assert.equal(wire.max_tokens, 5000);
+  assert.match(wire.messages[0].content, /所有员工必须省略 reasoningEffort/);
   const planningData = JSON.parse(wire.messages.find((message: any) => message.role === 'user').content);
   assert.deepEqual(planningData.savedPlan, original);
   assert.deepEqual(planningData.executionHistory, inspected.data.executionHistory);
@@ -184,6 +185,23 @@ test('invalid replies retain their fee receipt and cannot replace the original p
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM organization_previews')).rows[0].n, 0);
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage WHERE project_id=$1', [id])).rows[0].n, 1);
   assert.equal((await pool.query("SELECT count(*)::int AS n FROM model_reservations WHERE project_id=$1 AND status='settled'", [id])).rows[0].n, 1);
+});
+
+test('unsupported effort is explicitly invalid in project candidates and cannot launch a confirmed plan', { skip: !isolated }, async () => {
+  const id = await seed(); candidate.agents[0].reasoningEffort = 'medium';
+  const generated = await call('/projects/' + id + '/generate', 'POST', input());
+  assert.equal(generated.status, 200); assert.equal(generated.data.validation.valid, false);
+  assert.match(generated.data.validation.errors.join('；'), /使用模型默认/);
+  assert.equal(generated.data.plan.agents[0].reasoningEffort, 'medium', 'invalid candidate is retained without silently rewriting it');
+  assert.deepEqual((await pool.query('SELECT plan FROM projects WHERE id=$1', [id])).rows[0].plan, original);
+  const confirmed = await call('/projects/' + id + '/generated-plan/confirm', 'POST', { previewId: generated.data.previewId, version: 1 });
+  assert.equal(confirmed.status, 200); assert.equal(confirmed.data.validation.valid, false);
+  const beforeCalls = requests, beforeRuns = (await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n;
+  const approved = await call('/projects/' + id + '/approve', 'POST', { version: confirmed.data.version });
+  assert.equal(approved.status, 422); assert.equal(approved.data.code, 'PLAN_NOT_READY');
+  assert.match(approved.data.message, /使用模型默认/);
+  assert.equal(requests, beforeCalls);
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n, beforeRuns);
 });
 
 test('explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected', { skip: !isolated }, async () => {

@@ -1,0 +1,14 @@
+✔ actual router uses production TEXT identifiers to read the bound operation and immutable source evidence (2607.8162ms)
+✔ cross-run database operation cannot be substituted by a matching ID (16.1363ms)
+✔ formal row identity, unknown IDs and strict query validation stay enforced (41.4132ms)
+✔ missing or different database workspace revision cannot produce a verified QA card (33.6222ms)
+✔ tampered ancestor snapshot and oversized archive return explicit unavailable evidence (31.2406ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4606.9784
+exitCode=0

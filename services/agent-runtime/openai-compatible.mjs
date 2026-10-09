@@ -368,11 +368,16 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const tools = options.tools?.map(tool => ({ type: 'function', function: { name: tool.name, description: tool.description, parameters: structuredClone(tool.parameters) } }));
     const attribution={ ...(this.attribution?.(options.sessionId)??{sessionId:options.sessionId}), requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution' };
     const fallback = !!options.fallbackAttempted || !!attribution.reworkRound;
-    const expired = supersededFileReads(options,source,meta=>this.attestSupersededRead?.({...attribution,...meta}));
+    // A known truncated summary never grants permission to discard its source.
+    // The trusted employee context gate applies to preview AND dispatch, so a
+    // concurrent budget change cannot turn the preview into a lossy request.
+    const retainOriginal = options.purpose !== 'compaction' && this.requireCompleteContext?.(options.sessionId) === true;
+    const expired = retainOriginal ? [] : supersededFileReads(options,source,meta=>this.attestSupersededRead?.({...attribution,...meta}));
     const expiredIndexes=new Set(expired.map(item=>item.readIndex));
-    const deduplicated = dedupeReadOnlyEvidence(source, protectedWireIndexes(options, source, checkpoint).filter(index=>!expiredIndexes.has(index)), {
+    const protectedSource = retainOriginal ? source.map((_, index) => index) : protectedWireIndexes(options, source, checkpoint);
+    const deduplicated = dedupeReadOnlyEvidence(source, protectedSource.filter(index=>!expiredIndexes.has(index)), {
       pairwise: true,
-      attestGroup: options.purpose === 'compaction' ? undefined : meta => nativeReadGroup(options, meta.indexes, meta.calls) ?
+      attestGroup: options.purpose === 'compaction' || retainOriginal ? undefined : meta => nativeReadGroup(options, meta.indexes, meta.calls) ?
         this.attestReadGroup?.({ ...attribution, ...meta }) : undefined,
     });
     const original = deduplicated.messages, protectedIndexes = deduplicated.protectedIndexes;
@@ -520,6 +525,11 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       catch (error) { throw new LlmError(error.message, error.code ?? 'INVALID_RESPONSE'); }
       const message = payload.choices?.[0]?.message;
       if (!message || typeof message !== 'object') throw new LlmError('中转站响应缺少 assistant message', 'INVALID_RESPONSE');
+      // Execution cannot treat a capped response (text or tool arguments) as
+      // completed work. Known usage has already been durably recorded above.
+      // Compaction owns its separate incomplete-checkpoint/retained-source gate.
+      if (options.purpose !== 'compaction' && payload.choices?.[0]?.finish_reason === 'length')
+        throw new LlmError(`模型 ${route.wireModel} 的执行输出达到本次 ${maxTokens} Token 上限而被截断；未采纳为完成结果或执行工具。实际用量已记录，不会自动续写或重试。请缩短单次结果，或在项目中重新制定并确认方案。`, 'MAX_TOKENS');
       const blocks = [];
       if (typeof message.reasoning_content === 'string' && message.reasoning_content) blocks.push({ type: 'reasoning', text: message.reasoning_content });
       if (typeof message.content === 'string' && message.content) blocks.push({ type: 'text', text: message.content });

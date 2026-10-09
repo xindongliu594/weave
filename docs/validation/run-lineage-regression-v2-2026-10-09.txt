@@ -1,0 +1,53 @@
+✔ a temporary missing recovered run clears after a successful poll (11.8572ms)
+✔ successful background refresh cannot erase an approval or recovery operation failure (1.3401ms)
+✔ a new run clears old errors and ignores delayed old-run failures or refresh success (1.2652ms)
+✔ actual router reads only the bound operation and verifies immutable source snapshot/events (3790.6977ms)
+✔ cross-run database operation cannot be substituted by a matching ID (22.181ms)
+✔ formal row identity, unknown IDs and strict query validation stay enforced (44.7634ms)
+✔ missing or different database workspace revision cannot produce a verified QA card (47.8641ms)
+✔ tampered ancestor snapshot and oversized archive return explicit unavailable evidence (39.7848ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (27.9794ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (5.7616ms)
+✔ ancestry has an explicit maximum depth (2.5289ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (9.3259ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (15.8803ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (1.157ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (18.4516ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (4.2831ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (4.8859ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (2.0469ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (1.2174ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.3844ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.463ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.5667ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.622ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (1.0149ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (19.7208ms)
+✔ terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages (8.3863ms)
+✔ overlapping manual refresh and polling keep the furthest cursor and newer metadata (0.6528ms)
+✔ a stale response from a different run or plan version cannot attach events or completion state (0.3829ms)
+✔ terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict (0.6999ms)
+✔ native states use approved task IDs, contracts and dependencies even when summary omits the mapping (1.9295ms)
+✔ the latest rework mapping supersedes an older accepted completion regardless of native array order (0.7174ms)
+✔ native completed requires acceptance for this run, plan and exact current attempt (0.7059ms)
+✔ only an explicitly inherited accepted checkpoint may show a parent completion in a child run (0.4542ms)
+✔ an ancestor seal is inherited only through the current approved snapshot after repeated recovery (0.628ms)
+✔ seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved (0.8903ms)
+✔ the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions (100.6405ms)
+✔ completed accepted manager output supersedes stale coordinator reply and exposes its exact receipt without rewriting sources (4.5905ms)
+✔ every approved node needs complete output and input seals, including exact producer SHA and fixed input bindings (3.529ms)
+✔ inherited seals require server-verified ancestry, completed attempt and accepted file inventory (20.2249ms)
+✔ failed, interrupted, incomplete or unverified status never becomes an accepted delivery result (0.6343ms)
+✔ missing or foreign seals, wrong attempt/version, incomplete DAG and absent output hashes retain the raw reply (1.9684ms)
+✔ current paginated mapping and complete summary seals select the actual manager task (0.5994ms)
+✔ manager delivery identity is determined by approved assignee and terminal DAG, not prose or fixed task IDs (0.6035ms)
+✔ RunExtras renders the accepted manager result first and folds the untouched coordinator reply into traceable history (41.0021ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7046.6352
+exitCode=0

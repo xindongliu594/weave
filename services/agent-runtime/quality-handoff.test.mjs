@@ -19,10 +19,14 @@ async function qualityScenario(mode) {
     {id:'implement',kind:'implementation',subject:'[quality:implement]',assignee:'producer',objective:'Write a fixture result',dependencies:[],acceptanceCriteria:['result correct'],inScope:['result.txt'],verify:['check-fixture'],outputs:[{path:'result.txt',format:'text'}]},
     {id:'review',kind:'review',subject:'[quality:review]',assignee:'reviewer',objective:'Review the implementation independently',dependencies:['implement'],reviewedTaskId:'implement',acceptanceCriteria:['implementation meets goal']},
   ]};
+  if(mode==='manager-review'){
+    snapshot.agents=snapshot.agents.filter(employee=>employee.id!=='reviewer');
+    snapshot.tasks[1].assignee='manager';snapshot.tasks[1].maxOutputTokens=2048;snapshot.tasks[1].outputs=[];
+  }
   for(const task of snapshot.tasks) task.assigneeId='original-'+task.assignee;
   for(const employee of snapshot.agents) employee.modelId=employee.role==='manager'?'captain':'same-model';
   const archive=createRunArchive(root,snapshot),steps=new Map(),results=[],requests=[],hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-  let approvals=0,host,status;
+  let approvals=0,host,status,postHandoffRequests=0;
   // Test executor: only one fixed file and one recognized check. No shell or API.
   const sandbox={root:artifacts,revision:()=>hash(JSON.stringify(listArtifacts(artifacts))),async execute(name,args){
     if(name==='artifact_write'){
@@ -39,6 +43,13 @@ async function qualityScenario(mode) {
       requests.push(match?.[2]);
       if(match){
         const [,id,task]=match,key=options.sessionId+':'+attempt,step=steps.get(key)??0;steps.set(key,step+1);
+        if(task==='review'){
+          const message=options.messages.findLast(item=>item.source?.sections?.some(section=>section.name==='department:approved-context'));
+          const context=JSON.parse(message.source.sections.find(section=>section.name==='department:approved-context').text);
+          assert.match(context.completionGuidance,/agent_teams_update_task/);assert.match(context.completionGuidance,/600中文字/);
+          assert.equal(context.task.kind,'review');assert.equal(context.task.reviewedTaskId,'implement');
+          if(mode==='manager-review'){assert.equal(context.task.assignee,'manager');assert.equal(context.task.maxOutputTokens,2048);assert.deepEqual(context.task.outputs,[]);assert.match(context.completionGuidance,/2048 Token/);}
+        }
         const update=(status,more={})=>['agent_teams_update_task',{task_id:id,attempt_id:attempt,status,...more}];
         const finish={output:'fixture quality evidence',changedPaths:['result.txt'],acceptanceResults:[{criterion:'result correct',status:mode==='failed-acceptance'?'failed':'passed',evidence:'fixture result'}],commandsRun:[{command:'check-fixture',status:'passed',exitCode:0,evidence:'claimed check'}]};
         const actions=[['agent_teams_claim_task',{task_id:id}],update('in_progress')];
@@ -49,6 +60,7 @@ async function qualityScenario(mode) {
           actions.push(update('completed',finish));
         }else actions.push(mode==='review-revision'?update('failed',{verdict:'needs_revision',findings:[{id:'F1',severity:'high',problem:'fixture issue',requiredFix:'fix result'}]}):update('completed',{verdict:'pass',output:'independent fixture review'}));
         if(step<actions.length){const [name,args]=actions[step];yield{type:'block-start',index:0,blockType:'tool-call'};yield{type:'block-end',index:0,block:{type:'tool-call',id:randomUUID(),name,arguments:JSON.stringify(args)}};yield{type:'finish',reason:{kind:'tool-calls'}};return;}
+        if(mode==='bounded-completion'){postHandoffRequests++;throw Object.assign(Error('No model call remains after the accepted handoff'),{code:'TASK_TURN_LIMIT'});}
       }
       yield{type:'block-start',index:0,blockType:'text'};yield{type:'block-end',index:0,block:{type:'text',text:'fixture done'}};yield{type:'finish',reason:{kind:'stop'}};
     }
@@ -57,7 +69,7 @@ async function qualityScenario(mode) {
     host=await createTeamHost({adapter:new Adapter(),provider:'fixture',sessionRoot:join(root,'sessions'),archive,product:{snapshot,sandbox,gate:new Semaphore(2),requestApproval:async()=>{approvals++;}}});
     host.ctx.on('tools/result',(exec,result)=>results.push({name:exec.name,args:exec.arguments,result}));
     const captain=await host.captain({cwd:root,model:'captain'});
-    const created=await stageApprovedTeam(host,captain,{name:'quality-'+mode,members:snapshot.agents.slice(1).map(a=>({name:a.id,provider:'fixture',model:'same-model'})),tasks:teamTaskPlan(snapshot.tasks)});
+    const created=await stageApprovedTeam(host,captain,{name:'quality-'+mode,members:(mode==='manager-review'?snapshot.agents:snapshot.agents.slice(1)).map(a=>({name:a.id,provider:'fixture',model:a.modelId})),tasks:teamTaskPlan(snapshot.tasks)});
     host.bindTaskMapping(created.tasks,created.team_id);assert.equal(requests.length,0);
     await host.call(captain,'agent_teams_approve',{confirmation:'fixed quality fixture'});host.lockPlan();
     const deadline=Date.now()+5000;
@@ -67,6 +79,11 @@ async function qualityScenario(mode) {
       await new Promise(resolve=>setTimeout(resolve,10));
     }
     if(status.deliverable) await host.verifyDeliverable();
+    if(mode==='bounded-completion'){
+      // Let the native member loop settle, including a possible redundant final report.
+      await new Promise(resolve=>setTimeout(resolve,100));
+      assert.equal(postHandoffRequests,0,'accepted handoff must end its turn before another model request');
+    }
     assert.ok(status);assert.equal(status.tasks.length,2,'no unapproved repair/review task may appear');
     const events=readRun(root,archive.id).events,seals=events.filter(e=>e.type==='handoff/accepted');
     if(mode==='forged-command'||mode==='failed-acceptance'){
@@ -87,3 +104,5 @@ test('model claims of a passed command cannot unlock native quality work',()=>qu
 test('failed native acceptance rolls back the provisional host seal and leaves downstream pending',()=>qualityScenario('failed-acceptance'));
 test('review revision cannot create an unapproved automatic repair graph',()=>qualityScenario('review-revision'));
 test('stale attempt cannot publish a seal; the current attempt can still complete',()=>qualityScenario('stale-attempt'));
+test('a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate',()=>qualityScenario('manager-review'));
+test('accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review',()=>qualityScenario('bounded-completion'));

@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-08",
+  "stage": "deployed gateway port mismatch diagnosed; correction prepared, not applied",
+  "jjReadOnlyResults": {
+    "proposedPorts18770And18771": "no TCP listeners at check time",
+    "proposedStateDirectory": "not present at check time",
+    "python": "3.14.4",
+    "compose": "5.6.0",
+    "composeConfigFromStdinExit": 0,
+    "tomlParseAndSelectedSafetyAssertions": "passed after container listeners changed to 0.0.0.0; host published listeners remain 127.0.0.1",
+    "composeJsonHostLoopbackImagePinsAndNonPrivilegedAssertions": "passed",
+    "dockerDaemonAccessForConfigCheck": false,
+    "remoteFilesWritten": false
+  },
+  "historicalLocalBashSyntax": "bash --noprofile --norc -n start-gateway.sh passed during original preparation; script not executed then",
+  "historicalDraftPending": [
+    "root administrator review",
+    "daemon image pull connectivity",
+    "official gateway config preflight",
+    "PKI creation and protected API authentication",
+    "sandbox policy, non-root identity and restart verification"
+  ],
+  "portMismatchReadOnlyEvidence": {
+    "officialGatewayAmd64Manifest": "sha256:e0e18aa7a497290eed1f6ffb36f51540f037cec967c6d4354a264fecfd988620",
+    "officialGatewayConfigDigest": "sha256:d6a87806b557730d55c95b4b3bd99ab74ccab0ad479166e116fae545e2b2f45e",
+    "officialEntrypoint": ["/usr/local/bin/openshell-gateway"],
+    "officialDefaultCmd": ["--bind-address", "0.0.0.0", "--port", "8080"],
+    "officialDisableTlsEnvironment": false,
+    "actualProcPid": 1678362,
+    "actualSelectedArgs": {"--bind-address": "0.0.0.0", "--port": "8080", "disableTlsFlagPresent": false},
+    "health18771": "Root observed healthy v0.1.2; no successful main API authentication yet",
+    "clientBundleLayout": "official ca.crt/tls.crt/tls.key; preserved",
+    "clientCertificateChain": "openssl verify -purpose sslclient passed",
+    "clientCertificateKeyMatch": true,
+    "tlsProbeWithExistingBundle": "SNI localhost and 127.0.0.1 both EOF",
+    "unauthenticatedPlainHttp18770": "connection reset, HTTP 000",
+    "privateKeysPrintedOrModified": false
+  },
+  "correctionPreparationChecks": {
+    "composeExactSingleCommandPatch": "reversing command restores original SHA a10c59aa4721ad614ae4e3a8ac339ce26386b316e00d0f1301d9b25ce9abf3f6",
+    "embeddedPythonSyntax": "passed",
+    "localBashAttempt": "MSYS process initialization denied in sandbox; no script executed",
+    "jjBashSyntaxViaStdin": "start-gateway.sh and fix-gateway-port.sh both exit 0 with bash -n; no file written",
+    "jjComposeConfigViaStdin": "exit 0; explicit 0.0.0.0 port 18770 and host loopback verified; no daemon access",
+    "repairScriptExecuted": false,
+    "remoteConfigurationModified": false
+  },
+  "pending": [
+    "Root review and upload of explicit-command correction",
+    "user-local sudo authentication for guarded fix-gateway-port.sh --apply",
+    "actual corrected gateway listener and Connected/Authenticated verification",
+    "sandbox policy, non-root identity and restart verification"
+  ]
+}

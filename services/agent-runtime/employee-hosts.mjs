@@ -10,8 +10,8 @@ const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -84,6 +84,7 @@ export class EmployeeHostFactory {
       if (this.context) await installEmployeeContext(ctx, mount, { ...this.context, archive: this.archive });
       if (this.protectedContext) ctx.systemPrompt.context({ name: 'department:approved-context', order: 119,
         text: context => this.protectedContext(context.agent) });
+      const concludesAcceptedTask = this.concludesAcceptedTask;
       for (const schema of coordinator.tools.schemas()) {
         const definition = coordinator.tools.get(schema.name);
         ctx.tools.register({ ...definition, async execute(args, exec) {
@@ -91,7 +92,10 @@ export class EmployeeHostFactory {
           const result = await coordinator.tools.execute({ callId: exec.callId, name: schema.name, arguments: args, agent: exec.agent, signal: exec.signal });
           if (result.isError) throw new HarnessError(result.error.message, result.error.info?.code ?? 'COORDINATOR_TOOL_FAILED');
           for (const context of result.additionalContexts ?? []) exec.deferContext(context);
-          if (result.concludesTurn) exec.concludeTurn();
+          // The committed handoff already contains the employee's report and
+          // evidence. End at the official tool boundary without another model
+          // request merely to restate that success.
+          if (result.concludesTurn || concludesAcceptedTask?.(exec)) exec.concludeTurn();
           return result.value;
         } });
       }

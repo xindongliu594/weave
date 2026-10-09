@@ -1,0 +1,278 @@
+{
+  "status": "passed-after-verified-sql-hotfix",
+  "scope": "JJ4 staged build, existing-data activation and isolated backup recovery; not new employee-model acceptance",
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-jj4-20261009",
+  "activationId": "jj4-activation-20261009T085959.442947Z-9262fa28",
+  "completedEmployeeRunPreserved": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+  "stage": {
+    "overlayFiles": [
+      "apps/api/src/app.ts",
+      "apps/api/src/run-lineage-evidence.ts",
+      "apps/web/src/run-result-view.ts",
+      "apps/web/src/RunExtras.tsx",
+      "apps/web/src/RunInheritedEvidence.tsx",
+      "packages/contracts/run-lineage-evidence.ts",
+      "services/agent-runtime/run-evidence.d.mts",
+      "tests/run-lineage-evidence-api.test.ts",
+      "tests/run-lineage-evidence.test.ts",
+      "tests/run-result-view.test.ts"
+    ],
+    "testTotals": {
+      "tests": 126,
+      "pass": 126,
+      "fail": 0,
+      "skipped": 0
+    },
+    "typeCheckExit": 0,
+    "webBuildExit": 0,
+    "localCheckExit": 0,
+    "metadataSha256": "b231f01e1c0da9839ff224917c7e941d63848ac6ee17f2826ebade1fc91239a0",
+    "modelCalls": 0,
+    "productionServiceActions": 0,
+    "logs": [
+      {
+        "label": "openrig",
+        "exitCode": 0,
+        "passed": true,
+        "testTotals": {
+          "tests": 31,
+          "pass": 31,
+          "fail": 0,
+          "skipped": 0
+        },
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj4-openrig-20261009.txt",
+        "publicLog": "jj4-openrig-2026-10-09.txt",
+        "bytes": 7610,
+        "sha256": "c6f78d047981f276346478f750f9bab0103ce02b5c7f898cfacf88771fe07ebe",
+        "complete": true,
+        "redactionsNeeded": false
+      },
+      {
+        "label": "workbench-recovery",
+        "exitCode": 0,
+        "passed": true,
+        "testTotals": {
+          "tests": 63,
+          "pass": 63,
+          "fail": 0,
+          "skipped": 0
+        },
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj4-workbench-recovery-20261009.txt",
+        "publicLog": "jj4-workbench-recovery-2026-10-09.txt",
+        "bytes": 16906,
+        "sha256": "58bee951617154e7d2e670ba36c65bcaf6d6458e5d67c5b19f55a66751efe5fa",
+        "complete": true,
+        "redactionsNeeded": false
+      },
+      {
+        "label": "runtime-handoff",
+        "exitCode": 0,
+        "passed": true,
+        "testTotals": {
+          "tests": 32,
+          "pass": 32,
+          "fail": 0,
+          "skipped": 0
+        },
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj4-runtime-handoff-20261009.txt",
+        "publicLog": "jj4-runtime-handoff-2026-10-09.txt",
+        "bytes": 7869,
+        "sha256": "5751755ecaff9ce5350259a806284e7155b88db0c11561dfaa670eb5765bc725",
+        "complete": true,
+        "redactionsNeeded": false
+      },
+      {
+        "label": "types",
+        "exitCode": 0,
+        "passed": true,
+        "testTotals": null,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj4-types-20261009.txt",
+        "publicLog": "jj4-types-2026-10-09.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "complete": true,
+        "redactionsNeeded": false
+      },
+      {
+        "label": "web-build",
+        "exitCode": 0,
+        "passed": true,
+        "testTotals": null,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj4-web-build-20261009.txt",
+        "publicLog": "jj4-web-build-2026-10-09.txt",
+        "bytes": 714,
+        "sha256": "7df740327a9a6a6975bb05e323c44edfe2c37258125d9cdc45951246d1489347",
+        "complete": true,
+        "redactionsNeeded": false
+      },
+      {
+        "label": "local-check",
+        "exitCode": 0,
+        "passed": true,
+        "testTotals": null,
+        "remoteLog": "/home/jj/.local/share/weiwu/logs/jj4-local-check-20261009.txt",
+        "publicLog": "jj4-local-check-2026-10-09.txt",
+        "bytes": 293,
+        "sha256": "d47edbeca7600d6891b93ea53801d88463f4aad4a3600602b2a01e48287797e2",
+        "complete": true,
+        "redactionsNeeded": false
+      }
+    ],
+    "buildWarning": "Vite main JS chunk 567.12 kB exceeds the 500 kB advisory threshold; build succeeded.",
+    "webAssets": [
+      "index-CzCbk_YO.css",
+      "index--tuIbT-R.js"
+    ]
+  },
+  "activation": {
+    "passed": true,
+    "modelCalls": 0,
+    "service": {
+      "status": "active",
+      "pid": 3334098,
+      "workingDirectory": "/home/jj/.local/share/weiwu/releases/weiwu-jj4-20261009"
+    },
+    "sameOriginalApiData": true,
+    "sameOriginalCredentials": true,
+    "originalDatabaseOverwritten": false,
+    "openrigConfigurationChanged": false,
+    "queueWritesRequested": 0
+  },
+  "offlineBackup": {
+    "path": "/home/jj/.local/share/weiwu/backups/jj4-activation-20261009T085959.442947Z-9262fa28/pilot-before.tar.gz",
+    "sha256": "c7c2cfd198d4696ea6fcfdc5ac5f09ddf0f55dbe15c8962ab350f6c69a445c41",
+    "bytes": 23495289,
+    "files": 1575,
+    "allFileBytesVerified": true,
+    "restoredFromArchive": true,
+    "isolatedSql": {
+      "passed": true,
+      "readOnly": true,
+      "counts": {
+        "usage_count": 205,
+        "cost": 1.0543404,
+        "pending_approvals": 0,
+        "active_operations": 0,
+        "active_model_calls": 0
+      },
+      "runs": 16,
+      "projects": 2,
+      "openedOriginal": false
+    },
+    "isolatedOpenrigSqlite": {
+      "passed": true,
+      "readOnly": true,
+      "integrity": "ok",
+      "nodes": 3,
+      "rigs": 1,
+      "queueItems": 1,
+      "queueTransitions": 1,
+      "sessions": 0,
+      "sameQueueItemAndMapping": true
+    }
+  },
+  "openrigRestart": {
+    "status": "ready",
+    "oldPid": 3186171,
+    "newPid": 3334047,
+    "cleanDrain": true,
+    "sameRigId": "01M4FVAV12PXXFXH4Q9XJY00K2",
+    "sameSelfHostId": "host-91ecbc4f",
+    "sameSeats": [
+      {
+        "employeeId": "mgr-1",
+        "logicalId": "dev.manager",
+        "nodeId": "01M4FVAV13XCQSDBX8NR8CQFA3",
+        "role": "manager"
+      },
+      {
+        "employeeId": "dev-1",
+        "logicalId": "dev.dev",
+        "nodeId": "01M4FVAV1464J022EM1GNAM5Z1",
+        "role": "developer"
+      },
+      {
+        "employeeId": "qa-1",
+        "logicalId": "dev.qa",
+        "nodeId": "01M4FVAV15MTQMS90ZP7A9Q7E5",
+        "role": "qa"
+      }
+    ],
+    "noKernel": true,
+    "noProviderEnvironment": true,
+    "sameUniqueQueueAfterRestart": true,
+    "firstObservedRestartSinceBrowserCreation": true,
+    "queue": {
+      "queueItemId": "qitem-weiwu-5d3269976fa8bc4ff40334eb07c6f6e72c49896b2298545f315dae6cf3f882ac",
+      "total": 1,
+      "matching": 1,
+      "state": "pending",
+      "mappedProjectCount": 1,
+      "executionAuthority": "weiwu",
+      "acceptanceAuthority": "weiwu"
+    }
+  },
+  "sourceReceipts": [
+    {
+      "path": ".data\\research\\jj-deployment-2026-10-09\\jj4\\stage-jj4-result-2026-10-09.json",
+      "sha256": "c3a7abed62b3e873df1c0fca34cf23830ed56b0d25392112e791996dd49f6662"
+    },
+    {
+      "path": ".data\\research\\jj-deployment-2026-10-09\\jj4\\activate-jj4-result-2026-10-09.json",
+      "sha256": "f66dd4fb5688b062510c984327bb3609496b1b525764cf81e0aac9bff05626e1"
+    },
+    {
+      "path": ".data\\research\\jj-deployment-2026-10-09\\jj4\\activation-handoff-2026-10-09.json",
+      "sha256": "bc980b0173ca8e56f76dd1fa283d8045361c0a8fb0b99049b0158d7b214e0979"
+    },
+    {
+      "path": ".data\\research\\jj-deployment-2026-10-09\\jj4\\copied-linux-logs-2026-10-09.json",
+      "sha256": "81842c0c4c4d73261ccdbbd46b9bb2cf699bfe191e67fbb9b192b1891e02167f"
+    },
+    {
+      "path": ".data/research/jj-deployment-2026-10-09/jj4/sql-hotfix-result-2026-10-09.json",
+      "sha256": "2d8139886f2a589654167d63126ba4245cde935da39f7cc1e15202c37c5ba24d"
+    }
+  ],
+  "limitations": [
+    "Initial post-deployment lineage GET failed. A separate actual hotfix receipt now confirms verified; original stage/activation facts remain unchanged.",
+    "Release and regression checks are distinct from the already completed real employee acceptance runs.",
+    "The one OpenRig queue item remains pending. Persistence and mapping passed; this does not prove autonomous paid dispatch or 24x7 operation.",
+    "Existing credentials were compared and retained; credential bytes and hashes are not published.",
+    "This report derives from recorded activation and hotfix snapshots, not an additional live status poll.",
+    "Browser acceptance of the newly deployed release is documented separately."
+  ],
+  "reportPreparation": {
+    "source": "Existing stage/activation/hotfix receipts and six existing Linux logs",
+    "extraValidationRuns": 0,
+    "modelCalls": 0,
+    "businessOperations": 0,
+    "productionChanges": 0,
+    "logCopy": "One read-only SSH session; every complete log matched its frozen SHA256"
+  },
+  "stageAndActivationStatus": "passed",
+  "postActivationIssue": {
+    "status": "resolved-by-separately-verified-hotfix",
+    "source": "Root deployment observation and implementation-owner diagnosis; not re-polled by report author",
+    "endpoint": "GET /api/runs/{id}/lineage-evidence",
+    "observedEvidenceStatus": "partial",
+    "cause": "Production local_operations.id is text, but lineage lookup used uuid[]. The API regression fixture had incorrectly declared id uuid.",
+    "originalStageResultsRetained": true,
+    "hotfixValidatedByThisReport": true,
+    "correctionApplied": "ANY(text[]) and actual-schema fixture; main service restarted, OpenRig not restarted.",
+    "validationSource": "Existing successful hotfix activation and live-API receipt; report author did not re-query production.",
+    "hotfixEvidence": "run-lineage-sql-hotfix-live-2026-10-09.json",
+    "hotfixReport": "run-lineage-sql-hotfix-live-2026-10-09.md",
+    "finalMainPid": 3341617,
+    "finalEvidenceStatus": "verified"
+  },
+  "browserEvidence": {
+    "source": "Root agent reported one read-only browser check; not performed independently by this report author",
+    "reportedVisible": [
+      "manager acceptance heading",
+      "two inherited completed handoffs",
+      "QA 10/10"
+    ],
+    "screenshot": "screenshots/openshell-v12-final-recovered-qa-2026-10-09.png"
+  }
+}

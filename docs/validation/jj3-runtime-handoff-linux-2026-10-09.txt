@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: task attribution follows host-owned assignments and retains the completed task for final reporting
+ok 1 - task attribution follows host-owned assignments and retains the completed task for final reporting
+  ---
+  duration_ms: 2.097684
+  type: 'test'
+  ...
+# Subtest: concurrent reservations share both the project and task caps without leaking rejected reservations
+ok 2 - concurrent reservations share both the project and task caps without leaking rejected reservations
+  ---
+  duration_ms: 0.987832
+  type: 'test'
+  ...
+# Subtest: warnings include prior spend and block fallback and further calls at the defined thresholds
+ok 3 - warnings include prior spend and block fallback and further calls at the defined thresholds
+  ---
+  duration_ms: 0.472082
+  type: 'test'
+  ...
+# Subtest: retry counters are retained and a task cannot exceed the policy turn cap
+ok 4 - retry counters are retained and a task cannot exceed the policy turn cap
+  ---
+  duration_ms: 0.306591
+  type: 'test'
+  ...
+# Subtest: restored task holds remain occupied without charging the global carryover twice or releasing an older request
+ok 5 - restored task holds remain occupied without charging the global carryover twice or releasing an older request
+  ---
+  duration_ms: 0.525869
+  type: 'test'
+  ...
+# Subtest: adapter counts fallback against the same task and refuses it before a second fetch
+ok 6 - adapter counts fallback against the same task and refuses it before a second fetch
+  ---
+  duration_ms: 37.058897
+  type: 'test'
+  ...
+# Subtest: automatic rework is refused at 90 percent of the original task budget before dispatch
+ok 7 - automatic rework is refused at 90 percent of the original task budget before dispatch
+  ---
+  duration_ms: 0.639574
+  type: 'test'
+  ...
+# Subtest: adapter persists an excessive actual receipt before stopping and does not emit its tool call
+ok 8 - adapter persists an excessive actual receipt before stopping and does not emit its tool call
+  ---
+  duration_ms: 2.622247
+  type: 'test'
+  ...
+# Subtest: persistent reservations precede dispatch, and fallback preserves the first uncertain request identity
+ok 9 - persistent reservations precede dispatch, and fallback preserves the first uncertain request identity
+  ---
+  duration_ms: 2.488121
+  type: 'test'
+  ...
+# Subtest: admission rejection never dispatches; archive failure after reservation releases an unsent call
+ok 10 - admission rejection never dispatches; archive failure after reservation releases an unsent call
+  ---
+  duration_ms: 1.388261
+  type: 'test'
+  ...
+# Subtest: employee Hosts isolate registries, cancellation, failures and resumed history
+ok 11 - employee Hosts isolate registries, cancellation, failures and resumed history
+  ---
+  duration_ms: 217.733754
+  type: 'test'
+  ...
+# Subtest: failed employee setup leaves no published Agent or resident Host
+ok 12 - failed employee setup leaves no published Agent or resident Host
+  ---
+  duration_ms: 29.989034
+  type: 'test'
+  ...
+# Subtest: closing coordination cancels an unpublished employee setup and drains its Host
+ok 13 - closing coordination cancels an unpublished employee setup and drains its Host
+  ---
+  duration_ms: 28.192331
+  type: 'test'
+  ...
+# Subtest: approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume
+ok 14 - approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume
+  ---
+  duration_ms: 234.418218
+  type: 'test'
+  ...
+# Subtest: native quality contracts receive actual file and command evidence before independent review
+ok 15 - native quality contracts receive actual file and command evidence before independent review
+  ---
+  duration_ms: 703.904061
+  type: 'test'
+  ...
+# Subtest: model claims of a passed command cannot unlock native quality work
+ok 16 - model claims of a passed command cannot unlock native quality work
+  ---
+  duration_ms: 287.254015
+  type: 'test'
+  ...
+# Subtest: failed native acceptance rolls back the provisional host seal and leaves downstream pending
+ok 17 - failed native acceptance rolls back the provisional host seal and leaves downstream pending
+  ---
+  duration_ms: 327.079661
+  type: 'test'
+  ...
+# Subtest: review revision cannot create an unapproved automatic repair graph
+ok 18 - review revision cannot create an unapproved automatic repair graph
+  ---
+  duration_ms: 527.224747
+  type: 'test'
+  ...
+# Subtest: stale attempt cannot publish a seal; the current attempt can still complete
+ok 19 - stale attempt cannot publish a seal; the current attempt can still complete
+  ---
+  duration_ms: 582.917604
+  type: 'test'
+  ...
+# Subtest: a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate
+ok 20 - a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate
+  ---
+  duration_ms: 531.975906
+  type: 'test'
+  ...
+# Subtest: accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review
+ok 21 - accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review
+  ---
+  duration_ms: 617.792024
+  type: 'test'
+  ...
+# Subtest: review and requirements have a compact native completion guide while all contracts remain unchanged
+ok 22 - review and requirements have a compact native completion guide while all contracts remain unchanged
+  ---
+  duration_ms: 1.799751
+  type: 'test'
+  ...
+# Subtest: the guide invents no numeric output cap and unrelated task kinds receive no review instructions
+ok 23 - the guide invents no numeric output cap and unrelated task kinds receive no review instructions
+  ---
+  duration_ms: 0.319395
+  type: 'test'
+  ...
+# Subtest: approved review creates bounded native repair and independent re-review, then delivers newest sealed files
+ok 24 - approved review creates bounded native repair and independent re-review, then delivers newest sealed files
+  ---
+  duration_ms: 1456.759444
+  type: 'test'
+  ...
+# Subtest: two failed repair rounds stop at the approved limit with structured escalation
+ok 25 - two failed repair rounds stop at the approved limit with structured escalation
+  ---
+  duration_ms: 1585.541139
+  type: 'test'
+  ...
+# Subtest: out-of-scope finding cannot create a repair task
+ok 26 - out-of-scope finding cannot create a repair task
+  ---
+  duration_ms: 546.013568
+  type: 'test'
+  ...
+# Subtest: scope expansion in repair instructions is refused before any generated employee request
+ok 27 - scope expansion in repair instructions is refused before any generated employee request
+  ---
+  duration_ms: 568.123498
+  type: 'test'
+  ...
+# Subtest: explicit reject stops the loop even with spare rework allowance
+ok 28 - explicit reject stops the loop even with spare rework allowance
+  ---
+  duration_ms: 509.684956
+  type: 'test'
+  ...
+# Subtest: repair model calls share the original task allowance
+ok 29 - repair model calls share the original task allowance
+  ---
+  duration_ms: 734.5181
+  type: 'test'
+  ...
+# Subtest: repair cannot reuse the original implementation command as new verification evidence
+ok 30 - repair cannot reuse the original implementation command as new verification evidence
+  ---
+  duration_ms: 837.863979
+  type: 'test'
+  ...
+# Subtest: repair cannot overwrite a changed file with a stale hash
+ok 31 - repair cannot overwrite a changed file with a stale hash
+  ---
+  duration_ms: 751.664034
+  type: 'test'
+  ...
+# Subtest: duplicate finding IDs cannot authorize a repair graph
+ok 32 - duplicate finding IDs cannot authorize a repair graph
+  ---
+  duration_ms: 524.553254
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7732.720016

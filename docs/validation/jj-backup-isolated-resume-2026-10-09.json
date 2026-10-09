@@ -1,0 +1,233 @@
+{
+  "verificationId": "current-pilot-uncertain-20261008T153113.942287Z-903d23b7-sql-resume-20261009T070554.813919Z-8678a990",
+  "backupId": "current-pilot-uncertain-20261008T153113.942287Z-903d23b7",
+  "passed": true,
+  "scope": "Existing backup data and isolated SQL only",
+  "controlledEmployeeAcceptancePassed": false,
+  "realModelCalls": 0,
+  "serviceActions": 0,
+  "apiCalls": 0,
+  "newArchives": 0,
+  "originalDataOverwritten": false,
+  "restoredDeviceActivated": false,
+  "oldResultSha256": "49783b30d5b678d192dd955a029482b1de1bebb3cd4e8df348631707351931c5",
+  "manifestSha256": "a36d8966a407048d485ca6799ff25e04679789c59b93b715ec2e48924cb2d67f",
+  "baselineSha256": "ecd852682863dc0b5a86bc45bdcf90622ee85a3d22a70554bd640ad65b2209a4",
+  "archiveSha256": "255ea3a16c8aa35eea23100125a1265d3933a0b3758b5da350b48e3ffcfd515b",
+  "validatorSourceV2Sha256": "2589cbcd993e2ee1c3a380af020dcd32d3119ed735114c2f4aae1d78b7717246",
+  "nodeValidatorSha256": "24e898afd88f5dccc060f9f065cf105b790e8a82a21cba121730cd83c1003e47",
+  "priorFirstSqlPassed": true,
+  "priorBackupOverallPassed": false,
+  "copyByteValidation": {
+    "currentCopyPristine": false,
+    "databaseOnly": true,
+    "mismatchCount": 13,
+    "mode": "prior-all-byte-proof-plus-current-sql-fingerprints"
+  },
+  "isolatedReopenSameFullTablesReceipts": true,
+  "additionalReadOnlyOpens": 2,
+  "sameAsPriorFirstSql": true,
+  "restoredCopyClosed": true,
+  "privateEvidence": {
+    "path": "/home/jj/.local/share/weiwu/metadata/current-pilot-uncertain-20261008T153113.942287Z-903d23b7-sql-resume-20261009T070554.813919Z-8678a990.json",
+    "sha256": "af5e08bb29820872221779f8d743d0f2aa6a171907aeadda19a6b14e61a05a58"
+  },
+  "restoredData": {
+    "counts": {
+      "gateways": 1,
+      "knowledge_chunks": 2,
+      "knowledge_documents": 1,
+      "knowledge_revisions": 2,
+      "local_operations": 63,
+      "model_reservations": 147,
+      "models": 1,
+      "plan_versions": 11,
+      "project_runs": 12,
+      "projects": 1,
+      "usage": 146
+    },
+    "completedRuns": 1,
+    "reservationStates": {
+      "released": 0,
+      "settled": 146,
+      "uncertain": 1
+    },
+    "recordedCost": "0.7083728999999999812",
+    "unconfirmedCost": 0.0192111,
+    "dailyBudgetLimit": 20,
+    "knowledge": [
+      {
+        "currentVersion": 2,
+        "documentId": "981a73f7-419e-4ff6-9920-e394651ebc93",
+        "revisions": [
+          {
+            "sha256": "28f402ffac2655212e91e732e03b3490bc2320675430d73de28192ca6dddf08d",
+            "version": 2
+          },
+          {
+            "sha256": "50c5d56eb56959559539f83077c40f7745f80e092069d7886edd7d056383bead",
+            "version": 1
+          }
+        ]
+      }
+    ],
+    "privateKeyCount": 1,
+    "restoredDeviceActivated": false,
+    "usageCount": 146,
+    "runCount": 12,
+    "projectCount": 1,
+    "tableCount": 34,
+    "tableFingerprints": {
+      "activity": {
+        "rows": 18,
+        "sha256": "bbf9b2288052ca2675858b98fa3fdb198d8b531368ae86d572d7b389bf5fd693"
+      },
+      "automation_evaluations": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "automation_improvements": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "automation_knowledge_candidates": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "automation_notifications": {
+        "rows": 12,
+        "sha256": "4e99ae0358ffb4c5f3054f33537b710a8f485d53d67cef4b76ea024f4591a30c"
+      },
+      "automation_observations": {
+        "rows": 24,
+        "sha256": "fe78217994eba2aad309c19676696bc12e8255e585ad13dac7126f46939e7822"
+      },
+      "automation_occurrences": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "automation_reviews": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "automation_schedules": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "department_versions": {
+        "rows": 1,
+        "sha256": "e85e7f83159016336f88844fed63c09e32d7e91795e22628d1a1524780070c37"
+      },
+      "departments": {
+        "rows": 1,
+        "sha256": "8c392fd9015b0dbe4f3106ba4202086b94700f56650631058147b0c004ae55c0"
+      },
+      "gateways": {
+        "rows": 1,
+        "sha256": "7b69c6f76565f46e85afacc523d6283d3151336a9ec363fbee7b47fc10e2f2a3"
+      },
+      "knowledge_chunks": {
+        "rows": 2,
+        "sha256": "4a33b293d30d9519dc879050614bbad7f9fdfad654ac83566913839ebde21176"
+      },
+      "knowledge_documents": {
+        "rows": 1,
+        "sha256": "a7a7cecdba410ef26dcd449fc71afc4e2e6b6bd4b58a59d4571b7edcfcdaed73"
+      },
+      "knowledge_embeddings": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_revisions": {
+        "rows": 2,
+        "sha256": "ab1c04bafcd56d2b1cbcaa698aa0e2f67671a127f4cba5bc3bc9691c759cdfab"
+      },
+      "knowledge_spaces": {
+        "rows": 1,
+        "sha256": "d04a1aaf93f0e5b4e20d3bd959a4017105c16262a0105af48aefb4dede559125"
+      },
+      "local_devices": {
+        "rows": 1,
+        "sha256": "e31b53995bf48aa3b85c138e34a3ddf5338e787e53989218f05c1f9513af896e"
+      },
+      "local_operations": {
+        "rows": 63,
+        "sha256": "4050176731b411fc1e1fdeccf0c58013a2326b7c3ea60d24eb629bc2a8c0619b"
+      },
+      "manager_messages": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "mcp_connections": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "model_capability_tests": {
+        "rows": 1,
+        "sha256": "3b7a96956c335a41b2a8f012fdef2d28c13d456a7df86bfe68c42f81e99b4dbb"
+      },
+      "model_reservations": {
+        "rows": 147,
+        "sha256": "1450892556c64e7030137cabfd614f273935ab78ec70a848aeb7dc83b64f2b36"
+      },
+      "models": {
+        "rows": 1,
+        "sha256": "00ae2debfc2ced20021e8c81ba4ee7199ea040419e57d8d70691a13045024a6f"
+      },
+      "organization_previews": {
+        "rows": 5,
+        "sha256": "7e8cc8b65ac868b996dc4c49d882f3a159de172494d491300c806f372c8c8308"
+      },
+      "plan_versions": {
+        "rows": 11,
+        "sha256": "ae43029194eb47ba980dc5724ba67b510cfb43ef362813178e23dd0e3566d53e"
+      },
+      "product_settings": {
+        "rows": 1,
+        "sha256": "275c040f65b9f76b5a99a3b44f9e46be29be3ff3bc8dd37a592f7bef9d59036b"
+      },
+      "project_runs": {
+        "rows": 12,
+        "sha256": "44da44e85c43e3ffb7e651500f34f8603f81e97b4c9ed9584a7dac3cc09253b9"
+      },
+      "projects": {
+        "rows": 1,
+        "sha256": "f11cab20d2e87dddabbc3e22f4dcad43e4455b68b81225d4f26c6bf2e38b79ec"
+      },
+      "request_keys": {
+        "rows": 54,
+        "sha256": "2fd8e8b0d718b1a0f87aa56956b3c36b929b6754f7e991f6ee4ef5cbd7386c89"
+      },
+      "templates": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "tool_approvals": {
+        "rows": 16,
+        "sha256": "291cf7e39e7f1aeafaa6b46d4f0c20defb5df8d51218f7fec7996f7ae28b2be7"
+      },
+      "usage": {
+        "rows": 146,
+        "sha256": "b37ae75a8a0a868205cfee6336b05d5ea4c50d380acf4a0b29b2695625fe1575"
+      },
+      "work_file_snapshots": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "archive": {
+    "path": "/home/jj/.local/share/weiwu/backups/current-pilot-uncertain-20261008T153113.942287Z-903d23b7.tar.gz",
+    "sha256": "255ea3a16c8aa35eea23100125a1265d3933a0b3758b5da350b48e3ffcfd515b",
+    "bytes": 15855269,
+    "fileCount": 1372
+  },
+  "restoredDirectory": "/home/jj/.local/share/weiwu/data/restore-checks/current-pilot-uncertain-20261008T153113.942287Z-903d23b7/pilot",
+  "boundaries": [
+    "The original October 8 overall failure record remains unchanged.",
+    "The October 8 full byte comparison occurred before opening the isolated PGlite copy.",
+    "PGlite changed 13 database files after opening; all non-database files still match and all 34 table fingerprints match across three read-only SQL checks.",
+    "This proves backup contents and isolated reopening, not a restored live service or controlled employee execution.",
+    "No original database opened or overwritten, no service/API/model actions, no restored device activation."
+  ]
+}

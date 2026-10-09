@@ -1,0 +1,388 @@
+TAP version 13
+# Subtest: real IDs and current plan versions isolate departments, pending approvals and costs
+ok 1 - real IDs and current plan versions isolate departments, pending approvals and costs
+  ---
+  duration_ms: 2280.377715
+  type: 'test'
+  ...
+# Subtest: completed history never masks the latest failure or invents a delivery from a project label
+ok 2 - completed history never masks the latest failure or invents a delivery from a project label
+  ---
+  duration_ms: 19.261019
+  type: 'test'
+  ...
+# Subtest: bounded pages retain department-wide counts and deterministic ordering
+ok 3 - bounded pages retain department-wide counts and deterministic ordering
+  ---
+  duration_ms: 18.904602
+  type: 'test'
+  ...
+# Subtest: empty departments load, archived or absent departments and invalid bounds are rejected
+ok 4 - empty departments load, archived or absent departments and invalid bounds are rejected
+  ---
+  duration_ms: 28.031877
+  type: 'test'
+  ...
+# Subtest: reads preserve pending approvals, run outcomes and the billing ledger
+ok 5 - reads preserve pending approvals, run outcomes and the billing ledger
+  ---
+  duration_ms: 12.351763
+  type: 'test'
+  ...
+# Subtest: completed project keeps its actual lifecycle label when remaining budget cannot fund a second full run
+ok 6 - completed project keeps its actual lifecycle label when remaining budget cannot fund a second full run
+  ---
+  duration_ms: 13.948846
+  type: 'test'
+  ...
+# Subtest: running, queued, failed, cancelled and interrupted states take precedence over either validation result
+ok 7 - running, queued, failed, cancelled and interrupted states take precedence over either validation result
+  ---
+  duration_ms: 0.502523
+  type: 'test'
+  ...
+# Subtest: only a draft uses validation readiness; unknown lifecycle states are not relabeled as success or a draft
+ok 8 - only a draft uses validation readiness; unknown lifecycle states are not relabeled as success or a draft
+  ---
+  duration_ms: 0.268324
+  type: 'test'
+  ...
+# Subtest: both real project cards use lifecycle tags while the original validation and cost approval guards remain in place
+ok 9 - both real project cards use lifecycle tags while the original validation and cost approval guards remain in place
+  ---
+  duration_ms: 0.86084
+  type: 'test'
+  ...
+# Subtest: an unchecked, loading or failed inspection is distinguishable and never claims a current approval
+ok 10 - an unchecked, loading or failed inspection is distinguishable and never claims a current approval
+  ---
+  duration_ms: 29.784149
+  type: 'test'
+  ...
+# Subtest: inspection displays its version, current ledger, complete calls and separate resume/full-retry limits
+ok 11 - inspection displays its version, current ledger, complete calls and separate resume/full-retry limits
+  ---
+  duration_ms: 19.670408
+  type: 'test'
+  ...
+# Subtest: changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result
+ok 12 - changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result
+  ---
+  duration_ms: 1.789389
+  type: 'test'
+  ...
+# Subtest: missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation
+ok 13 - missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation
+  ---
+  duration_ms: 3.934066
+  type: 'test'
+  ...
+# Subtest: a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation
+ok 14 - a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation
+  ---
+  duration_ms: 1.82879
+  type: 'test'
+  ...
+# Subtest: actual router reads only the bound operation and verifies immutable source snapshot/events
+ok 15 - actual router reads only the bound operation and verifies immutable source snapshot/events
+  ---
+  duration_ms: 2279.588529
+  type: 'test'
+  ...
+# Subtest: cross-run database operation cannot be substituted by a matching ID
+ok 16 - cross-run database operation cannot be substituted by a matching ID
+  ---
+  duration_ms: 10.390175
+  type: 'test'
+  ...
+# Subtest: formal row identity, unknown IDs and strict query validation stay enforced
+ok 17 - formal row identity, unknown IDs and strict query validation stay enforced
+  ---
+  duration_ms: 13.874797
+  type: 'test'
+  ...
+# Subtest: missing or different database workspace revision cannot produce a verified QA card
+ok 18 - missing or different database workspace revision cannot produce a verified QA card
+  ---
+  duration_ms: 13.164835
+  type: 'test'
+  ...
+# Subtest: tampered ancestor snapshot and oversized archive return explicit unavailable evidence
+ok 19 - tampered ancestor snapshot and oversized archive return explicit unavailable evidence
+  ---
+  duration_ms: 9.374146
+  type: 'test'
+  ...
+# Subtest: repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response
+ok 20 - repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response
+  ---
+  duration_ms: 13.385652
+  type: 'test'
+  ...
+# Subtest: cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries
+ok 21 - cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries
+  ---
+  duration_ms: 2.754977
+  type: 'test'
+  ...
+# Subtest: ancestry has an explicit maximum depth
+ok 22 - ancestry has an explicit maximum depth
+  ---
+  duration_ms: 8.481924
+  type: 'test'
+  ...
+# Subtest: every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal
+ok 23 - every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal
+  ---
+  duration_ms: 4.121539
+  type: 'test'
+  ...
+# Subtest: QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation
+ok 24 - QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation
+  ---
+  duration_ms: 6.496924
+  type: 'test'
+  ...
+# Subtest: source-only summaries and unlinked commands cannot manufacture a test card
+ok 25 - source-only summaries and unlinked commands cannot manufacture a test card
+  ---
+  duration_ms: 0.568942
+  type: 'test'
+  ...
+# Subtest: QA must have executed the exact workspace revision sealed by the original host
+ok 26 - QA must have executed the exact workspace revision sealed by the original host
+  ---
+  duration_ms: 8.886418
+  type: 'test'
+  ...
+# Subtest: web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again
+ok 27 - web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again
+  ---
+  duration_ms: 2.103169
+  type: 'test'
+  ...
+# Subtest: opening and cancelling either confirmation is local and never dispatches a check or retry
+ok 28 - opening and cancelling either confirmation is local and never dispatches a check or retry
+  ---
+  duration_ms: 3.197351
+  type: 'test'
+  ...
+# Subtest: run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent
+ok 29 - run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent
+  ---
+  duration_ms: 0.931381
+  type: 'test'
+  ...
+# Subtest: explicit confirmation rechecks and dispatches the exact mode and choices only once under double click
+ok 30 - explicit confirmation rechecks and dispatches the exact mode and choices only once under double click
+  ---
+  duration_ms: 1.203849
+  type: 'test'
+  ...
+# Subtest: periodic ledger refresh disables submission without dismissing an unchanged confirmation
+ok 31 - periodic ledger refresh disables submission without dismissing an unchanged confirmation
+  ---
+  duration_ms: 0.421844
+  type: 'test'
+  ...
+# Subtest: cancel or changed context while the readonly check is pending prevents the retry POST
+ok 32 - cancel or changed context while the readonly check is pending prevents the retry POST
+  ---
+  duration_ms: 1.313213
+  type: 'test'
+  ...
+# Subtest: a fresh server check with changed fees or rejected mode never dispatches from an old successful check
+ok 33 - a fresh server check with changed fees or rejected mode never dispatches from an old successful check
+  ---
+  duration_ms: 0.672395
+  type: 'test'
+  ...
+# Subtest: a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation
+ok 34 - a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation
+  ---
+  duration_ms: 1.012532
+  type: 'test'
+  ...
+# Subtest: dispatch failure releases the lock, closes consent and propagates the error without automatic retry
+ok 35 - dispatch failure releases the lock, closes consent and propagates the error without automatic retry
+  ---
+  duration_ms: 0.912664
+  type: 'test'
+  ...
+# Subtest: accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks
+ok 36 - accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks
+  ---
+  duration_ms: 14.540695
+  type: 'test'
+  ...
+# Subtest: terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages
+ok 37 - terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages
+  ---
+  duration_ms: 2.474234
+  type: 'test'
+  ...
+# Subtest: overlapping manual refresh and polling keep the furthest cursor and newer metadata
+ok 38 - overlapping manual refresh and polling keep the furthest cursor and newer metadata
+  ---
+  duration_ms: 0.361237
+  type: 'test'
+  ...
+# Subtest: a stale response from a different run or plan version cannot attach events or completion state
+ok 39 - a stale response from a different run or plan version cannot attach events or completion state
+  ---
+  duration_ms: 0.308331
+  type: 'test'
+  ...
+# Subtest: terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict
+ok 40 - terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict
+  ---
+  duration_ms: 0.582349
+  type: 'test'
+  ...
+# Subtest: native states use approved task IDs, contracts and dependencies even when summary omits the mapping
+ok 41 - native states use approved task IDs, contracts and dependencies even when summary omits the mapping
+  ---
+  duration_ms: 1.394395
+  type: 'test'
+  ...
+# Subtest: the latest rework mapping supersedes an older accepted completion regardless of native array order
+ok 42 - the latest rework mapping supersedes an older accepted completion regardless of native array order
+  ---
+  duration_ms: 0.523838
+  type: 'test'
+  ...
+# Subtest: native completed requires acceptance for this run, plan and exact current attempt
+ok 43 - native completed requires acceptance for this run, plan and exact current attempt
+  ---
+  duration_ms: 0.705197
+  type: 'test'
+  ...
+# Subtest: only an explicitly inherited accepted checkpoint may show a parent completion in a child run
+ok 44 - only an explicitly inherited accepted checkpoint may show a parent completion in a child run
+  ---
+  duration_ms: 0.46018
+  type: 'test'
+  ...
+# Subtest: an ancestor seal is inherited only through the current approved snapshot after repeated recovery
+ok 45 - an ancestor seal is inherited only through the current approved snapshot after repeated recovery
+  ---
+  duration_ms: 0.346503
+  type: 'test'
+  ...
+# Subtest: seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved
+ok 46 - seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved
+  ---
+  duration_ms: 0.40343
+  type: 'test'
+  ...
+# Subtest: the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions
+ok 47 - the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions
+  ---
+  duration_ms: 44.603131
+  type: 'test'
+  ...
+# Subtest: completed accepted manager output supersedes stale coordinator reply and exposes its exact receipt without rewriting sources
+ok 48 - completed accepted manager output supersedes stale coordinator reply and exposes its exact receipt without rewriting sources
+  ---
+  duration_ms: 5.214134
+  type: 'test'
+  ...
+# Subtest: every approved node needs complete output and input seals, including exact producer SHA and fixed input bindings
+ok 49 - every approved node needs complete output and input seals, including exact producer SHA and fixed input bindings
+  ---
+  duration_ms: 2.870691
+  type: 'test'
+  ...
+# Subtest: inherited seals require server-verified ancestry, completed attempt and accepted file inventory
+ok 50 - inherited seals require server-verified ancestry, completed attempt and accepted file inventory
+  ---
+  duration_ms: 14.179168
+  type: 'test'
+  ...
+# Subtest: failed, interrupted, incomplete or unverified status never becomes an accepted delivery result
+ok 51 - failed, interrupted, incomplete or unverified status never becomes an accepted delivery result
+  ---
+  duration_ms: 0.271491
+  type: 'test'
+  ...
+# Subtest: missing or foreign seals, wrong attempt/version, incomplete DAG and absent output hashes retain the raw reply
+ok 52 - missing or foreign seals, wrong attempt/version, incomplete DAG and absent output hashes retain the raw reply
+  ---
+  duration_ms: 1.105915
+  type: 'test'
+  ...
+# Subtest: current paginated mapping and complete summary seals select the actual manager task
+ok 53 - current paginated mapping and complete summary seals select the actual manager task
+  ---
+  duration_ms: 0.227691
+  type: 'test'
+  ...
+# Subtest: manager delivery identity is determined by approved assignee and terminal DAG, not prose or fixed task IDs
+ok 54 - manager delivery identity is determined by approved assignee and terminal DAG, not prose or fixed task IDs
+  ---
+  duration_ms: 0.314416
+  type: 'test'
+  ...
+# Subtest: RunExtras renders the accepted manager result first and folds the untouched coordinator reply into traceable history
+ok 55 - RunExtras renders the accepted manager result first and folds the untouched coordinator reply into traceable history
+  ---
+  duration_ms: 29.465829
+  type: 'test'
+  ...
+# Subtest: actual completed event overrides the earlier manager waiting-model display without rewriting source events
+ok 56 - actual completed event overrides the earlier manager waiting-model display without rewriting source events
+  ---
+  duration_ms: 16.589904
+  type: 'test'
+  ...
+# Subtest: failed, cancelled and interrupted runs keep old active phases as folded history while active runs still show live phases
+ok 57 - failed, cancelled and interrupted runs keep old active phases as folded history while active runs still show live phases
+  ---
+  duration_ms: 3.013897
+  type: 'test'
+  ...
+# Subtest: even completed runs expose pending fees, unknown external operations and leftover approvals for reconciliation
+ok 58 - even completed runs expose pending fees, unknown external operations and leftover approvals for reconciliation
+  ---
+  duration_ms: 5.147805
+  type: 'test'
+  ...
+# Subtest: missing fees stay unknown, settled terminal runs avoid a false pending notice, and active-run controls are unchanged
+ok 59 - missing fees stay unknown, settled terminal runs avoid a false pending notice, and active-run controls are unchanged
+  ---
+  duration_ms: 1.244267
+  type: 'test'
+  ...
+# Subtest: hundreds of collapsed events neither serialize giant raw requests nor place their bodies in the DOM
+ok 60 - hundreds of collapsed events neither serialize giant raw requests nor place their bodies in the DOM
+  ---
+  duration_ms: 116.903672
+  type: 'test'
+  ...
+# Subtest: closed body guards serialization; an explicitly opened body renders complete original JSON and attempt identity
+ok 61 - closed body guards serialization; an explicitly opened body renders complete original JSON and attempt identity
+  ---
+  duration_ms: 2.981751
+  type: 'test'
+  ...
+# Subtest: main view omits routine status polling but preserves failures, unknown outcomes and accepted state changes
+ok 62 - main view omits routine status polling but preserves failures, unknown outcomes and accepted state changes
+  ---
+  duration_ms: 1.007818
+  type: 'test'
+  ...
+# Subtest: closed previews take only a bounded text prefix instead of joining the complete original message
+ok 63 - closed previews take only a bounded text prefix instead of joining the complete original message
+  ---
+  duration_ms: 0.209303
+  type: 'test'
+  ...
+1..63
+# tests 63
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3959.535802

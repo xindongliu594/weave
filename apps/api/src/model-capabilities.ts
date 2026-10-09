@@ -3,10 +3,12 @@ import type pg from 'pg';
 import { pool } from './db.ts';
 import { AppError,type ChatMessage } from './provider.ts';
 import { completeBudgeted } from './cost-control.ts';
-import type { Model } from '../../../packages/contracts/index.ts';
+import { agentReasoningErrors, type Model } from '../../../packages/contracts/index.ts';
 export const toolProbeVersion='chat-tools-roundtrip-v1';
 export function routeFingerprint(data:any,gatewayVersion:number){return createHash('sha256').update(JSON.stringify({data,gatewayVersion})).digest('hex');}
 export async function assertRunModels(snapshot:any,db:Pick<pg.PoolClient,'query'>=pool){
+ const reasoningErrors=agentReasoningErrors(snapshot.agents??[]);
+ if(reasoningErrors.length)throw new AppError(422,reasoningErrors.join('；'),'UNSUPPORTED_REASONING_EFFORT');
  const ids=[...new Set<string>((snapshot.agents??[]).flatMap((a:any)=>[a.modelId,a.fallbackModelId].filter(Boolean)))];
  if(!ids.length)throw new AppError(422,'运行快照缺少可验证的模型配置，请重新制定并批准方案','MODEL_REAPPROVAL_REQUIRED');
  const rows=(await db.query(`SELECT m.id,m.data,m.status,m.capabilities,g.version AS gateway_version FROM models m JOIN gateways g ON g.id=m.data->>'gatewayId' WHERE m.id=ANY($1::text[]) AND m.deleted_at IS NULL`,[ids])).rows;

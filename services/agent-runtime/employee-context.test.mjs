@@ -12,6 +12,75 @@ import { defineTool } from '@deepseek-ai/dsh-tools';
 import { employeeContextPolicy, EvidencePruner } from './employee-context.mjs';
 
 const prompt = text => createUserMessage({ content: [{ type: 'text', text }], source: { kind: 'user' } });
+
+// Local transport fixtures exercise the installed DSH summarizer's real
+// truncation, durable replacement and shared admission seams, not model quality.
+async function checkpointCapFixture({ legacy = false, taskCap = 2048, routeCap = 2048, defaultEntry = false, pressureAfterSummary = false,
+  omitSummaryUsage = false, rejectSummaryFee = false, unknownSummaryHop = false } = {}) {
+  const root = await mkdtemp(join(tmpdir(), 'context-approved-summary-cap-'));
+  const archive = createRunArchive(root, { title: 'approved checkpoint output cap' });
+  const route = { id: 'summary-cap', name: 'local fixture', wireModel: 'local-fixture', baseUrl: 'https://fixture.invalid/v1',
+    inputRate: 1, outputRate: 1, maxOutputTokens: routeCap, contextWindowTokens: 128000 };
+  const checkpoint = ['## Primary Request and Intent\n- COMPLETE_CHECKPOINT: finish cli.mjs and README.md.',
+    '## Key Technical Concepts\n- Node CLI; approved workspace only.',
+    '## Files and Code\n- cli.mjs: original evidence retained; do not replay completed writes.',
+    '## Errors and Fixes\n- (none)', '## Pending Jobs\n- Verify the CLI exit code independently.',
+    '## Current Work\n- Independent verification remains pending.', '## Next Step\n- Run the approved test command.',
+    '## Critical Context\n- ' + 'Keep exact file versions and the original task scope. '.repeat(105)].join('\n\n');
+  const summaryTokens = Math.ceil(checkpoint.length / 4);
+  assert.ok(summaryTokens > 1024 && summaryTokens < 2048, 'fixture requires the existing 2048 allowance');
+  const wires = [], usages = [];
+  const backup = { ...route, id: 'summary-backup', wireModel: 'local-fixture-backup' };
+  let executions = 0;
+  const fetchMock = mock.method(globalThis, 'fetch', async (url, init) => {
+    assert.equal(url, route.baseUrl + '/chat/completions');
+    const body = JSON.parse(init.body), summary = body.messages.at(-1)?.content?.includes('acting as a compaction engine');
+    wires.push({ body, summary });
+    if (summary && unknownSummaryHop && body.model === route.wireModel)
+      return Response.json({ error: { message: 'local configured-fallback fixture' } }, { status: 429 });
+    const length = summary && body.max_tokens < summaryTokens;
+    return Response.json({ choices: [{ message: { content: summary ? checkpoint.slice(0, body.max_tokens * 4) : 'execution continued' },
+      finish_reason: length ? 'length' : 'stop' }], ...(summary && omitSummaryUsage ? {} : { usage: {
+        prompt_tokens: summary ? 8000 : ++executions === 1 ? 7000 : pressureAfterSummary ? 19000 : executions === 2 ? 12000 : 2000,
+        completion_tokens: summary ? Math.min(summaryTokens, body.max_tokens) : 5 } }) });
+  });
+  const task = { id: 'dev', assigneeId: 'developer', maxOutputTokens: taskCap, maxBudget: .4, maxModelCalls: 10 };
+  const adapter = new OpenAiCompatibleAdapter({ routes: unknownSummaryHop ? [route, backup] : [route], tasks: [task], contextBytes: 64000, maxBudget: .4,
+    maxModelCalls: 10, beforeRequest: async () => {},
+    onCallError: data => archive.append('billing/unconfirmed', data),
+    onFallback: data => archive.append('model/fallback', data, { sessionId: data.sessionId }),
+    onRequest: data => {
+      archive.append('model/wire-request', data, { sessionId: data.sessionId });
+    }, onUsage: usage => {
+      if (rejectSummaryFee && usage.requestPurpose === 'compaction') throw Error('fixture summary fee persistence rejected');
+      archive.append('billing/usage', usage, { sessionId: usage.sessionId });
+      usages.push(usage);
+    } });
+  adapter.attribution = sessionId => ({ sessionId, taskId: task.id, employeeId: task.assigneeId });
+  const context = defaultEntry ? { mode: 'summary' } : employeeContextPolicy({ contextBytes: 64000 }, [route], 'fixture');
+  if (legacy) context.compaction.modelPolicies[0].maxTokens = 1024;
+  const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive, context });
+  const agentSetup = pressureAfterSummary ? ctx => {
+    ctx.systemPrompt.section({ name: 'fixed-scaffold', order: 120,
+      text: 'FIXED_SCAFFOLD: keep original approved scope and limits. '.repeat(150) });
+  } : undefined;
+  let handle = await host.ctx.agents.create({ sessionId: randomUUID(), agentOptions: { provider: 'fixture', model: route.id }, setup: agentSetup });
+  if (unknownSummaryHop) adapter.sessionPolicies.set(handle.agent.id, { fallbackModelId: backup.id });
+  return { root, adapter, archive, context, wires, usages, get agent() { return handle.agent; },
+    async seed() {
+      await turn(handle.agent, 'ORIGINAL_SOURCE_EVIDENCE ' + 'x'.repeat(28000));
+      await turn(handle.agent, 'RECENT_PENDING_WORK ' + 'y'.repeat(12000));
+      assert.equal(wires.length, 2, 'pressure arises after two execution requests');
+    },
+    async resume() {
+      const sessionId = handle.agent.id;
+      await handle.dispose();
+      handle = await host.ctx.agents.resume({ resumeSessionId: sessionId, agentOptions: { provider: 'fixture', model: route.id }, setup: agentSetup });
+      await handle.agent.whenIdle();
+    },
+    async close() { try { await host.close(); } finally { fetchMock.mock.restore(); await rm(root, { recursive: true, force: true }); } },
+  };
+}
 const reply = text => [
   { type: 'block-start', index: 0, blockType: 'text' },
   { type: 'block-end', index: 0, block: { type: 'text', text } },
@@ -19,6 +88,237 @@ const reply = text => [
 ];
 async function turn(agent, text) { agent.followup(prompt(text)); await agent.whenIdle(); }
 async function seed(agent, marker) { await turn(agent, marker + 'x'.repeat(4500)); await turn(agent, 'recent work ' + 'y'.repeat(3000)); }
+
+test('installed DSH discards a known-fee truncated checkpoint and continues with complete original history without a paid summary retry', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ legacy: true });
+  try {
+    await f.seed(); await turn(f.agent, 'continue the approved task');
+    const summaries = f.wires.filter(wire => wire.summary), events = f.agent.session.snapshotEvents();
+    assert.equal(summaries.length, 1); assert.equal(summaries[0].body.max_tokens, 1024);
+    assert.equal(f.usages.filter(usage => usage.requestPurpose === 'compaction').length, 1);
+    assert.equal(events.filter(event => event.type === 'compaction/summary').length, 0);
+    assert.ok(events.some(event => event.type === 'compaction/end' && event.data.error?.includes('incomplete checkpoint')));
+    assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.wires.length, 4, 'one complete original-history execution follows the discarded summary');
+    assert.equal(f.wires.at(-1).summary, false);
+    assert.ok(JSON.stringify(f.wires.at(-1).body.messages).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.ok(JSON.stringify(f.wires.at(-1).body.messages).includes('RECENT_PENDING_WORK'));
+    assert.equal(f.adapter.budget.run.calls, 4); assert.equal(f.adapter.budget.tasks.get('dev').calls, 4);
+    assert.equal(f.adapter.reserved, 0, 'the charged summary has known usage');
+    assert.equal(readRun(f.root, f.archive.id).integrity, 'ok');
+  } finally { await f.close(); }
+});
+
+test('a discarded checkpoint suppresses repeated summary fees and restores its confirmed failure gate on a cold Host', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ legacy: true, pressureAfterSummary: true });
+  try {
+    await f.seed(); await turn(f.agent, 'continue with original source');
+    for (let index = 0; index < 3; index++) await turn(f.agent, 'small pending-work followup ' + index);
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1);
+    await f.resume(); await turn(f.agent, 'resume the same pending work');
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1);
+    assert.equal(f.usages.filter(usage => usage.requestPurpose === 'compaction').length, 1);
+    assert.equal(f.agent.session.snapshotEvents().filter(event => event.type === 'compaction/summary').length, 0);
+    for (const wire of f.wires.slice(3)) {
+      assert.equal(wire.summary, false);
+      assert.ok(JSON.stringify(wire.body.messages).includes('ORIGINAL_SOURCE_EVIDENCE'));
+      assert.ok(JSON.stringify(wire.body.messages).includes('RECENT_PENDING_WORK'));
+    }
+    const run = readRun(f.root, f.archive.id);
+    assert.equal(run.integrity, 'ok');
+    assert.equal(run.events.filter(event => event.type === 'context/summary-truncated-retained').length, 1);
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.reserved, 0);
+  } finally { await f.close(); }
+});
+
+test('raw-history continuation after truncation rejects a 64000-byte overflow before another dispatch and keeps all source fields', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ legacy: true });
+  try {
+    await f.seed(); await turn(f.agent, 'continue with original source');
+    const before = { calls: f.adapter.budget.run.calls, spent: f.adapter.spent, wires: f.wires.length };
+    await turn(f.agent, 'RAW_REQUEST_TOO_LARGE ' + 'q'.repeat(70000));
+    assert.equal(f.wires.length, before.wires); assert.equal(f.adapter.budget.run.calls, before.calls);
+    assert.equal(f.adapter.spent, before.spent); assert.equal(f.adapter.contextBytes, 64000);
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1);
+    const visible = JSON.stringify(f.agent.session.deriveMessages());
+    assert.ok(visible.includes('ORIGINAL_SOURCE_EVIDENCE')); assert.ok(visible.includes('RECENT_PENDING_WORK'));
+    assert.ok(visible.includes('RAW_REQUEST_TOO_LARGE'));
+    assert.ok(JSON.stringify(f.agent.session.snapshotEvents()).includes('CONTEXT_LIMIT'));
+  } finally { await f.close(); }
+});
+
+test('raw-history continuation cannot shorten source to spend an existing retained budget hold', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ legacy: true }); let hold;
+  try {
+    await f.seed(); await turn(f.agent, 'continue with original source');
+    const attribution = { taskId: 'dev', employeeId: 'developer' };
+    hold = f.adapter.budget.reserve(f.adapter.budget.peekAvailable(attribution) - .001, attribution);
+    const before = { calls: f.adapter.budget.run.calls, reserved: f.adapter.budget.run.reserved, wires: f.wires.length };
+    await turn(f.agent, 'continue only with complete source');
+    assert.equal(f.wires.length, before.wires); assert.equal(f.adapter.budget.run.calls, before.calls);
+    assert.equal(f.adapter.budget.run.reserved, before.reserved);
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1);
+    assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.adapter.budget.run.limit, .4);
+  } finally { hold?.release(); await f.close(); }
+});
+
+test('missing summary usage, failed fee persistence and an unknown fallback hop never enable truncated-checkpoint degradation', { timeout: 15000 }, async () => {
+  for (const patch of [{ omitSummaryUsage: true }, { rejectSummaryFee: true }, { unknownSummaryHop: true }]) {
+    const f = await checkpointCapFixture({ legacy: true, ...patch });
+    try {
+      await f.seed(); await turn(f.agent, 'continue with original source');
+      assert.equal(f.wires.length, patch.unknownSummaryHop ? 4 : 3, 'there is no subsequent execution after an unconfirmed summary');
+      if (patch.unknownSummaryHop) {
+        const run = readRun(f.root, f.archive.id);
+        assert.ok(run.events.some(event => event.type === 'model/fallback'));
+        assert.ok(run.events.some(event => event.type === 'billing/unconfirmed'));
+      }
+      assert.equal(f.agent.session.snapshotEvents().filter(event => event.type === 'compaction/summary').length, 0);
+      assert.equal(readRun(f.root, f.archive.id).events.filter(event => event.type === 'context/summary-truncated-retained').length, 0);
+      assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    } finally { await f.close(); }
+  }
+});
+
+test('known-fee truncation still requires the official original-request flush before execution dispatch', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ legacy: true }); let unhook;
+  try {
+    await f.seed();
+    unhook = f.agent.ctx.on('session/flush', session => {
+      if (session.snapshotEvents().some(event => event.type === 'compaction/end' && event.data.error?.includes('incomplete checkpoint')))
+        throw Error('fixture original-prefix durability barrier rejected');
+    });
+    await turn(f.agent, 'continue with original source');
+    assert.equal(f.wires.length, 3, 'the discarded summary settles, but the original request cannot dispatch without flush');
+    assert.equal(f.usages.filter(usage => usage.requestPurpose === 'compaction').length, 1);
+    assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+  } finally { unhook?.(); await f.close(); }
+});
+
+test('a complete checkpoint above the soft pressure target continues execution and waits for new history before paying again', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ pressureAfterSummary: true });
+  try {
+    await f.seed(); await turn(f.agent, 'continue the approved task');
+    const initial = readRun(f.root, f.archive.id);
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1);
+    assert.ok(initial.events.some(event => event.type === 'context/summary-pressure-retained' && event.data.estimatedTokens >= event.data.softThresholdTokens));
+    assert.equal(f.wires.at(-1).summary, false, 'a fully committed summary is followed by normal execution');
+    assert.ok(!f.agent.session.snapshotEvents().some(event => event.type === 'compaction/end' && event.data.error));
+    for (let index = 0; index < 3; index++) await turn(f.agent, 'small unchanged-scope followup ' + index);
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1, 'unchanged high pressure does not buy repeated summaries');
+    await turn(f.agent, 'MATERIAL_NEW_EVIDENCE ' + 'z'.repeat(12000));
+    await turn(f.agent, 'continue after the new evidence');
+    assert.equal(f.wires.filter(wire => wire.summary).length, 2, 'meaningful new source history can authorize another ordinary summary');
+    assert.equal(f.usages.filter(usage => usage.requestPurpose === 'compaction').length, 2);
+    assert.ok(JSON.stringify(f.agent.session.snapshotEvents()).includes('MATERIAL_NEW_EVIDENCE'));
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.budget.tasks.get('dev').limit, .4);
+    assert.ok(f.adapter.spent < .4); assert.equal(f.adapter.reserved, 0);
+  } finally { await f.close(); }
+});
+
+test('a cold resumed employee reconstructs its successful checkpoint gate and retains the original source', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ pressureAfterSummary: true });
+  try {
+    await f.seed(); await turn(f.agent, 'continue the approved task');
+    const checkpoint = f.agent.session.snapshotEvents().find(event => event.type === 'compaction/summary');
+    assert.ok(checkpoint); await f.resume(); await turn(f.agent, 'resume with the same pending work');
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1, 'restoring a Host does not pay again for the same pressure');
+    assert.equal(f.agent.session.snapshotEvents().filter(event => event.type === 'compaction/summary').length, 1);
+    assert.ok(JSON.stringify(f.agent.session.snapshotEvents()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('COMPLETE_CHECKPOINT'));
+    assert.equal(readRun(f.root, f.archive.id).integrity, 'ok');
+  } finally { await f.close(); }
+});
+
+test('soft-pressure continuation leaves the original 64000-byte request boundary in force without extra summary fees', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ pressureAfterSummary: true });
+  try {
+    await f.seed(); await turn(f.agent, 'continue the approved task');
+    const before = { calls: f.adapter.budget.run.calls, spent: f.adapter.spent, wires: f.wires.length };
+    await turn(f.agent, 'OVERSIZED_CURRENT_REQUEST ' + 'q'.repeat(70000));
+    assert.equal(f.adapter.contextBytes, 64000); assert.equal(f.wires.length, before.wires);
+    assert.equal(f.adapter.budget.run.calls, before.calls); assert.equal(f.adapter.spent, before.spent);
+    assert.equal(f.wires.filter(wire => wire.summary).length, 1);
+    const events = f.agent.session.snapshotEvents();
+    assert.ok(JSON.stringify(events).includes('CONTEXT_LIMIT'));
+    assert.ok(JSON.stringify(events).includes('OVERSIZED_CURRENT_REQUEST'));
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.reserved, 0);
+  } finally { await f.close(); }
+});
+
+test('installed DSH completes a checkpoint using the existing approved 2048 cap and retains durable original evidence', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture();
+  try {
+    await f.seed(); await turn(f.agent, 'continue the approved task');
+    const summaries = f.wires.filter(wire => wire.summary), events = f.agent.session.snapshotEvents();
+    assert.equal(f.context.compaction.modelPolicies[0].maxTokens, 2048);
+    assert.equal(summaries.length, 1); assert.equal(summaries[0].body.max_tokens, 2048);
+    assert.equal(events.filter(event => event.type === 'compaction/summary').length, 1);
+    assert.ok(JSON.stringify(events).includes('ORIGINAL_SOURCE_EVIDENCE'), 'full source remains in the durable transcript');
+    const visible = JSON.stringify(f.agent.session.deriveMessages());
+    assert.ok(visible.includes('COMPLETE_CHECKPOINT')); assert.ok(visible.includes('RECENT_PENDING_WORK'));
+    assert.ok(!visible.includes('ORIGINAL_SOURCE_EVIDENCE'), 'only the successful summary replaces the old visible span');
+    assert.equal(f.wires.length, 4); assert.equal(f.wires.at(-1).summary, false);
+    assert.equal(f.adapter.budget.run.calls, 4); assert.equal(f.adapter.budget.tasks.get('dev').calls, 4);
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.budget.tasks.get('dev').limit, .4);
+    assert.equal(f.usages.filter(usage => usage.requestPurpose === 'compaction').length, 1);
+    assert.ok(f.adapter.spent > 0 && f.adapter.spent < .4); assert.equal(f.adapter.reserved, 0);
+  } finally { await f.close(); }
+});
+
+test('default context initialization uses the official summary allowance while the adapter clamps it to the approved task cap', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ defaultEntry: true, routeCap: 4096 });
+  try {
+    await f.seed();
+    const result = await f.agent.ctx.get('compaction').compactNow(f.agent, AbortSignal.timeout(5000));
+    const summaries = f.wires.filter(wire => wire.summary), events = f.agent.session.snapshotEvents();
+    assert.ok(result, 'the installed DSH default entry commits a complete checkpoint');
+    assert.equal(summaries.length, 1); assert.equal(summaries[0].body.max_tokens, 2048, 'task cap is stricter than the approved route');
+    const summary = events.find(event => event.type === 'compaction/summary');
+    assert.equal(summary.data.maxTokens, 8192, 'default initialization retains the pinned DSH generation configuration');
+    assert.ok(JSON.stringify(summary.data.summary).includes('COMPLETE_CHECKPOINT'));
+    assert.ok(JSON.stringify(events).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.adapter.budget.run.calls, 3); assert.equal(f.adapter.budget.tasks.get('dev').calls, 3);
+    assert.equal(f.usages.filter(usage => usage.requestPurpose === 'compaction').length, 1);
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.budget.tasks.get('dev').limit, .4);
+    assert.equal(f.adapter.reserved, 0); assert.equal(readRun(f.root, f.archive.id).integrity, 'ok');
+  } finally { await f.close(); }
+});
+
+test('a lower approved task cap still rejects the truncated checkpoint while safe original-history execution keeps that cap', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture({ taskCap: 1024 });
+  try {
+    await f.seed(); await turn(f.agent, 'continue the approved task');
+    const summaries = f.wires.filter(wire => wire.summary), events = f.agent.session.snapshotEvents();
+    assert.equal(f.context.compaction.modelPolicies[0].maxTokens, 2048);
+    assert.equal(summaries.length, 1); assert.equal(summaries[0].body.max_tokens, 1024, 'shared adapter preserves the approved task cap');
+    assert.equal(events.filter(event => event.type === 'compaction/summary').length, 0);
+    assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.wires.length, 4); assert.equal(f.usages.length, 4);
+    assert.equal(f.wires.at(-1).summary, false); assert.equal(f.wires.at(-1).body.max_tokens, 1024);
+    assert.ok(JSON.stringify(f.wires.at(-1).body.messages).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.budget.tasks.get('dev').limit, .4);
+  } finally { await f.close(); }
+});
+
+test('the larger checkpoint allowance cannot spend a retained task/project reservation or dispatch a budget-blocked summary', { timeout: 15000 }, async () => {
+  const f = await checkpointCapFixture(); let hold;
+  try {
+    await f.seed();
+    const attribution = { taskId: 'dev', employeeId: 'developer' };
+    hold = f.adapter.budget.reserve(f.adapter.budget.peekAvailable(attribution) - .001, attribution);
+    const beforeCalls = f.adapter.budget.run.calls, retained = f.adapter.budget.run.reserved;
+    await turn(f.agent, 'continue the approved task');
+    const events = f.agent.session.snapshotEvents();
+    assert.equal(f.wires.length, 2); assert.equal(f.usages.length, 2, 'no summary is dispatched or billed');
+    assert.equal(f.adapter.budget.run.calls, beforeCalls); assert.equal(f.adapter.budget.run.reserved, retained);
+    assert.equal(events.filter(event => event.type === 'compaction/summary').length, 0);
+    assert.ok(events.some(event => event.type === 'compaction/end' && event.data.error?.includes('BUDGET_CONTEXT_LIMIT')));
+    assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.adapter.budget.run.limit, .4); assert.equal(f.adapter.budget.tasks.get('dev').limit, .4);
+  } finally { hold?.release(); await f.close(); }
+});
 function setup(role) { return ctx => {
   ctx.tools.restrict({ allow: [] });
   ctx.systemPrompt.section({ name: 'role', order: 120, text: role });

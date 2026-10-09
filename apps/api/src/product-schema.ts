@@ -72,6 +72,7 @@ export async function migrateProduct(pool: pg.Pool) {
       created_at timestamptz NOT NULL DEFAULT now(), finished_at timestamptz
     );
     CREATE INDEX IF NOT EXISTS local_operations_device ON local_operations(device_id,status,created_at);
+    ALTER TABLE local_devices ADD COLUMN IF NOT EXISTS backend jsonb NOT NULL DEFAULT '{"kind":"native"}'::jsonb;
   `);
   // Preserve the existing scope on upgrade; do not invent policies for older historical versions.
   const client=await pool.connect();

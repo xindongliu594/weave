@@ -5,10 +5,11 @@ const {LocalExecutor}=require('./local-executor.cjs');
 const {normalizeServer}=require('./connection.cjs');
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 class LocalDeviceClient {
- constructor({connection,device,journalRoot,fetch:request=globalThis.fetch,onState=()=>{},pollMs=1000}){
+ constructor({connection,device,journalRoot,fetch:request=globalThis.fetch,onState=()=>{},pollMs=1000,executor}){
   if(!/^[a-f0-9-]{36}$/.test(device?.id)||!/^[a-f0-9]{64}$/.test(device?.token))throw Error('本机设备凭证不正确');
   this.connection={...connection,server:normalizeServer(connection.server)};this.device=device;this.journalRoot=journalRoot;this.request=request;this.onState=onState;this.pollMs=pollMs;
-  this.executor=new LocalExecutor(device.grant);this.controller=new AbortController();this.pending=new Map();this.active=null;this.stopped=false;
+  if(executor!==undefined&&(!executor||typeof executor.execute!=='function'))throw Error('执行设备适配器无效；拒绝回退到本机执行');
+  this.executor=executor===undefined?new LocalExecutor(device.grant):executor;this.controller=new AbortController();this.pending=new Map();this.active=null;this.stopped=false;
   fs.mkdirSync(journalRoot,{recursive:true,mode:0o700});if(fs.lstatSync(journalRoot).isSymbolicLink())throw Error('本机回执目录不能是链接');
  }
  async record(id,value){
@@ -34,7 +35,7 @@ class LocalDeviceClient {
   const data=await response.json();if(!response.ok)throw Object.assign(Error(data.message||'本机设备连接失败'),{code:data.code,status:response.status});return data;
  }
  async start(){
-  await this.api('register',{id:this.device.id,token:this.device.token,name:this.device.name,platform:process.platform,grant:{id:this.device.grant.id,label:path.basename(this.device.grant.root),allowCommands:!!this.device.grant.allowCommands}});
+  await this.api('register',{id:this.device.id,token:this.device.token,name:this.device.name,platform:process.platform,grant:{id:this.device.grant.id,label:path.basename(this.device.grant.root),allowCommands:!!this.device.grant.allowCommands},...(this.device.backend?{backend:this.device.backend}:{})});
   for(const name of fs.readdirSync(this.journalRoot)){if(/^[a-f0-9-]{36}\.json$/.test(name)){const id=name.slice(0,-5),previous=this.read(id);if(previous?.phase==='completed'&&previous.receipt)this.pending.set(id,previous.receipt);if(this.pending.size>=4)break;}}
   this.onState({status:'connected'});this.loop=this.poll();return this;
  }
@@ -80,7 +81,7 @@ class LocalDeviceClient {
    if(!this.stopped)await pause(this.pollMs);
   }
  }
- async close(){this.stopped=true;this.controller.abort(Error('本机执行已关闭'));this.active?.controller.abort(Error('本机执行已关闭'));await Promise.allSettled([this.loop,this.active?.promise]);this.onState({status:'disabled'});}
+ async close(){return this.closing??=(async()=>{this.stopped=true;this.controller.abort(Error('本机执行已关闭'));this.active?.controller.abort(Error('本机执行已关闭'));await Promise.allSettled([this.loop,this.active?.promise]);try{await this.executor.close?.();}finally{this.onState({status:'disabled'});}})();}
  async disable(){this.stopped=true;this.active?.controller.abort(Error('本机授权已撤回'));try{await this.api(this.device.id+'/disable',{});}catch{}await this.close();}
 }
 module.exports={LocalDeviceClient};

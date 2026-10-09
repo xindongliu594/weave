@@ -1,0 +1,28 @@
+[Unit]
+Description=Weiwu local MVP on JJ (private data, SSH access)
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1
+ExecStart=/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node scripts/local.mjs --production --data-dir=/home/jj/.local/share/weiwu/data/pilot
+Environment=HOME=/home/jj/.local/share/weiwu/home
+Environment=PATH=/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=TMPDIR=/home/jj/.local/share/weiwu/cache/tmp
+Environment=npm_config_cache=/home/jj/.local/share/weiwu/cache/npm
+Environment=npm_config_userconfig=/home/jj/.local/share/weiwu/home/.npmrc
+Environment=npm_config_globalconfig=/dev/null
+Environment=ONNXRUNTIME_NODE_INSTALL=skip
+Environment=LANG=C.UTF-8
+UMask=0077
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+KillMode=mixed
+TimeoutStopSec=30
+StandardOutput=append:/home/jj/.local/share/weiwu/logs/service.txt
+StandardError=append:/home/jj/.local/share/weiwu/logs/service.txt
+
+[Install]
+WantedBy=default.target

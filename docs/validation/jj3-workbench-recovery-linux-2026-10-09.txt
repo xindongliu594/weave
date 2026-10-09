@@ -1,0 +1,262 @@
+TAP version 13
+# Subtest: real IDs and current plan versions isolate departments, pending approvals and costs
+ok 1 - real IDs and current plan versions isolate departments, pending approvals and costs
+  ---
+  duration_ms: 1806.278507
+  type: 'test'
+  ...
+# Subtest: completed history never masks the latest failure or invents a delivery from a project label
+ok 2 - completed history never masks the latest failure or invents a delivery from a project label
+  ---
+  duration_ms: 14.667254
+  type: 'test'
+  ...
+# Subtest: bounded pages retain department-wide counts and deterministic ordering
+ok 3 - bounded pages retain department-wide counts and deterministic ordering
+  ---
+  duration_ms: 15.614362
+  type: 'test'
+  ...
+# Subtest: empty departments load, archived or absent departments and invalid bounds are rejected
+ok 4 - empty departments load, archived or absent departments and invalid bounds are rejected
+  ---
+  duration_ms: 26.402292
+  type: 'test'
+  ...
+# Subtest: reads preserve pending approvals, run outcomes and the billing ledger
+ok 5 - reads preserve pending approvals, run outcomes and the billing ledger
+  ---
+  duration_ms: 10.95448
+  type: 'test'
+  ...
+# Subtest: completed project keeps its actual lifecycle label when remaining budget cannot fund a second full run
+ok 6 - completed project keeps its actual lifecycle label when remaining budget cannot fund a second full run
+  ---
+  duration_ms: 10.571836
+  type: 'test'
+  ...
+# Subtest: running, queued, failed, cancelled and interrupted states take precedence over either validation result
+ok 7 - running, queued, failed, cancelled and interrupted states take precedence over either validation result
+  ---
+  duration_ms: 0.58047
+  type: 'test'
+  ...
+# Subtest: only a draft uses validation readiness; unknown lifecycle states are not relabeled as success or a draft
+ok 8 - only a draft uses validation readiness; unknown lifecycle states are not relabeled as success or a draft
+  ---
+  duration_ms: 0.241547
+  type: 'test'
+  ...
+# Subtest: both real project cards use lifecycle tags while the original validation and cost approval guards remain in place
+ok 9 - both real project cards use lifecycle tags while the original validation and cost approval guards remain in place
+  ---
+  duration_ms: 0.809149
+  type: 'test'
+  ...
+# Subtest: an unchecked, loading or failed inspection is distinguishable and never claims a current approval
+ok 10 - an unchecked, loading or failed inspection is distinguishable and never claims a current approval
+  ---
+  duration_ms: 29.541299
+  type: 'test'
+  ...
+# Subtest: inspection displays its version, current ledger, complete calls and separate resume/full-retry limits
+ok 11 - inspection displays its version, current ledger, complete calls and separate resume/full-retry limits
+  ---
+  duration_ms: 16.188558
+  type: 'test'
+  ...
+# Subtest: changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result
+ok 12 - changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result
+  ---
+  duration_ms: 1.651691
+  type: 'test'
+  ...
+# Subtest: missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation
+ok 13 - missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation
+  ---
+  duration_ms: 3.327963
+  type: 'test'
+  ...
+# Subtest: a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation
+ok 14 - a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation
+  ---
+  duration_ms: 1.790163
+  type: 'test'
+  ...
+# Subtest: opening and cancelling either confirmation is local and never dispatches a check or retry
+ok 15 - opening and cancelling either confirmation is local and never dispatches a check or retry
+  ---
+  duration_ms: 1.958579
+  type: 'test'
+  ...
+# Subtest: run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent
+ok 16 - run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent
+  ---
+  duration_ms: 0.548485
+  type: 'test'
+  ...
+# Subtest: explicit confirmation rechecks and dispatches the exact mode and choices only once under double click
+ok 17 - explicit confirmation rechecks and dispatches the exact mode and choices only once under double click
+  ---
+  duration_ms: 0.607882
+  type: 'test'
+  ...
+# Subtest: periodic ledger refresh disables submission without dismissing an unchanged confirmation
+ok 18 - periodic ledger refresh disables submission without dismissing an unchanged confirmation
+  ---
+  duration_ms: 0.235607
+  type: 'test'
+  ...
+# Subtest: cancel or changed context while the readonly check is pending prevents the retry POST
+ok 19 - cancel or changed context while the readonly check is pending prevents the retry POST
+  ---
+  duration_ms: 0.336045
+  type: 'test'
+  ...
+# Subtest: a fresh server check with changed fees or rejected mode never dispatches from an old successful check
+ok 20 - a fresh server check with changed fees or rejected mode never dispatches from an old successful check
+  ---
+  duration_ms: 0.404745
+  type: 'test'
+  ...
+# Subtest: a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation
+ok 21 - a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation
+  ---
+  duration_ms: 0.512312
+  type: 'test'
+  ...
+# Subtest: dispatch failure releases the lock, closes consent and propagates the error without automatic retry
+ok 22 - dispatch failure releases the lock, closes consent and propagates the error without automatic retry
+  ---
+  duration_ms: 0.826744
+  type: 'test'
+  ...
+# Subtest: accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks
+ok 23 - accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks
+  ---
+  duration_ms: 13.416523
+  type: 'test'
+  ...
+# Subtest: terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages
+ok 24 - terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages
+  ---
+  duration_ms: 2.789917
+  type: 'test'
+  ...
+# Subtest: overlapping manual refresh and polling keep the furthest cursor and newer metadata
+ok 25 - overlapping manual refresh and polling keep the furthest cursor and newer metadata
+  ---
+  duration_ms: 0.34926
+  type: 'test'
+  ...
+# Subtest: a stale response from a different run or plan version cannot attach events or completion state
+ok 26 - a stale response from a different run or plan version cannot attach events or completion state
+  ---
+  duration_ms: 0.234319
+  type: 'test'
+  ...
+# Subtest: terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict
+ok 27 - terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict
+  ---
+  duration_ms: 0.414176
+  type: 'test'
+  ...
+# Subtest: native states use approved task IDs, contracts and dependencies even when summary omits the mapping
+ok 28 - native states use approved task IDs, contracts and dependencies even when summary omits the mapping
+  ---
+  duration_ms: 1.144885
+  type: 'test'
+  ...
+# Subtest: the latest rework mapping supersedes an older accepted completion regardless of native array order
+ok 29 - the latest rework mapping supersedes an older accepted completion regardless of native array order
+  ---
+  duration_ms: 0.369731
+  type: 'test'
+  ...
+# Subtest: native completed requires acceptance for this run, plan and exact current attempt
+ok 30 - native completed requires acceptance for this run, plan and exact current attempt
+  ---
+  duration_ms: 0.48447
+  type: 'test'
+  ...
+# Subtest: only an explicitly inherited accepted checkpoint may show a parent completion in a child run
+ok 31 - only an explicitly inherited accepted checkpoint may show a parent completion in a child run
+  ---
+  duration_ms: 0.286181
+  type: 'test'
+  ...
+# Subtest: an ancestor seal is inherited only through the current approved snapshot after repeated recovery
+ok 32 - an ancestor seal is inherited only through the current approved snapshot after repeated recovery
+  ---
+  duration_ms: 0.272783
+  type: 'test'
+  ...
+# Subtest: seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved
+ok 33 - seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved
+  ---
+  duration_ms: 0.345272
+  type: 'test'
+  ...
+# Subtest: the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions
+ok 34 - the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions
+  ---
+  duration_ms: 35.05455
+  type: 'test'
+  ...
+# Subtest: actual completed event overrides the earlier manager waiting-model display without rewriting source events
+ok 35 - actual completed event overrides the earlier manager waiting-model display without rewriting source events
+  ---
+  duration_ms: 12.479144
+  type: 'test'
+  ...
+# Subtest: failed, cancelled and interrupted runs keep old active phases as folded history while active runs still show live phases
+ok 36 - failed, cancelled and interrupted runs keep old active phases as folded history while active runs still show live phases
+  ---
+  duration_ms: 5.479964
+  type: 'test'
+  ...
+# Subtest: even completed runs expose pending fees, unknown external operations and leftover approvals for reconciliation
+ok 37 - even completed runs expose pending fees, unknown external operations and leftover approvals for reconciliation
+  ---
+  duration_ms: 4.787734
+  type: 'test'
+  ...
+# Subtest: missing fees stay unknown, settled terminal runs avoid a false pending notice, and active-run controls are unchanged
+ok 38 - missing fees stay unknown, settled terminal runs avoid a false pending notice, and active-run controls are unchanged
+  ---
+  duration_ms: 1.041658
+  type: 'test'
+  ...
+# Subtest: hundreds of collapsed events neither serialize giant raw requests nor place their bodies in the DOM
+ok 39 - hundreds of collapsed events neither serialize giant raw requests nor place their bodies in the DOM
+  ---
+  duration_ms: 91.22157
+  type: 'test'
+  ...
+# Subtest: closed body guards serialization; an explicitly opened body renders complete original JSON and attempt identity
+ok 40 - closed body guards serialization; an explicitly opened body renders complete original JSON and attempt identity
+  ---
+  duration_ms: 3.402232
+  type: 'test'
+  ...
+# Subtest: main view omits routine status polling but preserves failures, unknown outcomes and accepted state changes
+ok 41 - main view omits routine status polling but preserves failures, unknown outcomes and accepted state changes
+  ---
+  duration_ms: 1.349321
+  type: 'test'
+  ...
+# Subtest: closed previews take only a bounded text prefix instead of joining the complete original message
+ok 42 - closed previews take only a bounded text prefix instead of joining the complete original message
+  ---
+  duration_ms: 0.246459
+  type: 'test'
+  ...
+1..42
+# tests 42
+# suites 0
+# pass 42
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3164.389996

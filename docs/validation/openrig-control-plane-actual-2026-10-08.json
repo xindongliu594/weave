@@ -1,0 +1,111 @@
+{
+  "kind": "real-openrig-control-plane",
+  "version": "0.6.6",
+  "probeRoot": "/home/jj/.local/share/weiwu/openrig/probes/control-plane-20261008T135403Z-3d03bb0b-bf56-4a4c-9b1b-5b5eea148065",
+  "db": "/home/jj/.local/share/weiwu/openrig/probes/control-plane-20261008T135403Z-3d03bb0b-bf56-4a4c-9b1b-5b5eea148065/state/probe.sqlite",
+  "port": 58033,
+  "installedSourceHashes": {
+    "dist/bin-wrapper.js": "dd76e3f0cc2776c2dc10791cbbb95de7978b4963c995fe321d8bcf454df6b2f3",
+    "dist/commands/import.js": "72179d64dc9d0b444897e373dce3bd1ac9de75e9a1d7dd3cd357ec089ee35ca9",
+    "dist/commands/queue.js": "d4aed0bb04bc8e611e9760a00f9b862878758a369131ded5c08622ce63dd714c",
+    "dist/daemon-lifecycle.js": "19f2bce6a4195e39f7ec177042a52c64d45cf93d0865621d0e1db1246f6b2fef",
+    "daemon/dist/domain/rigspec-schema.js": "98ee084d8d7c2c075a6956a26cea7ad97f3b3f82abbdde0bbc6f1023e3f057a0",
+    "daemon/dist/domain/queue-repository.js": "e3b7f51059001f51ed7f904ead0235f0637cc3bfd74fe19e3d1cd286846d8e00"
+  },
+  "startedHarnesses": false,
+  "modelCallsRequested": 0,
+  "employeeDevelopmentAcceptance": false,
+  "steps": [
+    {
+      "label": "spec-validate",
+      "exit": 0
+    },
+    {
+      "label": "start",
+      "exit": 0
+    },
+    {
+      "label": "materialize",
+      "exit": 0
+    },
+    {
+      "label": "create",
+      "exit": 0
+    },
+    {
+      "label": "dev-claim",
+      "exit": 0
+    },
+    {
+      "label": "handoff",
+      "exit": 0
+    },
+    {
+      "label": "qa-claim",
+      "exit": 0
+    },
+    {
+      "label": "before-restart-q1",
+      "exit": 0
+    },
+    {
+      "label": "before-restart-q2",
+      "exit": 0
+    },
+    {
+      "label": "before-restart-history1",
+      "exit": 0
+    },
+    {
+      "label": "before-restart-history2",
+      "exit": 0
+    },
+    {
+      "label": "stop-first",
+      "exit": 0
+    },
+    {
+      "label": "restart",
+      "exit": 0
+    },
+    {
+      "label": "after-restart-q1",
+      "exit": 0
+    },
+    {
+      "label": "after-restart-q2",
+      "exit": 0
+    },
+    {
+      "label": "after-restart-history1",
+      "exit": 0
+    },
+    {
+      "label": "after-restart-history2",
+      "exit": 0
+    },
+    {
+      "label": "close-probe",
+      "exit": 0
+    },
+    {
+      "label": "cleanup-owned-daemon",
+      "exit": 0
+    }
+  ],
+  "checks": {
+    "materializedNoActiveSessions": true,
+    "before-restartNoActiveSessions": true,
+    "after-restartNoActiveSessions": true,
+    "identityQueueHandoffRestartPersisted": true,
+    "finalNoActiveSessions": true,
+    "originalWeiwuServiceUnchanged": true
+  },
+  "status": "passed",
+  "originalWeiwuServiceBefore": "ActiveState=active\nSubState=running\nMainPID=1890583",
+  "rigId": "01M4DWNWQ6KA70DSXTWVSK9RBM",
+  "firstQitemId": "qitem-probe-d0b494ba-53dc-4371-906c-acf9249c6dc2",
+  "successorQitemId": "qitem-20261008135409-0c12d361",
+  "cleanup": "official-stop-and-process-listener-exit-verified",
+  "originalWeiwuServiceAfter": "ActiveState=active\nSubState=running\nMainPID=1890583"
+}
