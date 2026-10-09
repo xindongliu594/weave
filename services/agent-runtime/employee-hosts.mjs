@@ -5,13 +5,14 @@ import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
 import { randomUUID } from 'node:crypto';
 import { installEmployeeContext } from './employee-context.mjs';
 import { PRODUCT_TOOL_NAMES } from './product-tools.mjs';
+import { installApprovedSkills } from './approved-skills.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -132,6 +133,7 @@ export class EmployeeHostFactory {
         }, { prepend: true });
         const employee = this.identify?.(agent);
         if (employee) {
+          await installApprovedSkills(ctx, mount, { manifest: this.skillManifest, employee, agent, archive: this.archive });
           // Child setup installs the durable descriptor first. Restrict only
           // this known employee's domain schemas before publication/assembly;
           // the coordinator's execution permission checks remain authoritative.

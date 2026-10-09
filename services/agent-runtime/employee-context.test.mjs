@@ -428,6 +428,12 @@ const purePruner = () => Object.assign(Object.create(EvidencePruner.prototype), 
 });
 const jsonBlock = value => ({ type: 'text', text: JSON.stringify(value) });
 
+test('approved Skill instructions stay complete under pruning pressure', () => {
+  const block={type:'text',text:'<skill_content name="approved-method">\n'+('Required verification step.\n'.repeat(400))+'</skill_content>'};
+  assert.ok(block.text.length>6000);
+  assert.equal(purePruner().pruneContent([block]),null);
+});
+
 test('structured text below 6000 characters is safely shortened when serialized JSON exceeds the threshold', () => {
   const output = 'BEGIN "quoted"\\\n'.repeat(400).slice(0, 5453) + ' END';
   assert.ok(output.length < 6000);

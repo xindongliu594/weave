@@ -10,6 +10,7 @@ type Detail = RunDetail & { error?: string; hasMore: boolean; nextCursor: number
 const date = (value: string) => new Date(value).toLocaleString('zh-CN');
 const stateName: Record<string, string> = { running:'运行中',queued: '排队中', interrupted: '已中断', completed: '已完成', failed: '失败', cancelled: '已取消', unfinished: '运行中 / 可能中断', incomplete: '记录不完整' };
 const eventNames: Record<string, string> = {
+  'skill/catalog':'加载员工获授权的工作方法目录', 'skill/loaded':'读取已批准的工作方法',
   'runtime/model-settling':'核对在途模型用量', 'runtime/model-settled':'在途模型收尾结果',
   'run/created': '创建运行档案', 'run/queued': '进入执行队列', 'run/captain': '绑定协调经理', 'run/task-mapping': '任务编号映射', 'run/approved': '确认启动', 'run/started': '团队开始执行', 'run/deadline-exceeded': '达到已批准的运行时限', 'run/finished': '运行结束', 'billing/usage': '记录执行用量', 'billing/unconfirmed': '调用费用待核对', 'budget/warning': '预算阈值提醒', 'budget/stopped': '预算或调用次数停止',
   'session/created': '创建员工会话', 'agent/created': '加载员工模型', 'model/wire-request': '实际发送的模型请求', 'model/fallback': '切换备用模型', 'context/compacted': '整理上下文', 'approval/requested': '请求工具审批', 'approval/decided': '用户处理审批', 'knowledge/citation': '引用知识资料', 'artifact/updated': '更新交付物', 'model/request': '运行时原始上下文', 'model/finish': '模型返回', 'model/error': '模型调用失败', 'model/usage': '模型用量',

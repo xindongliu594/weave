@@ -9,7 +9,7 @@ import { embeddingVersion } from '../../../services/embedding/local.mjs';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type DocumentVersion = { documentId: string; version: number; title: string; spaceId: string; sha256: string; source: Record<string,unknown>; chunkCount: number };
-export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]>; retrieval?:{mode:'keyword'|'hybrid';embeddingVersion?:string}; runInputs?:{documentId:string;title:string;agentIds:string[];chunks:any[]}[] };
+export type KnowledgeManifest = { format: 'document-versions-v2'; documents: DocumentVersion[]; agentDocuments: Record<string,string[]>; retrieval?:{mode:'keyword'|'hybrid';embeddingVersion?:string}; runInputs?:{documentId:string;title:string;agentIds:string[];skillName?:string;chunks:any[]}[] };
 export async function validateKnowledgeGrants(agents:any[], departmentId:string, db:Database=pool) {
   // Lock grants in a stable order when called inside approval's transaction.
   for (const agent of [...agents].sort((a,b)=>a.id.localeCompare(b.id))) {
@@ -57,7 +57,10 @@ export function attachRunInputs(manifest:KnowledgeManifest,inputs:Plan['runInput
     const documentId=`run:${runId}:${input.id}`,sha256=createHash('sha256').update(input.content).digest('hex');
     const agentIds=input.agentIds.map(id=>agents.find(a=>(a.employeeId??a.id)===id)?.id);
     if(agentIds.some(id=>!id))throw new AppError(422,'本次资料授权员工不存在','KNOWLEDGE_SCOPE_INVALID');
-    return {documentId,title:input.title,agentIds,chunks:chunkDocument(documentId,1,input.content).map(chunk=>({...chunk,tokens:tokenize(input.title+' '+chunk.content),title:input.title,sha256,spaceId:`run:${runId}`,source:{type:'run-input',runId,inputId:input.id}}))};
+    // A method is one exact immutable body, reused by knowledge reads and the
+    // official Skill loader. Do not keep a second copy or reconstruct split lines.
+    const chunks=input.skillName?[{id:createHash('sha256').update(`${documentId}:1:skill:${sha256}`).digest('hex'),documentId,version:1,lineStart:1,lineEnd:input.content.split('\n').length,content:input.content}]:chunkDocument(documentId,1,input.content);
+    return {documentId,title:input.title,agentIds,...(input.skillName?{skillName:input.skillName}:{}),chunks:chunks.map(chunk=>({...chunk,tokens:tokenize(input.title+' '+chunk.content),title:input.title,sha256,spaceId:`run:${runId}`,source:{type:'run-input',runId,inputId:input.id}}))};
   })};
 }
 

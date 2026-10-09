@@ -13,6 +13,9 @@ const completeFileRead = value => value && typeof value === 'object' && !Array.i
 export class EvidencePruner extends ToolResultPruner {
   pruneContent(blocks) {
     if (this.measureContent(blocks) <= this.config.thresholdChars) return null;
+    // Loaded approved instructions must remain complete. Trimming steps can
+    // silently change the method; the existing request byte guard still applies.
+    if (blocks.some(block => block.type === 'text' && /^\s*<skill_content\b/.test(block.text))) return null;
     const parsed = blocks.map(block => {
       if (block.type !== 'text') return { block };
       try { return { block, json: true, value: JSON.parse(block.text) }; }

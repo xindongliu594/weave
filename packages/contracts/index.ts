@@ -94,6 +94,9 @@ export const runInputSchema = z.object({
   title: z.string().trim().min(1).max(200),
   content: z.string().trim().min(1).max(50000).refine(v=>!v.includes('\0'),'不支持二进制资料'),
   agentIds: z.array(z.string().min(1).max(80)).min(1).max(6),
+  skillName: z.string().min(1).max(80).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Skill 名称使用小写字母、数字和连字符').optional(),
+}).superRefine((input,ctx)=>{
+  if(input.skillName && input.content.length>16000)ctx.addIssue({code:'custom',message:'工作方法正文最多 16,000 字符',path:['content']});
 });
 export const planSchema = z.object({
   rationale: z.string().trim().min(1).max(5000),
@@ -105,6 +108,8 @@ export const planSchema = z.object({
 }).superRefine((plan,ctx)=>{
   const inputs=plan.runInputs??[];
   if(new Set(inputs.map(i=>i.id)).size!==inputs.length)ctx.addIssue({code:'custom',message:'本次资料 ID 不能重复'});
+  const skillNames=inputs.flatMap(input=>input.skillName?[input.skillName]:[]);
+  if(new Set(skillNames).size!==skillNames.length)ctx.addIssue({code:'custom',message:'本次工作方法的 Skill 名称不能重复'});
   if(inputs.reduce((n,i)=>n+i.content.length,0)>250000)ctx.addIssue({code:'custom',message:'本次资料正文合计不能超过 250,000 字符'});
   if(inputs.some(i=>i.agentIds.some(id=>!plan.agents.some(a=>a.id===id))))ctx.addIssue({code:'custom',message:'本次资料的授权员工不在方案中'});
 });
@@ -208,6 +213,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   check('员工推理强度兼容性', reasoningErrors.length === 0, reasoningErrors.join('；'));
   if(requireToolSupport)check('团队工具协议能力',plan.agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>models.find(m=>m.id===id)?.capabilities?.tools?.status==='supported')),'团队调度本身需要工具调用；所有主模型和备用模型必须通过工具往返测试');
   check('本次资料授权', (plan.runInputs??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '本次资料的授权员工必须在方案中，并开启知识检索工具');
+  check('工作方法授权', (plan.runInputs??[]).filter(input=>input.skillName).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_read')))), '工作方法的授权员工还须开启知识原文工具');
   check('导入资料授权', (plan.workFileSelections??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '导入资料的接收员工必须在方案中，并开启知识检索工具');
   const taskIds = new Set(plan.tasks.map(t => t.id));
   const referencesOK = taskIds.size === plan.tasks.length && plan.tasks.every(t => ids.has(t.assigneeId) && t.dependencies.every(id => taskIds.has(id)));

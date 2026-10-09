@@ -1,0 +1,15 @@
+{
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-plugin1-20261009",
+  "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-jj4-20261009",
+  "packetSha256": "bf5f5c614e89ac69a33b490a1cde7a402c8860ebe33d57c320474a3cf6a0139b",
+  "projectCount": 2,
+  "usageBefore": 205,
+  "modelCalls": 0,
+  "dependencies": "existing pinned directories reused",
+  "memOSInstalled": false,
+  "passed": true,
+  "usageAfter": 205,
+  "mainPID": "3553469",
+  "projectStatePreserved": true,
+  "usagePreserved": true
+}

@@ -273,7 +273,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     // task needs the public query service to read and resume the saved session.
     await mount('@deepseek-ai/dsh-session-query');
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
-      context: employeeContext,
+      context: employeeContext, skillManifest: product?.snapshot.knowledge,
       concludesAcceptedTask: handoff ? exec => {
         if (exec.name !== 'agent_teams_update_task' || exec.arguments.status !== 'completed' || exec.agent.id === captainId) return false;
         const task = teamState().tasks.find(item => item.id === exec.arguments.task_id);
