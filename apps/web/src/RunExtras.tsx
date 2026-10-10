@@ -11,6 +11,7 @@ import { runResultView } from './run-result-view.ts';
 import { createRunRecoveryConfirmation, type RunRecoveryContext, type RunRecoveryIntent } from './run-recovery-confirmation.ts';
 import {RunInheritedEvidence} from './RunInheritedEvidence.tsx';
 import {RunAcceptanceChecks} from './RunAcceptanceChecks.tsx';
+import {RunGoalChecks} from './RunGoalChecks.tsx';
 import type {RunLineageEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
 export type RunExtrasErrors = { id: string; operation: string; refresh: string };
 type RunExtrasErrorEvent = { id: string; type: 'reset' | 'operation' | 'refresh-failed' | 'refresh-succeeded'; message?: string };
@@ -120,7 +121,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  const team=events.findLast(e=>['team/snapshot','team/checkpoint'].includes(e.type))?.data;const finished=events.findLast(e=>e.type==='run/finished')?.data;
  const stopMessage=finished?.message||runError||'请查看下方任务结果和执行记录。';
  const readableStop=/\"code\":\"ABORTED\"/.test(stopMessage)?'执行调用被中断，已完成任务和文件保留。请核对下方费用状态和追溯记录，再恢复未完成任务。':stopMessage;
- const planningBlocked=recovery?.planningBlocked??(hasUnplannedTasks({tasks:snapshot.approvedTasks??snapshot.tasks??[]})?planningRequiredMessage:undefined);
+ const planningBlocked=recovery?.planningBlocked??(events.some(event=>event.type==='goal/blocked')?'目标边界检查已暂停执行，请重新制定并批准方案。':hasUnplannedTasks({tasks:snapshot.approvedTasks??snapshot.tasks??[]})?planningRequiredMessage:undefined);
  const result=runResultView(id,status,integrity,snapshot,events,traceEvents,lineage);
  const failedTasks=tasks.filter((task:any)=>task.status==='failed'&&typeof task.output==='string'&&task.output.trim());
  const employeeName=(agentId:string)=>snapshot.agents?.find((agent:any)=>agent.id===agentId)?.name??agentId;
@@ -157,6 +158,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
    {snapshot.projectId&&<button className="text-button" onClick={()=>onOpenProject(snapshot.projectId)}>返回项目修改方案</button>}
  </div>}
  <RunEmployeeStatus status={status} runtime={runtime} employeeName={employeeName} taskName={taskName}/>
+ <RunGoalChecks snapshot={snapshot} events={events}/>
  <RunAcceptanceChecks runId={id} snapshot={snapshot} evidence={lineage}/>
  <RunInheritedEvidence runId={id} snapshot={snapshot} evidence={lineage} error={lineageError} taskName={taskName}/>
  {tests.length>0&&<div className="lower"><h3>真实测试结果</h3><p className="subcopy">以下命令与输出来自本机执行回执，包含实际失败和修复后的复测；以当前文件版本的最终复验为准。</p>{tests.map(operation=><details key={operation.id}><summary>{operation.payload.arguments.command} · {operation.result.exitCode===0?'通过':'失败'} · 退出码 {operation.result.exitCode}</summary><pre className="product-pre">{operation.result.output}</pre></details>)}</div>}

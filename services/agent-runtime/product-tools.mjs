@@ -11,7 +11,7 @@ export function employeeFor(agent,snapshot,captainId){
   const name=descriptor?.data?.label?.split(':').at(-1);
   return snapshot.agents.find(a=>a.id===name);
 }
-export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,externalTool,handoff,activeWork,supervisor,captureReadScope,onReadEvidence,onWriteEvidence}){
+export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,externalTool,handoff,activeWork,supervisor,goal,captureReadScope,onReadEvidence,onWriteEvidence}){
   const string={type:'string',required:true};
   const local=snapshot.executionTarget?.kind==='local';
   const demo=Boolean(snapshot.demo?.fixture);
@@ -38,7 +38,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       if(!externalTool)throw Error('EXTERNAL_TOOL_UNAVAILABLE');
       const waiting=supervisor?.enter(exec.agent.id,'waiting_capacity');let release;
       try{release=await gate.acquire(exec.signal);}finally{waiting?.();}
-      try{supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
+      try{goal?.check('external-tool');supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
       catch(error){archive.append('external/tool-failed',{name,agentId:employee.id,message:error.message},ref);throw error;}
       finally{release();}
     }
@@ -63,6 +63,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     try { release=await gate.acquire(exec.signal); } finally { leave?.(); }
     try {
       const execute = async () => {
+        goal?.check('tool-dispatch');
         supervisor?.check();
         const work = handoff ? activeWork(exec.agent) : undefined;
         let dispatched=false,outcomeKnown=false;

@@ -9,6 +9,7 @@ import { completedTasks, resumeHandoff } from './handoff-checkpoints.ts';
 import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
 import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { hasUnplannedTasks, planningRequiredMessage } from '../../../packages/contracts/index.ts';
+import { assertGoalRecovery } from './goal-recovery.ts';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type History = Awaited<ReturnType<typeof budgetHistory>>;
@@ -74,6 +75,7 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
     common.push(issue(409, 'PROJECT_ALREADY_RUNNING', '此项目已有运行'));
   if (hasUnplannedTasks({ tasks: snapshot.approvedTasks ?? snapshot.tasks })) common.push(issue(422, 'PLAN_NOT_READY', planningRequiredMessage + '旧运行不能直接重试，请修改项目方案后重新批准。'));
   const run = readRun(traceRoot, runId);
+  try { assertGoalRecovery(snapshot,run); } catch(error) { addError(error); }
   if (run && run.integrity !== 'ok') common.push(issue(409, 'BUDGET_HISTORY_MISSING', '档案不完整，先导出并检查，不能自动恢复'));
   const unknown = run ? unresolvedOperations(run.events) : [];
   if (unknown.length && !choices.acknowledgeUnknownOperations) common.push(issue(409, 'OPERATION_RECONCILIATION_REQUIRED', '存在结果未知的修改操作，请核对操作和产物后确认重试，避免重复执行'));

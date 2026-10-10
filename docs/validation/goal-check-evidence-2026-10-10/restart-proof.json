@@ -1,0 +1,19 @@
+{
+  "runId": "3d004ea7-bb65-48bc-9513-1b0511fd469f",
+  "oldPID": "1459188",
+  "newPID": "1547958",
+  "beforeStatus": "running",
+  "afterStatus": "cancelled",
+  "goalBefore": {
+    "format": "approved-goal-v1",
+    "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+  },
+  "goalAfter": {
+    "format": "approved-goal-v1",
+    "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+  },
+  "modelPendingBefore": 0,
+  "unknownOperationsBefore": 0,
+  "localOperationsAllCompleted": true,
+  "onlyActiveProject": "1d432498-6e6a-4da5-9833-4e946283f29b"
+}

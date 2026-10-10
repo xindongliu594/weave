@@ -9,6 +9,7 @@ import { RuntimeSupervisor } from './supervisor.mjs';
 import { Semaphore } from './limits.mjs';
 import { teamTaskPlan, stageApprovedTeam, inspectArtifact } from './handoff.mjs';
 import { employeeContextPolicy } from './employee-context.mjs';
+import { GoalGuard } from './goal-guard.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -66,7 +67,7 @@ export class ProductDshRuntime {
   async execute(job, archive, snapshot, routes) {
     const usages = [];
     let runtimeFailure;
-    let host, adapter;
+    let host, adapter, goal;
     const sandbox = this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
     const supervisor = new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
     const durableArchive=archive;
@@ -80,6 +81,7 @@ export class ProductDshRuntime {
       void job.host?.close();
     }, snapshot.policy.deadlineSeconds * 1000);
     try {
+      goal = new GoalGuard({ snapshot, archive, onFailure: error => { runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error); } });
       await sandbox.prepare?.(job.controller.signal);
       for (const file of snapshot.recovery?.files ?? []) {
         if (inspectArtifact(sandbox.root,file).sha256 !== file.sha256) throw Error('RECOVERY_FILE_CHANGED: ' + file.path);
@@ -93,7 +95,7 @@ export class ProductDshRuntime {
         tasks: snapshot.tasks,
         maxTaskModelCalls: snapshot.policy.maxTaskModelCalls??40,
         onBudget: data=>archive.append('budget/'+data.kind,data,{taskId:data.taskId}),
-        beforeRequest:(data,signal)=>{assertArchiveCapacity(archive.dir);return this.beforeRequest?.(archive.id,data,signal);},
+        beforeRequest:(data,signal)=>{goal.check('request',data.taskId);assertArchiveCapacity(archive.dir);return this.beforeRequest?.(archive.id,data,signal);},
         onResponse:async data=>{archive.append('billing/provider-response',data);await this.onResponse?.(data);},
         onCallError:async data=>{archive.append('billing/unconfirmed',data);await this.onCallError?.(data);},
         maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
@@ -109,7 +111,7 @@ export class ProductDshRuntime {
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
-        product: { snapshot, sandbox, gate, supervisor, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
+        product: { snapshot, sandbox, gate, supervisor, goal, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');

@@ -42,6 +42,15 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   let productDispose, captainId, locked = false;
   const internalStatusPolls = new Set();
   const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
+  if (handoff && product.goal?.expected) {
+    for (const method of ['beforeFile','observe']) {
+      const original = handoff[method].bind(handoff);
+      handoff[method] = (...args) => {
+        try { return original(...args); }
+        catch (error) { throw product.goal.block(error, 'file-scope', args[0]); }
+      };
+    }
+  }
   const readEvidence = new Map();
   const writeEvidence = new Map();
   let employeeContext = context ?? (product ? { mode: product.snapshot.policy?.contextManagement ?? 'summary' } : undefined);
@@ -69,6 +78,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     return teamId && workspaceRoot ? { ...teamState(), budgetEvidence: captureBudgetEvidence(product?.snapshot, adapter.budget, archive?.id, point) } : undefined;
   }
   function taskFor(sessionId) {
+    product?.goal?.check('task-context');
     product?.supervisor?.check();
     rework?.check();
     if(sessionId===captainId)return undefined; // Coordination is charged to the project, not an arbitrary task.
@@ -78,6 +88,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const task=assignedTask(state,sessionId,employee.id,assignments.get(sessionId));assignments.set(sessionId,task);return task;
   }
   function activeWork(agent, requested) {
+    product?.goal?.check('tool',requested && taskIds.get(requested));
     product?.supervisor?.check();
     rework?.check();
     const state = teamState(), employee = employeeFor(agent, product.snapshot, captainId);
@@ -134,6 +145,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   }
   function protectedContext(agent) {
     if (!agent || !product) return '';
+    product.goal?.check('context');
     const employee = employeeFor(agent, product.snapshot, captainId);
     if (!employee) return '';
     const budgetContext = (taskId, state) => executionBudgetContext({ budget: adapter.budget, snapshot: product.snapshot, routes: adapter.routes, taskId,
@@ -152,7 +164,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const contract = rework.contractFor(current.taskId);
     if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
     const budget = budgetContext(contract.id, state);
+    const goal = product.goal?.context(contract.id);
     return JSON.stringify({ ...base, budget, task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
+      ...(goal ? { approvedGoal: { ...goal, requirement: undefined } } : {}),
       completionGuidance: reviewCompletionGuidance(contract, budget?.task?.configuredOutputLimit ?? contract.maxOutputTokens),
       runEvidence: taskRunEvidence({ snapshot: product.snapshot, taskId: contract.id, state, taskIds, handoff, budget: adapter.budget, runId: archive.id }),
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
@@ -199,6 +213,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       });
       productDispose = installProductTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId, captureReadScope, onReadEvidence, onWriteEvidence });
       ctx.on('llm/stream', async function* (options, next) {
+        product.goal?.check('model');
         product.supervisor?.check();
         const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
         if(!employee)throw Error('MODEL_PERMISSION_DENIED: 无法确认此会话所属员工');
@@ -209,7 +224,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
           product.supervisor?.session(options.sessionId,current);
           if (task && ['claimed', 'in_progress'].includes(task.status)) {
             const taskId = taskIds.get(task.id);
-            try { await handoff.exclusive(options.signal, () => handoff.begin(taskId, task.attemptId)); }
+            try { await handoff.exclusive(options.signal, () => { product.goal?.nodeStarted(taskId,task.attemptId);return handoff.begin(taskId, task.attemptId); }); }
             catch (error) { const blocked = handoff.block(taskId, task.attemptId, error); product.onHandoffBlocked?.(blocked); throw blocked; }
           }
         }
@@ -219,8 +234,12 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         try { product.supervisor?.check(); yield* next(); } finally { release(); }
       });
       ctx.on('tools/pre-execute', async (exec,next) => {
+        product.goal?.check('tool');
         product.supervisor?.check();
-        if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) throw Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
+        if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) {
+          const error=Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
+          throw product.goal?.expected ? product.goal.block(error,'plan-change') : error;
+        }
         return next();
       });
       ctx.on('tools/execute', async (exec, next) => {
@@ -241,6 +260,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
           return next();
         }
         return handoff.exclusive(exec.signal, async () => {
+          product.goal?.check('handoff',work.taskId);
           let record;
           try { record = handoff.prepare(work.taskId, work.attemptId, args); }
           catch (error) { throw handoff.block(work.taskId, work.attemptId, error); }
@@ -254,6 +274,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
             const result = await next();
             if (result.isError) handoff.rollback(record, previous); else {
               handoff.commit(record);
+              product.goal?.nodeAccepted(record);
               if (['review','requirements'].includes(contract.kind)) archive.append('quality/reviewed', { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId, verdict: args.verdict, findings: args.findings ?? [], reworkRound: contract.reworkRound ?? 0, inputs: record.inputs }, { sessionId: exec.agent.id, taskId: work.taskId, attemptId: work.attemptId });
               archive.append('team/checkpoint',checkpointState('node-accepted'));
             }

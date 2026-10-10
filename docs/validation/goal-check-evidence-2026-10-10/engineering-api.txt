@@ -1,0 +1,45 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1492.9954ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (169.8624ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (124.7499ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (188.7161ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (135.8128ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (132.4612ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (124.4524ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (150.1185ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (114.98ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3313.0317
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (10576.9726ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (7177.5963ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2420.0304ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (4596.8804ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (3347.75ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (3660.366ms)
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (6627.0956ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (6172.7967ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (19109.6467ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3107.2615ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (2948.2969ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (1850.7295ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (6035.6572ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (5414.6343ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (5492.8917ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (6724.3091ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (10005.2786ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (11491.7392ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 117403.5177

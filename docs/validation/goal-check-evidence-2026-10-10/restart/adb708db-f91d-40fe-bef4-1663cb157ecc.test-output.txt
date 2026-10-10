@@ -1,0 +1,17 @@
+✔ QA 正数整数相加 (0.852207ms)
+✔ QA 负数整数相加 (0.13797ms)
+✔ QA 零参与相加 (0.143379ms)
+✔ QA 返回值与整数输入的类型一致性 (0.180489ms)
+✔ QA 非整数输入被拒绝（TypeError） (0.447446ms)
+✔ 正数相加 (0.812714ms)
+✔ 负数相加 (0.13103ms)
+✔ 零的相加 (0.125216ms)
+✔ 非整数输入抛出 TypeError (0.439041ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 118.836941

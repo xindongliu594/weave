@@ -14,6 +14,8 @@ import { listArtifacts } from './sandbox.mjs';
 import { createRunArchive, readRun } from './trace-store.mjs';
 import { ExecutionBudget } from './budget.mjs';
 import { Semaphore } from './limits.mjs';
+import { createGoalContract } from '../../packages/contracts/goal-contract.mjs';
+import { GoalGuard } from './goal-guard.mjs';
 
 const sha = text => createHash('sha256').update(text).digest('hex');
 const source = "import test from 'node:test'; import assert from 'node:assert/strict'; test('real local fixture',()=>assert.equal(2+2,4)); test.skip('documented skipped fixture',()=>{}); console.log('PRIVATE_TERMINAL_TEXT');\n";
@@ -39,6 +41,7 @@ const initialSnapshot = () => ({ projectId: 'local-evidence-project', planVersio
 });
 
 async function runPhase(root, snapshot, { pauseAfterDev = false, restoredFile } = {}) {
+  snapshot.goalContract??=createGoalContract(snapshot);
   const archive = createRunArchive(join(root, 'runs'), snapshot), files = join(archive.dir, 'artifacts'), workspace = join(archive.dir, 'workspace');
   mkdirSync(files); mkdirSync(workspace); if (restoredFile) writeFileSync(join(files, 'fixture.test.mjs'), restoredFile);
   const requests = [], executed = [], steps = new Map(), terminalResults = [];
@@ -86,7 +89,7 @@ async function runPhase(root, snapshot, { pauseAfterDev = false, restoredFile } 
   let host, created, state;
   try {
     host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: 3,
-      product: { snapshot, sandbox, gate: new Semaphore(2), requestApproval: async () => randomUUID() } });
+      product: { snapshot, sandbox, gate: new Semaphore(2), goal:new GoalGuard({snapshot,archive}), requestApproval: async () => randomUUID() } });
     const captain = await host.captain({ cwd: workspace, model: 'captain' });
     created = await stageApprovedTeam(host, captain, { name: 'host-evidence-fixture', members: snapshot.agents.map(agent => ({ name: agent.id, provider: 'fixture', model: agent.modelId })),
       tasks: teamTaskPlan(snapshot.tasks, { hostContext: true, assertHostContext: () => host.assertApprovedTaskContext(snapshot.tasks) }) });
@@ -130,6 +133,8 @@ test('native developer → QA → manager sees real command hashes/counts with n
   const root = await mkdtemp(join(tmpdir(), 'run-evidence-native-'));
   try {
     const phase = await runPhase(root, initialSnapshot()); assertManagerEvidence(phase);
+    assert.equal(phase.events.filter(event=>event.type==='goal/node-checked').length,3);
+    for(const request of phase.requests.filter(item=>item.context?.task))assert.equal(request.context.approvedGoal.sha256,phase.events.find(event=>event.type==='goal/anchored').data.sha256);
     assert.equal(phase.events.filter(event => event.type === 'handoff/accepted').length, 3);
     assert.deepEqual(phase.terminalResults.map(result => result.taskId), ['dev', 'qa']);
     assert.equal(phase.events.findLast(event => event.type === 'team/checkpoint').data.budgetEvidence.project.callsUsed, phase.budget.run.calls);
@@ -152,6 +157,10 @@ test('native resumed QA/manager inherit source budget and exact developer seal w
       budgetHistory: { calls: parent.budget.run.calls, tasks: Object.fromEntries([...parent.budget.tasks].map(([key, bucket]) => [key, { cost: bucket.spent, reserved: bucket.reserved, calls: bucket.calls }])) } };
     const originalHash = sha(JSON.stringify(childSnapshot)), child = await runPhase(root, childSnapshot, { restoredFile: readFileSync(join(parent.files, 'fixture.test.mjs')) });
     assertManagerEvidence(child);
+    for(const request of child.requests.filter(item=>item.context?.task)){
+      assert.equal(request.context.approvedGoal.sha256,snapshot.goalContract.sha256);
+      assert.deepEqual(request.context.approvedGoal.criteria.map(c=>c.text),snapshot.tasks.find(task=>task.id===request.context.task.id).acceptanceCriteria);
+    }
     assert.ok(!child.executed.some(operation => operation.taskId === 'dev'));
     assert.ok(!child.requests.some(request => request.context?.task?.id === 'dev'));
     assert.deepEqual(child.terminalResults.map(result => result.taskId), ['qa']);

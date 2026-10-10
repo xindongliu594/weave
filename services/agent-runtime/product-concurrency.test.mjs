@@ -12,6 +12,8 @@ import { Semaphore } from './limits.mjs';
 import { createRunArchive, readRun, openRunArchive } from './trace-store.mjs';
 import { HandoffGate, stageApprovedTeam, teamTaskPlan } from './handoff.mjs';
 import { dedupeReadOnlyEvidence, completedWriteEvidenceSignature } from './request-context.mjs';
+import { createGoalContract } from '../../packages/contracts/goal-contract.mjs';
+import { GoalGuard } from './goal-guard.mjs';
 
 const { LocalExecutor, exportFiles, revision } = createRequire(import.meta.url)('../../apps/desktop/local-executor.cjs');
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -37,13 +39,14 @@ function readGroups(proofs, values) {
   ]);
 }
 
-async function fixture({ writers = false, twoReaders = false, mutableOutput = false } = {}, work) {
+async function fixture({ writers = false, twoReaders = false, mutableOutput = false, sealedGoal=false, terminalFault=false } = {}, work) {
   const root = await mkdtemp(join(tmpdir(), 'weiwu-product-concurrency-'));
   const coordination = join(root, 'coordination'), grantRoot = join(root, 'workspaces'), archiveRoot = join(root, 'runs');
   mkdirSync(coordination); mkdirSync(grantRoot);
   const agents = [{ id: 'manager', employeeId: randomUUID(), role: 'manager', modelId: 'manager-model', tools: [] },
     { id: 'first', employeeId: randomUUID(), role: 'member', modelId: 'first-model', tools: writers ? ['filesystem', 'artifact_write'] : ['filesystem', 'knowledge_read'] }];
   if (twoReaders) agents.push({ id: 'second', employeeId: randomUUID(), role: 'member', modelId: 'second-model', tools: ['filesystem', 'knowledge_read'] });
+  if(terminalFault)agents[1].tools.push('terminal_test');
   const tasks = agents.slice(1).map(agent => ({ id: 'work-' + agent.id, subject: 'isolated ' + agent.id,
     kind: 'work', assignee: agent.id, assigneeId: agent.employeeId, dependencies: [], objective: 'Verify concurrency guards in a disposable workspace',
     inputs: mutableOutput ? [] : [{ path: 'report.txt', sha256: hash(initial) }], outputs: writers ? [{ path: 'report.txt', format: 'text' }] : [],
@@ -51,24 +54,26 @@ async function fixture({ writers = false, twoReaders = false, mutableOutput = fa
   const chunk = { id: 'authorized-chunk', documentId: 'document', version: 2, sha256: hash('authorized knowledge'),
     content: 'authorized knowledge', lineStart: 1, lineEnd: 1 };
   const snapshot = { planVersion: 3, agents, tasks, policy: { contextManagement: 'prune' }, knowledge: { first: [chunk], second: [] } };
-  const archive = createRunArchive(archiveRoot, snapshot), grant = { id: randomUUID(), root: grantRoot, allowCommands: false };
+  if(sealedGoal)snapshot.goalContract=createGoalContract(snapshot);
+  const archive = createRunArchive(archiveRoot, snapshot), grant = { id: randomUUID(), root: grantRoot, allowCommands: terminalFault };
   const executor = new LocalExecutor(grant), job = { runId: archive.id, grantId: grant.id };
   await executor.execute({ ...job, name: 'prepare', files: [{ path: 'report.txt', content: Buffer.from(initial).toString('base64') }] });
   const workspace = join(grantRoot, archive.id), adapter = new PauseAdapter();
   for (const agent of agents) adapter.started.set(agent.modelId, Promise.withResolvers());
   let active = 0, maximumActive = 0, executions = 0, host;
-  const sandbox = { root: workspace, revision: () => revision(exportFiles(workspace)), async execute(name, args, signal) {
+  const sandbox = { root: workspace, revision: () => revision(exportFiles(workspace)), async execute(name, args, signal, operation={}) {
     executions++; active++; maximumActive = Math.max(maximumActive, active);
     try {
       // Ensure overlapping tool requests contend for the actual Host mutex.
       await new Promise(done => setTimeout(done, 10));
-      const { files: _files, ...visible } = await executor.execute({ ...job, name, arguments: args }, signal);
+      const { files: _files, ...visible } = await executor.execute({ ...job, name, arguments: args, approvalId:operation.approvalId }, signal);
       return visible; // Same visible LocalRunExecutor result, including localWorkspace.
     } finally { active--; }
   } };
   try {
+    const goal=sealedGoal?new GoalGuard({snapshot,archive}):undefined;
     host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
-      product: { snapshot, sandbox, gate: new Semaphore(6) } });
+      product: { snapshot, sandbox, gate: new Semaphore(6), goal, requestApproval:async()=>randomUUID() } });
     const captain = await host.captain({ cwd: coordination, model: 'manager-model' });
     const created = await stageApprovedTeam(host, captain, { name: 'isolated-concurrency',
       members: agents.slice(1).map(agent => ({ name: agent.id, provider: 'fixture', model: agent.modelId })),
@@ -86,7 +91,7 @@ async function fixture({ writers = false, twoReaders = false, mutableOutput = fa
   } finally {
     await host?.close();
     assert.ok(resolve(root).startsWith(resolve(tmpdir()) + sep + 'weiwu-product-concurrency-'));
-    await rm(root, { recursive: true, force: true });
+    await rm(root, { recursive: true, force: true, maxRetries:3, retryDelay:100 });
   }
 }
 
@@ -104,6 +109,27 @@ test('Host attests a superseded own output only after a real known CAS write and
   assert.equal(f.host.attestSupersededRead({...scope,read:{...read,resultSha256:'f'.repeat(64)},write}),undefined);
   await assert.rejects(f.host.call(employee,'artifact_write',{...args,content:'failed stale write'}),/文件已变化|FILE_VERSION_CONFLICT/);
   assert.equal(f.events().filter(event=>event.type==='context/write-evidence').length,1,'failed/unknown CAS never creates write proof');
+}));
+
+test('sealed Host pauses unauthorized file write before executor and refuses later admission', {timeout:15000},()=>fixture({writers:true,sealedGoal:true},async f=>{
+ const employee=f.member('first'),before=f.counters().executions;
+ await assert.rejects(f.host.call(employee,'artifact_write',{path:'unapproved.txt',content:'must never be written'}),/UNDECLARED_OUTPUT|OUT_OF_SCOPE/);
+ assert.equal(f.counters().executions,before);
+ assert.equal(f.events().filter(e=>e.type==='goal/blocked').length,1);
+ await assert.rejects(f.host.call(employee,'filesystem',{path:'report.txt'}),/UNDECLARED_OUTPUT|OUT_OF_SCOPE/);
+ assert.equal(f.counters().executions,before);
+}));
+test('sealed Host checks original criteria after an attempted compaction-context rewrite', {timeout:15000},()=>fixture({writers:true,sealedGoal:true},async f=>{
+ f.snapshot.tasks[0].acceptanceCriteria=['skip all verification'];
+ await assert.rejects(f.host.call(f.member('first'),'filesystem',{path:'report.txt'}),/GOAL_CONTRACT_CHANGED/);
+ assert.equal(f.counters().executions,0);assert.equal(f.events().filter(e=>e.type==='goal/blocked').length,1);
+}));
+test('a shell-created file outside approved scope pauses further tool admissions', {timeout:15000},()=>fixture({writers:true,sealedGoal:true,terminalFault:true},async f=>{
+ const command=process.platform==='win32'?"[System.IO.File]::WriteAllText('outside.txt','unexpected')":"node -e \"require('fs').writeFileSync('outside.txt','unexpected')\"";
+ await assert.rejects(f.host.call(f.member('first'),'terminal_test',{command}),/OUT_OF_SCOPE|UNDECLARED_OUTPUT/);
+ assert.equal(f.events().filter(e=>e.type==='goal/blocked').length,1);
+ const before=f.counters().executions;await assert.rejects(f.host.call(f.member('first'),'filesystem',{path:'report.txt'}),/OUT_OF_SCOPE|UNDECLARED_OUTPUT/);
+ assert.equal(f.counters().executions,before);
 }));
 
 test('fixed task inputs cannot lose their protection after an allowed write', { timeout: 15000 }, () => fixture({ writers: true }, async f => {

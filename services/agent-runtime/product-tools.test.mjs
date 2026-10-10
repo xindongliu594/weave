@@ -3,6 +3,22 @@ import {mkdtemp,rm} from 'node:fs/promises';import {tmpdir} from 'node:os';impor
 import {LlmAdapter,createUserMessage} from '@deepseek-ai/dsh-llm';import {createTeamHost} from './host.mjs';import {Semaphore} from './limits.mjs';import {createRunArchive} from './trace-store.mjs';import {PRODUCT_TOOL_NAMES} from './product-tools.mjs';
 class NeverModel extends LlmAdapter{providerInfo(){return{id:'fixture',name:'fixture'};}async resolveModel(){return{provider:'fixture',id:'test',name:'test'};}async *stream(){throw Error('Unexpected model call');}}
 
+test('a queued external tool rechecks a goal pause after capacity is released',async()=>{
+ const {GoalGuard}=await import('./goal-guard.mjs');const {createGoalContract}=await import('../../packages/contracts/goal-contract.mjs');
+ const root=await mkdtemp(join(tmpdir(),'goal-queue-'));let host,calls=0;
+ const snapshot={agents:[{id:'manager',role:'manager',tools:['browser_read'],browserOrigins:['https://approved.example']}],policy:{}};
+ snapshot.goalContract=createGoalContract(snapshot);const archive=createRunArchive(root,snapshot),gate=new Semaphore(1);
+ const goal=new GoalGuard({snapshot,archive});const release=await gate.acquire();
+ try{
+  host=await createTeamHost({adapter:new NeverModel(),provider:'fixture',sessionRoot:join(root,'sessions'),archive,
+    product:{snapshot,goal,gate,externalTool:async()=>{calls++;return{text:'fixture'};}}});
+  const captain=await host.captain({cwd:root,model:'test'});
+  const queued=host.call(captain,'browser_read',{url:'https://approved.example/reference'});
+  await new Promise(done=>setTimeout(done,30));goal.block(Error('GOAL_BOUNDARY_VIOLATION: paused'),'tool');release();
+  await assert.rejects(queued,/GOAL_BOUNDARY_VIOLATION/);assert.equal(calls,0);
+ }finally{release();await host?.close();await rm(root,{recursive:true,force:true,maxRetries:3,retryDelay:100});}
+});
+
 test('execution and summary requests cannot select a model outside the employee approval', async () => {
  const root=await mkdtemp(join(tmpdir(),'model-permission-'));let host;
  const snapshot={agents:[{id:'manager',role:'manager',modelId:'approved',tools:[]}],policy:{contextManagement:'prune'}};

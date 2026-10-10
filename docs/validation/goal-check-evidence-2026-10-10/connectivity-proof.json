@@ -1,0 +1,6 @@
+{
+  "atUtc": "2026-10-10T14:37:11.6588137+00:00",
+  "success": false,
+  "maxOutputTokens": 16,
+  "error": "\r\n{\r\n  \"code\": \"GATEWAY_CONNECTION_FAILED\",\r\n  \"message\": \"\\u65E0\\u6CD5\\u8FDE\\u63A5\\u4E2D\\u8F6C\\u7AD9\\uFF0C\\u8BF7\\u68C0\\u67E5 API \\u5730\\u5740\\u3001\\u7F51\\u7EDC\\u548C HTTPS \\u8BC1\\u4E66\"\r\n}"
+}

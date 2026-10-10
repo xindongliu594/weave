@@ -16,6 +16,7 @@ import { unresolvedOperations } from '../../../services/agent-runtime/recovery.m
 import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE, RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
 import { inspectRecoveryConditions, recoveryProjectBudgetIssues, recoveryHistoryBudgetIssues, assertRecoveryBudgetIssues } from './recovery-conditions.ts';
+import { assertGoalRecovery } from './goal-recovery.ts';
 export function runManagementRouter(traceRoot:string){
  const router=Router();
  router.get('/approvals',async(req,res)=>res.json((await pool.query('SELECT id,run_id AS "runId",agent_id AS "agentId",tool,arguments,status,created_at AS "createdAt" FROM tool_approvals WHERE ($1::text IS NULL OR run_id=$1) ORDER BY created_at DESC LIMIT 200',[req.query.runId??null])).rows));
@@ -58,6 +59,7 @@ export function runManagementRouter(traceRoot:string){
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    if(hasUnplannedTasks({tasks:old.snapshot.approvedTasks??old.snapshot.tasks}))throw new AppError(422,planningRequiredMessage+'旧运行不能直接重试，请修改项目方案后重新批准。','PLAN_NOT_READY');
    const run=readRun(traceRoot,id);if(run&&run.integrity!=='ok')throw new AppError(409,'档案不完整，先导出并检查，不能自动恢复');
+   assertGoalRecovery(old.snapshot,run);
    const unknown=run?unresolvedOperations(run.events):[];
    if(unknown.length&&!input.acknowledgeUnknownOperations)throw new AppError(409,'存在结果未知的修改操作，请核对操作和产物后确认重试，避免重复执行','OPERATION_RECONCILIATION_REQUIRED');
    const snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();

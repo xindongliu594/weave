@@ -1,0 +1,24 @@
+✔ goal seal binds nested criteria, goal, scope, permissions and version (6.034ms)
+✔ resume history and untrusted knowledge do not change goal authority (3.4595ms)
+✔ runtime cannot change effective tasks while retaining original approvedTasks (1.1901ms)
+✔ an independent expected seal rejects resealing and removal (2.3219ms)
+✔ legacy runs remain unsealed; sealed task context rejects unknown nodes (0.9732ms)
+✔ goal view distinguishes legacy, pending integrity and observed node evidence (19.5187ms)
+✔ goal boundary pause is visible and cannot be presented as acceptance (1.2435ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (3.6135ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.8147ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (1.8672ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.3525ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.5249ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.5169ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.5868ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.9603ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (14.64ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1262.584

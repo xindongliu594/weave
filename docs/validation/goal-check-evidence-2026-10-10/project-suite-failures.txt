@@ -1,0 +1,188 @@
+Ordinary serial project suite: 653 tests;360 passed;186 failed;107 skipped. PostgreSQL127.0.0.1:55432 was unavailable. Failure names retained; isolated related suites documented separately.
+
+gateway discovery, formal execution, versioned plans and deletion preserve history
+organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost
+model planning preserves user input scope and refuses to remove an input recipient
+dynamic loopback preview can save a gateway through the local proxy
+cross-origin mutations, remote host headers, and malformed data fail closed
+trace verification API persists a run and serves history after recreating the app
+one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings
+catalog refuses quotes fetched across a concurrent gateway edit
+text replies accept null tool calls but reject malformed non-null calls and retain usage
+gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes
+gateway service checks reject results from a changed connection and diagnose a closed port
+official pricing is the default, matches exact models, and does not fetch relay public prices
+planning timeouts preserve the saved plan and keep unresolved billing without automatic retries
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api.test.ts
+once and missed interval dispatch persist atomic approval drafts without running or broadening scope
+pause, resume, cancel and stale version protection persist across service instances
+virtual multi-day supervision survives restart, flags stale leases and emits one terminal unread notification
+knowledge candidates use approved source versions, deduplicate and never publish to a wider space
+fixed evaluation cases retain actual before/after outputs and manual adoption rollback without runtime mutation
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\automation-learning.test.ts
+browser origin scope rejects credentials, paths, protocols and other origins
+MCP JSON and SSE initialize, discover and redact credentials in tool results
+MCP bounds responses, checks matching request and protocol version, hides upstream errors
+MCP configuration seals keys and refuses stale versions and unsafe endpoint addresses
+employee scopes freeze connection versions and separate original department identities
+employee runtime calls only allowed read tools while a leased run is active
+manual MCP call requires explicit confirmation and does not auto retry
+real isolated browser reads, fills, clicks and screenshots while blocking scripts and POST
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\browser-mcp.test.ts
+only a complete tool roundtrip enables execution; evidence, cost and route revision are retained
+bad arguments, ignored tool results and missing usage never mark the model supported
+local budget rejection retains prior evidence, and configuration changes prevent the second request
+backups reject a live capability probe without deadlocking and restore completed evidence
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\capabilities.test.ts
+cross-department plans pin employee identity, knowledge scope, approval versions and billing ownership
+shared collaborator departments serialize runs and team limits fail before project creation
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\collaboration.test.ts
+tests\completion-protocol-api.test.ts
+approval blocks uncertain fees by default and an in-flight call still blocks explicit carryover
+opt-in approval freezes net budget while old unknown plus live reservation cover exact global and departmental daily caps once
+global live-run coverage still charges uncovered holds to the actual participating department
+insufficient original or daily budget rejects opt-in approval without changing unknown receipts
+retry retains the default gate and pending calls cannot be carried over even with explicit opt-in
+opt-in checkpoint resume inherits unknown wire calls and dispatches only the unfinished task through the local model
+an unknown task hold exhausts its original cap before retry even when the project still has funds
+an unknown wire attempt still exhausts the original retry call cap rather than resetting on carryover
+a late bill above its old hold fences every new reservation by total project cost, including parallel admission
+ordinary late settlement preserves history and never enlarges an already approved run allocation
+readiness and approved carryover expose only bounded receipt identities and amounts, never credentials or original context
+new-plan carryover approval cannot silently replay a prior native operation with an unknown outcome
+a model-only 403 with a confirmed native operation can retain its hold when a new plan is explicitly approved
+new-plan carryover refuses missing or incomplete original run evidence instead of treating it as a known operation outcome
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-carryover.test.ts
+demand discussion records actual usage without estimating or reserving an execution budget
+usage-only accounting cannot be applied to execution or project identities
+missing conversation usage stays unknown without claiming zero supplier charge
+parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission
+runtime requests share the run reservation and uncertain costs survive completion and block retry
+missing usage and network failures retain a lease until explicit reconciliation using pinned prices
+known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once
+403 response identifiers remain public after a failed bill query without releasing fees or replaying the model
+cost response selects only safe response fields and preserves absent IDs without exposing reservation context
+backup refuses live calls and restores unresolved reservations without inventing a zero charge
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost.test.ts
+removed employees restore complete role configuration with a new version, without changing existing projects
+manager restoration explicitly changes the incumbent role and keeps exactly one manager
+capacity, archive, stale version and wrong source cannot overwrite current employees; backup retains removed history
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\employee-history.test.ts
+approval freezes an execution phase while preserving earlier planning dialogue as quoted background
+manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it
+planner receives the project net budget and generated validation deducts the newly billed planning call
+project list validation includes open cost holds without modifying the ledger or starting execution
+approval freezes per-call output limits separately from the cumulative task estimates
+archived departments and revoked private knowledge grants block approval or retry without changing old snapshots
+request admission fences stale lease owners and rechecks current run authorization transactionally
+queue skips locked projects and simultaneous retries create at most one successor
+legacy projects inherit only their existing scope; backup restores policy and historical policy versions
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\execution-policy.test.ts
+extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action
+active paid manager replies block export and restore before any database replacement
+legacy backups without extension tables restore with empty defaults rather than stale extension records
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\extensions-backup.test.ts
+real local vectors recover English and Chinese paraphrases with authorization before ranking
+long passages include their tail and local vectors are normalized
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\hybrid.test.ts
+full corpus retrieval covers late chunks, stays permission scoped and pins compact immutable versions
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge.test.ts
+manager dialogue persists across workers, includes prior conversation and records billed usage
+active runs keep messages waiting; duplicate pending messages are rejected and cancellation persists
+stale project versions, denied model scope and insufficient request budget never call the model
+provider failure is not replayed, missing usage stays uncertain and empty reply retains paid usage
+queued messages reject changed model and gateway configuration versions before billing
+an interrupted in-flight reply becomes failed after recovery without a new paid request
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\manager-chat.test.ts
+executable candidate without host mappings is rejected without save or hidden model repair
+clarification replies retain global billed usage and do not create departments, previews or runs
+an explicit next turn sends validation feedback to one model call without saving it as user requirements
+client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call
+documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output
+second round uses conversation context but only user messages become the saved requirement; preview saves idempotently
+explicit employee effort rejects the candidate with no hidden repair, save or execution
+legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects
+only explicitly granted filesystem tools produce a valid implementation and independent review draft
+missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch
+tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts
+the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded
+invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts
+revision context includes stored employee IDs and task DAG without inheriting old permissions
+natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls
+partial candidates preserve useful replies, never render JSON fragments, and remain idempotent
+long conversations retain all user requirements but send bounded recent context and earlier user excerpts
+oversized prior previews use a marked bounded reference without sending truncated JSON to the model
+organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt
+organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-chat.test.ts
+tests\organization-session.test.ts
+confirming a revised proposal updates the same team and draft project, records versions, and never executes
+execution state, archived teams and mismatched project ownership refuse an update without partial writes
+all adopted planning charges count toward the updated budget and transfer only after successful confirmation
+revisions still require preview identity and explicit tool permissions
+pending and uncertain project charges block a revision before any budget or team change
+a team participating in another active project cannot be changed through a saved conversation
+employee prompt revisions advance role versions while replay and unchanged roles preserve them
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-update.test.ts
+new and configuration-only placeholder drafts are blocked before enqueue or billing
+resume and full retry of a legacy placeholder run cannot enqueue another attempt
+concrete implementation assigned to an employee without tools is rejected
+a deliberately edited single-person text plan can still be approved
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\plan-readiness.test.ts
+D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting
+D1 lost poll response recovers an unstarted claim and executes it exactly once
+D1 revoked device grants reject dispatch after approval and do not become unknown mutations
+D1 cancels an in-flight native command and reconnects by reporting its receipt without replay
+approved API flow waits for command approval, hands off verified files and settles usage
+employee summaries are billed to the active task and preserve approved contracts through handoff
+approved API rework repairs, independently re-reviews and bills the original task buckets
+API rework stops at its call allowance and full retry cannot reset the task counter
+API rework escalates exhausted rounds, forbidden files and explicit rejection
+missing output and forged verification cannot dispatch the dependent reviewer
+a modified accepted input is rejected before the reviewer makes a model request
+cancellation while approval is pending cancels the receipt and never runs the command
+C3 monitors actual employee waits and stops repeated actions/errors before more paid calls
+C3 retries a transient read within the same tool call, without extra model charges
+C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry
+checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard
+checkpoint recovery preserves the DAG, unfinished files and history across two interruptions
+C3 restores an independently passed rework pair and runs only its remaining consumer
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product-flow.test.ts
+organization templates, prompt versions, archive and restore remain durable
+knowledge permissions filter before retrieval and revisions keep stable source references
+Obsidian edits, wiki links and deletion preserve immutable versions and permissions
+idempotency rejects mismatched content and encrypted backup restores data
+approval knowledge grants reject missing, archived and foreign employee spaces
+expired runs require explicit checkpoint resume and cancelled queue entries stay visible
+retry admission preserves billed task cost and all wire calls, and refuses exhausted allowances
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product.test.ts
+exact request identity is required; ambiguous, mismapped, missing and refund records retain unknown fees
+provider charge is settled once from exact log plus verified units; replayed usage preserves authoritative charge
+absent logs retain reservation and durable query state until a later exact receipt is found
+changed gateway configuration and legacy calls cannot be settled using a replacement connection
+concurrent query and manual settlement preserve the manual receipt and do not duplicate charges
+changed quota conversion and lost query ownership never fabricate a zero settled cost
+restart cleanup terminates a stale third query without releasing or repeatedly querying the model
+permanent log failures pause the same configuration across receipts and service recreation without releasing fees
+exact legacy helper failures survive manual settlement, while explicit manual queries supersede scope pauses
+an explicit manual probe retries once and reinstates a pause when the same permission denial remains
+untrusted legacy prose containing denial words is not a permanent failure classification
+scope pauses do not carry into a different configuration version or base URL, and old receipts stay pinned
+distinct gateway IDs at the same origin and version do not inherit each other’s permission pause
+temporary network, rate, 5xx and absent-log outcomes retain the bounded three automatic probes
+concurrent automatic receipts defer the same scope and remember its first definitive denial
+a later explicit manual probe supersedes an earlier in-flight denial without resetting counts
+a definitive denial arriving after manual settlement preserves the settled ledger and scope evidence
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation.test.ts
+approval intersects long-term scope, freezes per-employee run inputs and preserves old citations through backup
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-input.test.ts
+terminal state is atomic with project state and closes pending tool approvals
+a late worker waiting on the project lock cannot overwrite a successor or append a failure event
+recovery owns a live lease until reconciliation and rejects expired owners including earlier recovery processes
+recovery reconciles a recorded completion and API state remains authoritative over later trace events
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-state.test.ts
+unresolved model charges disable both recovery actions and expose the reconciliation entry
+selected imports reach planning and approval with exact path/SHA while unselected and private references stay isolated
+approval rejects a shared workspace import missing any file-tool employee grant
+workspace files can be approved by file workers without granting knowledge tools
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\work-file-project.test.ts

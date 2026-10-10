@@ -12,6 +12,7 @@ import { pool } from './db.ts';
 import { seal, unseal } from './vault.ts';
 import { AppError, gatewayRequest, PLANNING_TIMEOUT_MS } from './provider.ts';
 import { departmentSchema, gatewaySchema, modelSchema, planSchema, policySchema, validatePlan, hasUnplannedTasks, planningRequiredMessage, placeholderTaskSubject, placeholderTaskCriterion, type Model, type Plan, type Policy } from '../../../packages/contracts/index.ts';
+import { createGoalContract } from '../../../packages/contracts/goal-contract.mjs';
 import { RunCoordinator } from './run-coordinator.ts';
 import { settings } from './product.ts';
 import { completeBudgeted,requireProjectCostReady,projectCostReadiness,projectCostCarryover,type ProjectCostReadiness,lockCostPolicy,checkDailyBudget,shareCostMaintenance,receiptTransaction } from './cost-control.ts';
@@ -456,10 +457,11 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
           knowledge,knowledgeDocumentIds:project.plan.knowledgeDocumentIds,importedFiles,
           approval: { kind: req.body.automatic ? 'automatic-policy' : 'project', approvedAt: new Date().toISOString(), projectVersion: project.version, retainUncertainCosts:input.retainUncertainCosts }, agents, tasks,
           modelRoutes: routes.map(({ apiKey: _secret, ...route }) => route),...(options.demo?{demo:{title:options.demo.title,fixture:true}}:{}) };
-        await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids) VALUES($1,$2,$3,$4,$5,$6)', [runId, project.id, project.version, 'queued', snapshot,participatingDepartments.map(d=>d.id)]);
+        const approvedSnapshot={...snapshot,goalContract:createGoalContract(snapshot)};
+        await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids) VALUES($1,$2,$3,$4,$5,$6)', [runId, project.id, project.version, 'queued', approvedSnapshot,participatingDepartments.map(d=>d.id)]);
         await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1", [project.id]);
         await client.query('COMMIT');
-        launch = { runId, projectId: project.id, snapshot, routes };
+        launch = { runId, projectId: project.id, snapshot:approvedSnapshot, routes };
       }
     } catch (error) {
       await client.query('ROLLBACK').catch(() => undefined);
@@ -497,7 +499,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
     const recovery:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string;costBlocked?:string;costReadiness?:ProjectCostReadiness}={unknownOperations:unresolvedOperations(run.events),costBlocked,costReadiness};
     if(hasUnplannedTasks({tasks:row?.snapshot.approvedTasks??run.snapshot.tasks}))recovery.planningBlocked=planningRequiredMessage;
     if(row&&['failed','interrupted','cancelled'].includes(row.status))try{resumeHandoff({...run.snapshot,tasks:run.snapshot.approvedTasks??run.snapshot.tasks},run.events,completedTasks(run.events,run.snapshot),resolve(traceRoot,id,'artifacts'));}catch(error){recovery.checkpointBlocked=(error as Error).message;}
-    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','team/snapshot','team/checkpoint','recovery/restored','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
+    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || e.type.startsWith('goal/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','team/snapshot','team/checkpoint','recovery/restored','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);

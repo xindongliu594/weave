@@ -1,0 +1,12 @@
+✔ 正数相加 (0.792329ms)
+✔ 负数相加 (0.139251ms)
+✔ 零的相加 (0.127001ms)
+✔ 非整数输入抛出 TypeError (0.378125ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 71.010341

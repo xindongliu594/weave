@@ -11,6 +11,7 @@ import express from 'express';
 import type pg from 'pg';
 import { createRunArchive } from '../services/agent-runtime/trace-store.mjs';
 import { toolEvidence } from './model-fixture.ts';
+import { createGoalContract } from '../packages/contracts/goal-contract.mjs';
 
 // This test can open only the integration runner's fresh in-memory database.
 // No product data, live service or external model endpoint is contacted.
@@ -58,15 +59,16 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed() {
+async function seed(sealGoal=false) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
-  const snapshot = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
+  const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
     title: 'Recovery fixture', templateVersion: 'fixture', policy, tasks, approvedTasks: tasks,
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
     modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1) }],
     departmentBudgets: { [departmentId]: .99 }, executionBudget: .99, budgetVersion: 1, budgetHistory: { calls: 0, tasks: {} } };
+  if(sealGoal)snapshot.goalContract=createGoalContract(snapshot);
   await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
     [projectId, departmentId, '恢复检查隔离部门', snapshot.requirement, { ...policy, maxBudget: 2 }, { rationale: 'Concrete bounded text work', agents: [employee], tasks }, 'manual']);
   await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,started_at) VALUES($1,$2,1,'failed',$3,now())", [runId, projectId, snapshot]);
@@ -105,6 +107,24 @@ test('HTTP check reads the original cap and current ledger, separates full retry
   assert.ok(Math.abs(task.availableBudget - .3) < 1e-10);
   assert.deepEqual(await state(), before); assert.equal(providerRequests, 0);
   assert.equal(createHash('sha256').update(readFileSync(join(archive.dir, 'events.jsonl'))).digest('hex'), journal);
+});
+
+test('sealed goal mutation blocks both preflight and actual resume without a child or model call', {skip:!isolated},async()=>{
+ const {runId}=await seed(true);
+ await pool.query("UPDATE project_runs SET snapshot=jsonb_set(snapshot,'{requirement}','\"changed goal\"'::jsonb) WHERE id=$1",[runId]);
+ const before=await state();const result=await check(runId,'?retainUncertainCosts=true');
+ assert.equal(result.resume.allowed,false);assert.equal(result.retry.allowed,false);
+ assert.ok(result.resume.reasons.some((r:any)=>r.code==='GOAL_CONTRACT_CHANGED'));
+ const response=await fetch(url+'/runs/'+runId+'/retry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({resume:true,retainUncertainCosts:true})});
+ assert.equal(response.status,409);assert.equal((await response.json() as any).code,'GOAL_CONTRACT_CHANGED');
+ assert.deepEqual(await state(),before);assert.equal(providerRequests,0);
+});
+test('a recorded goal boundary pause requires reapproval rather than repeating the same invalid run', {skip:!isolated},async()=>{
+ const {runId,archive}=await seed(true);archive.append('goal/blocked',{message:'file outside approved scope',point:'file-scope'});
+ const result=await check(runId,'?retainUncertainCosts=true');
+ assert.equal(result.resume.allowed,false);assert.ok(result.resume.reasons.some((r:any)=>r.code==='GOAL_REPLAN_REQUIRED'));
+ const response=await fetch(url+'/runs/'+runId+'/retry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({resume:true,retainUncertainCosts:true})});
+ assert.equal(response.status,409);assert.equal((await response.json() as any).code,'GOAL_REPLAN_REQUIRED');assert.equal(providerRequests,0);
 });
 
 test('unknown fees require explicit carryover; in-flight fees always block and do not expire during GET', { skip: !isolated }, async () => {
