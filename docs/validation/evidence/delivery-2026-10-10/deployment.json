@@ -1,0 +1,15 @@
+{
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-acceptance3-20261010",
+  "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-acceptance2-20261010",
+  "packetSha256": "cc8a7da069ff12946599e6371456eb1a4d7ac0689b17a5800f6fdcbb30d57666",
+  "projectCount": 2,
+  "usageBefore": 235,
+  "modelCalls": 0,
+  "dependencies": "existing pinned directories reused",
+  "memOSInstalled": false,
+  "passed": true,
+  "usageAfter": 235,
+  "mainPID": "487347",
+  "projectStatePreserved": true,
+  "usagePreserved": true
+}

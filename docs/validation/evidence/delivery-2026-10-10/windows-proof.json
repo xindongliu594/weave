@@ -1,0 +1,66 @@
+{
+  "sourceRunId": "6197cb6e-d63b-41e9-808e-3666bc376b84",
+  "actor": "Codex independent reproduction; not a new employee verdict",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "files": {
+    "cli.mjs": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+    "README.md": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+    "cli.test.mjs": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+  },
+  "smoke": {
+    "argv": [
+      "cli.mjs",
+      "25"
+    ],
+    "exitCode": 0,
+    "stdout": "{\"celsius\":25,\"fahrenheit\":77}\n",
+    "stderr": ""
+  },
+  "positive": {
+    "exitCode": 0,
+    "counts": {
+      "status": "available",
+      "format": "spec",
+      "tests": 17,
+      "suites": 0,
+      "pass": 17,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "negative": {
+    "exitCode": 1,
+    "counts": {
+      "status": "available",
+      "format": "spec",
+      "tests": 17,
+      "suites": 0,
+      "pass": 10,
+      "fail": 7,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "mutation": "isolated copy only: offset 32 changed to 31"
+  },
+  "restored": {
+    "exitCode": 0,
+    "counts": {
+      "status": "available",
+      "format": "spec",
+      "tests": 17,
+      "suites": 0,
+      "pass": 17,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "sourceUnchanged": true,
+  "modelCalls": 0,
+  "isolation": "fresh directory, not an OS sandbox"
+}

@@ -1,0 +1,93 @@
+{
+  "sourceRunId": "2079d91d-9017-444e-9846-50f8b47a24ba",
+  "beforePID": "408527",
+  "afterPID": "487347",
+  "stoppedStatus": "cancelled",
+  "beforeCost": {
+    "recordedCost": 1.2050562,
+    "reserved": 0.0192111,
+    "availableBudget": 0.6757326999999999,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "amount": 0.0192111,
+        "status": "uncertain",
+        "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+      }
+    ]
+  },
+  "check": {
+    "runId": "2079d91d-9017-444e-9846-50f8b47a24ba",
+    "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+    "planVersion": 14,
+    "checkedAt": "2026-10-10T06:06:53.155Z",
+    "originalBudget": 1.9,
+    "costReadiness": {
+      "recordedCost": 1.2050562,
+      "reserved": 0.0192111,
+      "availableBudget": 0.6757326999999999,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+          "amount": 0.0192111,
+          "status": "uncertain",
+          "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+        }
+      ]
+    },
+    "choices": {
+      "retainUncertainCosts": true,
+      "acknowledgeUnknownOperations": false
+    },
+    "nativeRequestChecked": false,
+    "unknownOperationCount": 0,
+    "unknownOperationIds": [],
+    "calls": {
+      "used": 12,
+      "limit": 100,
+      "remaining": 88
+    },
+    "tasks": [
+      {
+        "id": "delivery_qa",
+        "subject": "复用旧交付物，独立检查干净环境可用性",
+        "recordedCost": 0.0349761,
+        "reserved": 0,
+        "budgetLimit": 0.1,
+        "availableBudget": 0.0650239,
+        "calls": 6,
+        "callLimit": 40,
+        "remainingCalls": 34,
+        "completed": true
+      },
+      {
+        "id": "delivery_review",
+        "subject": "经理独立验收复用交付及新增可用性检查",
+        "recordedCost": 0.0206196,
+        "reserved": 0,
+        "budgetLimit": 0.1,
+        "availableBudget": 0.0793804,
+        "calls": 4,
+        "callLimit": 40,
+        "remainingCalls": 36,
+        "completed": false
+      }
+    ],
+    "resume": {
+      "allowed": true,
+      "reasons": [],
+      "completedTaskIds": [
+        "delivery_qa"
+      ]
+    },
+    "retry": {
+      "allowed": true,
+      "reasons": [],
+      "completedTaskIds": []
+    }
+  }
+}

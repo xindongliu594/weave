@@ -1,0 +1,375 @@
+{
+  "runId": "69766432-8165-457b-af86-01f1d2b61e72",
+  "status": "cancelled",
+  "error": "Run cancelled",
+  "integrity": "ok",
+  "planVersion": 13,
+  "resumedFrom": null,
+  "completedCheckpoints": [],
+  "ownAcceptedTasks": [
+    "delivery_qa"
+  ],
+  "completedSeals": [
+    {
+      "taskId": "delivery_qa",
+      "attemptId": "b4cc4237-a1ac-4ca9-9da1-fe3ce57fdb73",
+      "runId": "69766432-8165-457b-af86-01f1d2b61e72",
+      "workspaceRevision": "c6d9090ab1826ce931d784af75e259c39baeddc8af1c21f5293f5e8dd4dd03d2",
+      "inputs": [
+        {
+          "path": "cli.mjs",
+          "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+          "size": 2083
+        },
+        {
+          "path": "README.md",
+          "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+          "size": 1849
+        },
+        {
+          "path": "cli.test.mjs",
+          "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df",
+          "size": 7232
+        }
+      ],
+      "outputs": [
+        {
+          "path": "delivery.test.mjs",
+          "sha256": "8254b9e7084c954fec05d0c9f307ad5b84c99ba54a7e97fd0603576c5f86f8a1",
+          "size": 14631
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "c6d9090ab1826ce931d784af75e259c39baeddc8af1c21f5293f5e8dd4dd03d2",
+          "evidence": {
+            "version": 1,
+            "runId": "69766432-8165-457b-af86-01f1d2b61e72",
+            "observedAt": "2026-10-10T05:49:12.950Z",
+            "tool": "terminal_test",
+            "sessionId": "d6789af2-3a16-444c-ab8f-72454abafe8f",
+            "callId": "call_00_ia3q5aql3gru8kwkv604abec",
+            "approval": {
+              "status": "available",
+              "approvalId": "3957e5d9-8e76-4665-af1c-d68109d84c1f"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "b50b420c-854b-4603-ad67-809f78138d75",
+              "queuedSeq": 775,
+              "finishedSeq": 786
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "a81de87678c6f52149eaa7a4bbf27fc0d1ac9f9f8c86b3f8cbcc8d405bc47787",
+              "bytes": 1368,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 17,
+              "suites": 0,
+              "pass": 17,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "887cd5c49933d200e2f969f88bc332584a9b0a9b2e6e0708ad50084f9f93286d",
+              "status": "passed",
+              "reason": ""
+            },
+            {
+              "criterionIndex": 2,
+              "ruleSha256": "6f70b9a433e69c6729cb48976500412a5a9b9c1b8c88fa2e64a5dbf8322dfb0d",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 788
+        },
+        {
+          "command": "node --test delivery.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "c6d9090ab1826ce931d784af75e259c39baeddc8af1c21f5293f5e8dd4dd03d2",
+          "evidence": {
+            "version": 1,
+            "runId": "69766432-8165-457b-af86-01f1d2b61e72",
+            "observedAt": "2026-10-10T05:49:48.596Z",
+            "tool": "terminal_test",
+            "sessionId": "d6789af2-3a16-444c-ab8f-72454abafe8f",
+            "callId": "call_00_wuk6nnirk1zmb0yt2ft9lekp",
+            "approval": {
+              "status": "available",
+              "approvalId": "5826cb1d-f6d5-4fea-b70d-c08aa57a79fb"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "622aa8e5-0c19-4f4f-be96-cffb11799cfd",
+              "queuedSeq": 1005,
+              "finishedSeq": 1013
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "cda70a1df53d475da0eb22103e1895be36bf4b463981f18c7b576c2803835158",
+              "bytes": 1645,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 16,
+              "suites": 0,
+              "pass": 16,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "24a5e4dbba5641fa0a2f206d2fa610b0e119e58192085be6dcf2366aa21ab0a4",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 1015
+        }
+      ],
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "887cd5c49933d200e2f969f88bc332584a9b0a9b2e6e0708ad50084f9f93286d",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test cli.test.mjs"
+        },
+        {
+          "criterionIndex": 1,
+          "ruleSha256": "24a5e4dbba5641fa0a2f206d2fa610b0e119e58192085be6dcf2366aa21ab0a4",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test delivery.test.mjs"
+        },
+        {
+          "criterionIndex": 2,
+          "ruleSha256": "6f70b9a433e69c6729cb48976500412a5a9b9c1b8c88fa2e64a5dbf8322dfb0d",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test cli.test.mjs"
+        }
+      ],
+      "acceptedAt": "2026-10-10T05:49:58.192Z",
+      "budgetEvidence": {
+        "version": 1,
+        "runId": "69766432-8165-457b-af86-01f1d2b61e72",
+        "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+        "projectVersion": 13,
+        "capturedAt": "2026-10-10T05:49:58.192Z",
+        "point": "node-accepted",
+        "basis": "host-execution-budget",
+        "currency": "USD",
+        "project": {
+          "limit": 1.9,
+          "occupied": 1.1095752,
+          "activeReserved": 0,
+          "available": 0.7904247999999998,
+          "callsUsed": 8,
+          "callLimit": 100,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "inherited": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 1.0429614,
+          "retainedUnknownReservation": 0.0192111,
+          "availableBudget": 0.8378274999999998,
+          "callsUsed": null,
+          "callsBasis": "archived-model-wire-request-count",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        },
+        "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+      }
+    }
+  ],
+  "restore": [],
+  "quality": [],
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 1849,
+      "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b"
+    },
+    {
+      "path": "cli.mjs",
+      "size": 2083,
+      "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75"
+    },
+    {
+      "path": "cli.test.mjs",
+      "size": 7232,
+      "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+    },
+    {
+      "path": "delivery.test.mjs",
+      "size": 14631,
+      "sha256": "8254b9e7084c954fec05d0c9f307ad5b84c99ba54a7e97fd0603576c5f86f8a1"
+    }
+  ],
+  "commands": [
+    {
+      "operationId": "b50b420c-854b-4603-ad67-809f78138d75",
+      "approvalId": null,
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "outputSha256": "a81de87678c6f52149eaa7a4bbf27fc0d1ac9f9f8c86b3f8cbcc8d405bc47787",
+      "rawOutputFile": "69766432-8165-457b-af86-01f1d2b61e72-5.txt",
+      "execution": {
+        "cpu": [
+          100000,
+          100000
+        ],
+        "gid": 1000,
+        "uid": 1000,
+        "kind": "openshell",
+        "node": "v24.19.0",
+        "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "memory": "536870912",
+        "gateway": "weiwu-openshell-v012",
+        "version": "0.1.2",
+        "sandboxId": "7f2fe411-c181-4e3a-9b00-a9d98b31be9d",
+        "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+        "sandboxName": "wwe-3f01fb056c0e",
+        "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+        "effectivePolicyHash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5"
+      }
+    },
+    {
+      "operationId": "622aa8e5-0c19-4f4f-be96-cffb11799cfd",
+      "approvalId": null,
+      "command": "node --test delivery.test.mjs",
+      "exitCode": 0,
+      "outputSha256": "cda70a1df53d475da0eb22103e1895be36bf4b463981f18c7b576c2803835158",
+      "rawOutputFile": "69766432-8165-457b-af86-01f1d2b61e72-6.txt",
+      "execution": {
+        "cpu": [
+          100000,
+          100000
+        ],
+        "gid": 1000,
+        "uid": 1000,
+        "kind": "openshell",
+        "node": "v24.19.0",
+        "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "memory": "536870912",
+        "gateway": "weiwu-openshell-v012",
+        "version": "0.1.2",
+        "sandboxId": "7f2fe411-c181-4e3a-9b00-a9d98b31be9d",
+        "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+        "sandboxName": "wwe-3f01fb056c0e",
+        "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+        "effectivePolicyHash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5"
+      }
+    }
+  ],
+  "acceptance": {
+    "runId": "69766432-8165-457b-af86-01f1d2b61e72",
+    "planVersion": 13,
+    "rows": [
+      {
+        "taskId": "delivery_qa",
+        "criterionIndex": 0,
+        "criterion": "旧独立 QA 的 17 项测试全部通过，无跳过或待办",
+        "command": "node --test cli.test.mjs",
+        "status": "passed",
+        "reason": "",
+        "sourceRunId": "69766432-8165-457b-af86-01f1d2b61e72",
+        "attemptId": "b4cc4237-a1ac-4ca9-9da1-fe3ce57fdb73",
+        "workspaceRevision": "c6d9090ab1826ce931d784af75e259c39baeddc8af1c21f5293f5e8dd4dd03d2"
+      },
+      {
+        "taskId": "delivery_qa",
+        "criterionIndex": 1,
+        "criterion": "在干净目录中验证 README 五个成功示例和四类错误输入，至少 9 项真实测试通过",
+        "command": "node --test delivery.test.mjs",
+        "status": "passed",
+        "reason": "",
+        "sourceRunId": "69766432-8165-457b-af86-01f1d2b61e72",
+        "attemptId": "b4cc4237-a1ac-4ca9-9da1-fe3ce57fdb73",
+        "workspaceRevision": "c6d9090ab1826ce931d784af75e259c39baeddc8af1c21f5293f5e8dd4dd03d2"
+      },
+      {
+        "taskId": "delivery_qa",
+        "criterionIndex": 2,
+        "criterion": "原三份员工交付文件版本保持不变",
+        "command": "node --test cli.test.mjs",
+        "status": "passed",
+        "reason": "",
+        "sourceRunId": "69766432-8165-457b-af86-01f1d2b61e72",
+        "attemptId": "b4cc4237-a1ac-4ca9-9da1-fe3ce57fdb73",
+        "workspaceRevision": "c6d9090ab1826ce931d784af75e259c39baeddc8af1c21f5293f5e8dd4dd03d2"
+      },
+      {
+        "taskId": "delivery_review",
+        "criterionIndex": 0,
+        "criterion": "独立复测至少 9 项干净环境检查全部通过",
+        "command": "node --test delivery.test.mjs",
+        "status": "unverified",
+        "reason": "等待匹配的正式交接凭据",
+        "sourceRunId": null,
+        "attemptId": "6153caf6-f95f-4b87-9f5f-69a9a66a0c05",
+        "workspaceRevision": null
+      },
+      {
+        "taskId": "delivery_review",
+        "criterionIndex": 1,
+        "criterion": "按原 README 运行 25 摄氏示例得到正确 JSON 输出",
+        "command": "node cli.mjs 25",
+        "status": "unverified",
+        "reason": "等待匹配的正式交接凭据",
+        "sourceRunId": null,
+        "attemptId": "6153caf6-f95f-4b87-9f5f-69a9a66a0c05",
+        "workspaceRevision": null
+      }
+    ]
+  },
+  "usage": {
+    "calls": 14,
+    "cost": 0.0765531,
+    "taskCalls": {
+      "delivery_qa": 8,
+      "delivery_review": 4
+    },
+    "modelIds": [
+      "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051"
+    ]
+  }
+}

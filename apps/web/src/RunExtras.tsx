@@ -10,6 +10,7 @@ import { runTaskView } from './run-detail-view.ts';
 import { runResultView } from './run-result-view.ts';
 import { createRunRecoveryConfirmation, type RunRecoveryContext, type RunRecoveryIntent } from './run-recovery-confirmation.ts';
 import {RunInheritedEvidence} from './RunInheritedEvidence.tsx';
+import {RunAcceptanceChecks} from './RunAcceptanceChecks.tsx';
 import type {RunLineageEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
 export type RunExtrasErrors = { id: string; operation: string; refresh: string };
 type RunExtrasErrorEvent = { id: string; type: 'reset' | 'operation' | 'refresh-failed' | 'refresh-succeeded'; message?: string };
@@ -86,17 +87,18 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  const [checkingRecovery,setCheckingRecovery]=useState(false),[recoveryError,setRecoveryError]=useState('');
  const recoveryInFlight=useRef(false);
  const [localOperations,setLocalOperations]=useState<any[]>([]);
+ const tasks=runTaskView(id,snapshot,events,traceEvents);
+ const lineageTaskKey=JSON.stringify(tasks.map(task=>[task.id,task.status,task.attemptId]));
  const [lineage,setLineage]=useState<RunLineageEvidence>(),[lineageError,setLineageError]=useState('');
  const lineageRequest=useRef(0);
  async function refreshLineage(){
-  if(snapshot.recovery?.version!==1)return;
+  if(!snapshot.projectId)return;
   const request=++lineageRequest.current;
   try{const value=await api<RunLineageEvidence>('/runs/'+id+'/lineage-evidence');if(currentId.current===id&&request===lineageRequest.current){setLineage(value);setLineageError('');}}
   catch(error){if(currentId.current===id&&request===lineageRequest.current){setLineage(undefined);setLineageError((error as Error).message);}}
  }
- // Ancestry journals can be large. Read once per run/status change or explicit
- // refresh, never from the two-second approvals/cost polling loop.
- useEffect(()=>{setLineage(undefined);setLineageError('');void refreshLineage();return()=>{lineageRequest.current++;};},[id,status,snapshot.planVersion]);
+ // Read when a task changes state, rather than on every event or cost poll.
+ useEffect(()=>{setLineage(undefined);setLineageError('');void refreshLineage();return()=>{lineageRequest.current++;};},[id,status,snapshot.planVersion,lineageTaskKey]);
  const unknown=recovery?.unknownOperations??[];
  const unknownKey=JSON.stringify(unknown.map((operation:any)=>operation.callId).sort());
  useEffect(()=>{setAcknowledged(false);setCheckedRecovery(undefined);setRecoveryError('');},[id,unknownKey]);
@@ -119,7 +121,6 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  const stopMessage=finished?.message||runError||'请查看下方任务结果和执行记录。';
  const readableStop=/\"code\":\"ABORTED\"/.test(stopMessage)?'执行调用被中断，已完成任务和文件保留。请核对下方费用状态和追溯记录，再恢复未完成任务。':stopMessage;
  const planningBlocked=recovery?.planningBlocked??(hasUnplannedTasks({tasks:snapshot.approvedTasks??snapshot.tasks??[]})?planningRequiredMessage:undefined);
- const tasks=runTaskView(id,snapshot,events,traceEvents);
  const result=runResultView(id,status,integrity,snapshot,events,traceEvents,lineage);
  const failedTasks=tasks.filter((task:any)=>task.status==='failed'&&typeof task.output==='string'&&task.output.trim());
  const employeeName=(agentId:string)=>snapshot.agents?.find((agent:any)=>agent.id===agentId)?.name??agentId;
@@ -156,6 +157,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
    {snapshot.projectId&&<button className="text-button" onClick={()=>onOpenProject(snapshot.projectId)}>返回项目修改方案</button>}
  </div>}
  <RunEmployeeStatus status={status} runtime={runtime} employeeName={employeeName} taskName={taskName}/>
+ <RunAcceptanceChecks runId={id} snapshot={snapshot} evidence={lineage}/>
  <RunInheritedEvidence runId={id} snapshot={snapshot} evidence={lineage} error={lineageError} taskName={taskName}/>
  {tests.length>0&&<div className="lower"><h3>真实测试结果</h3><p className="subcopy">以下命令与输出来自本机执行回执，包含实际失败和修复后的复测；以当前文件版本的最终复验为准。</p>{tests.map(operation=><details key={operation.id}><summary>{operation.payload.arguments.command} · {operation.result.exitCode===0?'通过':'失败'} · 退出码 {operation.result.exitCode}</summary><pre className="product-pre">{operation.result.output}</pre></details>)}</div>}
  {snapshot.executionTarget?.kind==='local'&&<div className="lower"><h3>执行环境</h3><p>{snapshot.executionTarget.name} · {snapshot.executionTarget.platform} · {snapshot.executionTarget.label} / {id}</p><p className="subcopy">模型与审批由后端协调；文件和命令在这台设备执行。设备断线后停止在途操作，不自动重放修改或命令。</p>{isolation&&<p className="notice-box">OpenShell 沙箱已有执行回执 · Node {isolation.node} · 用户 {isolation.uid} · 1 核 / 512 MiB<br/>沙箱：{isolation.sandboxId}</p>}<details><summary>执行操作回执（{localOperations.length}）</summary>{localOperations.map(operation=><div className="knowledge-result" key={operation.id}><strong>{operation.payload.name} · {({queued:'等待设备领取',claimed:'设备已领取',started:'已开始',completed:'已完成',failed:'失败',cancelled:'已停止'}as any)[operation.status]??operation.status}</strong><p>{operation.result?.localWorkspace??operation.lateResult?.localWorkspace}</p>{operation.result?.execution?.kind==='openshell'&&<small>OpenShell {operation.result.execution.version} · {operation.result.execution.sandboxName}</small>}{operation.result?.error&&<p>{operation.result.error.message}</p>}{operation.lateResult&&<p>收到迟到回执，未重新执行。{operation.lateResult.ok?'设备报告已完成，请核对本机文件。':operation.lateResult.error?.message}</p>}{(operation.result?.output??operation.lateResult?.output)&&<pre className="product-pre">{operation.result?.output??operation.lateResult?.output}</pre>}</div>)}</details></div>}

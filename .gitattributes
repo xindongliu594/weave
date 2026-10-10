@@ -1,0 +1,2 @@
+# Keep archived executor output byte-exact for receipt SHA256 checks on Windows.
+docs/validation/evidence/delivery-2026-10-10/** -text

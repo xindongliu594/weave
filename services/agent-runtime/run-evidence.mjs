@@ -145,6 +145,7 @@ export function taskRunEvidence({ snapshot, taskId, state, taskIds, handoff, bud
     const sourceRunId = id(record.runId) ?? (restored ? id(snapshot.recovery.sourceRunId) : id(runId));
     completedAncestors.push({ taskId: ancestorId, attemptId: record.attemptId, runtimeTaskId: native.id, sourceRunId, restored,
       acceptedAt: id(record.acceptedAt), workspaceRevision: id(record.workspaceRevision),
+      ...(record.acceptanceChecks !== undefined ? { acceptanceChecks: record.acceptanceChecks } : {}),
       outputs: (record.outputs ?? []).map(file => ({ path: file.path, sha256: file.sha256, size: count(file.size) })),
       commands: (record.commands ?? []).map(command => receiptProjection(command, record, sourceRunId)) });
   }

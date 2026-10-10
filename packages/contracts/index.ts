@@ -73,6 +73,13 @@ export const taskSchema = z.object({
   subject: z.string().trim().min(1).max(200), objective: z.string().trim().min(1).max(5000),
   assigneeId: z.string().min(1), dependencies: z.array(z.string()).max(100),
   acceptanceCriteria: z.array(z.string().trim().min(1).max(2000)).min(1).max(20),
+  acceptanceChecks: z.array(z.object({
+    criterionIndex: z.number().int().min(0).max(19),
+    command: z.string().trim().min(1).max(5000),
+    expectedExitCode: z.number().int().min(0).max(255).optional(),
+    expectedOutput: z.string().max(16000).optional(),
+    minimumTests: z.number().int().min(1).max(100000).optional(),
+  })).min(1).max(20).optional().describe('可选逐项验收命令映射。启用时须覆盖全部验收标准，命令须在 verify 中；minimumTests 仅用于完整 Node --test 统计。语义覆盖仍需独立审查。'),
   estimatedInputTokens: z.number().int().min(0).max(2000000),
   estimatedOutputTokens: z.number().int().min(1).max(200000),
   maxOutputTokens: z.number().int().min(1).max(32768).optional().describe('当前任务每次模型请求的输出 Token 上限，独立于整项任务累计 estimatedOutputTokens；省略时保留原批准模型路线的单次上限。'),
@@ -214,7 +221,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   if(requireToolSupport)check('团队工具协议能力',plan.agents.every(a=>[a.modelId,a.fallbackModelId].filter(Boolean).every(id=>models.find(m=>m.id===id)?.capabilities?.tools?.status==='supported')),'团队调度本身需要工具调用；所有主模型和备用模型必须通过工具往返测试');
   check('本次资料授权', (plan.runInputs??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '本次资料的授权员工必须在方案中，并开启知识检索工具');
   check('工作方法授权', (plan.runInputs??[]).filter(input=>input.skillName).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_read')))), '工作方法的授权员工还须开启知识原文工具');
-  check('导入资料授权', (plan.workFileSelections??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&a.tools.includes('knowledge_search')))), '导入资料的接收员工必须在方案中，并开启知识检索工具');
+  check('导入资料授权', (plan.workFileSelections??[]).every(input=>input.agentIds.every(id=>plan.agents.some(a=>a.id===id&&(a.tools.includes('knowledge_search')||(input.mode==='workspace'&&a.tools.some(tool=>['filesystem','artifact_write','terminal','terminal_test'].includes(tool))))))), '参考资料的接收员工须开启知识检索；工作区文件的接收员工须有文件或终端权限');
   const taskIds = new Set(plan.tasks.map(t => t.id));
   const referencesOK = taskIds.size === plan.tasks.length && plan.tasks.every(t => ids.has(t.assigneeId) && t.dependencies.every(id => taskIds.has(id)));
   check('任务负责人和引用', referencesOK, '任务 ID 重复、负责人不存在或依赖任务不存在');

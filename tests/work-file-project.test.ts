@@ -78,3 +78,18 @@ test('approval rejects a shared workspace import missing any file-tool employee 
   let current=await createProject();current=await savePlan(current,{...current.plan,workFileSelections:[{snapshotId:imported.data.id,paths:['source.ts'],agentIds:['manager'],mode:'workspace'}]});
   const beforeCalls=providerRequests.length,result=await call('/projects/'+current.id+'/approve','POST',{version:current.version});assert.equal(result.status,422,JSON.stringify(result.data));assert.match(result.data.message,/所有文件和终端员工/);assert.equal(providerRequests.length,beforeCalls);assert.equal((await pool.query('SELECT id FROM project_runs WHERE project_id=$1',[current.id])).rowCount,0);
 });
+
+test('workspace files can be approved by file workers without granting knowledge tools',async()=>{
+  const imported=await call('/work-files','POST',{name:'仅工作区资料',files:[upload('source.ts','export const value=1;')]});assert.equal(imported.status,201);
+  let current=await createProject();
+  const agents=current.plan.agents.map((agent:any)=>({...agent,tools:agent.tools.filter((tool:string)=>!tool.startsWith('knowledge_'))}));
+  current=await savePlan(current,{...current.plan,agents,workFileSelections:[{snapshotId:imported.data.id,paths:['source.ts'],agentIds:agents.map((a:any)=>a.id),mode:'workspace'}]});
+  assert.equal(current.validation.valid,true,JSON.stringify(current.validation));
+  const approved=await call('/projects/'+current.id+'/approve','POST',{version:current.version});assert.equal(approved.status,202,JSON.stringify(approved.data));
+  const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].snapshot;
+  assert.equal(snapshot.importedFiles[0].sha256,hash('export const value=1;'));
+  assert.ok(snapshot.agents.every((a:any)=>a.tools.every((tool:string)=>!tool.startsWith('knowledge_'))));
+  const reference=await createProject();
+  const denied=await savePlan(reference,{...reference.plan,agents,workFileSelections:[{snapshotId:imported.data.id,paths:['source.ts'],agentIds:agents.map((a:any)=>a.id),mode:'reference'}]});
+  assert.equal(denied.validation.valid,false);assert.match(denied.validation.errors.join('；'),/参考资料/);
+});

@@ -1,0 +1,43 @@
+{
+  "finalRunId": "d22f8757-a521-4781-a0de-32ebd58c3b52",
+  "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+  "newCalls": 38,
+  "newCost": 0.2116158,
+  "usageCount": 243,
+  "allRecordedCost": 1.2659562,
+  "projectCost": {
+    "recordedCost": 1.2545772,
+    "reserved": 0.0192111,
+    "availableBudget": 0.6262116999999999,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "amount": 0.0192111,
+        "status": "uncertain",
+        "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a"
+      }
+    ]
+  },
+  "acceptancePassed": 5,
+  "qaCallsAfterRestart": 0,
+  "sourceHashesUnchanged": true,
+  "businessFileAuthor": "original employees; new delivery.test.mjs by QA model on JJ, not Codex",
+  "evidenceFiles": [
+    "2079d91d-9017-444e-9846-50f8b47a24ba-5.txt",
+    "2079d91d-9017-444e-9846-50f8b47a24ba-6.txt",
+    "2079d91d-9017-444e-9846-50f8b47a24ba.json",
+    "69766432-8165-457b-af86-01f1d2b61e72-5.txt",
+    "69766432-8165-457b-af86-01f1d2b61e72-6.txt",
+    "69766432-8165-457b-af86-01f1d2b61e72.json",
+    "6ac45960-b5b5-4f94-b465-fb50973877af-5.txt",
+    "6ac45960-b5b5-4f94-b465-fb50973877af-6.txt",
+    "6ac45960-b5b5-4f94-b465-fb50973877af.json",
+    "d22f8757-a521-4781-a0de-32ebd58c3b52-4.txt",
+    "d22f8757-a521-4781-a0de-32ebd58c3b52-5.txt",
+    "d22f8757-a521-4781-a0de-32ebd58c3b52.json",
+    "deployment.json",
+    "restart.json"
+  ]
+}

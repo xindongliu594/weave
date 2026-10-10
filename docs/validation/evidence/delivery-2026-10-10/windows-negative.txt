@@ -1,0 +1,158 @@
+✖ 0 摄氏度 → 32 华氏度 (82.9622ms)
+✖ 100 摄氏度 → 212 华氏度 (81.2921ms)
+✖ -40 摄氏度 → -40 华氏度 (78.9432ms)
+✖ 示例值 25 摄氏度 → 77 华氏度 (79.03ms)
+✖ 小数 36.6 摄氏度 → 97.88 华氏度（容差内） (79.0614ms)
+✖ 负数小数 -12.5 摄氏度 → 9.5 华氏度（容差内） (78.9529ms)
+✖ 小数 0.5 摄氏度 → 32.9 华氏度（容差内，非精确二进制小数） (87.3387ms)
+✔ 参数缺失：非零退出且 stderr 有说明 (84.03ms)
+✔ 非数字参数 "abc"：非零退出且 stderr 有说明 (76.7934ms)
+✔ 非数字参数 "12abc"：非零退出且 stderr 有说明 (80.4027ms)
+✔ 非数字参数 "NaN"：非零退出且 stderr 有说明 (83.6463ms)
+✔ 非数字参数 "Infinity"：非零退出且 stderr 有说明 (81.1741ms)
+✔ 多参数 "1 2"：非零退出且 stderr 有说明 (81.9278ms)
+✔ 多参数 "0 1 2"：非零退出且 stderr 有说明 (83.1669ms)
+✔ 空字符串参数：必须被拒绝，不得当作摄氏 0 成功退出 (78.7632ms)
+✔ 纯空白参数 "   "：必须被拒绝，不得当作摄氏 0 成功退出 (82.665ms)
+✔ 纯空白参数 "\t"：必须被拒绝，不得当作摄氏 0 成功退出 (79.8878ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 10
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1512.1828
+
+✖ failing tests:
+
+test at cli.test.mjs:141:1
+✖ 0 摄氏度 → 32 华氏度 (82.9622ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 32，实际 31
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:142:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at cli.test.mjs:145:1
+✖ 100 摄氏度 → 212 华氏度 (81.2921ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 212，实际 211
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:146:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at cli.test.mjs:149:1
+✖ -40 摄氏度 → -40 华氏度 (78.9432ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 -40，实际 -41
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:150:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at cli.test.mjs:153:1
+✖ 示例值 25 摄氏度 → 77 华氏度 (79.03ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 77，实际 76
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:154:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at cli.test.mjs:161:1
+✖ 小数 36.6 摄氏度 → 97.88 华氏度（容差内） (79.0614ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 97.88000000000001，实际 96.88000000000001
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:162:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at cli.test.mjs:165:1
+✖ 负数小数 -12.5 摄氏度 → 9.5 华氏度（容差内） (78.9529ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 9.5，实际 8.5
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:166:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at cli.test.mjs:169:1
+✖ 小数 0.5 摄氏度 → 32.9 华氏度（容差内，非精确二进制小数） (87.3387ms)
+  AssertionError [ERR_ASSERTION]: fahrenheit 期望 32.9，实际 31.9
+      at assertSuccess (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:103:10)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/tests/delivery-acceptance-20261010/clean/run-PUjqPZ/cli.test.mjs:176:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Plan } from '../../../packages/contracts/index.ts';
+import {AcceptanceCheckEditor} from './AcceptanceCheckEditor.tsx';
 
 type Task = Plan['tasks'][number];
 const names = {work:'普通任务',requirements:'需求确认',implementation:'实现',verification:'验证',review:'独立审查',repair:'修复',integration:'集成'};
@@ -25,6 +26,7 @@ export function TaskContracts({task,tasks,update}:{task:Task;tasks:Task[];update
   const showScope=requiresScope||task.inScope!==undefined||task.outOfScope!==undefined||outputs.length>0;
   const lines=(text:string)=>text.split('\n').map(s=>s.trim()).filter(Boolean);
   return <details className="lower-small"><summary>文件交接与质量检查</summary>
+    <AcceptanceCheckEditor task={task} update={update}/>
     <label className="field">任务类型<select value={task.kind??'work'} onChange={e=>update({kind:e.target.value as Task['kind'],...(['implementation','review'].includes(e.target.value)?{inputs:task.inputs??[],outputs:task.outputs??[]}:{}),maxReworkRounds:undefined})}>{Object.entries(names).map(([key,label])=><option value={key} key={key}>{label}</option>)}</select></label>
     <p className="subcopy">声明输出后，文件写入仅限这些路径。上游实际文件、版本和检查结果满足合同后，才允许下游开始工作。</p>
     <div className="section-title"><h4>需要的文件</h4><button type="button" onClick={()=>update({inputs:[...inputs,{path:''}]})}>添加输入</button></div>

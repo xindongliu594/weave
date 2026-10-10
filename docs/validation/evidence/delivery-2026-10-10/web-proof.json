@@ -1,0 +1,45 @@
+{
+  "finalRunId": "d22f8757-a521-4781-a0de-32ebd58c3b52",
+  "page": "http://127.0.0.1:4312/#run/d22f8757-a521-4781-a0de-32ebd58c3b52",
+  "backend": "JJ service through local SSH forwarding",
+  "realBrowserPassedRows": 5,
+  "realBrowserFailedRows": 0,
+  "recoveryPerformedInBrowser": true,
+  "managerCommandApprovedInBrowser": true,
+  "downloadedFiles": [
+    {
+      "path": "README.md",
+      "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+      "bytes": 1849,
+      "contentDisposition": "attachment; filename=\"README.md\"",
+      "contentSecurityPolicy": "default-src 'none'; sandbox",
+      "noSniff": "nosniff"
+    },
+    {
+      "path": "cli.mjs",
+      "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+      "bytes": 2083,
+      "contentDisposition": "attachment; filename=\"cli.mjs\"",
+      "contentSecurityPolicy": "default-src 'none'; sandbox",
+      "noSniff": "nosniff"
+    },
+    {
+      "path": "cli.test.mjs",
+      "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df",
+      "bytes": 7232,
+      "contentDisposition": "attachment; filename=\"cli.test.mjs\"",
+      "contentSecurityPolicy": "default-src 'none'; sandbox",
+      "noSniff": "nosniff"
+    },
+    {
+      "path": "delivery.test.mjs",
+      "sha256": "8254b9e7084c954fec05d0c9f307ad5b84c99ba54a7e97fd0603576c5f86f8a1",
+      "bytes": 14631,
+      "contentDisposition": "attachment; filename=\"delivery.test.mjs\"",
+      "contentSecurityPolicy": "default-src 'none'; sandbox",
+      "noSniff": "nosniff"
+    }
+  ],
+  "bundle": "private .data/exports/verified-cli-20261010.zip",
+  "businessFilesAddedByCodex": 0
+}

@@ -8,6 +8,7 @@ import {completedTasks} from './handoff-checkpoints.ts';
 import {readRun,redact} from '../../../services/agent-runtime/trace-store.mjs';
 import {nodeTestCounts} from '../../../services/agent-runtime/run-evidence.mjs';
 import {canonicalEvidence,handoffSealValue,sameHandoffSeal,type RunLineageEvidence,type RecoveredReceipt} from '../../../packages/contracts/run-lineage-evidence.ts';
+import {runAcceptanceEvidence} from './run-acceptance-evidence.ts';
 
 type Database={query:(sql:string,args?:any[])=>Promise<{rows:any[]}>};
 type Loaders={run:(id:string)=>any;operations:(runId:string,ids:string[])=>Promise<any[]>};
@@ -120,6 +121,7 @@ export function runLineageEvidenceRouter(database:Database,traceRoot:string){
   try{current=load(id);}catch{throw new AppError(409,'运行档案缺失或超出证据读取上限','LINEAGE_ARCHIVE_UNAVAILABLE');}
   if(!current||current.snapshot.projectId!==row.project_id||current.snapshot.planVersion!==row.project_version)throw new AppError(409,'运行档案与正式项目版本不一致','LINEAGE_ARCHIVE_UNAVAILABLE');
   const data=await collectRunLineageEvidence(current,{run:load,operations:async(runId,ids)=>(await database.query('SELECT id,run_id AS "runId",status,started,payload,result FROM local_operations WHERE run_id=$1 AND id=ANY($2::text[])',[runId,ids])).rows});
+  data.acceptance=runAcceptanceEvidence(current,data);
   res.json(data);
  });
  return router;

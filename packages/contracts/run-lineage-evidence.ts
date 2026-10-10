@@ -2,12 +2,13 @@ export type RecoveredReceipt = {taskId:string;attemptId:string;sourceRunId:strin
 export type RecoveredTest = {taskId:string;attemptId:string;sourceRunId:string;operationId:string;command:string;exitCode:number;
  output:string;outputSha256:string;workspaceRevision:string;observationSeq:number;acceptanceSeq:number;nodeTests?:any};
 export type RunLineageEvidence = {version:1;runId:string;projectId:string;planVersion:number;sourceRunId:string|null;status:'none'|'verified'|'partial'|'unavailable';
- receipts:RecoveredReceipt[];tests:RecoveredTest[];issues:{taskId?:string;code:string;message:string}[]};
+ receipts:RecoveredReceipt[];tests:RecoveredTest[];issues:{taskId?:string;code:string;message:string}[];
+ acceptance?:{runId:string;planVersion:number;rows:{taskId:string;criterionIndex:number;criterion:string;command:string|null;status:string;reason:string;sourceRunId:string|null;attemptId:string|null;workspaceRevision:string|null}[]}};
 
 // Host seal fields only. Budget notes, model prose and mutable UI summaries do
 // not participate in proof of a completed task or an observed command.
 export function handoffSealValue(record:any) {
- return Object.fromEntries(['runId','taskId','attemptId','workspaceRevision','inputs','outputs','commands','acceptedAt']
+ return Object.fromEntries(['runId','taskId','attemptId','workspaceRevision','inputs','outputs','commands','acceptanceChecks','acceptedAt']
   .filter(key=>record?.[key]!==undefined).map(key=>[key,record[key]]));
 }
 export function canonicalEvidence(value:any):string {

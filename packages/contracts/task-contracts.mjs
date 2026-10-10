@@ -20,6 +20,21 @@ export function taskContractErrors(tasks, agents = [], checkpoints = [], { allow
   for (const task of tasks) {
     const kind = task.kind ?? 'work', upstream = ancestors(task.id);
     if (!taskKinds.includes(kind)) errors.push(`${task.id}: 未知任务类型`);
+    if (task.acceptanceChecks !== undefined) {
+      const raw = task.acceptanceChecks, checks = Array.isArray(raw) ? raw.filter(check => check && typeof check === 'object') : [], criteria = task.acceptanceCriteria ?? [];
+      if (!Array.isArray(raw) || !criteria.length || checks.length !== raw.length || checks.length !== criteria.length ||
+          new Set(checks.map(check => check.criterionIndex)).size !== criteria.length ||
+          checks.some(check => !Number.isInteger(check.criterionIndex) || check.criterionIndex < 0 || check.criterionIndex >= criteria.length))
+        errors.push(`${task.id}: 逐项检查必须恰好覆盖每一条验收标准`);
+      for (const check of checks) {
+        if (!task.verify?.includes(check.command)) errors.push(`${task.id}: 逐项检查命令必须已列入 verify`);
+        if (check.expectedExitCode !== undefined && (!Number.isInteger(check.expectedExitCode) || check.expectedExitCode < 0 || check.expectedExitCode > 255)) errors.push(`${task.id}: 预期退出码必须为 0 到 255`);
+        if (check.minimumTests !== undefined && (!/^node(?:\.exe)?\s+--test(?:\s|$)/i.test(check.command) || /[;&|<>\r\n]/.test(check.command) || !Number.isSafeInteger(check.minimumTests) || check.minimumTests < 1 || (check.expectedExitCode ?? 0) !== 0))
+          errors.push(`${task.id}: 测试统计检查仅支持单条成功 Node --test 命令`);
+      }
+      if (checks?.some(check => checks.some(other => other.command === check.command && (other.expectedExitCode ?? 0) !== (check.expectedExitCode ?? 0))))
+        errors.push(`${task.id}: 同一命令不能有不同的预期退出码`);
+    }
     for (const field of ['inputs', 'outputs']) {
       const files = task[field] ?? [];
       if (new Set(files.map(f => f.path)).size !== files.length) errors.push(`${task.id}: ${field} 文件路径重复`);

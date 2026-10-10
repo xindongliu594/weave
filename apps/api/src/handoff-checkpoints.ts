@@ -1,6 +1,8 @@
 import { inspectArtifact } from '../../../services/agent-runtime/handoff.mjs';
 import { taskContractErrors } from '../../../packages/contracts/task-contracts.mjs';
 import { ancestors } from '../../../services/agent-runtime/checkpoint-context.mjs';
+import { assertAcceptanceChecks } from '../../../services/agent-runtime/acceptance-checks.mjs';
+import { canonicalEvidence } from '../../../packages/contracts/run-lineage-evidence.ts';
 
 /** Retain only host seals belonging to the exact completed attempt in the archive. */
 export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string) {
@@ -23,6 +25,11 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
     const accepted = events.findLast(event=>event.type==='handoff/accepted'&&event.data.taskId===id&&event.data.attemptId===attemptId)?.data
       ?? snapshot.handoffCheckpoints?.find((record:any)=>record.taskId===id&&record.attemptId===attemptId);
     if ((contract?.outputs?.length || ['implementation','repair','review','requirements'].includes(contract?.kind)) && !accepted) throw Error(`任务 ${id} 缺少宿主交付物验收记录，不能跳过，请完整重试`);
+    if (contract.acceptanceChecks !== undefined) {
+      if (!accepted) throw Error(`任务 ${id} 缺少逐项验收凭据，不能跳过`);
+      const checks = assertAcceptanceChecks(contract, accepted.commands ?? [], accepted.workspaceRevision);
+      if (canonicalEvidence(checks) !== canonicalEvidence(accepted.acceptanceChecks)) throw Error(`任务 ${id} 的逐项验收凭据已变化`);
+    }
     if (accepted) records.set(id,accepted);
     if (!accepted) records.set(id,{taskId:id,attemptId:attemptId??`checkpoint:${id}`,inputs:[],outputs:[],commands:[]});
     if (['review','requirements'].includes(contract?.kind)&&task.verdict!=='pass') throw Error(`任务 ${id} 缺少通过的审查结论，不能恢复`);

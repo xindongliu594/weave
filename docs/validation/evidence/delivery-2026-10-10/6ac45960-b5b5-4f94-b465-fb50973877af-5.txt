@@ -1,0 +1,24 @@
+✔ 干净环境: 临时目录只含复制进来的交付文件，且与源文件字节一致 (2.533991ms)
+✔ 干净环境: CLI 可在与工作区无关的独立 cwd 下运行（无隐式相对依赖） (34.763609ms)
+✔ README 成功示例 1: node cli.mjs 25 → {"celsius":25,"fahrenheit":77} (34.325773ms)
+✔ README 成功示例 2: node cli.mjs 0 → celsius 0, fahrenheit 32 (34.845365ms)
+✔ README 成功示例 3: node cli.mjs 100 → celsius 100, fahrenheit 212 (34.482684ms)
+✔ README 成功示例 4: node cli.mjs -40 → celsius -40, fahrenheit -40（负参数） (29.539277ms)
+✔ README 成功示例 5: node cli.mjs 36.6 → 小数换算在容差内 (28.264635ms)
+✔ 错误输入①参数缺失: node cli.mjs → 非零退出且 stderr 有说明 (28.872317ms)
+✔ 错误输入②非数字: node cli.mjs abc → 非零退出且 stderr 有说明 (31.903761ms)
+✔ 错误输入③多参数: node cli.mjs 1 2 → 非零退出且 stderr 有说明 (32.122696ms)
+✔ 错误输入④空白参数: node cli.mjs "   " → 非零退出且 stderr 有说明 (30.791443ms)
+✔ 错误输入②补充: 非数字 "12abc" 与 "NaN" 均被拒绝 (60.749581ms)
+✔ 错误输入③补充: 三个参数 "0 1 2" 被拒绝 (31.996118ms)
+✔ 错误输入④补充: 空字符串参数被拒绝，不得当作摄氏 0 成功退出 (38.379591ms)
+✔ README 用法与退出码说明与干净目录中的实际行为一致 (98.984186ms)
+✔ 干净目录中的原测试文件与原文件字节一致（可单独复跑，未被改写） (0.343894ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 651.23556

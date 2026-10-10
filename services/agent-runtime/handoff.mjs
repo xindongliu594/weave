@@ -5,6 +5,7 @@ import { Semaphore } from './limits.mjs';
 import { commandEvidence } from './run-evidence.mjs';
 import { taskContractErrors } from '../../packages/contracts/task-contracts.mjs';
 import { canonicalManifest } from '../../apps/desktop/local-executor.cjs';
+import { observeAcceptanceChecks, assertAcceptanceChecks } from './acceptance-checks.mjs';
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export function inspectArtifact(root, declaration) {
@@ -113,6 +114,7 @@ export class HandoffGate {
       const entries = this.commands.get(key) ?? []; this.commands.set(key, entries);
       const observation = { command: args.command, exitCode: result.exitCode, workspaceRevision: workspaceRevision(this.sandbox.root),
         evidence: commandEvidence({ archive: this.archive, name, taskId, attemptId, args, result, context }) };
+      if (task.acceptanceChecks !== undefined) observation.acceptanceChecks = observeAcceptanceChecks(task, args.command, result);
       entries.push(observation);
       const event = this.archive.append('handoff/command-observed', { taskId, attemptId, ...observation }, { sessionId: context.sessionId, callId: context.callId, taskId, attemptId });
       if (Number.isSafeInteger(event?.seq)) observation.observationSeq = event.seq;
@@ -126,13 +128,16 @@ export class HandoffGate {
     const revision = workspaceRevision(this.sandbox.root), observed = this.commands.get(key) ?? [];
     for (const command of task.verify ?? []) {
       const actual = observed.findLast(entry => entry.command === command);
-      if (!actual || actual.exitCode !== 0 || actual.workspaceRevision !== revision) throw Error('UNVERIFIED_COMMAND: ' + command);
+      const expectedExit = task.acceptanceChecks?.find(check => check.command === command)?.expectedExitCode ?? 0;
+      if (!actual || actual.exitCode !== expectedExit || actual.workspaceRevision !== revision) throw Error('UNVERIFIED_COMMAND: ' + command);
     }
+    const acceptanceChecks = assertAcceptanceChecks(task, observed, revision);
     if (['implementation', 'repair'].includes(task.kind)) {
       const actual = [...(this.writes.get(key)?.keys() ?? [])].sort();
       if (JSON.stringify([...(update.changedPaths ?? [])].sort()) !== JSON.stringify(actual)) throw Error('CHANGED_PATHS_MISMATCH: 必须提交实际修改的路径');
     }
-    return { taskId, attemptId, runId: this.archive.id, workspaceRevision: revision, inputs: this.bindings.get(key) ?? [], outputs, commands: observed, acceptedAt: new Date().toISOString() };
+    return { taskId, attemptId, runId: this.archive.id, workspaceRevision: revision, inputs: this.bindings.get(key) ?? [], outputs, commands: observed,
+      ...(task.acceptanceChecks !== undefined ? { acceptanceChecks } : {}), acceptedAt: new Date().toISOString() };
   }
   stage(record) { this.accepted.set(record.taskId, record); }
   invalidateCommands(taskId, attemptId) { this.commands.delete(this.key(taskId, attemptId)); }

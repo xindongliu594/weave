@@ -419,7 +419,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
         });
         const tasks = project.plan.tasks.map((task: any) => ({ id: task.id, subject: task.subject, assignee: runtimeNames.get(task.assigneeId), assigneeId: task.assigneeId,
           dependencies: task.dependencies, taskPrompt: approvedTaskPrompt(project.requirement, task, project.version),
-          acceptanceCriteria: task.acceptanceCriteria, estimatedInputTokens: task.estimatedInputTokens, estimatedOutputTokens: task.estimatedOutputTokens,
+          acceptanceCriteria: task.acceptanceCriteria, ...(task.acceptanceChecks !== undefined ? { acceptanceChecks: task.acceptanceChecks } : {}), estimatedInputTokens: task.estimatedInputTokens, estimatedOutputTokens: task.estimatedOutputTokens,
           maxBudget: task.maxBudget, maxModelCalls: task.maxModelCalls, maxOutputTokens: task.maxOutputTokens, objective: task.objective,
           ...Object.fromEntries(['kind','inputs','outputs','inScope','outOfScope','verify','reviewedTaskId','sourceTaskId','sourceFindingIds','maxReworkRounds'].filter(key=>task[key]!==undefined).map(key=>[key,task[key]])) }));
         const routes = routeRows.map(row => {

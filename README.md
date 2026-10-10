@@ -96,6 +96,8 @@ npm run demo
 
 ## 当前实现与验证
 
+2026-10-10 在 JJ 复用已有员工交付，补充干净目录测试：原 QA 17/17、新测试 16/16，网页受控停止、服务重启后只续经理，正式验收通过。新增逐项命令证据 5/5；早期调用次数超限失败仍保留。见 [验收报告](docs/validation/delivery-acceptance-2026-10-10.md)和 [网页使用说明](docs/delivery-acceptance-quickstart.md)。
+
 最新 Windows MVP 已用配置的真实 Go 模型完成 Todo API 的正常交付和受控停止、服务重启、同版本恢复两条路径。代码、测试与报告由项目员工生成，失败与修复历史保留。
 
 2026-10-09 的 JJ 迭代增加部门工作台、OpenShell 员工执行和可选 OpenRig 元数据队列。CLI 小任务已完成真实正常路径（17/17 测试）与受控重启恢复（10/10 测试、只续未完成经理）。OpenRig 负责岗位及工作项映射；为伍保留唯一执行、预算与正式验收入口。它目前不会自动领取并持续执行工作。详见 [本轮交付报告](docs/validation/phase1-phase2-delivery-2026-10-09.md)、[阶段进度](docs/validation/phase1-phase2-progress-2026-10-09.md)及 [OpenRig 集成边界](docs/openrig-integration.md)。
