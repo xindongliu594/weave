@@ -40,6 +40,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const taskIds = new Map();
   const assignments=new Map();let teamId,workspaceRoot;
   let productDispose, captainId, locked = false;
+  const internalStatusPolls = new Set();
   const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
   const readEvidence = new Map();
   const writeEvidence = new Map();
@@ -261,7 +262,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         });
       });
     }
-    if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined);
+    if (archive) trace = attachTrace(ctx, archive,product?taskFor:undefined,exec=>internalStatusPolls.has(exec.callId));
     if(product)adapter.attribution=(sessionId)=>{const request=trace?.request(sessionId)??{},employee=adapter.sessionPolicies?.get(sessionId),taskId=taskIds.get(request.taskId)??request.taskId;return {...request,sessionId,agentId:employee?.id,employeeId:employee?.employeeId,taskId,runtimeTaskId:request.taskId,reworkRound:rework?.contractFor(request.taskId)?.reworkRound};};
     if(product)adapter.attestReadGroup=attestReadGroup;
     if(product)adapter.attestSupersededRead=attestSupersededRead;
@@ -347,11 +348,15 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         trace?.check();
         if (!agent) throw new Error('A live calling agent is required');
         if (ctx.agents.get(agent.id) !== agent) throw new Error('EMPLOYEE_NOT_LIVE: 员工宿主已释放');
-        const result = await agent.ctx.tools.execute({ callId: randomUUID(), name, arguments: args, agent, signal });
-        if (result.isError) throw new Error(`${name}: ${JSON.stringify(result.error)}`);
-        trace?.check();
-        if (archive && name === 'agent_teams_status') archive.append('team/snapshot', result.value, { sessionId: agent.id });
-        return result.value;
+        const callId = randomUUID();
+        if (name === 'agent_teams_status' && agent.id === captainId) internalStatusPolls.add(callId);
+        try {
+          const result = await agent.ctx.tools.execute({ callId, name, arguments: args, agent, signal });
+          if (result.isError) throw new Error(`${name}: ${JSON.stringify(result.error)}`);
+          trace?.check();
+          if (archive && name === 'agent_teams_status' && agent.id !== captainId) archive.append('team/snapshot', result.value, { sessionId: agent.id });
+          return result.value;
+        } finally { internalStatusPolls.delete(callId); }
       },
     };
   } catch (error) {

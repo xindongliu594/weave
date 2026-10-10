@@ -1,0 +1,12 @@
+✔ --help 唯一参数：退出码 0、stderr 为空、stdout 含完整用法与 node cli.mjs 25 示例、不含换算 JSON (39.502079ms)
+✔ --help 带额外参数 "25"：向 stderr 说明并以非零退出码退出 (33.213931ms)
+✔ --help 带额外参数 "abc"：向 stderr 说明并以非零退出码退出 (31.832355ms)
+✔ --help 带额外参数 "--verbose"：向 stderr 说明并以非零退出码退出 (29.461558ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 196.756408

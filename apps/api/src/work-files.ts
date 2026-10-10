@@ -8,12 +8,15 @@ import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { createOfficeFile, readOfficeFile } from '../../../services/agent-runtime/office-files.mjs';
 import { isArtifactPath } from '../../../packages/contracts/task-contracts.mjs';
+import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
+import { artifactFile } from '../../../services/agent-runtime/sandbox.mjs';
+import { completedTasks, resumeHandoff } from './handoff-checkpoints.ts';
 
 type Database = Pick<pg.PoolClient,'query'>;
 export const workFileLimits={files:100,fileBytes:2*1024*1024,totalBytes:8*1024*1024,textCharacters:250000};
 export const workFileTables=['work_file_snapshots'];
 export type WorkFile = {path:string;bytes:number;sha256:string;kind:string;text:string;warnings:string[];base64:string};
-export type WorkFileSnapshot = {id:string;name:string;files:WorkFile[];bytes:number;createdAt:string};
+export type WorkFileSnapshot = {id:string;name:string;files:WorkFile[];bytes:number;createdAt:string;sourceRunId?:string|null};
 export type WorkFileSelection = {snapshotId:string;paths:string[];agentIds:string[];mode?:'reference'|'workspace'};
 export const workFileSelectionSchema=z.object({snapshotId:z.string().uuid(),paths:z.array(z.string().min(1).max(240)).min(1).max(100),agentIds:z.array(z.string().min(1).max(180)).min(1).max(6),mode:z.enum(['reference','workspace']).optional()}).strict();
 const uploadSchema=z.object({name:z.string().trim().min(1).max(100),files:z.array(z.object({path:z.string().min(1).max(240),base64:z.string().max(Math.ceil(workFileLimits.fileBytes/3)*4),kind:z.literal('file').optional()}).strict()).min(1).max(workFileLimits.files)}).strict();
@@ -38,9 +41,9 @@ export function prepareWorkFileSnapshot(value:unknown){
   });
   return {name:input.name,files,bytes};
 }
-export async function migrateWorkFiles(db:Database){await db.query(`CREATE TABLE IF NOT EXISTS work_file_snapshots(id text PRIMARY KEY,name text NOT NULL,files jsonb NOT NULL,bytes integer NOT NULL,created_at timestamptz NOT NULL DEFAULT now());`);}
+export async function migrateWorkFiles(db:Database){await db.query(`CREATE TABLE IF NOT EXISTS work_file_snapshots(id text PRIMARY KEY,name text NOT NULL,files jsonb NOT NULL,bytes integer NOT NULL,created_at timestamptz NOT NULL DEFAULT now());`);await db.query('ALTER TABLE work_file_snapshots ADD COLUMN IF NOT EXISTS source_run_id text');}
 export async function readWorkFileSnapshot(id:string,db:Database=pool):Promise<WorkFileSnapshot>{
-  const row=(await db.query('SELECT id,name,files,bytes,created_at AS "createdAt" FROM work_file_snapshots WHERE id=$1',[id])).rows[0];
+  const row=(await db.query('SELECT id,name,files,bytes,created_at AS "createdAt",source_run_id AS "sourceRunId" FROM work_file_snapshots WHERE id=$1',[id])).rows[0];
   if(!row)throw new AppError(404,'导入快照不存在。');return row;
 }
 function verifiedText(file:WorkFile){
@@ -124,14 +127,40 @@ export function prepareImportedWorkspace(traceRoot:string,runId:string,files:Imp
   }
   for(const file of copies){const target=join(targetRoot,file.path);directoryChain(dirname(target),true);writeFileSync(target,file.bytes,{flag:'wx',mode:0o600});}
 }
-export function workFilesRouter(db:Pick<pg.Pool,'query'|'connect'>=pool){
+export function workFilesRouter(db:Pick<pg.Pool,'query'|'connect'>=pool,traceRoot=resolve(process.env.TRACE_ROOT??'.data/runs')){
   const router=Router();
-  router.get('/work-files',async(_req,res)=>res.json((await db.query('SELECT id,name,bytes,created_at AS "createdAt",jsonb_array_length(files) AS "fileCount" FROM work_file_snapshots ORDER BY created_at DESC LIMIT 200')).rows));
-  async function store(value:unknown){
+  router.get('/work-files',async(_req,res)=>res.json((await db.query('SELECT id,name,bytes,created_at AS "createdAt",source_run_id AS "sourceRunId",jsonb_array_length(files) AS "fileCount" FROM work_file_snapshots ORDER BY created_at DESC LIMIT 200')).rows));
+  async function store(value:unknown,sourceRunId?:string){
     const snapshot=prepareWorkFileSnapshot(value),id=randomUUID(),client=await db.connect();
-    try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918279)');const row=(await client.query('SELECT count(*)::int AS count,coalesce(sum(bytes),0)::bigint AS bytes FROM work_file_snapshots')).rows[0];if(row.count>=200||Number(row.bytes)+snapshot.bytes>128*1024*1024)throw new AppError(422,'素材库已达到 200 份快照或 128 MiB 限额。');await client.query('INSERT INTO work_file_snapshots(id,name,files,bytes) VALUES($1,$2,$3,$4)',[id,snapshot.name,JSON.stringify(snapshot.files),snapshot.bytes]);await client.query('COMMIT');return {id,name:snapshot.name,bytes:snapshot.bytes,fileCount:snapshot.files.length};}catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
+    try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918279)');
+      if(sourceRunId){
+        const signature=(files:WorkFile[])=>files.map(file=>file.path+':'+file.sha256).sort().join('\n');
+        const prior=(await client.query('SELECT id,name,files,bytes FROM work_file_snapshots WHERE source_run_id=$1',[sourceRunId])).rows.find(row=>signature(row.files)===signature(snapshot.files));
+        if(prior){prior.files.forEach(verifiedText);await client.query('COMMIT');return {id:prior.id,name:prior.name,bytes:prior.bytes,fileCount:prior.files.length,sourceRunId,existing:true};}
+      }
+      const row=(await client.query('SELECT count(*)::int AS count,coalesce(sum(bytes),0)::bigint AS bytes FROM work_file_snapshots')).rows[0];if(row.count>=200||Number(row.bytes)+snapshot.bytes>128*1024*1024)throw new AppError(422,'素材库已达到 200 份快照或 128 MiB 限额。');await client.query('INSERT INTO work_file_snapshots(id,name,files,bytes,source_run_id) VALUES($1,$2,$3,$4,$5)',[id,snapshot.name,JSON.stringify(snapshot.files),snapshot.bytes,sourceRunId??null]);await client.query('COMMIT');return {id,name:snapshot.name,bytes:snapshot.bytes,fileCount:snapshot.files.length,...(sourceRunId?{sourceRunId}:{})};}catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
   }
   router.post('/work-files',async(req,res)=>res.status(201).json(await store(req.body)));
+  router.post('/work-files/from-run',async(req,res)=>{
+    const input=z.object({runId:z.uuid(),paths:z.array(z.string().min(1).max(240)).min(1).max(100),name:z.string().trim().min(1).max(100).optional()}).strict().parse(req.body);
+    const row=(await db.query('SELECT status,snapshot FROM project_runs WHERE id=$1',[input.runId])).rows[0];
+    const run=readRun(traceRoot,input.runId);
+    if(!row||!run)throw new AppError(404,'来源运行不存在。');
+    const sourceProjectId=(run.snapshot as {projectId?:unknown}).projectId;
+    if(row.status!=='completed'||run.status!=='completed'||run.integrity!=='ok'||typeof sourceProjectId!=='string'||row.snapshot.projectId!==sourceProjectId||row.snapshot.planVersion!==run.snapshot.planVersion)throw new AppError(409,'只能复用完整且已完成的正式运行。');
+    const root=join(traceRoot,input.runId,'artifacts');
+    let receipts:any[];
+    try{const done=completedTasks(run.events,run.snapshot);if(!done.size||!run.snapshot.tasks.every((task:any)=>done.has(task.id)))throw Error('任务尚未全部核验完成');receipts=resumeHandoff(run.snapshot,run.events,done,root);}catch(error){throw new AppError(409,'来源交接不能核对：'+(error as Error).message);}
+    const sealed=receipts.flatMap(record=>[...(record.inputs??[]),...(record.outputs??[])]);
+    const files=input.paths.map(path=>{
+      validateWorkFilePath(path);let raw:Buffer;try{raw=readFileSync(artifactFile(root,path));}catch{throw new AppError(422,'来源文件不存在或路径不允许：'+path);}
+      const sha256=createHash('sha256').update(raw).digest('hex');
+      if(!sealed.some(file=>file.path===path&&file.sha256===sha256))throw new AppError(409,'文件未绑定已核验交接，或版本已变化：'+path);
+      return {path,base64:raw.toString('base64')};
+    });
+    const result=await store({name:input.name??('已验收交付 · '+input.runId),files},input.runId);
+    res.status(result.existing?200:201).json(result);
+  });
   router.post('/work-files/generate',async(req,res)=>{
     const input=z.object({format:z.enum(['csv','docx','xlsx']),name:z.string().trim().min(1).max(80),title:z.string().max(200).optional(),text:z.string().max(250000).optional(),rows:z.array(z.array(z.union([z.string(),z.number().finite(),z.boolean(),z.null()]))).optional()}).strict().parse(req.body);
     let output:ReturnType<typeof createOfficeFile>;try{output=createOfficeFile({...input,title:input.title??input.name});}catch(error){throw new AppError(422,(error as Error).message);}

@@ -1,0 +1,33 @@
+✖ --help 唯一参数：退出码 0、stderr 为空、stdout 含完整用法与 node cli.mjs 25 示例、不含换算 JSON (32.740409ms)
+✔ --help 带额外参数 "25"：向 stderr 说明并以非零退出码退出 (27.801114ms)
+✔ --help 带额外参数 "abc"：向 stderr 说明并以非零退出码退出 (32.177066ms)
+✔ --help 带额外参数 "--verbose"：向 stderr 说明并以非零退出码退出 (29.742927ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 182.352767
+
+✖ failing tests:
+
+test at help.test.mjs:96:1
+✖ --help 唯一参数：退出码 0、stderr 为空、stdout 含完整用法与 node cli.mjs 25 示例、不含换算 JSON (32.740409ms)
+  AssertionError [ERR_ASSERTION]: --help 不应输出换算 JSON，实际 stdout="摄氏转华氏命令行工具\n\n用法:\n  node cli.mjs <celsius>\n  node cli.mjs --help\n\n参数:\n  <celsius>   摄氏温度，允许负数与小数（唯一位置参数）\n  --help      显示本帮助信息；仅可单独使用\n\n输出:\n  成功时向 stdout 输出一行 JSON: {\"celsius\": <number>, \"fahrenheit\": <number>}\n  换算公式: F = C * 9 / 5 + 32\n\n示例:\n  node cli.mjs 25\n  node cli.mjs 0\n  node cli.mjs 100\n  node cli.mjs -40\n  node cli.mjs 36.6\n  node cli.mjs --help\n\n退出码:\n  0  成功（含 --help）\n  1  缺少摄氏温度参数\n  2  参数多于一个（含 --help 后带额外参数）\n  3  参数为空、纯空白或非数字\n"
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///sandbox/help.test.mjs:132:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

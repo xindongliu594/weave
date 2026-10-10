@@ -1,0 +1,265 @@
+{
+  "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+  "projectId": "591c8468-febf-4d71-9414-2ee3b987f671",
+  "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+  "planVersion": 3,
+  "title": "工作记录 · 复用已验收的 Node.js 摄氏转华氏 CLI，只增加 --help 帮助入口，不重新开发整个项目。稍后在方案中选择来源运行 d22f8757-a521-4781-a0de-32ebd58c3b52 的独立交付快照。\n\n要求：node c",
+  "files": [
+    {
+      "path": "cli.mjs",
+      "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b"
+    },
+    {
+      "path": "cli.mjs",
+      "sha256": "9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "31d028660c0db8989c4931ed3040a3badccc03319b30038f61bea226ff00e4a0"
+    },
+    {
+      "path": "cli.test.mjs",
+      "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+    },
+    {
+      "path": "help.test.mjs",
+      "sha256": "6e682d657b4c0c85cb598f6473a2affbead2113567f8ce818c9284a27f2b8dd9"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "dev",
+      "subject": "为 cli.mjs 增加 --help 帮助入口并更新 README",
+      "kind": "implementation",
+      "dependencies": [],
+      "criteria": [
+        "node --check cli.mjs 通过，说明 cli.mjs 语法可运行；功能正确性由后续独立 QA 验证，语法检查不构成功能正确结论"
+      ],
+      "commands": [
+        {
+          "command": "node --check cli.mjs",
+          "exitCode": 0,
+          "checks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "9386be336d5a2fffde6723fa459a0076ee8054e1338214a44db5c256e3e131dc",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "tests": {
+            "status": "unknown",
+            "reason": "NOT_SINGLE_NODE_TEST_COMMAND"
+          }
+        }
+      ]
+    },
+    {
+      "id": "verify",
+      "subject": "独立 QA：复跑旧 17 项测试并新增 help.test.mjs 帮助测试",
+      "kind": "verification",
+      "dependencies": [
+        "dev"
+      ],
+      "criteria": [
+        "node --test cli.test.mjs 真实运行且至少 17 项测试通过，无失败或跳过",
+        "node --test help.test.mjs 真实运行且至少 2 项测试通过，覆盖正常帮助与带额外参数错误"
+      ],
+      "commands": [
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "checks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "tests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 17,
+            "suites": 0,
+            "pass": 17,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        {
+          "command": "node --test help.test.mjs",
+          "exitCode": 1,
+          "checks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916",
+              "status": "failed",
+              "reason": "有效测试数量不足，或存在失败、取消、跳过或待办"
+            }
+          ],
+          "tests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 4,
+            "suites": 0,
+            "pass": 3,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "checks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "tests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 17,
+            "suites": 0,
+            "pass": 17,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        {
+          "command": "node --test help.test.mjs",
+          "exitCode": 0,
+          "checks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "tests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 4,
+            "suites": 0,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "accept",
+      "subject": "经理只读验收 --help 实现与 QA 结果",
+      "kind": "review",
+      "dependencies": [
+        "dev",
+        "verify"
+      ],
+      "criteria": [
+        "逐条核对用户要求、当前版本文件与真实 QA 回执，至少 17 项旧测试与 2 项帮助测试均真实通过，结论为通过或不通过并附依据",
+        "node --test cli.test.mjs 复跑至少 17 项测试通过，node --test help.test.mjs 复跑至少 2 项测试通过"
+      ],
+      "commands": [
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "checks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "b9c959b8d67ef0c85cfb9db1464e75ecda53f3313efb5492e35a3c9a8d838164",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "tests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 17,
+            "suites": 0,
+            "pass": 17,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        {
+          "command": "node --test help.test.mjs",
+          "exitCode": 0,
+          "checks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "c26461e9b3ada0ca28f64d570aae47d16c74739ccdf07d420f1c40700812e013",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "tests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 4,
+            "suites": 0,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "taskId": "accept",
+      "verdict": "pass"
+    }
+  ],
+  "efficiency": {
+    "current": {
+      "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+      "goalHash": "5c42b293383060d9eb6e1d80d9fefc461b9a71a2d7cfecdcebe6d8bd4e61d063",
+      "acceptanceHash": "e57b7993eea1cdf9aaeb3ee4725f5bb68f7be5cd6e89fc569d265d4678186101",
+      "modelHash": "f8cabf1827e4f50bfa8ac31a7108f96b7f42c25b1abff8483c28aa75e9229fb4",
+      "deviceHash": "c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601",
+      "initialFilesHash": "3b451509683426e452205310d31601890056bfda208c2965fa3f5fb7377e9f72",
+      "resumed": false,
+      "usageComplete": true,
+      "wallMs": 1698783,
+      "approvalWaitMs": 1508186,
+      "activeMs": 190597,
+      "modelMs": 165174,
+      "inputTokens": 570807,
+      "outputTokens": 19444,
+      "totalTokens": 590251,
+      "modelCalls": 31,
+      "cost": 0.19457489999999997,
+      "pendingReceipts": 0,
+      "knowledgeVersions": [],
+      "citations": []
+    },
+    "baseline": null,
+    "comparison": null,
+    "method": "同部门、同需求、同验收标准、同模型、同初始工作区文件及执行设备的首次完整成功运行；恢复分段不计算收益。仅统计执行阶段，规划对话另记。固定知识版本数量只统计公司 / 部门知识文档，导入工作区资料另见来源运行。净耗时仅扣除审批等待，不代表 CPU 时间。正值为减少，负值为增加；零基准无百分比。此为实测对照，不能单独证明知识复用导致收益。"
+  },
+  "content": "# 工作记录\n来源运行：1fdf2d74-10d7-4e94-a3db-b6131fbf578c\n项目：591c8468-febf-4d71-9414-2ee3b987f671 · 方案 v3\n完成时间：2026-10-10T08:55:38.103Z\n\n## 需求\n复用已验收的 Node.js 摄氏转华氏 CLI，只增加 --help 帮助入口，不重新开发整个项目。稍后在方案中选择来源运行 d22f8757-a521-4781-a0de-32ebd58c3b52 的独立交付快照。\n\n要求：node cli.mjs --help 以退出码 0 向 stdout 输出用法 node cli.mjs <celsius> 和至少一个数字示例，不输出换算 JSON。--help 后多带参数仍拒绝，向 stderr 说明并非零退出。原数字、负数、小数换算、缺参数、非数字及多参数行为保持，旧 cli.test.mjs 不得修改。只用 Node 内置模块。\n\n同一部门三人串行：开发只修改 cli.mjs 与 README.md；独立 QA 复用原 17 项测试，另写 help.test.mjs 至少覆盖正常帮助与带额外参数的错误，并实际运行两份测试；经理只读核对当前文件、真实 QA 结果，提交正式审查结论。AI 自动生成输入版本、任务依赖、逐项命令映射及含摘要和恢复开销的预算，用户不手填内部合同。规划与执行共用本项目 $0.40 上限，未确认方案前不执行。\n\n## 已核验节点与实际命令\n```json\n[\n  {\n    \"id\": \"dev\",\n    \"subject\": \"为 cli.mjs 增加 --help 帮助入口并更新 README\",\n    \"kind\": \"implementation\",\n    \"dependencies\": [],\n    \"criteria\": [\n      \"node --check cli.mjs 通过，说明 cli.mjs 语法可运行；功能正确性由后续独立 QA 验证，语法检查不构成功能正确结论\"\n    ],\n    \"commands\": [\n      {\n        \"command\": \"node --check cli.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 0,\n            \"ruleSha256\": \"9386be336d5a2fffde6723fa459a0076ee8054e1338214a44db5c256e3e131dc\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"unknown\",\n          \"reason\": \"NOT_SINGLE_NODE_TEST_COMMAND\"\n        }\n      }\n    ]\n  },\n  {\n    \"id\": \"verify\",\n    \"subject\": \"独立 QA：复跑旧 17 项测试并新增 help.test.mjs 帮助测试\",\n    \"kind\": \"verification\",\n    \"dependencies\": [\n      \"dev\"\n    ],\n    \"criteria\": [\n      \"node --test cli.test.mjs 真实运行且至少 17 项测试通过，无失败或跳过\",\n      \"node --test help.test.mjs 真实运行且至少 2 项测试通过，覆盖正常帮助与带额外参数错误\"\n    ],\n    \"commands\": [\n      {\n        \"command\": \"node --test cli.test.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 0,\n            \"ruleSha256\": \"692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"available\",\n          \"format\": \"spec\",\n          \"tests\": 17,\n          \"suites\": 0,\n          \"pass\": 17,\n          \"fail\": 0,\n          \"cancelled\": 0,\n          \"skipped\": 0,\n          \"todo\": 0\n        }\n      },\n      {\n        \"command\": \"node --test help.test.mjs\",\n        \"exitCode\": 1,\n        \"checks\": [\n          {\n            \"criterionIndex\": 1,\n            \"ruleSha256\": \"dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916\",\n            \"status\": \"failed\",\n            \"reason\": \"有效测试数量不足，或存在失败、取消、跳过或待办\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"available\",\n          \"format\": \"spec\",\n          \"tests\": 4,\n          \"suites\": 0,\n          \"pass\": 3,\n          \"fail\": 1,\n          \"cancelled\": 0,\n          \"skipped\": 0,\n          \"todo\": 0\n        }\n      },\n      {\n        \"command\": \"node --test cli.test.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 0,\n            \"ruleSha256\": \"692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"available\",\n          \"format\": \"spec\",\n          \"tests\": 17,\n          \"suites\": 0,\n          \"pass\": 17,\n          \"fail\": 0,\n          \"cancelled\": 0,\n          \"skipped\": 0,\n          \"todo\": 0\n        }\n      },\n      {\n        \"command\": \"node --test help.test.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 1,\n            \"ruleSha256\": \"dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"available\",\n          \"format\": \"spec\",\n          \"tests\": 4,\n          \"suites\": 0,\n          \"pass\": 4,\n          \"fail\": 0,\n          \"cancelled\": 0,\n          \"skipped\": 0,\n          \"todo\": 0\n        }\n      }\n    ]\n  },\n  {\n    \"id\": \"accept\",\n    \"subject\": \"经理只读验收 --help 实现与 QA 结果\",\n    \"kind\": \"review\",\n    \"dependencies\": [\n      \"dev\",\n      \"verify\"\n    ],\n    \"criteria\": [\n      \"逐条核对用户要求、当前版本文件与真实 QA 回执，至少 17 项旧测试与 2 项帮助测试均真实通过，结论为通过或不通过并附依据\",\n      \"node --test cli.test.mjs 复跑至少 17 项测试通过，node --test help.test.mjs 复跑至少 2 项测试通过\"\n    ],\n    \"commands\": [\n      {\n        \"command\": \"node --test cli.test.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 0,\n            \"ruleSha256\": \"b9c959b8d67ef0c85cfb9db1464e75ecda53f3313efb5492e35a3c9a8d838164\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"available\",\n          \"format\": \"spec\",\n          \"tests\": 17,\n          \"suites\": 0,\n          \"pass\": 17,\n          \"fail\": 0,\n          \"cancelled\": 0,\n          \"skipped\": 0,\n          \"todo\": 0\n        }\n      },\n      {\n        \"command\": \"node --test help.test.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 1,\n            \"ruleSha256\": \"c26461e9b3ada0ca28f64d570aae47d16c74739ccdf07d420f1c40700812e013\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"available\",\n          \"format\": \"spec\",\n          \"tests\": 4,\n          \"suites\": 0,\n          \"pass\": 4,\n          \"fail\": 0,\n          \"cancelled\": 0,\n          \"skipped\": 0,\n          \"todo\": 0\n        }\n      }\n    ]\n  }\n]\n```\n## 正式审查记录\n```json\n[\n  {\n    \"taskId\": \"accept\",\n    \"verdict\": \"pass\"\n  }\n]\n```\n## 交付版本索引\n```json\n[\n  {\n    \"path\": \"cli.mjs\",\n    \"sha256\": \"51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75\"\n  },\n  {\n    \"path\": \"README.md\",\n    \"sha256\": \"ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b\"\n  },\n  {\n    \"path\": \"cli.mjs\",\n    \"sha256\": \"9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e\"\n  },\n  {\n    \"path\": \"README.md\",\n    \"sha256\": \"31d028660c0db8989c4931ed3040a3badccc03319b30038f61bea226ff00e4a0\"\n  },\n  {\n    \"path\": \"cli.test.mjs\",\n    \"sha256\": \"33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df\"\n  },\n  {\n    \"path\": \"help.test.mjs\",\n    \"sha256\": \"6e682d657b4c0c85cb598f6473a2affbead2113567f8ce818c9284a27f2b8dd9\"\n  }\n]\n```\n## 效率与知识复用实测\n同部门、同需求、同验收标准、同模型、同初始工作区文件及执行设备的首次完整成功运行；恢复分段不计算收益。仅统计执行阶段，规划对话另记。固定知识版本数量只统计公司 / 部门知识文档，导入工作区资料另见来源运行。净耗时仅扣除审批等待，不代表 CPU 时间。正值为减少，负值为增加；零基准无百分比。此为实测对照，不能单独证明知识复用导致收益。\n尚无同条件的首次运行，暂不计算减少百分比。\n```json\n{\n  \"current\": {\n    \"runId\": \"1fdf2d74-10d7-4e94-a3db-b6131fbf578c\",\n    \"goalHash\": \"5c42b293383060d9eb6e1d80d9fefc461b9a71a2d7cfecdcebe6d8bd4e61d063\",\n    \"acceptanceHash\": \"e57b7993eea1cdf9aaeb3ee4725f5bb68f7be5cd6e89fc569d265d4678186101\",\n    \"modelHash\": \"f8cabf1827e4f50bfa8ac31a7108f96b7f42c25b1abff8483c28aa75e9229fb4\",\n    \"deviceHash\": \"c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601\",\n    \"initialFilesHash\": \"3b451509683426e452205310d31601890056bfda208c2965fa3f5fb7377e9f72\",\n    \"resumed\": false,\n    \"usageComplete\": true,\n    \"wallMs\": 1698783,\n    \"approvalWaitMs\": 1508186,\n    \"activeMs\": 190597,\n    \"modelMs\": 165174,\n    \"inputTokens\": 570807,\n    \"outputTokens\": 19444,\n    \"totalTokens\": 590251,\n    \"modelCalls\": 31,\n    \"cost\": 0.19457489999999997,\n    \"pendingReceipts\": 0,\n    \"knowledgeVersions\": [],\n    \"citations\": []\n  },\n  \"baseline\": null,\n  \"comparison\": null,\n  \"method\": \"同部门、同需求、同验收标准、同模型、同初始工作区文件及执行设备的首次完整成功运行；恢复分段不计算收益。仅统计执行阶段，规划对话另记。固定知识版本数量只统计公司 / 部门知识文档，导入工作区资料另见来源运行。净耗时仅扣除审批等待，不代表 CPU 时间。正值为减少，负值为增加；零基准无百分比。此为实测对照，不能单独证明知识复用导致收益。\"\n}\n```\n原始交付、完整命令输出和费用保留在来源运行。此记录可供检索复用，Skill 或工具的采纳仍需独立评估。",
+  "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434",
+  "shareable": true
+}

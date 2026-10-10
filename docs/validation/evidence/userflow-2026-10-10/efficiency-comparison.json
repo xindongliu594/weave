@@ -1,0 +1,254 @@
+{
+  "current": {
+    "runId": "5825ba34-8451-4cf5-a30e-30454e699948",
+    "goalHash": "5c42b293383060d9eb6e1d80d9fefc461b9a71a2d7cfecdcebe6d8bd4e61d063",
+    "acceptanceHash": "e57b7993eea1cdf9aaeb3ee4725f5bb68f7be5cd6e89fc569d265d4678186101",
+    "modelHash": "f8cabf1827e4f50bfa8ac31a7108f96b7f42c25b1abff8483c28aa75e9229fb4",
+    "deviceHash": "c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601",
+    "initialFilesHash": "3b451509683426e452205310d31601890056bfda208c2965fa3f5fb7377e9f72",
+    "resumed": false,
+    "usageComplete": true,
+    "wallMs": 395661,
+    "approvalWaitMs": 199634,
+    "activeMs": 196027,
+    "modelMs": 187663,
+    "inputTokens": 558476,
+    "outputTokens": 20303,
+    "totalTokens": 578779,
+    "modelCalls": 30,
+    "cost": 0.19190639999999998,
+    "pendingReceipts": 0,
+    "knowledgeVersions": [
+      {
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      }
+    ],
+    "citations": [
+      {
+        "agentId": "employee-2",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "4064df87ebd6d29c4c504c013b4b0255dac11ef2de0c52baf97bf1a7a0af2059",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-2",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "5985bde60c194e4380ceff7285afd26e093250c319b07e7655681108c1fb859c",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-2",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_a2c0d83259b8971c19106c9c1f00cc0066dbd797",
+        "version": 1,
+        "chunkId": "510cd2040a996be38a865c3bd1f83bea4997da1009f25f6418f4038eedf3dcd7",
+        "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75"
+      },
+      {
+        "agentId": "employee-2",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "f769d8163f7385fe7a93b79995f687427833d85c73b059a5e78b39c12327dc2b",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-2",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_945127a3efc187adf87255ae683719b29f04c01d",
+        "version": 1,
+        "chunkId": "222bfeaf2eb99ef5aafb60b61ea050106a6045f21a2dc8b884027651f93b6f3c",
+        "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b"
+      },
+      {
+        "agentId": "employee-2",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "fc8926d987a9c42e74feea1b69609cb6736b564797ae6f366c6f7845b95936a4",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-3",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "f16e88fb5a5087929da4cb1433cde3f5d8b5c6e754af4f2f2a743d36bb7a4b91",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-3",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "beb17f2f826c1ba89290b0286a3d23420dc2e3bc68616c1f4141290f92e89086",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-3",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "4064df87ebd6d29c4c504c013b4b0255dac11ef2de0c52baf97bf1a7a0af2059",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-3",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "5985bde60c194e4380ceff7285afd26e093250c319b07e7655681108c1fb859c",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-3",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "f769d8163f7385fe7a93b79995f687427833d85c73b059a5e78b39c12327dc2b",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-3",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "8a5d65d0f322f1687d712c6e539360af4d9506605ede950e9dcaa5e6bf12fceb",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "4064df87ebd6d29c4c504c013b4b0255dac11ef2de0c52baf97bf1a7a0af2059",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_a2c0d83259b8971c19106c9c1f00cc0066dbd797",
+        "version": 1,
+        "chunkId": "510cd2040a996be38a865c3bd1f83bea4997da1009f25f6418f4038eedf3dcd7",
+        "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_945127a3efc187adf87255ae683719b29f04c01d",
+        "version": 1,
+        "chunkId": "222bfeaf2eb99ef5aafb60b61ea050106a6045f21a2dc8b884027651f93b6f3c",
+        "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "fc8926d987a9c42e74feea1b69609cb6736b564797ae6f366c6f7845b95936a4",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "f769d8163f7385fe7a93b79995f687427833d85c73b059a5e78b39c12327dc2b",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "run:5825ba34-8451-4cf5-a30e-30454e699948:import_0fdde2bc55b3b5664ea24ed0c5161db6fd361e15",
+        "version": 1,
+        "chunkId": "5985bde60c194e4380ceff7285afd26e093250c319b07e7655681108c1fb859c",
+        "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "beb17f2f826c1ba89290b0286a3d23420dc2e3bc68616c1f4141290f92e89086",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "f16e88fb5a5087929da4cb1433cde3f5d8b5c6e754af4f2f2a743d36bb7a4b91",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      },
+      {
+        "agentId": "employee-1",
+        "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "version": 1,
+        "chunkId": "8a5d65d0f322f1687d712c6e539360af4d9506605ede950e9dcaa5e6bf12fceb",
+        "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+      }
+    ]
+  },
+  "baseline": {
+    "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+    "goalHash": "5c42b293383060d9eb6e1d80d9fefc461b9a71a2d7cfecdcebe6d8bd4e61d063",
+    "acceptanceHash": "e57b7993eea1cdf9aaeb3ee4725f5bb68f7be5cd6e89fc569d265d4678186101",
+    "modelHash": "f8cabf1827e4f50bfa8ac31a7108f96b7f42c25b1abff8483c28aa75e9229fb4",
+    "deviceHash": "c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601",
+    "initialFilesHash": "3b451509683426e452205310d31601890056bfda208c2965fa3f5fb7377e9f72",
+    "resumed": false,
+    "usageComplete": true,
+    "wallMs": 1698783,
+    "approvalWaitMs": 1508186,
+    "activeMs": 190597,
+    "modelMs": 165174,
+    "inputTokens": 570807,
+    "outputTokens": 19444,
+    "totalTokens": 590251,
+    "modelCalls": 31,
+    "cost": 0.19457489999999997,
+    "pendingReceipts": 0,
+    "knowledgeVersions": [],
+    "citations": []
+  },
+  "comparison": {
+    "comparable": true,
+    "changes": {
+      "wallMs": {
+        "baseline": 1698783,
+        "current": 395661,
+        "saved": 1303122,
+        "savedPercent": 76.70915002092674
+      },
+      "activeMs": {
+        "baseline": 190597,
+        "current": 196027,
+        "saved": -5430,
+        "savedPercent": -2.8489430578655486
+      },
+      "modelMs": {
+        "baseline": 165174,
+        "current": 187663,
+        "saved": -22489,
+        "savedPercent": -13.615338975867871
+      },
+      "inputTokens": {
+        "baseline": 570807,
+        "current": 558476,
+        "saved": 12331,
+        "savedPercent": 2.1602748389560746
+      },
+      "outputTokens": {
+        "baseline": 19444,
+        "current": 20303,
+        "saved": -859,
+        "savedPercent": -4.417815264348899
+      },
+      "totalTokens": {
+        "baseline": 590251,
+        "current": 578779,
+        "saved": 11472,
+        "savedPercent": 1.943579934637976
+      },
+      "modelCalls": {
+        "baseline": 31,
+        "current": 30,
+        "saved": 1,
+        "savedPercent": 3.225806451612903
+      },
+      "cost": {
+        "baseline": 0.19457489999999997,
+        "current": 0.19190639999999998,
+        "saved": 0.0026684999999999903,
+        "savedPercent": 1.371451302300549
+      }
+    }
+  },
+  "method": "同部门、同需求、同验收标准、同模型、同初始工作区文件及执行设备的首次完整成功运行；恢复分段不计算收益。仅统计执行阶段，规划对话另记。固定知识版本数量只统计公司 / 部门知识文档，导入工作区资料另见来源运行。净耗时仅扣除审批等待，不代表 CPU 时间。正值为减少，负值为增加；零基准无百分比。此为实测对照，不能单独证明知识复用导致收益。"
+}

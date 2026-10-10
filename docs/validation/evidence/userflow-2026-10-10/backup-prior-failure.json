@@ -1,0 +1,18 @@
+{
+  "passed": false,
+  "archive": "/home/jj/.local/share/weiwu/backups/userflow-20261010T103134Z-c6b84ad3.tar.gz",
+  "restoreDirectory": "/home/jj/.local/share/weiwu/data/restore-checks/userflow-20261010T103134Z-c6b84ad3/pilot",
+  "modelCalls": 0,
+  "restoredDeviceActivated": false,
+  "originalDataOverwritten": false,
+  "archiveSha256": "5743c51df449566a604684de77a9c57e20df780579ce9878a267002e5042121d",
+  "archiveBytes": 35120134,
+  "snapshotBytes": 440995383,
+  "sameFiles": 1739,
+  "allInitialBytesMatch": true,
+  "archiveMode": "0600",
+  "originalHealthy": true,
+  "ledgerPreserved": true,
+  "mainPID": "1253405",
+  "openrigRestarted": true
+}

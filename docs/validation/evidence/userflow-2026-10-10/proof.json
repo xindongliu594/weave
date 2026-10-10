@@ -1,0 +1,808 @@
+{
+  "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+  "projectId": "591c8468-febf-4d71-9414-2ee3b987f671",
+  "planVersion": 3,
+  "finished": "completed",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2693,
+      "sha256": "31d028660c0db8989c4931ed3040a3badccc03319b30038f61bea226ff00e4a0"
+    },
+    {
+      "path": "cli.mjs",
+      "bytes": 3318,
+      "sha256": "9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e"
+    },
+    {
+      "path": "cli.test.mjs",
+      "bytes": 7232,
+      "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+    },
+    {
+      "path": "help.test.mjs",
+      "bytes": 7467,
+      "sha256": "6e682d657b4c0c85cb598f6473a2affbead2113567f8ce818c9284a27f2b8dd9"
+    }
+  ],
+  "commands": [
+    {
+      "taskId": "dev",
+      "command": "node --check cli.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "fa42730b3776afa1f45b90c566b6470c83796facf50aba2c4e46bb4faf8ca34e",
+      "seq": 1206,
+      "counts": {},
+      "file": "01-dev.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "taskId": "verify",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "374d9f65eb1c6797f280b3df700c257af4e5d1586ec7bb73f0fec6f26d98e9bb",
+      "seq": 2416,
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "file": "02-verify.txt",
+      "sha256": "8a1300d5bebbadcd0c4aa9814a72d51c076052196894fed0ce218dc1a3c8b6ab"
+    },
+    {
+      "taskId": "verify",
+      "command": "node --test help.test.mjs",
+      "exitCode": 1,
+      "workspaceRevision": "374d9f65eb1c6797f280b3df700c257af4e5d1586ec7bb73f0fec6f26d98e9bb",
+      "seq": 2945,
+      "counts": {
+        "tests": 4,
+        "pass": 3,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "file": "03-verify.txt",
+      "sha256": "6984ab3113fa704fd250e5db0f22f10af8231a840f981bb894b263688c0fb6e2"
+    },
+    {
+      "taskId": "verify",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+      "seq": 3974,
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "file": "04-verify.txt",
+      "sha256": "b25c101ee2ab97f1a585a33e167cfa80285d9279589b6097ea9cddf7e742e706"
+    },
+    {
+      "taskId": "verify",
+      "command": "node --test help.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+      "seq": 4841,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "file": "05-verify.txt",
+      "sha256": "f986fa55d041191bcfa48e8fdee3cf710465fb8cac85b31624f5981af2cb33cb"
+    },
+    {
+      "taskId": "accept",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+      "seq": 5970,
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "file": "06-accept.txt",
+      "sha256": "14082b548da6ce341b19547e52cdc2688dfd9bd2956a06c2a08fa43f3b7e2edb"
+    },
+    {
+      "taskId": "accept",
+      "command": "node --test help.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+      "seq": 6916,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "file": "07-accept.txt",
+      "sha256": "0e937510be4648f31d946b75a922a19c98898c0e275efb39d00069aede615d50"
+    }
+  ],
+  "reviews": [
+    {
+      "taskId": "accept",
+      "runtimeTaskId": "t3",
+      "attemptId": "2c70e8cc-5030-424e-ac0d-d17114bd3514",
+      "verdict": "pass",
+      "findings": [],
+      "reworkRound": 0,
+      "inputs": [
+        {
+          "path": "cli.mjs",
+          "sha256": "9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e",
+          "size": 3318,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "README.md",
+          "sha256": "31d028660c0db8989c4931ed3040a3badccc03319b30038f61bea226ff00e4a0",
+          "size": 2693,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "help.test.mjs",
+          "sha256": "6e682d657b4c0c85cb598f6473a2affbead2113567f8ce818c9284a27f2b8dd9",
+          "size": 7467,
+          "producerTaskId": "verify"
+        }
+      ]
+    }
+  ],
+  "accepted": [
+    {
+      "taskId": "dev",
+      "attemptId": "87e30054-c8cc-4b85-aaf5-fb610be3b62c",
+      "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+      "workspaceRevision": "fa42730b3776afa1f45b90c566b6470c83796facf50aba2c4e46bb4faf8ca34e",
+      "inputs": [
+        {
+          "path": "cli.mjs",
+          "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75",
+          "size": 2083
+        },
+        {
+          "path": "README.md",
+          "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b",
+          "size": 1849
+        }
+      ],
+      "outputs": [
+        {
+          "path": "cli.mjs",
+          "sha256": "9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e",
+          "size": 3318
+        },
+        {
+          "path": "README.md",
+          "sha256": "31d028660c0db8989c4931ed3040a3badccc03319b30038f61bea226ff00e4a0",
+          "size": 2693
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --check cli.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "fa42730b3776afa1f45b90c566b6470c83796facf50aba2c4e46bb4faf8ca34e",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:31:52.253Z",
+            "tool": "terminal_test",
+            "sessionId": "5fefc3bb-cb21-436a-9b97-2aacc801d4bb",
+            "callId": "call_00_ytxsij2kkg4s8khpgyet9scc",
+            "approval": {
+              "status": "available",
+              "approvalId": "ed335ef2-0fb0-470a-a67f-dcbf3c804d92"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "47eb2f5c-e01a-4fc6-ba27-b943993763cd",
+              "queuedSeq": 1198,
+              "finishedSeq": 1204
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "unknown",
+              "reason": "NOT_SINGLE_NODE_TEST_COMMAND"
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "9386be336d5a2fffde6723fa459a0076ee8054e1338214a44db5c256e3e131dc",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 1206
+        }
+      ],
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "9386be336d5a2fffde6723fa459a0076ee8054e1338214a44db5c256e3e131dc",
+          "status": "passed",
+          "reason": "",
+          "command": "node --check cli.mjs"
+        }
+      ],
+      "acceptedAt": "2026-10-10T08:32:00.119Z",
+      "budgetEvidence": {
+        "version": 1,
+        "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "projectId": "591c8468-febf-4d71-9414-2ee3b987f671",
+        "projectVersion": 3,
+        "capturedAt": "2026-10-10T08:32:00.119Z",
+        "point": "node-accepted",
+        "basis": "host-execution-budget",
+        "currency": "USD",
+        "project": {
+          "limit": 0.4,
+          "occupied": 0.059440800000000016,
+          "activeReserved": 0,
+          "available": 0.3405592,
+          "callsUsed": 7,
+          "callLimit": 100,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "inherited": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.0213186,
+          "retainedUnknownReservation": 0,
+          "availableBudget": 0.3786814,
+          "callsUsed": null,
+          "callsBasis": "archived-model-wire-request-count",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        },
+        "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+      }
+    },
+    {
+      "taskId": "verify",
+      "attemptId": "31235614-0833-4a7f-a188-ba7b23c96c47",
+      "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+      "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+      "inputs": [
+        {
+          "path": "cli.mjs",
+          "sha256": "9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e",
+          "size": 3318,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "cli.test.mjs",
+          "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df",
+          "size": 7232
+        }
+      ],
+      "outputs": [
+        {
+          "path": "help.test.mjs",
+          "sha256": "6e682d657b4c0c85cb598f6473a2affbead2113567f8ce818c9284a27f2b8dd9",
+          "size": 7467
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "374d9f65eb1c6797f280b3df700c257af4e5d1586ec7bb73f0fec6f26d98e9bb",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:36:24.522Z",
+            "tool": "terminal_test",
+            "sessionId": "e19651f5-6b00-4eee-ae3c-a3d2ed1a9b44",
+            "callId": "call_00_ULea1WaV8GDRxw5EPY9m1397",
+            "approval": {
+              "status": "available",
+              "approvalId": "c92874ca-d028-4a7f-9140-ac48caeff4de"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "56a6a277-6e82-4d7e-bafd-76613b04884c",
+              "queuedSeq": 2406,
+              "finishedSeq": 2414
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "8a1300d5bebbadcd0c4aa9814a72d51c076052196894fed0ce218dc1a3c8b6ab",
+              "bytes": 1365,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 17,
+              "suites": 0,
+              "pass": 17,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 2416
+        },
+        {
+          "command": "node --test help.test.mjs",
+          "exitCode": 1,
+          "workspaceRevision": "374d9f65eb1c6797f280b3df700c257af4e5d1586ec7bb73f0fec6f26d98e9bb",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:38:34.870Z",
+            "tool": "terminal_test",
+            "sessionId": "e19651f5-6b00-4eee-ae3c-a3d2ed1a9b44",
+            "callId": "call_00_FcKcV7x459hDVhunEZf85888",
+            "approval": {
+              "status": "available",
+              "approvalId": "76cd3e84-d675-465b-936a-dbdf814ff872"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "717347e5-ed0b-471e-99b7-0dcca2adbf37",
+              "queuedSeq": 2937,
+              "finishedSeq": 2943
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "6984ab3113fa704fd250e5db0f22f10af8231a840f981bb894b263688c0fb6e2",
+              "bytes": 1996,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 4,
+              "suites": 0,
+              "pass": 3,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916",
+              "status": "failed",
+              "reason": "有效测试数量不足，或存在失败、取消、跳过或待办"
+            }
+          ],
+          "observationSeq": 2945
+        },
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:42:57.023Z",
+            "tool": "terminal_test",
+            "sessionId": "e19651f5-6b00-4eee-ae3c-a3d2ed1a9b44",
+            "callId": "call_00_4GjXs7f4XUyPWi6TSJzY0350",
+            "approval": {
+              "status": "available",
+              "approvalId": "86f95ddd-5a69-4e82-9d8e-5845a8f929e5"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "9f30cc41-474d-4dd2-9f1e-85929a67688b",
+              "queuedSeq": 3964,
+              "finishedSeq": 3972
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "b25c101ee2ab97f1a585a33e167cfa80285d9279589b6097ea9cddf7e742e706",
+              "bytes": 1363,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 17,
+              "suites": 0,
+              "pass": 17,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 3974
+        },
+        {
+          "command": "node --test help.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:46:42.757Z",
+            "tool": "terminal_test",
+            "sessionId": "e19651f5-6b00-4eee-ae3c-a3d2ed1a9b44",
+            "callId": "call_00_ALL18HVtPTqXSZ7KTpyj8800",
+            "approval": {
+              "status": "available",
+              "approvalId": "494565c2-0606-4af3-9049-67bfbcfc96ac"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "6c174b75-16fe-4a48-b585-f92c5c5779df",
+              "queuedSeq": 4832,
+              "finishedSeq": 4839
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "f986fa55d041191bcfa48e8fdee3cf710465fb8cac85b31624f5981af2cb33cb",
+              "bytes": 541,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 4,
+              "suites": 0,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 4841
+        }
+      ],
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "692ec7c09be4cf8fe39dee839da5856070d0a05f1143eda1484419e5d19727f0",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test cli.test.mjs"
+        },
+        {
+          "criterionIndex": 1,
+          "ruleSha256": "dc8697c3380119751cc23404b913be2166b95683696b55248efc5d6e6c8f9916",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test help.test.mjs"
+        }
+      ],
+      "acceptedAt": "2026-10-10T08:47:01.473Z",
+      "budgetEvidence": {
+        "version": 1,
+        "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "projectId": "591c8468-febf-4d71-9414-2ee3b987f671",
+        "projectVersion": 3,
+        "capturedAt": "2026-10-10T08:47:01.473Z",
+        "point": "node-accepted",
+        "basis": "host-execution-budget",
+        "currency": "USD",
+        "project": {
+          "limit": 0.4,
+          "occupied": 0.18784170000000003,
+          "activeReserved": 0.0303729,
+          "available": 0.2121583,
+          "callsUsed": 23,
+          "callLimit": 100,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "inherited": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.0213186,
+          "retainedUnknownReservation": 0,
+          "availableBudget": 0.3786814,
+          "callsUsed": null,
+          "callsBasis": "archived-model-wire-request-count",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        },
+        "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+      }
+    },
+    {
+      "taskId": "accept",
+      "attemptId": "2c70e8cc-5030-424e-ac0d-d17114bd3514",
+      "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+      "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+      "inputs": [
+        {
+          "path": "cli.mjs",
+          "sha256": "9105a499636d1a83239882bfa3fb76369ad2626f1aa62952e0f442389163536e",
+          "size": 3318,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "README.md",
+          "sha256": "31d028660c0db8989c4931ed3040a3badccc03319b30038f61bea226ff00e4a0",
+          "size": 2693,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "help.test.mjs",
+          "sha256": "6e682d657b4c0c85cb598f6473a2affbead2113567f8ce818c9284a27f2b8dd9",
+          "size": 7467,
+          "producerTaskId": "verify"
+        }
+      ],
+      "outputs": [],
+      "commands": [
+        {
+          "command": "node --test cli.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:50:55.000Z",
+            "tool": "terminal_test",
+            "sessionId": "f562d4b9-53a5-4bb5-b093-3b0949df245b",
+            "callId": "call_00_og2ws25owz0fnfxrdo0jg48b",
+            "approval": {
+              "status": "available",
+              "approvalId": "bd617739-46f8-41d3-9489-f4f2010ba630"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "b18ffc45-8467-4ecd-8649-d869b3719fd3",
+              "queuedSeq": 5960,
+              "finishedSeq": 5968
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "14082b548da6ce341b19547e52cdc2688dfd9bd2956a06c2a08fa43f3b7e2edb",
+              "bytes": 1366,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 17,
+              "suites": 0,
+              "pass": 17,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "b9c959b8d67ef0c85cfb9db1464e75ecda53f3313efb5492e35a3c9a8d838164",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 5970
+        },
+        {
+          "command": "node --test help.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "a61df07aa8f63e2247bd686f168aa98c7fcc4fc79090bd37ff9fd3821ed48eee",
+          "evidence": {
+            "version": 1,
+            "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+            "observedAt": "2026-10-10T08:55:05.388Z",
+            "tool": "terminal_test",
+            "sessionId": "f562d4b9-53a5-4bb5-b093-3b0949df245b",
+            "callId": "call_01_e8gj0d19pqz1gsjuhlf8ebqv",
+            "approval": {
+              "status": "available",
+              "approvalId": "39ba95cc-8dcd-4d68-ae43-c64c215efc25"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "978d432c-b42d-4845-b532-dbe62c2866dd",
+              "queuedSeq": 6906,
+              "finishedSeq": 6914
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "0e937510be4648f31d946b75a922a19c98898c0e275efb39d00069aede615d50",
+              "bytes": 541,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 4,
+              "suites": 0,
+              "pass": 4,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 1,
+              "ruleSha256": "c26461e9b3ada0ca28f64d570aae47d16c74739ccdf07d420f1c40700812e013",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 6916
+        }
+      ],
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "b9c959b8d67ef0c85cfb9db1464e75ecda53f3313efb5492e35a3c9a8d838164",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test cli.test.mjs"
+        },
+        {
+          "criterionIndex": 1,
+          "ruleSha256": "c26461e9b3ada0ca28f64d570aae47d16c74739ccdf07d420f1c40700812e013",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test help.test.mjs"
+        }
+      ],
+      "acceptedAt": "2026-10-10T08:55:36.352Z",
+      "budgetEvidence": {
+        "version": 1,
+        "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+        "projectId": "591c8468-febf-4d71-9414-2ee3b987f671",
+        "projectVersion": 3,
+        "capturedAt": "2026-10-10T08:55:36.352Z",
+        "point": "node-accepted",
+        "basis": "host-execution-budget",
+        "currency": "USD",
+        "project": {
+          "limit": 0.4,
+          "occupied": 0.2089101,
+          "activeReserved": 0,
+          "available": 0.19108990000000003,
+          "callsUsed": 30,
+          "callLimit": 100,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "inherited": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.0213186,
+          "retainedUnknownReservation": 0,
+          "availableBudget": 0.3786814,
+          "callsUsed": null,
+          "callsBasis": "archived-model-wire-request-count",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        },
+        "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+      }
+    }
+  ],
+  "cost": 0.2158935,
+  "calls": 36,
+  "journalBytes": 8777622,
+  "eventCount": 7090,
+  "internalPollReferences": 3165,
+  "fullTeamSnapshots": 10,
+  "modelRequests": 31,
+  "finalAt": "2026-10-10T08:55:38.103Z"
+}

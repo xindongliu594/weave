@@ -3,13 +3,13 @@ import type { Plan } from '../../../packages/contracts/index.ts';
 /** A contract example, never a generated candidate or employee deliverable. */
 export const organizationPlanningTaskExample: Plan['tasks'] = [
   { id: 'develop', subject: '实现 CLI 与使用说明', objective: '实现用户要求的小型 CLI，并说明使用方法。', assigneeId: 'developer', dependencies: [],
-    acceptanceCriteria: ['CLI 满足用户要求，语法检查通过，使用说明完整'], estimatedInputTokens: 60000, estimatedOutputTokens: 6000, maxOutputTokens: 1500,
+    acceptanceCriteria: ['CLI 语法检查通过；功能由后续独立 QA 验证'], acceptanceChecks: [{criterionIndex:0,command:'node --check cli.mjs'}], estimatedInputTokens: 60000, estimatedOutputTokens: 6000, maxOutputTokens: 4096,
     kind: 'implementation', inputs: [], outputs: [{ path: 'cli.mjs', format: 'text' }, { path: 'README.md', format: 'text' }], inScope: ['cli.mjs', 'README.md'], verify: ['node --check cli.mjs'] },
   { id: 'verify', subject: '独立测试 CLI', objective: '读取开发交付，另行编写并实际执行独立测试。', assigneeId: 'qa', dependencies: ['develop'],
-    acceptanceCriteria: ['独立测试覆盖用户要求及边界，实际命令退出码为 0'], estimatedInputTokens: 45000, estimatedOutputTokens: 4000, maxOutputTokens: 1000,
+    acceptanceCriteria: ['独立测试覆盖用户要求及边界，至少 4 项真实测试通过'], acceptanceChecks: [{criterionIndex:0,command:'node --test cli.test.mjs',minimumTests:4}], estimatedInputTokens: 45000, estimatedOutputTokens: 4000, maxOutputTokens: 4096,
     kind: 'verification', inputs: [{ path: 'cli.mjs', producerTaskId: 'develop' }], outputs: [{ path: 'cli.test.mjs', format: 'text' }], inScope: ['cli.test.mjs'], verify: ['node --test cli.test.mjs'] },
   { id: 'accept', subject: '经理只读验收', objective: '现有经理读取开发和 QA 交付，核对宿主记录的真实测试证据，通过任务完成回复给出结论。', assigneeId: 'manager', dependencies: ['develop', 'verify'],
-    acceptanceCriteria: ['核对用户要求、当前交付版本与真实 QA 结果，明确通过项和未完成项'], estimatedInputTokens: 20000, estimatedOutputTokens: 1500, maxOutputTokens: 800,
+    acceptanceCriteria: ['核对用户要求、当前交付版本与真实 QA 结果，明确通过项和未完成项'], estimatedInputTokens: 20000, estimatedOutputTokens: 1500, maxOutputTokens: 4096,
     kind: 'review', reviewedTaskId: 'develop', inputs: [{ path: 'cli.mjs', producerTaskId: 'develop' }, { path: 'README.md', producerTaskId: 'develop' }, { path: 'cli.test.mjs', producerTaskId: 'verify' }], outputs: [], maxReworkRounds: 0 },
 ];
 

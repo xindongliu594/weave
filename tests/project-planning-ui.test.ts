@@ -64,6 +64,14 @@ test('original defaults remain 10% capped at $1 and 5000 output, without changin
   assert.equal(JSON.stringify(project), before);
 });
 
+test('a changed conversation requires fresh review even when rates and reservation are unchanged',async()=>{
+  const visible=quote({conversation:{sha256:'a'.repeat(64),messageIds:['message'],count:1,omitted:0,pendingCount:0}});
+  const changed={...visible,conversation:{...visible.conversation!,sha256:'b'.repeat(64)}};
+  assert.notEqual(planningQuoteKey(visible),planningQuoteKey(changed));
+  const client:PlanningClient=async<T>(path:string)=>{assert.ok(path.endsWith('/planning-quote'));return changed as T;};
+  const result=await generatePlanningCandidate(parameters,visible,'must-not-generate',client);assert.equal(result.kind,'recheck');
+});
+
 test('the exact user adjustment invalidates an old quote and stays in the locked generation body', async () => {
   const revisionRequest = '改用 DeepSeek 和 GLM。\n  保留原权限、费用与历史。';
   const revised = { ...parameters, revisionRequest }, visible = quote({ revisionRequest });

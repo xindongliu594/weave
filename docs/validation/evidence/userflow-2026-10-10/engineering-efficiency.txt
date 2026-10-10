@@ -1,0 +1,12 @@
+✔ overlapping approvals are counted once and clipped to the measured run (3.0508ms)
+✔ receipts supply real tokens; missing duration, unknown costs and a different device stay explicit (2.3511ms)
+✔ matching successful goals compare raw values with signed savings and never divide by zero (1.3541ms)
+✔ fallback sends are counted separately and matched to their own receipts (0.423ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 403.5459

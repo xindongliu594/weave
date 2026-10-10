@@ -1,0 +1,12 @@
+✔ --help 唯一参数：退出码 0、stdout 含完整用法与示例、不含换算 JSON (29.778611ms)
+✔ --help 唯一参数：多次运行结果稳定且不产生换算 JSON (59.311962ms)
+✔ --help 带额外参数（--help 25）：非零退出、stderr 说明且不输出帮助/换算结果 (35.096933ms)
+✔ --help 带额外参数（--help 25 99）：非零退出且 stderr 有说明 (32.916234ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 226.833916

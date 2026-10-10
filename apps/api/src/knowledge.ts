@@ -11,6 +11,8 @@ export { knowledgeSnapshot, validateKnowledgeGrants } from './knowledge-store.ts
 import { searchAvailableKnowledge } from './knowledge-store.ts';
 import { knowledgeIndexStatus,startKnowledgeIndex } from './knowledge-vector.ts';
 import { embedTexts } from '../../../services/embedding/local.mjs';
+import {acceptedWorkRecord} from './work-records.ts';
+import {resolve} from 'node:path';
 async function saveKnowledgeDocumentUnlocked(input:z.infer<typeof documentSchema>, id:string, isNew:boolean) {
   await syncObsidian();
   const client=await pool.connect();let version=1;
@@ -27,8 +29,22 @@ async function saveKnowledgeDocumentUnlocked(input:z.infer<typeof documentSchema
 }
 export const saveKnowledgeDocument=(input:unknown,id:string=randomUUID(),isNew=true)=>withVaultLock(()=>saveKnowledgeDocumentUnlocked(documentSchema.parse(input),id,isNew));
 
-export function knowledgeRouter() {
+export function knowledgeRouter(traceRoot=resolve(process.env.TRACE_ROOT??'.data/runs')) {
   const router=Router();
+  router.get('/knowledge/work-records',async(_req,res)=>res.json((await pool.query(`SELECT r.id AS "runId",r.project_id AS "projectId",r.snapshot->>'title' AS title,r.snapshot->>'planVersion' AS "planVersion",r.status,r.created_at AS "createdAt",p.department_id AS "departmentId" FROM project_runs r JOIN projects p ON p.id=r.project_id JOIN departments d ON d.id=p.department_id WHERE d.deleted_at IS NULL ORDER BY r.created_at DESC LIMIT 50`)).rows));
+  router.get('/knowledge/work-records/:id',async(req,res)=>res.json(await acceptedWorkRecord(pool,traceRoot,z.uuid().parse(req.params.id))));
+  router.post('/knowledge/work-records/:id/publish',async(req,res)=>withVaultLock(async()=>{
+    const runId=z.uuid().parse(req.params.id),{spaceId}=z.object({spaceId:z.string().min(1)}).strict().parse(req.body);
+    const record=await acceptedWorkRecord(pool,traceRoot,runId),space=(await pool.query('SELECT scope,department_id FROM knowledge_spaces WHERE id=$1 AND deleted_at IS NULL',[spaceId])).rows[0];
+    if(!space||space.scope!=='department'||space.department_id!==record.departmentId)throw new AppError(422,'工作记录只能发布到来源部门的知识空间');
+    if(!record.shareable)throw new AppError(422,'来源含员工定向资料，请先审查私有资料边界；不能直接发布为部门知识');
+    const id='work-'+runId,existing=(await pool.query('SELECT d.space_id,d.deleted_at,r.sha256 FROM knowledge_documents d JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=d.version WHERE d.id=$1',[id])).rows[0];
+    if(existing){if(existing.deleted_at||existing.space_id!==spaceId||existing.sha256!==record.sha256)throw new AppError(409,'工作知识记录已编辑、归档或发布到另一空间，请查看原记录');return res.json({id,existing:true});}
+    const quota=(await pool.query("SELECT count(DISTINCT d.id)::int AS count,coalesce(sum(octet_length(r.content)),0)::bigint AS bytes FROM knowledge_documents d JOIN knowledge_revisions r ON r.document_id=d.id WHERE d.id LIKE 'work-%'")).rows[0];
+    if(quota.count>=500||Number(quota.bytes)+Buffer.byteLength(record.content)>8*1024*1024)throw new AppError(422,'工作知识登记达到 500 份或 8 MiB 限额；原记录及历史保留');
+    const result=await saveKnowledgeDocumentUnlocked({spaceId,title:record.title,content:record.content,source:{runId,note:`已核验工作记录；项目 ${record.projectId} 方案 v${record.planVersion}；记录 SHA256 ${record.sha256}`}},id,true);
+    res.status(201).json(result);
+  }));
   router.get('/knowledge/retrieval',async(_req,res)=>{const row=(await pool.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];res.json({mode:row.data.knowledgeSearchMode??'keyword',version:row.version,...await knowledgeIndexStatus()});});
   router.put('/knowledge/retrieval',async(req,res)=>{
     const input=z.object({mode:z.enum(['keyword','hybrid']),version:z.number().int().positive()}).parse(req.body);

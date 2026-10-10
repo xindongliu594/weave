@@ -1,0 +1,11 @@
+{
+  "passed": false,
+  "archive": "/home/jj/.local/share/weiwu/backups/userflow-20261010T102634Z-eb2aef78.tar.gz",
+  "restoreDirectory": "/home/jj/.local/share/weiwu/data/restore-checks/userflow-20261010T102634Z-eb2aef78/pilot",
+  "modelCalls": 0,
+  "restoredDeviceActivated": false,
+  "originalDataOverwritten": false,
+  "originalHealthy": true,
+  "ledgerPreserved": true,
+  "mainPID": "1248136"
+}

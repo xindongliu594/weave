@@ -24,8 +24,8 @@ function candidate() { return { department: { name: '需求研究部', descripti
 function implementationCandidate() {
   const team = [agent('manager', 'manager'), agent('developer', 'member', ['filesystem', 'artifact_write', 'terminal_test']), agent('reviewer', 'member', ['filesystem', 'terminal_test'])];
   return { department: { name: 'Todo 研发部', description: '独立实现和测试。', agents: team }, rationale: '开发先产出，再由独立员工验收，经理汇总。', tasks: [
-    { id: 'implement', subject: '开发 Todo API', objective: '在批准目录实现 Todo 接口与测试。', assigneeId: 'developer', dependencies: [], acceptanceCriteria: ['接口自检通过'], estimatedInputTokens: 500, estimatedOutputTokens: 400, kind: 'implementation', inputs: [], outputs: [{ path: 'todo.mjs' }, { path: 'smoke.test.mjs' }], inScope: ['todo.mjs', 'smoke.test.mjs'], verify: ['node --test smoke.test.mjs'] },
-    { id: 'review', subject: '独立检查实现', objective: '读取开发文件并实际运行已授权的验证命令，返回审查结论。', assigneeId: 'reviewer', dependencies: ['implement'], acceptanceCriteria: ['读取当前产物并核对真实命令结果'], estimatedInputTokens: 500, estimatedOutputTokens: 200, kind: 'review', reviewedTaskId: 'implement', inputs: [{ path: 'todo.mjs', producerTaskId: 'implement' }, { path: 'smoke.test.mjs', producerTaskId: 'implement' }], outputs: [], verify: ['node --test smoke.test.mjs'], maxReworkRounds: 0 },
+    { id: 'implement', subject: '开发 Todo API', objective: '在批准目录实现 Todo 接口与测试。', assigneeId: 'developer', dependencies: [], acceptanceCriteria: ['接口自检通过'], acceptanceChecks:[{criterionIndex:0,command:'node --test smoke.test.mjs',minimumTests:1}], estimatedInputTokens: 500, estimatedOutputTokens: 400, kind: 'implementation', inputs: [], outputs: [{ path: 'todo.mjs' }, { path: 'smoke.test.mjs' }], inScope: ['todo.mjs', 'smoke.test.mjs'], verify: ['node --test smoke.test.mjs'] },
+    { id: 'review', subject: '独立检查实现', objective: '读取开发文件并实际运行已授权的验证命令，返回审查结论。', assigneeId: 'reviewer', dependencies: ['implement'], acceptanceCriteria: ['读取当前产物并核对真实命令结果'], acceptanceChecks:[{criterionIndex:0,command:'node --test smoke.test.mjs',minimumTests:1}], estimatedInputTokens: 500, estimatedOutputTokens: 200, kind: 'review', reviewedTaskId: 'implement', inputs: [{ path: 'todo.mjs', producerTaskId: 'implement' }, { path: 'smoke.test.mjs', producerTaskId: 'implement' }], outputs: [], verify: ['node --test smoke.test.mjs'], maxReworkRounds: 0 },
     { id: 'deliver', subject: '经理汇总验收', objective: '汇总审查结论、使用方法和未完成项。', assigneeId: 'manager', dependencies: ['review'], acceptanceCriteria: ['清楚区分通过项与未完成项'], estimatedInputTokens: 200, estimatedOutputTokens: 200, kind: 'work' },
   ] };
 }
@@ -43,6 +43,14 @@ before(async () => {
   await pool.query("UPDATE models SET status='available'");
 });
 after(async () => { await app?.locals.shutdown(); for (const current of [server, gateway]) if (current) { current.closeAllConnections(); await new Promise<void>(r => current.close(() => r())); } await pool?.end(); await admin.query('DROP SCHEMA ' + schema + ' CASCADE'); await admin.end(); if (directory) { assert.ok(resolve(directory).startsWith(resolve(tmpdir()) + sep + 'organization-chat-')); await rm(directory, { recursive: true, force: true }); } });
+
+test('executable candidate without host mappings is rejected without save or hidden model repair',async()=>{
+  const draft:any=implementationCandidate();delete draft.tasks[0].acceptanceChecks;
+  response={reply:'待确认的执行方案',candidate:draft};const before=await counts(),calls=requests;
+  const result=await call('/organizations/chat',input({policy:{...policy,allowedTools:['filesystem','artifact_write','terminal_test']}}));
+  assert.equal(result.data.draftIssue.code,'ORGANIZATION_CHAT_PLAN_INVALID');assert.match(result.data.draftIssue.message,/逐项/);
+  assert.equal(result.data.preview,undefined);assert.deepEqual(await counts(),before);assert.equal(requests,calls+1);
+});
 
 test('clarification replies retain global billed usage and do not create departments, previews or runs', async () => {
   response = { reply: '这个工具主要解决什么问题？' }; const before = await counts(), beforeCalls = requests;

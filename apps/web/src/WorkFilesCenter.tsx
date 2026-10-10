@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from './api.ts';
 
-type SnapshotSummary={id:string;name:string;bytes:number;fileCount:number;createdAt:string};
+type SnapshotSummary={id:string;name:string;bytes:number;fileCount:number;createdAt:string;sourceRunId?:string|null};
 type FilePreview={path:string;bytes:number;sha256:string;kind:string;text:string;warnings:string[]};
 type Snapshot=SnapshotSummary&{files:FilePreview[]};
 export type WorkFileSelectionValue={snapshotId:string;paths:string[];agentIds:string[];mode?:'reference'|'workspace'};
@@ -17,8 +17,9 @@ export function WorkFilesCenter(){
   const [snapshots,setSnapshots]=useState<SnapshotSummary[]>([]),[selected,setSelected]=useState<Snapshot|null>(null),[preview,setPreview]=useState<FilePreview|null>(null);
   const [name,setName]=useState(''),[pending,setPending]=useState<{file:File;path:string}[]>([]),[skipped,setSkipped]=useState<string[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
   const [format,setFormat]=useState<'docx'|'xlsx'|'csv'>('docx'),[outputName,setOutputName]=useState('工作文档'),[content,setContent]=useState(''),[rows,setRows]=useState('[["项目","状态"],["示例","待办"]]');
+  const [runs,setRuns]=useState<{id:string;title:string;status:string;integrity:string}[]>([]),[sourceRunId,setSourceRunId]=useState(''),[runFiles,setRunFiles]=useState<{path:string;size:number;sha256:string}[]>([]),[runPaths,setRunPaths]=useState<string[]>([]);
   async function refresh(){setSnapshots(await api<SnapshotSummary[]>('/work-files'));}
-  useEffect(()=>{void refresh().catch(e=>setError(e.message));},[]);
+  useEffect(()=>{void refresh().catch(e=>setError(e.message));void api<typeof runs>('/runs').then(value=>setRuns(value.filter(run=>run.status==='completed'&&run.integrity==='ok'))).catch(e=>setError(e.message));},[]);
   async function act(fn:()=>Promise<void>){setError('');setNotice('');setBusy(true);try{await fn();await refresh();}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
   async function open(id:string){const data=await api<Snapshot>('/work-files/'+id);setSelected(data);setPreview(data.files[0]??null);}
   function choose(files:FileList|null){
@@ -28,6 +29,11 @@ export function WorkFilesCenter(){
   }
   return <><div className="page-head"><div><div className="eyebrow">WORK FILES</div><h1>项目素材与办公文件</h1><p>导入已有目录的独立副本，保留相对路径；在项目方案中选择文件和获授权员工。</p></div></div>
     {error&&<p className="banner error" role="alert">{error}</p>}{notice&&<p className="banner" role="status">{notice}</p>}
+    <section className="panel padded lower"><h2>复用已验收交付</h2><p className="subcopy">直接保存已完成运行的独立文件快照，原交付和记录保持不变。同一来源与文件版本再次选用时复用快照；临时文件和未核验版本不能导入。</p>
+      <label className="field">来源运行<select value={sourceRunId} disabled={busy} onChange={e=>{const id=e.target.value;setSourceRunId(id);setRunFiles([]);setRunPaths([]);if(id)void act(async()=>{setRunFiles(await api<typeof runFiles>('/runs/'+id+'/artifacts'));});}}><option value="">选择已完成运行</option>{runs.map(run=><option key={run.id} value={run.id}>{run.title.slice(0,70)} · {run.id}</option>)}</select></label>
+      {runFiles.map(file=><label className="inline-check" key={file.path}><input type="checkbox" disabled={busy||excluded.test(file.path)||file.size>2*1024*1024} checked={runPaths.includes(file.path)} onChange={e=>setRunPaths(paths=>e.target.checked?[...paths,file.path]:paths.filter(path=>path!==file.path))}/>{file.path} · {bytes(file.size)}</label>)}
+      {sourceRunId&&<><p><a href={'#run/'+sourceRunId}>查看来源验收与交付</a></p><button className="primary" disabled={busy||!runPaths.length} onClick={()=>void act(async()=>{const result=await api<{id:string;existing?:boolean}>('/work-files/from-run','POST',{runId:sourceRunId,paths:runPaths},crypto.randomUUID());await open(result.id);setNotice(result.existing?'已复用相同来源与版本的现有快照。':'已保存验收交付快照，可在项目方案中选择并授权。');})}>保存选定交付快照</button></>}
+    </section>
     <div className="product-columns"><section className="panel padded"><h2>导入文件或项目目录</h2><p className="subcopy">最多 100 个文件，单文件 2 MiB，单次合计 8 MiB。支持 UTF-8 代码/文本、CSV、DOCX、XLSX 和 PPTX 正文；不会修改原目录。素材只作为参考，不会自动执行其中的脚本。</p>
       <div className="form-grid"><label className="field">选择文件<input type="file" multiple disabled={busy} onChange={e=>choose(e.target.files)}/></label><label className="field">选择项目目录<input type="file" multiple disabled={busy} ref={node=>{node?.setAttribute('webkitdirectory','');}} onChange={e=>choose(e.target.files)}/></label></div>
       {!!skipped.length&&<details><summary>已排除 {skipped.length} 个凭证、依赖、不支持或过大文件</summary><pre className="product-pre">{skipped.join('\n')}</pre></details>}
@@ -36,7 +42,7 @@ export function WorkFilesCenter(){
     </section><section className="panel padded"><h2>生成办公文件</h2><p className="subcopy">将正文生成 DOCX，或将表格数组生成 CSV / XLSX。员工可先交付 Markdown / CSV，再在这里转换。最小版仅保留文字与单元格，不生成排版、图表或公式。</p>
       <form onSubmit={e=>{e.preventDefault();void act(async()=>{const result=await api<{id:string}>('/work-files/generate','POST',{format,name:outputName,title:outputName,...(format==='docx'?{text:content}:{rows:JSON.parse(rows)})});await open(result.id);setNotice('文件已生成并保存，点击下方“下载原文件”。');});}}><label className="field">文件名称<input required maxLength={80} value={outputName} onChange={e=>setOutputName(e.target.value)}/></label><label className="field">格式<select value={format} onChange={e=>setFormat(e.target.value as typeof format)}><option value="docx">Word 文档（DOCX）</option><option value="xlsx">Excel 表格（XLSX）</option><option value="csv">CSV 表格</option></select></label>{format==='docx'?<label className="field">正文<textarea rows={7} maxLength={250000} value={content} onChange={e=>setContent(e.target.value)}/></label>:<label className="field">二维 JSON 表格数组<textarea required rows={7} value={rows} onChange={e=>setRows(e.target.value)}/><small>例如 [["姓名","数量"],["张三",3]]。最多 2,000 行、100 列和 20,000 个单元格。</small></label>}<button disabled={busy} className="primary">生成并保存</button></form>
     </section></div>
-    <section className="panel padded lower"><h2>已保存的素材快照</h2>{!snapshots.length&&<p className="compact-empty">还没有导入素材。</p>}{snapshots.map(item=><div className="document-row" key={item.id}><div><strong>{item.name}</strong><small>{item.fileCount} 个文件 · {bytes(item.bytes)} · {new Date(item.createdAt).toLocaleString()}</small></div><button disabled={busy} onClick={()=>void act(()=>open(item.id))}>查看文件</button></div>)}</section>
+    <section className="panel padded lower"><h2>已保存的素材快照</h2>{!snapshots.length&&<p className="compact-empty">还没有导入素材。</p>}{snapshots.map(item=><div className="document-row" key={item.id}><div><strong>{item.name}</strong><small>{item.fileCount} 个文件 · {bytes(item.bytes)} · {new Date(item.createdAt).toLocaleString()}</small>{item.sourceRunId&&<a href={'#run/'+item.sourceRunId}>来源验收记录</a>}</div><button disabled={busy} onClick={()=>void act(()=>open(item.id))}>查看文件</button></div>)}</section>
     {selected&&<section className="panel padded lower"><h2>{selected.name}</h2><div className="product-columns"><div>{selected.files.map((file,index)=><div className="lower-small" key={file.path}><button style={{maxWidth:'100%',overflowWrap:'anywhere',textAlign:'left'}} onClick={()=>setPreview(file)}>{file.path}</button> <a href={import.meta.env.BASE_URL+'api/work-files/'+selected.id+'/files/'+index+'/download'} download>下载原文件</a><small style={{display:'block'}}>{bytes(file.bytes)} · {file.kind}</small></div>)}</div>{preview&&<div style={{minWidth:0}}><h3 style={{overflowWrap:'anywhere'}}>{preview.path}</h3>{preview.warnings.map(w=><p className="subcopy" key={w}>{w}</p>)}<pre className="product-pre" style={{maxHeight:420,overflow:'auto',whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{preview.text||'（没有可提取正文）'}</pre><WorkFileSha256 sha256={preview.sha256} path={preview.path}/></div>}</div></section>}
   </>;
 }
@@ -47,7 +53,7 @@ export function WorkFileSelection({value,onChange,agents,disabled=false}:{value:
   useEffect(()=>{let active=true;for(const selection of value)if(!details[selection.snapshotId])void api<Snapshot>('/work-files/'+selection.snapshotId).then(item=>{if(active)setDetails(current=>({...current,[item.id]:item}));}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[value,details]);
   async function add(id:string){if(!id)return;setLoading(true);setError('');try{const snapshot=await api<Snapshot>('/work-files/'+id);setDetails(current=>({...current,[id]:snapshot}));onChange([...value,{snapshotId:id,paths:[],agentIds:[]}]);}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
   function patch(index:number,part:Partial<WorkFileSelectionValue>){onChange(value.map((item,i)=>i===index?{...item,...part}:item));}
-  return <fieldset className="panel padded lower" disabled={disabled||loading}><legend>选用导入素材</legend><p className="subcopy">只有明确勾选的文件和员工进入本次运行。每次最多 20 份 / 250,000 字符，单份最多 50,000 字符；员工需开启知识检索。目录里的文本文件可复制到独立 Run 工作区继续制作。</p>{error&&<p role="alert" className="banner error">{error}</p>}
+  return <fieldset className="panel padded lower" disabled={disabled||loading}><legend>选用导入素材</legend><p className="subcopy">只有明确勾选的文件和员工进入本次运行。每次最多 20 份 / 250,000 字符，单份最多 50,000 字符。参考资料需知识检索；复制到工作区的文件由已有文件/终端员工读取。AI 会从所选快照绑定输入版本，不需手填哈希。</p>{error&&<p role="alert" className="banner error">{error}</p>}
     <label className="field">添加素材快照<select value="" onChange={e=>void add(e.target.value)}><option value="">请选择已导入的快照</option>{snapshots.filter(s=>!value.some(v=>v.snapshotId===s.id)).map(s=><option key={s.id} value={s.id}>{s.name}（{s.fileCount} 个文件）</option>)}</select></label>{!snapshots.length&&<p className="subcopy">请先在“项目素材”中导入文件或目录。</p>}
     {value.map((selection,index)=><div className="lower" key={selection.snapshotId}>
       <div className="section-title"><strong>{details[selection.snapshotId]?.name??snapshots.find(s=>s.id===selection.snapshotId)?.name??'读取快照…'}</strong><button type="button" onClick={()=>onChange(value.filter((_,i)=>i!==index))}>移除</button></div>

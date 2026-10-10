@@ -1,0 +1,95 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ project dialogue retains source versions without old grants, and new dialogue invalidates an unconfirmed candidate (2728.3246ms)
+✔ unfinished conversation blocks planning before any extra model request (152.7792ms)
+✔ missing generated command mappings preserve the saved plan and paid receipt (152.8262ms)
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (204.8375ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (160.663ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (137.8728ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (221.5879ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (251.5116ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (220.8146ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (155.8693ms)
+✔ unsupported effort is explicitly invalid in project candidates and cannot launch a confirmed plan (211.9161ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (223.5939ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (408.2517ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (345.0786ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (189.2708ms)
+✔ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (88.4053ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (174.8114ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (306.3643ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (124.88ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (262.4788ms)
+✔ a new user adjustment is quoted and pinned without editing the saved requirement, grants or prior plan (291.8944ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7540.3741
+✔ executable candidate without host mappings is rejected without save or hidden model repair (2866.5599ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (89.7662ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (224.077ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (72.6246ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (123.4998ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (128.7901ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (60.3989ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (159.4474ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (125.4949ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (130.3722ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (483.3018ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (234.4235ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (223.2446ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (215.8618ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (345.8079ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (545.4115ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (125.1014ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (62.5875ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (366.92ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (326.4951ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7820.849
+✔ directional workspace imports and legacy private knowledge cannot publish into department knowledge (6773.6018ms)
+✔ work knowledge projects sealed test counters without inventing legacy values (148.3757ms)
+✔ accepted work is discoverable and publishes once through the existing versioned knowledge index (480.8328ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10220.2122
+✔ manager dialogue persists across workers, includes prior conversation and records billed usage (4050.2363ms)
+✔ active runs keep messages waiting; duplicate pending messages are rejected and cancellation persists (336.8896ms)
+✔ stale project versions, denied model scope and insufficient request budget never call the model (324.6312ms)
+✔ provider failure is not replayed, missing usage stays uncertain and empty reply retains paid usage (519.0713ms)
+✔ queued messages reject changed model and gateway configuration versions before billing (149.3485ms)
+✔ an interrupted in-flight reply becomes failed after recovery without a new paid request (82.5946ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7997.3152
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (4638.2022ms)
+✔ active paid manager replies block export and restore before any database replacement (232.2958ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (649.9187ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6972.9027

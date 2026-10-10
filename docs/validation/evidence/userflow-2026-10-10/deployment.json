@@ -1,0 +1,15 @@
+{
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-userflow6-20261010",
+  "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-userflow5-20261010",
+  "packetSha256": "e188a778ad655a286f5d5c019a28475f3d5df37642bff7bc2699c5be3bd6a150",
+  "projectCount": 3,
+  "usageBefore": 279,
+  "modelCalls": 0,
+  "dependencies": "existing pinned directories reused",
+  "memOSInstalled": false,
+  "passed": true,
+  "usageAfter": 279,
+  "mainPID": "1164279",
+  "projectStatePreserved": true,
+  "usagePreserved": true
+}

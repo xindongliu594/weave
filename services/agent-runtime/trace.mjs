@@ -1,10 +1,12 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
+import { redact } from './trace-store.mjs';
 
 /** Observe the actual runtime. Session records are deduplicated on durable source identity. */
-export function attachTrace(ctx, archive,taskFor) {
+export function attachTrace(ctx, archive,taskFor,internalStatusPoll=()=>false) {
   const disposers = [];
   const links = new Map();
   const requests = new Map();
+  const statusResults = new Map();
   let failure;
   const write = (type, data, ref) => {
     try { return archive.append(type, data, ref); }
@@ -37,7 +39,18 @@ export function attachTrace(ctx, archive,taskFor) {
       links.set(exec.agent.id, { taskId: value.task_id ?? exec.arguments.task_id, attemptId: value.attempt_id });
       Object.assign(ref, links.get(exec.agent.id));
     }
-    write('tool/result', { name: exec.name, result }, ref);
+    // Only host-owned readonly polling is compacted. Model-issued tools,
+    // errors and every changed state keep their complete original result.
+    if (exec.name === 'agent_teams_status' && internalStatusPoll(exec) && result.isError === false) {
+      const json = JSON.stringify(redact(result)), previous = statusResults.get(exec.agent?.id);
+      if (previous?.json === json) {
+        write('runtime/status-poll', { name: exec.name, unchanged: true, resultSequence: previous.seq, resultSha256: previous.sha256 }, ref);
+      } else {
+        const event = write('tool/result', { name: exec.name, result }, ref);
+        statusResults.set(exec.agent?.id, { json, seq: event.seq, sha256: createHash('sha256').update(json).digest('hex') });
+        write('team/snapshot', result.value, { sessionId: exec.agent?.id });
+      }
+    } else write('tool/result', { name: exec.name, result }, ref);
     if (exec.name.startsWith('agent_teams_') && exec.name !== 'agent_teams_status') {
       write('team/operation', { name: exec.name, arguments: exec.arguments, result }, ref);
     }

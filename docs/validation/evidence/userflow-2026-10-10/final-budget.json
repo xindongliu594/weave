@@ -1,0 +1,13 @@
+{
+  "authorization": 2,
+  "knownTotal": 1.673756100000001,
+  "unknownOriginalPreserved": [
+    {
+      "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+      "amount": 0.0192111,
+      "status": "uncertain"
+    }
+  ],
+  "retainedTotal": 0.0192111,
+  "usageCount": 309
+}

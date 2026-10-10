@@ -1,0 +1,13 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ directional workspace imports and legacy private knowledge cannot publish into department knowledge (5808.2912ms)
+✔ work knowledge projects sealed test counters without inventing legacy values (119.2498ms)
+✔ accepted work is discoverable and publishes once through the existing versioned knowledge index (440.0452ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8593.5187

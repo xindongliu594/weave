@@ -11,9 +11,10 @@ export type PlanningQuote = PlanningParameters & {
   checkedAt: string; reservation: number; inputBytes: number; rates: { inputRate: number; outputRate: number };
   costReadiness: CostReadiness; allowed: boolean; reasons: { code: string; message: string }[]; nativeExecutionChecked: false;
   executionHistory?: PlanningExecutionContext; savedPlanIncluded?: true;
+  conversation?: {sha256:string;messageIds:string[];count:number;omitted:number;pendingCount:number};
   retainedCostEvidence?: { retained: boolean; recordedCost: number; reserved: number; availableBudget: number; receipts: CostReadiness['receipts'] };
 };
-export type GeneratedPlan = { previewId: string; projectId: string; baseVersion: number; plan: Plan; policy: Policy; validation: Validation; usageId: string; retainUncertainCosts?: boolean; revisionRequest?: string };
+export type GeneratedPlan = { previewId: string; projectId: string; baseVersion: number; plan: Plan; policy: Policy; validation: Validation; usageId: string; retainUncertainCosts?: boolean; revisionRequest?: string;conversation?:PlanningQuote['conversation'] };
 export type ConfirmedPlan = { ok: true; version: number; existing?: true; validation?: Validation; costReadiness?: CostReadiness };
 export type PlanningClient = <T>(path: string, method?: string, body?: unknown, requestKey?: string) => Promise<T>;
 export type GenerationRequest = { key: string; parameters: PlanningParameters };
@@ -45,7 +46,7 @@ export function planningQuoteKey(quote: PlanningQuote) {
     quote.reservation, quote.inputBytes, quote.rates, quote.allowed, quote.reasons, costs.recordedCost, costs.reserved,
     costs.availableBudget, costs.pendingCount, costs.uncertainCount,
     costs.receipts.map(receipt => [receipt.id, receipt.amount, receipt.status, receipt.runId]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
-    quote.retainedCostEvidence, quote.savedPlanIncluded, quote.executionHistory]);
+    quote.retainedCostEvidence, quote.savedPlanIncluded, quote.executionHistory,quote.conversation]);
 }
 export async function readPlanningQuote(parameters: PlanningParameters, client: PlanningClient = api) {
   if (!planningParametersValid(parameters)) throw new Error('请选择规划模型，并填写有效的单次规划限额和输出上限。');
@@ -135,6 +136,7 @@ export function PlanningQuoteView({ quote, stale, checking, onCheck, disabled }:
       </div>}
       <p className="subcopy">保守输入计数 {quote.inputBytes.toLocaleString('zh-CN')} 字节（完整 JSON 请求封装 + 1024 字节安全余量，并非实际 Token 或账单） · 单次最大输出 {quote.maxOutputTokens.toLocaleString('zh-CN')} Token · 每百万 Token 配置单价：输入 {dollars(quote.rates.inputRate)} / 输出 {dollars(quote.rates.outputRate)}</p>
       <PlanningExecutionHistoryView history={quote.executionHistory} savedPlanIncluded={quote.savedPlanIncluded}/>
+      {quote.conversation&&<p className="subcopy">已参考本项目的 {quote.conversation.count-quote.conversation.omitted} 条需求对话，保留讨论时的方案版本；经理回复仅作参考。{quote.conversation.omitted>0&&`另有 ${quote.conversation.omitted} 条较早对话未进入本轮上下文。`}</p>}
       <strong>{stale ? '需重新预检' : quote.allowed ? '检查时可发起本次规划' : '检查时不能发起规划'}</strong>
       {quote.reasons.map((reason, index) => <p className="validation-error" key={reason.code + ':' + index}>{reason.message} <small>（{reason.code}）</small></p>)}
     </>}
@@ -179,6 +181,7 @@ export function GeneratedPlanView({ candidate, currentVersion, models, busy, dis
   return <section className="panel padded lower" role="region" aria-label="AI 方案候选">
     <div className="section-title"><h3>AI 方案候选 · 尚未保存</h3><span className="tag">基于 v{candidate.baseVersion}</span></div>
     <p>{candidate.plan.rationale}</p>
+    {candidate.conversation&&<p className="subcopy">候选已绑定当前需求对话。新增或修改对话后需重新规划，确认不会覆盖新要求。</p>}
     <p className="subcopy">确认保存仅生成方案新版本，不启动执行、不清零已登记费用或未知预留。原运行与交付保留；新版本需重新批准，不会自动继承原运行检查点。</p>
     {stale && <p className="validation-error" role="status">当前方案已是 v{currentVersion}，此候选不能覆盖新版本。请丢弃后重新检查。</p>}
     <h4>岗位与权限</h4>

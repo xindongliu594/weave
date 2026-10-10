@@ -95,6 +95,34 @@ async function hold(projectId: string, status: string, options: { amount?: numbe
 const near = (actual: number, expected: number) => assert.ok(Math.abs(actual - expected) < 1e-10, `${actual} != ${expected}`);
 const receipt = async (id: string) => (await pool.query('SELECT * FROM model_reservations WHERE id=$1', [id])).rows[0];
 
+test('project dialogue retains source versions without old grants, and new dialogue invalidates an unconfirmed candidate', {skip:!isolated},async()=>{
+  const id=await seed();await pool.query('UPDATE projects SET version=2 WHERE id=$1',[id]);
+  for(const [messageId,version,content] of [['older',1,'OLD_VERSION_NOT_CURRENT'],['current',2,'补充 --help 只打印用法；不要增加服务器或权限。']] as const)
+    await pool.query("INSERT INTO manager_messages(id,project_id,project_version,content,reply,status,max_cost,model_id) VALUES($1,$2,$3,$4,'经理建议仅供参考','replied',.02,$5)",[messageId,id,version,content,modelId]);
+  const inspected=await quote(id,{version:2});assert.equal(inspected.data.conversation.count,2);assert.deepEqual(inspected.data.conversation.messageIds,['older','current']);
+  const generated=await call('/projects/'+id+'/generate','POST',input({version:2}));assert.equal(generated.status,200,JSON.stringify(generated.data));
+  const materials=JSON.parse(wire.messages.find((message:any)=>message.role==='user').content);assert.equal(materials.conversation.messages[1].user,'补充 --help 只打印用法；不要增加服务器或权限。');assert.deepEqual(materials.conversation.messages.map((m:any)=>m.sourceVersion),[1,2]);
+  assert.deepEqual(generated.data.policy.allowedTools,[]);assert.equal(generated.data.conversation.sha256,inspected.data.conversation.sha256);
+  await pool.query("INSERT INTO manager_messages(id,project_id,project_version,content,reply,status,max_cost,model_id) VALUES('newer',$1,2,'帮助中再加运行示例','待规划','replied',.02,$2)",[id,modelId]);
+  const denied=await call('/projects/'+id+'/generated-plan/confirm','POST',{previewId:generated.data.previewId,version:2});assert.equal(denied.status,409);assert.equal(denied.data.code,'PLANNING_CONVERSATION_CHANGED');
+  assert.equal(requests,1);assert.equal((await pool.query('SELECT version FROM projects WHERE id=$1',[id])).rows[0].version,2);
+});
+
+test('unfinished conversation blocks planning before any extra model request', {skip:!isolated},async()=>{
+  const id=await seed();await pool.query("INSERT INTO manager_messages(id,project_id,project_version,content,status,max_cost,model_id) VALUES('pending',$1,1,'补充需求等待经理','waiting',.02,$2)",[id,modelId]);
+  const inspected=await quote(id);assert.equal(inspected.data.allowed,false);assert.ok(inspected.data.reasons.some((r:any)=>r.code==='CONVERSATION_ACTIVE'));
+  const generated=await call('/projects/'+id+'/generate','POST',input());assert.equal(generated.data.code,'CONVERSATION_ACTIVE');assert.equal(requests,0);
+});
+
+test('missing generated command mappings preserve the saved plan and paid receipt', {skip:!isolated},async()=>{
+  const id=await seed();candidate.tasks[0].verify=['node --test check.test.mjs'];
+  const result=await call('/projects/'+id+'/generate','POST',input());
+  assert.equal(result.status,422);assert.equal(result.data.code,'PLAN_ACCEPTANCE_REQUIRED');
+  assert.equal(requests,1);assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage')).rows[0].n,1);
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM organization_previews')).rows[0].n,0);
+  const saved=(await pool.query('SELECT plan,version FROM projects WHERE id=$1',[id])).rows[0];assert.equal(saved.version,1);assert.deepEqual(saved.plan,original);
+});
+
 test('HTTP quote is read-only, uses the exact generation body and shares its reservation formula', { skip: !isolated }, async () => {
   const id = await seed(), before = await state();
   const inspected = await quote(id); assert.equal(inspected.status, 200, JSON.stringify(inspected.data));

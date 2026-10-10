@@ -1,0 +1,379 @@
+{
+  "baseVersion": 2,
+  "conversation": {
+    "count": 2,
+    "messageIds": [
+      "0cd6f628-58e8-45dd-b6a1-6a525daaac10",
+      "707b0818-0a4d-41a3-82be-a500a76101ba"
+    ],
+    "omitted": 0,
+    "pendingCount": 0,
+    "sha256": "b76f77ef88d41911d9de5b6a2e89808804e4ada245c7ce2f4002b0fc5fba1ae2"
+  },
+  "plan": {
+    "agents": [
+      {
+        "id": "mgr-1",
+        "instructions": "只读复核。读取当前 cli.mjs、README.md 与 QA 的 help.test.mjs，核对宿主记录的开发语法检查与 QA 两份 Node 测试真实回执，提交正式 verdict：明确通过项、未完成项与依据。不得修改任何文件，不得代写开发或 QA 结论，不得在 review 节点创建交付文件。",
+        "knowledgeSpaceIds": [],
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "name": "协调经理",
+        "outputFormat": "以文本回复给出正式审查结论：状态（通过/不通过）、逐条核对依据（引用真实命令回执）、未完成项清单。",
+        "role": "manager",
+        "sourceAgentId": "mgr-1",
+        "sourceDepartmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+        "title": "协调经理",
+        "tools": [
+          "filesystem",
+          "terminal_test"
+        ]
+      },
+      {
+        "id": "dev-1",
+        "instructions": "在来源快照 cli.mjs、README.md 基础上只增加 --help 帮助入口：当且仅当 --help 是唯一参数时，退出码 0，向 stdout 输出包含完整用法 node cli.mjs <celsius> 与示例 node cli.mjs 25 的文本，不输出换算 JSON；--help 后带任何额外参数按多参数错误处理，向 stderr 说明并非零退出。保留原有数字、负数、小数换算与缺参数、非数字、多参数错误行为，仅使用 Node 内置模块。只修改 cli.mjs 与 README.md，不修改 cli.test.mjs，不编写测试，不代写 QA 结论。唯一自检为 node --check cli.mjs（语法层面，不代表功能正确）。",
+        "knowledgeSpaceIds": [],
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "name": "开发工程师",
+        "outputFormat": "写入 cli.mjs 与 README.md，并文本汇报实现要点与语法检查的真实回执。",
+        "role": "member",
+        "sourceAgentId": "dev-1",
+        "sourceDepartmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+        "title": "开发工程师",
+        "tools": [
+          "filesystem",
+          "artifact_write",
+          "terminal_test"
+        ]
+      },
+      {
+        "id": "qa-1",
+        "instructions": "只读消费旧 cli.test.mjs（不得修改），另行独立编写 help.test.mjs，至少覆盖两项：正常帮助（--help 唯一参数成功、退出码 0、stdout 含完整用法与示例、不含换算 JSON）与带额外参数的错误（如 node cli.mjs --help 25 走多参数错误：stderr 说明且非零退出）。实际运行 node --test cli.test.mjs 与 node --test help.test.mjs 并如实报告通过/失败与真实证据。不引用开发结论，不修改 cli.mjs 与 README.md，不代写经理结论。",
+        "knowledgeSpaceIds": [],
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "name": "质量审查员",
+        "outputFormat": "写入 help.test.mjs，并文本汇报两份测试执行命令、通过数、失败/跳过情况与失败细节。",
+        "role": "member",
+        "sourceAgentId": "qa-1",
+        "sourceDepartmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+        "title": "质量审查员",
+        "tools": [
+          "filesystem",
+          "artifact_write",
+          "terminal_test"
+        ]
+      }
+    ],
+    "rationale": "复用已验收快照，仅新增 --help：dev-1 只改 cli.mjs 与 README.md，唯一验收为语法检查；qa-1 保留旧 17 项测试只读并另写 help.test.mjs（≥2 项），实际运行两份测试；mgr-1 只读 review 给出正式 verdict。旧 cli.test.mjs 与导入的 cli.mjs/README.md 使用固定 SHA 作为 dev 输入，QA 与经理的更新后路径改绑 producerTaskId。员工 ID 与三人编制不变，不新增预算与授权。需注意：模型不支持显式 reasoningEffort，故所有员工省略该字段并采用模型默认；当前为待确认候选，未执行、未保存。",
+    "tasks": [
+      {
+        "acceptanceChecks": [
+          {
+            "command": "node --check cli.mjs",
+            "criterionIndex": 0,
+            "expectedExitCode": 0
+          }
+        ],
+        "acceptanceCriteria": [
+          "node --check cli.mjs 通过，说明 cli.mjs 语法可运行；功能正确性由后续独立 QA 验证，语法检查不构成功能正确结论"
+        ],
+        "assigneeId": "dev-1",
+        "dependencies": [],
+        "estimatedInputTokens": 70000,
+        "estimatedOutputTokens": 9000,
+        "id": "dev",
+        "inScope": [
+          "cli.mjs",
+          "README.md"
+        ],
+        "inputs": [
+          {
+            "path": "cli.mjs",
+            "sha256": "51b1b9e7700943b74c4c3610c392ef815c36c6cc464bef4a1ec96a69f799be75"
+          },
+          {
+            "path": "README.md",
+            "sha256": "ab601b391833c1b899ad9d08c4defdf2e3a56dda2d54051b69b090f428009f5b"
+          }
+        ],
+        "kind": "implementation",
+        "maxModelCalls": 12,
+        "maxOutputTokens": 8192,
+        "objective": "在来源快照 cli.mjs、README.md 基础上仅新增 --help 帮助入口：--help 作为唯一参数时退出码 0，stdout 输出包含完整用法 node cli.mjs <celsius> 与至少一个数字示例（须含 node cli.mjs 25），且不输出换算 JSON；--help 后带额外参数时按多参数错误处理，向 stderr 说明并以非零退出码退出。保持原有数字/负数/小数换算与缺参数、非数字、多参数错误行为不变，仅使用 Node 内置模块。不修改 cli.test.mjs，不编写或运行功能测试，不代写 QA 结论。",
+        "outOfScope": [
+          "cli.test.mjs",
+          "help.test.mjs"
+        ],
+        "outputs": [
+          {
+            "format": "text",
+            "path": "cli.mjs"
+          },
+          {
+            "format": "text",
+            "path": "README.md"
+          }
+        ],
+        "subject": "为 cli.mjs 增加 --help 帮助入口并更新 README",
+        "verify": [
+          "node --check cli.mjs"
+        ]
+      },
+      {
+        "acceptanceChecks": [
+          {
+            "command": "node --test cli.test.mjs",
+            "criterionIndex": 0,
+            "expectedExitCode": 0,
+            "minimumTests": 17
+          },
+          {
+            "command": "node --test help.test.mjs",
+            "criterionIndex": 1,
+            "expectedExitCode": 0,
+            "minimumTests": 2
+          }
+        ],
+        "acceptanceCriteria": [
+          "node --test cli.test.mjs 真实运行且至少 17 项测试通过，无失败或跳过",
+          "node --test help.test.mjs 真实运行且至少 2 项测试通过，覆盖正常帮助与带额外参数错误"
+        ],
+        "assigneeId": "qa-1",
+        "dependencies": [
+          "dev"
+        ],
+        "estimatedInputTokens": 80000,
+        "estimatedOutputTokens": 10000,
+        "id": "verify",
+        "inScope": [
+          "help.test.mjs"
+        ],
+        "inputs": [
+          {
+            "path": "cli.mjs",
+            "producerTaskId": "dev"
+          },
+          {
+            "path": "cli.test.mjs",
+            "sha256": "33a6514402afd8a52431f12e4272daf7591d8ac0d24197a0ca9d77b8145a57df"
+          }
+        ],
+        "kind": "verification",
+        "maxModelCalls": 16,
+        "maxOutputTokens": 8192,
+        "objective": "只读消费旧 cli.test.mjs（不得修改），独立编写 help.test.mjs，至少覆盖两项帮助用例：--help 唯一参数成功（退出码 0、stdout 含完整用法 node cli.mjs <celsius> 与示例 node cli.mjs 25、不含换算 JSON），以及 --help 带额外参数的错误（向 stderr 说明、非零退出）。实际运行旧测试与新增测试两份，如实报告结果。",
+        "outOfScope": [
+          "cli.mjs",
+          "README.md",
+          "cli.test.mjs"
+        ],
+        "outputs": [
+          {
+            "format": "text",
+            "path": "help.test.mjs"
+          }
+        ],
+        "subject": "独立 QA：复跑旧 17 项测试并新增 help.test.mjs 帮助测试",
+        "verify": [
+          "node --test cli.test.mjs",
+          "node --test help.test.mjs"
+        ]
+      },
+      {
+        "acceptanceChecks": [
+          {
+            "command": "node --test cli.test.mjs",
+            "criterionIndex": 0,
+            "expectedExitCode": 0,
+            "minimumTests": 17
+          },
+          {
+            "command": "node --test help.test.mjs",
+            "criterionIndex": 1,
+            "expectedExitCode": 0,
+            "minimumTests": 2
+          }
+        ],
+        "acceptanceCriteria": [
+          "逐条核对用户要求、当前版本文件与真实 QA 回执，至少 17 项旧测试与 2 项帮助测试均真实通过，结论为通过或不通过并附依据",
+          "node --test cli.test.mjs 复跑至少 17 项测试通过，node --test help.test.mjs 复跑至少 2 项测试通过"
+        ],
+        "assigneeId": "mgr-1",
+        "dependencies": [
+          "dev",
+          "verify"
+        ],
+        "estimatedInputTokens": 60000,
+        "estimatedOutputTokens": 6000,
+        "id": "accept",
+        "inputs": [
+          {
+            "path": "cli.mjs",
+            "producerTaskId": "dev"
+          },
+          {
+            "path": "README.md",
+            "producerTaskId": "dev"
+          },
+          {
+            "path": "help.test.mjs",
+            "producerTaskId": "verify"
+          }
+        ],
+        "kind": "review",
+        "maxModelCalls": 12,
+        "maxOutputTokens": 6000,
+        "maxReworkRounds": 0,
+        "objective": "读取当前 cli.mjs、README.md 与 QA 的 help.test.mjs，核对宿主记录的开发语法回执与 QA 两份 Node 测试真实回执，判断是否满足用户全部验收细节（帮助成功路径、多参数错误、原换算与错误行为保持、旧测试未修改），以正式 verdict 完成语义验收并列出未完成项。不修改任何文件。",
+        "outputs": [],
+        "reviewedTaskId": "dev",
+        "subject": "经理只读验收 --help 实现与 QA 结果",
+        "verify": [
+          "node --test cli.test.mjs",
+          "node --test help.test.mjs"
+        ]
+      }
+    ],
+    "workFileSelections": [
+      {
+        "agentIds": [
+          "mgr-1",
+          "dev-1",
+          "qa-1"
+        ],
+        "mode": "workspace",
+        "paths": [
+          "README.md",
+          "cli.mjs",
+          "cli.test.mjs"
+        ],
+        "snapshotId": "9ee5cc2f-4758-4ea2-89c8-e3bf1c6f4a25"
+      }
+    ]
+  },
+  "policy": {
+    "allowedDepartmentIds": [
+      "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a"
+    ],
+    "allowedKnowledgeSpaceIds": [],
+    "allowedModelIds": [
+      "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051"
+    ],
+    "allowedTools": [
+      "filesystem",
+      "terminal_test",
+      "artifact_write"
+    ],
+    "contextBytes": 128000,
+    "deadlineSeconds": 3600,
+    "executionTarget": {
+      "backend": {
+        "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+        "gateway": "weiwu-openshell-v012",
+        "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "kind": "openshell",
+        "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+        "version": "0.1.2"
+      },
+      "deviceId": "14b3b6f9-a109-4396-a8cc-8691fa33458a",
+      "grantId": "d75b2a15-c862-4de4-a363-5afd3e3428ea",
+      "kind": "local"
+    },
+    "maxAgents": 3,
+    "maxBudget": 0.4,
+    "maxConcurrentAgents": 1,
+    "maxModelCalls": 100,
+    "maxTaskModelCalls": 40
+  },
+  "previewId": "f70dfa3d-d937-49a9-bc70-c353da3956bf",
+  "projectId": "591c8468-febf-4d71-9414-2ee3b987f671",
+  "retainUncertainCosts": false,
+  "revisionRequest": "重新生成最小可运行方案，不增加预算或授权。来源快照导入的 cli.mjs、README.md 只作为 dev 输入使用固定 SHA；开发更新后，QA 的 cli.mjs 输入绑定 dev 的 producerTaskId，经理 cli.mjs/README.md 绑定 dev、help.test.mjs 绑定 QA；旧 cli.test.mjs 仍用原 SHA。不得把更新后的路径绑旧哈希。开发唯一验收标准为语法，唯一 verify/acceptanceChecks.command 为 node --check cli.mjs，不用 Git。开发 outputs/inScope 仅 cli.mjs、README.md。QA outputs/inScope 仅 help.test.mjs；旧测试只读。QA 两条 Node 测试映射必须明确 minimumTests 分别 17 与 2。经理只读 review、reviewedTaskId 指开发、直接依赖开发和 QA、outputs=[]，verify 可用上述两条 Node 测试且映射分别最少 17 和 2，用正式 verdict 做最终语义验收。员工 ID 不变；角色指令跟新任务一致，语法检查不当成功能正确。任务次数/输出应足够摘要、结论和恢复，金额可共用原项目预算，避免把过低估算设成硬上限。rationale 简短，保留两轮补充需求，不执行。",
+  "usageId": "424c931a-2ee5-4f99-92ea-eb7d4d3e1a07",
+  "validation": {
+    "checks": [
+      {
+        "label": "任务已规划",
+        "pass": true
+      },
+      {
+        "label": "策略允许的模型",
+        "pass": true
+      },
+      {
+        "label": "策略允许的工具",
+        "pass": true
+      },
+      {
+        "label": "策略允许的知识空间",
+        "pass": true
+      },
+      {
+        "label": "策略允许的参与部门",
+        "pass": true
+      },
+      {
+        "label": "组织与人数",
+        "pass": true
+      },
+      {
+        "label": "并发上限",
+        "pass": true
+      },
+      {
+        "label": "模型可用性",
+        "pass": true
+      },
+      {
+        "label": "备用模型可用性",
+        "pass": true
+      },
+      {
+        "label": "员工推理强度兼容性",
+        "pass": true
+      },
+      {
+        "label": "团队工具协议能力",
+        "pass": true
+      },
+      {
+        "label": "本次资料授权",
+        "pass": true
+      },
+      {
+        "label": "工作方法授权",
+        "pass": true
+      },
+      {
+        "label": "导入资料授权",
+        "pass": true
+      },
+      {
+        "label": "任务负责人和引用",
+        "pass": true
+      },
+      {
+        "label": "任务依赖无环",
+        "pass": true
+      },
+      {
+        "label": "文件交接与质量合同",
+        "pass": true
+      },
+      {
+        "label": "任务费用上限",
+        "pass": true
+      },
+      {
+        "label": "员工每任务调用上限",
+        "pass": true
+      },
+      {
+        "label": "预估执行费用",
+        "pass": true
+      }
+    ],
+    "errors": [],
+    "estimate": 0.1116,
+    "valid": true
+  }
+}

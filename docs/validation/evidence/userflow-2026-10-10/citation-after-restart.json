@@ -1,0 +1,16 @@
+{
+  "id": "4064df87ebd6d29c4c504c013b4b0255dac11ef2de0c52baf97bf1a7a0af2059",
+  "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+  "version": 1,
+  "lineStart": 8,
+  "lineEnd": 66,
+  "content": "# 工作记录\n来源运行：1fdf2d74-10d7-4e94-a3db-b6131fbf578c\n项目：591c8468-febf-4d71-9414-2ee3b987f671 · 方案 v3\n完成时间：2026-10-10T08:55:38.103Z\n\n## 需求\n复用已验收的 Node.js 摄氏转华氏 CLI，只增加 --help 帮助入口，不重新开发整个项目。稍后在方案中选择来源运行 d22f8757-a521-4781-a0de-32ebd58c3b52 的独立交付快照。\n\n要求：node cli.mjs --help 以退出码 0 向 stdout 输出用法 node cli.mjs <celsius> 和至少一个数字示例，不输出换算 JSON。--help 后多带参数仍拒绝，向 stderr 说明并非零退出。原数字、负数、小数换算、缺参数、非数字及多参数行为保持，旧 cli.test.mjs 不得修改。只用 Node 内置模块。\n\n同一部门三人串行：开发只修改 cli.mjs 与 README.md；独立 QA 复用原 17 项测试，另写 help.test.mjs 至少覆盖正常帮助与带额外参数的错误，并实际运行两份测试；经理只读核对当前文件、真实 QA 结果，提交正式审查结论。AI 自动生成输入版本、任务依赖、逐项命令映射及含摘要和恢复开销的预算，用户不手填内部合同。规划与执行共用本项目 $0.40 上限，未确认方案前不执行。\n\n## 已核验节点与实际命令\n```json\n[\n  {\n    \"id\": \"dev\",\n    \"subject\": \"为 cli.mjs 增加 --help 帮助入口并更新 README\",\n    \"kind\": \"implementation\",\n    \"dependencies\": [],\n    \"criteria\": [\n      \"node --check cli.mjs 通过，说明 cli.mjs 语法可运行；功能正确性由后续独立 QA 验证，语法检查不构成功能正确结论\"\n    ],\n    \"commands\": [\n      {\n        \"command\": \"node --check cli.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n            \"criterionIndex\": 0,\n            \"ruleSha256\": \"9386be336d5a2fffde6723fa459a0076ee8054e1338214a44db5c256e3e131dc\",\n            \"status\": \"passed\",\n            \"reason\": \"\"\n          }\n        ],\n        \"tests\": {\n          \"status\": \"unknown\",\n          \"reason\": \"NOT_SINGLE_NODE_TEST_COMMAND\"\n        }\n      }\n    ]\n  },\n  {\n    \"id\": \"verify\",\n    \"subject\": \"独立 QA：复跑旧 17 项测试并新增 help.test.mjs 帮助测试\",\n    \"kind\": \"verification\",\n    \"dependencies\": [\n      \"dev\"\n    ],\n    \"criteria\": [\n      \"node --test cli.test.mjs 真实运行且至少 17 项测试通过，无失败或跳过\",\n      \"node --test help.test.mjs 真实运行且至少 2 项测试通过，覆盖正常帮助与带额外参数错误\"\n    ],\n    \"commands\": [\n      {\n        \"command\": \"node --test cli.test.mjs\",\n        \"exitCode\": 0,\n        \"checks\": [\n          {\n",
+  "title": "工作记录 · 复用已验收的 Node.js 摄氏转华氏 CLI，只增加 --help 帮助入口，不重新开发整个项目。稍后在方案中选择来源运行 d22f8757-a521-4781-a0de-32ebd58c3b52 的独立交付快照。\n\n要求：node c",
+  "spaceId": "83de1de6-7db0-4f9b-8dd7-abae4b7a15e7",
+  "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434",
+  "source": {
+    "note": "已核验工作记录；项目 591c8468-febf-4d71-9414-2ee3b987f671 方案 v3；记录 SHA256 3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434",
+    "runId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+    "vaultPath": "department/研发已验收工作记录-83de1de6/工作记录 · 复用已验收的 Node.js 摄氏转华氏 CLI，只增加 --help 帮助入口，不重新开发整个项目。稍后在方案中选择来源运行 d22f8757--work-1fd.md"
+  }
+}

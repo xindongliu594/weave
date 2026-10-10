@@ -45,7 +45,9 @@ import { browserMcpRouter, closeBrowserMcp } from './work-tools-browser.ts';
 import { workFilesRouter, selectedWorkFileInputs, selectedWorkFileCopies } from './work-files.ts';
 import { AutomationLearningService, automationLearningRouter } from './automation-learning.ts';
 import { saveKnowledgeDocument } from './knowledge.ts';
-import { approvedExecutionPhase, approvedTaskPrompt, approvedExecutionDescription } from './execution-prompt.ts';
+import { approvedExecutionPhase, approvedTaskPrompt, approvedExecutionDescription, plannedAcceptanceErrors } from './execution-prompt.ts';
+import {planningConversation} from './planning-conversation.ts';
+import {archiveStorageUsage,ARCHIVE_ROOT_LIMIT_BYTES,RUN_ARCHIVE_LIMIT_BYTES} from '../../../services/agent-runtime/archive-storage.mjs';
 
 async function modelsFrom(db:Pick<import('pg').PoolClient,'query'>): Promise<Model[]> {
   const { rows } = await db.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
@@ -110,11 +112,11 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.use('/api', idempotency);
   app.use('/api', managerChatRouter());
   app.use('/api', browserMcpRouter());
-  app.use('/api', workFilesRouter());
+  app.use('/api', workFilesRouter(pool,traceRoot));
   app.use('/api', automationLearningRouter({ service: automation, publishKnowledge: (input, id) => saveKnowledgeDocument(input, id, true) }));
   app.use('/api',localDeviceRouter(traceRoot));
   app.use('/api', obsidianRouter());
-  app.use('/api', knowledgeRouter());
+  app.use('/api', knowledgeRouter(traceRoot));
   app.use('/api', productRouter());
   app.use('/api', employeeHistoryRouter());
   app.use('/api', departmentWorkbenchRouter(pool));
@@ -307,7 +309,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
     const input = projectPlanningInputSchema.parse(req.body);
     const { prepared, quote } = await inspectProjectPlanning(pool, lockId, input);
     if (!quote.allowed) { const first=quote.reasons[0]; throw new AppError(first.code==='COST_PENDING'||first.code==='PROJECT_ACTIVE'?409:422,first.message,first.code); }
-    const { project, model, catalog, messages, baseFingerprint } = prepared;
+    const { project, model, catalog, messages, baseFingerprint, conversation:{messages:_conversationMessages,...conversation} } = prepared;
       const response = await completeBudgeted(model,messages,input.maxOutputTokens,{purpose:'组织规划',projectId:project.id,projectVersion:input.version,maxCost:input.maxPlanningCost,timeoutMs:PLANNING_TIMEOUT_MS,...(input.retainUncertainCosts === undefined ? {} : { retainUncertainCosts: input.retainUncertainCosts })}).catch(error=>{
         if(error instanceof AppError&&error.code==='GATEWAY_TIMEOUT')throw new AppError(502,'AI 方案生成超时：未在等待时限内收到完整结果（最长 3 分钟）。原方案未被替换；本轮费用待核对，请在系统设置中核对中转站账单后再重试。','PLANNING_TIMEOUT');
         throw error;
@@ -323,6 +325,8 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
       const parsed = planSchema.safeParse(candidate);
       if (!parsed.success) return await rejectOutput(new PlanningOutputError('PLAN_SCHEMA_INVALID',null,parsed.error.issues),'模型方案不符合结构要求，原方案已保留；本次调用用量已记录','PLANNING_SCHEMA_INVALID');
       if (hasUnplannedTasks(parsed.data)) throw new AppError(422, '模型仍返回默认占位任务，原方案已保留；请明确分工与验收标准后重新规划。本次调用用量已记录。', 'PLAN_NOT_READY');
+      const acceptanceErrors=plannedAcceptanceErrors(parsed.data.tasks);
+      if(acceptanceErrors.length)throw new AppError(422,'模型未完成验收规划，原方案已保留；请在调整说明中要求 AI 补齐：'+acceptanceErrors.join('；'),'PLAN_ACCEPTANCE_REQUIRED');
       // Only the user controls input documents and their recipients. A planner cannot replace them.
       parsed.data.knowledgeDocumentIds=project.plan.knowledgeDocumentIds;
       parsed.data.runInputs=project.plan.runInputs;
@@ -333,7 +337,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
       const previewId=randomUUID();
       const retention=input.retainUncertainCosts === undefined ? {} : {retainUncertainCosts:input.retainUncertainCosts};
       const adjustments=input.revisionRequest === undefined ? {} : {revisionRequest:input.revisionRequest};
-      const draft={kind:'project-plan',projectId:project.id,baseVersion:input.version,baseFingerprint,...retention,...adjustments,
+      const draft={kind:'project-plan',projectId:project.id,baseVersion:input.version,baseFingerprint,conversation,...retention,...adjustments,
         plan:parsed.data,policy:project.policy,usageId:response.usageId,modelId:model.id};
       const previewClient=await pool.connect();
       try {await previewClient.query('BEGIN');
@@ -342,7 +346,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
         await previewClient.query('COMMIT');
       }catch(error){await previewClient.query('ROLLBACK');throw error;}finally{previewClient.release();}
       const afterPlanning = await projectCostReadiness(pool, project.id);
-      res.json({ previewId,projectId:project.id,baseVersion:input.version,...retention,...adjustments,plan:parsed.data,policy:project.policy,usageId:response.usageId,
+      res.json({ previewId,projectId:project.id,baseVersion:input.version,conversation,...retention,...adjustments,plan:parsed.data,policy:project.policy,usageId:response.usageId,
         validation:validatePlan(parsed.data,{...project.policy,maxBudget:afterPlanning.availableBudget},catalog) });
     } finally { planning.delete(lockId); }
   });
@@ -362,7 +366,11 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
       }
       if(project.version!==input.version||planningProjectFingerprint(project)!==draft.baseFingerprint)
         throw new AppError(409,'生成候选后项目已发生变更，请检查最新方案；原候选和费用仍保留','VERSION_CONFLICT');
+      if(draft.conversation&&(await planningConversation(client,project.id,input.version)).sha256!==draft.conversation.sha256)
+        throw new AppError(409,'生成候选后需求对话已变化，请基于最新对话重新规划；原候选和费用保留','PLANNING_CONVERSATION_CHANGED');
       const plan=planSchema.parse(draft.plan);
+      const acceptanceErrors=plannedAcceptanceErrors(plan.tasks);
+      if(acceptanceErrors.length)throw new AppError(422,acceptanceErrors.join('；'),'PLAN_ACCEPTANCE_REQUIRED');
       const version=await savePlanTransaction(client,project.id,input.version,plan,'model');
       const costReadiness=await projectCostReadiness(client,project.id),catalog=await modelsFrom(client);
       const validation=validatePlan(plan,{...draft.policy,maxBudget:costReadiness.availableBudget},catalog);
@@ -384,6 +392,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
       existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
       if (existing) { await client.query('COMMIT'); }
       else {
+        if(archiveStorageUsage(traceRoot).bytes>=ARCHIVE_ROOT_LIMIT_BYTES)throw new AppError(422,'运行档案达到 1 GiB，已保留原数据并阻止新运行；请先归档历史数据','ARCHIVE_STORAGE_LIMIT');
         const { rows: modelRows } = await client.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
         const catalog: Model[] = modelRows.map(row => ({ ...row.data, id: row.id, version: row.version, status: row.status, checkedAt: row.checked_at,capabilities:row.capabilities }));
         const costReadiness=await requireProjectCostReady(client,project.id,input.retainUncertainCosts);
@@ -468,6 +477,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.get('/api/usage', async (_req, res) => {
     const { rows } = await pool.query('SELECT u.id,u.model_id AS "modelId",u.project_id AS "projectId",u.department_id AS "departmentId",u.run_id AS "runId",u.agent_id AS "agentId",u.employee_id AS "employeeId",u.session_id AS "sessionId",u.task_id AS "taskId",u.attempt_id AS "attemptId",u.request_id AS "requestId",u.duration_ms AS "durationMs",u.input_tokens AS "inputTokens",u.output_tokens AS "outputTokens",u.cost::float AS cost,u.purpose,u.created_at AS "createdAt",(SELECT a->>\'name\' FROM jsonb_array_elements(r.snapshot->\'agents\') a WHERE a->>\'id\'=u.agent_id LIMIT 1) AS "agentName" FROM usage u LEFT JOIN project_runs r ON r.id=u.run_id ORDER BY u.created_at DESC'); res.json(rows);
   });
+  app.get('/api/storage',async(_req,res)=>res.json({...archiveStorageUsage(traceRoot),maxBytes:ARCHIVE_ROOT_LIMIT_BYTES,runMaxBytes:RUN_ARCHIVE_LIMIT_BYTES,mode:'admission-only',retention:'preserve'}));
   app.get('/api/runs', async (_req, res) => {
     const archived=listRuns(traceRoot),stored=(await pool.query(`SELECT id,created_at AS "createdAt",snapshot->>'title' AS title,status,error FROM project_runs`)).rows;
     const byId=new Map(stored.map(row=>[row.id,row]));

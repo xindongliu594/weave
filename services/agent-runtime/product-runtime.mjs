@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { createRunArchive, readRun } from './trace-store.mjs';
+import {assertArchiveCapacity,ARCHIVE_ROOT_LIMIT_BYTES} from './archive-storage.mjs';
 import { createTeamHost } from './host.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
 import { RunSandbox, listArtifacts } from './sandbox.mjs';
@@ -42,6 +43,7 @@ export class ProductDshRuntime {
 
   async start({ runId, approvedSnapshot, routes }) {
     if (this.jobs.has(runId)) throw new Error('RUN_ALREADY_ACTIVE');
+    assertArchiveCapacity(this.traceRoot,ARCHIVE_ROOT_LIMIT_BYTES);
     const archive = createRunArchive(this.traceRoot, approvedSnapshot, { id: runId });
     archive.append('run/queued', { projectId: approvedSnapshot.projectId, projectVersion: approvedSnapshot.planVersion });
     const job = { controller: new AbortController(), host: undefined, cancelled: false };
@@ -91,7 +93,7 @@ export class ProductDshRuntime {
         tasks: snapshot.tasks,
         maxTaskModelCalls: snapshot.policy.maxTaskModelCalls??40,
         onBudget: data=>archive.append('budget/'+data.kind,data,{taskId:data.taskId}),
-        beforeRequest:this.beforeRequest?(data,signal)=>this.beforeRequest(archive.id,data,signal):undefined,
+        beforeRequest:(data,signal)=>{assertArchiveCapacity(archive.dir);return this.beforeRequest?.(archive.id,data,signal);},
         onResponse:async data=>{archive.append('billing/provider-response',data);await this.onResponse?.(data);},
         onCallError:async data=>{archive.append('billing/unconfirmed',data);await this.onCallError?.(data);},
         maxModelCalls: snapshot.policy.maxModelCalls ?? 100,
@@ -107,7 +109,7 @@ export class ProductDshRuntime {
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
-        product: { snapshot, sandbox, gate, supervisor, requestApproval: this.requestApproval, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
+        product: { snapshot, sandbox, gate, supervisor, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');

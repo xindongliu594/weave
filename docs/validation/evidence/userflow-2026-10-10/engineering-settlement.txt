@@ -1,0 +1,16 @@
+✔ successful native delivery settles a dispatched member tail request before disposal and suppresses late tools (6041.0616ms)
+✔ user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee (1127.7306ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (13.722ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.4629ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.8664ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.8919ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.5228ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (2807.8428ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10992.8241

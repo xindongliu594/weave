@@ -1,0 +1,16 @@
+{
+  "knownBefore": 1.481849700000001,
+  "planSource": "Reuse original AI-generated plan v3; knowledge-only grants and employee retrieval instruction added",
+  "knowledge": {
+    "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+    "version": 1,
+    "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+  },
+  "retainedBefore": 0.0192111,
+  "originalInputSnapshot": "9ee5cc2f-4758-4ea2-89c8-e3bf1c6f4a25",
+  "worstCase": 1.901060800000001,
+  "globalAuthorization": 2,
+  "projectCap": 0.4,
+  "baselineRunId": "1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+  "projectId": "cf00d8a8-078b-43ae-847b-fb8607a23575"
+}
