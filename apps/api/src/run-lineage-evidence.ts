@@ -9,6 +9,7 @@ import {readRun,redact} from '../../../services/agent-runtime/trace-store.mjs';
 import {nodeTestCounts} from '../../../services/agent-runtime/run-evidence.mjs';
 import {canonicalEvidence,handoffSealValue,sameHandoffSeal,type RunLineageEvidence,type RecoveredReceipt} from '../../../packages/contracts/run-lineage-evidence.ts';
 import {runAcceptanceEvidence} from './run-acceptance-evidence.ts';
+import {verifiedResourceEdge} from './recovery-resource-plan.ts';
 
 type Database={query:(sql:string,args?:any[])=>Promise<{rows:any[]}>};
 type Loaders={run:(id:string)=>any;operations:(runId:string,ids:string[])=>Promise<any[]>};
@@ -35,8 +36,11 @@ export async function collectRunLineageEvidence(current:any,load:Loaders):Promis
   while(next){
    assert(z.uuid().safeParse(next).success&&!seen.has(next)&&runs.length<=MAX_DEPTH,'LINEAGE_INVALID');seen.add(next);
    const source=load.run(next);
+   const descendant=runs.at(-1);
+   const resourceEdge=descendant.snapshot.resourceRevision||source?.snapshot.resourceRevision;
    assert(source&&source.id===next&&source.integrity==='ok'&&source.snapshot.projectId===response.projectId&&source.snapshot.planVersion===response.planVersion&&
-    canonicalEvidence(contracts(source))===canonicalEvidence(approved),'LINEAGE_INVALID');
+    (resourceEdge?verifiedResourceEdge(descendant.snapshot,source.snapshot,source.id,[...completedTasks(source.events,source.snapshot).keys()]):
+      canonicalEvidence(contracts(source))===canonicalEvidence(contracts(descendant))),'LINEAGE_INVALID');
    runs.push(source);assert(!source.snapshot.recovery||source.snapshot.recovery.version===1,'LINEAGE_INVALID');next=source.snapshot.recovery?.sourceRunId;
   }
  }catch{response.status='unavailable';response.issues.push({code:'LINEAGE_INVALID',message:messages.LINEAGE_INVALID});return response;}

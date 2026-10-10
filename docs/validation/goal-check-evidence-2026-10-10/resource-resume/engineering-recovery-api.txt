@@ -1,0 +1,24 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1591.8795ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (189.4367ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (162.5557ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (206.823ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (150.913ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (153.089ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (156.9343ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (167.9276ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (115.4559ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (110.7471ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (300.812ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (154.2222ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (190.8645ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (264.5114ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4582.7103

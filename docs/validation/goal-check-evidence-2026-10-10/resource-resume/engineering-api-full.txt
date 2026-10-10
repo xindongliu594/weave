@@ -1,0 +1,62 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1746.2197ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (193.1502ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (167.7163ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (225.0264ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (185.0404ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (178.9768ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (189.0528ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (196.7499ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (150.9396ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (126.5685ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (281.0903ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (208.5802ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (288.0236ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4917.1481
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (13061.5439ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (8268.7263ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2570.6075ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (4793.6559ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (4113.1116ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (4720.1066ms)
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (8610.3833ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (5236.9647ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (20027.5933ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3776.6037ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (2530.4116ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (1810.2359ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (5810.0442ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (4355.7146ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (6208.2567ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (6856.7397ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (10337.0294ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (11373.3636ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 125125.2383
+✔ actual router uses production TEXT identifiers to read the bound operation and immutable source evidence (2846.4093ms)
+✔ cross-run database operation cannot be substituted by a matching ID (16.8797ms)
+✔ formal row identity, unknown IDs and strict query validation stay enforced (43.7278ms)
+✔ missing or different database workspace revision cannot produce a verified QA card (36.5699ms)
+✔ tampered ancestor snapshot and oversized archive return explicit unavailable evidence (40.7988ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4888.3401

@@ -105,6 +105,7 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
   snapshot.tasks = structuredClone(snapshot.approvedTasks ?? snapshot.tasks);
   const done = run ? completedTasks(run.events, snapshot) : new Map<string, any>();
   const resumeReasons = [...common], retryReasons = [...common];
+  if(snapshot.resourceRevision)retryReasons.push(issue(409,'RESOURCE_RESUME_ONLY','资源补充只批准未完成节点，完整重试需要另外批准方案'));
   if (!run) resumeReasons.push(issue(409, 'BUDGET_HISTORY_MISSING', '运行档案缺失，无法恢复上下文和核对调用上限；请先恢复备份'));
   if (run && run.integrity === 'ok') {
     try { resumeHandoff(snapshot, run.events, done, join(traceRoot, runId, 'artifacts')); }

@@ -137,7 +137,7 @@ async function reserveCallAttempt(input:CallInput) {
    if(task){
     const taskCost=Number((await client.query(`SELECT COALESCE(sum(u.cost),0) AS n FROM usage u JOIN project_runs r ON r.id=u.run_id WHERE r.project_id=$1 AND r.project_version=$2 AND u.task_id=$3`,[project.id,run.snapshot.planVersion,task.id])).rows[0].n);
     const taskHeld=Number((await client.query(`SELECT COALESCE(sum(c.amount),0) AS n FROM model_reservations c JOIN project_runs r ON r.id=c.run_id WHERE r.project_id=$1 AND r.project_version=$2 AND c.context->>'taskId'=$3 AND c.${open}`,[project.id,run.snapshot.planVersion,task.id])).rows[0].n);
-    if(greater(taskCost+taskHeld+input.amount,task.maxBudget??project.policy.maxBudget))throw new AppError(422,'任务请求与待核对费用超过任务上限','TASK_BUDGET_EXCEEDED');
+    if(greater(taskCost+taskHeld+input.amount,task.maxBudget??run.snapshot.policy.maxBudget))throw new AppError(422,'任务请求与待核对费用超过任务上限','TASK_BUDGET_EXCEEDED');
    }
    if(billingDepartmentId){
     const departmentCost=Number((await client.query(`SELECT COALESCE(sum(u.cost),0) AS n FROM usage u LEFT JOIN projects p ON p.id=u.project_id WHERE u.run_id=$1 AND COALESCE(u.department_id,p.department_id)=$2`,[input.runId,billingDepartmentId])).rows[0].n);

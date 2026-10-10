@@ -1,0 +1,60 @@
+{
+  "atUtc": "20261010T170831Z",
+  "mode": "proposal",
+  "budgetBefore": {
+    "known": 1.8583053,
+    "held": 0.054876,
+    "remaining": 0.0868187,
+    "projectKnown": 0.0911703,
+    "projectHeld": 0.0352938,
+    "unknownReceiptIds": [
+      "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+      "730e094b-e047-4b11-a159-8dffa4a83d40",
+      "f865392a-f575-4f5b-9041-59954d407986"
+    ]
+  },
+  "request": {
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "maxBudget": 0.18,
+    "maxPlanningCost": 0.003,
+    "retainUncertainCosts": true
+  },
+  "candidate": {
+    "previewId": "372fcdc6-244d-40d6-a55a-a042acce74ca",
+    "kind": "run-resource-proposal",
+    "sourceRunId": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+    "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+    "projectVersion": 2,
+    "sourceGoalContract": {
+      "format": "approved-goal-v1",
+      "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+    },
+    "sourceResourceRevision": 0,
+    "ceiling": 0.18,
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "usageId": "4e52f372-ad58-4c68-9a46-0c9f12c199ac",
+    "proposal": {
+      "maxBudget": 0.16,
+      "taskCallLimits": {
+        "accept": 12
+      },
+      "rationale": "恢复后仅剩经理只读验收未完成，需要重新读取两个测试文件、逐次审批真实 node --test、处理结果并正式交接；旧费用与预留保留，净额不足，故在用户0.13–0.18上限内将累计预算提高到0.16，并给 accept 至少6次以上剩余调用。"
+    },
+    "completedTaskIds": [
+      "develop",
+      "qa"
+    ]
+  },
+  "budgetAfter": {
+    "known": 1.8586449,
+    "held": 0.054876,
+    "remaining": 0.0864791,
+    "projectKnown": 0.0915099,
+    "projectHeld": 0.0352938,
+    "unknownReceiptIds": [
+      "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+      "730e094b-e047-4b11-a159-8dffa4a83d40",
+      "f865392a-f575-4f5b-9041-59954d407986"
+    ]
+  }
+}

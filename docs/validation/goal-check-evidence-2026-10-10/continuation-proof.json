@@ -1,0 +1,45 @@
+{
+  "source": "official API and real OpenCode Go model; no local model doubles",
+  "atUtc": "20261010T155430Z",
+  "generationProbe": {
+    "ok": true,
+    "usageReported": true,
+    "message": "文本调用成功；执行团队前还需完成工具能力测试"
+  },
+  "probeRecordedCost": 3.6e-06,
+  "retainedOldUnknownCosts": [
+    "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+    "730e094b-e047-4b11-a159-8dffa4a83d40",
+    "f865392a-f575-4f5b-9041-59954d407986"
+  ],
+  "resumeRunId": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+  "resumedFrom": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+  "goalContractUnchanged": true,
+  "allFourFileHashesUnchanged": true,
+  "completedCheckpoints": [
+    "develop",
+    "qa"
+  ],
+  "unknownExternalOperationCountBeforeResume": 0,
+  "retainUncertainCosts": true,
+  "newRunCalls": 0,
+  "newRunCost": 0,
+  "newRunStatus": "failed",
+  "newRunError": "agent_teams_status: {\"message\":\"BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 34433 字节，精简前预留 $0.01309470；当前请求字节上限 128000；可用预算 $0.00407800；输出上限 2048 tokens 保持不变；单次完整上下文最低预留 $0.01154790，至少另需 $0.00746990\",\"info\":{\"name\":\"HarnessError\",\"code\":\"BUDGET_CONTEXT_LIMIT\"}}",
+  "projectAvailableBudget": 0.004078000000000019,
+  "minimumProtectedRequestReservation": 0.0115479,
+  "reservationShortfall": 0.0074699,
+  "managerRemainingCalls": 1,
+  "cumulativeBudget": {
+    "known": 1.8577632,
+    "held": 0.054876,
+    "remaining": 0.0873608,
+    "unknownReceiptIds": [
+      "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+      "730e094b-e047-4b11-a159-8dffa4a83d40",
+      "f865392a-f575-4f5b-9041-59954d407986"
+    ]
+  },
+  "formalManagerAcceptance": false,
+  "fullRecoveryAcceptance": "blocked by local approved project budget; provider generation is reachable"
+}

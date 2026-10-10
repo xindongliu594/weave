@@ -10,7 +10,8 @@ const originalTasks = snapshot => snapshot.approvedTasks ?? snapshot.tasks;
 function manifest(snapshot) {
   return { requirement: snapshot.requirement, projectId: snapshot.projectId, planVersion: snapshot.planVersion,
     departmentId: snapshot.departmentId, departmentIds: snapshot.departmentIds, agents: snapshot.agents,
-    policy: snapshot.policy, modelRoutes: snapshot.modelRoutes, tasks: originalTasks(snapshot) };
+    policy: snapshot.policy, modelRoutes: snapshot.modelRoutes, tasks: originalTasks(snapshot),
+    resourceRevision: snapshot.resourceRevision, resourceApproval: snapshot.resourceApproval };
 }
 export function createGoalContract(snapshot) {
   return { format: 'approved-goal-v1', sha256: digest(manifest(snapshot)) };

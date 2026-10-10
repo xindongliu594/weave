@@ -17,8 +17,11 @@ import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-s
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE, RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
 import { inspectRecoveryConditions, recoveryProjectBudgetIssues, recoveryHistoryBudgetIssues, assertRecoveryBudgetIssues } from './recovery-conditions.ts';
 import { assertGoalRecovery } from './goal-recovery.ts';
+import { approvedRecoveryResources } from './recovery-resource-plan.ts';
+import { recoveryResourceRouter } from './recovery-resource-router.ts';
 export function runManagementRouter(traceRoot:string){
  const router=Router();
+ router.use(recoveryResourceRouter(traceRoot));
  router.get('/approvals',async(req,res)=>res.json((await pool.query('SELECT id,run_id AS "runId",agent_id AS "agentId",tool,arguments,status,created_at AS "createdAt" FROM tool_approvals WHERE ($1::text IS NULL OR run_id=$1) ORDER BY created_at DESC LIMIT 200',[req.query.runId??null])).rows));
  router.post('/approvals/:id',async(req,res)=>{const input=z.object({decision:z.enum(['approved','denied'])}).parse(req.body);const r=await pool.query("UPDATE tool_approvals SET status=$1,decided_at=now() WHERE id=$2 AND status='pending' AND EXISTS(SELECT 1 FROM project_runs WHERE id=tool_approvals.run_id AND status='running' AND NOT cancel_requested) RETURNING run_id,agent_id",[input.decision,req.params.id]);if(!r.rowCount)throw new AppError(409,'审批已处理或运行已停止');openRunArchive(traceRoot,r.rows[0].run_id).append('approval/decided',{id:req.params.id,decision:input.decision,agentId:r.rows[0].agent_id});res.json({ok:true});});
  router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');res.json(listArtifacts(join(traceRoot,id,'artifacts')));});
@@ -47,22 +50,33 @@ export function runManagementRouter(traceRoot:string){
   }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
  });
  router.post('/runs/:id/retry',async(req,res)=>{
-  const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true),acknowledgeUnknownOperations:z.boolean().default(false),retainUncertainCosts:z.boolean().default(false)}).parse(req.body),client=await pool.connect();
+  const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true),acknowledgeUnknownOperations:z.boolean().default(false),retainUncertainCosts:z.boolean().default(false),
+    budgetPreviewId:z.uuid().optional(),confirmation:z.literal('APPROVE_RESOURCES_AND_RESUME').optional()}).parse(req.body);
+  if(input.budgetPreviewId&&input.confirmation!=='APPROVE_RESOURCES_AND_RESUME')throw new AppError(400,'请明确确认资源额度与续跑','RESOURCE_CONFIRMATION_REQUIRED');
+  if(input.budgetPreviewId&&!input.resume)throw new AppError(409,'资源补充只允许续跑未完成节点','RESOURCE_RESUME_ONLY');
+  const client=await pool.connect();
   try{await client.query('BEGIN');await shareCostMaintenance(client);
    const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
    await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
    const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
+   if(!input.resume&&old.snapshot.resourceRevision)throw new AppError(409,'资源补充只批准未完成节点，完整重试需要另外批准方案','RESOURCE_RESUME_ONLY');
    if(!['failed','interrupted','cancelled'].includes(old.status))throw new AppError(409,'仅能恢复或重试已停止的运行');
    // A repeated recovery request returns its committed child even while that
    // child is active. The project lock still fences creation of a new child.
-   const already=(await client.query('SELECT id FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];if(already){await client.query('COMMIT');return res.json({id:already.id,existing:true});}
+   const already=(await client.query('SELECT id,snapshot FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];
+   if(already){
+    if(input.budgetPreviewId&&(already.snapshot.approval?.kind!=='resume-resources'||already.snapshot.resourceApproval?.previewId!==input.budgetPreviewId||
+       already.snapshot.resourceApproval?.sourceRunId!==id||already.snapshot.resourceRevision!==(old.snapshot.resourceRevision??0)+1))
+      throw new AppError(409,'此运行已有其他续跑记录，请打开已有运行后重新核对资源方案','RESOURCE_PREVIEW_STALE');
+    await client.query('COMMIT');return res.json({id:already.id,existing:true});
+   }
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    if(hasUnplannedTasks({tasks:old.snapshot.approvedTasks??old.snapshot.tasks}))throw new AppError(422,planningRequiredMessage+'旧运行不能直接重试，请修改项目方案后重新批准。','PLAN_NOT_READY');
    const run=readRun(traceRoot,id);if(run&&run.integrity!=='ok')throw new AppError(409,'档案不完整，先导出并检查，不能自动恢复');
    assertGoalRecovery(old.snapshot,run);
    const unknown=run?unresolvedOperations(run.events):[];
    if(unknown.length&&!input.acknowledgeUnknownOperations)throw new AppError(409,'存在结果未知的修改操作，请核对操作和产物后确认重试，避免重复执行','OPERATION_RECONCILIATION_REQUIRED');
-   const snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();
+   let snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();
    snapshot.approvedTasks??=structuredClone(snapshot.tasks);
    if(!input.resume){snapshot.tasks=structuredClone(snapshot.approvedTasks);delete snapshot.handoffCheckpoints;delete snapshot.completedCheckpoints;delete snapshot.recovery;}
    if(input.resume&&run){
@@ -73,19 +87,24 @@ export function runManagementRouter(traceRoot:string){
     snapshot.recovery=buildCheckpointContext(snapshot,run.events,checkpointTasks(run.events,snapshot),done,join(traceRoot,id,'artifacts'),id);
    }
    if(input.resume&&!run)throw new AppError(409,'运行档案缺失，无法恢复上下文和核对调用上限；请先恢复备份','BUDGET_HISTORY_MISSING');
+   const history=await budgetHistory(client,traceRoot,old.project_id,old.project_version);
+   if(input.budgetPreviewId){
+     const resourceSnapshot=await approvedRecoveryResources(client,old,input.budgetPreviewId,[...done.keys()],history);
+     snapshot={...resourceSnapshot,runtimeArchitecture:snapshot.runtimeArchitecture,handoffCheckpoints:snapshot.handoffCheckpoints,recovery:snapshot.recovery};
+   }
    if(!snapshot.tasks.some((task:any)=>!done.has(task.id)))throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
    const costReadiness=await requireProjectCostReady(client,old.project_id,input.retainUncertainCosts,snapshot.policy.maxBudget);
    await assertRunAuthorization(old,client);
    snapshot.executionBudget=costReadiness.availableBudget;snapshot.costCarryover=projectCostCarryover(costReadiness,input.retainUncertainCosts);
    assertRecoveryBudgetIssues(recoveryProjectBudgetIssues(costReadiness,snapshot.policy.maxBudget));
-   snapshot.budgetVersion=1;snapshot.budgetHistory=await budgetHistory(client,traceRoot,old.project_id,old.project_version);
+   snapshot.budgetVersion=1;snapshot.budgetHistory=history;
    assertRecoveryBudgetIssues(recoveryHistoryBudgetIssues(snapshot,snapshot.budgetHistory,new Set(done.keys())));
    await assertRunModels(snapshot,client);
    const previousBudgets=snapshot.departmentBudgets??{[snapshot.departmentId]:snapshot.executionBudget},previousTotal=Object.values(previousBudgets).reduce((n:number,value:any)=>n+Number(value),0);
    snapshot.departmentBudgets=Object.fromEntries(Object.entries(previousBudgets).map(([departmentId,value])=>[departmentId,previousTotal>0?snapshot.executionBudget*Number(value)/previousTotal:(departmentId===snapshot.departmentId?snapshot.executionBudget:0)]));
    const config=await lockCostPolicy(client);await checkDailyBudget(client,config,snapshot.departmentId,snapshot.departmentBudgets[snapshot.departmentId]??0,snapshot.executionBudget);
    for(const departmentId of snapshot.departmentIds??[snapshot.departmentId])if(departmentId!==snapshot.departmentId)await checkDailyBudget(client,config,departmentId,snapshot.departmentBudgets[departmentId]??0,0);
-   snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id,retainUncertainCosts:input.retainUncertainCosts,...(unknown.length?{reconciledOperations:unknown}: {})};
+   snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.budgetPreviewId?'resume-resources':input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id,retainUncertainCosts:input.retainUncertainCosts,...(unknown.length?{reconciledOperations:unknown}: {})};
    const newId=randomUUID(),attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);
    await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,parent_run_id,department_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[newId,old.project_id,old.project_version,'queued',snapshot,attempt,id,old.department_ids??snapshot.departmentIds??[snapshot.departmentId]]);
    await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1 AND version=$2",[old.project_id,old.project_version]);await client.query('COMMIT');res.status(202).json({id:newId,completedCheckpoints:[...done.keys()]});

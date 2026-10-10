@@ -1,0 +1,40 @@
+✔ goal seal binds nested criteria, goal, scope, permissions and version (3.5923ms)
+✔ resume history and untrusted knowledge do not change goal authority (2.1792ms)
+✔ runtime cannot change effective tasks while retaining original approvedTasks (0.4303ms)
+✔ an independent expected seal rejects resealing and removal (1.284ms)
+✔ legacy runs remain unsealed; sealed task context rejects unknown nodes (0.6265ms)
+✔ resource approval preserves original semantics, grants and source snapshot (6.4429ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (2.9704ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.394ms)
+✔ subsequent resource approval retains each ancestor once (0.6909ms)
+✔ goal view distinguishes legacy, pending integrity and observed node evidence (16.7564ms)
+✔ goal boundary pause is visible and cannot be presented as acceptance (1.2197ms)
+✔ explicit resource approval preserves exact inherited QA evidence across ordinary later recovery (29.186ms)
+✔ a resource boundary cannot authorize changed goal, completed contract or counterfeit parent (7.8651ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (2.8512ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (3.3207ms)
+✔ ancestry has an explicit maximum depth (1.8501ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (6.9158ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (16.3033ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (0.8072ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (14.6357ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (3.3873ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (2.7067ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.8357ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.9136ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.3577ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.4404ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.4871ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.6511ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.9528ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (12.4841ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (12.539ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.8476ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2021.4685

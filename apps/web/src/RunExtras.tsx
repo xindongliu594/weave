@@ -12,6 +12,7 @@ import { createRunRecoveryConfirmation, type RunRecoveryContext, type RunRecover
 import {RunInheritedEvidence} from './RunInheritedEvidence.tsx';
 import {RunAcceptanceChecks} from './RunAcceptanceChecks.tsx';
 import {RunGoalChecks} from './RunGoalChecks.tsx';
+import {RunResourceResume} from './RunResourceResume.tsx';
 import type {RunLineageEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
 export type RunExtrasErrors = { id: string; operation: string; refresh: string };
 type RunExtrasErrorEvent = { id: string; type: 'reset' | 'operation' | 'refresh-failed' | 'refresh-succeeded'; message?: string };
@@ -158,6 +159,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
    {snapshot.projectId&&<button className="text-button" onClick={()=>onOpenProject(snapshot.projectId)}>返回项目修改方案</button>}
  </div>}
  <RunEmployeeStatus status={status} runtime={runtime} employeeName={employeeName} taskName={taskName}/>
+ {snapshot.resourceRevision>0&&<p className="notice-box">原任务方案 v{snapshot.planVersion} · 资源补充审批第 {snapshot.resourceRevision} 次 · 本次续跑项目累计上限 ${snapshot.policy.maxBudget}。原项目草案保留，旧费用、预留和调用次数继续计入；补充审批只允许未完成节点续跑。</p>}
  <RunGoalChecks snapshot={snapshot} events={events}/>
  <RunAcceptanceChecks runId={id} snapshot={snapshot} evidence={lineage}/>
  <RunInheritedEvidence runId={id} snapshot={snapshot} evidence={lineage} error={lineageError} taskName={taskName}/>
@@ -170,10 +172,12 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
   {recovery?.costBlocked&&!costs.readiness&&<p className="banner error" role="status">{recovery.costBlocked} <a href="#usage">核对调用费用</a></p>}
   {unknown.length>0&&<div><p>以下操作的结果尚未确认，恢复前需要单独检查：</p>{unknown.map(operation=><pre className="product-pre" key={operation.callId}>{operation.name} · {JSON.stringify(operation.arguments)}</pre>)}<label><input type="checkbox" checked={acknowledged} disabled={busy||checkingRecovery} onChange={e=>setAcknowledged(e.target.checked)}/>我已核对这些操作和现有产物，允许未完成部分重新执行。</label></div>}
   <RecoveryConditionsView result={checkedRecovery?.data} stale={recoveryStale} checking={checkingRecovery} error={recoveryError} disabled={busy} staticEstimate={snapshot.estimatedCost} onCheck={()=>void checkRecovery(costs)}/>
-  <RunRecoveryActions key={id} busy={busy} checking={checkingRecovery} context={{runId:id,version:snapshot.planVersion,key:checkKey,retainUncertainCosts:costs.retainUncertainCosts,acknowledged,
+  <RunRecoveryActions key={'recovery-actions:'+id} busy={busy} checking={checkingRecovery} context={{runId:id,version:snapshot.planVersion,key:checkKey,retainUncertainCosts:costs.retainUncertainCosts,acknowledged,
    allowResume:recoveryConditionsAllow(checkedRecovery?.data,checkedRecovery?.key,checkKey,true)&&!runContinuationBlocked(costs,{busy,legacyCostBlocked:recovery?.costBlocked,checkpointBlocked:recovery?.checkpointBlocked,unknownCount:unknown.length,acknowledged,resume:true}),
    allowRetry:recoveryConditionsAllow(checkedRecovery?.data,checkedRecovery?.key,checkKey,false)&&!runContinuationBlocked(costs,{busy,legacyCostBlocked:recovery?.costBlocked,unknownCount:unknown.length,acknowledged,resume:false})}}
    check={intent=>checkRecovery(costs,intent.acknowledged)} submit={intent=>api<{id:string}>('/runs/'+intent.runId+'/retry','POST',{resume:intent.resume,acknowledgeUnknownOperations:intent.acknowledged,retainUncertainCosts:intent.retainUncertainCosts})} onError={setError}/>
+  {snapshot.goalContract&&<RunResourceResume key={'resource-resume:'+id} id={id} snapshot={snapshot} retained={costs.readiness?.reserved??0} retainUncertainCosts={costs.retainUncertainCosts}
+    disabled={busy||checkingRecovery||integrity!=='ok'||unknown.length>0||costs.blocked||events.some(event=>event.type==='goal/blocked')}/>}
  </div>}
  {escalation&&<div className="banner error" role="status"><strong>返工已停止，需要你处理</strong><p>{escalation.message}</p><p>检查下方问题和现有交付物；需要新增权限、扩大范围或增加额度时，在项目中保存新方案并重新批准。</p></div>}
  {(rework.length>0||escalation)&&<details className="lower"><summary>审查问题与返工记录</summary>{events.filter(e=>['quality/review-submitted','quality/rework-created','quality/reviewed'].includes(e.type)).map(e=><div className="knowledge-result" key={e.seq}><strong>{e.data.reviewTaskId??e.data.taskId} · {e.type==='quality/rework-created'?`返工第 ${e.data.round} 轮`:e.data.verdict==='pass'?'独立复验通过':'审查要求修订'}</strong>{(e.data.findings??[]).map((finding:any)=><p key={finding.id}>{finding.id} · {finding.severity}{finding.file?` · ${finding.file}`:''}<br/>{finding.problem}<br/>修复要求：{finding.requiredFix}</p>)}</div>)}</details>}

@@ -1,0 +1,333 @@
+{
+  "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+  "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+  "planVersion": 2,
+  "goalContract": {
+    "format": "approved-goal-v1",
+    "sha256": "00a0003f89ab303fda9a9675ada30db3bd1b643bfe99ccb6f1dbcaabdad86f45"
+  },
+  "status": "completed",
+  "completedCheckpoints": [
+    "develop",
+    "qa"
+  ],
+  "resumedFrom": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+  "files": [
+    {
+      "path": "README.md",
+      "size": 656,
+      "sha256": "6bc1aeae3049ca8c59f1dcbb686ca2d2358036e56c44158d4a4f466cb6afe48b"
+    },
+    {
+      "path": "qa.test.mjs",
+      "size": 1291,
+      "sha256": "f8b293486d2cb3ac395297cfcf323a63e3d40b4f773b3b6ff8a603368b48c519"
+    },
+    {
+      "path": "smoke.test.mjs",
+      "size": 530,
+      "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59"
+    },
+    {
+      "path": "sum.mjs",
+      "size": 342,
+      "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9"
+    }
+  ],
+  "commands": [
+    {
+      "taskId": "accept",
+      "attemptId": "2399ef60-07e3-4019-b032-9fbb7182c3d0",
+      "command": "node --test smoke.test.mjs qa.test.mjs",
+      "exitCode": 0,
+      "evidence": {
+        "version": 1,
+        "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+        "observedAt": "2026-10-10T17:10:00.322Z",
+        "tool": "terminal_test",
+        "sessionId": "b3283f74-59cb-4a5a-9701-8b63430fb15f",
+        "callId": "call_00_gjoldvj7yqjdzp02t77lxxwk",
+        "approval": {
+          "status": "available",
+          "approvalId": "7a4581a5-41e5-4674-b86a-e829f2a6ef2d"
+        },
+        "operation": {
+          "status": "available",
+          "operationId": "e2b2b10a-2d67-46c4-b53b-cc07c21991cb",
+          "queuedSeq": 373,
+          "finishedSeq": 379
+        },
+        "hashBasis": "executor-result-before-archive-redaction",
+        "output": {
+          "status": "available",
+          "sha256": "aa6356bb89fa5099386e49b90f95f1726d24587152c270650c853c889aa710ce",
+          "bytes": 489,
+          "complete": true,
+          "layout": "combined"
+        },
+        "stdout": {
+          "status": "unknown",
+          "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+        },
+        "stderr": {
+          "status": "unknown",
+          "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+        },
+        "nodeTests": {
+          "status": "available",
+          "format": "spec",
+          "tests": 9,
+          "suites": 0,
+          "pass": 9,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      },
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "a507c8ef92ce41f9b6649ae5cd08345464d46482fdc5a9feba529c3b99d154ee",
+          "status": "passed",
+          "reason": ""
+        }
+      ]
+    }
+  ],
+  "goalEvents": [
+    {
+      "seq": 4,
+      "at": "2026-10-10T17:08:51.142Z",
+      "type": "goal/anchored",
+      "data": {
+        "format": "approved-goal-v1",
+        "sha256": "00a0003f89ab303fda9a9675ada30db3bd1b643bfe99ccb6f1dbcaabdad86f45",
+        "planVersion": 2
+      }
+    },
+    {
+      "seq": 47,
+      "at": "2026-10-10T17:08:52.973Z",
+      "type": "goal/node-started",
+      "data": {
+        "taskId": "accept",
+        "attemptId": "2399ef60-07e3-4019-b032-9fbb7182c3d0",
+        "sha256": "00a0003f89ab303fda9a9675ada30db3bd1b643bfe99ccb6f1dbcaabdad86f45"
+      }
+    },
+    {
+      "seq": 431,
+      "at": "2026-10-10T17:10:08.039Z",
+      "type": "goal/node-checked",
+      "data": {
+        "taskId": "accept",
+        "attemptId": "2399ef60-07e3-4019-b032-9fbb7182c3d0",
+        "sha256": "00a0003f89ab303fda9a9675ada30db3bd1b643bfe99ccb6f1dbcaabdad86f45",
+        "criteriaIds": [
+          "accept:1"
+        ],
+        "evidence": "handoff/accepted"
+      }
+    }
+  ],
+  "accepted": [
+    {
+      "taskId": "accept",
+      "attemptId": "2399ef60-07e3-4019-b032-9fbb7182c3d0",
+      "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+      "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003",
+      "inputs": [
+        {
+          "path": "sum.mjs",
+          "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9",
+          "size": 342,
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "smoke.test.mjs",
+          "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59",
+          "size": 530,
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "qa.test.mjs",
+          "sha256": "f8b293486d2cb3ac395297cfcf323a63e3d40b4f773b3b6ff8a603368b48c519",
+          "size": 1291,
+          "producerTaskId": "qa"
+        }
+      ],
+      "outputs": [],
+      "commands": [
+        {
+          "command": "node --test smoke.test.mjs qa.test.mjs",
+          "exitCode": 0,
+          "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003",
+          "evidence": {
+            "version": 1,
+            "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+            "observedAt": "2026-10-10T17:10:00.322Z",
+            "tool": "terminal_test",
+            "sessionId": "b3283f74-59cb-4a5a-9701-8b63430fb15f",
+            "callId": "call_00_gjoldvj7yqjdzp02t77lxxwk",
+            "approval": {
+              "status": "available",
+              "approvalId": "7a4581a5-41e5-4674-b86a-e829f2a6ef2d"
+            },
+            "operation": {
+              "status": "available",
+              "operationId": "e2b2b10a-2d67-46c4-b53b-cc07c21991cb",
+              "queuedSeq": 373,
+              "finishedSeq": 379
+            },
+            "hashBasis": "executor-result-before-archive-redaction",
+            "output": {
+              "status": "available",
+              "sha256": "aa6356bb89fa5099386e49b90f95f1726d24587152c270650c853c889aa710ce",
+              "bytes": 489,
+              "complete": true,
+              "layout": "combined"
+            },
+            "stdout": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "stderr": {
+              "status": "unknown",
+              "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+            },
+            "nodeTests": {
+              "status": "available",
+              "format": "spec",
+              "tests": 9,
+              "suites": 0,
+              "pass": 9,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "a507c8ef92ce41f9b6649ae5cd08345464d46482fdc5a9feba529c3b99d154ee",
+              "status": "passed",
+              "reason": ""
+            }
+          ],
+          "observationSeq": 381
+        }
+      ],
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "a507c8ef92ce41f9b6649ae5cd08345464d46482fdc5a9feba529c3b99d154ee",
+          "status": "passed",
+          "reason": "",
+          "command": "node --test smoke.test.mjs qa.test.mjs"
+        }
+      ],
+      "acceptedAt": "2026-10-10T17:10:08.028Z",
+      "budgetEvidence": {
+        "version": 1,
+        "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+        "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+        "projectVersion": 2,
+        "capturedAt": "2026-10-10T17:10:08.028Z",
+        "point": "node-accepted",
+        "basis": "host-execution-budget",
+        "currency": "USD",
+        "project": {
+          "limit": 0.16,
+          "occupied": 0.14580720000000003,
+          "activeReserved": 0,
+          "available": 0.014192799999999978,
+          "callsUsed": 27,
+          "callLimit": 45,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "inherited": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.0915099,
+          "retainedUnknownReservation": 0.03529379999999999,
+          "availableBudget": 0.033196300000000005,
+          "callsUsed": 23,
+          "callsBasis": "durable-admissions-and-archived-wire-requests",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        },
+        "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "taskId": "accept",
+      "runtimeTaskId": "t3",
+      "attemptId": "2399ef60-07e3-4019-b032-9fbb7182c3d0",
+      "verdict": "pass",
+      "findings": [],
+      "reworkRound": 0,
+      "inputs": [
+        {
+          "path": "sum.mjs",
+          "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9",
+          "size": 342,
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "smoke.test.mjs",
+          "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59",
+          "size": 530,
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "qa.test.mjs",
+          "sha256": "f8b293486d2cb3ac395297cfcf323a63e3d40b4f773b3b6ff8a603368b48c519",
+          "size": 1291,
+          "producerTaskId": "qa"
+        }
+      ]
+    }
+  ],
+  "wireRequests": [
+    {
+      "seq": 58,
+      "taskId": "accept",
+      "sessionId": "b3283f74-59cb-4a5a-9701-8b63430fb15f",
+      "requestId": "adf69ce6-81a2-4e58-89a6-4ed091acc283",
+      "usageId": "87107145-8eeb-4dec-be93-26e2dc16208b"
+    },
+    {
+      "seq": 83,
+      "taskId": "accept",
+      "sessionId": "b3283f74-59cb-4a5a-9701-8b63430fb15f",
+      "requestId": "a1fc2dda-b615-408f-b14b-9d57151a9517",
+      "usageId": "f4847013-991e-42d1-88b0-7d49e1add58c"
+    },
+    {
+      "seq": 144,
+      "taskId": "accept",
+      "sessionId": "b3283f74-59cb-4a5a-9701-8b63430fb15f",
+      "requestId": "250d6565-0cd7-45f3-9d2a-b7b6edc7ef07",
+      "usageId": "666cc228-322e-43b6-baf5-acf22d65a45a"
+    },
+    {
+      "seq": 393,
+      "taskId": "accept",
+      "sessionId": "b3283f74-59cb-4a5a-9701-8b63430fb15f",
+      "requestId": "2869d6a6-eb94-4dbd-807e-cb254d3a1d04",
+      "usageId": "48812227-9655-439e-9c24-f92ca83115a3"
+    },
+    {
+      "seq": 451,
+      "taskId": null,
+      "sessionId": "9f705294-fdd0-4b24-a319-eb8b98ebb597",
+      "requestId": "5032bb83-c87a-4c13-a259-aa2209c239e1",
+      "usageId": "374ad749-4cd2-4c8f-8206-b68645c67592"
+    }
+  ],
+  "cost": 0.021171,
+  "calls": 5,
+  "source": "real configured DeepSeek + employee-generated files + OpenShell execution; read-only evidence copy"
+}

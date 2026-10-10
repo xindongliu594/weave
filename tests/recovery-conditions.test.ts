@@ -18,6 +18,8 @@ import { createGoalContract } from '../packages/contracts/goal-contract.mjs';
 const isolated = process.env.SIMULATED_INTEGRATION === 'pglite';
 let pool: pg.Pool, server: http.Server, gateway: http.Server, directory: string, traceRoot: string, url: string;
 let providerRequests = 0;
+let resourcePlanningReply:object|undefined;
+let resourcePlanningMessages:any[]=[];
 const modelId = 'recovery-check-model', gatewayId = 'recovery-check-gateway', departmentId = 'recovery-check-department';
 const employee = { id: 'manager', name: '隔离测试经理', title: '经理', role: 'manager', instructions: 'Read only fixture checks', modelId, tools: [] };
 const tasks = [
@@ -26,7 +28,7 @@ const tasks = [
   { id: 'finish', subject: '未完成的验收任务', objective: 'Finish fixture text', assigneeId: employee.id, assignee: employee.id, dependencies: ['prepare'],
     acceptanceCriteria: ['fixture finished'], estimatedInputTokens: 10, estimatedOutputTokens: 10, maxBudget: .5, maxModelCalls: 3, taskPrompt: 'Finish fixture text' },
 ];
-const policy = { maxBudget: 1, maxAgents: 1, maxConcurrentAgents: 1, maxModelCalls: 5, maxTaskModelCalls: 3, deadlineSeconds: 60 };
+const policy = { maxBudget: 1, maxAgents: 1, maxConcurrentAgents: 1, maxModelCalls: 5, maxTaskModelCalls: 3, deadlineSeconds: 60, allowedModelIds:[modelId] };
 const close = (instance?: http.Server) => instance ? new Promise<void>(resolve => { instance.closeAllConnections(); instance.close(() => resolve()); }) : Promise.resolve();
 
 before(async () => {
@@ -35,7 +37,10 @@ before(async () => {
   directory = await mkdtemp(join(tmpdir(), 'recovery-conditions-')); traceRoot = join(directory, 'runs');
   process.env.DATA_DIR = directory; process.env.TRACE_ROOT = traceRoot; process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate();
-  gateway = http.createServer((_req, res) => { providerRequests++; res.writeHead(500); res.end('NO_MODEL_CALL_EXPECTED'); });
+  gateway = http.createServer(async(req, res) => { providerRequests++;const chunks=[];for await(const chunk of req)chunks.push(chunk);
+    resourcePlanningMessages=JSON.parse(Buffer.concat(chunks).toString()).messages??[];
+    if(resourcePlanningReply){res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(resourcePlanningReply)},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:10}}));}
+    else{res.writeHead(500);res.end('NO_MODEL_CALL_EXPECTED');} });
   gateway.listen(0, '127.0.0.1'); await once(gateway, 'listening');
   const model = { id: modelId, gatewayId, name: 'No inference fixture', model: 'fixture', inputRate: 2, outputRate: 10 };
   await pool.query('INSERT INTO gateways(id,data) VALUES($1,$2)', [gatewayId, { name: 'Local sentinel', baseUrl: 'http://127.0.0.1:' + (gateway.address() as any).port + '/v1' }]);
@@ -52,6 +57,8 @@ beforeEach(async () => {
   await pool.query('UPDATE product_settings SET data=$1 WHERE id=1', [{ autoBudgetLimit: .25, dailyBudgetLimit: 20, maxActiveRuns: 2, retentionDays: 0 }]);
   await pool.query('UPDATE gateways SET version=1 WHERE id=$1', [gatewayId]);
   providerRequests = 0;
+  resourcePlanningReply=undefined;
+  resourcePlanningMessages=[];
 });
 after(async () => {
   if (!isolated) return;
@@ -191,4 +198,104 @@ test('model configuration changes are reported by read-only inspection without r
   const before = await state(); const result = await check(runId, '?retainUncertainCosts=true');
   assert.ok(result.resume.reasons.some((reason: any) => reason.code === 'MODEL_REAPPROVAL_REQUIRED'));
   assert.equal(result.nativeRequestChecked, false); assert.equal(providerRequests, 0); assert.deepEqual(await state(), before);
+});
+
+async function resourcePreview(runId:string,changes:any={}) {
+  const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0];
+  const previewId=randomUUID(),usageId=randomUUID();
+  const data={kind:'run-resource-proposal',sourceRunId:runId,projectId:row.project_id,projectVersion:row.project_version,
+    sourceGoalContract:row.snapshot.goalContract,sourceResourceRevision:0,ceiling:1.5,modelId,usageId,
+    proposal:{maxBudget:1.5,taskCallLimits:{finish:3},rationale:'Fund only unfinished work without resetting original counts'},...changes};
+  await pool.query('INSERT INTO organization_previews(id,data,project_id) VALUES($1,$2,$3)',[previewId,data,row.project_id]);
+  await pool.query("INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose,planning_preview_id) VALUES($1,$2,$3,1,1,.001,'预算补充规划',$4)",[usageId,modelId,row.project_id,previewId]);
+  return {previewId,data};
+}
+const resourceRetry=(id:string,body:any)=>fetch(url+'/runs/'+id+'/retry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+
+test('resource candidate needs explicit approval and cannot silently launch ordinary resume', {skip:!isolated},async()=>{
+  const {runId}=await seed(true),{previewId}=await resourcePreview(runId),before=await state();
+  const result=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:previewId});
+  assert.equal(result.status,400);assert.equal((await result.json() as any).code,'RESOURCE_CONFIRMATION_REQUIRED');
+  assert.deepEqual(await state(),before);assert.equal(providerRequests,0);
+});
+test('confirmed resource resume retains completed nodes, old counts and holds, and is idempotent', {skip:!isolated},async()=>{
+  const {runId,receiptId}=await seed(true),{previewId}=await resourcePreview(runId);
+  const original=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
+  const body={resume:true,retainUncertainCosts:true,budgetPreviewId:previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'};
+  const response=await resourceRetry(runId,body);assert.equal(response.status,202);
+  const child=await response.json() as any;
+  const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[child.id])).rows[0];
+  assert.equal(row.project_version,1);assert.equal(row.snapshot.resourceRevision,1);assert.equal(row.snapshot.policy.maxBudget,1.5);
+  assert.equal(row.snapshot.resourceApproval.sourceRunId,runId);assert.equal(row.snapshot.resourceApproval.previewId,previewId);
+  assert.deepEqual(row.snapshot.completedCheckpoints,['prepare']);assert.equal(row.snapshot.budgetHistory.calls,2);
+  assert.equal(row.snapshot.costCarryover.reserved,.1);assert.equal(row.snapshot.costCarryover.retained,true);
+  assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot,original);
+  assert.equal((await pool.query('SELECT status FROM model_reservations WHERE id=$1',[receiptId])).rows[0].status,'uncertain');
+  const repeated=await resourceRetry(runId,body);assert.equal((await repeated.json() as any).id,child.id);
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,2);
+  const alternative=await resourcePreview(runId);
+  const different=await resourceRetry(runId,{...body,budgetPreviewId:alternative.previewId});
+  assert.equal(different.status,409);assert.equal((await different.json() as any).code,'RESOURCE_PREVIEW_STALE');
+  await pool.query("UPDATE project_runs SET status='failed' WHERE id=$1",[child.id]);
+  const archive=createRunArchive(traceRoot,row.snapshot,{id:child.id});
+  archive.append('run/task-mapping',{tasks:[{task_id:'t2',seed_id:'finish'}]});
+  archive.append('model/wire-request',{taskId:'finish'});archive.append('model/wire-request',{taskId:'finish'});
+  archive.append('team/checkpoint',{tasks:[{task_id:'t2',status:'failed'}]});
+  const inspected=await check(child.id,'?retainUncertainCosts=true');
+  assert.equal(inspected.calls.used,4);assert.equal(inspected.tasks.find((t:any)=>t.id==='finish').calls,3);
+  assert.ok(inspected.retry.reasons.some((r:any)=>r.code==='RESOURCE_RESUME_ONLY'));
+  const full=await resourceRetry(child.id,{resume:false,retainUncertainCosts:true});
+  assert.equal(full.status,409);assert.equal((await full.json() as any).code,'RESOURCE_RESUME_ONLY');assert.equal(providerRequests,0);
+});
+
+test('an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees', {skip:!isolated},async()=>{
+  const {runId}=await seed(true);
+  const normal=await resourceRetry(runId,{resume:true,retainUncertainCosts:true});assert.equal(normal.status,202);
+  const normalId=(await normal.json() as any).id;
+  await pool.query("UPDATE project_runs SET status='failed' WHERE id=$1",[normalId]);
+  const {previewId}=await resourcePreview(runId);
+  const changed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  assert.equal(changed.status,409);assert.equal((await changed.json() as any).code,'RESOURCE_PREVIEW_STALE');
+  const planning=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+  assert.equal(planning.status,409);assert.equal((await planning.json() as any).code,'RESOURCE_SOURCE_SUPERSEDED');assert.equal(providerRequests,0);
+});
+test('resource approval refuses stale goal, different source and completed-node changes', {skip:!isolated},async()=>{
+  const {runId}=await seed(true),before=await state();
+  for(const changes of [{sourceRunId:randomUUID()},{sourceGoalContract:{format:'approved-goal-v1',sha256:'a'.repeat(64)}},
+    {proposal:{maxBudget:1.5,taskCallLimits:{prepare:3},rationale:'Invalid completed node adjustment'}}]){
+    const {previewId}=await resourcePreview(runId,changes);
+    const response=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+    assert.ok([409,422].includes(response.status));
+  }
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
+  assert.equal(providerRequests,0);
+  assert.deepEqual((await state()).find(entry=>entry.name==='model_reservations'),before.find(entry=>entry.name==='model_reservations'));
+});
+
+test('AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate', {skip:!isolated},async()=>{
+  const {runId,projectId}=await seed(true),original=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},rationale:'Local planner fixture, never employee acceptance'};
+  const body={modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true};
+  await pool.query("UPDATE projects SET policy=jsonb_set(policy,'{maxBudget}','0.301'::jsonb) WHERE id=$1",[projectId]);
+  const blocked=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  assert.equal(blocked.status,422);assert.equal((await blocked.json() as any).code,'BUDGET_EXCEEDED');assert.equal(providerRequests,0);
+  await pool.query("UPDATE projects SET policy=jsonb_set(policy,'{maxBudget}','1'::jsonb) WHERE id=$1",[projectId]);
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+  assert.equal(candidate.kind,'run-resource-proposal');assert.deepEqual(candidate.completedTaskIds,['prepare']);
+  const prompt=resourcePlanningMessages[0].content;
+  assert.match(prompt,/"minimum":1/);assert.match(prompt,/"maximum":1.5/);
+  assert.match(prompt,/项目累计总额/);
+  const schema=JSON.parse(prompt.slice(prompt.indexOf('{'),prompt.indexOf('\n')));
+  assert.equal(schema.properties.taskCallLimits.properties.finish.minimum,3);
+  const context=JSON.parse(resourcePlanningMessages[1].content);
+  assert.equal(context.costs.reserved,.1);assert.ok(context.costs.recordedCost>0);
+  assert.ok(context.costs.availableAtCeiling>context.costs.availableAtOriginal);
+  assert.equal(providerRequests,1);assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
+  assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot,original);
+  const usage=(await pool.query('SELECT purpose,input_tokens,output_tokens,planning_preview_id FROM usage WHERE id=$1',[candidate.usageId])).rows[0];
+  assert.equal(usage.purpose,'预算补充规划');assert.equal(usage.input_tokens,10);assert.equal(usage.planning_preview_id,candidate.previewId);
+  const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  assert.equal(confirmed.status,202);assert.equal(providerRequests,1);
 });

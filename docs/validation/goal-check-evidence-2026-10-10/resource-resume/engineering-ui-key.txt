@@ -1,0 +1,19 @@
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (2.6724ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.7865ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.898ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.3574ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.4501ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.4592ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.5931ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.9369ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (12.4811ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (11.7413ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.5606ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 783.6534

@@ -1,0 +1,575 @@
+{
+  "atUtc": "2026-10-10T17:28:24.336290+00:00",
+  "sourceRunId": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+  "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+  "status": "completed",
+  "planVersion": 2,
+  "resourceRevision": 1,
+  "resourceApproval": {
+    "format": "run-resource-approval-v1",
+    "ceiling": 0.18,
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "usageId": "4e52f372-ad58-4c68-9a46-0c9f12c199ac",
+    "proposal": {
+      "maxBudget": 0.16,
+      "rationale": "恢复后仅剩经理只读验收未完成，需要重新读取两个测试文件、逐次审批真实 node --test、处理结果并正式交接；旧费用与预留保留，净额不足，故在用户0.13–0.18上限内将累计预算提高到0.16，并给 accept 至少6次以上剩余调用。",
+      "taskCallLimits": {
+        "accept": 12
+      }
+    },
+    "revision": 1,
+    "previewId": "372fcdc6-244d-40d6-a55a-a042acce74ca",
+    "approvedAt": "2026-10-10T17:08:50.988Z",
+    "sourceRunId": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+    "sourceGoalContract": {
+      "format": "approved-goal-v1",
+      "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+    }
+  },
+  "oldGoalContract": {
+    "format": "approved-goal-v1",
+    "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+  },
+  "newGoalContract": {
+    "format": "approved-goal-v1",
+    "sha256": "00a0003f89ab303fda9a9675ada30db3bd1b643bfe99ccb6f1dbcaabdad86f45"
+  },
+  "unchanged": [
+    "requirement",
+    "DAG/task semantics/acceptance/files/grants/model routes/knowledge versions",
+    "four artifact SHA256"
+  ],
+  "newWireRequestsByTask": {
+    "accept": 4,
+    "coordinator": 1
+  },
+  "inheritedCompletedTaskIds": [
+    "develop",
+    "qa"
+  ],
+  "budgetHistoryAtStart": {
+    "calls": 23,
+    "tasks": {
+      "qa": {
+        "cost": 0.0314292,
+        "calls": 7
+      },
+      "accept": {
+        "cost": 0.022739699999999998,
+        "calls": 5,
+        "reserved": 0.03529379999999999
+      },
+      "develop": {
+        "cost": 0.0230805,
+        "calls": 6
+      }
+    },
+    "callsBasis": "durable-admissions-and-archived-wire-requests"
+  },
+  "budgetAtEnd": {
+    "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+    "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+    "planVersion": 2,
+    "checkedAt": "2026-10-10T17:28:23.140Z",
+    "originalBudget": 0.16,
+    "costReadiness": {
+      "recordedCost": 0.1126809,
+      "reserved": 0.03529379999999999,
+      "availableBudget": 0.01202530000000001,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+          "amount": 0.03529379999999999,
+          "status": "uncertain",
+          "runId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c"
+        }
+      ]
+    },
+    "choices": {
+      "retainUncertainCosts": true,
+      "acknowledgeUnknownOperations": false
+    },
+    "nativeRequestChecked": false,
+    "unknownOperationCount": 0,
+    "unknownOperationIds": [],
+    "calls": {
+      "used": 28,
+      "limit": 45,
+      "remaining": 17
+    },
+    "tasks": [
+      {
+        "id": "develop",
+        "subject": "实现 sum.mjs、README 与 smoke 测试",
+        "recordedCost": 0.0230805,
+        "reserved": 0,
+        "budgetLimit": 0.16,
+        "availableBudget": 0.1369195,
+        "calls": 6,
+        "callLimit": 8,
+        "remainingCalls": 2,
+        "completed": true
+      },
+      {
+        "id": "qa",
+        "subject": "独立 QA 测试 sum.mjs",
+        "recordedCost": 0.0314292,
+        "reserved": 0,
+        "budgetLimit": 0.16,
+        "availableBudget": 0.1285708,
+        "calls": 7,
+        "callLimit": 7,
+        "remainingCalls": 0,
+        "completed": true
+      },
+      {
+        "id": "accept",
+        "subject": "经理只读验收",
+        "recordedCost": 0.0417432,
+        "reserved": 0.03529379999999999,
+        "budgetLimit": 0.16,
+        "availableBudget": 0.08296300000000001,
+        "calls": 9,
+        "callLimit": 12,
+        "remainingCalls": 3,
+        "completed": true
+      }
+    ],
+    "resume": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 409,
+          "code": "RUN_NOT_STOPPED",
+          "message": "仅能恢复或重试已停止的运行"
+        },
+        {
+          "status": 409,
+          "code": "RUN_ALREADY_COMPLETE",
+          "message": "所有任务已有完成记录，请查看交付结果，无需重跑"
+        }
+      ],
+      "completedTaskIds": [
+        "develop",
+        "qa",
+        "accept"
+      ]
+    },
+    "retry": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 409,
+          "code": "RUN_NOT_STOPPED",
+          "message": "仅能恢复或重试已停止的运行"
+        },
+        {
+          "status": 409,
+          "code": "RESOURCE_RESUME_ONLY",
+          "message": "资源补充只批准未完成节点，完整重试需要另外批准方案"
+        },
+        {
+          "status": 422,
+          "code": "TASK_BUDGET_EXHAUSTED",
+          "message": "任务「独立 QA 测试 sum.mjs」已达到费用或调用次数上限，请调整方案后重新批准",
+          "taskId": "qa"
+        }
+      ],
+      "completedTaskIds": []
+    }
+  },
+  "planningReceipts": [
+    {
+      "id": "4e52f372-ad58-4c68-9a46-0c9f12c199ac",
+      "inputTokens": 752,
+      "outputTokens": 95,
+      "cost": 0.0003396,
+      "createdAt": "2026-10-10T17:08:34.696Z",
+      "purpose": "预算补充规划"
+    },
+    {
+      "id": "c7f2b842-184f-4194-ad3e-a22ed4492fcf",
+      "inputTokens": 649,
+      "outputTokens": 73,
+      "cost": 0.0002823,
+      "createdAt": "2026-10-10T17:04:03.476Z",
+      "purpose": "预算补充规划"
+    },
+    {
+      "id": "0ab69175-a374-4509-ab29-013f3ae7c19a",
+      "inputTokens": 622,
+      "outputTokens": 61,
+      "cost": 0.0002598,
+      "createdAt": "2026-10-10T16:59:12.310Z",
+      "purpose": "预算补充规划"
+    }
+  ],
+  "globalBudget": {
+    "authorized": 2,
+    "known": 1.8798159,
+    "held": 0.054876,
+    "occupied": 1.9346919,
+    "remaining": 0.0653081
+  },
+  "projectDraftCap": 0.13,
+  "approvedRunCap": 0.16,
+  "completedLocalOperations": 5,
+  "unknownExternalOperations": 0,
+  "artifactFiles": [
+    {
+      "path": "README.md",
+      "size": 656,
+      "sha256": "6bc1aeae3049ca8c59f1dcbb686ca2d2358036e56c44158d4a4f466cb6afe48b"
+    },
+    {
+      "path": "qa.test.mjs",
+      "size": 1291,
+      "sha256": "f8b293486d2cb3ac395297cfcf323a63e3d40b4f773b3b6ff8a603368b48c519"
+    },
+    {
+      "path": "smoke.test.mjs",
+      "size": 530,
+      "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59"
+    },
+    {
+      "path": "sum.mjs",
+      "size": 342,
+      "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9"
+    }
+  ],
+  "lineageEvidence": {
+    "version": 1,
+    "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+    "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+    "planVersion": 2,
+    "sourceRunId": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+    "status": "verified",
+    "receipts": [
+      {
+        "taskId": "develop",
+        "attemptId": "1eb124ad-97ae-4d45-97f0-2c10be24aadd",
+        "sourceRunId": "3d004ea7-bb65-48bc-9513-1b0511fd469f",
+        "acceptanceSeq": 415,
+        "receipt": {
+          "runId": "3d004ea7-bb65-48bc-9513-1b0511fd469f",
+          "taskId": "develop",
+          "attemptId": "1eb124ad-97ae-4d45-97f0-2c10be24aadd",
+          "workspaceRevision": "577cb78358dd37b5f89eb90b847f6da072e9b1b585c372c398c56034a17cfbd7",
+          "inputs": [],
+          "outputs": [
+            {
+              "path": "sum.mjs",
+              "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9",
+              "size": 342
+            },
+            {
+              "path": "README.md",
+              "sha256": "6bc1aeae3049ca8c59f1dcbb686ca2d2358036e56c44158d4a4f466cb6afe48b",
+              "size": 656
+            },
+            {
+              "path": "smoke.test.mjs",
+              "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59",
+              "size": 530
+            }
+          ],
+          "commands": [
+            {
+              "command": "node --test smoke.test.mjs",
+              "exitCode": 0,
+              "workspaceRevision": "577cb78358dd37b5f89eb90b847f6da072e9b1b585c372c398c56034a17cfbd7",
+              "evidence": {
+                "version": 1,
+                "runId": "3d004ea7-bb65-48bc-9513-1b0511fd469f",
+                "observedAt": "2026-10-10T14:16:44.037Z",
+                "tool": "terminal_test",
+                "sessionId": "e465af7a-c733-4247-bb45-4e458ce8a2b7",
+                "callId": "call_00_phcegje5etqcvw0gkazqk5ns",
+                "approval": {
+                  "status": "available",
+                  "approvalId": "e8ac28a6-058e-4904-b10b-84d2905c8309"
+                },
+                "operation": {
+                  "status": "available",
+                  "operationId": "2c81d3f3-9f32-4045-9880-4a98bafa31d8",
+                  "queuedSeq": 357,
+                  "finishedSeq": 363
+                },
+                "hashBasis": "executor-result-before-archive-redaction",
+                "output": {
+                  "status": "available",
+                  "sha256": "015b5a58cb5874f590f7c887bc6e2a7a99b668d5b0bc6c67c08f6ce008923f6f",
+                  "bytes": 253,
+                  "complete": true,
+                  "layout": "combined"
+                },
+                "stdout": {
+                  "status": "unknown",
+                  "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+                },
+                "stderr": {
+                  "status": "unknown",
+                  "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+                },
+                "nodeTests": {
+                  "status": "available",
+                  "format": "spec",
+                  "tests": 4,
+                  "suites": 0,
+                  "pass": 4,
+                  "fail": 0,
+                  "cancelled": 0,
+                  "skipped": 0,
+                  "todo": 0
+                }
+              },
+              "acceptanceChecks": [
+                {
+                  "criterionIndex": 0,
+                  "ruleSha256": "719f29523b498c75d2b153e11baa775e57010018646a5a74b19f02f8ca9af5a7",
+                  "status": "passed",
+                  "reason": ""
+                }
+              ],
+              "observationSeq": 365
+            }
+          ],
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "719f29523b498c75d2b153e11baa775e57010018646a5a74b19f02f8ca9af5a7",
+              "status": "passed",
+              "reason": "",
+              "command": "node --test smoke.test.mjs"
+            }
+          ],
+          "acceptedAt": "2026-10-10T14:16:50.286Z"
+        }
+      },
+      {
+        "taskId": "qa",
+        "attemptId": "c1ace3de-9182-4d83-85f7-dbbf843cff81",
+        "sourceRunId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+        "acceptanceSeq": 633,
+        "receipt": {
+          "runId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+          "taskId": "qa",
+          "attemptId": "c1ace3de-9182-4d83-85f7-dbbf843cff81",
+          "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003",
+          "inputs": [
+            {
+              "path": "sum.mjs",
+              "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9",
+              "size": 342,
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "smoke.test.mjs",
+              "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59",
+              "size": 530,
+              "producerTaskId": "develop"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "qa.test.mjs",
+              "sha256": "f8b293486d2cb3ac395297cfcf323a63e3d40b4f773b3b6ff8a603368b48c519",
+              "size": 1291
+            }
+          ],
+          "commands": [
+            {
+              "command": "node --test smoke.test.mjs qa.test.mjs",
+              "exitCode": 0,
+              "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003",
+              "evidence": {
+                "version": 1,
+                "runId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+                "observedAt": "2026-10-10T14:24:53.803Z",
+                "tool": "terminal_test",
+                "sessionId": "5a2a9ab7-4d2c-4e25-ba83-d0d97bf98189",
+                "callId": "call_00_adu7s8atv3dzpwygo5qr0lwt",
+                "approval": {
+                  "status": "available",
+                  "approvalId": "0b75e437-2aaa-4da2-a52f-7db1bde98632"
+                },
+                "operation": {
+                  "status": "available",
+                  "operationId": "833e0599-8894-4b18-80b2-b1d3e9e49135",
+                  "queuedSeq": 578,
+                  "finishedSeq": 583
+                },
+                "hashBasis": "executor-result-before-archive-redaction",
+                "output": {
+                  "status": "available",
+                  "sha256": "befd7fa4b59f6f4ae6e8e7c184e117ea0282e28d68b3ef3ec27cc524f956e1d5",
+                  "bytes": 489,
+                  "complete": true,
+                  "layout": "combined"
+                },
+                "stdout": {
+                  "status": "unknown",
+                  "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+                },
+                "stderr": {
+                  "status": "unknown",
+                  "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+                },
+                "nodeTests": {
+                  "status": "available",
+                  "format": "spec",
+                  "tests": 9,
+                  "suites": 0,
+                  "pass": 9,
+                  "fail": 0,
+                  "cancelled": 0,
+                  "skipped": 0,
+                  "todo": 0
+                }
+              },
+              "acceptanceChecks": [
+                {
+                  "criterionIndex": 0,
+                  "ruleSha256": "7bd59676543fa50075e2875e7440bd6e3d3554c6de8fb4e84df42cba8f4a1f5a",
+                  "status": "passed",
+                  "reason": ""
+                }
+              ],
+              "observationSeq": 585
+            }
+          ],
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "ruleSha256": "7bd59676543fa50075e2875e7440bd6e3d3554c6de8fb4e84df42cba8f4a1f5a",
+              "status": "passed",
+              "reason": "",
+              "command": "node --test smoke.test.mjs qa.test.mjs"
+            }
+          ],
+          "acceptedAt": "2026-10-10T14:24:59.708Z"
+        }
+      }
+    ],
+    "tests": [
+      {
+        "taskId": "develop",
+        "attemptId": "1eb124ad-97ae-4d45-97f0-2c10be24aadd",
+        "sourceRunId": "3d004ea7-bb65-48bc-9513-1b0511fd469f",
+        "operationId": "2c81d3f3-9f32-4045-9880-4a98bafa31d8",
+        "command": "node --test smoke.test.mjs",
+        "exitCode": 0,
+        "output": "✔ 正数相加 (0.792329ms)\n✔ 负数相加 (0.139251ms)\n✔ 零的相加 (0.127001ms)\n✔ 非整数输入抛出 TypeError (0.378125ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 71.010341\n",
+        "outputSha256": "015b5a58cb5874f590f7c887bc6e2a7a99b668d5b0bc6c67c08f6ce008923f6f",
+        "workspaceRevision": "577cb78358dd37b5f89eb90b847f6da072e9b1b585c372c398c56034a17cfbd7",
+        "observationSeq": 365,
+        "acceptanceSeq": 415,
+        "nodeTests": {
+          "status": "available",
+          "format": "spec",
+          "tests": 4,
+          "suites": 0,
+          "pass": 4,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      },
+      {
+        "taskId": "qa",
+        "attemptId": "c1ace3de-9182-4d83-85f7-dbbf843cff81",
+        "sourceRunId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+        "operationId": "833e0599-8894-4b18-80b2-b1d3e9e49135",
+        "command": "node --test smoke.test.mjs qa.test.mjs",
+        "exitCode": 0,
+        "output": "✔ QA 正数整数相加 (0.951656ms)\n✔ QA 负数整数相加 (0.136184ms)\n✔ QA 零参与相加 (0.134473ms)\n✔ QA 返回值与整数输入的类型一致性 (0.178519ms)\n✔ QA 非整数输入被拒绝（TypeError） (0.46427ms)\n✔ 正数相加 (0.81201ms)\n✔ 负数相加 (0.138382ms)\n✔ 零的相加 (0.164005ms)\n✔ 非整数输入抛出 TypeError (0.377806ms)\nℹ tests 9\nℹ suites 0\nℹ pass 9\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 123.497108\n",
+        "outputSha256": "befd7fa4b59f6f4ae6e8e7c184e117ea0282e28d68b3ef3ec27cc524f956e1d5",
+        "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003",
+        "observationSeq": 585,
+        "acceptanceSeq": 633,
+        "nodeTests": {
+          "status": "available",
+          "format": "spec",
+          "tests": 9,
+          "suites": 0,
+          "pass": 9,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "issues": [],
+    "acceptance": {
+      "runId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+      "planVersion": 2,
+      "rows": [
+        {
+          "taskId": "develop",
+          "criterionIndex": 0,
+          "criterion": "smoke.test.mjs 至少3个真实测试全部通过，覆盖正数、负数、零；README 给出运行测试步骤",
+          "command": "node --test smoke.test.mjs",
+          "status": "passed",
+          "reason": "",
+          "sourceRunId": "3d004ea7-bb65-48bc-9513-1b0511fd469f",
+          "attemptId": "1eb124ad-97ae-4d45-97f0-2c10be24aadd",
+          "workspaceRevision": "577cb78358dd37b5f89eb90b847f6da072e9b1b585c372c398c56034a17cfbd7"
+        },
+        {
+          "taskId": "qa",
+          "criterionIndex": 0,
+          "criterion": "qa.test.mjs 至少3个独立测试，联合运行 smoke.test.mjs 与 qa.test.mjs 共至少6个测试全部通过",
+          "command": "node --test smoke.test.mjs qa.test.mjs",
+          "status": "passed",
+          "reason": "",
+          "sourceRunId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+          "attemptId": "c1ace3de-9182-4d83-85f7-dbbf843cff81",
+          "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003"
+        },
+        {
+          "taskId": "accept",
+          "criterionIndex": 0,
+          "criterion": "联合测试 node --test smoke.test.mjs qa.test.mjs 至少6个测试全部通过，验收结论明确；未修改任何文件",
+          "command": "node --test smoke.test.mjs qa.test.mjs",
+          "status": "passed",
+          "reason": "",
+          "sourceRunId": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+          "attemptId": "2399ef60-07e3-4019-b032-9fbb7182c3d0",
+          "workspaceRevision": "4de35161ab2fee495f111b56a4889aed4b87867662b622f6c78d36b9cfe42003"
+        }
+      ]
+    }
+  },
+  "knowledgeVersionIds": [
+    {
+      "documentId": "work-1fdf2d74-10d7-4e94-a3db-b6131fbf578c",
+      "version": 1,
+      "sha256": "3be6ce3ac74b41a91813d086c37b4a8795176461506fb120b16080b635cb6434"
+    },
+    {
+      "documentId": "work-5825ba34-8451-4cf5-a30e-30454e699948",
+      "version": 1,
+      "sha256": "9f4b6972d382751d9ff37557d8c6cea32bc285baa27a8fad8543a97521a493e4"
+    }
+  ],
+  "deployment": {
+    "release": "/home/jj/.local/share/weiwu/releases/weiwu-resources4-20261011",
+    "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-resources3-20261011",
+    "packetSha256": "513a07311f123a162bb23d5e70bbc1c6b1a57dd0287b14eb746459b5676620f1",
+    "projectCount": 6,
+    "usageBefore": 362,
+    "modelCalls": 0,
+    "dependencies": "existing pinned directories reused",
+    "memOSInstalled": false,
+    "passed": true,
+    "usageAfter": 362,
+    "mainPID": "2498251",
+    "projectStatePreserved": true,
+    "usagePreserved": true
+  },
+  "source": "Actual API/archive/operation receipts; read-only copies; no employee file edits"
+}

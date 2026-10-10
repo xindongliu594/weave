@@ -1,0 +1,66 @@
+{
+  "runId": "52c502e5-e8dd-42a8-b1b8-d3813029b128",
+  "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+  "planVersion": 2,
+  "goalContract": {
+    "format": "approved-goal-v1",
+    "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+  },
+  "status": "failed",
+  "completedCheckpoints": [
+    "develop",
+    "qa"
+  ],
+  "resumedFrom": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+  "files": [
+    {
+      "path": "README.md",
+      "size": 656,
+      "sha256": "6bc1aeae3049ca8c59f1dcbb686ca2d2358036e56c44158d4a4f466cb6afe48b"
+    },
+    {
+      "path": "qa.test.mjs",
+      "size": 1291,
+      "sha256": "f8b293486d2cb3ac395297cfcf323a63e3d40b4f773b3b6ff8a603368b48c519"
+    },
+    {
+      "path": "smoke.test.mjs",
+      "size": 530,
+      "sha256": "4a4e33f97d6f2ef01946bc8f9dbf368bc282f45512760e2d2ffd40b4f550eb59"
+    },
+    {
+      "path": "sum.mjs",
+      "size": 342,
+      "sha256": "11415e72ff1885dc7f3ab7c445ff9a6c42a1009b81a8e08a2e5bd4b32420e7f9"
+    }
+  ],
+  "commands": [],
+  "goalEvents": [
+    {
+      "seq": 4,
+      "at": "2026-10-10T15:55:24.562Z",
+      "type": "goal/anchored",
+      "data": {
+        "format": "approved-goal-v1",
+        "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6",
+        "planVersion": 2
+      }
+    },
+    {
+      "seq": 50,
+      "at": "2026-10-10T15:55:26.330Z",
+      "type": "goal/node-started",
+      "data": {
+        "taskId": "accept",
+        "attemptId": "9d4714f6-602b-4db1-8030-568cdf11f51b",
+        "sha256": "53bed7b36168545f30787aba5aadb90d2a39a7974bf8d9271a68a940069ce9f6"
+      }
+    }
+  ],
+  "accepted": [],
+  "reviews": [],
+  "wireRequests": [],
+  "cost": 0,
+  "calls": 0,
+  "source": "real configured DeepSeek + employee-generated files + OpenShell execution; read-only evidence copy"
+}

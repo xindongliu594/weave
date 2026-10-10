@@ -5,6 +5,8 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {collectRunLineageEvidence} from '../apps/api/src/run-lineage-evidence.ts';
 import {RunInheritedEvidence} from '../apps/web/src/RunInheritedEvidence.tsx';
+import {createGoalContract} from '../packages/contracts/goal-contract.mjs';
+import {applyRecoveryResources} from '../apps/api/src/recovery-resource-plan.ts';
 
 // Isolated regression fixtures. No model, production DB or employee artifact
 // is generated here. Real acceptance is documented separately.
@@ -40,6 +42,41 @@ function fixture(){
  const load={run:(id:string)=>{reads.push(id);return id===parentId?parent:id===childId?child:null;},operations:async(id:string,ids:string[])=>id===childId&&ids.includes(operationId)?[operation]:[]};
  return {current,parent,child,operation,load,reads,t1,t2};
 }
+
+function resourceFixture(){
+ const f=fixture();
+ for(const run of [f.parent,f.child,f.current]){
+  run.snapshot=structuredClone(run.snapshot);run.snapshot.requirement='Original immutable goal';
+  run.snapshot.policy={maxBudget:.13,maxModelCalls:45,maxTaskModelCalls:10};
+  run.snapshot.tasks[2].maxModelCalls=3;run.snapshot.approvedTasks=structuredClone(run.snapshot.tasks);
+  run.snapshot.goalContract=createGoalContract(run.snapshot);
+ }
+ const proposal={maxBudget:.18,taskCallLimits:{T3:6},rationale:'Only resource approval for the remaining manager'};
+ f.current.snapshot=applyRecoveryResources(f.current.snapshot,proposal,{newRevision:1,completedTaskIds:['T1','T2'],
+  history:{calls:2,tasks:{T3:{calls:1}}},ceiling:.18});
+ f.current.snapshot.resourceApproval={format:'run-resource-approval-v1',revision:1,sourceRunId:childId,
+  sourceGoalContract:f.child.snapshot.goalContract,proposal,ceiling:.18,previewId:operationId,usageId:operationId,modelId:'m',approvedAt:'fixture'};
+ f.current.snapshot.goalContract=createGoalContract(f.current.snapshot);
+ return f;
+}
+test('explicit resource approval preserves exact inherited QA evidence across ordinary later recovery',async()=>{
+ const f=resourceFixture();
+ const result=await collectRunLineageEvidence(f.current,f.load);assert.equal(result.status,'verified');assert.equal(result.tests.length,1);
+ const later={...f.current,id:'66666666-6666-4666-8666-666666666666',snapshot:structuredClone(f.current.snapshot)};
+ later.snapshot.recovery.sourceRunId=runId;
+ const next=await collectRunLineageEvidence(later,{...f.load,run:id=>id===runId?f.current:f.load.run(id)});
+ assert.equal(next.status,'verified');assert.equal(next.tests[0].sourceRunId,childId);
+});
+test('a resource boundary cannot authorize changed goal, completed contract or counterfeit parent',async()=>{
+ for(const mutate of [(f:any)=>{f.current.snapshot.tasks[0].objective='Changed completed work';f.current.snapshot.approvedTasks=structuredClone(f.current.snapshot.tasks);},
+   (f:any)=>{f.current.snapshot.agents[0].tools=['terminal'];},
+   (f:any)=>{f.current.snapshot.resourceApproval.sourceRunId=parentId;},
+   (f:any)=>{f.current.snapshot.resourceApproval.sourceGoalContract={format:'approved-goal-v1',sha256:'a'.repeat(64)};},
+   (f:any)=>{f.current.snapshot.resourceRevision=2;}]){
+  const f=resourceFixture();mutate(f);f.current.snapshot.goalContract=createGoalContract(f.current.snapshot);
+  const result=await collectRunLineageEvidence(f.current,f.load);assert.equal(result.status,'unavailable');assert.equal(result.tests.length,0);
+ }
+});
 
 test('repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response',async()=>{
  const f=fixture(),before=JSON.stringify([f.current,f.parent,f.child,f.operation]);
