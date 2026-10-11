@@ -34,3 +34,8 @@ test('journal and sandbox confirmations never reuse the workspace deletion label
 test('legacy interrupted records with unresolved results retain read-only reconciliation',()=>{
  for(const state of ['present','unverified']){const html=renderToStaticMarkup(createElement(ui.CleanupHistory,{rows:[{...preview,status:'interrupted',result:{state}}],busy:false,onReconcile:()=>{}}));assert.ok(html.includes('核对中断结果'));}
 });
+
+test('retention panel makes recommendations explicit and retains preview before confirmation',()=>{
+ assert.equal(typeof ui.RetentionReport,'function');const html=renderToStaticMarkup(createElement(ui.RetentionReport,{data:{mode:'suggestion-only',policy:{hotJournalHours:24,completedCopiesDays:7,releaseKeepLatest:3,backupDays:30,backupKeepLatest:3},recommendations:[{runId:'run',kind:'journal',ageDays:2}]},busy:false,onPreview:()=>{}}));
+ for(const text of ['保留与维护建议','不自动删除','7 天','24 小时','预览日志归档','共享依赖','30 天'])assert.ok(html.includes(text),text);assert.ok(!html.includes('确认删除全部'));
+});

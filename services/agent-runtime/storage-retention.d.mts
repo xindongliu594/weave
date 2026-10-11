@@ -1,0 +1,2 @@
+export type RetentionKind='journal'|'workspace'|'sandbox';
+export function retentionAdvice(runs:{id:string;status:string;finishedAt:string|null;blocked:boolean;journal:boolean;workspace:boolean;sandbox:boolean}[],now?:number):{mode:'suggestion-only';automaticDeletion:false;policy:{hotJournalHours:number;completedCopiesDays:number;releaseKeepLatest:number;backupDays:number;backupKeepLatest:number};recommendations:{runId:string;kind:RetentionKind;ageDays:number}[]};

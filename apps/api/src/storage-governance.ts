@@ -2,11 +2,13 @@ import {Router} from 'express';
 import {z} from 'zod';
 import {randomUUID,createHash} from 'node:crypto';
 import {join,resolve,isAbsolute} from 'node:path';
+import {lstatSync} from 'node:fs';
 import type pg from 'pg';
 import {pool} from './db.ts';
 import {AppError} from './provider.ts';
 import {scanStorage,workspaceRunIds,workspaceCopyCandidates,validateWorkspaceCopies,removeWorkspaceCopies,reconcileWorkspaceCopies,assertStorageHeadroom,MIN_STORAGE_FREE_BYTES,type StorageOptions} from '../../../services/agent-runtime/storage-governance.mjs';
 import {ARCHIVE_ROOT_LIMIT_BYTES,RUN_ARCHIVE_LIMIT_BYTES} from '../../../services/agent-runtime/archive-storage.mjs';
+import {retentionAdvice} from '../../../services/agent-runtime/storage-retention.mjs';
 import {type SandboxMaintenance,maintenanceCandidate,validateMaintenance,applyMaintenance,reconcileMaintenance,maintenanceError,maintenanceConfirmation,boundSandbox} from './storage-lifecycle.ts';
 export const storageTables=['storage_cleanups'];
 export async function migrateStorage(db:Pick<pg.Pool,'query'>){await db.query(`CREATE TABLE IF NOT EXISTS storage_cleanups(id text PRIMARY KEY,status text NOT NULL DEFAULT 'preview',preview jsonb NOT NULL,result jsonb,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());`);}
@@ -26,6 +28,17 @@ async function idle(db:Pick<pg.PoolClient,'query'>){
 }
 export function storageRouter(traceRoot:string,paths:Paths={},db:pg.Pool=pool){
  const router=Router(),scopeHash=scope(traceRoot,paths);
+ router.get('/storage/retention',async(_req,res)=>{
+  const adapter=paths.sandbox?.(),scopes=adapter?.executor.storageScopes()??[];
+  const rows=(await db.query(`SELECT r.id,r.status,r.finished_at,r.snapshot->'executionTarget' AS target,EXISTS(SELECT 1 FROM local_operations o WHERE o.run_id=r.id AND (o.status NOT IN ('completed','failed','cancelled') OR (o.started AND o.result IS NULL))) OR EXISTS(SELECT 1 FROM model_reservations c WHERE c.run_id=r.id AND c.status IN ('pending','uncertain')) AS blocked FROM project_runs r ORDER BY created_at DESC LIMIT 50`)).rows;
+  const ordinary=(path:string,directory=false)=>{try{const s=lstatSync(path);return !s.isSymbolicLink()&&(directory?s.isDirectory():s.isFile()&&s.nlink===1);}catch{return false;}};
+  // Suggestions only; the original preview still checks archive integrity, grants and exact file versions.
+  res.json(retentionAdvice(rows.map(row=>({id:row.id,status:row.status,finishedAt:row.finished_at instanceof Date?row.finished_at.toISOString():row.finished_at,blocked:row.blocked,
+   journal:ordinary(join(traceRoot,row.id,'events.jsonl')),
+   workspace:!!paths.workspaceRoot&&!!paths.nativeDeviceId&&row.target?.kind==='local'&&row.target.deviceId===paths.nativeDeviceId&&ordinary(join(paths.workspaceRoot,row.id),true),
+   sandbox:!!adapter&&row.target?.deviceId===adapter.deviceId&&row.target?.grantId===adapter.grantId&&row.target?.backend?.fingerprint===adapter.fingerprint&&scopes.some(s=>s.runId===row.id&&['ready','stopped'].includes(s.phase)&&!!s.storage)
+  }))));
+ });
  router.get('/storage/sandboxes',async(_req,res)=>{const adapter=paths.sandbox?.();res.json({available:!!adapter,scopes:adapter?.executor.storageScopes()??[],hardQuota:false});});
  router.post('/storage/sandboxes/:id/inspect',async(req,res)=>{
   const runId=idSchema.parse(req.params.id);z.object({}).strict().parse(req.body);const client=await db.connect();

@@ -3,6 +3,13 @@ import {api} from './api.ts';
 type Cleanup={id:string;status:string;createdAt:string;preview:{kind?:string;expiresAt:string;bytes:number;candidates:{runId:string;path:string;bytes:number}[];protectedRuns:{runId:string;reason:string}[]};result?:{bytes?:number;savedBytes?:number;state?:string;message?:string;replayed?:boolean;observed?:{runId:string;path:string;state:string}[]}};
 const confirmations:Record<string,string>={workspace:'CLEAN_WORKSPACE_COPIES',sandbox:'RETIRE_SANDBOX',journal:'ARCHIVE_JOURNAL'};
 const bytes=(n:number)=>n>=1024**3?(n/1024**3).toFixed(2)+' GiB':n>=1024**2?(n/1024**2).toFixed(2)+' MiB':n>=1024?(n/1024).toFixed(1)+' KiB':n+' B';
+export function RetentionReport({data,busy,onPreview}:{data:any;busy:boolean;onPreview:(kind:string,id:string)=>void}){return <details className="lower"><summary>保留与维护建议</summary>
+ <p>按完成时间给出建议，不自动删除。预览仍会核对费用、授权、原档案和文件版本；失败与结果未知的现场保留。</p>
+ <p>完成日志保留 {data.policy.hotJournalHours} 小时后可预览压缩；完成工作区副本和沙箱保留 {data.policy.completedCopiesDays} 天后可预览回收。</p>
+ <p className="subcopy">旧发布建议保留当前版本、最新 {data.policy.releaseKeepLatest} 个版本及全部共享依赖来源；备份保留最近 {data.policy.backupDays} 天和最新 {data.policy.backupKeepLatest} 份。发布、备份和缓存需人工核对归档，本页不执行删除。</p>
+ <p className="subcopy">工作区副本预览列出全部符合条件的本机副本，请按预览清单确认。建议列表仅包含最近 50 次运行。</p>
+ {data.recommendations.length===0?<p>当前没有达到建议保留时间的资源。</p>:data.recommendations.map((r:any)=><p key={r.runId+'/'+r.kind}><a href={'#run/'+r.runId}>{r.runId}</a> · 完成 {Math.floor(r.ageDays)} 天 · <button disabled={busy} onClick={()=>onPreview(r.kind,r.runId)}>{r.kind==='journal'?'预览日志归档':r.kind==='sandbox'?'预览沙箱回收':'预览全部本机副本'}</button></p>)}
+ </details>;}
 export function cleanupCanConfirm(row:Cleanup,busy:boolean){return !busy&&row.status==='preview'&&row.preview.candidates.length>0&&Date.parse(row.preview.expiresAt)>Date.now();}
 export function StorageReport({data,busy=false,onJournalPreview}:{data:any;busy?:boolean;onJournalPreview?:(id:string)=>void}){return <>
  <p>运行档案：{bytes(data.bytes)} / 1 GiB · 单次运行档案上限：64 MiB</p>
@@ -32,15 +39,16 @@ export function CleanupHistory({rows,busy,onReconcile}:{rows:Cleanup[];busy:bool
  {row.result?.observed?.map(o=><p key={o.runId+'/'+o.path}>{o.runId}/{o.path}：{({present:'副本仍在',changed:'副本已变化',unverified:'暂未核对','missing-copy':'副本已不存在，交付档案保留'} as Record<string,string>)[o.state]??o.state}</p>)}
  </div>)}</details>;}
 export function StorageCenter(){
- const [data,setData]=useState<any>(),[sandboxes,setSandboxes]=useState<any>(),[rows,setRows]=useState<Cleanup[]>([]),[preview,setPreview]=useState<Cleanup>(),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const [data,setData]=useState<any>(),[sandboxes,setSandboxes]=useState<any>(),[retention,setRetention]=useState<any>(),[rows,setRows]=useState<Cleanup[]>([]),[preview,setPreview]=useState<Cleanup>(),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const lock=useRef(false),mounted=useRef(true);
- async function refresh(){const [report,history,sandboxReport]=await Promise.all([api('/storage'),api<Cleanup[]>('/storage/cleanups'),api('/storage/sandboxes')]);if(mounted.current){setData(report);setRows(history);setSandboxes(sandboxReport);}}
+ async function refresh(){const [report,history,sandboxReport,advice]=await Promise.all([api('/storage'),api<Cleanup[]>('/storage/cleanups'),api('/storage/sandboxes'),api('/storage/retention')]);if(mounted.current){setData(report);setRows(history);setSandboxes(sandboxReport);setRetention(advice);}}
  useEffect(()=>{mounted.current=true;void refresh().catch(e=>{if(mounted.current)setError(e.message);});return()=>{mounted.current=false;};},[]);
  async function act(fn:()=>Promise<void>){if(lock.current)return;lock.current=true;setBusy(true);setError('');setNotice('');try{await fn();}catch(e){if(mounted.current)setError((e as Error).message);}finally{try{await refresh();}catch(e){if(mounted.current)setError((e as Error).message);}lock.current=false;if(mounted.current)setBusy(false);}}
  async function makePreview(body:any){const saved=await api<Cleanup>('/storage/preview','POST',body);if(mounted.current)setPreview(saved);}
  return <section className="panel padded lower"><h2>文件与数据容量</h2><p className="subcopy">先核对占用，再确认维护。交付、知识和操作收据保护；完成日志可校验压缩。旧发布与缓存只读盘点；沙箱只统计获授权的可写目录。</p>
  {error&&<p role="alert" className="banner error">{error}</p>}{notice&&<p role="status" className="banner">{notice}</p>}{data?<StorageReport data={data} busy={busy} onJournalPreview={id=>void act(()=>makePreview({kind:'journal',runId:id}))}/>:<p>正在核对容量…</p>}
  <button disabled={busy} onClick={()=>void act(refresh)}>刷新容量</button>{' '}<button disabled={busy} onClick={()=>void act(async()=>{const saved=await api<Cleanup>('/storage/preview','POST',{});if(mounted.current)setPreview(saved);})}>生成清理预览</button>
+ {retention&&<RetentionReport data={retention} busy={busy} onPreview={(kind,id)=>void act(()=>makePreview(kind==='workspace'?{}:{kind,runId:id}))}/>}
  <SandboxStorageReport data={sandboxes} busy={busy} onInspect={id=>void act(async()=>{await api('/storage/sandboxes/'+id+'/inspect','POST',{});if(mounted.current)setNotice('容量与当前文件版本已核对，未删除沙箱。');})} onPreview={id=>void act(()=>makePreview({kind:'sandbox',runId:id}))}/>
  {preview&&<CleanupPreview row={preview} busy={busy} onConfirm={()=>void act(async()=>{const saved=await api<Cleanup>('/storage/cleanups/'+preview.id+'/confirm','POST',{confirmation:confirmations[preview.preview.kind??'workspace']});if(mounted.current){setPreview(saved);setNotice(saved.status==='completed'?'维护记录已保存，正式交付和恢复证据保留。':'请查看维护记录并核对结果。');}})}/>}
  <CleanupHistory rows={rows} busy={busy} onReconcile={id=>void act(async()=>{await api('/storage/cleanups/'+id+'/reconcile','POST',{});if(mounted.current)setNotice('现状核对已保存，没有续删或重放。');})}/>

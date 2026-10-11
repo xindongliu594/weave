@@ -40,6 +40,14 @@ const confirm={confirmation:'CLEAN_WORKSPACE_COPIES'};
 test('inventory keeps legacy quota fields and reports archive/workspace categories without model calls',{skip:!isolated},async()=>{
  const r=await call('/storage');assert.equal(r.status,200);assert.ok(r.data.bytes>0);assert.equal(r.data.maxBytes,1073741824);assert.equal(r.data.runMaxBytes,67108864);assert.ok(r.data.groups.some((g:any)=>g.id==='workspaces'));assert.ok(r.data.runs.some((run:any)=>run.id===runId));
 });
+
+test('retention advice is read-only, uses finished age, and cannot bypass preview confirmation',{skip:!isolated},async()=>{
+ await pool.query("UPDATE project_runs SET finished_at=now()-interval '8 days' WHERE id=$1",[runId]);
+ const before=(await pool.query('SELECT count(*)::int AS n FROM storage_cleanups')).rows[0].n;
+ for(let n=0;n<2;n++){const r=await call('/storage/retention');assert.equal(r.status,200);assert.equal(r.data.mode,'suggestion-only');assert.ok(r.data.recommendations.some((a:any)=>a.runId===runId&&a.kind==='journal'));}
+ assert.equal((await pool.query('SELECT count(*)::int AS n FROM storage_cleanups')).rows[0].n,before);assert.equal(await readFile(join(workspaceRoot,runId,'delivery.txt'),'utf8'),'official delivery');
+ await pool.query("UPDATE project_runs SET status='failed' WHERE id=$1",[runId]);assert.ok(!(await call('/storage/retention')).data.recommendations.some((a:any)=>a.runId===runId));
+});
 test('explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion',{skip:!isolated},async()=>{
  const p=await preview();assert.ok(p.preview.candidates.some((c:any)=>c.runId===runId));
  const r=await call('/storage/cleanups/'+p.id+'/confirm',confirm);assert.equal(r.status,200);assert.equal(r.data.status,'completed');
