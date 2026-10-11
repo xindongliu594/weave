@@ -1,0 +1,712 @@
+{
+  "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+  "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+  "planVersion": 7,
+  "runStatus": "completed",
+  "archiveIntegrity": "ok",
+  "eventCount": 716,
+  "documentIds": [
+    "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+    "a92a3281-7acd-4ab8-81f2-20b6cb41c192"
+  ],
+  "permissionApproval": "用户明确允许 QA/经理只限两份验收方法，snapshot 固定 documentIds",
+  "agents": [
+    {
+      "id": "employee-1",
+      "sourceAgentId": "dev-1",
+      "role": "member",
+      "tools": [
+        "filesystem",
+        "artifact_write",
+        "knowledge_search",
+        "knowledge_read"
+      ],
+      "knowledgeSpaceIds": [
+        "5928897e-5aec-4aa0-a683-e7b77bf684de"
+      ]
+    },
+    {
+      "id": "employee-2",
+      "sourceAgentId": "qa-1",
+      "role": "member",
+      "tools": [
+        "filesystem",
+        "knowledge_search",
+        "knowledge_read"
+      ],
+      "knowledgeSpaceIds": [
+        "5928897e-5aec-4aa0-a683-e7b77bf684de"
+      ]
+    },
+    {
+      "id": "employee-3",
+      "sourceAgentId": "mgr-1",
+      "role": "manager",
+      "tools": [
+        "filesystem",
+        "knowledge_search",
+        "knowledge_read"
+      ],
+      "knowledgeSpaceIds": [
+        "5928897e-5aec-4aa0-a683-e7b77bf684de"
+      ]
+    }
+  ],
+  "seals": [
+    {
+      "seq": 253,
+      "at": "2026-10-11T11:03:33.692Z",
+      "data": {
+        "taskId": "dev-doc",
+        "attemptId": "339c434b-85c4-445c-b881-9e81b01a711b",
+        "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+        "workspaceRevision": "c183a2559bcd7af6c03e9261e60404bee427103c3dbd357f65f3b0b7ecb64c29",
+        "inputs": [],
+        "outputs": [
+          {
+            "path": "selection.md",
+            "sha256": "f31b4232f5f197abbf221e69f71a8111fd04f0ef4dee738482e2608d0b8a5527",
+            "size": 2978
+          }
+        ],
+        "commands": [],
+        "acceptedAt": "2026-10-11T11:03:33.640Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+          "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+          "projectVersion": 7,
+          "capturedAt": "2026-10-11T11:03:33.640Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.15,
+            "occupied": 0.09023999999999999,
+            "activeReserved": 0,
+            "available": 0.05976000000000001,
+            "callsUsed": 6,
+            "callLimit": 32,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.0691182,
+            "retainedUnknownReservation": 0,
+            "availableBudget": 0.08088179999999999,
+            "callsUsed": null,
+            "callsBasis": "archived-model-wire-request-count",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    },
+    {
+      "seq": 518,
+      "at": "2026-10-11T11:03:52.110Z",
+      "data": {
+        "taskId": "qa-check",
+        "attemptId": "d0bc94bb-27fe-49de-b98c-f9bd875922cf",
+        "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+        "workspaceRevision": "c183a2559bcd7af6c03e9261e60404bee427103c3dbd357f65f3b0b7ecb64c29",
+        "inputs": [
+          {
+            "path": "selection.md",
+            "sha256": "f31b4232f5f197abbf221e69f71a8111fd04f0ef4dee738482e2608d0b8a5527",
+            "size": 2978,
+            "producerTaskId": "dev-doc"
+          }
+        ],
+        "outputs": [],
+        "commands": [],
+        "acceptedAt": "2026-10-11T11:03:52.009Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+          "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+          "projectVersion": 7,
+          "capturedAt": "2026-10-11T11:03:52.009Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.15,
+            "occupied": 0.11484479999999998,
+            "activeReserved": 0,
+            "available": 0.03515520000000001,
+            "callsUsed": 14,
+            "callLimit": 32,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.0691182,
+            "retainedUnknownReservation": 0,
+            "availableBudget": 0.08088179999999999,
+            "callsUsed": null,
+            "callsBasis": "archived-model-wire-request-count",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    },
+    {
+      "seq": 683,
+      "at": "2026-10-11T11:04:08.798Z",
+      "data": {
+        "taskId": "accept",
+        "attemptId": "c50c7995-4256-4460-9381-823de40adec4",
+        "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+        "workspaceRevision": "c183a2559bcd7af6c03e9261e60404bee427103c3dbd357f65f3b0b7ecb64c29",
+        "inputs": [
+          {
+            "path": "selection.md",
+            "sha256": "f31b4232f5f197abbf221e69f71a8111fd04f0ef4dee738482e2608d0b8a5527",
+            "size": 2978,
+            "producerTaskId": "dev-doc"
+          }
+        ],
+        "outputs": [],
+        "commands": [],
+        "acceptedAt": "2026-10-11T11:04:08.786Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+          "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+          "projectVersion": 7,
+          "capturedAt": "2026-10-11T11:04:08.786Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.15,
+            "occupied": 0.1324455,
+            "activeReserved": 0,
+            "available": 0.0175545,
+            "callsUsed": 19,
+            "callLimit": 32,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.0691182,
+            "retainedUnknownReservation": 0,
+            "availableBudget": 0.08088179999999999,
+            "callsUsed": null,
+            "callsBasis": "archived-model-wire-request-count",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    }
+  ],
+  "reports": [
+    {
+      "seq": 257,
+      "arguments": {
+        "attempt_id": "339c434b-85c4-445c-b881-9e81b01a711b",
+        "task_id": "t1",
+        "status": "completed",
+        "output": "selection.md 已一次写入（2978 bytes, sha256 f31b4232…5527）。采用登记：S1 sum addition validation checklist（d4c239b4/chunk 6a11c024, line7，场景A完全适用、场景B部分复用并列出4条复用步骤+4条改动条件）；S2 CLI checklist（a92a3281/chunk 95b45153, line7）判定不适用，仅读取未采用；场景C授权目录未找到适用方法，已声明并给出自拟C1–C7。含A1–A5、B1–B5检查项，正文中文≤1000字。未改旧代码/未装依赖/未写测试代码/未执行终端命令。请 QA 只读核验。",
+        "changedPaths": [
+          "selection.md"
+        ],
+        "acceptanceResults": [
+          {
+            "criterion": "selection.md 存在且为中文检查表，正文不超过1000字",
+            "status": "passed",
+            "evidence": "文件已写入，2978 bytes；正文为中文检查表，约900字"
+          },
+          {
+            "criterion": "场景A给出正数/负数/零检查项",
+            "status": "passed",
+            "evidence": "A1 sum(2,3)=5；A2 sum(-2,-3)=-5；A3 sum(0,0)=0"
+          },
+          {
+            "criterion": "场景B给出小数检查项及复用步骤与改动条件",
+            "status": "passed",
+            "evidence": "复用步骤1-4、改动条件4条、B1-B5 小数检查项"
+          },
+          {
+            "criterion": "场景C声明无适用方法并给出新检查项",
+            "status": "passed",
+            "evidence": "声明段+自拟C1-C7"
+          },
+          {
+            "criterion": "来源登记真实，未强行使用无关方法",
+            "status": "passed",
+            "evidence": "S1/S2 带 documentId/chunkId/行号；S2 判定不适用未采用"
+          }
+        ]
+      }
+    },
+    {
+      "seq": 522,
+      "arguments": {
+        "attempt_id": "d0bc94bb-27fe-49de-b98c-f9bd875922cf",
+        "task_id": "t2",
+        "status": "completed",
+        "verdict": "pass",
+        "output": "逐项证据报告（只读，未改/未建文件，未跑终端）：\n1) 三场景检查项：A 有 A1-A5（原文\"A1 正数：sum(2,3) 预期 5。/A2 负数：sum(-2,-3) 预期 -5。/A3 零：sum(0,0) 预期 0。\"）；B 有 B1-B5；C 有 C1-C7。通过。\n2) B 复用步骤与改动条件：原文\"可复用步骤（沿用 S1）：1. 先确认数值取值范围或精度…4. 保留非法输入拒绝项；要改动的条件：…预期结果由精确相等改为允许容差比较（如 |实际-预期|≤1e-9）\"。通过。\n3) C 无适用方法声明+新检查项：原文\"声明：授权目录内未找到适用于多租户权限测试的方法；S2 明确不覆盖该场景，故不采用。以下为自拟检查项。\"，随后 C1-C7。通过。\n4) 来源登记真实性（比对知识切片）：S1=doc d4c239b4 / chunk 6a11c024… line 7《sum addition validation checklist》，内容确含\"检查正数 2+3=5、负数 -2+-3=-5、零 0+0=0…拒绝非整数\"，A 标\"完全适用\"、B 标\"部分复用\"与原文\"此方法只适用于整数加法，不能直接用于小数或权限测试\"一致；S2=doc a92a3281 / chunk 95b45153… line 7，原文\"适用于 CLI，不能替代一般函数计算或多租户权限测试\"，selection.md 标\"不适用…仅检索读取，未采用\"，未把只检索当采用。通过。\n5) 字数：2978 字节 UTF-8 中文正文，按字典序约 800-900 汉字，≤1000。通过。\n结论：qa-check verdict=pass。残留风险：字数未用程序精确统计（合同禁止终端命令），为按字符粗略估算；不改变结论。"
+      }
+    },
+    {
+      "seq": 687,
+      "arguments": {
+        "task_id": "t3",
+        "attempt_id": "c50c7995-4256-4460-9381-823de40adec4",
+        "status": "completed",
+        "verdict": "pass",
+        "output": "只读验收结论：通过。依据：selection.md（sha256 f31b4232…5527, 2978B）与 dev-doc 交付物及 QA 审查的 workspaceRevision c183a255… 一致，为当前版本；A1–A5、B1–B5、C1–C7 三场景检查项齐全；B 含 4 条复用步骤+4 条改动条件；C 明确声明授权目录未找到适用方法并给出自拟检查项；来源登记与知识切片核对为真（S1 d4c239b4 采用，S2 a92a3281 仅检索未采用），未把只检索当采用；正文中文粗估约800–900字，≤1000字。QA 报告引用原文与文件实际一致，verdict=pass。未完成项：无；仅保留字数未程序化精确统计（任务禁终端）。未修改/未创建任何文件。",
+        "acceptanceResults": [
+          {
+            "criterion": "核对当前版本 selection.md 满足五项验收点，并结合 QA 证据报告",
+            "status": "passed",
+            "evidence": "直读 selection.md：hash f31b4232…5527/2978B 与 dev-doc 及 QA 同一 revision c183a255… 相符；A1–A5/B1–B5/C1–C7 齐全；B 有4条复用步骤+4条改动条件；C 有\"授权目录内未找到适用方法\"声明+自拟C1–C7；来源登记经知识切片核对为真（S1 采用、S2 仅检索未采用）；正文约800–900汉字<1000。QA 报告原文引用与文件逐句吻合。"
+          },
+          {
+            "criterion": "明确通过项与未完成项，结论仅以任务完成回复返回",
+            "status": "passed",
+            "evidence": "通过项：五项全部通过；未完成项：无（仅字数未程序化精确统计，任务禁终端命令，不改结论）。结论仅经本任务完成回复返回。"
+          },
+          {
+            "criterion": "未修改任何文件、未创建文件",
+            "status": "passed",
+            "evidence": "本次仅 filesystem 读取 selection.md 与只读知识检索，无写入调用，无终端命令；工作区文件数仍为 1（selection.md）。"
+          }
+        ]
+      }
+    }
+  ],
+  "citations": [
+    {
+      "seq": 108,
+      "at": "2026-10-11T11:03:18.266Z",
+      "agentId": "employee-1",
+      "operation": "search",
+      "sources": [
+        {
+          "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+          "version": 1,
+          "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f",
+          "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+          "lineStart": 7,
+          "lineEnd": 7
+        },
+        {
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+          "lineStart": 7,
+          "lineEnd": 7
+        }
+      ]
+    },
+    {
+      "seq": 136,
+      "at": "2026-10-11T11:03:20.587Z",
+      "agentId": "employee-1",
+      "operation": "read",
+      "sources": [
+        {
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+          "lineStart": 7,
+          "lineEnd": 7
+        }
+      ]
+    },
+    {
+      "seq": 142,
+      "at": "2026-10-11T11:03:20.601Z",
+      "agentId": "employee-1",
+      "operation": "read",
+      "sources": [
+        {
+          "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+          "version": 1,
+          "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f",
+          "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+          "lineStart": 7,
+          "lineEnd": 7
+        }
+      ]
+    },
+    {
+      "seq": 438,
+      "at": "2026-10-11T11:03:45.937Z",
+      "agentId": "employee-2",
+      "operation": "read",
+      "sources": [
+        {
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+          "lineStart": 7,
+          "lineEnd": 7
+        }
+      ]
+    },
+    {
+      "seq": 447,
+      "at": "2026-10-11T11:03:46.014Z",
+      "agentId": "employee-2",
+      "operation": "read",
+      "sources": [
+        {
+          "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+          "version": 1,
+          "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f",
+          "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+          "lineStart": 7,
+          "lineEnd": 7
+        }
+      ]
+    }
+  ],
+  "adoptionEvents": [
+    {
+      "seq": 166,
+      "data": {
+        "agentId": "employee-1",
+        "taskId": "dev-doc",
+        "attemptId": "339c434b-85c4-445c-b881-9e81b01a711b",
+        "kind": "knowledge",
+        "id": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+        "source": {
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7"
+        },
+        "note": "场景A完全适用：采用其先确认整数范围、正数2+3=5、负数-2+-3=-5、零0+0=0、明确拒绝非整数、检查项写明输入与预期结果的步骤；场景B仅复用其\"检查项写明输入与预期结果、先确认取值范围\"框架，改用小数输入与容差条件。",
+        "validation": "pending"
+      }
+    }
+  ],
+  "file": {
+    "path": "selection.md",
+    "bytes": 2978,
+    "sha256": "f31b4232f5f197abbf221e69f71a8111fd04f0ef4dee738482e2608d0b8a5527",
+    "unicodeCharacters": 1392,
+    "hanCharacters": 649,
+    "containsLiteralEscapedNewlines": false,
+    "codexModified": false
+  },
+  "registeredEfficiency": {
+    "current": {
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "goalHash": "7b1a36c601b2876998c9620c3a62d9e55d49c61d211d70ce44dd7c01add67465",
+      "acceptanceHash": "1e56b5028e24684a3e8d6ba4762812d6fd5d6abe3d96e5cfbb0e19d32a5b86c3",
+      "modelHash": "a2e337da39fc43f9f0fb1ec237d1eefff06b063e24c0b8772934aa96e9f1f9c9",
+      "deviceHash": "c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601",
+      "initialFilesHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "resumed": false,
+      "usageComplete": true,
+      "wallMs": 59711,
+      "approvalWaitMs": 0,
+      "activeMs": 59711,
+      "modelMs": 55372,
+      "inputTokens": 200821,
+      "outputTokens": 5635,
+      "totalTokens": 206456,
+      "modelCalls": 20,
+      "cost": 0.0670083,
+      "pendingReceipts": 0,
+      "knowledgeVersions": [
+        {
+          "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+          "version": 1,
+          "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+        },
+        {
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+        }
+      ],
+      "citations": [
+        {
+          "agentId": "employee-1",
+          "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+          "version": 1,
+          "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+          "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+        },
+        {
+          "agentId": "employee-1",
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+        },
+        {
+          "agentId": "employee-2",
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+        },
+        {
+          "agentId": "employee-2",
+          "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+          "version": 1,
+          "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+          "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+        }
+      ]
+    },
+    "baseline": null,
+    "comparison": null,
+    "method": "仅在本次核对窗口内寻找同条件最早完整可比较运行；不是全历史首个运行。未齐费用或没有基线时保持未验证，不推断因果收益。"
+  },
+  "usage": [
+    {
+      "id": "3a302dd2-4287-4a57-81d3-476b339ce553",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10290,
+      "outputTokens": 495,
+      "cost": 0.003681,
+      "createdAt": "2026-10-11T11:04:13.204Z"
+    },
+    {
+      "id": "620a4f15-03c0-4bc5-ba9f-d1750d5656f7",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11306,
+      "outputTokens": 1204,
+      "cost": 0.004836599999999999,
+      "createdAt": "2026-10-11T11:04:08.748Z"
+    },
+    {
+      "id": "7d1baef1-f01a-4e20-a08f-43c6b0eb61e4",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11233,
+      "outputTokens": 128,
+      "cost": 0.0035235,
+      "createdAt": "2026-10-11T11:04:01.313Z"
+    },
+    {
+      "id": "705791a2-962a-42e0-8dc9-fd58971b145f",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10323,
+      "outputTokens": 307,
+      "cost": 0.0034653,
+      "createdAt": "2026-10-11T11:03:59.432Z"
+    },
+    {
+      "id": "77f0eb53-543a-4325-a459-4e5d25d9b8a9",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 7384,
+      "outputTokens": 98,
+      "cost": 0.0023328,
+      "createdAt": "2026-10-11T11:03:55.363Z"
+    },
+    {
+      "id": "9b2d4131-f40c-4ce9-a94c-afbc8e8e75b5",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11279,
+      "outputTokens": 49,
+      "cost": 0.0034425,
+      "createdAt": "2026-10-11T11:03:53.839Z"
+    },
+    {
+      "id": "ca5e129f-5aef-4444-ab1c-f317566ddb58",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 12156,
+      "outputTokens": 596,
+      "cost": 0.004362,
+      "createdAt": "2026-10-11T11:03:51.953Z"
+    },
+    {
+      "id": "3d1fd329-6ebc-42e6-ac86-b3c42ec17177",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10527,
+      "outputTokens": 88,
+      "cost": 0.0032637,
+      "createdAt": "2026-10-11T11:03:47.900Z"
+    },
+    {
+      "id": "5fbf9508-14c2-4892-9eed-3425c6a26921",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10738,
+      "outputTokens": 152,
+      "cost": 0.0034038000000000002,
+      "createdAt": "2026-10-11T11:03:45.852Z"
+    },
+    {
+      "id": "22a3646e-c6b1-4a55-828d-126e3e0eb82b",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10565,
+      "outputTokens": 81,
+      "cost": 0.0032667,
+      "createdAt": "2026-10-11T11:03:43.498Z"
+    },
+    {
+      "id": "23cf96b1-a03b-49e5-aac3-2749890d2abf",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 8730,
+      "outputTokens": 24,
+      "cost": 0.0026478,
+      "createdAt": "2026-10-11T11:03:40.935Z"
+    },
+    {
+      "id": "c80355fd-df5d-41f1-b9d5-5ed8db65e07d",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10224,
+      "outputTokens": 126,
+      "cost": 0.0032183999999999997,
+      "createdAt": "2026-10-11T11:03:39.191Z"
+    },
+    {
+      "id": "0ab0eb80-9441-41c1-9705-bbf3d1e7acfb",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 7147,
+      "outputTokens": 98,
+      "cost": 0.0022616999999999997,
+      "createdAt": "2026-10-11T11:03:37.239Z"
+    },
+    {
+      "id": "0294c2e9-99e3-4534-b77f-9959f3e418cc",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 6881,
+      "outputTokens": 97,
+      "cost": 0.0021807,
+      "createdAt": "2026-10-11T11:03:35.550Z"
+    },
+    {
+      "id": "ffd10980-9809-4ac2-956e-55b2dc2d4441",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11151,
+      "outputTokens": 561,
+      "cost": 0.0040184999999999995,
+      "createdAt": "2026-10-11T11:03:33.625Z"
+    },
+    {
+      "id": "8960e056-263b-454b-a0e1-796f84bb1d24",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11742,
+      "outputTokens": 935,
+      "cost": 0.0046446000000000005,
+      "createdAt": "2026-10-11T11:03:28.568Z"
+    },
+    {
+      "id": "e759adaf-e563-4b97-87f5-76e757337aea",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11402,
+      "outputTokens": 183,
+      "cost": 0.0036401999999999997,
+      "createdAt": "2026-10-11T11:03:22.829Z"
+    },
+    {
+      "id": "f6302b95-12aa-4229-b89a-f46d9128af4f",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10122,
+      "outputTokens": 139,
+      "cost": 0.0032034,
+      "createdAt": "2026-10-11T11:03:20.569Z"
+    },
+    {
+      "id": "8c823d85-6c8b-48e3-8a50-78fa37a02695",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10557,
+      "outputTokens": 139,
+      "cost": 0.0033339,
+      "createdAt": "2026-10-11T11:03:18.189Z"
+    },
+    {
+      "id": "2efdecc7-ac1c-4370-9563-d056d5d98148",
+      "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+      "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 7064,
+      "outputTokens": 135,
+      "cost": 0.0022811999999999997,
+      "createdAt": "2026-10-11T11:03:15.803Z"
+    }
+  ],
+  "budget": {
+    "authorization": 2.1,
+    "known": 2.0159424,
+    "oldUncertainHolds": 0.054876,
+    "total": 2.0708184,
+    "remaining": 0.0291816,
+    "projectLimit": 0.15,
+    "projectCost": 0.13612649999999998
+  },
+  "originalDeliveryHashesPreserved": {
+    "README.md": "3864d96f4df5619d84bc061ed3122825597c9babe0bbc35108565277fb99fc31",
+    "cli.mjs": "ed8b322a2aa5ee08d81ffaf26ab733b58f91f7c154f6176bae6805edf4e358de",
+    "cli.test.mjs": "b36e07cba6c5eb345698b48fabf40ffec00992d6265f763d51e067908e827d67"
+  },
+  "modelCallsForAudit": 0,
+  "limits": [
+    "文档选用与只读核对，未运行新代码测试或终端命令",
+    "只有一个成功工作，无可比效率基线，未达到3次候选门槛",
+    "工程 fixture 验证自动候选，不能冒称真实跨三工作沉淀已发生"
+  ]
+}

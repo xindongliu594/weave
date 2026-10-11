@@ -1,0 +1,1 @@
+selection.md 已一次写入（2978 bytes, sha256 f31b4232…5527）。采用登记：S1 sum addition validation checklist（d4c239b4/chunk 6a11c024, line7，场景A完全适用、场景B部分复用并列出4条复用步骤+4条改动条件）；S2 CLI checklist（a92a3281/chunk 95b45153, line7）判定不适用，仅读取未采用；场景C授权目录未找到适用方法，已声明并给出自拟C1–C7。含A1–A5、B1–B5检查项，正文中文≤1000字。未改旧代码/未装依赖/未写测试代码/未执行终端命令。请 QA 只读核验。
