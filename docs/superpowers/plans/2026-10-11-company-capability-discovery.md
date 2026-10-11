@@ -1,6 +1,6 @@
 # 公司能力发现与采用记录 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 员工自主发现获授权公司知识、Skill 与工具；按需加载固定方法，登记实际采用并关联已核验工作。
 
@@ -35,10 +35,10 @@
 
 **Interfaces:** `queryKnowledge(snapshot, agentId, 'skill', documentId)` 返回经授权固定修订正文及版本哈希；`companySkills(manifest, employee)` 仅返回目录摘要和来源；`installApprovedSkills` 通过已有 queryKnowledge 回调注册 DSH Provider。
 
-- [ ] RED：公司方法通过 API 保存，非法名字/大正文拒绝；普通文档不进 Skill 目录；两员工 ACL、固定 v1 及篡改哈希拒绝。
-- [ ] GREEN：元数据 `source.skillName` 明确发布；Provider 惰性 get；唯一名字使用文档 ID 摘要前缀，保留运行内 Skill。
-- [ ] 验证：`node scripts/test-integration.mjs tests/company-capabilities.test.ts tests/knowledge.test.ts`；`node --test services/agent-runtime/approved-skills.test.mjs`。Expected: 相关用例全部通过。
-- [ ] 提交固定版本与加载器。
+- [x] RED：公司方法通过 API 保存，非法名字/大正文拒绝；普通文档不进 Skill 目录；两员工 ACL、固定 v1 及篡改哈希拒绝。
+- [x] GREEN：元数据 `source.skillName` 明确发布；Provider 惰性 get；唯一名字使用文档 ID 摘要前缀，保留运行内 Skill。
+- [x] 验证：`node scripts/test-integration.mjs tests/company-capabilities.test.ts tests/knowledge.test.ts`；`node --test services/agent-runtime/approved-skills.test.mjs`。Expected: 相关用例全部通过。
+- [x] 提交固定版本与加载器。
 
 ### Task 2: 员工能力检索与采用回执
 
@@ -46,10 +46,10 @@
 
 **Interfaces:** `installEmployeeCapabilities(ctx, {employee,agent,manifest,queryKnowledge,archive,activeWork})` 安装 `capability_search({query})` 和 `capability_use({kind:'knowledge'|'skill',id,note})`；`acceptedAdoptions(events, receipts)` 投影成功尝试，按任务与来源去重。
 
-- [ ] RED：知识/Skill/原已授工具检索，零命中、错误不吞；采用前必须有对应读取；无活动任务拒绝；冷恢复同尝试重复只记一次；失败尝试不进正式工作。
-- [ ] GREEN：复用现有关键词搜索与 DSH schemas/list；回执使用现有 sourceKey 幂等、 taskId/attemptId，正文不重复保存。
-- [ ] 验证：`node --test services/agent-runtime/employee-capabilities.test.mjs services/agent-runtime/approved-skills.test.mjs services/agent-runtime/employee-hosts.test.mjs services/agent-runtime/product-tools.test.mjs`；`node scripts/test-integration.mjs tests/work-records.test.ts`。Expected: 全部通过。
-- [ ] 提交发现和采用回执。
+- [x] RED：知识/Skill/原已授工具检索，零命中、错误不吞；采用前必须有对应读取；无活动任务拒绝；冷恢复同尝试重复只记一次；失败尝试不进正式工作。
+- [x] GREEN：复用现有关键词搜索与 DSH schemas/list；回执使用现有 sourceKey 幂等、 taskId/attemptId，正文不重复保存。
+- [x] 验证：`node --test services/agent-runtime/employee-capabilities.test.mjs services/agent-runtime/approved-skills.test.mjs services/agent-runtime/employee-hosts.test.mjs services/agent-runtime/product-tools.test.mjs`；`node scripts/test-integration.mjs tests/work-records.test.ts`。Expected: 全部通过。
+- [x] 提交发现和采用回执。
 
 ### Task 3: 网页发布入口、验证与交付
 
@@ -57,10 +57,10 @@
 
 **Interfaces:** 知识编辑表单以 `source.skillName` 显式区分普通资料和批准 Skill；运行时间线显示发现/读取/采用状态；工作记录包含成功采用及证据链接。
 
-- [ ] RED→GREEN：表单可发布/取消方法，编辑保留来源；网页展示采用事件与仅声明采用的限定说明。
-- [ ] 本地相关回归、类型检查、构建；一次全变更独立审查及必要修复。
-- [ ] JJ 可达则部署固定新 release、保留共享依赖/旧数据，验证 API 与一处关键网页；不可达则记录阻塞并交付可启动代码。
-- [ ] 保存测试输出、部署/浏览器证据、状态限制，提交并推送现有分支。
+- [x] RED→GREEN：表单可发布/取消方法，编辑保留来源；网页展示采用事件与仅声明采用的限定说明。
+- [x] 本地相关回归、类型检查、构建；一次全变更独立审查及必要修复。
+- [x] JJ 可达则部署固定新 release、保留共享依赖/旧数据，验证 API 与一处关键网页；不可达则记录阻塞并交付可启动代码。
+- [x] 保存测试输出、部署/浏览器证据、状态限制，提交并推送现有分支。
 
 ## 执行方式与既有授权
 

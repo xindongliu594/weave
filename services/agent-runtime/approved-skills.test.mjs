@@ -61,6 +61,8 @@ test('official Skill catalog and loader isolate employees, audit reads and retai
     const request=JSON.stringify(requests[0]);
     assert.ok(request.includes('fixed-method'));
     assert.ok(!request.includes(content),'catalog injects summaries, not complete method bodies');
+    assert.ok(requests[0].tools.some(tool=>tool.name==='capability_search'),'discovery is offered on the actual model request');
+    assert.ok(requests[0].tools.some(tool=>tool.name==='capability_use'),'adoption is offered to the authorized employee');
     const readerContext=factory.list().find(slot=>slot.sessionId===reader.agent.id).ctx;
     const otherContext=factory.list().find(slot=>slot.sessionId===other.agent.id).ctx;
     assert.equal(otherContext.tools.get('skill'),undefined);

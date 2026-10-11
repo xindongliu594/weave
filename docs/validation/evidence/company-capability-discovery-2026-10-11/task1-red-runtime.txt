@@ -1,0 +1,19 @@
+✖ company Skill provider loads only selected fixed bodies and denies forged employee access (1213.5425ms)
+✔ official Skill catalog and loader isolate employees, audit reads and retain fixed content on cold resume (542.0897ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2332.9801
+
+✖ failing tests:
+
+test at services\agent-runtime\approved-skills.test.mjs:20:1
+✖ company Skill provider loads only selected fixed bodies and denies forged employee access (1213.5425ms)
+  TypeError: Cannot read properties of undefined (reading 'list')
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/approved-skills.test.mjs:34:36)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)

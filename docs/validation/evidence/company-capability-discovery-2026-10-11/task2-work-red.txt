@@ -1,0 +1,34 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ accepted work exposes adopted versions only from its sealed attempt, with sources in the reusable document (2309.3257ms)
+✔ directional workspace imports and legacy private knowledge cannot publish into department knowledge (240.194ms)
+✔ work knowledge projects sealed test counters without inventing legacy values (71.3313ms)
+✔ accepted work is discoverable and publishes once through the existing versioned knowledge index (222.4447ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3821.7527
+
+✖ failing tests:
+
+test at tests\work-records.test.ts:1:3697
+✖ accepted work exposes adopted versions only from its sealed attempt, with sources in the reusable document (2309.3257ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(record.data.content.includes('已采用的固定知识与方法'))
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\work-records.test.ts:41:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

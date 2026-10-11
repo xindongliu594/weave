@@ -1,0 +1,42 @@
+✖ knowledge library exposes explicit method publication without promoting ordinary documents (23.4862ms)
+✖ editing a method preserves work provenance while explicit demotion removes its instruction flag (0.2612ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1075.4673
+
+✖ failing tests:
+
+test at tests\company-capabilities-ui.test.ts:1:328
+✖ knowledge library exposes explicit method publication without promoting ordinary documents (23.4862ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(html.includes('发布为批准工作方法'))
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\company-capabilities-ui.test.ts:9:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\company-capabilities-ui.test.ts:1:1001
+✖ editing a method preserves work provenance while explicit demotion removes its instruction flag (0.2612ms)
+  TypeError: build is not a function
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\company-capabilities-ui.test.ts:18:19)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)

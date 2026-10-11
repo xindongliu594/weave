@@ -1,0 +1,31 @@
+✔ employee discovers only authorized knowledge, methods and tools without loading all bodies (332.9088ms)
+✔ adoption requires actual reads, remains pending and deduplicates on cold resume (296.3012ms)
+✖ adoption cannot cross a task attempt change while source verification is pending (163.1763ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1200.0429
+
+✖ failing tests:
+
+test at services\agent-runtime\employee-capabilities.test.mjs:69:1
+✖ adoption cannot cross a task attempt change while source verification is pending (163.1763ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-capabilities.test.mjs:71:94
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-capabilities.test.mjs:39:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

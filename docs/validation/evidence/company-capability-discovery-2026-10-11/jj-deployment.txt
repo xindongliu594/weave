@@ -1,0 +1,23 @@
+✔ company Skill provider loads only selected fixed bodies and denies forged employee access (207.190094ms)
+✔ official Skill catalog and loader isolate employees, audit reads and retain fixed content on cold resume (125.417267ms)
+✔ employee discovers only authorized knowledge, methods and tools without loading all bodies (195.620974ms)
+✔ adoption requires actual reads, remains pending and deduplicates on cold resume (151.336223ms)
+✔ adoption cannot cross a task attempt change while source verification is pending (79.699099ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (267.355902ms)
+✔ failed employee setup leaves no published Agent or resident Host (52.65343ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (48.534053ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (163.03608ms)
+✔ identical fragments of one long line retain distinct stable chunk identities (3.350915ms)
+✔ execution and summary requests cannot select a model outside the employee approval (163.114429ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (74.159849ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (122.923209ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (74.402027ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 755.201904
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-company-capabilities1-20261011", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-retention1-20261011", "packetSha256": "303dec35f932eccc4afaac3860a5bae32a1a48e269dfee04ab60648979aa13af", "projectCount": 6, "usageBefore": 362, "modelCalls": 0, "dependencies": "existing pinned directories reused", "memOSInstalled": false, "passed": true, "usageAfter": 362, "mainPID": "735150", "projectStatePreserved": true, "usagePreserved": true, "originalArchivesPreserved": true, "archiveEvidence": {"files": 332, "bytes": 366882161, "manifestSha256": "575ef998ba94f5c86e980283c58f521f9516c3becfe4f248f9f7bf251fa402f1"}}

@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "url": "http://127.0.0.1:4312/#knowledge",
+  "database": "connected",
+  "projectCount": 6,
+  "usageCount": 362,
+  "documentCount": 3,
+  "existingMethodFlags": 0,
+  "ordinaryDocumentsAutoPromoted": false,
+  "originalAcceptedWork": {
+    "runId": "f86bfd4f-265d-43f4-ad30-5c5c1140dd92",
+    "adoptions": [],
+    "fileVersions": 3,
+    "planVersion": 9
+  },
+  "browser": {
+    "publicationCheckboxVerified": true,
+    "methodNameInputVerified": true,
+    "textareaMaxlengthVerified": 16000,
+    "checkboxRestored": true,
+    "saveClicked": false,
+    "testDocumentsCreated": 0
+  },
+  "modelCalls": 0,
+  "productionArchive": {
+    "files": 332,
+    "bytes": 366882161,
+    "manifestSha256": "575ef998ba94f5c86e980283c58f521f9516c3becfe4f248f9f7bf251fa402f1"
+  }
+}

@@ -1,0 +1,35 @@
+✔ company Skill provider loads only selected fixed bodies and denies forged employee access (1020.3845ms)
+✔ official Skill catalog and loader isolate employees, audit reads and retain fixed content on cold resume (616.3587ms)
+✔ employee discovers only authorized knowledge, methods and tools without loading all bodies (876.0551ms)
+✔ adoption requires actual reads, remains pending and deduplicates on cold resume (661.2999ms)
+✔ adoption cannot cross a task attempt change while source verification is pending (449.6576ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (956.3651ms)
+✔ failed employee setup leaves no published Agent or resident Host (124.5052ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (124.8488ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (948.5304ms)
+✔ admission uses an independent seal and retains first pause reason without log flooding (11.7684ms)
+✔ node evidence and restored context always retain original acceptance during authorized rework (8.0906ms)
+✔ identical fragments of one long line retain distinct stable chunk identities (8.6713ms)
+✔ a queued external tool rechecks a goal pause after capacity is released (766.2048ms)
+✔ execution and summary requests cannot select a model outside the employee approval (159.6623ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (372.1462ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (596.8665ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (365.8969ms)
+✔ large journal appends stay durable and sequential across independent handles without reparsing every prefix (770.8177ms)
+✔ external valid appends refresh the shared cursor and source-key deduplication (128.4321ms)
+✔ same-size corruption with restored mtime rejects append before writing, and repaired bytes are revalidated (163.8572ms)
+✔ truncation and equal-size file replacement cannot reuse an old valid cursor (158.2413ms)
+✔ snapshot SHA validation is retained after same-size mutation and restored mtime (90.4332ms)
+✔ partial write failure invalidates the cursor and cannot hide a damaged tail (78.8342ms)
+✔ fsync failure revalidates the actual written event and does not replay its source key (95.4617ms)
+✔ same ID in different roots and returned-event mutation cannot poison a cursor (113.9524ms)
+✔ nonfinite source keys retain JSON journal semantics across hot and cold handles (236.979ms)
+✔ bounded cursor eviction preserves sequence and oversized source-key sets use strict reads (6738.9066ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8972.1166

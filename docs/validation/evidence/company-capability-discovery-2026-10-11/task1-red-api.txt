@@ -1,0 +1,49 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ company methods are explicit, lazy, authorized and retain the original revision on recovery (16136.5666ms)
+✖ method publication rejects unsafe names and oversized bodies while ordinary documents remain usable (44.3817ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19945.2672
+
+✖ failing tests:
+
+test at tests\company-capabilities.test.ts:1:2189
+✖ company methods are explicit, lazy, authorized and retain the original revision on recovery (16136.5666ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'delivery-check'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\company-capabilities.test.ts:27:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'delivery-check',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\company-capabilities.test.ts:1:4274
+✖ method publication rejects unsafe names and oversized bodies while ordinary documents remain usable (44.3817ms)
+  AssertionError [ERR_ASSERTION]: {"status":201,"data":{"id":"a4020582-abd6-482e-9589-74f94dabd7dc","version":1}}
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\company-capabilities.test.ts:43:142)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

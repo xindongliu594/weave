@@ -1,0 +1,10 @@
+✔ company Skill provider loads only selected fixed bodies and denies forged employee access (452.3851ms)
+✔ official Skill catalog and loader isolate employees, audit reads and retain fixed content on cold resume (266.5868ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1122.1924

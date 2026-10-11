@@ -1,0 +1,17 @@
+✔ method editor explains required grant, method identity and instruction size (25.2375ms)
+✔ approval summary distinguishes a method and renders body as escaped text (1.493ms)
+✔ company catalog bounds and immutable identities fail closed without exposing ungranted methods (5.3881ms)
+✔ approved method keeps one exact body and maps employee identity without importing shared knowledge (2.4484ms)
+✔ ordinary knowledge is never promoted into instructions; tampered approved content fails closed (1.137ms)
+✔ method schema rejects invalid names and oversized instructions (4.7407ms)
+✔ plan approval requires original knowledge access and rejects duplicate method identities (11.7909ms)
+✔ knowledge library exposes explicit method publication without promoting ordinary documents (23.8635ms)
+✔ editing a method preserves work provenance while explicit demotion removes its instruction flag (1.2927ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3637.5738
