@@ -1,0 +1,78 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (1335.9596ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (154.5081ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (98.865ms)
+✔ post-preview file change refuses the whole batch (82.906ms)
+✔ expired persisted previews reject confirmation (66.5607ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (123.2833ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (75.0603ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (96.6937ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (78.2705ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2764.4542
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (1806.5754ms)
+✔ active paid manager replies block export and restore before any database replacement (116.0916ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (306.3198ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2861.0159
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1522.9142ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (182.6311ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (119.3635ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (170.1309ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (136.9455ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (127.8289ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (128.6864ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (137.0852ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (98.4432ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (89.2914ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (229.3774ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (131.2845ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (163.2148ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (227.9862ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4163.5023
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (10931.2527ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (7269.7826ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2472.8062ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (4549.2983ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (3236.643ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (3643.9597ms)
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (7535.8839ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (4501.5981ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (15237.0695ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3131.851ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (2377.0325ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (1622.5222ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (4818.3401ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (3474.3072ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (5075.8824ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (5499.2621ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (9244.1963ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (9522.1927ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 104753.7011

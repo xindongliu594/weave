@@ -37,6 +37,8 @@
 
 ## JJ 实际部署与数据核对
 
+以上是与本批变更相关的检查；本轮未重跑依赖独立 PostgreSQL 环境的全仓原始测试命令，不宣称全仓测试通过。
+
 - 当前发布：`/home/jj/.local/share/weiwu/releases/weiwu-storage1-20261011`；服务 `weiwu-jj.service`，复用原固定依赖。
 - 原发布 `weiwu-resources4-20261011`、凭据和全部数据保留，更新包 SHA-256：`140da8d7d1ae3fc159ab3750507d05a80a61de4e7f63a5d805d3799c80c7a912`。
 - 历史 6 个项目的版本/状态、362 条用量记录和 332 个运行档案文件未变化，运行档案总字节 `366882161`；用量摘要及档案清单摘要见 [实际核对 JSON](evidence/storage-governance-2026-10-11/summary.json)。

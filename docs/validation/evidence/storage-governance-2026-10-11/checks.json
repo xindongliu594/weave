@@ -61,5 +61,12 @@
   ],
   "modelCallsMade": 0,
   "productionFileDeletions": 0,
-  "simulatedBoundary": "PGlite uses one product DB connection; independent PostgreSQL backend lock contention and model quality are excluded. Files are real temporary files. Linux module uses real filesystem."
+  "simulatedBoundary": "PGlite uses one product DB connection; independent PostgreSQL backend lock contention and model quality are excluded. Files are real temporary files. Linux module uses real filesystem.",
+  "earlierProductFlow": {
+    "passed": 18,
+    "failed": 0,
+    "exitCode": 0,
+    "log": "product-baseline.txt",
+    "executedBeforeFinalSharedAdmissionPatch": true
+  }
 }
