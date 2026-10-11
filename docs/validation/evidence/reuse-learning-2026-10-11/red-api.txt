@@ -1,0 +1,78 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1709.0266ms)
+✖ fixed versions remain separate and private or changed archives cannot seed public statistics (203.7576ms)
+✖ background reuse candidates use configurable thresholds and do not overwrite reviewed content (74.2962ms)
+✖ candidate publishing rechecks the actual accepted work and current grants (6.791ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3776.4294
+
+✖ failing tests:
+
+test at tests\knowledge-reuse.test.ts:1:4997
+✖ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1709.0266ms)
+  AssertionError [ERR_ASSERTION]: {"message":"接口不存在"}
+  
+  404 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:38:79)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\knowledge-reuse.test.ts:1:5751
+✖ fixed versions remain separate and private or changed archives cannot seed public statistics (203.7576ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:44:79)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\knowledge-reuse.test.ts:1:6617
+✖ background reuse candidates use configurable thresholds and do not overwrite reviewed content (74.2962ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:51:71)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\knowledge-reuse.test.ts:1:7930
+✖ candidate publishing rechecks the actual accepted work and current grants (6.791ms)
+  TypeError: Cannot read properties of undefined (reading 'reuseEvidence')
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:57:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

@@ -1,0 +1,56 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1666.5783ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (219.597ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (221.8883ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (1050.7037ms)
+✔ single-employee shared-method use with an employee-private source never enters department knowledge (374.1087ms)
+✔ publication rehashes the source revision after candidate generation (251.3249ms)
+✔ reuse scans do not traverse unbounded earlier archives to calculate baselines (98.7463ms)
+✔ a bounded history window still generates proved candidates and preserves older pending evidence (1146.8396ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (272.6773ms)
+✔ bounded background batches eventually visit every department (383.7789ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7622.2154
+✔ accepted work exposes adopted versions only from its sealed attempt, with sources in the reusable document (2103.6104ms)
+✔ directional workspace imports and legacy private knowledge cannot publish into department knowledge (235.2765ms)
+✔ work knowledge projects sealed test counters without inventing legacy values (61.5895ms)
+✔ accepted work is discoverable and publishes once through the existing versioned knowledge index (193.3429ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3570.5241
+✔ once and missed interval dispatch persist atomic approval drafts without running or broadening scope (1444.8969ms)
+✔ pause, resume, cancel and stale version protection persist across service instances (100.9488ms)
+✔ virtual multi-day supervision survives restart, flags stale leases and emits one terminal unread notification (111.3198ms)
+✔ knowledge candidates use approved source versions, deduplicate and never publish to a wider space (156.0457ms)
+✔ fixed evaluation cases retain actual before/after outputs and manual adoption rollback without runtime mutation (126.9907ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2536.6752
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (2099.3304ms)
+✔ active paid manager replies block export and restore before any database replacement (104.8823ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (366.4149ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3203.7905

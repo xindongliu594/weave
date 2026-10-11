@@ -1,0 +1,53 @@
+{
+  "health": {
+    "database": "connected",
+    "runtime": {
+      "ready": true,
+      "reason": "DSH + AgentTeams：员工独立宿主、受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。"
+    },
+    "version": "0.2.0",
+    "workspace": {
+      "kind": "local",
+      "database": "pglite",
+      "workspacesPath": "/home/jj/.local/share/weiwu/data/pilot/workspaces",
+      "executionTarget": {
+        "kind": "local",
+        "deviceId": "5b34cfd1-eee6-45fd-9be7-9000c4daf9d8",
+        "grantId": "7ffb9e55-18e1-4a9c-aeed-befddb39a6b3"
+      }
+    }
+  },
+  "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+  "projectStatus": "FAILED",
+  "projectVersion": 3,
+  "projectMaxBudget": 0.06,
+  "runId": "86ca97da-dd42-47a8-8f57-be50e6834cab",
+  "runStatus": "failed",
+  "successfulAdoptionWorks": 0,
+  "candidateCount": 0,
+  "threshold": 3,
+  "usageRecords": 371,
+  "knownCost": 1.910235,
+  "unknownHolds": 0.054876,
+  "authorization": 2,
+  "remaining": 0.034889,
+  "originalRunId": "f86bfd4f-265d-43f4-ad30-5c5c1140dd92",
+  "originalDeliverables": [
+    {
+      "path": "README.md",
+      "bytes": 2208,
+      "sha256": "3864d96f4df5619d84bc061ed3122825597c9babe0bbc35108565277fb99fc31"
+    },
+    {
+      "path": "cli.mjs",
+      "bytes": 2501,
+      "sha256": "ed8b322a2aa5ee08d81ffaf26ab733b58f91f7c154f6176bae6805edf4e358de"
+    },
+    {
+      "path": "cli.test.mjs",
+      "bytes": 10279,
+      "sha256": "b36e07cba6c5eb345698b48fabf40ffec00992d6265f763d51e067908e827d67"
+    }
+  ],
+  "modelCallsForAudit": 0
+}

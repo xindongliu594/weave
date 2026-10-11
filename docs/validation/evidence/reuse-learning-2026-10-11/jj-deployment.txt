@@ -1,0 +1,34 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (905.194777ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (75.1885ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (102.826876ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (723.052035ms)
+✔ single-employee shared-method use with an employee-private source never enters department knowledge (151.335791ms)
+✔ publication rehashes the source revision after candidate generation (67.27966ms)
+✔ reuse scans do not traverse unbounded earlier archives to calculate baselines (57.798439ms)
+✔ a bounded history window still generates proved candidates and preserves older pending evidence (388.948604ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (95.426525ms)
+✔ bounded background batches eventually visit every department (183.215389ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4000.456979
+✔ once and missed interval dispatch persist atomic approval drafts without running or broadening scope (867.453653ms)
+✔ pause, resume, cancel and stale version protection persist across service instances (45.272794ms)
+✔ virtual multi-day supervision survives restart, flags stale leases and emits one terminal unread notification (35.958548ms)
+✔ knowledge candidates use approved source versions, deduplicate and never publish to a wider space (59.016896ms)
+✔ fixed evaluation cases retain actual before/after outputs and manual adoption rollback without runtime mutation (48.282839ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1375.644216
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-learning1-20261011", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-company-capabilities1-20261011", "packetSha256": "0f28cb44040c5216adb10f122f8ad622efb0748cbedd5a6f0fd61b686c536b29", "projectCount": 7, "usageBefore": 371, "modelCalls": 0, "dependencies": "existing pinned directories reused", "memOSInstalled": false, "passed": true, "usageAfter": 371, "mainPID": "2500248", "projectStatePreserved": true, "usagePreserved": true, "originalArchivesPreserved": true, "archiveEvidence": {"files": 349, "bytes": 368992033, "manifestSha256": "ece3f1feefbdaddc78591da6f91ea5eea864eb95682a2f0fec09acacc1d6a4c6"}}

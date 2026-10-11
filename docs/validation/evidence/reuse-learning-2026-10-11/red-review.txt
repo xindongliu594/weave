@@ -1,0 +1,76 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1832.2245ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (322.9102ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (453.5664ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (1585.9312ms)
+✖ single-employee shared-method use with an employee-private source never enters department knowledge (234.8353ms)
+✖ publication rehashes the source revision after candidate generation (472.4512ms)
+✖ reuse scans do not traverse unbounded earlier archives to calculate baselines (240.9832ms)
+✔ a bounded history window still generates proved candidates and preserves older pending evidence (1392.4096ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (278.3667ms)
+✔ bounded background batches eventually visit every department (431.5236ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 7
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9211.1127
+
+✖ failing tests:
+
+test at tests\knowledge-reuse.test.ts:1:11181
+✖ single-employee shared-method use with an employee-private source never enters department knowledge (234.8353ms)
+  AssertionError [ERR_ASSERTION]: all participating employees having access does not make an employee-private space department-shared
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:84:102)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\knowledge-reuse.test.ts:1:13155
+✖ publication rehashes the source revision after candidate generation (472.4512ms)
+  AssertionError [ERR_ASSERTION]: a matching SHA column alone is not intact source evidence
+  
+  200 !== 409
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:94:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 409,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\knowledge-reuse.test.ts:1:14244
+✖ reuse scans do not traverse unbounded earlier archives to calculate baselines (240.9832ms)
+  AssertionError [ERR_ASSERTION]: bounded adoption scanning must not recursively scan unlimited efficiency baselines
+  
+  15 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:100:122)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 15,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

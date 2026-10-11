@@ -1,0 +1,16 @@
+✔ knowledge library exposes explicit method publication without promoting ordinary documents (60.3764ms)
+✔ editing a method preserves work provenance while explicit demotion removes its instruction flag (2.7497ms)
+✔ knowledge library exposes distinct-work statistics and unverified efficiency honestly (58.5502ms)
+✔ learning threshold accepts bounded distinct-work counts and rejects one repeated work (6318.9608ms)
+✔ overlapping approvals are counted once and clipped to the measured run (14.3652ms)
+✔ receipts supply real tokens; missing duration, unknown costs and a different device stay explicit (4.9104ms)
+✔ matching successful goals compare raw values with signed savings and never divide by zero (2.8621ms)
+✔ fallback sends are counted separately and matched to their own receipts (2.1026ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8048.5049

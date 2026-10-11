@@ -33,28 +33,32 @@
 **Files:** 本阶段私有验证脚本；docs/validation/reuse-learning-2026-10-11.md 与 evidence 同名目录。
 **Interfaces:** 既有 /projects、planning-quote、generated-plan/confirm、approve、runs、approvals、knowledge API。
 
-- [ ] 核对现有模型价格、总费用/预留、原小项目及资料授权，估算最小真实任务。
+- [x] 核对现有模型价格、总费用/预留、原小项目及资料授权，估算最小真实任务。
 - [ ] 原额度容纳时创建隔离的验证任务和少量方法，真实模型自行选择；完整、部分、不适用行为按实际证据分别记录。
-- [ ] 保存运行 ID、固定来源、采用事件、交付及验收结果；受阻记录精确门禁，不重复无效请求。
+- [x] 保存运行 ID、固定来源、采用事件、交付及验收结果；受阻记录精确门禁，不重复无效请求。
+
+实际：真实员工已生成三场景选用报告，但没有完成节点封存、QA 与经理核对。运行 `86ca97da-dd42-47a8-8f57-be50e6834cab` 在下一请求发送前因任务预算不足停止。完整真实验收仍未完成，成功计数为 0；费用与文件保留。
 
 ### Task 2: 跨工作采用统计
 
 **Files:** 新建 apps/api/src/knowledge-reuse.ts；修改 knowledge.ts、KnowledgeCenter.tsx、KnowledgeReuse.tsx；新增 tests/knowledge-reuse.test.ts 和相关 UI 测试。
 **Interfaces:** knowledgeReuse(db,traceRoot,departmentId) 返回 fixed-source groups、distinct works、实际效率和明确 omissions；GET /knowledge/reuse?departmentId=...。
 
-- [ ] RED：不同项目成功采用累计，同项目同版本恢复去重；读取/失败不计；源版本分开；私有工作不公开；无基线不伪造收益。
-- [ ] GREEN：从 acceptedWorkRecord 投影，复用现有历史与效率接口，有界扫描并显式返回遗漏/截断。
-- [ ] 网页显示来源版本、不同工作数、证据入口和已有实际指标，权限与错误清楚；相关回归并提交。
+- [x] RED：不同项目成功采用累计，同项目同版本恢复去重；读取/失败不计；源版本分开；私有工作不公开；无基线不伪造收益。
+- [x] GREEN：从公共 acceptedWorkEvidence 投影，复用现有历史与效率接口，有界扫描并显式返回遗漏/截断；后台不扫描效率基线。
+- [x] 网页显示来源版本、不同工作数、证据入口和已有实际指标，权限与错误清楚；相关回归并提交。
 
 ### Task 3: 自动待审候选、部署与交付
 
 **Files:** knowledge-reuse.ts、automation-learning.ts、AutomationLearningCenter.tsx、相应集成与备份测试、阶段报告。
 **Interfaces:** syncReuseCandidates(db,traceRoot,departmentId,minSuccessfulWorks) 复用原候选表和发布器，只处理同部门共享来源与可共享的工作。候选包含不可变来源和成功工作的证据，已有候选不覆盖。
 
-- [ ] RED：门槛可设置，满足时幂等创建；失败/恢复不加次数；归档/授权/旧候选保护；新字段备份隔离恢复。
-- [ ] GREEN：现有补检服务按有界节奏同步，使用既有候选编辑、审查确认与原空间发布；显示门槛和来源工作。
-- [ ] 类型、构建、相关回归、一次全变更独立审查；必要修复保留 RED→GREEN。
-- [ ] JJ 新 release 验证，原数据/交付哈希保持；短网页验证，保存结果并提交推送现有分支。
+- [x] RED：门槛可设置，满足时幂等创建；失败/恢复不加次数；归档/授权/旧候选保护；新字段备份隔离恢复。
+- [x] GREEN：现有补检服务按有界节奏同步，使用既有候选编辑、审查确认与原空间发布；显示门槛和来源工作。
+- [x] 类型、构建、相关回归、一次全变更独立审查；必要修复保留 RED→GREEN。
+- [x] JJ 新 release 验证，原数据/交付哈希保持；短网页验证，保存结果并提交推送现有分支。
+
+工程证据：API 22 项、UI/效率 8 项、类型及构建通过；JJ 15 项回归通过，新 release 为 `weiwu-reuse-learning1-20261011`。发布前后 7 项目、371 条用量与全部运行档案哈希一致，原交付三文件 SHA256 未变。独立审查初始三项问题已复现修复，未进行第二轮独立审查。完整真实选用验收受预算阻塞，不能将整批标记为已验收。
 
 ## 执行方式
 

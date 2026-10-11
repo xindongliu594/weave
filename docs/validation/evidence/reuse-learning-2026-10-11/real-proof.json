@@ -1,0 +1,120 @@
+{
+  "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+  "runId": "86ca97da-dd42-47a8-8f57-be50e6834cab",
+  "previousRunIds": [
+    "cadb094e-0902-4e2c-a9e5-e94b53fb1b86"
+  ],
+  "status": "failed",
+  "integrity": "ok",
+  "error": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 85697 字节，精简前预留 $0.02847390；当前请求字节上限 48000；可用预算 $0.01000220；输出上限 2048 tokens 保持不变；单次完整上下文最低预留 $0.01204530，至少另需 $0.00204310",
+  "events": [
+    {
+      "sessionId": "53d12a2d-28c5-42a3-a2f5-f346a27dfbb3",
+      "callId": "call_01_9hu4i2j15f3lz2gn33p7etky",
+      "seq": 80,
+      "at": "2026-10-11T08:40:59.720Z",
+      "type": "skill/loaded",
+      "data": {
+        "agentId": "employee-2",
+        "name": "kb-d578bdc1d6fb-sum-checklist",
+        "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+        "version": 1,
+        "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+      }
+    },
+    {
+      "sessionId": "53d12a2d-28c5-42a3-a2f5-f346a27dfbb3",
+      "callId": "call_02_80d24m7ss1sf0la48z9rafc3",
+      "seq": 83,
+      "at": "2026-10-11T08:40:59.729Z",
+      "type": "capability/searched",
+      "data": {
+        "agentId": "employee-2",
+        "query": "sum 加法校验检查表 整数 小数 多租户权限",
+        "knowledge": [
+          {
+            "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+            "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+            "version": 1,
+            "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+          },
+          {
+            "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+            "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+            "version": 1,
+            "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+          }
+        ],
+        "skills": [
+          "kb-d578bdc1d6fb-sum-checklist"
+        ],
+        "tools": [
+          "knowledge_search",
+          "knowledge_read",
+          "filesystem"
+        ]
+      }
+    },
+    {
+      "sessionId": "53d12a2d-28c5-42a3-a2f5-f346a27dfbb3",
+      "callId": "call_00_o35n6e22ywej9iwlvv5ha4qf",
+      "taskId": "select",
+      "attemptId": "48ed9e70-e326-450c-9c8e-613d995e1e31",
+      "sourceKey": "capability-use:da83b15b1f0dee49d619d1ced3eded102e92ad2af4289d8c05c1dd44e9c1a247",
+      "seq": 174,
+      "at": "2026-10-11T08:41:09.264Z",
+      "type": "capability/adopted",
+      "data": {
+        "agentId": "employee-2",
+        "taskId": "select",
+        "attemptId": "48ed9e70-e326-450c-9c8e-613d995e1e31",
+        "kind": "knowledge",
+        "id": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+        "source": {
+          "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+          "version": 1,
+          "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+          "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7"
+        },
+        "note": "已读取《sum addition validation checklist》(sum-checklist)后采用：场景A按\"先确认整数范围→正数2+3=5、负数-2+-3=-5、零0+0=0→明确拒绝非整数，检查项写明输入与预期\"设计。该切片自述不能直接用于小数或权限，故场景B仅复用其步骤并改写条件，场景C不采用。",
+        "validation": "pending"
+      }
+    },
+    {
+      "sessionId": "53d12a2d-28c5-42a3-a2f5-f346a27dfbb3",
+      "callId": "call_00_4l72mf14vut9we4ei5tmi0fh",
+      "taskId": "select",
+      "attemptId": "48ed9e70-e326-450c-9c8e-613d995e1e31",
+      "seq": 226,
+      "at": "2026-10-11T08:41:17.806Z",
+      "type": "artifact/updated",
+      "data": {
+        "agentId": "employee-2",
+        "files": [
+          {
+            "path": "selection.md",
+            "size": 2882,
+            "sha256": "08cdbecc9d3f0abd8526c6e66d8a788876bf42459f3b2c160c188de26f4d7f7e"
+          }
+        ]
+      }
+    }
+  ],
+  "known": 1.910235,
+  "held": 0.054875999999999994,
+  "cumulativeMax": 2,
+  "projectMax": 0.06,
+  "modelCalls": 5,
+  "successWorkCount": 0,
+  "qaCompleted": false,
+  "managerCompleted": false,
+  "remaining": 0.0348890000000001,
+  "stageCost": 0.030419100000000032,
+  "artifacts": [
+    {
+      "path": "selection.md",
+      "size": 2882,
+      "sha256": "08cdbecc9d3f0abd8526c6e66d8a788876bf42459f3b2c160c188de26f4d7f7e"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1613.2342ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (305.8074ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (350.4675ms)
+✖ manual candidates are preserved and automatic candidates respect a bounded storage quota (1019.8665ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (396.2493ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5673.5208
+
+✖ failing tests:
+
+test at tests\knowledge-reuse.test.ts:1:8333
+✖ manual candidates are preserved and automatic candidates respect a bounded storage quota (1019.8665ms)
+  AssertionError [ERR_ASSERTION]: automatic extraction must not grow beyond the 8 MiB quota
+  
+  3 !== 2
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:68:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

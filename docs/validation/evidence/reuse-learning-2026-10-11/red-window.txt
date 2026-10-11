@@ -1,0 +1,34 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1809.7189ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (323.3406ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (437.3149ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (1881.0327ms)
+✖ a bounded history window still generates proved candidates and preserves older pending evidence (1247.6007ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (580.5184ms)
+✔ bounded background batches eventually visit every department (593.968ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8942.328
+
+✖ failing tests:
+
+test at tests\knowledge-reuse.test.ts:1:10797
+✖ a bounded history window still generates proved candidates and preserves older pending evidence (1247.6007ms)
+  AssertionError [ERR_ASSERTION]: three sealed different works are sufficient even when older history is omitted
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\knowledge-reuse.test.ts:83:196)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
