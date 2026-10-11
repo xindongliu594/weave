@@ -6,13 +6,14 @@ import { randomUUID } from 'node:crypto';
 import { installEmployeeContext } from './employee-context.mjs';
 import { PRODUCT_TOOL_NAMES } from './product-tools.mjs';
 import { installApprovedSkills } from './approved-skills.mjs';
+import { installEmployeeCapabilities } from './employee-capabilities.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -142,6 +143,7 @@ export class EmployeeHostFactory {
           const granted = PRODUCT_TOOL_NAMES.filter(name => known.has(name) && employee.tools.includes(name));
           const denied = PRODUCT_TOOL_NAMES.filter(name => known.has(name) && !employee.tools.includes(name));
           if (denied.length) agentCtx.tools.restrict({ deny: denied });
+          installEmployeeCapabilities(ctx,{employee,agent,manifest:this.skillManifest,queryKnowledge:this.queryKnowledge,archive:this.archive,activeWork:this.activeWork});
           this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, granted, removed: denied, resumed: resume }, { sessionId: agent.id });
         }
         return { commit: () => {

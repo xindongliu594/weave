@@ -30,6 +30,17 @@ before(async()=>{
  const {createApp}=await import('../apps/api/src/app.ts');const app=createApp();shutdown=app.locals.shutdown;await shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
 });
 
+test('accepted work exposes adopted versions only from its sealed attempt, with sources in the reusable document',{skip:!isolated},async()=>{
+ const id=randomUUID(),snapshot=structuredClone(fixtureSnapshot),archive=createRunArchive(process.env.TRACE_ROOT!,snapshot,{id}),files=join(process.env.TRACE_ROOT!,id,'artifacts');mkdirSync(files,{recursive:true});writeFileSync(join(files,'cli.mjs'),'fixture');
+ const source={documentId:'method',version:3,sha256:'a'.repeat(64),chunkId:'chunk'};
+ archive.append('capability/searched',{knowledge:[source]});
+ for(const attemptId of ['failed','a','a'])archive.append('capability/adopted',{agentId:'reader',taskId:'code',attemptId,kind:'knowledge',id:'chunk',source,note:'采用测试方法',validation:'pending'});
+ archive.append('run/task-mapping',{tasks:[{task_id:'t1',seed_id:'code'}]});archive.append('handoff/accepted',{runId:id,taskId:'code',attemptId:'a',inputs:[],outputs:[inspectArtifact(files,{path:'cli.mjs'})],commands:[]});archive.append('team/checkpoint',{tasks:[{id:'t1',status:'completed',attemptId:'a'}]});archive.append('run/finished',{status:'completed'});
+ await pool.query("INSERT INTO project_runs(id,project_id,project_version,attempt,status,snapshot) VALUES($1,$2,1,99,'completed',$3)",[id,project,snapshot]);
+ const record=await api('/knowledge/work-records/'+id);assert.equal(record.status,200,JSON.stringify(record.data));assert.equal(record.data.adoptions.length,1);assert.equal(record.data.adoptions[0].attemptId,'a');
+ assert.ok(record.data.content.includes('已采用的固定知识与方法'));assert.ok(record.data.content.includes('"documentId": "method"'));
+});
+
 test('directional workspace imports and legacy private knowledge cannot publish into department knowledge',{skip:!isolated},async()=>{
  let attempt=2;
  for(const privateSource of [{importedFiles:[{path:'private.txt',agentIds:['reader']}]},{knowledge:{reader:[{content:'private fixture'}],manager:[]}}]){

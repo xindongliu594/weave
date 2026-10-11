@@ -48,7 +48,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       const result=queryKnowledge?await retryRead(name,()=>queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000)),readOptions):
         name==='knowledge_search'?searchKnowledge(chunks,String(args.query).slice(0,1000)):chunks.find(c=>c.id===args.chunkId);
       if(!result)throw Error('知识切片不存在或未授权');
-      archive.append('knowledge/citation',{agentId:employee.id,query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});attestRead(result);return result;
+      archive.append('knowledge/citation',{agentId:employee.id,operation:name==='knowledge_search'?'search':'read',query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});attestRead(result);return result;
     }
     let approvalId;
     if(name==='terminal'||name==='terminal_test'){
