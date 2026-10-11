@@ -1,0 +1,16 @@
+✔ inventory marks incomplete scans and gives a settings action instead of claiming all data was counted (17.3151ms)
+✔ preview makes clear exactly which copies are removed and preserves recovery evidence (2.1649ms)
+✔ expired, empty and started previews never enable a deletion confirmation (0.3153ms)
+✔ interrupted history has a reconcile action and does not offer automatic replay (32.4415ms)
+✔ sandbox panel exposes measured writable directories and labels application limits honestly (1.5641ms)
+✔ journal and sandbox confirmations never reuse the workspace deletion label (2.4942ms)
+✔ legacy interrupted records with unresolved results retain read-only reconciliation (1.787ms)
+✔ retention panel makes recommendations explicit and retains preview before confirmation (1.107ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 660.7546

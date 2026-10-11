@@ -1,0 +1,48 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (1336.8232ms)
+✔ retention advice is read-only, uses finished age, and cannot bypass preview confirmation (75.0436ms)
+✖ retention protects unknown or damaged original archives even when database says completed (45.8186ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (172.7176ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (137.9734ms)
+✔ post-preview file change refuses the whole batch (84.8082ms)
+✔ expired persisted previews reject confirmation (70.1667ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (136.7783ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (89.3391ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (124.7678ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (92.9015ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (128.1271ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (208.5543ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (34.8291ms)
+✔ sandbox storage shows registered identity and explicit inspection never deletes (98.6336ms)
+✔ sandbox retirement requires its own confirmation and preserves official delivery (163.844ms)
+✔ changed canonical delivery blocks sandbox retirement before external delete (100.4488ms)
+✔ sandbox uncertain deletion records partial and only reconciles without another delete (140.7548ms)
+✔ journal preview seals real completed events and preserves exact trace reads (130.7556ms)
+✔ unresolved sandbox reconciliation can query the same ID again without replaying deletion (146.3004ms)
+✔ journal archive refuses post-preview append and never removes original evidence (92.3726ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 20
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4324.8911
+
+✖ failing tests:
+
+test at tests\storage-governance.test.ts:1:5383
+✖ retention protects unknown or damaged original archives even when database says completed (45.8186ms)
+  AssertionError [ERR_ASSERTION]: Unknown archive must not receive maintenance advice
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\storage-governance.test.ts:54:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

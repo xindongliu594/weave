@@ -1,0 +1,15 @@
+{
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-retention1-20261011",
+  "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-lifecycle1-20261011",
+  "packetSha256": "423b0df5ad50af69895c2160bc1653fa3b91467e775dc465fb36b37bf0f236d4",
+  "projectCount": 6,
+  "usageBefore": 362,
+  "modelCalls": 0,
+  "dependencies": "existing pinned directories reused",
+  "memOSInstalled": false,
+  "passed": true,
+  "usageAfter": 362,
+  "mainPID": "3704365",
+  "projectStatePreserved": true,
+  "usagePreserved": true
+}

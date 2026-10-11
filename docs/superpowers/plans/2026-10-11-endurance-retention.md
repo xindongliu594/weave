@@ -27,22 +27,24 @@
 
 **Files:** scripts/validation/sandbox-endurance.cjs、sandbox-endurance.test.cjs。
 **Interfaces:** checkpoint has runId/grant/sandbox/revision, startedOperation or completed round; validateCheckpoint refuses in-flight or failed state. Script controller launches two worker processes with persisted checkpoint and enforces 30 real minutes.
-- [ ] RED: 未知/失败/来源变化拒绝；原文件不变；真实 elapsed >= duration 的判定。
-- [ ] GREEN: 最小脚本，预检后在 JJ 启动一次 30 分钟探针，输出增量证据。
-- [ ] 提交脚本与本任务检查结果。
+- [x] RED: 未知/失败/来源变化拒绝；原文件不变；真实 elapsed >= duration 的判定。
+- [x] GREEN: 最小脚本，预检后在 JJ 启动一次 30 分钟探针，输出增量证据。
+- [x] 提交脚本与本任务检查结果。
 
 ### Task 2: 网页保留建议
 
 **Files:** services/agent-runtime/storage-retention.mjs/.d.mts/.test.mjs；apps/api/src/storage-governance.ts；apps/web/src/StorageCenter.tsx；tests/storage-governance.test.ts / storage-center.test.ts。
 **Interfaces:** retentionAdvice(runs,now) returns fixed policy plus bounded recommendations; GET /storage/retention exposes safe runId/kind/age recommendation with no provider/executor mutation. UI recommendation buttons call existing kind previews.
-- [ ] RED: 完成且足龄建议；未来/坏日期/未知费用/失败保护；重复读取不改变清理表；UI 显示手动确认和保护规则。
-- [ ] GREEN: 复用原预览/确认和只读分类，不增加自动清理。
-- [ ] 相关回归、类型、构建，保存结果并提交。
+- [x] RED: 完成且足龄建议；未来/坏日期/未知费用/失败保护；重复读取不改变清理表；UI 显示手动确认和保护规则。
+- [x] GREEN: 复用原预览/确认和只读分类，不增加自动清理。
+- [x] 相关回归、类型、构建，保存结果并提交。
 
 ### Task 3: 实测、部署和交付
 
 **Files:** docs/storage-governance.md、README.md、本轮验收报告和 evidence。
-- [ ] 独立最终审查，重要问题一轮 RED→GREEN 修复。
-- [ ] 耐久实测通过或明确记录失败/受阻，不盲目重试。
-- [ ] JJ 部署建议入口，网页短验，项目/用量/原文件哈希一致。
-- [ ] 记录实测增长与限制，提交并推送当前分支。
+- [x] 独立最终审查，重要问题一轮 RED→GREEN 修复。
+- [x] 耐久实测通过或明确记录失败/受阻，不盲目重试。
+- [x] JJ 部署建议入口，网页短验，项目/用量/原文件哈希一致。
+- [x] 记录实测增长与限制，提交并推送当前分支。
+
+结果和版本边界见 [验收报告](../../validation/endurance-retention-2026-10-11.md)。物理探针运行启动时版本；本轮计时修复的回归与独立 systemd 时长证据均单独记录，没有在运行中覆盖脚本。

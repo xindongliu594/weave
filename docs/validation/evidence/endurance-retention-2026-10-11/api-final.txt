@@ -1,0 +1,31 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (1353.5252ms)
+✔ retention advice is read-only, uses finished age, and cannot bypass preview confirmation (79.465ms)
+✔ retention protects unknown or damaged original archives even when database says completed (62.6531ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (171.1407ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (117.8305ms)
+✔ post-preview file change refuses the whole batch (88.1967ms)
+✔ expired persisted previews reject confirmation (84.2223ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (140.5745ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (88.8579ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (111.297ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (90.2497ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (109.3831ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (161.7919ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (33.7896ms)
+✔ sandbox storage shows registered identity and explicit inspection never deletes (107.6828ms)
+✔ sandbox retirement requires its own confirmation and preserves official delivery (209.1833ms)
+✔ changed canonical delivery blocks sandbox retirement before external delete (123.9504ms)
+✔ sandbox uncertain deletion records partial and only reconciles without another delete (139.1856ms)
+✔ journal preview seals real completed events and preserves exact trace reads (156.5845ms)
+✔ unresolved sandbox reconciliation can query the same ID again without replaying deletion (201.3574ms)
+✔ journal archive refuses post-preview append and never removes original evidence (93.6556ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4389.0737

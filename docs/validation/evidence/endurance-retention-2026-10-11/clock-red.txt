@@ -1,0 +1,37 @@
+✔ known checkpoint accepts only the pinned employee file version (3.4282ms)
+✔ in-flight or failed work cannot be replayed as a fresh iteration (0.4162ms)
+✔ short or simulated time does not satisfy a real thirty-minute experiment (0.3095ms)
+✔ same-process and zero-round runs never count as restart endurance (0.3038ms)
+✔ invalid IDs, dates and counters fail before opening an executor (0.3768ms)
+✖ wall-clock forward jumps cannot replace thirty monotonic minutes (1.3683ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 162.5709
+
+✖ failing tests:
+
+test at scripts\validation\sandbox-endurance.test.cjs:9:1
+✖ wall-clock forward jumps cannot replace thirty monotonic minutes (1.3683ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  true !== false
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\scripts\validation\sandbox-endurance.test.cjs:9:85)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

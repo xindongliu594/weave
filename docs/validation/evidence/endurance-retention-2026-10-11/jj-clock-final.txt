@@ -1,0 +1,14 @@
+✔ known checkpoint accepts only the pinned employee file version (1.261335ms)
+✔ in-flight or failed work cannot be replayed as a fresh iteration (0.20728ms)
+✔ short or simulated time does not satisfy a real thirty-minute experiment (0.170071ms)
+✔ same-process and zero-round runs never count as restart endurance (0.174643ms)
+✔ invalid IDs, dates and counters fail before opening an executor (0.221217ms)
+✔ wall-clock forward jumps cannot replace thirty monotonic minutes (0.135498ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 66.579339

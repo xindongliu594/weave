@@ -1,0 +1,11 @@
+{
+  "startedMessageId": "39f53479d3a045ac8e11786248231fbf",
+  "finishedMonotonicUs": "1118438079305",
+  "startedMonotonicUs": "1116635005508",
+  "invocationId": "828544c77b7b420b85e7010ac94b0930",
+  "memoryPeakBytes": "142962688",
+  "cpuUsageNs": "119530353000",
+  "sameBoot": true,
+  "finishedMessageId": "ae8f7b866b0347b9af31fe1c80b127c0",
+  "unit": "weiwu-endurance-20261011.service"
+}

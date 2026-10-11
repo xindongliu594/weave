@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "runId": "2326dc56-76c7-492b-8524-20f15b1d1ed1",
+  "sourceRun": "f86bfd4f-265d-43f4-ad30-5c5c1140dd92",
+  "sourceRevision": "94e378e602b6f9cc9db7441bd8c02b6fb8f6eaf8408c1b1037b55701025a400e",
+  "startedAt": "2026-10-11T04:18:29.921Z",
+  "finishedAt": "2026-10-11T04:48:32.903Z",
+  "elapsedMs": 1802982,
+  "durationMs": 1800000,
+  "workers": 2,
+  "workerPids": [
+    3552090,
+    3689173
+  ],
+  "rounds": 54,
+  "completedOperations": 217,
+  "sandboxId": "d2a640ed-2923-4a56-abc5-a762d8082927",
+  "restartVerified": true,
+  "workspaceRevision": "f4580b64611dc59926c05e784ecbe69e4a51dc4722bb0ccb3354342f0b85362b",
+  "sourceManifest": [
+    {
+      "path": "README.md",
+      "size": 2208,
+      "sha256": "3864d96f4df5619d84bc061ed3122825597c9babe0bbc35108565277fb99fc31"
+    },
+    {
+      "path": "cli.mjs",
+      "size": 2501,
+      "sha256": "ed8b322a2aa5ee08d81ffaf26ab733b58f91f7c154f6176bae6805edf4e358de"
+    },
+    {
+      "path": "cli.test.mjs",
+      "size": 10279,
+      "sha256": "b36e07cba6c5eb345698b48fabf40ffec00992d6265f763d51e067908e827d67"
+    }
+  ],
+  "retirement": {
+    "runId": "2326dc56-76c7-492b-8524-20f15b1d1ed1",
+    "sandboxId": "d2a640ed-2923-4a56-abc5-a762d8082927",
+    "state": "retired",
+    "replayed": false
+  },
+  "status": "completed",
+  "modelCalls": 0,
+  "employeeCalls": 0,
+  "systemdCpuUsageNs": 119530353000,
+  "monotonicSource": "systemd journal unit start/resources, same invocation and boot",
+  "systemdMonotonicDurationMs": 1803073.797,
+  "systemdMemoryPeakBytes": 142962688,
+  "systemdInvocationId": "828544c77b7b420b85e7010ac94b0930",
+  "physicalInstrumentSha256": "78fb8c8cbbec77bb1413c8218efb3b66f4afde4d624adb95b4c11bce16f68457",
+  "metrics": {
+    "workspaceBytesMinMax": [
+      15030,
+      15031
+    ],
+    "tempBytesAfterEachRound": 0,
+    "instrumentTempPeakBytes": 65536,
+    "sandboxMemoryCurrentMinMax": [
+      28766208,
+      34291712
+    ],
+    "sandboxMemoryPeak": 61231104,
+    "workerRssMinMax": [
+      66646016,
+      147722240
+    ],
+    "instrumentFilesBytes": 138761,
+    "samplesBytes": 42336,
+    "operationsBytes": 83196,
+    "firstWorkerLastRound": 27,
+    "secondWorkerFirstRound": 28
+  },
+  "lastTestOutputSha256": "3ae6d9648dd0cf559931da538344f6274dcf9d8804b10653b4135e04340247e2",
+  "evidenceFiles": {
+    "samples.jsonl": "12dbf3ba6aa0395f96ce77514e214b055ec76bb3c9189ecad87f37fba4efb0b2",
+    "operations.jsonl": "a1ed283897c4dc2aa40b8b0d20caec328ac3fc1896afd3dbf02a80c3c1e608bf",
+    "last-test-output.txt": "3ae6d9648dd0cf559931da538344f6274dcf9d8804b10653b4135e04340247e2"
+  }
+}

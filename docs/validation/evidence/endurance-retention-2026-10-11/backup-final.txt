@@ -1,0 +1,13 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (3753.695ms)
+✔ active paid manager replies block export and restore before any database replacement (325.7883ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (1401.8538ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6725.104

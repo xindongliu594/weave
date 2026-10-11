@@ -1,0 +1,11 @@
+{
+  "physicalScriptCommit": "9d25dc0",
+  "physicalScriptSha256": "78fb8c8cbbec77bb1413c8218efb3b66f4afde4d624adb95b4c11bce16f68457",
+  "finalClockFixCommit": "8d2fa9c",
+  "finalScriptSha256": "bffbee22212f0b588b6cf4ef3ac039bfc42268b0db93bb3c9967b73b6315c341",
+  "physicalScriptNormalizedBytesMatchCommit": true,
+  "physicalExecutorBytesMatchRepository": true,
+  "actualDurationVerification": "independent systemd monotonic start/exit",
+  "runningScriptReplaced": false,
+  "physicalRunAfterClockFixRepeated": false
+}

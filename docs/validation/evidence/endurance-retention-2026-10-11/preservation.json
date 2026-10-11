@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "projects": 6,
+  "usageRecords": 362,
+  "originalArchiveFiles": 332,
+  "originalArchiveBytes": 366882161,
+  "projectVersionsStatesPreserved": true,
+  "usagePreserved": true,
+  "normalAndRecoveryRunState": "completed / integrity ok",
+  "allOriginalFileHashesPreserved": true,
+  "employeeSourceHashesPreserved": true,
+  "physicalEvidenceHashesVerified": true,
+  "productionFilesDeleted": 0,
+  "productionLogsArchived": 0,
+  "modelCalls": 0,
+  "employeeCalls": 0,
+  "authorizationUsd": 2,
+  "confirmedAndOldHoldsUsd": 1.934692,
+  "remainingUsd": 0.065308,
+  "scope": "No-model endurance and read-only retention suggestions; previous unknown charges preserved"
+}

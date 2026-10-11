@@ -1,0 +1,37 @@
+{
+  "mode": "suggestion-only",
+  "automaticDeletion": false,
+  "policy": {
+    "hotJournalHours": 24,
+    "completedCopiesDays": 7,
+    "releaseKeepLatest": 3,
+    "backupDays": 30,
+    "backupKeepLatest": 3
+  },
+  "recommendations": [
+    {
+      "runId": "19acad23-c885-40cc-9fa7-df7d7ec127bf",
+      "kind": "journal",
+      "ageDays": 1.8421464814814814
+    },
+    {
+      "runId": "6197cb6e-d63b-41e9-808e-3666bc376b84",
+      "kind": "journal",
+      "ageDays": 1.8805624652777777
+    },
+    {
+      "runId": "f86bfd4f-265d-43f4-ad30-5c5c1140dd92",
+      "kind": "journal",
+      "ageDays": 2.6470331944444445
+    }
+  ],
+  "readOnlyVerified": true,
+  "cleanupRecordsBefore": 4,
+  "cleanupRecordsAfter": 4,
+  "webPreviewId": "654fead3-87a8-4f23-89f4-7b8689cf51b6",
+  "webPreviewStatus": "preview",
+  "webPreviewRunId": "f86bfd4f-265d-43f4-ad30-5c5c1140dd92",
+  "webPreviewBytes": 24506503,
+  "confirmationExecuted": false,
+  "modelCalls": 0
+}
