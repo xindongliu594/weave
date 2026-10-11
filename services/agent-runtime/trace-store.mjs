@@ -1,6 +1,7 @@
 import { mkdirSync, openSync, writeSync, fsyncSync, closeSync, readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
+import {readJournal,assertJournalWritable} from './journal-archive.mjs';
 
 const validId = /^[a-f0-9-]{36}$/;
 function location(root, id) {
@@ -61,7 +62,7 @@ export function readRun(root, id) {
   if (!existsSync(join(dir, 'snapshot.json'))) return null;
   const rawSnapshot = readFileSync(join(dir, 'snapshot.json'), 'utf8');
   const snapshot = JSON.parse(rawSnapshot);
-  const text = readFileSync(join(dir, 'events.jsonl'), 'utf8');
+  const text = readJournal(dir);
   const lines = text.split('\n');
   let integrity = lines.pop() === '' ? 'ok' : 'incomplete';
   const events = [];
@@ -100,7 +101,7 @@ const sourceKeyBytes = key => Buffer.byteLength(JSON.stringify(key)) + 32;
 const supportedSourceKey = key => Boolean(key) && ['string','number','boolean'].includes(typeof key) &&
   (typeof key !== 'number' || Number.isFinite(key));
 function verifiedAppendCursor(root, id) {
-  const key = location(resolve(root), id), before = archiveIdentity(key), cached = appendCursors.get(key);
+  const key = location(resolve(root), id);assertJournalWritable(key);const before = archiveIdentity(key), cached = appendCursors.get(key);
   if (before && cached && contentIdentityKey(before) === contentIdentityKey(cached.identity)) {
     appendCursors.delete(key); appendCursors.set(key, cached);
     return cached;
@@ -153,7 +154,8 @@ function advanceAppendCursor(key, entry, event, writtenBytes) {
 const summaryCache = new Map(), summaryCacheLimit = 256, summaryByteLimit = 64 * 1024;
 function archiveIdentity(dir) {
   try {
-    return ['snapshot.json', 'events.jsonl'].map(name => {
+    const files=existsSync(join(dir,'events.jsonl'))?['snapshot.json','events.jsonl']:['snapshot.json','events.jsonl.gz','journal-archive.json'];
+    return files.map(name => {
       const stat = statSync(join(dir, name), { bigint: true });
       return Object.keys(stat).sort().map(key => [key, String(stat[key])]);
     });
