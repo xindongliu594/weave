@@ -10,6 +10,7 @@ type Detail = RunDetail & { error?: string; hasMore: boolean; nextCursor: number
 const date = (value: string) => new Date(value).toLocaleString('zh-CN');
 const stateName: Record<string, string> = { running:'运行中',queued: '排队中', interrupted: '已中断', completed: '已完成', failed: '失败', cancelled: '已取消', unfinished: '运行中 / 可能中断', incomplete: '记录不完整' };
 const eventNames: Record<string, string> = {
+  'capability/searched':'检索员工获授权的知识、方法与工具', 'capability/adopted':'登记实际采用声明',
   'skill/catalog':'加载员工获授权的工作方法目录', 'skill/loaded':'读取已批准的工作方法',
   'runtime/model-settling':'核对在途模型用量', 'runtime/model-settled':'在途模型收尾结果',
   'run/created': '创建运行档案', 'run/queued': '进入执行队列', 'run/captain': '绑定协调经理', 'run/task-mapping': '任务编号映射', 'run/approved': '确认启动', 'run/started': '团队开始执行', 'run/deadline-exceeded': '达到已批准的运行时限', 'run/finished': '运行结束', 'billing/usage': '记录执行用量', 'billing/unconfirmed': '调用费用待核对', 'budget/warning': '预算阈值提醒', 'budget/stopped': '预算或调用次数停止',
@@ -24,6 +25,8 @@ const eventNames: Record<string, string> = {
   'session/compaction/summary': '摘要内容、来源和用量', 'session/compaction/prune': '工具缩减来源', 'session/compaction/end': '历史整理结束',
 };
 export function eventSummary(e: TraceEvent) {
+  if(e.type==='capability/searched')return `${e.data.query} · 知识 ${e.data.knowledge?.length??0} · 方法 ${e.data.skills?.length??0} · 工具 ${e.data.tools?.length??0}`;
+  if(e.type==='capability/adopted')return `${e.data.note} · 来源 v${e.data.source?.version??'?'} · 验收结果见工作记录`;
   if (e.type === 'model/request') return `${e.data.provider} / ${e.data.model}`;
   if (typeof e.data.name === 'string') return e.data.name;
   if (e.type === 'team/snapshot') return `${e.data.phase} · ${e.data.tasks?.filter((t: any) => t.status === 'completed').length ?? 0}/${e.data.tasks?.length ?? 0} 项完成`;

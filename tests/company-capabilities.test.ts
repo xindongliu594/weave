@@ -36,6 +36,10 @@ test('company methods are explicit, lazy, authorized and retain the original rev
  assert.equal(await store.queryKnowledge(fresh,reader.id,'skill',ordinary.data.id),undefined);
  await pool.query('UPDATE knowledge_revisions SET sha256=$1 WHERE document_id=$2 AND version=1',['bad',created.data.id]);
  await assert.rejects(store.queryKnowledge(snapshot,reader.id,'skill',created.data.id),/版本缺失|完整|校验/);
+ await pool.query('UPDATE knowledge_revisions SET sha256=$1 WHERE document_id=$2 AND version=1',[loaded.sha256,created.data.id]);
+ assert.equal((await api('/knowledge/documents/'+created.data.id,{version:2},'DELETE')).status,200);
+ assert.equal(companySkills(await store.knowledgeSnapshot([reader],'department'),reader).length,0);
+ assert.equal((await store.queryKnowledge(snapshot,reader.id,'skill',created.data.id)).content,body.content,'archiving retires new catalogs without changing an approved old revision');
 });
 
 test('method publication rejects unsafe names and oversized bodies while ordinary documents remain usable',async()=>{

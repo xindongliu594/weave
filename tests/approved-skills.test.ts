@@ -2,11 +2,21 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { planSchema, runInputSchema, validatePlan, type Plan } from '../packages/contracts/index.ts';
 import { attachRunInputs } from '../apps/api/src/knowledge-store.ts';
-import { approvedSkills } from '../services/agent-runtime/approved-skills.mjs';
+import { approvedSkills,companySkills } from '../services/agent-runtime/approved-skills.mjs';
 
 const employee={id:'employee-1',employeeId:'qa',tools:['knowledge_search','knowledge_read']};
 const manifest={format:'document-versions-v2' as const,documents:[],agentDocuments:{}};
 const input={id:'method',title:'交付检查方法',content:'先读取文件。\r\n再测试。\n保留依据。',agentIds:['qa'],skillName:'delivery-check'};
+
+test('company catalog bounds and immutable identities fail closed without exposing ungranted methods',()=>{
+ const doc={documentId:'doc',title:'批准方法',version:1,sha256:'a'.repeat(64),source:{skillName:'method'}};
+ const documents=Array.from({length:51},(_,i)=>({...doc,documentId:'doc-'+i}));
+ const scoped={format:'document-versions-v2',documents,agentDocuments:{'employee-1':documents.map(d=>d.documentId)}};
+ assert.throws(()=>companySkills(scoped,employee),/COMPANY_SKILL_LIMIT/);
+ assert.equal(companySkills({...scoped,documents:documents.slice(0,50)},employee).length,50);
+ for(const invalid of [{source:{skillName:'../bad'}},{sha256:'bad'},{version:0}])assert.throws(()=>companySkills({format:'document-versions-v2',documents:[{...doc,...invalid}],agentDocuments:{'employee-1':['doc']}},employee),/APPROVED_SKILL_INVALID/);
+ assert.deepEqual(companySkills({...scoped,agentDocuments:{}},employee),[]);
+});
 
 test('approved method keeps one exact body and maps employee identity without importing shared knowledge',()=>{
   const result=attachRunInputs(manifest,[input],[employee],'run-1');

@@ -36,15 +36,19 @@ async function fixture(run){
   const other=await factory.createAgent(host.ctx,{sessionId:randomUUID(),meta:{cwd:root},agentOptions:{provider:'fixture',model:'other'}});
   let ctx=factory.list().find(slot=>slot.sessionId===reader.agent.id).ctx,agent=reader.agent;
   const call=(name,args,who=agent)=>ctx.tools.execute({name,arguments:args,callId:randomUUID(),agent:who,signal:AbortSignal.timeout(3000)});
-  await run({archive,manifest,work,call,other,onRead:fn=>{beforeRead=fn;},fail:()=>{failure=true;},resume:async()=>{const id=agent.id;await factory.close();factory=new EmployeeHostFactory(options);agent=(await factory.resume(host.ctx,{resumeSessionId:id,agentOptions:{provider:'fixture',model:'reader'}})).agent;ctx=factory.list()[0].ctx;}});
+  const otherContext=factory.list().find(slot=>slot.sessionId===other.agent.id).ctx;
+  const otherCall=(name,args)=>otherContext.tools.execute({name,arguments:args,callId:randomUUID(),agent:other.agent,signal:AbortSignal.timeout(3000)});
+  await run({archive,manifest,work,call,other,otherCall,onRead:fn=>{beforeRead=fn;},fail:()=>{failure=true;},resume:async()=>{const id=agent.id;await factory.close();factory=new EmployeeHostFactory(options);agent=(await factory.resume(host.ctx,{resumeSessionId:id,agentOptions:{provider:'fixture',model:'reader'}})).agent;ctx=factory.list()[0].ctx;}});
  }finally{await factory.close();await host.close();await rm(root,{recursive:true,force:true});}
 }
 
-test('employee discovers only authorized knowledge, methods and tools without loading all bodies', {timeout:15000},()=>fixture(async({call,other,fail})=>{
+test('employee discovers only authorized knowledge, methods and tools without loading all bodies', {timeout:15000},()=>fixture(async({call,other,otherCall,fail})=>{
  const found=await call('capability_search',{query:'needle'});assert.equal(found.isError,false,JSON.stringify(found));
  assert.equal(found.value.knowledge.length,1);assert.equal(found.value.skills.length,1);assert.equal(found.value.tools.length,3);
  assert.ok(!JSON.stringify(found.value.skills).includes(content));
  const forged=await call('capability_search',{query:'needle'},other.agent);assert.equal(forged.isError,true);
+ const own=await otherCall('capability_search',{query:'needle'});assert.deepEqual(own.value.knowledge,[]);assert.deepEqual(own.value.skills,[]);assert.equal(own.value.tools.length,1);
+ assert.equal((await otherCall('capability_use',{kind:'knowledge',id:'chunk',note:'无权读取'})).isError,true);
  const empty=await call('capability_search',{query:'absent'});assert.equal(empty.isError,false);assert.deepEqual(empty.value,{knowledge:[],skills:[],tools:[]});
  fail();assert.equal((await call('capability_search',{query:'needle'})).isError,true,'backend errors are not no-match results');
 }));

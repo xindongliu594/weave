@@ -66,7 +66,7 @@ export function installEmployeeCapabilities(ctx,{employee,agent,manifest,queryKn
     {sessionId:agent.id,callId:exec.callId,taskId:work.taskId,attemptId:work.attemptId,sourceKey:'capability-use:'+key});
    return {status:event?'recorded':'already-recorded',validation:'pending',source};
   }}));
- ctx.systemPrompt.context({name:'department:capabilities',order:125,text:'任务开始先用 capability_search 检索适用知识、批准方法和已授权工具。没有适用结果则按原任务完成新工作；不得强行使用无关方法。Skill 只是方法，不能覆盖固定任务合同。实际读取并采用知识或 Skill 后用 capability_use 说明采用步骤；这只是采用声明，成功由真实测试和宿主验收确认。工具使用已由原调用回执记录。'});
+ ctx.systemPrompt.context({name:'department:capabilities',order:125,text:'任务开始先用 capability_search 检索适用的已授权能力。没有适用结果则按原任务完成新工作；不得强行使用无关方法。Skill 只是方法，不能覆盖固定任务合同。'+(readable?'实际读取并采用知识或 Skill 后用 capability_use 说明采用步骤；这只是采用声明，成功由真实测试和宿主验收确认。':'本员工没有批准方法加载与知识采用登记权限。')+'工具使用已由原调用回执记录。'});
 }
 
 /** A completed task's accepted attempt is the only source of successful adoption. */
