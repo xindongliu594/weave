@@ -1,0 +1,73 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (4574.0048ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (640.3276ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (403.6993ms)
+✔ post-preview file change refuses the whole batch (329.4059ms)
+✔ expired persisted previews reject confirmation (285.109ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (421.1185ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (284.733ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (384.0932ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (302.5043ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (315.9544ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (592.0869ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (127.6707ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9894.5649
+✔ demand discussion records actual usage without estimating or reserving an execution budget (3156.6076ms)
+✔ usage-only accounting cannot be applied to execution or project identities (40.8563ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (104.8263ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (177.2321ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (278.2659ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (373.0268ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (198.1302ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (222.5729ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (109.5394ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (381.9713ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5788.1882
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (1853.0708ms)
+✔ active paid manager replies block export and restore before any database replacement (112.9322ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (334.3923ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2927.8706
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1507.662ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (162.2441ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (136.4743ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (186.4522ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (154.0993ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (133.5327ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (138.3248ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (172.0243ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (130.8973ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (111.4867ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (294.9589ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (176.9173ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (188.7318ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (273.5836ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4426.5502

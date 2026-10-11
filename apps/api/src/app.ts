@@ -1,4 +1,6 @@
 import {employeeHistoryRouter} from './employee-history.ts';
+import {storageRouter} from './storage-governance.ts';
+import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-governance.mjs';
 import { departmentWorkbenchRouter } from './department-workbench.ts';
 import { openRigRouter } from './openrig-router.ts';
 import { runLineageEvidenceRouter } from './run-lineage-evidence.ts';
@@ -126,6 +128,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.use('/api', costRouter());
   app.use('/api', runManagementRouter(traceRoot));
   app.use('/api', backupRouter(traceRoot));
+  app.use('/api',storageRouter(traceRoot,{dataRoot:process.env.LOCAL_WORKSPACE_ROOT,workspaceRoot:options.localWorkspace?.workspacesPath,nativeDeviceId:options.localWorkspace?.executionTarget.kind==='local'?options.localWorkspace.executionTarget.deviceId:undefined,deploymentBase:process.env.WEIWU_STORAGE_BASE}));
   app.get('/api/health', async (_req, res) => {
     await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.2.0',...(options.demo?{demo:options.demo}: {}),...(options.localWorkspace?{workspace:options.localWorkspace}:{}) });
   });
@@ -393,6 +396,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
       existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
       if (existing) { await client.query('COMMIT'); }
       else {
+        assertStorageHeadroom(traceRoot);
         if(archiveStorageUsage(traceRoot).bytes>=ARCHIVE_ROOT_LIMIT_BYTES)throw new AppError(422,'运行档案达到 1 GiB，已保留原数据并阻止新运行；请先归档历史数据','ARCHIVE_STORAGE_LIMIT');
         const { rows: modelRows } = await client.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
         const catalog: Model[] = modelRows.map(row => ({ ...row.data, id: row.id, version: row.version, status: row.status, checkedAt: row.checked_at,capabilities:row.capabilities }));
@@ -479,7 +483,6 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.get('/api/usage', async (_req, res) => {
     const { rows } = await pool.query('SELECT u.id,u.model_id AS "modelId",u.project_id AS "projectId",u.department_id AS "departmentId",u.run_id AS "runId",u.agent_id AS "agentId",u.employee_id AS "employeeId",u.session_id AS "sessionId",u.task_id AS "taskId",u.attempt_id AS "attemptId",u.request_id AS "requestId",u.duration_ms AS "durationMs",u.input_tokens AS "inputTokens",u.output_tokens AS "outputTokens",u.cost::float AS cost,u.purpose,u.created_at AS "createdAt",(SELECT a->>\'name\' FROM jsonb_array_elements(r.snapshot->\'agents\') a WHERE a->>\'id\'=u.agent_id LIMIT 1) AS "agentName" FROM usage u LEFT JOIN project_runs r ON r.id=u.run_id ORDER BY u.created_at DESC'); res.json(rows);
   });
-  app.get('/api/storage',async(_req,res)=>res.json({...archiveStorageUsage(traceRoot),maxBytes:ARCHIVE_ROOT_LIMIT_BYTES,runMaxBytes:RUN_ARCHIVE_LIMIT_BYTES,mode:'admission-only',retention:'preserve'}));
   app.get('/api/runs', async (_req, res) => {
     const archived=listRuns(traceRoot),stored=(await pool.query(`SELECT id,created_at AS "createdAt",snapshot->>'title' AS title,status,error FROM project_runs`)).rows;
     const byId=new Map(stored.map(row=>[row.id,row]));
@@ -515,6 +518,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.use((_req, res) => res.status(404).json({ message: '接口不存在' }));
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (error instanceof z.ZodError) return res.status(422).json({ code: 'VALIDATION_ERROR', message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('；') });
+    if(error instanceof Error&&'code' in error&&error.code==='STORAGE_FREE_LIMIT')return res.status(422).json({code:error.code,message:error.message});
     if (error instanceof AppError){
       const diagnostic=error.outputDiagnostic;
       if(diagnostic)try{recordPlanningOutputDiagnostic(traceRoot,diagnostic);}catch(failure){console.error('Planning diagnostic write:',failure instanceof Error?failure.name:'UnknownError');}

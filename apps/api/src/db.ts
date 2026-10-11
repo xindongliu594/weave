@@ -1,4 +1,5 @@
 import pg from 'pg';
+import {migrateStorage} from './storage-governance.ts';
 import { migrateProduct } from './product-schema.ts';
 import { migrateManagerChat } from './manager-chat.ts';
 import { migrateBrowserMcp } from './work-tools-browser.ts';
@@ -47,6 +48,7 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS project_runs_project ON project_runs(project_id, created_at DESC);
   `);
   await migrateProduct(pool);
+  await migrateStorage(pool);
   await migrateManagerChat(pool);
   await migrateBrowserMcp(pool);
   await migrateWorkFiles(pool);

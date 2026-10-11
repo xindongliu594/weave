@@ -1,0 +1,139 @@
+{
+  "checkedAtUtc": "2026-10-11T01:09:40.145287+00:00",
+  "modelCallsMade": 0,
+  "productionFilesDeleted": 0,
+  "projectsUnchanged": true,
+  "usageUnchanged": true,
+  "usageRecords": 362,
+  "usageDigest": "8d03ec3f2c1a08c93904494a27dd7daaf5f2f5a8167a1eeb2adabb405565562e",
+  "archiveFilesUnchanged": true,
+  "archiveFileCount": 332,
+  "archiveBytes": 366882161,
+  "archiveManifestSha256": "575ef998ba94f5c86e980283c58f521f9516c3becfe4f248f9f7bf251fa402f1",
+  "archiveScanComplete": true,
+  "diskFreeBytes": 425580777472,
+  "groups": [
+    {
+      "id": "runs",
+      "bytes": 366882161,
+      "files": 332,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "database",
+      "bytes": 81428575,
+      "files": 1153,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "credentials",
+      "bytes": 32,
+      "files": 1,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "workspaces",
+      "bytes": 81776,
+      "files": 28,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "journal",
+      "bytes": 4788,
+      "files": 63,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "openshell",
+      "bytes": 30772,
+      "files": 146,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "obsidian-vault",
+      "bytes": 29346,
+      "files": 4,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "openrig",
+      "bytes": 5930750,
+      "files": 121,
+      "complete": true,
+      "links": 0
+    }
+  ],
+  "deploymentGroups": [
+    {
+      "id": "releases",
+      "bytes": 2250407819,
+      "files": 86245,
+      "complete": true,
+      "links": 98
+    },
+    {
+      "id": "cache",
+      "bytes": 322122004,
+      "files": 3433,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "backups",
+      "bytes": 860016405,
+      "files": 3435,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "logs",
+      "bytes": 501760,
+      "files": 61,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "runtime",
+      "bytes": 298309870,
+      "files": 13212,
+      "complete": true,
+      "links": 8
+    },
+    {
+      "id": "metadata",
+      "bytes": 954652864,
+      "files": 225,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "data",
+      "bytes": 1791747851,
+      "files": 9139,
+      "complete": true,
+      "links": 0
+    },
+    {
+      "id": "probes",
+      "bytes": 7837394,
+      "files": 579,
+      "complete": true,
+      "links": 1
+    }
+  ],
+  "livePreviewId": "97c85384-2d64-45e7-8e29-b5ce4915c268",
+  "livePreviewStatus": "preview",
+  "candidateFiles": 3,
+  "reclaimableBytes": 14988,
+  "parallelPreviewsReused": true,
+  "oldRunsOverLimit": [
+    "5513740d-bc77-4f8e-bda2-54845b960e41"
+  ]
+}

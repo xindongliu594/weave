@@ -1,0 +1,12 @@
+✔ inventory marks incomplete scans and gives a settings action instead of claiming all data was counted (15.5341ms)
+✔ preview makes clear exactly which copies are removed and preserves recovery evidence (2.8687ms)
+✔ expired, empty and started previews never enable a deletion confirmation (0.5171ms)
+✔ interrupted history has a reconcile action and does not offer automatic replay (31.1556ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 647.8007

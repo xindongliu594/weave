@@ -1,0 +1,22 @@
+✔ inventory counts actual regular bytes without following directory links and marks bounded scans incomplete (5.927723ms)
+✔ only completed native workspace copies with verified identical canonical delivery become candidates (4.605668ms)
+✔ incomplete journal and mismatched completion are retained even when database says completed (1.590569ms)
+✔ cleaning copies preserves immutable deliverables, checkpoints and a valid complete journal (4.045729ms)
+✔ changed second candidate rejects the entire preview before the first file is deleted (2.571911ms)
+✔ canonical delivery changes invalidate a preview without deleting its workspace copy (5.308872ms)
+✔ workspace ancestor links and hard-linked files cannot become cleanup candidates (1.887164ms)
+✔ preview paths cannot traverse, name internal files or forge a different run (2.457248ms)
+✔ disk admission uses actual filesystem free space and stops before altering any file (1.010329ms)
+✔ inventory refuses a linked ancestor instead of counting files outside the declared directory (0.983399ms)
+✔ a completed journal with an unresolved external mutation still protects its workspace (1.133431ms)
+✔ linked or oversized snapshot metadata cannot authorize cleanup (15.075244ms)
+✔ workspace directory enumeration returns only the bounded UUID scope (1.032395ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 121.089658
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-storage1-20261011", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-resources4-20261011", "packetSha256": "140da8d7d1ae3fc159ab3750507d05a80a61de4e7f63a5d805d3799c80c7a912", "projectCount": 6, "usageBefore": 362, "modelCalls": 0, "dependencies": "existing pinned directories reused", "memOSInstalled": false, "passed": true, "usageAfter": 362, "mainPID": "2953005", "projectStatePreserved": true, "usagePreserved": true}

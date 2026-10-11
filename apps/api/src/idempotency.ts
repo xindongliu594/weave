@@ -10,6 +10,8 @@ export const idempotency:RequestHandler=async(req,res,next)=>{
  if(req.path.startsWith('/backup/'))return next();
  // Device claims and receipts use their durable operation IDs, never a cached claim response.
  if(req.path.startsWith('/local-devices/'))return next();
+ // Storage actions have durable preview/cleanup IDs and reconcile their current state.
+ if(req.path.startsWith('/storage/'))return next();
  const key=req.get('Idempotency-Key')!;if(!/^[A-Za-z0-9_-]{8,100}$/.test(key))return res.status(422).json({message:'Idempotency-Key 格式不正确'});
  const fingerprint=createHash('sha256').update(req.method+' '+req.originalUrl+' '+JSON.stringify(req.body)).digest('hex');
  const inserted=await pool.query('INSERT INTO request_keys(key,fingerprint) VALUES($1,$2) ON CONFLICT DO NOTHING',[key,fingerprint]);

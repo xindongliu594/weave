@@ -24,7 +24,9 @@ before(async () => {
   await mkdir(join(directory, 'runs', archivedRunId, 'artifacts'), { recursive: true }); await writeFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt'), 'Windows 嵌套档案也必须完整保留。');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); backupModule = await import('../apps/api/src/backup.ts');
   const automation = await import('../apps/api/src/automation-learning.ts'), chat = await import('../apps/api/src/manager-chat.ts'), browser = await import('../apps/api/src/work-tools-browser.ts'), files = await import('../apps/api/src/work-files.ts');
-  extensionTables = [...chat.managerChatTables, ...browser.browserMcpTables, ...files.workFileTables, ...automation.automationTables];
+  const storage=await import('../apps/api/src/storage-governance.ts');
+  extensionTables = [...chat.managerChatTables, ...browser.browserMcpTables, ...files.workFileTables, ...automation.automationTables,...storage.storageTables];
+  await pool.query("INSERT INTO storage_cleanups(id,status,preview,result) VALUES('cleanup-fixture','completed',$1,$2)",[{candidates:[{runId:archivedRunId,path:'result.txt',bytes:42}],policy:'fixture'}, {bytes:42,deleted:[{runId:archivedRunId,path:'result.txt'}]}]);
   await pool.query("INSERT INTO gateways(id,data) VALUES('gateway',$1)", [{ name: 'Fixture gateway', baseUrl: 'http://127.0.0.1:1/v1' }]);
   await pool.query("INSERT INTO models(id,data,status) VALUES('model',$1,'available')", [{ name: 'Fixture', gatewayId: 'gateway', model: 'fixture', inputRate: 1, outputRate: 2 }]);
   const agent = { id: 'manager', name: '经理', role: 'manager', title: '经理', modelId: 'model', instructions: '协调项目', tools: [] };
@@ -61,6 +63,7 @@ test('extension tables survive encrypted backup while scheduled dispatch and pen
   assert.ok(Object.keys(plain.vaultFiles).length > 0); assert.ok(Object.keys(plain.vaultFiles).every(key => !key.includes('\\')), 'vault paths are portable relative paths');
   for (const table of extensionTables) assert.ok(plain.tables[table].length > 0, `${table} is included`);
   assert.equal(plain.tables.automation_schedules[0].status, 'active');
+  assert.equal(plain.tables.storage_cleanups[0].result.bytes,42);
   await pool.query("UPDATE automation_schedules SET name='Changed',status='cancelled'"); await pool.query("UPDATE work_file_snapshots SET name='Changed'");
   const restored = await call('restore', { password, backup, confirmation: 'RESTORE' }); assert.equal(restored.status, 200, JSON.stringify(restored.data));
   assert.equal((await pool.query("SELECT name,status FROM automation_schedules WHERE id='schedule'")).rows[0].status, 'paused');
@@ -70,6 +73,7 @@ test('extension tables survive encrypted backup while scheduled dispatch and pen
   assert.equal(messages.find(m => m.id === 'replied-message').reply, '历史答复'); assert.equal(messages.find(m => m.id === 'replied-message').status, 'replied');
   assert.equal((await pool.query("SELECT name,files FROM work_file_snapshots WHERE id='files'")).rows[0].files[0].path, 'todo/README.md');
   assert.equal((await pool.query('SELECT * FROM automation_reviews')).rows[0].note, '人工核对通过');
+  assert.deepEqual((await pool.query("SELECT result FROM storage_cleanups WHERE id='cleanup-fixture'")).rows[0].result,{bytes:42,deleted:[{runId:archivedRunId,path:'result.txt'}]});
   assert.ok((await pool.query('SELECT read_at FROM automation_notifications')).rows[0].read_at);
   const vault = await import('../apps/api/src/vault.ts'); assert.equal(vault.unseal((await pool.query("SELECT credential FROM mcp_connections WHERE id='mcp'")).rows[0].credential), 'fixture-token');
   assert.equal((await pool.query('SELECT document_id FROM automation_knowledge_candidates')).rows[0].document_id, documentId);

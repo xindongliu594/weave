@@ -1,5 +1,6 @@
 import {existsSync,lstatSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
+import {assertStorageHeadroom} from './storage-governance.mjs';
 
 export const RUN_ARCHIVE_LIMIT_BYTES=64*1024*1024;
 export const ARCHIVE_ROOT_LIMIT_BYTES=1024*1024*1024;
@@ -16,6 +17,7 @@ export function archiveStorageUsage(root){
  return {bytes,files};
 }
 export function assertArchiveCapacity(root,maxBytes=RUN_ARCHIVE_LIMIT_BYTES){
+ assertStorageHeadroom(root);
  const usage=archiveStorageUsage(root);
  if(usage.bytes>=maxBytes)throw Object.assign(Error(`运行档案达到容量限额（${Math.round(maxBytes/1024/1024)} MiB），已停止新增调用或命令；原交付、检查点和费用保留，请先归档再继续`),{code:'ARCHIVE_STORAGE_LIMIT'});
  return usage;

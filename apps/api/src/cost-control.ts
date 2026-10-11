@@ -1,9 +1,11 @@
 import type pg from 'pg';
 import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
 import { pool } from './db.ts';
 import { AppError,complete,assertCompletionContext,prepareCompletionRequest,type ChatMessage,type CompletionOptions } from './provider.ts';
 import type { Model } from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
+import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-governance.mjs';
 type Database=Pick<pg.PoolClient,'query'>;
 const today="date_trunc('day',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'";
 const open="status IN ('pending','uncertain')";
@@ -84,6 +86,8 @@ export async function reserveCall(input:CallInput) {
  return withFreshLocalAdmission(()=>reserveCallAttempt({...input,id}),input.signal);
 }
 async function reserveCallAttempt(input:CallInput) {
+ try{assertStorageHeadroom(resolve(process.env.TRACE_ROOT??'.data/runs'));}
+ catch(error:any){if(error.code==='STORAGE_FREE_LIMIT')throw new AppError(422,error.message,error.code);throw error;}
  const conversation=input.accountingMode==='conversation';
  if(conversation&&(input.purpose!=='组织需求对话'||input.amount!==0||input.projectId!==undefined||input.projectVersion!==undefined||input.runId!==undefined||input.billingDepartmentId!==undefined||input.maxCost!==undefined))throw new AppError(400,'需求对话用量记录不能用于项目预算调用','INVALID_CONVERSATION_ACCOUNTING');
  const id=input.id??randomUUID(),client=await pool.connect();

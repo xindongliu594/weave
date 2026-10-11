@@ -1,0 +1,65 @@
+{
+  "checks": [
+    {
+      "name": "Windows file protection + existing archive quota",
+      "passed": 14,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "windows-files.txt"
+    },
+    {
+      "name": "Storage HTTP with real temp files + PGlite",
+      "passed": 12,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "api-backup-cost-recovery.txt"
+    },
+    {
+      "name": "Costs and conversation accounting",
+      "passed": 10,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "api-backup-cost-recovery.txt"
+    },
+    {
+      "name": "Encrypted isolated backup + legacy defaults",
+      "passed": 3,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "api-backup-cost-recovery.txt"
+    },
+    {
+      "name": "Recovery conditions",
+      "passed": 14,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "api-backup-cost-recovery.txt"
+    },
+    {
+      "name": "Web view rendering",
+      "passed": 4,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "web-views.txt"
+    },
+    {
+      "name": "Linux new file module",
+      "passed": 13,
+      "failed": 0,
+      "exitCode": 0,
+      "log": "jj-deploy.txt"
+    },
+    {
+      "name": "TypeScript --noEmit",
+      "exitCode": 0
+    },
+    {
+      "name": "Vite build",
+      "exitCode": 0,
+      "log": "build.txt"
+    }
+  ],
+  "modelCallsMade": 0,
+  "productionFileDeletions": 0,
+  "simulatedBoundary": "PGlite uses one product DB connection; independent PostgreSQL backend lock contention and model quality are excluded. Files are real temporary files. Linux module uses real filesystem."
+}

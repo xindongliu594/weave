@@ -34,6 +34,8 @@ OpenRig 的队列状态与为伍经理验收分开展示。当前还未接通自
 
 ## 数据与维护
 
+网页“系统设置 → 文件与数据容量”可查看容量、生成完成副本的清理预览，确认后逐文件回收。交付档案和恢复证据保留；中断后只核对，不自动续删。[使用方法与边界](storage-governance.md)
+
 - 业务数据：`/home/jj/.local/share/weiwu/data/pilot`。
 - OpenShell 独立设备资料：上述目录的 `openshell`；原 native 资料保留。
 - OpenRig 元数据、数据库、token 与映射：上述目录的 `openrig`；不要提交这些私有文件到 Git。

@@ -1,0 +1,12 @@
+export type StorageScan={bytes:number;files:number;entries:number;links:number;complete:boolean;errors:{path:string;code:string}[]};
+export type StorageRun={id:string;status:string;native:boolean;blocked:boolean};
+export type StorageOptions={traceRoot:string;workspaceRoot?:string;runs:StorageRun[]};
+export type CopyCandidate={runId:string;path:string;bytes:number;sha256:string;identity:string;canonicalIdentity:string};
+export function scanStorage(root:string,limit?:number):StorageScan;
+export function workspaceRunIds(root?:string,limit?:number):string[];
+export function workspaceCopyCandidates(options:StorageOptions):{candidates:CopyCandidate[];protectedRuns:{runId:string;reason:string}[]};
+export function validateWorkspaceCopies(options:StorageOptions,candidates:CopyCandidate[]):void;
+export function removeWorkspaceCopies(options:StorageOptions,candidates:CopyCandidate[]):{deleted:Pick<CopyCandidate,'runId'|'path'|'bytes'|'sha256'>[];bytes:number};
+export function reconcileWorkspaceCopies(options:StorageOptions,candidates:CopyCandidate[]):{runId:string;path:string;state:string;canonicalPreserved?:boolean}[];
+export const MIN_STORAGE_FREE_BYTES:number;
+export function assertStorageHeadroom(root:string,minFreeBytes?:number):{freeBytes:number;minFreeBytes:number};
