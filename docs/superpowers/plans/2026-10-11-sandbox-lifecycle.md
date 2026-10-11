@@ -31,26 +31,28 @@
 **Files:** apps/desktop/openshell-executor.cjs、openshell-executor.test.cjs；新增资源测试。
 **Interfaces:** executor.storageScopes() 返回固定映射；inspectStorage(runId) 返回容量与文件版本；retireStorage(runId,expected) 单次删除；reconcileStorage(runId) 只查状态。
 
-- [ ] RED：目录容量、活动命令超限、身份/版本变化、删除断线、重开后核对。
-- [ ] 实现固定脚本监管和同队列维护，既有执行器回归 GREEN。
-- [ ] 保存结果并提交。
+- [x] RED：目录容量、活动命令超限、身份/版本变化、删除断线、重开后核对。
+- [x] 实现固定脚本监管和同队列维护，既有执行器回归 GREEN。
+- [x] 保存结果并提交。
 
 ### Task 2: 完成日志 gzip 归档
 
 **Files:** 新模块 journal-archive.mjs / .d.mts / .test.mjs；trace-store.mjs；归档/API测试。
 **Interfaces:** journalArchiveCandidate(root,runId) 返回固定元数据；archiveJournal(root,candidate) 校验压缩后替换；readJournal(dir) 读取原文并验证；trace-store 调用兼容。
 
-- [ ] RED：相同事件/列表、坏 gzip、链接/变化、双份中断、不可追加、备份恢复。
-- [ ] Node gzip 最小实现，复用现有事件解析，相关 trace 回归 GREEN。
-- [ ] 保存结果并提交。
+- [x] RED：相同事件/列表、坏 gzip、链接/变化、双份中断、不可追加、备份恢复。
+- [x] Node gzip 最小实现，复用现有事件解析，相关 trace 回归 GREEN。
+- [x] 保存结果并提交。
 
 ### Task 3: 网页维护、JJ 验证和交付
 
 **Files:** storage-governance.ts / StorageCenter.tsx / local-api.ts / app.ts；新增生命周期 HTTP/UI 测试；验收资料。
 **Interfaces:** 设置页增加沙箱核对/回收与完成日志归档；复用持久 storage_cleanups 状态和既有确认/核对入口，预览 kind 绑定执行方法。
 
-- [ ] RED：维护权限、活动/未知拒绝、明确确认、重复/重启、不同类型不可交叉确认。
-- [ ] 实现同进程适配及页面，回归、类型和构建通过。
-- [ ] 一次完整独立审查，重要问题一轮修复。
-- [ ] JJ 部署、实际沙箱资源验证与受控持续实验；保留数据/用量证据。
-- [ ] 记录限制，提交并推送当前分支。
+- [x] RED：维护权限、活动/未知拒绝、明确确认、重复/重启、不同类型不可交叉确认。
+- [x] 实现同进程适配及页面，回归、类型和构建通过。
+- [x] 一次完整独立审查，重要问题一轮修复。
+- [x] JJ 部署、实际沙箱资源验证与受控持续实验；保留数据/用量证据。
+- [x] 记录限制，提交并推送当前分支。
+
+验收范围：JJ 受控持续实验为约一分钟生命周期采样；多小时员工任务未验证，完整范围及审查修复见 docs/validation/sandbox-lifecycle-2026-10-11.md。

@@ -1,0 +1,42 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ demand discussion records actual usage without estimating or reserving an execution budget (2751.8195ms)
+✔ usage-only accounting cannot be applied to execution or project identities (34.0948ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (104.9424ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (211.9397ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (226.9072ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (396.4572ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (201.4646ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (250.3746ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (108.7023ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (406.2837ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5354.4719
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1546.3756ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (182.0598ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (160.1961ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (229.3979ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (179.6325ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (166.0961ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (181.4819ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (183.2214ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (162.8055ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (119.7152ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (280.0775ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (166.8647ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (192.4167ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (276.5694ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4725.6268

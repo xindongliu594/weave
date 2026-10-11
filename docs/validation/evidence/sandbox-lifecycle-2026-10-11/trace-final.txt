@@ -1,0 +1,29 @@
+✔ archive quota includes nested sessions and artifacts, refuses further admission and never deletes evidence (8.1097ms)
+✔ large journal appends stay durable and sequential across independent handles without reparsing every prefix (399.7499ms)
+✔ external valid appends refresh the shared cursor and source-key deduplication (66.7075ms)
+✔ same-size corruption with restored mtime rejects append before writing, and repaired bytes are revalidated (104.2303ms)
+✔ truncation and equal-size file replacement cannot reuse an old valid cursor (105.2029ms)
+✔ snapshot SHA validation is retained after same-size mutation and restored mtime (57.1732ms)
+✔ partial write failure invalidates the cursor and cannot hide a damaged tail (51.3847ms)
+✔ fsync failure revalidates the actual written event and does not replay its source key (66.6992ms)
+✔ same ID in different roots and returned-event mutation cannot poison a cursor (74.9714ms)
+✔ nonfinite source keys retain JSON journal semantics across hot and cold handles (159.5728ms)
+✔ bounded cursor eviction preserves sequence and oversized source-key sets use strict reads (6031.4083ms)
+✔ an unchanged real 10 MiB journal is parsed once for lists while full reads always bypass the cache (235.4491ms)
+✔ cross-handle appends invalidate summaries and retain all fields, terminal state and descending order (123.0439ms)
+✔ journal truncation, same-size corruption with restored mtime, and repair all invalidate the cached integrity (101.8983ms)
+✔ snapshot replacement and malformed snapshots with equal size/restored mtime never retain the old valid summary (81.8538ms)
+✔ two roots with the same run ID stay independent, deleted entries disappear, and caller mutation cannot poison cache (83.5429ms)
+✔ cache count and per-summary size are bounded without changing returned data (6495.2688ms)
+✔ a transient read exception remains incomplete but is retried with unchanged file identities (46.872ms)
+✔ actual team execution archives prompts, task attempts, messages and results across a new process (1789.5257ms)
+✔ approval and runtime handles share the journal cursor and deduplicate source identities (43.5255ms)
+✔ partial journal is reported as incomplete, snapshots redact known credential fields (47.5697ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7387.7878

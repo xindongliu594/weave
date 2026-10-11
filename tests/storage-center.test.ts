@@ -21,3 +21,16 @@ test('interrupted history has a reconcile action and does not offer automatic re
  assert.equal(typeof ui.CleanupHistory,'function');const html=renderToStaticMarkup(createElement(ui.CleanupHistory,{rows:[{...preview,status:'started'}],busy:false,onReconcile:()=>{}}));
  assert.ok(html.includes('核对中断结果'));assert.ok(html.includes('不会自动续删'));assert.ok(!html.includes('清理成功'));
 });
+
+test('sandbox panel exposes measured writable directories and labels application limits honestly',()=>{
+ assert.equal(typeof ui.SandboxStorageReport,'function');const html=renderToStaticMarkup(createElement(ui.SandboxStorageReport,{data:{available:true,hardQuota:false,scopes:[{runId:'run',sandboxId:'sandbox',phase:'stopped',storage:{workspace:{bytes:17},temp:{bytes:5},checkedAt:new Date().toISOString()}}]},busy:false,onInspect:()=>{},onPreview:()=>{}}));
+ for(const text of ['OpenShell','/sandbox','/tmp','应用层','硬磁盘配额','核对容量','停止','预览回收'])assert.ok(html.includes(text),text);
+});
+test('journal and sandbox confirmations never reuse the workspace deletion label',()=>{
+ const journal=renderToStaticMarkup(createElement(ui.CleanupPreview,{row:{...preview,preview:{...preview.preview,kind:'journal'}},busy:false,onConfirm:()=>{}}));assert.ok(journal.includes('确认压缩归档'));assert.ok(!journal.includes('确认清理上述副本'));
+ const sandbox=renderToStaticMarkup(createElement(ui.CleanupPreview,{row:{...preview,preview:{...preview.preview,kind:'sandbox'}},busy:false,onConfirm:()=>{}}));assert.ok(sandbox.includes('确认回收沙箱'));assert.ok(sandbox.includes('正式交付'));
+});
+
+test('legacy interrupted records with unresolved results retain read-only reconciliation',()=>{
+ for(const state of ['present','unverified']){const html=renderToStaticMarkup(createElement(ui.CleanupHistory,{rows:[{...preview,status:'interrupted',result:{state}}],busy:false,onReconcile:()=>{}}));assert.ok(html.includes('核对中断结果'));}
+});

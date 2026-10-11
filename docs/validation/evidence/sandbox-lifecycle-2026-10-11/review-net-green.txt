@@ -1,0 +1,29 @@
+✔ gzip archive preserves exact events, snapshots and list cache across reopening (87.3999ms)
+✔ changed source or linked source rejects before moving the only journal (59.4241ms)
+✔ failed and unknown journals remain active-format evidence (54.8202ms)
+✔ corrupt compressed data fails closed and cannot appear completed (69.8746ms)
+✔ interrupted archive with both files preserves original and refuses blind completion (76.9907ms)
+✔ persisted JSON key order cannot invalidate the same approved archive candidate (67.0247ms)
+✔ tiny completed journals with no net compression benefit keep their only source (60.828ms)
+✔ inventory counts actual regular bytes without following directory links and marks bounded scans incomplete (40.6476ms)
+✔ only completed native workspace copies with verified identical canonical delivery become candidates (64.421ms)
+✔ incomplete journal and mismatched completion are retained even when database says completed (42.4847ms)
+✔ cleaning copies preserves immutable deliverables, checkpoints and a valid complete journal (57.1646ms)
+✔ changed second candidate rejects the entire preview before the first file is deleted (52.2099ms)
+✔ canonical delivery changes invalidate a preview without deleting its workspace copy (54.2632ms)
+✔ workspace ancestor links and hard-linked files cannot become cleanup candidates (62.7028ms)
+✔ preview paths cannot traverse, name internal files or forge a different run (49.2286ms)
+✔ disk admission uses actual filesystem free space and stops before altering any file (31.5067ms)
+✔ inventory refuses a linked ancestor instead of counting files outside the declared directory (42.4219ms)
+✔ a completed journal with an unresolved external mutation still protects its workspace (54.6737ms)
+✔ linked or oversized snapshot metadata cannot authorize cleanup (41.3561ms)
+✔ workspace directory enumeration returns only the bounded UUID scope (29.6994ms)
+✔ verified compressed completed logs still authorize identical workspace copy cleanup (68.0508ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 878.6352

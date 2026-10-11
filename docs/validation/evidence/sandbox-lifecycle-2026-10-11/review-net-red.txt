@@ -1,0 +1,54 @@
+✖ gzip archive preserves exact events, snapshots and list cache across reopening (119.5348ms)
+✔ changed source or linked source rejects before moving the only journal (85.0329ms)
+✔ failed and unknown journals remain active-format evidence (82.6707ms)
+✔ corrupt compressed data fails closed and cannot appear completed (88.7502ms)
+✔ interrupted archive with both files preserves original and refuses blind completion (103.037ms)
+✔ persisted JSON key order cannot invalidate the same approved archive candidate (102.3533ms)
+✖ tiny completed journals with no net compression benefit keep their only source (83.6689ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 876.9856
+
+✖ failing tests:
+
+test at services\agent-runtime\journal-archive.test.mjs:4:1
+✖ gzip archive preserves exact events, snapshots and list cache across reopening (119.5348ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  30025 !== 29683
+
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/journal-archive.test.mjs:4:373)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 30025,
+    expected: 29683,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\journal-archive.test.mjs:11:1
+✖ tiny completed journals with no net compression benefit keep their only source (83.6689ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/journal-archive.test.mjs:13:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'JOURNAL_ARCHIVE_NO_BENEFIT' },
+    operator: 'throws',
+    diff: 'simple'
+  }

@@ -1,0 +1,36 @@
+✔ stdin restores exact source bytes; CAS/revisions/metadata match existing contract, no host workspace writes (273.1908ms)
+✔ grant, approval, hidden paths and file limits deny before any CLI dispatch (81.5987ms)
+✔ large contents stay out of argv; duplicate completed jobs and cold mapping never repeat create/exec (215.694ms)
+✔ connection loss persists unknown across reopen; no repeated external operation and no host fallback (74.8302ms)
+✔ changed effective policy blocks before employee operation; clean close stops same scope once (61.3735ms)
+✔ configuration fingerprint is field-order invariant and every fixed field changes its identity (6.4736ms)
+✔ approved remote command nonzero exit is a known result; child output cannot forge transport receipt (65.2531ms)
+✔ remote workspace governance files and hard links are refused before returning any artifacts (85.6263ms)
+✔ clean shutdown and cold reopen start the same sandbox once, retain files and never replay completed operations (145.7943ms)
+✔ cold recovery checks saved revision before a new write even without caller-supplied workspace revision (99.7031ms)
+✔ ambiguous start or stop is retained across reopen and never repeated (152.5091ms)
+✔ service shutdown refuses new work immediately and concurrent close stops the sandbox only once (39.2546ms)
+✔ cancellation or truncated receipt after a remote write preserves the unknown outcome without replay (160.262ms)
+✔ actual helper checks UID, GID, Node and cgroup values before an employee write (303.8463ms)
+✔ sandbox ID replacement blocks cold start before any new external mutation (58.1245ms)
+✔ prepare accepts an exact 5 MiB file and 20 MiB workspace through stdin (2138.2958ms)
+✔ damaged persistent mappings cannot omit recovery versions or redirect a sandbox name (280.131ms)
+✔ real local transport forwards large stdin, bounds output, and classifies cancellation after spawn as unknown (600.2266ms)
+✔ maintenance inspects exact bytes then retires only the matching sandbox once (137.8664ms)
+✔ maintenance refuses changed versions and does not send delete (45.9348ms)
+✔ delete disconnect survives executor recreation and reconciles absence without replay (113.0821ms)
+✔ deletion accepted with a still-present sandbox is not reported as reclaimed (90.5518ms)
+✔ running command is killed when temporary storage exceeds limits before its normal exit (375.5725ms)
+✔ real directory storage counts bytes and free filesystem without reading file contents (19.6323ms)
+✔ temporary file growth stops admission independently of workspace exports (6.7194ms)
+✔ bounded enumeration and directory links fail closed without traversing targets (487.1049ms)
+✔ concurrent temporary deletion triggers a bounded rescan rather than an admission failure (10.7782ms)
+✔ persistent directory churn is bounded and permission errors are never swallowed (8.2477ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5803.1562

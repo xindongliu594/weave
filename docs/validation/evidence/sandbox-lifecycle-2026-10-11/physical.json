@@ -1,0 +1,404 @@
+{
+  "root": "/home/jj/.local/share/weiwu/probes/lifecycle-3o1BRA",
+  "runId": "eee48e21-159c-482c-934f-c38b1f1b9e0c",
+  "sourceRun": "f86bfd4f-265d-43f4-ad30-5c5c1140dd92",
+  "sourceRevision": "94e378e602b6f9cc9db7441bd8c02b6fb8f6eaf8408c1b1037b55701025a400e",
+  "modelCalls": 0,
+  "employeeCalls": 0,
+  "sourceFilesWrittenByCodex": 0,
+  "sourceManifest": [
+    {
+      "path": "README.md",
+      "sha256": "3864d96f4df5619d84bc061ed3122825597c9babe0bbc35108565277fb99fc31"
+    },
+    {
+      "path": "cli.mjs",
+      "sha256": "ed8b322a2aa5ee08d81ffaf26ab733b58f91f7c154f6176bae6805edf4e358de"
+    },
+    {
+      "path": "cli.test.mjs",
+      "sha256": "b36e07cba6c5eb345698b48fabf40ffec00992d6265f763d51e067908e827d67"
+    }
+  ],
+  "sandboxId": "d21d4c80-c398-4b87-9934-ebeb4334177b",
+  "initialStorage": {
+    "workspace": {
+      "bytes": 14988,
+      "files": 3,
+      "entries": 4
+    },
+    "temp": {
+      "bytes": 0,
+      "files": 0,
+      "entries": 1
+    },
+    "disk": {
+      "freeBytes": 425564622848
+    },
+    "limits": {
+      "workspaceBytes": 20971520,
+      "workspaceFiles": 128,
+      "workspaceEntries": 512,
+      "tempBytes": 67108864,
+      "tempEntries": 4096,
+      "minFreeBytes": 268435456
+    },
+    "hardQuota": false,
+    "checkedAt": "2026-10-11T02:14:44.572Z"
+  },
+  "workspaceRevision": "94e378e602b6f9cc9db7441bd8c02b6fb8f6eaf8408c1b1037b55701025a400e",
+  "samples": [
+    {
+      "at": "2026-10-11T02:14:45.185Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564610560
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:14:45.028Z"
+    },
+    {
+      "at": "2026-10-11T02:14:50.685Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564569600
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:14:50.516Z"
+    },
+    {
+      "at": "2026-10-11T02:14:56.187Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564524544
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:14:56.026Z"
+    },
+    {
+      "at": "2026-10-11T02:15:01.682Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564504064
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:01.521Z"
+    },
+    {
+      "at": "2026-10-11T02:15:07.155Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564479488
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:06.989Z"
+    },
+    {
+      "at": "2026-10-11T02:15:12.618Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564459008
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:12.456Z"
+    },
+    {
+      "at": "2026-10-11T02:15:18.123Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564426240
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:17.959Z"
+    },
+    {
+      "at": "2026-10-11T02:15:23.635Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564397568
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:23.468Z"
+    },
+    {
+      "at": "2026-10-11T02:15:29.127Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564372992
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:28.964Z"
+    },
+    {
+      "at": "2026-10-11T02:15:34.599Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564352512
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:34.436Z"
+    },
+    {
+      "at": "2026-10-11T02:15:40.103Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564332032
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:39.942Z"
+    },
+    {
+      "at": "2026-10-11T02:15:45.599Z",
+      "workspace": {
+        "bytes": 14988,
+        "files": 3,
+        "entries": 4
+      },
+      "temp": {
+        "bytes": 0,
+        "files": 0,
+        "entries": 1
+      },
+      "disk": {
+        "freeBytes": 425564307456
+      },
+      "limits": {
+        "workspaceBytes": 20971520,
+        "workspaceFiles": 128,
+        "workspaceEntries": 512,
+        "tempBytes": 67108864,
+        "tempEntries": 4096,
+        "minFreeBytes": 268435456
+      },
+      "hardQuota": false,
+      "checkedAt": "2026-10-11T02:15:45.435Z"
+    }
+  ],
+  "stopped": true,
+  "restartStorage": {
+    "workspace": {
+      "bytes": 14988,
+      "files": 3,
+      "entries": 4
+    },
+    "temp": {
+      "bytes": 0,
+      "files": 0,
+      "entries": 1
+    },
+    "disk": {
+      "freeBytes": 425564254208
+    },
+    "limits": {
+      "workspaceBytes": 20971520,
+      "workspaceFiles": 128,
+      "workspaceEntries": 512,
+      "tempBytes": 67108864,
+      "tempEntries": 4096,
+      "minFreeBytes": 268435456
+    },
+    "hardQuota": false,
+    "checkedAt": "2026-10-11T02:15:47.273Z"
+  },
+  "sameSandboxAfterRestart": true,
+  "retirement": {
+    "runId": "eee48e21-159c-482c-934f-c38b1f1b9e0c",
+    "sandboxId": "d21d4c80-c398-4b87-9934-ebeb4334177b",
+    "state": "retired",
+    "replayed": false
+  },
+  "retirementAgain": {
+    "runId": "eee48e21-159c-482c-934f-c38b1f1b9e0c",
+    "sandboxId": "d21d4c80-c398-4b87-9934-ebeb4334177b",
+    "state": "retired",
+    "replayed": false
+  },
+  "passed": true
+}

@@ -1,0 +1,40 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (3793.5359ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (431.6142ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (295.4986ms)
+✔ post-preview file change refuses the whole batch (240.4857ms)
+✔ expired persisted previews reject confirmation (231.6596ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (349.231ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (206.1368ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (334.8824ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (253.4899ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (312.976ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (394.1088ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (105.6277ms)
+✔ sandbox storage shows registered identity and explicit inspection never deletes (195.8504ms)
+✔ sandbox retirement requires its own confirmation and preserves official delivery (301.2021ms)
+✔ changed canonical delivery blocks sandbox retirement before external delete (255.427ms)
+✔ sandbox uncertain deletion records partial and only reconciles without another delete (345.1801ms)
+✔ journal preview seals real completed events and preserves exact trace reads (272.615ms)
+✔ unresolved sandbox reconciliation can query the same ID again without replaying deletion (356.5107ms)
+✔ journal archive refuses post-preview append and never removes original evidence (257.2664ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10668.9658
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (5228.5194ms)
+✔ active paid manager replies block export and restore before any database replacement (361.5955ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (730.1351ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8033.8526

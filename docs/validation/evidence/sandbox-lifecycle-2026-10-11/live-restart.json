@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "runId": "213d33c2-3aac-4122-bccf-2520c2c61b0e",
+  "sandboxId": "f93b85e2-cf54-48b2-9b94-705655526e5f",
+  "workspaceRevision": "526e57323402196b443e4a668ebae029c14c513da2056b95e33a98f7d0293108",
+  "storage": {
+    "workspace": {
+      "bytes": 3540,
+      "files": 4,
+      "entries": 5
+    },
+    "temp": {
+      "bytes": 0,
+      "files": 0,
+      "entries": 1
+    },
+    "disk": {
+      "freeBytes": 425554231296
+    },
+    "limits": {
+      "workspaceBytes": 20971520,
+      "workspaceFiles": 128,
+      "workspaceEntries": 512,
+      "tempBytes": 67108864,
+      "tempEntries": 4096,
+      "minFreeBytes": 268435456
+    },
+    "hardQuota": false,
+    "checkedAt": "2026-10-11T02:27:42.723Z"
+  },
+  "sandboxPreviewId": "f2fe3b0d-b30f-4532-b2f5-45336d5559a9",
+  "journalPreviewId": "8d26bbfb-4c06-4191-b2c7-d2b3767d6c42",
+  "pidBefore": "3071210",
+  "pidAfter": "3095893",
+  "historyPreserved": true,
+  "feesPreserved": true,
+  "usageCount": 362,
+  "sameStoppedSandboxAfterRestart": true,
+  "modelCallsMade": 0,
+  "productionFilesDeleted": 0,
+  "productionJournalsArchived": 0
+}

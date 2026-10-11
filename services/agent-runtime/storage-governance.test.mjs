@@ -65,3 +65,4 @@ test('workspace directory enumeration returns only the bounded UUID scope',t=>{
  assert.equal(typeof storage.workspaceRunIds,'function');const f=fixture(t);for(let n=0;n<6;n++)mkdirSync(join(f.workspaceRoot,`00000000-0000-0000-0000-${String(n).padStart(12,'0')}`));
  const ids=storage.workspaceRunIds(f.workspaceRoot,3);assert.equal(ids.length,3);assert.ok(ids.every(id=>/^[a-f0-9-]{36}$/.test(id)));
 });
+test('verified compressed completed logs still authorize identical workspace copy cleanup',async t=>{const f=fixture(t),journal=await import('./journal-archive.mjs');f.archive.append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});journal.archiveJournal(f.traceRoot,journal.journalArchiveCandidate(f.traceRoot,f.archive.id));assert.equal(storage.workspaceCopyCandidates(f).candidates.length,1);});

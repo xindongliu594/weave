@@ -27,7 +27,7 @@ if (device.grant.root !== workspacesPath) throw Error('本机执行目录与已�
 await migrate();
 const workspace = { kind: 'local' as const, database: 'pglite' as const, workspacesPath, executionTarget: { kind: 'local' as const, deviceId: device.id, grantId: device.grant.id } };
 // No fixture gateway, DemoSandbox, or readiness bypass is installed here.
-const app = createApp({ localWorkspace: workspace });
+const app = createApp({ localWorkspace: workspace,sandboxMaintenance:()=>openshellClient?{deviceId:openshellClient.device.id,grantId:openshellClient.device.grant.id,fingerprint:openshellClient.executor.backend.fingerprint,executor:openshellClient.executor}:undefined });
 const server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
 const address = server.address(); if (!address || typeof address === 'string') throw Error('本机 API 启动失败');
 const apiPort = address.port;

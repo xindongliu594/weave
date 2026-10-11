@@ -1,0 +1,94 @@
+{
+  "passed": true,
+  "phaseBase": "f8ef71ff4c8525f35e6c913da651c83c446df492",
+  "projectCount": 6,
+  "usageRecords": 362,
+  "usageDigest": "8d03ec3f2c1a08c93904494a27dd7daaf5f2f5a8167a1eeb2adabb405565562e",
+  "archiveFiles": 332,
+  "archiveBytes": 366882161,
+  "archiveManifestDigest": "575ef998ba94f5c86e980283c58f521f9516c3becfe4f248f9f7bf251fa402f1",
+  "allOriginalArchiveFilesUnchanged": true,
+  "sourceEmployeeFilesUnchanged": true,
+  "modelCallsMade": 0,
+  "employeeCallsMade": 0,
+  "productionFilesDeleted": 0,
+  "productionJournalsArchived": 0,
+  "paidTestBudgetCapUsd": 2,
+  "newPaidUsageUsd": 0,
+  "remainingAuthorizationIncludingOldHoldsUsd": 0.065308,
+  "normalAndRecoveredRuns": [
+    {
+      "id": "213d33c2-3aac-4122-bccf-2520c2c61b0e",
+      "status": "completed",
+      "integrity": "ok",
+      "files": [],
+      "eventCount": 1952,
+      "goalContract": {
+        "format": "approved-goal-v1",
+        "sha256": "ef19ac9ea0e44236509defc3df90d8e268b0567b09491aa393f8523d005b0bdf"
+      }
+    },
+    {
+      "id": "5bbc46e2-8dc5-496c-acca-b2abc8c282b8",
+      "status": "completed",
+      "integrity": "ok",
+      "files": [],
+      "eventCount": 465,
+      "goalContract": {
+        "format": "approved-goal-v1",
+        "sha256": "00a0003f89ab303fda9a9675ada30db3bd1b643bfe99ccb6f1dbcaabdad86f45"
+      }
+    }
+  ],
+  "physicalProbeNotMultiHourEmployeeRun": true,
+  "checks": {
+    "windowsResourceExecutor": 28,
+    "journal": 7,
+    "workspaceStorage": 14,
+    "traceCacheCursorArchive": 21,
+    "maintenanceApi": 19,
+    "backup": 3,
+    "costs": 10,
+    "recoveryConditions": 14,
+    "ui": 7,
+    "linuxStaged": 50,
+    "typescriptExit": 0,
+    "viteExit": 0,
+    "viteWarning": "existing JS chunk >500 kB"
+  },
+  "logs": [
+    "review-reconcile-red.txt",
+    "review-reconcile-green.txt",
+    "review-ui-red.txt",
+    "review-churn-red.txt",
+    "review-churn-green.txt",
+    "review-net-red.txt",
+    "review-net-green.txt",
+    "api-backup-final.txt",
+    "cost-recovery-final.txt",
+    "trace-final.txt",
+    "ui-final.txt",
+    "types-final.txt",
+    "build-final.txt",
+    "jj-deployment.txt"
+  ],
+  "rulings": [
+    {
+      "decision": "application monitoring, no new hard disk quota",
+      "reason": "fixed CLI lacks generic disk flag and administrator storage driver support is not verified",
+      "costIfWrong": "cannot guarantee OS-level write caps"
+    },
+    {
+      "decision": "one-minute lifecycle sampling without paid employee run",
+      "reason": "lifecycle proof within existing budget; no new inference needed for these checks",
+      "costIfWrong": "multi-hour employee autonomy remains unverified"
+    }
+  ],
+  "minorDeferred": [],
+  "verificationLimits": [
+    "single PGlite product connection does not prove independent PostgreSQL lock contention",
+    "protocol double command growth proves monitor control path, not physical OpenShell hard quota",
+    "physical preflight was run before the final bounded-rescan patch; final patch has Windows and staged Linux regressions",
+    "initial integration invocation included two nonexistent test paths; corrected paths and all final commands pass"
+  ]
+}

@@ -1,5 +1,6 @@
 import {employeeHistoryRouter} from './employee-history.ts';
 import {storageRouter} from './storage-governance.ts';
+import type {SandboxMaintenance} from './storage-lifecycle.ts';
 import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-governance.mjs';
 import { departmentWorkbenchRouter } from './department-workbench.ts';
 import { openRigRouter } from './openrig-router.ts';
@@ -78,7 +79,7 @@ function assertCarriedOperationOutcomes(traceRoot:string,projectId:string,readin
     if(unknown.length)throw new AppError(409,`此前运行 ${runId} 有结果未知的修改或命令。保留模型费用不能替代操作核对，请先检查原运行记录与产物`,'OPERATION_RECONCILIATION_REQUIRED');
   }
 }
-export function createApp(options:{createExecutor?:ConstructorParameters<typeof RunCoordinator>[1];assertExecutorReady?:(signal:AbortSignal)=>Promise<void>;demo?:{title:string;projectId:string;gatewayUrl:string};localWorkspace?:{kind:'local';database:'pglite';workspacesPath:string;executionTarget:NonNullable<Policy['executionTarget']>}}={}) {
+export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|undefined;createExecutor?:ConstructorParameters<typeof RunCoordinator>[1];assertExecutorReady?:(signal:AbortSignal)=>Promise<void>;demo?:{title:string;projectId:string;gatewayUrl:string};localWorkspace?:{kind:'local';database:'pglite';workspacesPath:string;executionTarget:NonNullable<Policy['executionTarget']>}}={}) {
   const app = express();
   const allowedOrigins = configuredOrigins();
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
@@ -128,7 +129,7 @@ export function createApp(options:{createExecutor?:ConstructorParameters<typeof 
   app.use('/api', costRouter());
   app.use('/api', runManagementRouter(traceRoot));
   app.use('/api', backupRouter(traceRoot));
-  app.use('/api',storageRouter(traceRoot,{dataRoot:process.env.LOCAL_WORKSPACE_ROOT,workspaceRoot:options.localWorkspace?.workspacesPath,nativeDeviceId:options.localWorkspace?.executionTarget.kind==='local'?options.localWorkspace.executionTarget.deviceId:undefined,deploymentBase:process.env.WEIWU_STORAGE_BASE}));
+  app.use('/api',storageRouter(traceRoot,{dataRoot:process.env.LOCAL_WORKSPACE_ROOT,workspaceRoot:options.localWorkspace?.workspacesPath,nativeDeviceId:options.localWorkspace?.executionTarget.kind==='local'?options.localWorkspace.executionTarget.deviceId:undefined,deploymentBase:process.env.WEIWU_STORAGE_BASE,sandbox:options.sandboxMaintenance}));
   app.get('/api/health', async (_req, res) => {
     await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.2.0',...(options.demo?{demo:options.demo}: {}),...(options.localWorkspace?{workspace:options.localWorkspace}:{}) });
   });

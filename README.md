@@ -159,7 +159,7 @@ npm run runtime:test:portable
 npm run test:integration
 ```
 
-本轮提交的类型检查、构建与回归结果见 [2026-10-08 提交检查](docs/validation/readme-release-check-2026-10-08.md)。
+类型检查、构建与回归结果见 [提交检查](docs/validation/readme-release-check-2026-10-08.md)及 [2026-10-11 沙箱与日志生命周期验收](docs/validation/sandbox-lifecycle-2026-10-11.md)。网页“系统设置 → 文件与数据容量”可核对沙箱、确认回收与归档完成日志；使用步骤及边界见 [容量维护说明](docs/storage-governance.md)。
 
 本地回归优先使用隔离数据库和协议测试服务。真实模型、Docker、语义检索及浏览器验证有独立前提；跳过或模拟结果与真实业务验收分别记录。完整检查边界见 [运行时说明](docs/employee-runtime.md)与[验收报告](docs/mvp-acceptance-2026-10-07.md)。
 

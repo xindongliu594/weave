@@ -38,7 +38,7 @@ export function scanStorage(root,limit=100000){
 }
 function eligible(options,runId){const run=options.runs.find(item=>item.id===runId);
  if(!uuid.test(runId)||!run||run.status!=='completed'||!run.native||run.blocked)throw changed();
- checked(options.traceRoot,runId);const journalPath=checked(options.traceRoot,runId+'/events.jsonl'),journal=lstatSync(journalPath),snapshotPath=checked(options.traceRoot,runId+'/snapshot.json'),snapshot=lstatSync(snapshotPath);
+ checked(options.traceRoot,runId);const logName=existsSync(join(options.traceRoot,runId,'events.jsonl'))?'events.jsonl':'events.jsonl.gz',journalPath=checked(options.traceRoot,runId+'/'+logName),journal=lstatSync(journalPath),snapshotPath=checked(options.traceRoot,runId+'/snapshot.json'),snapshot=lstatSync(snapshotPath);
  if(!journal.isFile()||journal.size>64*1024*1024)throw changed();
  if(!snapshot.isFile()||snapshot.size>8*1024*1024)throw changed();
  const record=readRun(options.traceRoot,runId);

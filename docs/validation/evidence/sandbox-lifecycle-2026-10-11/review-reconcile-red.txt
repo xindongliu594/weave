@@ -1,0 +1,51 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (3174.5395ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (194.2636ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (137.195ms)
+✔ post-preview file change refuses the whole batch (102.8633ms)
+✔ expired persisted previews reject confirmation (95.06ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (141.9443ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (102.8633ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (134.2426ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (109.2015ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (121.3348ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (166.2373ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (35.2163ms)
+✔ sandbox storage shows registered identity and explicit inspection never deletes (93.23ms)
+✔ sandbox retirement requires its own confirmation and preserves official delivery (147.9331ms)
+✔ changed canonical delivery blocks sandbox retirement before external delete (115.2913ms)
+✔ sandbox uncertain deletion records partial and only reconciles without another delete (156.3971ms)
+✔ journal preview seals real completed events and preserves exact trace reads (125.8293ms)
+✖ unresolved sandbox reconciliation can query the same ID again without replaying deletion (154.2389ms)
+✔ journal archive refuses post-preview append and never removes original evidence (85.2918ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7309.2153
+
+✖ failing tests:
+
+test at tests\storage-governance.test.ts:1:15858
+✖ unresolved sandbox reconciliation can query the same ID again without replaying deletion (154.2389ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'partial'
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\storage-governance.test.ts:142:80)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'partial',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

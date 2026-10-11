@@ -1,0 +1,87 @@
+✔ real directory storage counts bytes and free filesystem without reading file contents (14.0608ms)
+✔ temporary file growth stops admission independently of workspace exports (8.6791ms)
+✖ bounded enumeration and directory links fail closed without traversing targets (5.5078ms)
+✖ concurrent temporary deletion triggers a bounded rescan rather than an admission failure (9.0455ms)
+✖ persistent directory churn is bounded and permission errors are never swallowed (8.7094ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 2
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 216.9431
+
+✖ failing tests:
+
+test at apps\desktop\sandbox-storage.test.cjs:6:1
+✖ bounded enumeration and directory links fail closed without traversing targets (5.5078ms)
+  Error: EPERM: operation not permitted, symlink 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\.sandbox-storage-4df91e4e-3b51-4ae6-aac3-02dc2acd30e4\work' -> 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\.sandbox-storage-4df91e4e-3b51-4ae6-aac3-02dc2acd30e4\temp\link'
+      at Object.symlinkSync (node:fs:1938:11)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:6:175)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'symlink',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-4df91e4e-3b51-4ae6-aac3-02dc2acd30e4\\work',
+    dest: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-4df91e4e-3b51-4ae6-aac3-02dc2acd30e4\\temp\\link'
+  }
+
+test at apps\desktop\sandbox-storage.test.cjs:8:1
+✖ concurrent temporary deletion triggers a bounded rescan rather than an admission failure (9.0455ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\.sandbox-storage-b755d76b-547d-4ff7-bdb3-4058e7302135\temp\gone'
+      at lstatSync (node:fs:1771:25)
+      at Object.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:10:101)
+      at Object.apply (node:internal/test_runner/mock/mock:767:20)
+      at boundedStorage (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.cjs:6:55)
+      at Object.checkSandboxStorage (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.cjs:17:119)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:11:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-b755d76b-547d-4ff7-bdb3-4058e7302135\\temp\\gone'
+  }
+
+test at apps\desktop\sandbox-storage.test.cjs:14:1
+✖ persistent directory churn is bounded and permission errors are never swallowed (8.7094ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    Comparison {
+  +   code: 'ENOENT'
+  -   code: 'SANDBOX_STORAGE_LIMIT'
+    }
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:17:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: racing
+        at Object.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:16:81)
+        at Object.apply (node:internal/test_runner/mock/mock:767:20)
+        at boundedStorage (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.cjs:6:55)
+        at Object.checkSandboxStorage (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.cjs:17:119)
+        at assert.throws.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:17:30)
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:17:9)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1382:25),
+    expected: { code: 'SANDBOX_STORAGE_LIMIT' },
+    operator: 'throws',
+    diff: 'simple'
+  }

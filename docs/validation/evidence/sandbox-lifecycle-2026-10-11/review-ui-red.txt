@@ -1,0 +1,38 @@
+✔ inventory marks incomplete scans and gives a settings action instead of claiming all data was counted (14.1854ms)
+✔ preview makes clear exactly which copies are removed and preserves recovery evidence (2.0269ms)
+✔ expired, empty and started previews never enable a deletion confirmation (0.2644ms)
+✔ interrupted history has a reconcile action and does not offer automatic replay (26.2387ms)
+✔ sandbox panel exposes measured writable directories and labels application limits honestly (1.4419ms)
+✔ journal and sandbox confirmations never reuse the workspace deletion label (1.4394ms)
+✖ legacy interrupted records with unresolved results retain read-only reconciliation (8.9383ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 660.9369
+
+✖ failing tests:
+
+test at tests\storage-center.test.ts:1:4354
+✖ legacy interrupted records with unresolved results retain read-only reconciliation (8.9383ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(html.includes('核对中断结果'))
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\storage-center.test.ts:35:208)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

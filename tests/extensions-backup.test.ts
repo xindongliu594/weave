@@ -15,6 +15,7 @@ const originalURL = process.env.DATABASE_URL ?? 'postgres://agent_department:loc
 const admin = new pg.Pool({ connectionString: originalURL });
 const password = 'test-fixture-password';
 const archivedRunId = randomUUID();
+let archivedEvents:any;
 let pool: pg.Pool, server: http.Server, url: string, directory: string, backupModule: typeof import('../apps/api/src/backup.ts'), backup: any, documentId: string;
 let extensionTables: string[];
 async function call(path: string, body: any) { const result = await fetch(url + '/backup/' + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { status: result.status, data: await result.json() }; }
@@ -22,6 +23,7 @@ before(async () => {
   await admin.query(`CREATE SCHEMA ${schema}`); const dbUrl = new URL(originalURL); dbUrl.searchParams.set('options', `-c search_path=${schema}`); process.env.DATABASE_URL = dbUrl.toString();
   directory = await mkdtemp(join(tmpdir(), 'ad-extensions-backup-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs'); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   await mkdir(join(directory, 'runs', archivedRunId, 'artifacts'), { recursive: true }); await writeFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt'), 'Windows 嵌套档案也必须完整保留。');
+  const trace=await import('../services/agent-runtime/trace-store.mjs'),journals=await import('../services/agent-runtime/journal-archive.mjs');const completed=trace.createRunArchive(join(directory,'runs'),{title:'cold backup fixture'},{id:archivedRunId});completed.append('evidence/test-output',{output:'backup evidence\n'.repeat(2000)});completed.append('run/finished',{status:'completed'});archivedEvents=trace.readRun(join(directory,'runs'),archivedRunId)!.events;journals.archiveJournal(join(directory,'runs'),journals.journalArchiveCandidate(join(directory,'runs'),archivedRunId));
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); backupModule = await import('../apps/api/src/backup.ts');
   const automation = await import('../apps/api/src/automation-learning.ts'), chat = await import('../apps/api/src/manager-chat.ts'), browser = await import('../apps/api/src/work-tools-browser.ts'), files = await import('../apps/api/src/work-files.ts');
   const storage=await import('../apps/api/src/storage-governance.ts');
@@ -78,6 +80,7 @@ test('extension tables survive encrypted backup while scheduled dispatch and pen
   const vault = await import('../apps/api/src/vault.ts'); assert.equal(vault.unseal((await pool.query("SELECT credential FROM mcp_connections WHERE id='mcp'")).rows[0].credential), 'fixture-token');
   assert.equal((await pool.query('SELECT document_id FROM automation_knowledge_candidates')).rows[0].document_id, documentId);
   assert.equal(await readFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt'), 'utf8'), 'Windows 嵌套档案也必须完整保留。');
+  const {readRun}=await import('../services/agent-runtime/trace-store.mjs');assert.deepEqual(readRun(join(directory,'runs'),archivedRunId)!.events,archivedEvents);assert.ok((await readFile(join(directory,'runs',archivedRunId,'events.jsonl.gz'))).length>0);
 });
 
 test('active paid manager replies block export and restore before any database replacement', async () => {
