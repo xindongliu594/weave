@@ -1,0 +1,55 @@
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (208.301928ms)
+✔ failed employee setup leaves no published Agent or resident Host (30.93012ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (25.779157ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (177.478964ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (7.281384ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (2.175842ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (3.321545ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (2.581182ms)
+✔ host file checks reject linked directories before reading their contents (2.062438ms)
+✔ host file checks reject binary content declared as text (0.869222ms)
+✖ optimistic writes reject a second editor using the same observed hash (1.059766ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (268.993502ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (106.009815ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (92.389665ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (281.211001ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (103.815064ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (126.661327ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (155.534929ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (165.959983ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (125.843804ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.505891ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 20
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1626.58569
+
+✖ failing tests:
+
+test at services/agent-runtime/handoff.test.mjs:84:1
+✖ optimistic writes reject a second editor using the same observed hash (1.059766ms)
+  Error: ENOENT: no such file or directory, open '/home/jj/.local/share/weiwu/releases/weiwu-reuse-alias1-20261011/tests/fixtures/offline-handoff/inputs/orders.json'
+      at readFileSync (node:fs:484:20)
+      at fixtureText (file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-alias1-20261011/services/agent-runtime/test-support/handoff-fixtures.mjs:11:36)
+      at makeFixtureFiles (file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-alias1-20261011/services/agent-runtime/test-support/handoff-fixtures.mjs:62:51)
+      at file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-alias1-20261011/services/agent-runtime/handoff.test.mjs:85:15
+      at fixture (file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-alias1-20261011/services/agent-runtime/handoff.test.mjs:13:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/home/jj/.local/share/weiwu/releases/weiwu-reuse-alias1-20261011/tests/fixtures/offline-handoff/inputs/orders.json'
+  }
+Traceback (most recent call last):
+  File "/home/jj/.local/share/weiwu/admin/reuse-alias1-20261011/apply.py", line 67, in <module>
+    subprocess.run(['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node','--test','services/agent-runtime/product-concurrency.test.mjs','services/agent-runtime/handoff.test.mjs','services/agent-runtime/employee-hosts.test.mjs'],cwd=new,check=True,timeout=120)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node', '--test', 'services/agent-runtime/product-concurrency.test.mjs', 'services/agent-runtime/handoff.test.mjs', 'services/agent-runtime/employee-hosts.test.mjs']' returned non-zero exit status 1.

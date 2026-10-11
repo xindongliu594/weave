@@ -1,0 +1,36 @@
+✖ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (828.1076ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1424.7937
+
+✖ failing tests:
+
+test at services\agent-runtime\product-concurrency.test.mjs:207:1
+✖ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (828.1076ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /STALE_ATTEMPT/. Input:
+  
+  'Error: agent_teams_update_task: {"message":"TASK_NOT_ACTIVE: 工具仅能用于当前分派的任务","info":{"name":"HarnessError","code":"COORDINATOR_TOOL_FAILED"}}'
+  
+      at async file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:210:3
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:89:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: agent_teams_update_task: {"message":"TASK_NOT_ACTIVE: 工具仅能用于当前分派的任务","info":{"name":"HarnessError","code":"COORDINATOR_TOOL_FAILED"}}
+        at Object.call (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/host.mjs:376:37)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:210:3
+        at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:89:5)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    expected: /STALE_ATTEMPT/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

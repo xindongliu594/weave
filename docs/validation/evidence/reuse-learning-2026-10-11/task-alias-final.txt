@@ -1,0 +1,29 @@
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (419.2398ms)
+✔ failed employee setup leaves no published Agent or resident Host (59.2068ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (53.855ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (429.0745ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (24.5339ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (10.0574ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (21.6876ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (18.0494ms)
+✔ host file checks reject linked directories before reading their contents (11.3503ms)
+✔ host file checks reject binary content declared as text (5.3447ms)
+✔ optimistic writes reject a second editor using the same observed hash (10.8327ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (812.8614ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (396.3568ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (346.3215ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (3038.8459ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (474.7355ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (521.0086ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (720.6703ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (667.9116ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (680.1441ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (1.2556ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8136.0483

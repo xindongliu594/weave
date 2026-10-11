@@ -1,0 +1,30 @@
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (208.217579ms)
+✔ failed employee setup leaves no published Agent or resident Host (30.010037ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (27.349406ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (180.082193ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (7.234557ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (2.201395ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (3.501413ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (2.644951ms)
+✔ host file checks reject linked directories before reading their contents (2.32728ms)
+✔ host file checks reject binary content declared as text (1.027512ms)
+✔ optimistic writes reject a second editor using the same observed hash (1.889436ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (276.218288ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (118.771361ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (90.466528ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (200.497812ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (107.965507ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (121.96636ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (154.133167ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (178.740567ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (130.391734ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.590176ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1568.331666
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-alias2-20261011", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-learning1-20261011", "packetSha256": "dc49e40f4d2461c0d0139bf357b384b1b59688cd6e1ad0f1c616a4ad3d4a6f68", "projectCount": 7, "usageBefore": 380, "modelCalls": 0, "dependencies": "existing pinned directories reused", "memOSInstalled": false, "passed": true, "usageAfter": 380, "mainPID": "2747464", "projectStatePreserved": true, "usagePreserved": true, "originalArchivesPreserved": true, "archiveEvidence": {"files": 358, "bytes": 371225157, "manifestSha256": "e4acfbf831756138246afdebb0a56126bb5d4503b9d47cefba55fc78797fb0d3"}}

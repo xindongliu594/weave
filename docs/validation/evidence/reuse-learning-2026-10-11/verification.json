@@ -1,0 +1,47 @@
+{
+  "reuseCodeCommit": "ab7423e",
+  "runtimeFixCommit": "9332d0e",
+  "relatedAPI": {
+    "command": "node scripts/test-integration.mjs tests/knowledge-reuse.test.ts tests/work-records.test.ts tests/automation-learning.test.ts tests/extensions-backup.test.ts",
+    "exitCode": 0,
+    "passed": 22,
+    "failed": 0,
+    "environment": "Windows with existing PGlite/pgvector test harness and temporary-path preload"
+  },
+  "uiEfficiency": {
+    "command": "node --import tsx --test tests/knowledge-reuse-ui.test.ts tests/company-capabilities-ui.test.ts tests/work-efficiency.test.ts",
+    "exitCode": 0,
+    "passed": 8,
+    "failed": 0
+  },
+  "runtimeFix": {
+    "command": "node --test services/agent-runtime/product-concurrency.test.mjs services/agent-runtime/handoff.test.mjs services/agent-runtime/employee-hosts.test.mjs",
+    "exitCode": 0,
+    "passed": 21,
+    "failed": 0,
+    "extraFocusedCheck": "Same alias case rerun after adding a native terminal-marker assertion; 1/1 passed, not counted again"
+  },
+  "types": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0,
+    "stdout": "empty; successful check emits no text",
+    "checkedAgainAfterRuntimeFix": true
+  },
+  "webBuild": {
+    "command": "node node_modules/vite/bin/vite.js build",
+    "exitCode": 0,
+    "warning": "Existing bundle over 500 kB, recorded in build.txt; later runtime patch changes no web source"
+  },
+  "jj": {
+    "relatedAPI": "15/15 isolated integration checks passed",
+    "runtimeFix": "21/21 Host/handoff checks passed before switching service",
+    "productionRestore": false
+  },
+  "employeePartialArtifact": {
+    "file": "partial-selection.md",
+    "gitBlobAndLocalSha256": "08cdbecc9d3f0abd8526c6e66d8a788876bf42459f3b2c160c188de26f4d7f7e",
+    "matchesOriginalEmployeeBytes": true,
+    "accepted": false
+  },
+  "limit": "Engineering fixtures are not real model quality or causal efficiency acceptance; real results are recorded separately."
+}
