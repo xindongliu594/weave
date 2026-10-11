@@ -79,13 +79,22 @@ async function verifyVersions(refs:DocumentVersion[],db:Database) {
 }
 
 /** Permissions are fixed by the approved manifest before any ranking or chunk lookup. */
-export async function queryKnowledge(snapshot:any,agentId:string,operation:'search'|'read',value:string,limit=6,db:Database=pool):Promise<any> {
+export async function queryKnowledge(snapshot:any,agentId:string,operation:'search'|'read'|'skill',value:string,limit=6,db:Database=pool):Promise<any> {
   if(operation==='search'&&!value.trim())return [];
   if (snapshot?.format!=='document-versions-v2') {
+    if(operation==='skill')return undefined;
     const chunks=Array.isArray(snapshot?.[agentId])?snapshot[agentId]:[];
     return operation==='search'?searchKnowledge(chunks,value,limit):chunks.find((chunk:any)=>chunk.id===value);
   }
   const refs=references(snapshot,agentId);
+  if(operation==='skill'){
+    const ref=refs.find(doc=>doc.documentId===value&&typeof doc.source?.skillName==='string');
+    if(!ref)return undefined;
+    await verifyVersions([ref],db);
+    const row=(await db.query('SELECT content FROM knowledge_revisions WHERE document_id=$1 AND version=$2 AND sha256=$3',[ref.documentId,ref.version,ref.sha256])).rows[0];
+    if(!row||!row.content.trim()||row.content.length>16000||createHash('sha256').update(row.content).digest('hex')!==ref.sha256)throw new AppError(409,'批准工作方法的固定版本正文校验失败','APPROVED_SKILL_INVALID');
+    return {...ref,content:row.content};
+  }
   const hybrid=operation==='search'&&snapshot.retrieval?.mode==='hybrid';
   if(hybrid&&snapshot.retrieval.embeddingVersion!==embeddingVersion)throw new AppError(409,'本次运行使用不同的语义索引版本，请恢复对应模型后检索。','EMBEDDING_VERSION_MISMATCH');
   const count=Math.min(20,Math.max(1,limit)),candidateCount=hybrid?20:count;

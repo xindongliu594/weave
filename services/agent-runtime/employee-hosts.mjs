@@ -11,8 +11,8 @@ const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -133,7 +133,7 @@ export class EmployeeHostFactory {
         }, { prepend: true });
         const employee = this.identify?.(agent);
         if (employee) {
-          await installApprovedSkills(ctx, mount, { manifest: this.skillManifest, employee, agent, archive: this.archive });
+          await installApprovedSkills(ctx, mount, { manifest: this.skillManifest, employee, agent, archive: this.archive, queryKnowledge:this.queryKnowledge });
           // Child setup installs the durable descriptor first. Restrict only
           // this known employee's domain schemas before publication/assembly;
           // the coordinator's execution permission checks remain authoritative.

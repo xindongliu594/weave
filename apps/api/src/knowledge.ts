@@ -6,7 +6,7 @@ import { AppError } from './provider.ts';
 import { ensureSpaceFolder, writeVaultDocument, archiveVaultDocument, syncObsidian, withVaultLock } from './obsidian.ts';
 import { chunkDocument } from '../../../services/agent-runtime/knowledge.mjs';
 const spaceSchema = z.object({ name: z.string().trim().min(1).max(100), scope: z.enum(['company','department','employee']), departmentId: z.string().nullable().optional(), agentIds: z.array(z.string()).max(6).default([]) });
-const documentSchema = z.object({ spaceId: z.string(), title: z.string().trim().min(1).max(200), content: z.string().min(1).max(250000), version: z.number().int().positive().optional(), source: z.object({ runId: z.string().optional(), note: z.string().max(1000).optional() }).default({}) });
+const documentSchema = z.object({ spaceId: z.string(), title: z.string().trim().min(1).max(200), content: z.string().min(1).max(250000), version: z.number().int().positive().optional(), source: z.object({ runId: z.string().optional(), note: z.string().max(1000).optional(), skillName:z.string().max(80).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional() }).default({}) }).refine(input=>!input.source.skillName||(input.content.trim().length>0&&input.content.length<=16000),{message:'批准工作方法正文须非空且最多 16,000 字符',path:['content']});
 export { knowledgeSnapshot, validateKnowledgeGrants } from './knowledge-store.ts';
 import { searchAvailableKnowledge } from './knowledge-store.ts';
 import { knowledgeIndexStatus,startKnowledgeIndex } from './knowledge-vector.ts';

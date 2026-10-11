@@ -9,12 +9,12 @@ export function tokenize(text) {
 export function chunkDocument(id, version, content) {
   const lines = content.replace(/\r\n/g, '\n').split('\n');
   const result = []; let start = 0, text = '';
-  const push = end => { if (text.trim()) result.push({ id: createHash('sha256').update(`${id}:${version}:${start}:${text}`).digest('hex'), documentId: id, version, lineStart: start + 1, lineEnd: end, content: text, tokens: tokenize(text) }); };
+  const push = (end, offset) => { if (text.trim()) result.push({ id: createHash('sha256').update(`${id}:${version}:${start}:${offset===undefined?'':`part-${offset}:`}${text}`).digest('hex'), documentId: id, version, lineStart: start + 1, lineEnd: end, content: text, tokens: tokenize(text) }); };
   for (let i = 0; i < lines.length; i++) {
     if (text && text.length + lines[i].length > 1800) { push(i); start = i; text = ''; }
     if (lines[i].length > 4000) {
       if (text) { push(i); text = ''; }
-      for (let at = 0; at < lines[i].length; at += 1800) { start = i; text = lines[i].slice(at, at + 1800); push(i + 1); }
+      for (let at = 0; at < lines[i].length; at += 1800) { start = i; text = lines[i].slice(at, at + 1800); push(i + 1, at); }
       text = ''; start = i + 1;
     } else text += lines[i] + '\n';
   }
