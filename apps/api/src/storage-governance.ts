@@ -9,6 +9,8 @@ import {AppError} from './provider.ts';
 import {scanStorage,workspaceRunIds,workspaceCopyCandidates,validateWorkspaceCopies,removeWorkspaceCopies,reconcileWorkspaceCopies,assertStorageHeadroom,MIN_STORAGE_FREE_BYTES,type StorageOptions} from '../../../services/agent-runtime/storage-governance.mjs';
 import {ARCHIVE_ROOT_LIMIT_BYTES,RUN_ARCHIVE_LIMIT_BYTES} from '../../../services/agent-runtime/archive-storage.mjs';
 import {retentionAdvice} from '../../../services/agent-runtime/storage-retention.mjs';
+import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
+import {unresolvedOperations} from '../../../services/agent-runtime/recovery.mjs';
 import {type SandboxMaintenance,maintenanceCandidate,validateMaintenance,applyMaintenance,reconcileMaintenance,maintenanceError,maintenanceConfirmation,boundSandbox} from './storage-lifecycle.ts';
 export const storageTables=['storage_cleanups'];
 export async function migrateStorage(db:Pick<pg.Pool,'query'>){await db.query(`CREATE TABLE IF NOT EXISTS storage_cleanups(id text PRIMARY KEY,status text NOT NULL DEFAULT 'preview',preview jsonb NOT NULL,result jsonb,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());`);}
@@ -33,7 +35,8 @@ export function storageRouter(traceRoot:string,paths:Paths={},db:pg.Pool=pool){
   const rows=(await db.query(`SELECT r.id,r.status,r.finished_at,r.snapshot->'executionTarget' AS target,EXISTS(SELECT 1 FROM local_operations o WHERE o.run_id=r.id AND (o.status NOT IN ('completed','failed','cancelled') OR (o.started AND o.result IS NULL))) OR EXISTS(SELECT 1 FROM model_reservations c WHERE c.run_id=r.id AND c.status IN ('pending','uncertain')) AS blocked FROM project_runs r ORDER BY created_at DESC LIMIT 50`)).rows;
   const ordinary=(path:string,directory=false)=>{try{const s=lstatSync(path);return !s.isSymbolicLink()&&(directory?s.isDirectory():s.isFile()&&s.nlink===1);}catch{return false;}};
   // Suggestions only; the original preview still checks archive integrity, grants and exact file versions.
-  res.json(retentionAdvice(rows.map(row=>({id:row.id,status:row.status,finishedAt:row.finished_at instanceof Date?row.finished_at.toISOString():row.finished_at,blocked:row.blocked,
+  const archiveBlocked=(row:any)=>{if(!idSchema.safeParse(row.id).success||row.status!=='completed'||row.blocked)return true;try{const record=readRun(traceRoot,row.id);return !record||record.integrity!=='ok'||record.status!=='completed'||unresolvedOperations(record.events).length>0;}catch{return true;}};
+  res.json(retentionAdvice(rows.filter(row=>idSchema.safeParse(row.id).success).map(row=>({id:row.id,status:row.status,finishedAt:row.finished_at instanceof Date?row.finished_at.toISOString():row.finished_at,blocked:archiveBlocked(row),
    journal:ordinary(join(traceRoot,row.id,'events.jsonl')),
    workspace:!!paths.workspaceRoot&&!!paths.nativeDeviceId&&row.target?.kind==='local'&&row.target.deviceId===paths.nativeDeviceId&&ordinary(join(paths.workspaceRoot,row.id),true),
    sandbox:!!adapter&&row.target?.deviceId===adapter.deviceId&&row.target?.grantId===adapter.grantId&&row.target?.backend?.fingerprint===adapter.fingerprint&&scopes.some(s=>s.runId===row.id&&['ready','stopped'].includes(s.phase)&&!!s.storage)

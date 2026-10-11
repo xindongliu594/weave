@@ -48,6 +48,14 @@ test('retention advice is read-only, uses finished age, and cannot bypass previe
  assert.equal((await pool.query('SELECT count(*)::int AS n FROM storage_cleanups')).rows[0].n,before);assert.equal(await readFile(join(workspaceRoot,runId,'delivery.txt'),'utf8'),'official delivery');
  await pool.query("UPDATE project_runs SET status='failed' WHERE id=$1",[runId]);assert.ok(!(await call('/storage/retention')).data.recommendations.some((a:any)=>a.runId===runId));
 });
+test('retention protects unknown or damaged original archives even when database says completed',{skip:!isolated},async()=>{
+ await pool.query("UPDATE project_runs SET finished_at=now()-interval '8 days' WHERE id=$1",[runId]);
+ fixtures[runId].append('runtime/outcome-unknown',{callId:'unverified-operation',name:'terminal'});
+ assert.ok(!(await call('/storage/retention')).data.recommendations.some((a:any)=>a.runId===runId),'Unknown archive must not receive maintenance advice');
+ await writeFile(join(traceRoot,runId,'events.jsonl'),'broken journal');
+ assert.ok(!(await call('/storage/retention')).data.recommendations.some((a:any)=>a.runId===runId),'Damaged archive must not receive maintenance advice');
+});
+
 test('explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion',{skip:!isolated},async()=>{
  const p=await preview();assert.ok(p.preview.candidates.some((c:any)=>c.runId===runId));
  const r=await call('/storage/cleanups/'+p.id+'/confirm',confirm);assert.equal(r.status,200);assert.equal(r.data.status,'completed');
