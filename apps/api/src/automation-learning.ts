@@ -5,6 +5,8 @@ import type pg from 'pg';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { validateKnowledgeGrants } from './knowledge-store.ts';
+import {syncReuseCandidates,validateReuseEvidence} from './knowledge-reuse.ts';
+import {resolve} from 'node:path';
 
 export const automationTables = ['automation_schedules', 'automation_occurrences', 'automation_notifications', 'automation_observations', 'automation_knowledge_candidates', 'automation_improvements', 'automation_evaluations', 'automation_reviews'];
 export async function migrateAutomationLearning(db: pg.Pool) {
@@ -20,6 +22,7 @@ export async function migrateAutomationLearning(db: pg.Pool) {
     CREATE INDEX IF NOT EXISTS automation_schedules_due ON automation_schedules(status,next_due);
     CREATE INDEX IF NOT EXISTS automation_notifications_unread ON automation_notifications(read_at,created_at);
     ALTER TABLE automation_knowledge_candidates ADD COLUMN IF NOT EXISTS publishing_at timestamptz;
+    ALTER TABLE automation_knowledge_candidates ADD COLUMN IF NOT EXISTS reuse_evidence jsonb;
   `);
 }
 
@@ -47,7 +50,9 @@ export class AutomationLearningService {
   private stopped = false;
   public lastError: string | null = null;
   public lastCheckedAt: string | null = null;
-  constructor(private db: pg.Pool = pool, private options: { clock?: () => Date; intervalMs?: number } = {}) {}
+  private reuseCheckedAt?: number;
+  private reuseDepartmentCursor='';
+  constructor(private db: pg.Pool = pool, private options: { clock?: () => Date; intervalMs?: number;traceRoot?:string } = {}) {}
   start() { if (this.timer) return this; this.stopped = false; this.timer = setInterval(() => void this.tick(), this.options.intervalMs ?? 10000); this.timer.unref(); void this.tick(); return this; }
   async close() { this.stopped = true; clearInterval(this.timer); this.timer = undefined; await this.work; }
   async tick() {
@@ -57,10 +62,17 @@ export class AutomationLearningService {
     return this.work;
   }
   private async check() {
-    const now = this.options.clock?.() ?? new Date();
+    const now = this.options.clock?.() ?? new Date();let reuseChecked=false,reuseCursor=this.reuseDepartmentCursor;
     await transaction(this.db, async client => {
       // Share the backup/coordinator fence; writes and notification dedupe commit together.
       if (!(await client.query('SELECT pg_try_advisory_xact_lock(918274) AS locked')).rows[0].locked) return;
+      if(this.reuseCheckedAt===undefined||now.getTime()-this.reuseCheckedAt>=60000){
+        let departments=(await client.query("SELECT DISTINCT p.department_id FROM projects p JOIN departments d ON d.id=p.department_id JOIN project_runs r ON r.project_id=p.id WHERE d.deleted_at IS NULL AND r.status='completed' AND p.department_id>$1 ORDER BY p.department_id LIMIT 20",[this.reuseDepartmentCursor])).rows;
+        if(!departments.length&&this.reuseDepartmentCursor)departments=(await client.query("SELECT DISTINCT p.department_id FROM projects p JOIN departments d ON d.id=p.department_id JOIN project_runs r ON r.project_id=p.id WHERE d.deleted_at IS NULL AND r.status='completed' ORDER BY p.department_id LIMIT 20")).rows;
+        for(const department of departments)await syncReuseCandidates(client,this.options.traceRoot??resolve(process.env.TRACE_ROOT??'.data/runs'),department.department_id);
+        reuseCursor=departments.length===20?departments.at(-1).department_id:'';
+        reuseChecked=true;
+      }
       const schedules = (await client.query("SELECT * FROM automation_schedules WHERE status='active' AND next_due<=$1 ORDER BY next_due LIMIT 20 FOR UPDATE SKIP LOCKED", [now])).rows;
       for (const schedule of schedules) {
         // Clone the complete approved-to-be plan, including file selections and tool scopes.
@@ -85,6 +97,7 @@ export class AutomationLearningService {
         if (terminal.includes(run.status)) await notify(client, 'run:' + run.id, run.status === 'completed' ? 'success' : 'attention', `${run.status === 'completed' ? '项目完成' : '项目已停止'}：${run.title ?? run.id}`, { runId: run.id, projectId: run.project_id, status: run.status }, now);
       }
     });
+    if(reuseChecked){this.reuseCheckedAt=now.getTime();this.reuseDepartmentCursor=reuseCursor;}
     this.lastCheckedAt = now.toISOString(); this.lastError = null;
   }
 }
@@ -141,7 +154,7 @@ export function automationLearningRouter(options: { db?: pg.Pool; service?: Auto
     const runs = (await db.query("SELECT id,snapshot FROM project_runs WHERE snapshot ? 'approval' ORDER BY created_at DESC LIMIT 100")).rows;
     res.json(runs.map(r => ({ runId: r.id, title: r.snapshot.title ?? r.id, documents: (r.snapshot.knowledge?.documents ?? []).map((d: any) => ({ id: d.documentId, title: d.title, version: d.version })) })));
   });
-  router.get('/automation/knowledge-candidates', async (_req, res) => res.json((await db.query('SELECT id,run_id AS "runId",document_id AS "documentId",source_version AS "sourceVersion",source_hash AS "sourceHash",space_id AS "spaceId",title,content,status,published_document_id AS "publishedDocumentId",version FROM automation_knowledge_candidates ORDER BY created_at DESC LIMIT 100')).rows));
+  router.get('/automation/knowledge-candidates', async (_req, res) => res.json((await db.query('SELECT id,run_id AS "runId",document_id AS "documentId",source_version AS "sourceVersion",source_hash AS "sourceHash",space_id AS "spaceId",title,content,status,published_document_id AS "publishedDocumentId",reuse_evidence AS "reuseEvidence",version FROM automation_knowledge_candidates ORDER BY created_at DESC LIMIT 100')).rows));
   router.post('/automation/knowledge-candidates', async (req, res) => {
     const input = z.object({ runId: z.string().min(1), documentId: z.string().min(1) }).parse(req.body);
     const result = await transaction(db, async client => {
@@ -164,6 +177,7 @@ export function automationLearningRouter(options: { db?: pg.Pool; service?: Auto
     if (candidate.status === 'published') return res.json({ id: candidate.published_document_id });
     if (candidate.version !== input.version) throw new AppError(409, '候选已变化，请重新审查');
     await authorizedSource(db, candidate.run_id, candidate.document_id);
+    if(candidate.reuse_evidence)await validateReuseEvidence(db,resolve(process.env.TRACE_ROOT??'.data/runs'),candidate.reuse_evidence);
     if (!options.publishKnowledge) throw new AppError(503, '知识发布服务未启用');
     // Stable document identity makes a retry after a lost response recover the same publication.
     const publicationId = candidate.id;

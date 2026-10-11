@@ -11,7 +11,7 @@ import { organizationCandidateSchema, templatePlan } from '../../../packages/con
 import { completeBudgeted,lockCostPolicy,checkDailyBudget,shareCostMaintenance,requireProjectCostReady } from './cost-control.ts';
 import { departmentTemplates, roleTemplates } from '../../../packages/contracts/templates.ts';
 import { organizationChatRouter } from './organization-chat.ts';
-export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0),knowledgeSearchMode:z.enum(['keyword','hybrid']).optional()});
+export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0),knowledgeSearchMode:z.enum(['keyword','hybrid']).optional(),reuseMinSuccessfulWorks:z.number().int().min(2).max(100).optional()});
 export async function settings(client:pg.Pool|pg.PoolClient=pool){return (await client.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];}
 // Role versions are server-managed metadata, not a different user-approved proposal.
 function withoutRoleVersions<T extends {agents:any[]}>(value:T){return {...value,agents:value.agents.map(({roleVersion,...agent}:any)=>agent)};}

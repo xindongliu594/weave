@@ -43,7 +43,7 @@ before(async () => {
   await pool.query("INSERT INTO automation_occurrences(id,schedule_id,due_at,project_id) VALUES('occurrence','schedule',now(),'project')");
   await pool.query("INSERT INTO automation_notifications(id,event_key,kind,title,details,read_at) VALUES('notification','run:run','success','已完成','{}',now())");
   await pool.query("INSERT INTO automation_observations(id,run_id,bucket,status,details,observed_at) VALUES('observation','run','terminal','completed','{}',now())");
-  await pool.query("INSERT INTO automation_knowledge_candidates(id,run_id,document_id,source_version,source_hash,space_id,title,content) VALUES('candidate','run',$1,1,$2,'space','待审查经验','来源摘录')", [documentId, revision.sha256]);
+  await pool.query("INSERT INTO automation_knowledge_candidates(id,run_id,document_id,source_version,source_hash,space_id,title,content,reuse_evidence) VALUES('candidate','run',$1,1,$2,'space','待审查经验','来源摘录',$3)", [documentId, revision.sha256,{source:{documentId,version:1,sha256:revision.sha256},works:[{runId:'run',workKey:'project:1'}],successWorkCount:3,minSuccessfulWorks:3}]);
   await pool.query("INSERT INTO automation_improvements(id,title,source_run_id,baseline,proposal,cases,status) VALUES('improvement','改进建议','run','原方案','新方案','[]','adopted')");
   await pool.query("INSERT INTO automation_evaluations(id,improvement_id,results) VALUES('evaluation','improvement','{\"beforeScore\":0,\"afterScore\":1}')");
   await pool.query("INSERT INTO automation_reviews(id,improvement_id,evaluation_id,action,note) VALUES('review','improvement','evaluation','adopt','人工核对通过')");
@@ -79,6 +79,7 @@ test('extension tables survive encrypted backup while scheduled dispatch and pen
   assert.ok((await pool.query('SELECT read_at FROM automation_notifications')).rows[0].read_at);
   const vault = await import('../apps/api/src/vault.ts'); assert.equal(vault.unseal((await pool.query("SELECT credential FROM mcp_connections WHERE id='mcp'")).rows[0].credential), 'fixture-token');
   assert.equal((await pool.query('SELECT document_id FROM automation_knowledge_candidates')).rows[0].document_id, documentId);
+  assert.deepEqual((await pool.query('SELECT reuse_evidence FROM automation_knowledge_candidates')).rows[0].reuse_evidence.works,[{runId:'run',workKey:'project:1'}]);
   assert.equal(await readFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt'), 'utf8'), 'Windows 嵌套档案也必须完整保留。');
   const {readRun}=await import('../services/agent-runtime/trace-store.mjs');assert.deepEqual(readRun(join(directory,'runs'),archivedRunId)!.events,archivedEvents);assert.ok((await readFile(join(directory,'runs',archivedRunId,'events.jsonl.gz'))).length>0);
 });

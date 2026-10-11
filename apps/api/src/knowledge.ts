@@ -12,6 +12,7 @@ import { searchAvailableKnowledge } from './knowledge-store.ts';
 import { knowledgeIndexStatus,startKnowledgeIndex } from './knowledge-vector.ts';
 import { embedTexts } from '../../../services/embedding/local.mjs';
 import {acceptedWorkRecord} from './work-records.ts';
+import {knowledgeReuse} from './knowledge-reuse.ts';
 import {resolve} from 'node:path';
 async function saveKnowledgeDocumentUnlocked(input:z.infer<typeof documentSchema>, id:string, isNew:boolean) {
   await syncObsidian();
@@ -32,6 +33,7 @@ export const saveKnowledgeDocument=(input:unknown,id:string=randomUUID(),isNew=t
 export function knowledgeRouter(traceRoot=resolve(process.env.TRACE_ROOT??'.data/runs')) {
   const router=Router();
   router.get('/knowledge/work-records',async(_req,res)=>res.json((await pool.query(`SELECT r.id AS "runId",r.project_id AS "projectId",r.snapshot->>'title' AS title,r.snapshot->>'planVersion' AS "planVersion",r.status,r.created_at AS "createdAt",p.department_id AS "departmentId" FROM project_runs r JOIN projects p ON p.id=r.project_id JOIN departments d ON d.id=p.department_id WHERE d.deleted_at IS NULL ORDER BY r.created_at DESC LIMIT 50`)).rows));
+  router.get('/knowledge/reuse',async(req,res)=>res.json(await knowledgeReuse(pool,traceRoot,z.uuid().parse(req.query.departmentId))));
   router.get('/knowledge/work-records/:id',async(req,res)=>res.json(await acceptedWorkRecord(pool,traceRoot,z.uuid().parse(req.params.id))));
   router.post('/knowledge/work-records/:id/publish',async(req,res)=>withVaultLock(async()=>{
     const runId=z.uuid().parse(req.params.id),{spaceId}=z.object({spaceId:z.string().min(1)}).strict().parse(req.body);
