@@ -27,8 +27,9 @@ async function work(options:any={}){
  const project=options.project??randomUUID(),runId=randomUUID(),source=options.doc??doc;
  if(!options.project)await db.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',[project,department,'隔离统计验证','协议夹具，不是模型验收',{maxBudget:1},{agents:[],tasks:[]},'manual']);
  const snapshot:any={mode:'product',projectId:project,departmentId:department,planVersion:1,title:'夹具工作',requirement:'协议夹具，不是模型验收',approval:{fixture:true},agents:[agent],knowledge:{format:'document-versions-v2',documents:[{documentId:source.id,version:source.version,title:'方法夹具',spaceId:space,sha256:source.sha256}],agentDocuments:{reader:[source.id]}},tasks:[{id:'task',kind:'work',assigneeId:'reader',subject:'夹具检查',dependencies:[],outputs:[{path:'result.md'}]}],...(options.private?{agents:[agent,{...agent,id:'other'}],importedFiles:[{path:'private.txt',agentIds:['reader']}]}:{}),...(options.resumed?{resumedFrom:options.resumed}:{} )};
+ if(options.secretDoc){snapshot.agents=[{...agent,knowledgeSpaceIds:[space,options.secretDoc.spaceId]}];snapshot.knowledge.documents.push({documentId:options.secretDoc.id,version:options.secretDoc.version,spaceId:options.secretDoc.spaceId,sha256:options.secretDoc.sha256,title:options.secretDoc.title});snapshot.knowledge.agentDocuments.reader.push(options.secretDoc.id);}
  const archive=createRunArchive(join(root,'runs'),snapshot,{id:runId}),files=join(root,'runs',runId,'artifacts');mkdirSync(files,{recursive:true});writeFileSync(join(files,'result.md'),'测试夹具，不能作为员工交付。');
- if(!options.readOnly)for(const attemptId of options.failedOnly?['failed']:['failed','accepted','accepted'])archive.append('capability/adopted',{agentId:'reader',taskId:'task',attemptId,kind:'skill',id:'method',source:{documentId:source.id,version:source.version,sha256:source.sha256},note:'实际采用边界条件检查步骤',validation:'pending'});
+ if(!options.readOnly)for(const attemptId of options.failedOnly?['failed']:['failed','accepted','accepted'])archive.append('capability/adopted',{agentId:'reader',taskId:'task',attemptId,kind:'skill',id:'method',source:{documentId:source.id,version:source.version,sha256:source.sha256},note:options.note??'实际采用边界条件检查步骤',validation:'pending'});
  archive.append('knowledge/citation',{agentId:'reader',operation:'read',sources:[{documentId:source.id,version:source.version,sha256:source.sha256}]});
  archive.append('run/task-mapping',{tasks:[{task_id:'t1',seed_id:'task'}]});archive.append('handoff/accepted',{runId,taskId:'task',attemptId:'accepted',inputs:[],outputs:[inspectArtifact(files,{path:'result.md'})],commands:[]});archive.append('team/checkpoint',{tasks:[{id:'t1',status:'completed',attemptId:'accepted'}]});archive.append('run/finished',{status:'completed'});
  await db.query("INSERT INTO project_runs(id,project_id,project_version,attempt,status,snapshot) VALUES($1,$2,1,$3,'completed',$4)",[runId,project,options.project?2:1,snapshot]);
@@ -72,6 +73,31 @@ test('manual candidates are preserved and automatic candidates respect a bounded
  const candidate=(await api('/automation/knowledge-candidates')).data.find((row:any)=>row.documentId===source2.id);assert.ok(candidate.reuseEvidence);
  const publication=await api('/automation/knowledge-candidates/'+candidate.id+'/publish','POST',{version:candidate.version,reviewed:true});assert.equal(publication.status,200,JSON.stringify(publication.data));
  const published=(await api('/knowledge/documents')).data.find((row:any)=>row.id===publication.data.id);assert.equal(published.source.skillName,undefined,'experience publication never silently grants Skill instructions');
+});
+test('single-employee shared-method use with an employee-private source never enters department knowledge',{skip:!isolated},async()=>{
+ const privateSpace=(await api('/knowledge/spaces','POST',{name:'员工私有夹具',scope:'employee',departmentId:department,agentIds:['reader']})).data.id;
+ const secretSaved=(await api('/knowledge/documents','POST',{spaceId:privateSpace,title:'私有资料',content:'PRIVATE_WORK_SECRET'})).data;
+ const sharedSaved=(await api('/knowledge/documents','POST',{spaceId:space,title:'混合输入共享方法',content:'共享边界检查步骤',source:{skillName:'mixed-check'}})).data;
+ const docs=(await api('/knowledge/documents')).data,secret=docs.find((row:any)=>row.id===secretSaved.id),shared=docs.find((row:any)=>row.id===sharedSaved.id);
+ await db.query('UPDATE departments SET data=$1 WHERE id=$2',[{name:'私有边界夹具',agents:[{...agent,knowledgeSpaceIds:[space,privateSpace]}]},department]);
+ const one=await work({doc:shared,secretDoc:secret,note:'PRIVATE_WORK_SECRET'});await work({doc:shared,secretDoc:secret,note:'PRIVATE_WORK_SECRET'});
+ const record=await api('/knowledge/work-records/'+one.runId);assert.equal(record.status,200);assert.equal(record.data.shareable,false,'all participating employees having access does not make an employee-private space department-shared');
+ assert.equal((await api('/knowledge/work-records/'+one.runId+'/publish','POST',{spaceId:space})).status,422);
+ const report=await api('/knowledge/reuse?departmentId='+department);assert.ok(!JSON.stringify(report.data.groups).includes('PRIVATE_WORK_SECRET'));
+ await new AutomationLearningService(db,{traceRoot:join(root,'runs')}).tick();assert.ok(!(await api('/automation/knowledge-candidates')).data.some((row:any)=>row.documentId===shared.id));
+ await db.query('UPDATE departments SET data=$1 WHERE id=$2',[{name:'隔离统计验证',agents:[agent]},department]);
+});
+test('publication rehashes the source revision after candidate generation',{skip:!isolated},async()=>{
+ const saved=(await api('/knowledge/documents','POST',{spaceId:space,title:'原文哈希验证',content:'原始验证步骤'})).data;const source=(await api('/knowledge/documents')).data.find((row:any)=>row.id===saved.id);await work({doc:source});await work({doc:source});await new AutomationLearningService(db,{traceRoot:join(root,'runs')}).tick();
+ const candidate=(await api('/automation/knowledge-candidates')).data.find((row:any)=>row.documentId===source.id);assert.ok(candidate);
+ await db.query('UPDATE knowledge_revisions SET content=$1 WHERE document_id=$2 AND version=1',['corrupted with the stored hash unchanged',source.id]);
+ assert.equal((await api('/automation/knowledge-candidates/'+candidate.id+'/publish','POST',{version:candidate.version,reviewed:true})).status,409,'a matching SHA column alone is not intact source evidence');
+ await db.query('UPDATE knowledge_revisions SET content=$1 WHERE document_id=$2 AND version=1',[source.content,source.id]);
+});
+test('reuse scans do not traverse unbounded earlier archives to calculate baselines',{skip:!isolated},async()=>{
+ const {knowledgeReuse}=await import('../apps/api/src/knowledge-reuse.ts');const unbounded:string[]=[];
+ const guarded={query:async(sql:string,args:any[])=>{if(sql.includes("SELECT id FROM project_runs WHERE status='completed'")&&sql.includes('requirement')&&!sql.includes('LIMIT'))unbounded.push(sql);return db.query(sql,args)}};
+ const result=await knowledgeReuse(guarded as any,join(root,'runs'),department);assert.ok(result.groups.length>0);assert.equal(unbounded.length,0,'bounded adoption scanning must not recursively scan unlimited efficiency baselines');
 });
 test('a bounded history window still generates proved candidates and preserves older pending evidence',{skip:!isolated},async()=>{
  const saved=(await api('/knowledge/documents','POST',{spaceId:space,title:'旧待审来源',content:'旧来源步骤'})).data;const older=(await api('/knowledge/documents')).data.find((row:any)=>row.id===saved.id);await work({doc:older});await work({doc:older});await new AutomationLearningService(db,{traceRoot:join(root,'runs')}).tick();

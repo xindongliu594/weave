@@ -123,7 +123,7 @@ async function authorizedSource(db: Database, runId: string, documentId: string)
   if (!reference || !agents.length) throw new AppError(403, '资料不在本次运行授权范围');
   await validateKnowledgeGrants(agents, snapshot.departmentId, db);
   const source = (await db.query('SELECT d.title,d.space_id,r.content,r.sha256 FROM knowledge_documents d JOIN knowledge_spaces s ON s.id=d.space_id JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=$2 WHERE d.id=$1 AND d.deleted_at IS NULL AND s.deleted_at IS NULL', [documentId, reference.version])).rows[0];
-  if (!source || source.sha256 !== reference.sha256 || source.space_id !== reference.spaceId) throw new AppError(409, '引用资料已归档或授权版本缺失');
+  if (!source || source.sha256 !== reference.sha256 || hash(source.content)!==reference.sha256 || source.space_id !== reference.spaceId) throw new AppError(409, '引用资料已归档、正文校验失败或授权版本缺失');
   return { ...source, version: reference.version };
 }
 
