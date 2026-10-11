@@ -12,8 +12,8 @@ const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -87,11 +87,13 @@ export class EmployeeHostFactory {
       if (this.protectedContext) ctx.systemPrompt.context({ name: 'department:approved-context', order: 119,
         text: context => this.protectedContext(context.agent) });
       const concludesAcceptedTask = this.concludesAcceptedTask;
+      const prepareToolArguments = this.prepareToolArguments;
       for (const schema of coordinator.tools.schemas()) {
         const definition = coordinator.tools.get(schema.name);
         ctx.tools.register({ ...definition, async execute(args, exec) {
           if (coordinator.agents.get(exec.agent?.id) !== exec.agent) throw Error('EMPLOYEE_NOT_LIVE');
-          const result = await coordinator.tools.execute({ callId: exec.callId, name: schema.name, arguments: args, agent: exec.agent, signal: exec.signal });
+          const forwarded=prepareToolArguments?.(exec.agent,schema.name,args)??args;
+          const result = await coordinator.tools.execute({ callId: exec.callId, name: schema.name, arguments: forwarded, agent: exec.agent, signal: exec.signal });
           if (result.isError) throw new HarnessError(result.error.message, result.error.info?.code ?? 'COORDINATOR_TOOL_FAILED');
           for (const context of result.additionalContexts ?? []) exec.deferContext(context);
           // The committed handoff already contains the employee's report and

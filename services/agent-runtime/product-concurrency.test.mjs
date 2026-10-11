@@ -204,6 +204,23 @@ test('overlapping current-task writes use the real local executor: one old SHA c
   assert.equal(readFileSync(join(f.workspace, 'report.txt'), 'utf8'), merged);
 }));
 
+test('an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts', { timeout: 15000 }, () => fixture({ twoReaders: true }, async f => {
+  const employee=f.member('first'),task=f.current('first'),second=f.current('second');
+  await assert.rejects(f.host.call(employee,'agent_teams_update_task',{task_id:'work-second',attempt_id:second.attemptId,status:'completed',output:'foreign'}),/TASK_NOT_ACTIVE/);
+  await assert.rejects(f.host.call(employee,'agent_teams_update_task',{task_id:'work-first',attempt_id:randomUUID(),status:'completed',output:'stale'}),/STALE_ATTEMPT/);
+  assert.notEqual(f.current('first').status,'completed');
+  await f.host.call(employee,'agent_teams_update_task',{task_id:'work-first',attempt_id:task.attemptId,status:'in_progress'});
+  await f.host.call(employee,'agent_teams_update_task',{task_id:'work-first',attempt_id:task.attemptId,status:'completed',output:'Read-only fixture complete'});
+  assert.equal(f.current('first').id,task.id);
+  assert.equal(f.current('first').status,'completed');
+  assert.notEqual(f.current('second').status,'completed');
+  const seal=f.events().findLast(event=>event.type==='handoff/accepted');
+  assert.equal(seal.data.taskId,'work-first');
+  assert.equal(seal.data.attemptId,task.attemptId);
+  assert.equal(f.events().findLast(event=>event.type==='handoff/turn-concluded').data.runtimeTaskId,task.id);
+  await assert.rejects(f.host.call(employee,'agent_teams_update_task',{task_id:'work-first',attempt_id:task.attemptId,status:'completed',output:'duplicate'}),/TASK_NOT_ACTIVE/);
+}));
+
 test('unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model', () => {
   const base = { id: 'first', assignee: 'A', dependencies: [], inputs: [], outputs: [{ path: 'shared.txt' }] };
   for (const second of [

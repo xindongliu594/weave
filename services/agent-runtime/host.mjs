@@ -87,12 +87,17 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const state=teamState();
     const task=assignedTask(state,sessionId,employee.id,assignments.get(sessionId));assignments.set(sessionId,task);return task;
   }
+  function nativeTaskId(requested) {
+    if(taskIds.has(requested))return requested;
+    const matches=[...taskIds].filter(([,approved])=>approved===requested);
+    return matches.length===1?matches[0][0]:requested;
+  }
   function activeWork(agent, requested) {
     product?.goal?.check('tool',requested && taskIds.get(requested));
     product?.supervisor?.check();
     rework?.check();
     const state = teamState(), employee = employeeFor(agent, product.snapshot, captainId);
-    const task = requested ? state.tasks.find(t => t.id === requested) : state.tasks.find(t => t.assignee === employee?.id && ['claimed', 'in_progress'].includes(t.status));
+    const task = requested ? state.tasks.find(t => t.id === nativeTaskId(requested)) : state.tasks.find(t => t.assignee === employee?.id && ['claimed', 'in_progress'].includes(t.status));
     if (!task || !employee || task.assignee !== employee.id || !state.members.some(m => m.id === agent.id && m.name === employee.id) || !['claimed', 'in_progress'].includes(task.status)) throw Error('TASK_NOT_ACTIVE: 工具仅能用于当前分派的任务');
     const id = taskIds.get(task.id);
     if (!id) throw Error('UNAPPROVED_TASK: ' + task.id);
@@ -296,9 +301,16 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     await mount('@deepseek-ai/dsh-session-query');
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
       context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
+      prepareToolArguments: handoff ? (agent,name,args) => {
+        if(name!=='agent_teams_update_task'||nativeTaskId(args.task_id)===args.task_id)return args;
+        // Resolve a unique approved alias before the native registry freezes input.
+        const work=activeWork(agent,args.task_id);
+        if(args.attempt_id!==work.attemptId)throw Error('STALE_ATTEMPT: 任务更新需要当前任务凭证');
+        return {...args,task_id:work.task.id};
+      } : undefined,
       concludesAcceptedTask: handoff ? exec => {
         if (exec.name !== 'agent_teams_update_task' || exec.arguments.status !== 'completed' || exec.agent.id === captainId) return false;
-        const task = teamState().tasks.find(item => item.id === exec.arguments.task_id);
+        const task = teamState().tasks.find(item => item.id === nativeTaskId(exec.arguments.task_id));
         const employee = employeeFor(exec.agent, product.snapshot, captainId);
         const accepted = handoff.committed.get(taskIds.get(task?.id));
         const concluded = Boolean(task?.status === 'completed' && task.assignee === employee?.id &&
