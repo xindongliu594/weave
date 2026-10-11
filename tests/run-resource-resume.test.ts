@@ -18,3 +18,16 @@ test('stale source/version/seal prevents constructing the approval request; unkn
   for(const value of [{...candidate,sourceRunId:'other'},{...candidate,projectVersion:3},
     {...candidate,sourceGoalContract:{...candidate.sourceGoalContract,sha256:'changed'}}])assert.throws(()=>resourceResumeBody(value,'source',snapshot,true));
 });
+
+test('node money confirmation shows cumulative caps under the shared project ceiling',()=>{
+  const value={...candidate,proposal:{...candidate.proposal,taskBudgetLimits:{accept:.045}}};
+  const original={...snapshot,tasks:[{...snapshot.tasks[0],maxBudget:.025}]};
+  const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot:original,retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
+  for(const text of ['经理验收','节点累计费用上限','$0.025000','$0.045000','仍共享项目总上限'])assert.ok(html.includes(text),text);
+});
+
+test('confirmation names a larger total call ceiling while preserving shared dollars',()=>{
+  const value={...candidate,proposal:{...candidate.proposal,maxModelCalls:48}};
+  const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot:{...snapshot,policy:{...snapshot.policy,maxModelCalls:32}},retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
+  assert.ok(html.includes('项目累计调用上限 32 → 48'));assert.ok(html.includes('旧调用次数继续计入'));
+});

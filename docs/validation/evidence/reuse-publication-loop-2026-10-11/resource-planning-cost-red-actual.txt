@@ -1,0 +1,38 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ demand discussion records actual usage without estimating or reserving an execution budget (1463.1517ms)
+✔ usage-only accounting cannot be applied to execution or project identities (41.4459ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (116.768ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (212.7545ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (228.4737ms)
+✖ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (62.1798ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (403.4688ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (181.2356ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (219.8187ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (107.7972ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (436.706ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5305.6937
+
+✖ failing tests:
+
+test at tests\cost.test.ts:1:10708
+✖ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (62.1798ms)
+  Error: 规划预留与已登记费用、未知预留超过项目原预算
+      at reserveCallAttempt (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\cost-control.ts:119:102)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async withFreshLocalAdmission (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-admission.ts:12:14)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost.test.ts:116:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    outputDiagnostic: undefined,
+    status: 422,
+    code: 'BUDGET_EXCEEDED',
+    upstreamStatus: undefined
+  }

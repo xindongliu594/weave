@@ -1,0 +1,65 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1693.6168ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (163.2933ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (138.888ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (188.1692ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (137.0179ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (147.2966ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (116.0029ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (146.306ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (115.5323ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (88.1981ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (233.9598ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (138.0801ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (170.8687ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (226.4265ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (127.2114ms)
+✖ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (63.6515ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4572.3508
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:26406
+✖ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (63.6515ms)
+  Error: EEXIST: file already exists, open 'C:\Users\JJ\AppData\Local\Temp\recovery-conditions-MvWvT7\runs\341c779a-b0ce-4945-9306-fa3fd194d42f\snapshot.json'
+      at openSync (node:fs:622:18)
+      at durableWrite (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/trace-store.mjs:20:14)
+      at createRunArchive (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/trace-store.mjs:31:3)
+      at blockedRead (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:331:19)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:340:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -4075,
+    code: 'EEXIST',
+    syscall: 'open',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Temp\\recovery-conditions-MvWvT7\\runs\\341c779a-b0ce-4945-9306-fa3fd194d42f\\snapshot.json'
+  }
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (341.2416ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (96.2618ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (197.729ms)
+✔ other project/version registration cannot leak into this exact version (184.8501ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (242.41ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (109.1002ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (86.1915ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (52.8641ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (194.5321ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (75.692ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (103.6963ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (25.4814ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3487.497

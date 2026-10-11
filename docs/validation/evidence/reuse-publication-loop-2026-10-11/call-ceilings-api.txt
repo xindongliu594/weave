@@ -1,0 +1,104 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ demand discussion records actual usage without estimating or reserving an execution budget (1468.9071ms)
+✔ usage-only accounting cannot be applied to execution or project identities (41.6284ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (119.2797ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (205.186ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (246.7567ms)
+✔ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (148.9752ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (405.3613ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (183.45ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (242.2788ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (127.5651ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (447.8064ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5487.0914
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1617.4387ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (177.6171ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (153.3349ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (204.694ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (151.0288ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (146.9305ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (173.2841ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (184.2432ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (142.3161ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (115.8114ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (294.108ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (196.3412ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (203.8203ms)
+✖ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (138.5693ms)
+✖ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (126.8143ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1363.9471ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 14
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6079.3539
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:22006
+✖ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (138.5693ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  409 !== 422
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:283:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 422,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\recovery-conditions.test.ts:1:25323
+✖ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (126.8143ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  409 !== 422
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:319:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 422,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (380.8987ms)
+✔ resource history retains full wire schema overhead without counting message contents or inherited history (84.1151ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (89.3269ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (172.0842ms)
+✔ other project/version registration cannot leak into this exact version (147.1098ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (147.3972ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (75.0903ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (84.2252ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (53.7705ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (213.0782ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (86.5139ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (99.3343ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (32.7305ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3415.0161

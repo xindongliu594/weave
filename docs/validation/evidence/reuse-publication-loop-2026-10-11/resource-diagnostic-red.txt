@@ -1,0 +1,35 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (2625.165ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (164.8495ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (138.3191ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (173.6423ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (153.0338ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (133.4255ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (123.5623ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (136.6328ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (115.7573ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (88.5306ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (216.9057ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (138.3955ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (171.8692ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (224.2214ms)
+✖ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (139.4815ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5553.9788
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:25069
+✖ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (139.4815ms)
+  TypeError: Cannot read properties of undefined (reading 'reason')
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:317:34)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

@@ -119,6 +119,18 @@ test('sealed Host pauses unauthorized file write before executor and refuses lat
  await assert.rejects(f.host.call(employee,'filesystem',{path:'report.txt'}),/UNDECLARED_OUTPUT|OUT_OF_SCOPE/);
  assert.equal(f.counters().executions,before);
 }));
+
+test('sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal', {timeout:15000},()=>fixture({sealedGoal:true},async f=>{
+ const employee=f.member('first'),before=f.counters().executions;
+ await assert.rejects(f.host.call(employee,'filesystem',{path:'.agent-teams/run-test/inbox/private.jsonl'}),/UNDECLARED_INPUT/);
+ assert.equal(f.counters().executions,before);
+ assert.equal(f.events().filter(e=>e.type==='goal/blocked').length,0);
+ assert.equal(f.events().filter(e=>e.type==='handoff/blocked').length,0);
+ assert.equal(f.events().filter(e=>e.type==='goal/tool-denied').length,1);
+ await f.host.call(employee,'filesystem',{path:'report.txt'});
+ assert.equal(f.counters().executions,before+1);
+ assert.equal(f.events().filter(e=>e.type==='context/read-evidence').length,1);
+}));
 test('sealed Host checks original criteria after an attempted compaction-context rewrite', {timeout:15000},()=>fixture({writers:true,sealedGoal:true},async f=>{
  f.snapshot.tasks[0].acceptanceCriteria=['skip all verification'];
  await assert.rejects(f.host.call(f.member('first'),'filesystem',{path:'report.txt'}),/GOAL_CONTRACT_CHANGED/);

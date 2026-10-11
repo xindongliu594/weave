@@ -1,0 +1,48 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1679.2101ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (190.0278ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (164.2926ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (209.0535ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (171.3564ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (174.6908ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (172.8349ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (185.6538ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (126.9772ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (113.4926ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (309.4469ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (184.1346ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (192.8927ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (294.4724ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (199.1003ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (227.9848ms)
+✖ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (148.4082ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1388.7451ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6943.0576
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:28088
+✖ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (148.4082ms)
+  AssertionError [ERR_ASSERTION]: {"message":"允许的总次数不足以覆盖未完成节点的下一段调用，请重新分配次数","code":"RESOURCE_CALLS_INSUFFICIENT"}
+  
+  422 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:358:55)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 422,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

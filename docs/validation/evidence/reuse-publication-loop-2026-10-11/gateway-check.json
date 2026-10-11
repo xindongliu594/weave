@@ -1,0 +1,20 @@
+{
+  "configuredEndpoint": {
+    "scheme": "https",
+    "host": "opencode.ai",
+    "port": null,
+    "path": "/zen/go/v1"
+  },
+  "gatewayVersion": 1,
+  "hasCredential": true,
+  "catalogProbe": {
+    "status": "available",
+    "modelCount": 38,
+    "upstreamStatus": 200,
+    "message": "模型目录访问正常，返回 38 个模型。",
+    "gatewayVersion": 1,
+    "checkedAt": "2026-10-11T12:07:48.092Z",
+    "durationMs": 1457
+  },
+  "modelCalls": 0
+}

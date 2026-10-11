@@ -1,0 +1,71 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1103.443113ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (89.595198ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (69.527216ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (80.113531ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (62.149384ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (57.400312ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (62.599425ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (69.065981ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (45.337481ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (37.038052ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (85.778114ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (62.016204ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (72.650614ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (94.694969ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2334.533536
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (219.662068ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (36.273343ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (56.231915ms)
+✔ other project/version registration cannot leak into this exact version (45.291966ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (47.676257ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (34.114012ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (47.038518ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (27.526794ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (57.445865ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (24.718058ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (30.95076ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (16.2249ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1690.486185
+✔ resource approval preserves original semantics, grants and source snapshot (4.188604ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (2.144563ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.006006ms)
+✔ subsequent resource approval retains each ancestor once (0.56767ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (2.274203ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (1.564485ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (1.809209ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.52373ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.706249ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.34971ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.389998ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.458028ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.570538ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.765725ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (11.82798ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (12.460316ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.383243ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (0.763231ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1098.769739
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle2-20261011", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-alias2-20261011", "packetSha256": "f814a9f8d0bf0c002882a2fd298c128402a0b8006d5568ec0710c14d133d94a0", "projectCount": 10, "usageBefore": 425, "modelCalls": 0, "dependencies": "existing pinned directories reused", "memOSInstalled": false, "passed": true, "usageAfter": 425, "mainPID": "108705", "projectStatePreserved": true, "usagePreserved": true, "originalArchivesPreserved": true, "archiveEvidence": {"files": 383, "bytes": 380190242, "manifestSha256": "2e56f1bcc57b7b1f83108dfc64232fe2dccb4aa8f868361c477ce57dbb4cdf63"}}

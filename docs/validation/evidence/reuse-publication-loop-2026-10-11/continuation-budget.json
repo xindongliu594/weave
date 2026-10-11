@@ -1,0 +1,11 @@
+{
+  "stageCurrentOccupied": 0.2608014,
+  "otherCompletedAndRetainedCosts": 0.1268031,
+  "inventoryProposedCeiling": 0.2,
+  "followupProposedCeiling": 0.115,
+  "worstPhaseOccupied": 0.4418031,
+  "stageAuthorization": 0.45,
+  "cumulativeAuthorization": 2.6,
+  "candidateNotRequested": true,
+  "userConfirmationRequired": true
+}

@@ -1,0 +1,133 @@
+{
+  "runId": "62c5db8a-617b-41db-9394-c8000f58997d",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "status": "failed",
+  "integrity": "ok",
+  "planVersion": 3,
+  "resourceRevision": 5,
+  "completedCheckpoints": [
+    "t1-doc"
+  ],
+  "goalContract": {
+    "format": "approved-goal-v1",
+    "sha256": "b7af2588b9db22cddf874378b98f766e0a67a2e306917944690bfe88d9703bf8"
+  },
+  "policy": {
+    "maxBudget": 0.2,
+    "contextBytes": 48000,
+    "maxModelCalls": 48,
+    "maxTaskModelCalls": 32
+  },
+  "knowledge": {
+    "format": "document-versions-v2",
+    "documents": [
+      {
+        "title": "command line CLI validation checklist",
+        "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f",
+        "source": {
+          "note": "真实选用验收样本；不是员工交付物",
+          "skillName": "cli-checklist",
+          "vaultPath": "department/能力选用验收资料-5928897e/command line CLI validation checklist-a92a3281.md"
+        },
+        "spaceId": "5928897e-5aec-4aa0-a683-e7b77bf684de",
+        "version": 1,
+        "chunkCount": 1,
+        "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192"
+      },
+      {
+        "title": "sum addition validation checklist",
+        "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+        "source": {
+          "note": "真实选用验收样本；不是员工交付物",
+          "skillName": "sum-checklist",
+          "vaultPath": "department/能力选用验收资料-5928897e/sum addition validation checklist-d4c239b4.md"
+        },
+        "spaceId": "5928897e-5aec-4aa0-a683-e7b77bf684de",
+        "version": 1,
+        "chunkCount": 1,
+        "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6"
+      }
+    ],
+    "retrieval": {
+      "mode": "keyword"
+    },
+    "agentDocuments": {
+      "employee-1": [
+        "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+        "d4c239b4-bfe4-487b-bce0-10482c6c5bd6"
+      ],
+      "employee-2": [
+        "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+        "d4c239b4-bfe4-487b-bce0-10482c6c5bd6"
+      ],
+      "employee-3": [
+        "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+        "d4c239b4-bfe4-487b-bce0-10482c6c5bd6"
+      ]
+    }
+  },
+  "events": [
+    {
+      "seq": 29,
+      "at": "2026-10-11T15:04:41.531Z",
+      "type": "recovery/restored",
+      "data": {
+        "sourceRunId": "0f9e41af-d1b7-4dd3-9e74-f3555bdd9fa8",
+        "completed": [
+          "t1-doc"
+        ],
+        "files": [
+          {
+            "path": "inventory-cases.md",
+            "size": 2742,
+            "state": "accepted",
+            "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+            "producerTaskId": "t1-doc"
+          }
+        ]
+      }
+    },
+    {
+      "sessionId": "910c4b07-8dc2-47e9-b135-bce42ae0cf51",
+      "seq": 148,
+      "at": "2026-10-11T15:04:49.600Z",
+      "type": "knowledge/citation",
+      "data": {
+        "agentId": "employee-3",
+        "operation": "read",
+        "sources": [
+          {
+            "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+            "version": 1,
+            "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+            "title": "sum addition validation checklist",
+            "lineStart": 7,
+            "lineEnd": 7,
+            "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+            "source": {
+              "note": "真实选用验收样本；不是员工交付物",
+              "skillName": "sum-checklist",
+              "vaultPath": "department/能力选用验收资料-5928897e/sum addition validation checklist-d4c239b4.md"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 178,
+      "at": "2026-10-11T15:04:50.114Z",
+      "type": "run/finished",
+      "data": {
+        "status": "failed",
+        "message": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 46819 字节，精简前预留 $0.01681050；当前请求字节上限 48000；可用预算 $0.01279520；输出上限 2048 tokens 保持不变；单次完整上下文最低预留 $0.01327110，至少另需 $0.00047590",
+        "usageCost": 0.00972
+      }
+    }
+  ],
+  "delivery": {
+    "path": "inventory-cases.md",
+    "bytes": 2742,
+    "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+    "copiedWithoutEditing": true
+  }
+}

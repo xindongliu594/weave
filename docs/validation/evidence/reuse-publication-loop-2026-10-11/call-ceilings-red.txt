@@ -1,0 +1,67 @@
+✔ resource approval preserves original semantics, grants and source snapshot (6.7649ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (3.0382ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.4268ms)
+✔ subsequent resource approval retains each ancestor once (0.7536ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (3.2943ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.18ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (1.0917ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.9755ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.4299ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.3664ms)
+✖ explicit call ceilings extend only unfinished resources and keep every historical attempt (1.0016ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (11.4722ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.6165ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (1.2042ms)
+✖ confirmation names a larger total call ceiling while preserving shared dollars (8.2007ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 13
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2487.538
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:9241
+✖ explicit call ceilings extend only unfinished resources and keep every historical attempt (1.0016ms)
+  ZodError: [
+    {
+      "code": "unrecognized_keys",
+      "keys": [
+        "maxModelCalls"
+      ],
+      "path": [],
+      "message": "Unrecognized key: \"maxModelCalls\""
+    }
+  ]
+      at applyRecoveryResources (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\recovery-resource-plan.ts:29:49)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:133:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\run-resource-resume.test.ts:1:2757
+✖ confirmation names a larger total call ceiling while preserving shared dollars (8.2007ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(html.includes('项目累计调用上限 32 → 48'))
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-resource-resume.test.ts:32:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

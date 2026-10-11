@@ -1,0 +1,46 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1532.3239ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (165.6653ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (119.2394ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (188.7166ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (133.299ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (126.9757ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (128.7928ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (124.1006ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (97.6086ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (92.2352ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (230.5237ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (138.7394ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (173.0747ms)
+✖ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (183.7781ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (139.1903ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4306.7373
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:21864
+✖ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (183.7781ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /调用次数也是累计上限/. Input:
+  
+  '只规划续跑的资源，不改变任务、验收、权限，不生成交付物。返回一个简短JSON对象：{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"maxBudget":{"type":"number","minimum":1,"maximum":1.5},"taskCallLimits":{"type":"object","properties":{"finish":{"type":"integer","minimum":3,"maximum":3}},"required":["finish"],"additionalProperties":false},"taskBudgetLimits":{"type":"object","properties":{"finish":{"type":"number","minimum":0.5,"maximum":1.5}},"required":["finish"],"additionalProperties":false},"rationale":{"type":"string","minLength":5,"maxLength":2000}},"required":["maxBudget","taskCallLimits","taskBudgetLimits","rationale"],"additionalProperties":false}\n' +
+    'maxBudget是项目累计总额，包含已用费用和预留，不是新增费用；必须在 1 到 1.5 美元之间。taskCallLimits和taskBudgetLimits只填未完成任务。节点金额也是累计上限，扣除usedCost与reserved后才是节点净额；不能仅提高项目总额却保留已不足的节点金额。各节点仍共享项目门禁，不得把节点额度当成额外项目预算。恢复后仍需读取、逐次审批真实测试、处理结果和正式交接，尽量给每个未完成节点至少6次剩余调用和完整上下文费用余量；不减少旧额度，且不超过原maxTaskModelCalls。rationale用一两句说明。'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:290:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '只规划续跑的资源，不改变任务、验收、权限，不生成交付物。返回一个简短JSON对象：{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"maxBudget":{"type":"number","minimum":1,"maximum":1.5},"taskCallLimits":{"type":"object","properties":{"finish":{"type":"integer","minimum":3,"maximum":3}},"required":["finish"],"additionalProperties":false},"taskBudgetLimits":{"type":"object","properties":{"finish":{"type":"number","minimum":0.5,"maximum":1.5}},"required":["finish"],"additionalProperties":false},"rationale":{"type":"string","minLength":5,"maxLength":2000}},"required":["maxBudget","taskCallLimits","taskBudgetLimits","rationale"],"additionalProperties":false}\nmaxBudget是项目累计总额，包含已用费用和预留，不是新增费用；必须在 1 到 1.5 美元之间。taskCallLimits和taskBudgetLimits只填未完成任务。节点金额也是累计上限，扣除usedCost与reserved后才是节点净额；不能仅提高项目总额却保留已不足的节点金额。各节点仍共享项目门禁，不得把节点额度当成额外项目预算。恢复后仍需读取、逐次审批真实测试、处理结果和正式交接，尽量给每个未完成节点至少6次剩余调用和完整上下文费用余量；不减少旧额度，且不超过原maxTaskModelCalls。rationale用一两句说明。',
+    expected: /调用次数也是累计上限/,
+    operator: 'match',
+    diff: 'simple'
+  }

@@ -1,0 +1,50 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ demand discussion records actual usage without estimating or reserving an execution budget (2630.6004ms)
+✔ usage-only accounting cannot be applied to execution or project identities (36.4505ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (111.561ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (211.1454ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (225.2328ms)
+✖ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (35.603ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (415.0199ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (195.0463ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (224.1049ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (94.5702ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (451.695ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6490.0321
+
+✖ failing tests:
+
+test at tests\cost.test.ts:1:10708
+✖ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (35.603ms)
+  error: duplicate key value violates unique constraint "project_runs_attempt"
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost.test.ts:112:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    length: 253,
+    severity: 'ERROR',
+    code: '23505',
+    detail: 'Key (project_id, project_version, attempt)=(project, 1, 1) already exists.',
+    hint: undefined,
+    position: undefined,
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: 'public',
+    table: 'project_runs',
+    column: undefined,
+    dataType: undefined,
+    constraint: 'project_runs_attempt',
+    file: 'nbtinsert.c',
+    line: '673',
+    routine: '_bt_check_unique'
+  }

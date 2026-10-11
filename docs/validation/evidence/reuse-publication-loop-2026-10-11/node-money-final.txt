@@ -1,0 +1,26 @@
+✔ resource approval preserves original semantics, grants and source snapshot (13.3841ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (6.8826ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (3.2985ms)
+✔ subsequent resource approval retains each ancestor once (1.2156ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (6.5228ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (5.127ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (3.405ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.8465ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (1.0985ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.805ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.5597ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.4927ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.6003ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (2.3047ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (15.1096ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (39.6432ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (4.3866ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (4.5375ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4090.9672

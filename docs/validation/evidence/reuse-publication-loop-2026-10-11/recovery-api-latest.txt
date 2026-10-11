@@ -1,0 +1,46 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1668.7591ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (175.2049ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (162.9154ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (222.6539ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (171.3398ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (163.7951ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (137.7266ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (168.6375ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (131.5398ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (120.4215ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (287.591ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (183.5657ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (191.2849ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (273.4287ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (153.6431ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1348.5721ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6298.1958
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (421.8079ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (93.6054ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (160.4298ms)
+✔ other project/version registration cannot leak into this exact version (151.697ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (154.6294ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (85.8213ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (97.2755ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (55.5936ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (224.3622ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (95.1516ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (98.3733ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (33.6262ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3485.5846

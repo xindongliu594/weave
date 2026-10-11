@@ -1,0 +1,37 @@
+✔ resource approval preserves original semantics, grants and source snapshot (6.4723ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (3.0812ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.3454ms)
+✔ subsequent resource approval retains each ancestor once (0.7626ms)
+✖ unfinished node money can be reallocated under the original project ceiling without resetting spend (0.7918ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (1.3952ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2535.0688
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:3710
+✖ unfinished node money can be reallocated under the original project ceiling without resetting spend (0.7918ms)
+  ZodError: [
+    {
+      "code": "unrecognized_keys",
+      "keys": [
+        "taskBudgetLimits"
+      ],
+      "path": [],
+      "message": "Unrecognized key: \"taskBudgetLimits\""
+    }
+  ]
+      at applyRecoveryResources (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\recovery-resource-plan.ts:11:49)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:60:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

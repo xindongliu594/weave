@@ -47,7 +47,13 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       const original = handoff[method].bind(handoff);
       handoff[method] = (...args) => {
         try { return original(...args); }
-        catch (error) { throw product.goal.block(error, 'file-scope', args[0]); }
+        catch (error) {
+          if(method==='beforeFile'&&args[2]==='filesystem'&&error.code==='UNDECLARED_INPUT'&&error.notExecuted===true){
+            archive.append('goal/tool-denied',{point:'file-scope',taskId:args[0],code:error.code,message:error.message,notExecuted:true});
+            throw error;
+          }
+          throw product.goal.block(error, 'file-scope', args[0]);
+        }
       };
     }
   }

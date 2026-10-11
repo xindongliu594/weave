@@ -18,7 +18,7 @@ export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoo
     if(!validId(row.id)||seen.has(row.id)||!runIds.has(row.run_id)||row.project_id!==projectId||row.task_id!==null&&!validId(row.task_id))throw invalid();
     seen.add(row.id);if(!registered.has(row.run_id))registered.set(row.run_id,[]);registered.get(row.run_id)!.push(row);
   }
-  const tasks:Record<string,number>=Object.create(null);let calls=0;
+  const tasks:Record<string,number>=Object.create(null),requestOverheadBytes:Record<string,number>=Object.create(null);let calls=0;
   for(const run of runs) {
     if(run.project_id!==projectId||run.project_version!==version)throw invalid();
     const receipts=registered.get(run.id)??[];
@@ -42,7 +42,16 @@ export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoo
       if(event.type!=='model/wire-request')continue;
       wires++;
       const taskId=event.data.taskId??(event.sessionId?sessions.get(event.sessionId):undefined);
-      if(taskId!==undefined)add(wireTasks,taskId);
+      if(taskId!==undefined){
+        add(wireTasks,taskId);
+        const body=event.data.body;
+        // Preserve actual schemas/configuration from integrity-checked wires;
+        // only messages/input vary with the bounded conversation on recovery.
+        if(body&&typeof body==='object'&&!Array.isArray(body)&&(Array.isArray(body.messages)||Array.isArray(body.input))){
+          const envelope={...body,...(Array.isArray(body.messages)?{messages:[]}:{input:[]})},id=mapping.get(taskId)??taskId;
+          requestOverheadBytes[id]=Math.max(requestOverheadBytes[id]??0,Buffer.byteLength(JSON.stringify(envelope))-2);
+        }
+      }
     }
     for(const row of receipts)if(row.task_id!==null)add(admissionTasks,row.task_id);
     const runCalls=Math.max(wires,receipts.length),merged=new Map<string,number>();
@@ -52,13 +61,14 @@ export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoo
     if([...merged.values()].reduce((sum,value)=>sum+value,0)>runCalls)throw invalid();
     calls+=runCalls;for(const [taskId,count] of merged)tasks[taskId]=(tasks[taskId]??0)+count;
   }
-  return {calls,tasks,callsBasis};
+  return {calls,tasks,callsBasis,requestOverheadBytes};
 }
 
 /** A retry uses the same approved task IDs; a new plan version has its own task counters. */
 export async function budgetHistory(db:Pick<pg.PoolClient,'query'>,traceRoot:string,projectId:string,version:number) {
   const history=await durableCallHistory(db,traceRoot,projectId,version);
-  const tasks:Record<string,{cost:number;calls:number;reserved?:number}>=Object.fromEntries(Object.entries(history.tasks).map(([id,calls])=>[id,{cost:0,calls}]));
+  const tasks:Record<string,{cost:number;calls:number;reserved?:number;requestOverheadBytes?:number}>=Object.fromEntries(Object.entries(history.tasks).map(([id,calls])=>[id,{cost:0,calls,
+    ...(history.requestOverheadBytes[id]===undefined?{}:{requestOverheadBytes:history.requestOverheadBytes[id]})}]));
   const costs=(await db.query(`SELECT u.task_id,sum(u.cost) AS cost FROM usage u JOIN project_runs r ON r.id=u.run_id
     WHERE r.project_id=$1 AND r.project_version=$2 AND u.task_id IS NOT NULL GROUP BY u.task_id`,[projectId,version])).rows;
   for(const row of costs)(tasks[row.task_id]??={cost:0,calls:0}).cost=Number(row.cost);

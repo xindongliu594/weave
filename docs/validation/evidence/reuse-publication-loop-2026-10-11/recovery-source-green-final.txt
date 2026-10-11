@@ -1,0 +1,24 @@
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (182.1561ms)
+✔ historical command bootstrap stays within its 8KB cap with long Unicode history and never includes arbitrary evidence payloads (2.2236ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (1092.569ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (291.9028ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (120.5457ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (175.0117ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (94.0271ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (90.4453ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (101.1382ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (50.3691ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (27.5439ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (21.9772ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (31.859ms)
+✔ host file checks reject linked directories before reading their contents (5.3501ms)
+✔ host file checks reject binary content declared as text (14.4643ms)
+✔ optimistic writes reject a second editor using the same observed hash (41.186ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6481.9635

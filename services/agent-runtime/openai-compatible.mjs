@@ -5,6 +5,26 @@ import { ExecutionBudget } from './budget.mjs';
 import { dedupeReadOnlyEvidence, readOnlyEvidenceSignature, completedWriteEvidenceSignature } from './request-context.mjs';
 import { completionRequest, completionResponse, completionUsage, conversationHeaders } from './completion-protocol.mjs';
 import { modelCompletionOptions } from './completion-options.mjs';
+import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
+
+// The native prompt plugin explicitly replaces its full runtime snapshot at
+// each step. Keep the journal intact, but do not spend the wire budget on old
+// copies that displace work history. Text resemblance alone is never enough.
+function currentRuntimeMessages(messages) {
+  const sections = message => {
+    const source=message.source,list=source?.sections;
+    if(message.role!=='user'||source?.kind!=='plugin'||source.plugin!=='@deepseek-ai/dsh-system-prompt'||source.form!=='snapshot'||
+      !Array.isArray(list)||!list.length||list.some(item=>typeof item.name!=='string'||typeof item.text!=='string')||
+      new Set(list.map(item=>item.name)).size!==list.length||!list.some(item=>item.name==='department:approved-context')||
+      message.content?.length!==1||message.content[0].type!=='text'||message.content[0].text!==joinContextSections(list))return;
+    return list;
+  };
+  const latest=messages.findLastIndex(message=>sections(message));
+  if(latest<0)return {messages,removed:0};
+  const covered=new Set(sections(messages[latest]).map(item=>item.name));
+  const retained=messages.filter((message,index)=>index>=latest||!sections(message)?.every(item=>covered.has(item.name)));
+  return {messages:retained,removed:messages.length-retained.length};
+}
 
 function responsesHistory(messages) {
   if (!Array.isArray(messages)) throw new LlmError('Responses 请求缺少完整对话历史', 'INVALID_COMPLETION_HISTORY');
@@ -353,6 +373,9 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     let configured;
     try { configured = modelCompletionOptions(route); }
     catch (error) { throw new LlmError(error.message, error.code); }
+    const retainOriginal = options.purpose !== 'compaction' && this.requireCompleteContext?.(options.sessionId) === true;
+    const runtimeSnapshots=options.purpose==='compaction'||retainOriginal?{messages:options.messages,removed:0}:currentRuntimeMessages(options.messages);
+    options={...options,messages:runtimeSnapshots.messages};
     const fullEnvelope = route.protocol === 'responses' || route.thinkingMode !== undefined;
     if (route.protocol === 'responses') {
       responsesHistory(options.messages);
@@ -371,7 +394,6 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     // A known truncated summary never grants permission to discard its source.
     // The trusted employee context gate applies to preview AND dispatch, so a
     // concurrent budget change cannot turn the preview into a lossy request.
-    const retainOriginal = options.purpose !== 'compaction' && this.requireCompleteContext?.(options.sessionId) === true;
     const expired = retainOriginal ? [] : supersededFileReads(options,source,meta=>this.attestSupersededRead?.({...attribution,...meta}));
     const expiredIndexes=new Set(expired.map(item=>item.readIndex));
     const protectedSource = retainOriginal ? source.map((_, index) => index) : protectedWireIndexes(options, source, checkpoint);
@@ -411,6 +433,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       fitted.deduplicatedBytes = deduplicated.beforeBytes - deduplicated.afterBytes;
       fitted.evidenceDuplicates = deduplicated.duplicates;
       fitted.supersededReads = expired;
+      fitted.supersededRuntimeSnapshots=runtimeSnapshots.removed;
     }
     catch(error) {
       let failure = error instanceof LlmError ? error : typeof error?.code === 'string' ? new LlmError(error.message, error.code) : error;
@@ -469,8 +492,9 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const activeRequest = { id: usageId, dispatched: false, done: new Promise(resolve => { finishRequest = resolve; }) };
     this.activeRequests.set(usageId, activeRequest);
     try {
-      if(fitted.removed || fitted.deduplicatedGroups) this.onContext?.({ sessionId: options.sessionId, modelId: route.id, requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution', removedGroups: fitted.removed,
+      if(fitted.removed || fitted.deduplicatedGroups || fitted.supersededRuntimeSnapshots) this.onContext?.({ sessionId: options.sessionId, modelId: route.id, requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution', removedGroups: fitted.removed,
         deduplicatedGroups:fitted.deduplicatedGroups,deduplicatedBytes:fitted.deduplicatedBytes,evidenceDuplicates:fitted.evidenceDuplicates,supersededReads:fitted.supersededReads,
+        supersededRuntimeSnapshots:fitted.supersededRuntimeSnapshots,
         beforeBytes:fitted.beforeBytes,afterBytes:fitted.afterBytes,inputUpperBound:fitted.inputUpperBound,reservation,availableBudget:fitted.availableBudget,maxTokens,
         note:'完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。' });
       await this.beforeRequest?.({id:usageId,...attribution,modelId:route.id,reservation},options.signal);registered=!!this.beforeRequest;

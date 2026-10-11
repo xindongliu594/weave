@@ -1,0 +1,64 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (9469.9981ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (491.7568ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (149.0769ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (187.4879ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (130.2053ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (141.4075ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (122.5897ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (155.12ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (128.8516ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (89.0699ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (245.397ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (151.9095ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (171.2876ms)
+✖ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (181.0634ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 13
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21612.0181
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:21799
+✖ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (181.0634ms)
+  AssertionError [ERR_ASSERTION]: {"message":"AI没有返回有效资源方案，旧运行和额度未改变；本次用量已记录","code":"RESOURCE_PROPOSAL_INVALID"}
+  
+  422 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:285:55)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 422,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (302.7929ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (90.3072ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (148.4352ms)
+✔ other project/version registration cannot leak into this exact version (137.4362ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (135.5603ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (70.9641ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (80.2797ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (48.1408ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (172.0885ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (70.7381ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (77.1304ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (23.3295ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3385.1086

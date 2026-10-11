@@ -6,6 +6,8 @@ import { AppError,complete,assertCompletionContext,prepareCompletionRequest,type
 import type { Model } from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
 import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-governance.mjs';
+import {assertGoalContract} from '../../../packages/contracts/goal-contract.mjs';
+import {verifiedResourceEdge} from './recovery-resource-plan.ts';
 type Database=Pick<pg.PoolClient,'query'>;
 const today="date_trunc('day',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'";
 const open="status IN ('pending','uncertain')";
@@ -80,7 +82,7 @@ export function projectCostCarryover(readiness:ProjectCostReadiness,retained:boo
  return {retained,reserved:readiness.reserved,receipts:readiness.receipts.map(({id,amount,runId})=>({id,amount,...(runId?{runId}:{})})),recordedCost:readiness.recordedCost,availableBudget:readiness.availableBudget};
 }
 
-type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;leaseOwner?:string;billingDepartmentId?:string;authorize?:(db:Database,row:any)=>Promise<void>;maxCost?:number;context?:Record<string,any>;retainUncertainCosts?:boolean;signal?:AbortSignal;accountingMode?:'conversation'};
+type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;resourcePlanningRunId?:string;leaseOwner?:string;billingDepartmentId?:string;authorize?:(db:Database,row:any)=>Promise<void>;maxCost?:number;context?:Record<string,any>;retainUncertainCosts?:boolean;signal?:AbortSignal;accountingMode?:'conversation'};
 export async function reserveCall(input:CallInput) {
  const id=input.id??randomUUID();
  return withFreshLocalAdmission(()=>reserveCallAttempt({...input,id}),input.signal);
@@ -99,10 +101,27 @@ async function reserveCallAttempt(input:CallInput) {
   if(input.projectId&&!project)throw new AppError(404,'项目不存在');
   if(input.projectVersion!==undefined&&project.version!==input.projectVersion)throw new AppError(409,'方案版本已变化');
   const config=await lockCostPolicy(client);
+  let planningBudget=project?.policy.maxBudget;
+  if(input.resourcePlanningRunId!==undefined){
+   const invalid=()=>new AppError(409,'资源规划必须使用当前同项目同版本、已停止且已批准的最新运行','RESOURCE_PLANNING_SOURCE_INVALID');
+   if(!project||input.runId||input.projectVersion===undefined||input.purpose!=='预算补充规划'||conversation)throw invalid();
+   const source=(await client.query(`SELECT r.*,p.snapshot AS parent_snapshot FROM project_runs r LEFT JOIN project_runs p ON p.id=r.parent_run_id
+     WHERE r.id=$1 AND r.project_id=$2 AND r.project_version=$3 AND r.status IN ('failed','interrupted','cancelled')
+       AND NOT EXISTS(SELECT 1 FROM project_runs child WHERE child.parent_run_id=r.id) FOR SHARE OF r`,
+     [input.resourcePlanningRunId,project.id,input.projectVersion])).rows[0];
+   try{
+    if(!source||source.snapshot.projectId!==project.id||source.snapshot.planVersion!==input.projectVersion||!source.snapshot.approval)throw invalid();
+    assertGoalContract(source.snapshot);
+    if(source.snapshot.resourceApproval){
+     if(!source.parent_snapshot||!verifiedResourceEdge(source.snapshot,source.parent_snapshot,source.parent_run_id,source.snapshot.completedCheckpoints??[]))throw invalid();
+     planningBudget=source.snapshot.policy.maxBudget;
+    }else planningBudget=Math.min(source.snapshot.policy.maxBudget,project.policy.maxBudget);
+   }catch{throw invalid();}
+  }
   // A planning opt-in applies to receipts already known to be uncertain. A
   // pending request cannot become admissible merely because maintenance would
   // expire its lease between the read-only quote and this locked admission.
-  if(project&&!input.runId)await requireProjectCostReady(client,project.id,input.retainUncertainCosts===true);
+  if(project&&!input.runId)await requireProjectCostReady(client,project.id,input.retainUncertainCosts===true,planningBudget);
   await expireReservations(client);
   if(input.context?.probeId&&!(await client.query("SELECT id FROM model_capability_tests WHERE id=$1 AND status='running' AND created_at>now()-interval '3 minutes' FOR SHARE",[input.context.probeId])).rowCount)throw new AppError(409,'能力测试已中断或超时，请重新开始','PROBE_EXPIRED');
   const existing=(await client.query('SELECT id FROM model_reservations WHERE id=$1',[id])).rows[0];
@@ -114,9 +133,9 @@ async function reserveCallAttempt(input:CallInput) {
   let offlineError:unknown;
   let planningCarryover:ReturnType<typeof projectCostCarryover>|undefined;
   if(project&&!input.runId){
-   const readiness=await requireProjectCostReady(client,project.id,input.retainUncertainCosts===true);
+   const readiness=await requireProjectCostReady(client,project.id,input.retainUncertainCosts===true,planningBudget);
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[project.id])).rowCount)throw new AppError(409,'项目正在执行，暂不能另外调用规划模型');
-   if(greater(readiness.recordedCost+readiness.reserved+input.amount,project.policy.maxBudget))throw new AppError(422,'规划预留与已登记费用、未知预留超过项目原预算','BUDGET_EXCEEDED');
+   if(greater(readiness.recordedCost+readiness.reserved+input.amount,planningBudget))throw new AppError(422,'规划预留与已登记费用、未知预留超过项目已批准预算','BUDGET_EXCEEDED');
    if(input.retainUncertainCosts===true)planningCarryover=projectCostCarryover(readiness,true);
   }
   if(input.runId){
@@ -153,7 +172,7 @@ async function reserveCallAttempt(input:CallInput) {
   }
   if(!conversation)await checkDailyBudget(client,config,billingDepartmentId,departmentAdditional,input.runId?0:input.amount);
   const billing=(await client.query(`SELECT g.id,g.version,g.data,m.data->>'model' AS wire_model FROM models m JOIN gateways g ON g.id=m.data->>'gatewayId' WHERE m.id=$1`,[input.model.id])).rows[0];
-  const context={...input.context,accountingMode:conversation?'conversation':'budgeted',...(planningCarryover?{costCarryover:planningCarryover}:{}),...(billing?{billingRoute:{gatewayId:billing.id,gatewayVersion:billing.version,baseUrl:billing.data.baseUrl,wireModel:billing.wire_model,autoReconcile:billing.data.pricingSource==='new-api',...(billing.data._billingUnit?{billingUnit:billing.data._billingUnit}:{})}}:{})};
+  const context={...input.context,...(input.resourcePlanningRunId?{resourcePlanningRunId:input.resourcePlanningRunId}:{}),accountingMode:conversation?'conversation':'budgeted',...(planningCarryover?{costCarryover:planningCarryover}:{}),...(billing?{billingRoute:{gatewayId:billing.id,gatewayVersion:billing.version,baseUrl:billing.data.baseUrl,wireModel:billing.wire_model,autoReconcile:billing.data.pricingSource==='new-api',...(billing.data._billingUnit?{billingUnit:billing.data._billingUnit}:{})}}:{})};
   input.signal?.throwIfAborted();
   if(offlineError)throw offlineError;
   await client.query(`INSERT INTO model_reservations(id,model_id,project_id,department_id,run_id,purpose,amount,input_rate,output_rate,context)
@@ -225,7 +244,7 @@ export function budgetedRequestEstimate(model:Pick<Model,'inputRate'|'outputRate
  const inputBytes=Buffer.byteLength(JSON.stringify(envelope))+1024;
  return {inputBytes,reservation:(inputBytes*model.inputRate+maxTokens*model.outputRate)/1e6};
 }
-export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;maxCost?:number;context?:Record<string,any>;timeoutMs?:number;retainUncertainCosts?:boolean},request:CompletionOptions={}) {
+export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;resourcePlanningRunId?:string;maxCost?:number;context?:Record<string,any>;timeoutMs?:number;retainUncertainCosts?:boolean},request:CompletionOptions={}) {
  const estimate=budgetedRequestEstimate(model,messages,maxTokens,request),amount=estimate.reservation;
  assertCompletionContext(model,estimate.inputBytes,maxTokens);
  const {timeoutMs,...reservation}=options;

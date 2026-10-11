@@ -1,0 +1,29 @@
+✔ resource approval preserves original semantics, grants and source snapshot (6.6075ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (2.9343ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.3932ms)
+✔ subsequent resource approval retains each ancestor once (0.6976ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (3.1056ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.3085ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (1.5802ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (1.3591ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.6079ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (3.4761ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.8365ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (1.1372ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.404ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.467ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.5163ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.7111ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (1.1423ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (15.4347ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (12.0763ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.5764ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (1.2344ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2577.3615

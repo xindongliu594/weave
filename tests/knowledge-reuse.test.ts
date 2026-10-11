@@ -124,5 +124,53 @@ test('bounded background batches eventually visit every department',{skip:!isola
  const service=new AutomationLearningService(wrapped as any,{traceRoot:join(root,'runs'),clock:()=>now});await service.tick();now=new Date(now.getTime()+60000);await service.tick();assert.equal(service.lastError,null);
  assert.equal(new Set(batches.flat()).size,22,'a permanent first-20 limit must not starve later departments');
 });
+test('accepted reuse flows through reviewed publication into an authorized lazy skill with a fixed recovery revision',{skip:!isolated},async()=>{
+ // These isolated archive fixtures verify the interfaces, not real employee quality or adoption.
+ await db.query('UPDATE departments SET data=$1 WHERE id=$2',[{name:'隔离统计验证',agents:[agent]},department]);
+ await db.query("UPDATE product_settings SET data=data||'{\"reuseMinSuccessfulWorks\":3}'::jsonb WHERE id=1");
+ const created=await api('/knowledge/documents','POST',{spaceId:space,title:'闭环协议夹具方法',content:'隔离协议夹具：先识别边界，再核对结果；不是员工交付。'});
+ assert.equal(created.status,201,JSON.stringify(created.data));
+ const source=(await api('/knowledge/documents')).data.find((row:any)=>row.id===created.data.id);
+ for(let i=0;i<3;i++)await work({doc:source});
+ const {syncReuseCandidates}=await import('../apps/api/src/knowledge-reuse.ts');
+ await syncReuseCandidates(db,join(root,'runs'),department);
+ const candidate=(await api('/automation/knowledge-candidates')).data.find((row:any)=>row.documentId===source.id);
+ assert.ok(candidate,'three accepted fixture works create a reviewable candidate');
+ assert.equal(candidate.reuseEvidence.successWorkCount,3);
+ assert.equal(new Set(candidate.reuseEvidence.works.map((item:any)=>item.workKey)).size,3);
+ const publication='/automation/knowledge-candidates/'+candidate.id+'/publish';
+ assert.equal((await api(publication,'POST',{version:candidate.version,reviewed:false})).status,422);
+ const published=await api(publication,'POST',{version:candidate.version,reviewed:true});
+ assert.equal(published.status,200,JSON.stringify(published.data));
+ assert.equal((await api(publication,'POST',{version:candidate.version,reviewed:true})).data.id,published.data.id);
+ let rows=(await api('/knowledge/documents')).data;
+ assert.equal(rows.filter((row:any)=>row.id===published.data.id).length,1,'lost responses cannot duplicate publication');
+ const document=rows.find((row:any)=>row.id===published.data.id);
+ const store=await import('../apps/api/src/knowledge-store.ts');
+ const {companySkills}=await import('../services/agent-runtime/approved-skills.mjs');
+ const outsider={...agent,id:'outsider',knowledgeSpaceIds:[]};
+ const ordinary=await store.knowledgeSnapshot([agent,outsider],department);
+ assert.ok(!companySkills(ordinary,agent).some((item:any)=>item.evidence.documentId===document.id),'reviewed experience does not automatically become a skill');
+ const promoted=await api('/knowledge/documents/'+document.id,'PUT',{spaceId:space,title:document.title,content:document.content,version:document.version,source:{...document.source,skillName:'reviewed-boundary-check'}});
+ assert.equal(promoted.status,200,JSON.stringify(promoted.data));
+ const pinned=await store.knowledgeSnapshot([agent,outsider],department);
+ const method=companySkills(pinned,agent).find((item:any)=>item.evidence.documentId===document.id);
+ assert.ok(method);assert.equal(method.evidence.version,2);
+ assert.deepEqual(companySkills(pinned,outsider),[]);
+ assert.ok(!JSON.stringify(pinned).includes(document.content),'catalog contains references rather than the full method');
+ const loaded=await store.queryKnowledge(pinned,agent.id,'skill',document.id);
+ assert.equal(loaded.content,document.content);assert.equal(loaded.sha256,method.evidence.sha256);
+ assert.equal(await store.queryKnowledge(pinned,outsider.id,'skill',document.id),undefined);
+ const edited=await api('/knowledge/documents/'+document.id,'PUT',{spaceId:space,title:document.title,content:'新修订的隔离夹具方法，不能替换旧批准上下文。',version:2,source:{...document.source,skillName:'reviewed-boundary-check'}});
+ assert.equal(edited.status,200,JSON.stringify(edited.data));
+ assert.equal((await store.queryKnowledge(JSON.parse(JSON.stringify(pinned)),agent.id,'skill',document.id)).content,loaded.content);
+ const fresh=await store.knowledgeSnapshot([agent],department);
+ const freshMethod=companySkills(fresh,agent).find((item:any)=>item.evidence.documentId===document.id);
+ assert.ok(freshMethod);assert.equal(freshMethod.evidence.version,3);
+ await syncReuseCandidates(db,join(root,'runs'),department);
+ const after=(await api('/automation/knowledge-candidates')).data.find((row:any)=>row.id===candidate.id);
+ assert.equal(after.status,'published');assert.equal(after.content,candidate.content,'background reconciliation preserves the reviewed publication');
+});
+
 after(async()=>{if(!isolated)return;server.closeAllConnections();await new Promise<void>(r=>server.close(r));await db.end();assert.ok(root.startsWith(join(tmpdir(),'knowledge-reuse-')));rmSync(root,{recursive:true,force:true});});
 

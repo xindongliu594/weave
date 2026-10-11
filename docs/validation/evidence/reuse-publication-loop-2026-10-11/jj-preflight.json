@@ -1,0 +1,23 @@
+{
+  "registered": 2.0159424,
+  "unknownHolds": 0.054876,
+  "total": 2.0708184,
+  "authorization": 2.1,
+  "remaining": 0.0291816,
+  "projects": 7,
+  "sampleStatus": "COMPLETED",
+  "sourceWorks": [
+    {
+      "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+      "count": 1
+    }
+  ],
+  "candidateCapacity": {
+    "count": 0,
+    "bytes": 0,
+    "maxCount": 500,
+    "maxBytes": 8388608
+  },
+  "modelCalls": 0,
+  "productionWrites": 0
+}

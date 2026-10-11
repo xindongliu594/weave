@@ -1,0 +1,43 @@
+✔ resource approval preserves original semantics, grants and source snapshot (7.632ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (3.4726ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.3655ms)
+✔ subsequent resource approval retains each ancestor once (0.7025ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (3.2088ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.1795ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (1.0837ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.9283ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.4248ms)
+✖ planning funds the next bounded tranche rather than only the first resumed request (3.7975ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2691.2823
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:8686
+✖ planning funds the next bounded tranche rather than only the first resumed request (3.7975ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 0.0659568
+  - 0.1044696
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:121:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.0659568,
+    expected: 0.1044696,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

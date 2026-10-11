@@ -1,0 +1,121 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1084.372879ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (75.693438ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (61.399295ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (82.40476ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (64.034037ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (52.352611ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (61.51786ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (63.568488ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (43.977306ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (35.254812ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (83.729792ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (54.9147ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (74.463899ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (97.745002ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (56.839144ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2335.504674
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (218.703287ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (35.773978ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (55.69597ms)
+✔ other project/version registration cannot leak into this exact version (42.674497ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (41.488145ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (28.232505ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (36.075376ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (32.752736ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (66.238947ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (26.323086ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (32.103727ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (16.400497ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1640.293866
+✔ resource approval preserves original semantics, grants and source snapshot (4.231255ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (2.366281ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (0.968374ms)
+✔ subsequent resource approval retains each ancestor once (0.583763ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (2.360247ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (1.608821ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (2.25271ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.565642ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.597325ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.249556ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.280637ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.363542ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.501076ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.832487ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (8.424738ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (8.623396ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.356185ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (0.952775ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1038.04546
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (19.96357ms)
+✔ historical command bootstrap stays within its 8KB cap with long Unicode history and never includes arbitrary evidence payloads (2.368591ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (114.009928ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (57.45561ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (37.395489ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (49.354703ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (34.239366ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (28.095086ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (37.969253ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (7.298438ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (2.090546ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (3.830037ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (2.558084ms)
+✔ host file checks reject linked directories before reading their contents (2.30259ms)
+✔ host file checks reject binary content declared as text (0.937901ms)
+✖ optimistic writes reject a second editor using the same observed hash (1.16287ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 536.599332
+
+✖ failing tests:
+
+test at services/agent-runtime/handoff.test.mjs:84:1
+✖ optimistic writes reject a second editor using the same observed hash (1.16287ms)
+  Error: ENOENT: no such file or directory, open '/home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle5-20261011/tests/fixtures/offline-handoff/inputs/orders.json'
+      at readFileSync (node:fs:484:20)
+      at fixtureText (file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle5-20261011/services/agent-runtime/test-support/handoff-fixtures.mjs:11:36)
+      at makeFixtureFiles (file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle5-20261011/services/agent-runtime/test-support/handoff-fixtures.mjs:62:51)
+      at file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle5-20261011/services/agent-runtime/handoff.test.mjs:85:15
+      at fixture (file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle5-20261011/services/agent-runtime/handoff.test.mjs:13:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle5-20261011/tests/fixtures/offline-handoff/inputs/orders.json'
+  }
+Traceback (most recent call last):
+  File "/home/jj/.local/share/weiwu/admin/reuse-cycle5-20261011/apply.py", line 69, in <module>
+    subprocess.run(['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node','--test','services/agent-runtime/checkpoint-context.test.mjs','services/agent-runtime/handoff.test.mjs','services/agent-runtime/employee-checkpoint-policy.test.mjs'],cwd=new,check=True,timeout=120)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node', '--test', 'services/agent-runtime/checkpoint-context.test.mjs', 'services/agent-runtime/handoff.test.mjs', 'services/agent-runtime/employee-checkpoint-policy.test.mjs']' returned non-zero exit status 1.

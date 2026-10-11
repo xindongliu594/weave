@@ -1,0 +1,69 @@
+{
+  "runId": "0f9e41af-d1b7-4dd3-9e74-f3555bdd9fa8",
+  "status": "failed",
+  "integrity": "ok",
+  "wireRequests": [
+    {
+      "seq": 61,
+      "messages": 4,
+      "runtimeSnapshotCount": 1,
+      "runtimeSnapshotBytes": 13778
+    },
+    {
+      "seq": 91,
+      "messages": 7,
+      "runtimeSnapshotCount": 2,
+      "runtimeSnapshotBytes": 27556
+    },
+    {
+      "seq": 129,
+      "messages": 6,
+      "runtimeSnapshotCount": 2,
+      "runtimeSnapshotBytes": 27544
+    },
+    {
+      "seq": 154,
+      "messages": 7,
+      "runtimeSnapshotCount": 1,
+      "runtimeSnapshotBytes": 13785
+    },
+    {
+      "seq": 178,
+      "messages": 7,
+      "runtimeSnapshotCount": 1,
+      "runtimeSnapshotBytes": 13788
+    },
+    {
+      "seq": 200,
+      "messages": 7,
+      "runtimeSnapshotCount": 1,
+      "runtimeSnapshotBytes": 13768
+    },
+    {
+      "seq": 226,
+      "messages": 7,
+      "runtimeSnapshotCount": 1,
+      "runtimeSnapshotBytes": 13786
+    },
+    {
+      "seq": 256,
+      "messages": 8,
+      "runtimeSnapshotCount": 1,
+      "runtimeSnapshotBytes": 13789
+    }
+  ],
+  "employeeActions": {
+    "agent_teams_claim_task": 3,
+    "capability_search": 4,
+    "capability_use": 1,
+    "knowledge_read": 1,
+    "filesystem": 1
+  },
+  "formalHandoffs": 0,
+  "lastFailure": {
+    "status": "failed",
+    "message": "前置任务失败，相关下游未执行；请检查记录后重新制定方案",
+    "usageCost": 0.025998600000000004
+  },
+  "conclusion": "Repeated native snapshots occupy the fixed wire limit and displace work history. The local fix is verified by regression only; it has not completed real QA or manager acceptance."
+}

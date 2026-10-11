@@ -47,9 +47,9 @@ async function project(version = 8) {
   return value;
 }
 type RunOptions = { version?: number; wires?: (string | undefined)[]; inherited?: number; status?: string; archiveVersion?: number; archiveProject?: string;
-  missing?: boolean; started?: boolean; legacySession?: boolean; omitVersion?: boolean };
+  missing?: boolean; started?: boolean; legacySession?: boolean; omitVersion?: boolean; wireBody?: any };
 async function run(value: any, { version: runVersion = Number(value.version), wires = [], inherited = 0, status = 'failed', archiveVersion = runVersion, archiveProject = value.id,
-  missing = false, started = true, legacySession = false, omitVersion = false }: RunOptions = {}) {
+  missing = false, started = true, legacySession = false, omitVersion = false, wireBody }: RunOptions = {}) {
   const id = randomUUID(), attempt = Number((await pool.query('SELECT COALESCE(max(attempt),0)+1 AS n FROM project_runs WHERE project_id=$1 AND project_version=$2', [value.id, runVersion])).rows[0].n);
   const snapshot: any = { projectId: archiveProject, ...(!omitVersion ? { planVersion: archiveVersion } : {}), requirement: value.requirement, policy: value.policy,
     tasks: value.plan.tasks, agents: value.plan.agents, budgetHistory: { calls: inherited, tasks: { qa_review: { cost: 99, calls: inherited } } },
@@ -66,7 +66,7 @@ async function run(value: any, { version: runVersion = Number(value.version), wi
       if (legacySession && target) {
         archive.append('model/request', {}, { sessionId: usageId, taskId: 'native-' + target });
         archive.append('model/wire-request', {}, { sessionId: usageId });
-      } else archive.append('model/wire-request', { usageId, ...(target ? { taskId: target } : {}) });
+      } else archive.append('model/wire-request', { usageId, ...(target ? { taskId: target } : {}), ...(wireBody ? { body: wireBody } : {}) });
     }
     archive.append('run/finished', { status });
   }
@@ -98,6 +98,15 @@ test('one successful wire and matching persisted receipt consume one call, witho
     [rid, modelId, p.id, r.id, 'dev', 'settled fixture']);
   const { history, planning } = await both(p);
   assert.equal(history.calls, 1); assert.deepEqual(history.tasks.dev, { cost: .003, calls: 1 }); assert.equal(planning.budget.reserved, 0);
+});
+
+test('resource history retains full wire schema overhead without counting message contents or inherited history', { skip: !isolated }, async () => {
+  const p=await project(),body={model:'fixture',messages:[{role:'user',content:'x'.repeat(6000)}],max_tokens:2048,
+    tools:[{type:'function',function:{name:'filesystem',description:'x'.repeat(12000),parameters:{type:'object'}}}],thinking:{type:'disabled'}};
+  await run(p,{wires:['qa_review'],wireBody:body});
+  const history=await budgetHistory(readonlyDb,traceRoot,p.id,p.version);
+  assert.equal(history.tasks.qa_review.requestOverheadBytes,Buffer.byteLength(JSON.stringify({...body,messages:[]}))-2);
+  assert.equal(history.tasks.qa_review.cost,0);assert.equal(history.tasks.qa_review.calls,1);
 });
 test('registered undispatched released attempt retains its global and qa_review call with no fee', { skip: !isolated }, async () => {
   const p = await project(), r = await run(p); await admission(p, r.id, 'qa_review');

@@ -1,0 +1,29 @@
+[
+  {
+    "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+    "registeredCost": 0.18720479999999998,
+    "unknownHold": 0,
+    "settledUsageRecords": 61,
+    "inputTokens": 563920,
+    "outputTokens": 15024,
+    "tokenCoverage": "Settled records only. Unknown calls have no confirmed token count."
+  },
+  {
+    "projectId": "acc5411f-e128-4dc4-98ef-6a43a110b228",
+    "registeredCost": 0.1063818,
+    "unknownHold": 0.0022239,
+    "settledUsageRecords": 34,
+    "inputTokens": 316394,
+    "outputTokens": 9553,
+    "tokenCoverage": "Settled records only. Unknown calls have no confirmed token count."
+  },
+  {
+    "projectId": "cf082432-c6e7-42d2-8068-0ef9bbdd7dee",
+    "registeredCost": 0.0041123999999999996,
+    "unknownHold": 0.014085,
+    "settledUsageRecords": 1,
+    "inputTokens": 7416,
+    "outputTokens": 1573,
+    "tokenCoverage": "Settled records only. Unknown calls have no confirmed token count."
+  }
+]

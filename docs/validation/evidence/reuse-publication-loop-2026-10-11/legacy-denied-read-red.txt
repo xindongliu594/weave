@@ -1,0 +1,45 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1661.9574ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (194.3815ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (159.7459ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (221.9128ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (155.298ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (176.1095ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (157.1465ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (168.6535ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (131.5034ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (117.153ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (276.842ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (154.2094ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (191.9913ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (248.3975ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (147.4428ms)
+✖ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (81.7315ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5035.7839
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:26406
+✖ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (81.7315ms)
+  Error: EEXIST: file already exists, open 'C:\Users\JJ\AppData\Local\Temp\recovery-conditions-TFxl2c\runs\982611cf-b8a9-4f84-a7f1-6b470eb36f46\snapshot.json'
+      at openSync (node:fs:622:18)
+      at durableWrite (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/trace-store.mjs:20:14)
+      at createRunArchive (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/trace-store.mjs:31:3)
+      at blockedRead (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:331:19)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:340:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -4075,
+    code: 'EEXIST',
+    syscall: 'open',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Temp\\recovery-conditions-TFxl2c\\runs\\982611cf-b8a9-4f84-a7f1-6b470eb36f46\\snapshot.json'
+  }

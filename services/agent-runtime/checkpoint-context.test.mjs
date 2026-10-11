@@ -29,6 +29,7 @@ test('recovery retains host evidence, bounds bootstrap and pages full own histor
   assert.equal(snapshot.recovery.files.find(file=>file.path==='code.txt').state,'accepted');
   assert.equal(snapshot.recovery.files.find(file=>file.path==='notes.txt').state,'unverified');
   const brief=recoveryContext(snapshot,'review');assert.equal(brief.current.commands[0].exitCode,1);assert.match(brief.current.errors[0].message,/connection closed/);
+  assert.deepEqual(brief.dependencies[0].read,{tool:'recovery_read',arguments:{taskId:'build'}});
   const passing=brief.current.commands.at(-1);assert.equal(passing.runId,archive.id);assert.equal(passing.workspaceRevision,'v2');
   assert.deepEqual(passing.nodeTests,{status:'available',format:'spec',tests:8,suites:0,pass:8,fail:0,cancelled:0,skipped:0,todo:0});
   assert.equal(brief.current.status,'restart');assert.equal(brief.current.lastMessage,long.slice(0,800));
@@ -44,6 +45,8 @@ test('recovery retains host evidence, bounds bootstrap and pages full own histor
   assert.ok(JSON.stringify(brief).length<6000);assert.equal(brief.dependencies[0].output,'Implemented the agreed interface');
   const target=join(root,'new-run');
   const upstream=readRecoveryContext(snapshot,target,'review',{taskId:'build'});assert.equal(JSON.stringify(upstream).includes('PRIVATE_UPSTREAM_KNOWLEDGE'),false);
+  assert.match(upstream.text,/Implemented the agreed interface/);
+  assert.throws(()=>freshGate.beforeFile('review','fresh-attempt','filesystem',{path:'.agent-teams/run-new/inbox/worker.jsonl'}),/UNDECLARED_INPUT/);
   assert.throws(()=>readRecoveryContext(snapshot,target,'review',{taskId:'sibling'}),/DENIED/);
   const unrelated=createRunArchive(root,{projectId:'other'});
   assert.throws(()=>readRecoveryContext(snapshot,target,'review',{cursor:JSON.stringify({runId:unrelated.id,after:0})}),/DENIED/);

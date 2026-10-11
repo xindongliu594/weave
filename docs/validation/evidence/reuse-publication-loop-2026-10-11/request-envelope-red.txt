@@ -1,0 +1,58 @@
+✔ resource approval preserves original semantics, grants and source snapshot (7.2303ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (3.0738ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.4862ms)
+✔ subsequent resource approval retains each ancestor once (0.7218ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (3.3212ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.0921ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (1.0357ms)
+✖ the request floor includes archived wire schemas and envelope fields, beyond the message cap (3.7684ms)
+✖ runtime employee identity takes precedence over source aliases and absent IDs never match (0.9825ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2535.4832
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:7144
+✖ the request floor includes archived wire schemas and envelope fields, beyond the message cap (3.7684ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:103:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /完整请求/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\recovery-resource-plan.test.ts:1:7988
+✖ runtime employee identity takes precedence over source aliases and absent IDs never match (0.9825ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0.001 !== 0.05312
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:112:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.001,
+    expected: 0.05312,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

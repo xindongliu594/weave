@@ -1,0 +1,45 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (458.196ms)
+✖ resource history retains full wire schema overhead without counting message contents or inherited history (88.4233ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (94.4443ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (160.0232ms)
+✔ other project/version registration cannot leak into this exact version (153.8744ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (154.1741ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (77.1069ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (88.9532ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (58.4817ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (194.0787ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (89.7401ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (106.7702ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (29.1167ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3554.3204
+
+✖ failing tests:
+
+test at tests\budget-history-admission.test.ts:1:7109
+✖ resource history retains full wire schema overhead without counting message contents or inherited history (88.4233ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 12191
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\budget-history-admission.test.ts:108:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 12191,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

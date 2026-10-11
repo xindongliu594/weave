@@ -1,0 +1,16 @@
+✔ resource approval preserves original semantics, grants and source snapshot (6.9263ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (2.9511ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (1.3747ms)
+✔ subsequent resource approval retains each ancestor once (0.7137ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (1.1762ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.0683ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (11.7601ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.5554ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2660.2533

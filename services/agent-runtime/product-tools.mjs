@@ -83,6 +83,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
           const classification=classifyFailure(name,error,dispatched&&!outcomeKnown&&!error.notExecuted);
           archive.append('runtime/operation-failed',{name,classification,code:error.code??error.name,message:error.message},ref);
           if(classification==='outcome_unknown')archive.append('runtime/outcome-unknown',{name,callId:exec.callId,arguments:args,message:error.message},ref);
+          if(name==='filesystem'&&!dispatched&&error.code==='UNDECLARED_INPUT'&&error.notExecuted===true)throw error;
           if (handoff && work) {
             // Failed mutations may leave an unsynchronized container workspace.
             // Require fresh observed verification instead of reusing old proof.

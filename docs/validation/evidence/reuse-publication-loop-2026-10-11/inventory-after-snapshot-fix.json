@@ -1,0 +1,85 @@
+{
+  "runId": "62c5db8a-617b-41db-9394-c8000f58997d",
+  "status": "failed",
+  "integrity": "ok",
+  "wireRequests": [
+    {
+      "seq": 61,
+      "taskId": "t2-qa",
+      "messageCount": 4,
+      "runtimeSnapshotCount": 1
+    },
+    {
+      "seq": 91,
+      "taskId": "t2-qa",
+      "messageCount": 7,
+      "runtimeSnapshotCount": 1
+    },
+    {
+      "seq": 126,
+      "taskId": "t2-qa",
+      "messageCount": 10,
+      "runtimeSnapshotCount": 1
+    }
+  ],
+  "events": [
+    {
+      "seq": 88,
+      "type": "context/compacted",
+      "data": {
+        "sessionId": "910c4b07-8dc2-47e9-b135-bce42ae0cf51",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "requestPurpose": "execution",
+        "removedGroups": 0,
+        "deduplicatedGroups": 0,
+        "deduplicatedBytes": 0,
+        "evidenceDuplicates": [],
+        "supersededReads": [],
+        "supersededRuntimeSnapshots": 1,
+        "beforeBytes": 39671,
+        "afterBytes": 39671,
+        "inputUpperBound": 40695,
+        "reservation": 0.0146661,
+        "availableBudget": 0.019756400000000007,
+        "maxTokens": 2048,
+        "note": "完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。"
+      }
+    },
+    {
+      "seq": 125,
+      "type": "context/compacted",
+      "data": {
+        "sessionId": "910c4b07-8dc2-47e9-b135-bce42ae0cf51",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "requestPurpose": "execution",
+        "removedGroups": 0,
+        "deduplicatedGroups": 0,
+        "deduplicatedBytes": 0,
+        "evidenceDuplicates": [],
+        "supersededReads": [],
+        "supersededRuntimeSnapshots": 2,
+        "beforeBytes": 44684,
+        "afterBytes": 44684,
+        "inputUpperBound": 45708,
+        "reservation": 0.01617,
+        "availableBudget": 0.016517000000000004,
+        "maxTokens": 2048,
+        "note": "完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。"
+      }
+    },
+    {
+      "seq": 178,
+      "type": "run/finished",
+      "data": {
+        "status": "failed",
+        "message": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 46819 字节，精简前预留 $0.01681050；当前请求字节上限 48000；可用预算 $0.01279520；输出上限 2048 tokens 保持不变；单次完整上下文最低预留 $0.01327110，至少另需 $0.00047590",
+        "usageCost": 0.00972
+      }
+    }
+  ],
+  "formalHandoffs": 0,
+  "sourceRunId": "0f9e41af-d1b7-4dd3-9e74-f3555bdd9fa8",
+  "preservedNodes": [
+    "t1-doc"
+  ]
+}

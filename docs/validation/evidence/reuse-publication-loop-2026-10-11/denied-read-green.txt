@@ -1,0 +1,28 @@
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (186.8492ms)
+✔ historical command bootstrap stays within its 8KB cap with long Unicode history and never includes arbitrary evidence payloads (2.9303ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (196.0316ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (136.2085ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (86.3078ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (170.7164ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (78.3345ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (75.9307ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (103.6212ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (697.7449ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (370.6461ms)
+✔ sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal (391.7734ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (370.9959ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (3023.6229ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (398.3385ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (432.578ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (560.1743ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (577.8397ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (527.9361ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.8434ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7979.2939

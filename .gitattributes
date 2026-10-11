@@ -4,3 +4,4 @@ docs/validation/evidence/userflow-2026-10-10/** -text -whitespace
 docs/validation/evidence/endurance-retention-2026-10-11/samples.jsonl -text
 docs/validation/evidence/endurance-retention-2026-10-11/operations.jsonl -text
 docs/validation/evidence/endurance-retention-2026-10-11/last-test-output.txt -text
+docs/validation/evidence/reuse-publication-loop-2026-10-11/** -text -whitespace

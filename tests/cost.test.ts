@@ -10,6 +10,8 @@ import {randomUUID} from 'node:crypto';
 import pg from 'pg';
 import type {Model} from '../packages/contracts/index.ts';
 import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
+import {createGoalContract} from '../packages/contracts/goal-contract.mjs';
+import {applyRecoveryResources} from '../apps/api/src/recovery-resource-plan.ts';
 const base=process.env.DATABASE_URL??'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const admin=new pg.Pool({connectionString:base}),schema='cost_'+Date.now();
 let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,cost:typeof import('../apps/api/src/cost-control.ts');
@@ -94,6 +96,32 @@ test('runtime requests share the run reservation and uncertain costs survive com
  assert.equal((await call('/runs/'+runId+'/retry','POST',{resume:true})).data.code,'COST_PENDING');
  assert.match((await call('/runs/'+runId)).data.recovery.costBlocked,/核对供应方账单/);
  await pool.query("UPDATE usage SET created_at=now()-interval '2 days'");assert.deepEqual(await cost.dailyTotals(pool),{spent:0,reserved:1});
+});
+
+test('resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling',async()=>{
+  const parentId=randomUUID(),sourceId=randomUUID();
+  const old:any={projectId:'project',departmentId:'department',planVersion:1,policy:{...policy,maxModelCalls:32,maxTaskModelCalls:16},
+    requirement:'Original task',agents:[agent],tasks:[{id:'task',subject:'Original task',assignee:'manager',maxBudget:2,maxModelCalls:6}]};
+  old.goalContract=createGoalContract(old);
+  const proposal={maxBudget:18,taskCallLimits:{task:8},rationale:'Explicit budget approval fixture'};
+  const snapshot=applyRecoveryResources(old,proposal,{newRevision:1,completedTaskIds:[],history:{calls:3,tasks:{task:{calls:3}}},ceiling:18});
+  snapshot.resourceApproval={format:'run-resource-approval-v1',revision:1,sourceRunId:parentId,sourceGoalContract:old.goalContract,
+    ceiling:18,proposal,previewId:randomUUID(),usageId:randomUUID()};
+  snapshot.approval={kind:'resume-resources'};snapshot.goalContract=createGoalContract(snapshot);
+  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES($1,'project',1,'failed',$2)",[parentId,old]);
+  await pool.query("INSERT INTO project_runs(id,project_id,project_version,parent_run_id,attempt,status,snapshot) VALUES($1,'project',1,$2,2,'failed',$3)",[sourceId,parentId,snapshot]);
+  await pool.query("INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,'model','project',0,990,9.9,'Synthetic prior cost')",[randomUUID()]);
+  const input={model,amount:.2,purpose:'预算补充规划',projectId:'project',projectVersion:1,resourcePlanningRunId:sourceId};
+  await assert.rejects(cost.reserveCall({...input,resourcePlanningRunId:undefined}),e=>(e as any).code==='BUDGET_EXCEEDED');
+  const id=await cost.reserveCall(input);assert.equal(Number((await pool.query('SELECT amount FROM model_reservations WHERE id=$1',[id])).rows[0].amount),.2);
+  await cost.settleCall(id,0,20);assert.equal(requests,0);
+  for(const patch of [{purpose:'Other planning'},{projectVersion:2},{resourcePlanningRunId:parentId},{resourcePlanningRunId:randomUUID()},
+    {runId:sourceId}])await assert.rejects(cost.reserveCall({...input,...patch}));
+  await assert.rejects(cost.reserveCall({...input,amount:8.1}),e=>(e as any).code==='BUDGET_EXCEEDED');
+  await pool.query("UPDATE project_runs SET status='running' WHERE id=$1",[sourceId]);
+  await assert.rejects(cost.reserveCall(input),e=>(e as any).code==='RESOURCE_PLANNING_SOURCE_INVALID');
+  await pool.query("UPDATE project_runs SET status='failed',snapshot=$1 WHERE id=$2",[{...snapshot,policy:{...snapshot.policy,maxBudget:19}},sourceId]);
+  await assert.rejects(cost.reserveCall(input),e=>(e as any).code==='RESOURCE_PLANNING_SOURCE_INVALID');
 });
 
 test('missing usage and network failures retain a lease until explicit reconciliation using pinned prices',async()=>{

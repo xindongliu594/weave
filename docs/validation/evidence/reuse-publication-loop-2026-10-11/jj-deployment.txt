@@ -1,0 +1,65 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle1-20261011/tests/model-fixture.ts' imported from /home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle1-20261011/tests/recovery-conditions.test.ts
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at nextResolve (node:internal/modules/esm/hooks:785:28)
+    at resolveBase (file:///home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/node_modules/tsx/dist/esm/index.mjs?1791722116714:2:3744)
+    at async resolveDirectory (file:///home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/node_modules/tsx/dist/esm/index.mjs?1791722116714:2:4237)
+    at async resolve (file:///home/jj/.local/share/weiwu/releases/4f19ab005f80eb07fd3623e7f2e8792ed5ba71ac-jj1/node_modules/tsx/dist/esm/index.mjs?1791722116714:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:785:22)
+    at async AsyncLoaderHooksOnLoaderHookWorker.resolve (node:internal/modules/esm/hooks:269:24)
+    at async handleMessage (node:internal/modules/esm/worker:251:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle1-20261011/tests/model-fixture.ts'
+}
+
+Node.js v24.19.0
+✖ tests/recovery-conditions.test.ts (265.361592ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 274.061728
+
+✖ failing tests:
+
+test at tests/recovery-conditions.test.ts:1:1
+✖ tests/recovery-conditions.test.ts (265.361592ms)
+  'test failed'
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (233.315252ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (39.393162ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (79.157313ms)
+✔ other project/version registration cannot leak into this exact version (44.418083ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (44.149087ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (26.853688ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (33.958128ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (28.154282ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (68.87644ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (26.622415ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (32.611577ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (18.586659ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1865.633016
+Traceback (most recent call last):
+  File "/home/jj/.local/share/weiwu/admin/reuse-cycle1-20261011/apply.py", line 67, in <module>
+    subprocess.run(['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node','scripts/test-integration.mjs','tests/recovery-conditions.test.ts','tests/budget-history-admission.test.ts'],cwd=new,check=True,timeout=120)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node', 'scripts/test-integration.mjs', 'tests/recovery-conditions.test.ts', 'tests/budget-history-admission.test.ts']' returned non-zero exit status 1.

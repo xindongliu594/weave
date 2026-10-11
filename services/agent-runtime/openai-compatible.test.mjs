@@ -2,9 +2,48 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
+import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
 
 const route = { id: 'model-record', name: 'Relay model', wireModel: 'upstream-model', baseUrl: 'https://relay.invalid/v1', apiKey: 'not-a-real-key', inputRate: 1, outputRate: 2, maxOutputTokens: 1000 };
 const message = { id: 'message-1', role: 'user', source: { kind: 'user' }, content: [{ type: 'text', text: 'Do the task' }] };
+
+const runtimeSnapshot=(text,extra=[])=>{
+  const sections=[{name:'department:approved-context',text},...extra];
+  return {role:'user',source:{kind:'plugin',plugin:'@deepseek-ai/dsh-system-prompt',form:'snapshot',sections},content:[{type:'text',text:joinContextSections(sections)}]};
+};
+test('current native runtime snapshot replaces older covered snapshots without dropping task evidence or the latest tool result',()=>{
+  const old=runtimeSnapshot('OLD contract and budget'),latest=runtimeSnapshot('CURRENT contract and budget');
+  const file={path:'inventory-cases.md',sha256:'a'.repeat(64),content:'Complete employee delivery'};
+  const call={role:'assistant',content:[{type:'tool-call',id:'read',name:'filesystem',arguments:'{"path":"inventory-cases.md"}'}]};
+  const result={role:'user',content:[{type:'tool-result',toolCallId:'read',content:[{type:'text',text:JSON.stringify(file)}]}]};
+  const normal={role:'user',source:{kind:'user'},content:[{type:'text',text:'Current runtime context. User instruction must remain.'}]};
+  const messages=[old,call,result,runtimeSnapshot('SECOND old budget'),normal,latest],before=structuredClone(messages);
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,contextBytes:64000});
+  const prepared=adapter.prepareRequest({model:route.id,messages});
+  assert.deepEqual(prepared.body.messages.map(m=>m.content),[null,JSON.stringify(file),normal.content[0].text,latest.content[0].text]);
+  assert.equal(prepared.fitted.supersededRuntimeSnapshots,2);
+  assert.deepEqual(messages,before);assert.equal(adapter.calls,0);assert.equal(adapter.spent,0);
+});
+test('foreign, unmatched, partial or no-longer-covered snapshots remain, as do all compaction and incomplete-summary sources',()=>{
+  const latest=runtimeSnapshot('CURRENT');
+  const foreign={...runtimeSnapshot('FOREIGN'),source:{...latest.source,plugin:'other-plugin'}};
+  const unmatched=runtimeSnapshot('UNMATCHED');unmatched.content[0].text+=' extra instruction';
+  const missing=runtimeSnapshot('OLDER');
+  const oldWithExtra=runtimeSnapshot('OLD',[{name:'other:instruction',text:'Uncovered instruction'}]);
+  const noContract={role:'user',source:{...latest.source,sections:[{name:'other',text:'OTHER'}]},content:[{type:'text',text:joinContextSections([{name:'other',text:'OTHER'}])}]};
+  const partial={...runtimeSnapshot('PARTIAL'),content:[{type:'text',text:'incomplete text'}]};
+  for(const messages of [[foreign,latest],[unmatched,latest],[oldWithExtra,latest],[partial,latest],[missing,noContract]]){
+    const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,contextBytes:64000});
+    const prepared=adapter.prepareRequest({model:route.id,messages});
+    assert.equal(prepared.body.messages.length,messages.length);assert.equal(prepared.fitted.supersededRuntimeSnapshots??0,0);
+  }
+  for(const mode of ['compaction','incomplete-summary']){
+    const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,contextBytes:64000});
+    if(mode==='incomplete-summary')adapter.requireCompleteContext=()=>true;
+    const prepared=adapter.prepareRequest({model:route.id,messages:[runtimeSnapshot('OLD'),latest],purpose:mode==='compaction'?'compaction':undefined});
+    assert.equal(prepared.body.messages.length,2);
+  }
+});
 
 test('an abort during durable reservation never dispatches a request or reports an unknown sent call', async () => {
   const original = globalThis.fetch, controller = new AbortController(), failures = [], requests = [];

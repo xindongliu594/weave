@@ -1,0 +1,176 @@
+{
+  "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+  "minSuccessfulWorks": 3,
+  "candidateCapacity": {
+    "count": 0,
+    "bytes": 0,
+    "maxCount": 500,
+    "maxBytes": 8388608
+  },
+  "scannedRuns": 2,
+  "truncated": false,
+  "omissions": [],
+  "groups": [
+    {
+      "source": {
+        "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+        "version": 1,
+        "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+        "spaceId": "5928897e-5aec-4aa0-a683-e7b77bf684de",
+        "title": "sum addition validation checklist",
+        "scope": "department"
+      },
+      "successWorkCount": 2,
+      "workReferences": [
+        {
+          "workKey": "d4f37ca9-a891-4d32-b705-6a170f103a6b:7",
+          "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025"
+        },
+        {
+          "workKey": "acc5411f-e128-4dc4-98ef-6a43a110b228:2",
+          "runId": "7bbcdd40-056f-4ab4-85e5-7db7b3b27286"
+        }
+      ],
+      "works": [
+        {
+          "workKey": "acc5411f-e128-4dc4-98ef-6a43a110b228:2",
+          "runId": "7bbcdd40-056f-4ab4-85e5-7db7b3b27286",
+          "projectId": "acc5411f-e128-4dc4-98ef-6a43a110b228",
+          "planVersion": 2,
+          "notes": [
+            "经理只读验收时，采用该切片的“先确认整数范围、按正/负/零取例、明确拒绝非整数、逐条写明输入与预期”结构，作为核对 refund-cases.md 覆盖完整性与边界判定（尤其是非整数必须报错、安全整数上下界）的方法依据；该切片自述仅适用于整数加法。"
+          ],
+          "taskIds": [
+            "accept"
+          ],
+          "efficiency": {
+            "current": {
+              "runId": "7bbcdd40-056f-4ab4-85e5-7db7b3b27286",
+              "goalHash": "8108517f0eaed21f35ce715de62c7899e88ddf1b656938698c97e8025b42f0d3",
+              "acceptanceHash": "f09aa73aee4cc334d773ef5ffcbf345ebf3e45a41723aafd9fe23b80852abce7",
+              "modelHash": "bee527d97577aea73a8bc27d95c06517366f08aaf76a2e38f154ea4ce324e248",
+              "deviceHash": "c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601",
+              "initialFilesHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "resumed": true,
+              "usageComplete": true,
+              "wallMs": 25234,
+              "approvalWaitMs": 0,
+              "activeMs": 25234,
+              "modelMs": 23819,
+              "inputTokens": 61174,
+              "outputTokens": 2117,
+              "totalTokens": 63291,
+              "modelCalls": 6,
+              "cost": 0.020892599999999997,
+              "pendingReceipts": 0,
+              "knowledgeVersions": [
+                {
+                  "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+                  "version": 1,
+                  "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+                },
+                {
+                  "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+                  "version": 1,
+                  "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+                }
+              ],
+              "citations": [
+                {
+                  "agentId": "employee-3",
+                  "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+                  "version": 1,
+                  "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+                  "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+                }
+              ]
+            },
+            "baseline": null,
+            "comparison": null,
+            "method": "仅在本次核对窗口内寻找同条件最早完整可比较运行；不是全历史首个运行。未齐费用或没有基线时保持未验证，不推断因果收益。"
+          }
+        },
+        {
+          "workKey": "d4f37ca9-a891-4d32-b705-6a170f103a6b:7",
+          "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+          "projectId": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+          "planVersion": 7,
+          "notes": [
+            "场景A完全适用：采用其先确认整数范围、正数2+3=5、负数-2+-3=-5、零0+0=0、明确拒绝非整数、检查项写明输入与预期结果的步骤；场景B仅复用其\"检查项写明输入与预期结果、先确认取值范围\"框架，改用小数输入与容差条件。"
+          ],
+          "taskIds": [
+            "dev-doc"
+          ],
+          "efficiency": {
+            "current": {
+              "runId": "e3f2213c-6eb0-4b0c-acba-5274bc891025",
+              "goalHash": "7b1a36c601b2876998c9620c3a62d9e55d49c61d211d70ce44dd7c01add67465",
+              "acceptanceHash": "1e56b5028e24684a3e8d6ba4762812d6fd5d6abe3d96e5cfbb0e19d32a5b86c3",
+              "modelHash": "a2e337da39fc43f9f0fb1ec237d1eefff06b063e24c0b8772934aa96e9f1f9c9",
+              "deviceHash": "c5cdc76c2dc4ad2f445e9e80fc269cbc7950556af6874704ab404208fe43c601",
+              "initialFilesHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "resumed": false,
+              "usageComplete": true,
+              "wallMs": 59711,
+              "approvalWaitMs": 0,
+              "activeMs": 59711,
+              "modelMs": 55372,
+              "inputTokens": 200821,
+              "outputTokens": 5635,
+              "totalTokens": 206456,
+              "modelCalls": 20,
+              "cost": 0.0670083,
+              "pendingReceipts": 0,
+              "knowledgeVersions": [
+                {
+                  "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+                  "version": 1,
+                  "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+                },
+                {
+                  "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+                  "version": 1,
+                  "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+                }
+              ],
+              "citations": [
+                {
+                  "agentId": "employee-1",
+                  "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+                  "version": 1,
+                  "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+                  "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+                },
+                {
+                  "agentId": "employee-1",
+                  "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+                  "version": 1,
+                  "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+                  "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+                },
+                {
+                  "agentId": "employee-2",
+                  "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+                  "version": 1,
+                  "chunkId": "6a11c02428cdd32f1885a408bc42b5f94a3001f29b750752371972868bd8c0a7",
+                  "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+                },
+                {
+                  "agentId": "employee-2",
+                  "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+                  "version": 1,
+                  "chunkId": "95b4515395160dc0f0ff70c74608da5a92c868a30282b77e920114264aec03c7",
+                  "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+                }
+              ]
+            },
+            "baseline": null,
+            "comparison": null,
+            "method": "仅在本次核对窗口内寻找同条件最早完整可比较运行；不是全历史首个运行。未齐费用或没有基线时保持未验证，不推断因果收益。"
+          }
+        }
+      ]
+    }
+  ],
+  "method": "按最近核对窗口内的项目与语义方案版本统计不同已验收工作；超过窗口时次数是已证实下界，不能解释为全部历史总数；恢复、重复读取和失败尝试不增加成功次数。来源版本分别统计，收益仅沿用同条件实测对照；没有基线或用量不齐时保持未验证。每次最多核对100个完成运行、100个来源，每来源显示最近20个工作。"
+}

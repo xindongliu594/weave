@@ -1,0 +1,35 @@
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (164.6795ms)
+✔ historical command bootstrap stays within its 8KB cap with long Unicode history and never includes arbitrary evidence payloads (2.3491ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (198.7347ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (135.4512ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (82.6152ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (152.0467ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (78.472ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (76.2507ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (85.8726ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (56.2988ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (31.2413ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (23.6821ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (26.3602ms)
+✔ host file checks reject linked directories before reading their contents (5.6778ms)
+✔ host file checks reject binary content declared as text (13.9963ms)
+✔ optimistic writes reject a second editor using the same observed hash (19.0356ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (717.5221ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (355.331ms)
+✔ sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal (419.6056ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (343.7009ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (3215.2767ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (437.2811ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (446.2857ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (586.2444ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (607.7968ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (692.4615ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (1.1761ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8297.0065

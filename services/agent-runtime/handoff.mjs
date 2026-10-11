@@ -89,7 +89,8 @@ export class HandoffGate {
   }
   beforeFile(taskId, attemptId, name, args) {
     const task = this.begin(taskId, attemptId);
-    if (name === 'filesystem' && task.inputs !== undefined && !task.inputs.some(i => i.path === args.path) && !(task.outputs ?? []).some(o => o.path === args.path)) throw Error('UNDECLARED_INPUT: ' + args.path);
+    if (name === 'filesystem' && task.inputs !== undefined && !task.inputs.some(i => i.path === args.path) && !(task.outputs ?? []).some(o => o.path === args.path))
+      throw Object.assign(Error('UNDECLARED_INPUT: ' + args.path),{code:'UNDECLARED_INPUT',notExecuted:true});
     if (name === 'artifact_write' && task.outputs !== undefined && !(task.outputs ?? []).some(o => o.path === args.path)) throw Error('UNDECLARED_OUTPUT: ' + args.path);
     if (name === 'artifact_write' && ((task.inScope?.length && !scoped(args.path, task.inScope)) || scoped(args.path, task.outOfScope))) throw Error('OUT_OF_SCOPE: ' + args.path);
     return listArtifacts(this.sandbox.root);

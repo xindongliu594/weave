@@ -1,0 +1,136 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ demand discussion records actual usage without estimating or reserving an execution budget (984.362672ms)
+✔ usage-only accounting cannot be applied to execution or project identities (17.84142ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (58.656959ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (88.390762ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (88.498839ms)
+✔ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (70.728024ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (147.238994ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (71.229009ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (90.56192ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (53.99403ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (185.621692ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2999.762166
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (991.516862ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (85.05665ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (52.637544ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (78.596635ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (65.755444ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (60.442204ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (59.379384ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (57.7237ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (44.269551ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (39.30589ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (90.312033ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (56.529466ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (68.001965ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (113.119984ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (62.085231ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (98.18424ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (60.509607ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (309.708382ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2754.584739
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (214.918854ms)
+✔ resource history retains full wire schema overhead without counting message contents or inherited history (27.508103ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (35.435752ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (52.914197ms)
+✔ other project/version registration cannot leak into this exact version (42.572423ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (48.907924ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (33.4817ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (31.385264ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (27.60998ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (57.796302ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (24.610979ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (31.485592ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (16.965886ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1663.356418
+✔ resource approval preserves original semantics, grants and source snapshot (4.398577ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (2.249414ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (0.991819ms)
+✔ subsequent resource approval retains each ancestor once (0.587423ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (2.51994ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (1.73989ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (0.798456ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.687113ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.266395ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.234706ms)
+✔ explicit call ceilings extend only unfinished resources and keep every historical attempt (2.295475ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (2.325753ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.824921ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.814573ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.318157ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.341574ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.401239ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.542086ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.702236ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (10.840025ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (8.430846ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.422909ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (1.110706ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (0.60235ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1125.715599
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (23.864568ms)
+✔ historical command bootstrap stays within its 8KB cap with long Unicode history and never includes arbitrary evidence payloads (2.947661ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (115.666611ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (64.286478ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (56.241274ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (62.031571ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (37.180222ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (29.297011ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (40.490018ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (7.275487ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (2.190392ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (4.505624ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (3.604524ms)
+✔ host file checks reject linked directories before reading their contents (5.868094ms)
+✔ host file checks reject binary content declared as text (1.186912ms)
+✔ optimistic writes reject a second editor using the same observed hash (2.039997ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (278.962491ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (102.548034ms)
+✔ sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal (103.501707ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (92.598702ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (238.48869ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (112.028819ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (136.630291ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (164.379755ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (179.99623ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (143.137912ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.547674ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1758.378527
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle9-20261011", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-reuse-cycle8-20261011", "packetSha256": "3375f8597ab4a1a99a1802ee37e8fafef2fb82fb56d57f4a2159b70e0c4ad569", "projectCount": 10, "usageBefore": 484, "modelCalls": 0, "dependencies": "existing pinned directories reused", "memOSInstalled": false, "passed": true, "usageAfter": 484, "mainPID": "1758004", "projectStatePreserved": true, "usagePreserved": true, "originalArchivesPreserved": true, "archiveEvidence": {"files": 449, "bytes": 393758014, "manifestSha256": "11349a05d815b6c6c2e5e2216070c24d5d89b0316c6494a03194834fff681c19"}}

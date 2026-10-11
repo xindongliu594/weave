@@ -9,7 +9,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import http from 'node:http';
 import express from 'express';
 import type pg from 'pg';
-import { createRunArchive } from '../services/agent-runtime/trace-store.mjs';
+import { createRunArchive, openRunArchive, readRun } from '../services/agent-runtime/trace-store.mjs';
 import { toolEvidence } from './model-fixture.ts';
 import { createGoalContract } from '../packages/contracts/goal-contract.mjs';
 
@@ -48,7 +48,7 @@ before(async () => {
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [departmentId, { name: '恢复检查隔离部门', agents: [employee] }]);
   const { runManagementRouter } = await import('../apps/api/src/run-management.ts');
   const app = express(); app.use(express.json()); app.use('/api', runManagementRouter(traceRoot));
-  app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message, code: error.code }));
+  app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message, code: error.code, ...(error.outputDiagnostic?{diagnostic:error.outputDiagnostic}:{}) }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as any).port + '/api';
 });
 beforeEach(async () => {
@@ -66,18 +66,19 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed(sealGoal=false) {
+async function seed(sealGoal=false,declaredReads=false) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
+  const planTasks=declaredReads?tasks.map(task=>({...task,inputs:[]})):tasks;
   const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
-    title: 'Recovery fixture', templateVersion: 'fixture', policy, tasks, approvedTasks: tasks,
+    title: 'Recovery fixture', templateVersion: 'fixture', policy, tasks:planTasks, approvedTasks:planTasks,approval:{kind:'project',approvedAt:new Date().toISOString()},
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
     modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1) }],
     departmentBudgets: { [departmentId]: .99 }, executionBudget: .99, budgetVersion: 1, budgetHistory: { calls: 0, tasks: {} } };
   if(sealGoal)snapshot.goalContract=createGoalContract(snapshot);
   await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
-    [projectId, departmentId, '恢复检查隔离部门', snapshot.requirement, { ...policy, maxBudget: 2 }, { rationale: 'Concrete bounded text work', agents: [employee], tasks }, 'manual']);
+    [projectId, departmentId, '恢复检查隔离部门', snapshot.requirement, { ...policy, maxBudget: 2 }, { rationale: 'Concrete bounded text work', agents: [employee], tasks:planTasks }, 'manual']);
   await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,started_at) VALUES($1,$2,1,'failed',$3,now())", [runId, projectId, snapshot]);
   for (const taskId of ['prepare', 'finish']) await pool.query('INSERT INTO usage(id,model_id,project_id,run_id,task_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,$4,$5,1,1,.1,$6)',
     [randomUUID(), modelId, projectId, runId, taskId, 'isolated budget fixture']);
@@ -275,7 +276,7 @@ test('resource approval refuses stale goal, different source and completed-node 
 
 test('AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate', {skip:!isolated},async()=>{
   const {runId,projectId}=await seed(true),original=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
-  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},rationale:'Local planner fixture, never employee acceptance'};
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},rationale:'Local planner fixture, never employee acceptance'};
   const body={modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true};
   await pool.query("UPDATE projects SET policy=jsonb_set(policy,'{maxBudget}','0.301'::jsonb) WHERE id=$1",[projectId]);
   const blocked=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
@@ -287,9 +288,13 @@ test('AI resource planning keeps the original project admission cap and only sto
   const prompt=resourcePlanningMessages[0].content;
   assert.match(prompt,/"minimum":1/);assert.match(prompt,/"maximum":1.5/);
   assert.match(prompt,/项目累计总额/);
+  assert.match(prompt,/调用次数也是累计上限/);
   const schema=JSON.parse(prompt.slice(prompt.indexOf('{'),prompt.indexOf('\n')));
   assert.equal(schema.properties.taskCallLimits.properties.finish.minimum,3);
+  assert.equal(schema.properties.taskBudgetLimits.properties.finish.maximum,1.5);
+  assert.deepEqual(candidate.proposal.taskBudgetLimits,{finish:1.2});
   const context=JSON.parse(resourcePlanningMessages[1].content);
+  assert.equal(context.tasks.find((task:any)=>task.id==='finish').minimumCallLimit,3);
   assert.equal(context.costs.reserved,.1);assert.ok(context.costs.recordedCost>0);
   assert.ok(context.costs.availableAtCeiling>context.costs.availableAtOriginal);
   assert.equal(providerRequests,1);assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
@@ -298,4 +303,88 @@ test('AI resource planning keeps the original project admission cap and only sto
   assert.equal(usage.purpose,'预算补充规划');assert.equal(usage.input_tokens,10);assert.equal(usage.planning_preview_id,candidate.previewId);
   const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
   assert.equal(confirmed.status,202);assert.equal(providerRequests,1);
+  const resumed=(await confirmed.json() as any).id;
+  const resumedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[resumed])).rows[0].snapshot;
+  assert.equal(resumedSnapshot.tasks.find((task:any)=>task.id==='finish').maxBudget,1.2);
+  assert.equal(resumedSnapshot.budgetHistory.tasks.finish.cost,context.tasks.find((task:any)=>task.id==='finish').usedCost);
+});
+
+test('invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees', {skip:!isolated},async()=>{
+  const {runId}=await seed(true);
+  const privateText='private-model-content-must-not-leak';
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:0},taskBudgetLimits:{finish:1.2},rationale:privateText};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+  const result=await response.json() as any;
+  assert.equal(response.status,422);assert.equal(result.code,'RESOURCE_PROPOSAL_INVALID');
+  assert.equal(result.diagnostic.reason,'PLAN_SCHEMA_INVALID');
+  assert.equal(result.diagnostic.finishReason,'stop');
+  assert.equal(result.diagnostic.schemaIssues[0].expected.minimum,3);
+  assert.equal(JSON.stringify(result).includes(privateText),false);
+  assert.match(result.diagnostic.originalOutputSHA,/^[a-f0-9]{64}$/);
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
+  assert.equal((await pool.query("SELECT count(*)::int AS n FROM usage WHERE purpose='预算补充规划'")).rows[0].n,1);
+});
+
+test('explicit larger call ceilings travel from planning through confirmation without resetting archived calls', {skip:!isolated},async()=>{
+  const {runId}=await seed(true);
+  resourcePlanningReply={maxBudget:1.5,maxModelCalls:12,taskCallLimits:{finish:7},taskBudgetLimits:{finish:.9},rationale:'Explicit cumulative call allowance fixture'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true,maxModelCalls:12,maxTaskModelCalls:8})});
+  const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+  assert.deepEqual(candidate.callCeilings,{maxModelCalls:12,maxTaskModelCalls:8});
+  const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  assert.equal(confirmed.status,202);const child=(await confirmed.json() as any).id;
+  const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[child])).rows[0].snapshot;
+  assert.equal(snapshot.policy.maxModelCalls,12);assert.equal(snapshot.policy.maxTaskModelCalls,7);
+  assert.equal(snapshot.tasks.find((t:any)=>t.id==='finish').maxModelCalls,7);
+  assert.equal(snapshot.budgetHistory.calls,2);assert.equal(snapshot.budgetHistory.tasks.finish.calls,1);
+  assert.deepEqual(snapshot.completedCheckpoints,['prepare']);assert.equal(providerRequests,1);
+});
+
+test('overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling', {skip:!isolated},async()=>{
+  const seeded=await seed(true),base=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[seeded.runId])).rows[0].snapshot;
+  const projectId=randomUUID(),runId=randomUUID(),unfinished=['first','second','third'].map(id=>({...tasks[1],id,dependencies:[],maxModelCalls:40}));
+  const snapshot={...base,projectId,policy:{...base.policy,maxModelCalls:100,maxTaskModelCalls:40},tasks:unfinished,approvedTasks:unfinished};
+  snapshot.goalContract=createGoalContract(snapshot);
+  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
+    [projectId,departmentId,'Fixture',snapshot.requirement,snapshot.policy,{agents:[employee],tasks:unfinished,rationale:'Shared project cap'},'manual']);
+  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,started_at) VALUES($1,$2,1,'failed',$3,now())",[runId,projectId,snapshot]);
+  const archive=createRunArchive(traceRoot,snapshot,{id:runId});archive.append('run/finished',{status:'failed'});
+  resourcePlanningReply={maxBudget:1.5,maxModelCalls:100,taskCallLimits:{first:40,second:40,third:40},
+    taskBudgetLimits:{first:.5,second:.5,third:.5},rationale:'Overlapping lifetime allowances share one project gate'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1})});
+  const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+  const context=JSON.parse(resourcePlanningMessages[1].content);
+  assert.equal(context.tasks.reduce((sum:number,task:any)=>sum+task.nextRequestCount,0),18);
+  assert.ok(context.tasks.every((task:any)=>task.minimumCallLimit===40&&task.usedCalls===0));
+  assert.equal(candidate.proposal.maxModelCalls,100);assert.equal(providerRequests,1);
+});
+
+test('legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal', {skip:!isolated},async()=>{
+  async function blockedRead(change:Record<string,any>={}){
+    const seeded=await seed(true,true),row=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[seeded.runId])).rows[0];
+    const archive=openRunArchive(traceRoot,seeded.runId),callId='denied-read-'+randomUUID(),sessionId=randomUUID();
+    const path='.agent-teams/run-test/inbox/private.jsonl',message='UNDECLARED_INPUT: '+path;
+    archive.append('tool/start',{name:'filesystem',arguments:{path}},{sessionId,callId});
+    archive.append('goal/blocked',{point:'file-scope',taskId:'finish',sha256:row.snapshot.goalContract.sha256,message,...change.block});
+    if(change.brokenSequence)archive.append('fixture/interleaved',{});
+    archive.append('runtime/operation-failed',{name:'filesystem',classification:'blocked',code:'Error',message,...change.failure},{sessionId,callId});
+    archive.append('handoff/blocked',{taskId:'finish',attemptId:'attempt',message});
+    if(!change.missingResult)archive.append('tool/result',{name:'filesystem',result:{isError:true,error:{message:'HANDOFF_BLOCKED: finish: '+message},...change.result}},{sessionId,callId:change.foreignCall?'other-call':callId,taskId:change.foreignTask?'t1':'t2',attemptId:change.foreignAttempt?'foreign':'attempt'});
+    if(change.extraGoalBlock)archive.append('goal/blocked',{point:'tool-dispatch',message:'GOAL_CONTRACT_CHANGED: real violation'});
+    return seeded.runId;
+  }
+  const runId=await blockedRead(),beforeUsage=(await pool.query('SELECT count(*)::int AS n FROM usage')).rows[0].n;
+  const {assertGoalRecovery}=await import('../apps/api/src/goal-recovery.ts'),run=readRun(traceRoot,runId);
+  assert.throws(()=>assertGoalRecovery(run!.snapshot,{...run,integrity:'incomplete'}),{code:'GOAL_REPLAN_REQUIRED'});
+  const result=await check(runId,'?retainUncertainCosts=true');assert.equal(result.resume.allowed,true,JSON.stringify(result.resume.reasons));
+  const resumed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true});assert.equal(resumed.status,202);
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage')).rows[0].n,beforeUsage);assert.equal(providerRequests,0);
+  for(const change of [{missingResult:true},{brokenSequence:true},{extraGoalBlock:true},{foreignCall:true},{foreignTask:true},{foreignAttempt:true},{result:{error:{message:'unrelated'}}},{failure:{name:'artifact_write'}},{failure:{classification:'outcome_unknown'}},
+    {result:{isError:false,value:{content:'read data'}}},{block:{point:'tool-dispatch'}},{block:{sha256:'0'.repeat(64)}},{block:{message:'VERSION_MISMATCH: protected.txt'}}]){
+    const denied=await check(await blockedRead(change),'?retainUncertainCosts=true');
+    assert.equal(denied.resume.allowed,false);assert.ok(denied.resume.reasons.some((r:any)=>r.code==='GOAL_REPLAN_REQUIRED'));
+  }
 });

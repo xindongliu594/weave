@@ -1,0 +1,1 @@
+tests/recovery-resource-plan.test.ts(5,33): error TS7016: Could not find a declaration file for module '../services/agent-runtime/budget.mjs'. 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/budget.mjs' implicitly has an 'any' type.
