@@ -3,6 +3,7 @@ const path=require('node:path');
 const {createHash,randomUUID,randomBytes}=require('node:crypto');
 const {spawn}=require('node:child_process');
 const {validPath,canonicalManifest}=require('./local-executor.cjs');
+const {SANDBOX_STORAGE_LIMITS,storageDenied,boundedStorage,checkSandboxStorage}=require('./sandbox-storage.cjs');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const POLICY_TEXT='version: 1\nfilesystem_policy:\n  include_workdir: false\n  read_only: [/bin, /usr, /lib, /lib64, /etc, /proc, /dev/urandom, /var/tmp, /sys/fs/cgroup]\n  read_write: [/sandbox, /tmp, /dev/null]\nlandlock:\n  compatibility: hard_requirement\nprocess:\n  run_as_user: "1000"\n  run_as_group: "1000"\nnetwork_policies: {}\nnetwork_middlewares: {}\n';
@@ -65,25 +66,43 @@ ${denied.toString()}
 ${validPath.toString()}
 ${decodeFiles.toString()}
 ${canonicalManifest.toString()}
+const SANDBOX_STORAGE_LIMITS=${JSON.stringify(SANDBOX_STORAGE_LIMITS)};
+${storageDenied.toString()}
+${boundedStorage.toString()}
+${checkSandboxStorage.toString()}
 function checkedPath(root,value){validPath(value);let at=root;if(!fs.lstatSync(at).isDirectory()||fs.lstatSync(at).isSymbolicLink())throw denied('沙箱工作区目录已被替换');for(const part of value.split('/')){at=path.join(at,part);try{const stat=fs.lstatSync(at);if(stat.isSymbolicLink()||stat.isFile()&&stat.nlink>1)throw denied('沙箱工作区不允许链接');}catch(error){if(error.code!=='ENOENT')throw error;}}return at;}
 function exportFiles(root){const files=[];let total=0,entries=0;function walk(dir){for(const name of fs.readdirSync(dir).sort()){if(++entries>512)throw denied('工作区项目数量超过限制','LOCAL_FILE_LIMIT');const full=path.join(dir,name),stat=fs.lstatSync(full),relative=path.relative(root,full).split(path.sep).join('/');checkedPath(root,relative);if(stat.isDirectory())walk(full);else if(stat.isFile()){if(files.length>=128||stat.size>5*1024*1024||(total+=stat.size)>20*1024*1024)throw denied('工作区文件超过限制','LOCAL_FILE_LIMIT');files.push({path:relative,content:fs.readFileSync(full).toString('base64')});}else throw denied('工作区出现非普通文件');}}walk(root);decodeFiles(files);return files;}
 function manifest(files){return canonicalManifest(decodeFiles(files).map(file=>({path:file.path,size:file.bytes.length,sha256:hash(file.bytes)})));}
 function revision(files){return hash(JSON.stringify(manifest(files)));}
 function writeVersion(root,value,bytes,expected){const file=checkedPath(root,value),current=fs.existsSync(file)?hash(fs.readFileSync(file)):null;if(current!==(expected??null))throw denied('文件已变化，请携带正确 sha256','FILE_VERSION_CONFLICT');let temporary;try{fs.mkdirSync(path.dirname(file),{recursive:true,mode:0o700});checkedPath(root,value);temporary=path.join(path.dirname(file),'.agent-write-'+crypto.randomUUID());const fd=fs.openSync(temporary,'wx',0o600);try{fs.writeFileSync(fd,bytes);fs.fsyncSync(fd);}finally{fs.closeSync(fd);}checkedPath(root,value);if((fs.existsSync(file)?hash(fs.readFileSync(file)):null)!==current)throw denied('写入期间文件已变化','FILE_VERSION_CONFLICT');fs.renameSync(temporary,file);}catch(error){error.notExecuted=false;throw error;}finally{if(temporary&&fs.existsSync(temporary))fs.unlinkSync(temporary);}}
-async function command(command,cwd){if(typeof command!=='string'||!command||command.length>5000)throw denied('命令格式不正确');return await new Promise((resolve,reject)=>{const child=spawn('/bin/sh',['-lc',command],{cwd,env:process.env,stdio:['ignore','pipe','pipe'],detached:true});let chunks=[],size=0,overflow=false,timedOut=false;const kill=()=>{try{process.kill(-child.pid,'SIGKILL');}catch{}};const timer=setTimeout(()=>{timedOut=true;kill();},60000);const collect=chunk=>{size+=chunk.length;if(size>1024*1024){overflow=true;kill();}else chunks.push(chunk);};child.stdout.on('data',collect);child.stderr.on('data',collect);child.once('error',error=>{clearTimeout(timer);reject(Object.assign(error,{notExecuted:true}));});child.once('close',code=>{clearTimeout(timer);kill();if(overflow||timedOut||code===null)return reject(Object.assign(Error(overflow?'命令输出超过限制':timedOut?'命令超过批准的执行时限':'命令退出结果不明确'),{code:overflow?'LOCAL_OUTPUT_LIMIT':'LOCAL_OUTCOME_UNKNOWN',notExecuted:false}));resolve({exitCode:code,output:Buffer.concat(chunks).toString('utf8')});});});}
+async function command(command,cwd){
+ if(typeof command!=='string'||!command||command.length>5000)throw denied('命令格式不正确');
+ return await new Promise((resolve,reject)=>{
+  const child=spawn('/bin/sh',['-lc',command],{cwd,env:process.env,stdio:['ignore','pipe','pipe'],detached:true});let chunks=[],size=0,overflow=false,timedOut=false,storageError;
+  const kill=()=>{try{process.kill(-child.pid,'SIGKILL');}catch{}};
+  const timer=setTimeout(()=>{timedOut=true;kill();},60000),monitor=setInterval(()=>{try{checkSandboxStorage();}catch(error){storageError=error;kill();}},250);
+  const clear=()=>{clearTimeout(timer);clearInterval(monitor);};
+  const collect=chunk=>{size+=chunk.length;if(size>1024*1024){overflow=true;kill();}else chunks.push(chunk);};child.stdout.on('data',collect);child.stderr.on('data',collect);
+  child.once('error',error=>{clear();reject(Object.assign(error,{notExecuted:true}));});
+  child.once('close',code=>{clear();kill();if(storageError)return reject(Object.assign(storageError,{notExecuted:false}));
+   if(overflow||timedOut||code===null)return reject(Object.assign(Error(overflow?'命令输出超过限制':timedOut?'命令超过批准的执行时限':'命令退出结果不明确'),{code:overflow?'LOCAL_OUTPUT_LIMIT':'LOCAL_OUTCOME_UNKNOWN',notExecuted:false}));resolve({exitCode:code,output:Buffer.concat(chunks).toString('utf8')});
+  });
+ });
+}
 let buffers=[],length=0;
 process.stdin.on('data',chunk=>{length+=chunk.length;if(length>29*1024*1024)process.exit(65);buffers.push(chunk);});
 process.stdin.on('end',async()=>{let request,changed=false;try{
  request=JSON.parse(Buffer.concat(buffers).toString('utf8'));const root='/sandbox',args=request.arguments??{};
  const identity={uid:process.getuid(),gid:process.getgid(),node:process.version,cpu:fs.readFileSync('/sys/fs/cgroup/cpu.max','utf8').trim().split(/\s+/).map(Number),memory:fs.readFileSync('/sys/fs/cgroup/memory.max','utf8').trim()};
  if(identity.uid!==1000||identity.gid!==1000||identity.node!=='v24.19.0'||identity.cpu[0]/identity.cpu[1]!==1||Number(identity.memory)!==536870912)throw denied('实际沙箱身份或资源限制不匹配','OPENSHELL_IDENTITY_MISMATCH');
- let files=exportFiles(root),result={};if(request.expectedStoredRevision&&request.expectedStoredRevision!==revision(files))throw denied('沙箱文件与已保存的恢复版本不一致','WORKSPACE_VERSION_CONFLICT');if(args.expectedWorkspaceRevision&&args.expectedWorkspaceRevision!==revision(files))throw denied('批准后的工作区已变化','WORKSPACE_VERSION_CONFLICT');
+ checkSandboxStorage();let files=exportFiles(root),result={};if(request.expectedStoredRevision&&request.expectedStoredRevision!==revision(files))throw denied('沙箱文件与已保存的恢复版本不一致','WORKSPACE_VERSION_CONFLICT');if(args.expectedWorkspaceRevision&&args.expectedWorkspaceRevision!==revision(files))throw denied('批准后的工作区已变化','WORKSPACE_VERSION_CONFLICT');
  if(request.name==='prepare'){const inputs=decodeFiles(request.files??[]);if(files.length)throw denied('沙箱工作区已经存在文件，拒绝重复初始化','LOCAL_WORKSPACE_CONFLICT');for(const file of inputs){changed=true;writeVersion(root,file.path,file.bytes,null);}}
  else if(request.name==='filesystem'){const file=checkedPath(root,args.path),stat=fs.lstatSync(file);if(!stat.isFile()||stat.size>1024*1024)throw denied('读取文件超过限制','LOCAL_FILE_LIMIT');const bytes=fs.readFileSync(file);result={path:args.path,content:bytes.toString('utf8'),sha256:hash(bytes)};}
  else if(request.name==='artifact_write'){if(typeof args.content!=='string'||Buffer.byteLength(args.content)>5*1024*1024)throw denied('写入文件超过限制','LOCAL_FILE_LIMIT');validPath(args.path);decodeFiles([...files.filter(f=>f.path!==args.path),{path:args.path,content:Buffer.from(args.content).toString('base64')}]);writeVersion(root,args.path,Buffer.from(args.content),args.expectedSha256);changed=true;result={path:args.path,bytes:Buffer.byteLength(args.content),sha256:hash(Buffer.from(args.content))};}
  else if(request.name==='terminal'||request.name==='terminal_test'){changed=true;result=await command(args.command,root);}
+ else if(request.name==='storage_inspect'){}
  else throw denied('沙箱工具未开放');
- files=exportFiles(root);console.log(JSON.stringify({nonce:request.nonce,ok:true,result:{...result,files,artifacts:manifest(files),workspaceRevision:revision(files)},identity}));
+ const storage=checkSandboxStorage();files=exportFiles(root);console.log(JSON.stringify({nonce:request.nonce,ok:true,result:{...result,files,artifacts:manifest(files),workspaceRevision:revision(files),storage},identity}));
  }catch(error){console.log(JSON.stringify({nonce:request?.nonce,ok:false,error:{code:error.code??'LOCAL_OPERATION_FAILED',message:String(error.message).slice(0,500),notExecuted:!changed&&(error.notExecuted===true||request?.name==='filesystem')}}));}
 });
 `;
@@ -116,7 +135,7 @@ class OpenShellDeviceExecutor {
  read(runId){
   const file=this.stateFile(runId);if(!fs.existsSync(file))return null;canonicalPath(file);if(fs.statSync(file).size>1024*1024)throw denied('OpenShell 映射文件超过限制');const scope=JSON.parse(fs.readFileSync(file,'utf8'));
   if(scope.runId!==runId||scope.grantId!==this.grant.id||scope.fingerprint!==this.backend.fingerprint)throw denied('OpenShell 持久映射授权已变化');
-  if(scope.schema!==1||!/^wwe-[a-f0-9]{12}$/.test(scope.name)||!['creating','importing','ready','starting','stopping','stopped','unknown'].includes(scope.phase)||!Array.isArray(scope.completedOperations)||scope.completedOperations.length>4096||scope.completedOperations.some(id=>!uuid.test(id))||new Set(scope.completedOperations).size!==scope.completedOperations.length||scope.activeOperation!=null&&!uuid.test(scope.activeOperation))throw denied('OpenShell 持久映射格式不正确');
+  if(scope.schema!==1||!/^wwe-[a-f0-9]{12}$/.test(scope.name)||!['creating','importing','ready','starting','stopping','stopped','unknown','retiring','retired'].includes(scope.phase)||!Array.isArray(scope.completedOperations)||scope.completedOperations.length>4096||scope.completedOperations.some(id=>!uuid.test(id))||new Set(scope.completedOperations).size!==scope.completedOperations.length||scope.activeOperation!=null&&!uuid.test(scope.activeOperation))throw denied('OpenShell 持久映射格式不正确');
   if(!['creating','unknown'].includes(scope.phase)&&!uuid.test(scope.sandboxId)||['ready','starting','stopping','stopped'].includes(scope.phase)&&! /^[a-f0-9]{64}$/.test(scope.workspaceRevision))throw denied('OpenShell 持久映射缺少已确认的沙箱或文件版本');
   return scope;
  }
@@ -188,7 +207,7 @@ class OpenShellDeviceExecutor {
    decodeFiles(result.files);if(result.workspaceRevision!==revision(result.files)||JSON.stringify(result.artifacts)!==JSON.stringify(manifest(result.files)))throw unknown('OpenShell 文件回执与版本不一致');
    if(job.name==='prepare'&&result.workspaceRevision!==scope.sourceRevision)throw unknown('恢复文件与原始版本不一致');
    await this.admit(scope,signal);
-   scope.phase='ready';scope.activeOperation=null;scope.completedOperations.push(job.id);scope.workspaceRevision=result.workspaceRevision;scope.identity=identity;scope.effectivePolicyHash=OPENSHELL_CONSTANTS.effectivePolicyHash;this.save(scope);
+   scope.phase='ready';scope.activeOperation=null;scope.completedOperations.push(job.id);scope.workspaceRevision=result.workspaceRevision;scope.identity=identity;scope.effectivePolicyHash=OPENSHELL_CONSTANTS.effectivePolicyHash;scope.storage=result.storage;this.save(scope);
    return {...result,localWorkspace:'openshell://'+this.config.gateway+'/'+scope.sandboxId+'/sandbox',execution:{...this.backend,sandboxId:scope.sandboxId,sandboxName:scope.name,...identity,effectivePolicyHash:scope.effectivePolicyHash}};
   }catch(error){
    if(lifecyclePending||dispatched&&(!error.knownRemoteOutcome||!error.notExecuted)){scope.phase='unknown';error.notExecuted=false;}else if(job.name==='prepare'&&dispatched){scope.phase='unknown';error.notExecuted=false;}
@@ -196,6 +215,52 @@ class OpenShellDeviceExecutor {
    scope.activeOperation=null;scope.lastError={code:error.code??'LOCAL_OPERATION_FAILED',message:String(error.message).slice(0,500),notExecuted:!!error.notExecuted};this.save(scope);throw error;
   }
  }
+ storageScopes(){
+  if(!fs.existsSync(this.stateRoot))return [];canonicalPath(this.stateRoot,{directory:true});const rows=[],dir=fs.opendirSync(this.stateRoot);let entries=0;
+  try{let entry;while((entry=dir.readSync())){if(++entries>1000){rows.push({phase:'unverified',error:'映射条目超过 1000，剩余保留'});break;}if(!/^[a-f0-9-]{36}\.json$/.test(entry.name))continue;
+   const runId=entry.name.slice(0,-5);try{const scope=this.read(runId);rows.push({runId,sandboxId:scope.sandboxId,name:scope.name,phase:scope.phase,workspaceRevision:scope.workspaceRevision,storage:scope.storage,retirement:scope.retirement});}catch{rows.push({runId,phase:'unverified',error:'映射授权或格式未核对'});}
+  }}finally{dir.closeSync();}return rows;
+ }
+ maintenance(fn){if(this.closing||this.closed)return Promise.reject(denied('OpenShell 执行器已关闭'));const task=this.queue.then(fn);this.queue=task.catch(()=>{});return task;}
+ inspectStorage(runId){return this.maintenance(()=>this.inspectStorageNow(runId));}
+ async inspectStorageNow(runId){
+  this.assertGrant({id:randomUUID(),runId,grantId:this.grant.id});let scope=this.read(runId);if(!scope||!['ready','stopped'].includes(scope.phase)||scope.activeOperation)throw unknown('沙箱当前状态或操作结果尚未核对');
+  const signal=AbortSignal.timeout(120000);let started=false;
+  try{
+   if(scope.phase==='stopped'){const state=await this.get(scope,signal);if(state.phase!=='Stopped')throw denied('停止状态已变化','OPENSHELL_IDENTITY_MISMATCH');scope.phase='starting';this.save(scope);started=true;await this.cli(['sandbox','start',scope.name],signal,{timeoutMs:90000,mutation:true});await this.waitForPhase(scope,'Ready',signal);scope.phase='ready';this.save(scope);started=false;}
+   await this.admit(scope,signal);const nonce=randomBytes(16).toString('hex');
+   const response=await this.cli(['sandbox','exec','--name',scope.name,'--workdir','/sandbox','--no-tty','--no-login-shell','--timeout','75','--','node','-e',REMOTE_SCRIPT],signal,{input:JSON.stringify({nonce,name:'storage_inspect',expectedStoredRevision:scope.workspaceRevision}),timeoutMs:90000});
+   let receipt;try{receipt=JSON.parse(response.stdout);}catch{throw unknown('磁盘核对回执不完整');}
+   if(receipt.nonce!==nonce||typeof receipt.ok!=='boolean')throw unknown('磁盘核对回执不匹配');
+   if(!receipt.ok)throw denied(receipt.error?.message??'磁盘核对失败',receipt.error?.code??'SANDBOX_STORAGE_LIMIT');
+   const result=receipt.result,identity=receipt.identity;
+   if(identity?.uid!==1000||identity.gid!==1000||identity.node!=='v24.19.0'||identity.cpu?.[0]/identity.cpu?.[1]!==1||Number(identity.memory)!==536870912)throw denied('核对身份不匹配','OPENSHELL_IDENTITY_MISMATCH');
+   decodeFiles(result.files);if(result.workspaceRevision!==revision(result.files)||result.workspaceRevision!==scope.workspaceRevision||JSON.stringify(result.artifacts)!==JSON.stringify(manifest(result.files))||!result.storage)throw denied('当前文件版本未核对','WORKSPACE_VERSION_CONFLICT');
+   await this.admit(scope,signal);scope.storage=result.storage;this.save(scope);return {runId,sandboxId:scope.sandboxId,workspaceRevision:scope.workspaceRevision,storage:result.storage};
+  }catch(error){if(started){scope.phase='unknown';scope.lastError={code:error.code??'LOCAL_OUTCOME_UNKNOWN',message:'启动核对中断，禁止自动重放'};this.save(scope);throw unknown(scope.lastError.message);}throw error;}
+ }
+ retireStorage(runId,expected){return this.maintenance(async()=>{
+  this.assertGrant({id:randomUUID(),runId,grantId:this.grant.id});let scope=this.read(runId);if(scope?.phase==='retired')return scope.retirement.result;
+  if(!scope||scope.phase==='retiring'||scope.phase==='unknown'||scope.activeOperation)throw unknown('原回收结果未核对，禁止重发删除');
+  if(expected?.sandboxId!==scope.sandboxId||expected?.workspaceRevision!==scope.workspaceRevision)throw denied('回收预览与沙箱版本不同','WORKSPACE_VERSION_CONFLICT');
+  await this.inspectStorageNow(runId);scope=this.read(runId);const signal=AbortSignal.timeout(60000);
+  scope.phase='retiring';scope.retirement={id:randomUUID(),sandboxId:scope.sandboxId,workspaceRevision:scope.workspaceRevision,startedAt:new Date().toISOString()};this.save(scope);
+  try{await this.cli(['sandbox','delete',scope.sandboxId],signal,{mutation:true});const result=await this.confirmAbsent(scope,signal);if(result.state!=='retired')throw unknown('删除已受理但资源仍在');scope.phase='retired';scope.retirement.result=result;this.save(scope);return result;}
+  catch(error){scope.phase='unknown';scope.lastError={code:'LOCAL_OUTCOME_UNKNOWN',message:'回收已发出但未取得最终回执，请只核对原沙箱'};this.save(scope);throw unknown(scope.lastError.message);}
+ });}
+ async confirmAbsent(scope,signal){
+  for(let attempts=0;attempts<20;attempts++){const response=await this.transport(this.config.cliPath,['--gateway',this.config.gateway,'sandbox','get',scope.sandboxId,'--output','json'],{env:this.env,signal,timeoutMs:30000});
+   if(response.exitCode===1&&response.stderr?.toLowerCase().includes('sandbox not found'))return {runId:scope.runId,sandboxId:scope.sandboxId,state:'retired',replayed:false};
+   if(response.exitCode!==0)throw unknown('回收状态查询没有确定回执');const actual=JSON.parse(response.stdout);if(actual.id!==scope.sandboxId)throw unknown('回收沙箱 ID 不匹配');
+   if(actual.phase!=='Deleting')return {runId:scope.runId,sandboxId:scope.sandboxId,state:'present',replayed:false};
+   await new Promise(resolve=>setTimeout(resolve,250));
+  }throw unknown('OpenShell 仍在处理回收，须稍后核对');
+ }
+ reconcileStorage(runId){return this.maintenance(async()=>{
+  this.assertGrant({id:randomUUID(),runId,grantId:this.grant.id});const scope=this.read(runId);if(!scope?.retirement)throw denied('没有原回收意图，不能核对');
+  if(scope.phase==='retired')return scope.retirement.result;const result=await this.confirmAbsent(scope,AbortSignal.timeout(60000));
+  if(result.state==='retired'){scope.phase='retired';scope.retirement.result=result;this.save(scope);}return result;
+ });}
  close(){return this.closing??=(async()=>{
   await this.queue;this.closed=true;const signal=AbortSignal.timeout(60000);
   for(const scope of this.scopes.values())if(scope.phase==='ready'&&!scope.activeOperation){
