@@ -35,7 +35,8 @@ async function fixture(t, pending, stream) {
   const handle = await factory.createAgent(host.ctx, { sessionId: randomUUID(), meta: { cwd: root }, agentOptions: { provider: 'fixture', model: 'fixture' } });
   handle.agent.followup(createUserMessage({ content: [{ type: 'text', text: 'Protocol regression fixture, not real employee acceptance.' }], source: { kind: 'user' } }));
   await handle.agent.whenIdle();
-  return { requests, blocked, events: readRun(join(root, 'runs'), archive.id).events, agent: handle.agent };
+  return { requests, blocked, events: readRun(join(root, 'runs'), archive.id).events, agent: handle.agent,
+    factory,host,handle,root,archive };
 }
 
 test('a plain final answer gets one native same-attempt handoff reminder, never automatic success', async t => {
@@ -66,6 +67,26 @@ test('the reminder stops when the same task becomes sealed; no third model reque
   assert.equal(f.requests.length, 2); assert.equal(f.blocked.length, 0);
   assert.equal(f.events.filter(e => e.type === 'handoff/reminder').length, 1);
   assert.equal(f.events.filter(e => e.type === 'handoff/accepted').length, 0);
+});
+
+test('a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own', { timeout: 15000 }, async t => {
+  let pending=task;
+  const f=await fixture(t,()=>pending,()=>reply('Protocol text without formal submission.'));
+  const sessionId=f.agent.id;
+  await f.handle.dispose();
+  const resumed=await f.factory.resume(f.host.ctx,{resumeSessionId:sessionId,agentOptions:{provider:'fixture',model:'fixture'}});
+  resumed.agent.followup(createUserMessage({content:[{type:'text',text:'Resume the same protocol attempt.'}],source:{kind:'user'}}));
+  await resumed.agent.whenIdle();
+  assert.equal(f.requests.length,3,'same attempt receives no second corrective request');
+  assert.equal(f.blocked.length,2);
+  let events=readRun(join(f.root,'runs'),f.archive.id).events;
+  assert.equal(events.filter(e=>e.type==='handoff/reminder').length,1);
+  pending={...task,attemptId:'new-attempt'};
+  resumed.agent.followup(createUserMessage({content:[{type:'text',text:'New separately approved protocol attempt.'}],source:{kind:'user'}}));
+  await resumed.agent.whenIdle();
+  assert.equal(f.requests.length,5);
+  events=readRun(join(f.root,'runs'),f.archive.id).events;
+  assert.deepEqual(events.filter(e=>e.type==='handoff/reminder').map(e=>e.data.attemptId),['fixed-attempt','new-attempt']);
 });
 
 test('the production Host reminder accepts only the real native handoff and excludes the captain', { timeout: 15000 }, async t => {

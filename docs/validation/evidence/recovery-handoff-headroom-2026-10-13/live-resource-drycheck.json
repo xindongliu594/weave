@@ -1,0 +1,44 @@
+{
+  "runId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "sourceRunsChecked": 8,
+  "allowedCallCeilings": {
+    "maxModelCalls": 64,
+    "maxTaskModelCalls": 40
+  },
+  "requirements": {
+    "tasks": {
+      "t2-qa": {
+        "workRequests": 1,
+        "handoffCorrectionRequests": 1,
+        "nextRequestCount": 2,
+        "minimumCallLimit": 40
+      },
+      "t3-review": {
+        "workRequests": 6,
+        "handoffCorrectionRequests": 1,
+        "nextRequestCount": 7,
+        "minimumCallLimit": 32
+      }
+    },
+    "minimumTotalCalls": 64
+  },
+  "projectCap": 0.3,
+  "minimumProjectBudget": 0.408798,
+  "currentBudgetSufficient": false,
+  "recordedCost": 0.2501061,
+  "retained": 0,
+  "nodeFloors": [
+    {
+      "taskId": "t2-qa",
+      "minimumBudget": 0.2231997,
+      "requestOverheadBytes": 6969
+    },
+    {
+      "taskId": "t3-review",
+      "minimumBudget": 0.2,
+      "requestOverheadBytes": 13
+    }
+  ],
+  "modelCalls": 0,
+  "productionWrites": 0
+}

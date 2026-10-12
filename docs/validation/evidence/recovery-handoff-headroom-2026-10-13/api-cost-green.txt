@@ -1,0 +1,51 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1596.0417ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (175.5289ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (152.5692ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (193.1296ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (150.6946ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (153.0068ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (136.3806ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (155.5254ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (132.0031ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (101.3887ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (294.5887ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (168.5608ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (190.6446ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (263.8291ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (155.8046ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (154.5833ms)
+✔ shared project money rejects a full correction tranche before planning despite sufficient node money (109.0182ms)
+✔ late project expenses prevent confirming a previously valid correction candidate (127.1547ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (147.0391ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (217.223ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (203.4538ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1277.0879ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7013.7554
+✔ demand discussion records actual usage without estimating or reserving an execution budget (2300.8743ms)
+✔ usage-only accounting cannot be applied to execution or project identities (30.3764ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (100.8015ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (195.138ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (224.9547ms)
+✔ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (136.041ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (364.5502ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (166.8315ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (223.1226ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (96.6116ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (362.8181ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5991.2725

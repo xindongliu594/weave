@@ -66,7 +66,7 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed(sealGoal=false,declaredReads=false) {
+async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
@@ -74,7 +74,7 @@ async function seed(sealGoal=false,declaredReads=false) {
   const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
     title: 'Recovery fixture', templateVersion: 'fixture', policy, tasks:planTasks, approvedTasks:planTasks,approval:{kind:'project',approvedAt:new Date().toISOString()},
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
-    modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1) }],
+    modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1),...(pricedRoutes?{inputRate:2,outputRate:10,maxOutputTokens:512}:{}) }],
     departmentBudgets: { [departmentId]: .99 }, executionBudget: .99, budgetVersion: 1, budgetHistory: { calls: 0, tasks: {} } };
   if(sealGoal)snapshot.goalContract=createGoalContract(snapshot);
   await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
@@ -205,7 +205,7 @@ async function resourcePreview(runId:string,changes:any={}) {
   const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0];
   const previewId=randomUUID(),usageId=randomUUID();
   const data={kind:'run-resource-proposal',sourceRunId:runId,projectId:row.project_id,projectVersion:row.project_version,
-    sourceGoalContract:row.snapshot.goalContract,sourceResourceRevision:0,ceiling:1.5,modelId,usageId,
+    sourceGoalContract:row.snapshot.goalContract,sourceResourceRevision:0,ceiling:1.5,modelId,usageId,callRequirementVersion:'handoff-correction-v1',
     proposal:{maxBudget:1.5,taskCallLimits:{finish:3},rationale:'Fund only unfinished work without resetting original counts'},...changes};
   await pool.query('INSERT INTO organization_previews(id,data,project_id) VALUES($1,$2,$3)',[previewId,data,row.project_id]);
   await pool.query("INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose,planning_preview_id) VALUES($1,$2,$3,1,1,.001,'预算补充规划',$4)",[usageId,modelId,row.project_id,previewId]);
@@ -295,6 +295,9 @@ test('AI resource planning keeps the original project admission cap and only sto
   assert.deepEqual(candidate.proposal.taskBudgetLimits,{finish:1.2});
   const context=JSON.parse(resourcePlanningMessages[1].content);
   assert.equal(context.tasks.find((task:any)=>task.id==='finish').minimumCallLimit,3);
+  assert.equal(context.tasks.find((task:any)=>task.id==='finish').handoffCorrectionRequests,1);
+  assert.equal(context.tasks.find((task:any)=>task.id==='finish').workRequests,1);
+  assert.equal(candidate.callRequirementVersion,'handoff-correction-v1');
   assert.equal(context.costs.reserved,.1);assert.ok(context.costs.recordedCost>0);
   assert.ok(context.costs.availableAtCeiling>context.costs.availableAtOriginal);
   assert.equal(providerRequests,1);assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
@@ -306,7 +309,54 @@ test('AI resource planning keeps the original project admission cap and only sto
   const resumed=(await confirmed.json() as any).id;
   const resumedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[resumed])).rows[0].snapshot;
   assert.equal(resumedSnapshot.tasks.find((task:any)=>task.id==='finish').maxBudget,1.2);
+  assert.equal(resumedSnapshot.resourceApproval.callRequirementVersion,'handoff-correction-v1');
   assert.equal(resumedSnapshot.budgetHistory.tasks.finish.cost,context.tasks.find((task:any)=>task.id==='finish').usedCost);
+});
+
+test('one remaining node call is rejected before paid resource planning or any data changes', {skip:!isolated},async()=>{
+  const {runId}=await seed(true);
+  openRunArchive(traceRoot,runId).append('model/wire-request',{taskId:'finish'});
+  const before=await state();
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},rationale:'Insufficient one-call fixture'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+  assert.equal(response.status,422);assert.equal((await response.json() as any).code,'RESOURCE_CALLS_INSUFFICIENT');
+  assert.equal(providerRequests,0);assert.deepEqual(await state(),before);
+});
+
+test('confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees', {skip:!isolated},async()=>{
+  const {runId}=await seed(true),{previewId}=await resourcePreview(runId),before=await state();
+  openRunArchive(traceRoot,runId).append('model/wire-request',{taskId:'finish'});
+  const body={resume:true,retainUncertainCosts:true,budgetPreviewId:previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'};
+  const exhausted=await resourceRetry(runId,body);
+  assert.equal(exhausted.status,422);assert.equal((await exhausted.json() as any).code,'RESOURCE_CALLS_INSUFFICIENT');
+  const oldDraft=await resourcePreview(runId,{callRequirementVersion:undefined});
+  const outdated=await resourceRetry(runId,{...body,budgetPreviewId:oldDraft.previewId});
+  assert.equal(outdated.status,409);assert.equal((await outdated.json() as any).code,'RESOURCE_PREVIEW_STALE');
+  assert.equal(providerRequests,0);
+  assert.deepEqual((await state()).find(entry=>entry.name==='model_reservations'),before.find(entry=>entry.name==='model_reservations'));
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
+});
+
+test('shared project money rejects a full correction tranche before planning despite sufficient node money', {skip:!isolated},async()=>{
+  const {runId,projectId}=await seed(true,false,true);
+  await pool.query('INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,1,1,1.1,$4)',
+    [randomUUID(),modelId,projectId,'isolated historical project expense']);
+  const before=await state();
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+  assert.equal(response.status,422);assert.equal((await response.json() as any).code,'RESOURCE_BUDGET_INSUFFICIENT');
+  assert.equal(providerRequests,0);assert.deepEqual(await state(),before);
+});
+
+test('late project expenses prevent confirming a previously valid correction candidate', {skip:!isolated},async()=>{
+  const {runId,projectId}=await seed(true,false,true),{previewId}=await resourcePreview(runId);
+  await pool.query('INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,1,1,1.1,$4)',
+    [randomUUID(),modelId,projectId,'isolated late confirmed expense']);
+  const before=await state();
+  const response=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  assert.equal(response.status,422);assert.equal((await response.json() as any).code,'RESOURCE_BUDGET_INSUFFICIENT');
+  assert.equal(providerRequests,0);assert.deepEqual(await state(),before);
 });
 
 test('invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees', {skip:!isolated},async()=>{
@@ -328,7 +378,7 @@ test('invalid resource proposals expose bounded diagnostics, preserve settled us
 
 test('explicit larger call ceilings travel from planning through confirmation without resetting archived calls', {skip:!isolated},async()=>{
   const {runId}=await seed(true);
-  resourcePlanningReply={maxBudget:1.5,maxModelCalls:12,taskCallLimits:{finish:7},taskBudgetLimits:{finish:.9},rationale:'Explicit cumulative call allowance fixture'};
+  resourcePlanningReply={maxBudget:1.5,maxModelCalls:12,taskCallLimits:{finish:8},taskBudgetLimits:{finish:.9},rationale:'Explicit cumulative call allowance fixture'};
   const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true,maxModelCalls:12,maxTaskModelCalls:8})});
   const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
@@ -336,8 +386,8 @@ test('explicit larger call ceilings travel from planning through confirmation wi
   const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
   assert.equal(confirmed.status,202);const child=(await confirmed.json() as any).id;
   const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[child])).rows[0].snapshot;
-  assert.equal(snapshot.policy.maxModelCalls,12);assert.equal(snapshot.policy.maxTaskModelCalls,7);
-  assert.equal(snapshot.tasks.find((t:any)=>t.id==='finish').maxModelCalls,7);
+  assert.equal(snapshot.policy.maxModelCalls,12);assert.equal(snapshot.policy.maxTaskModelCalls,8);
+  assert.equal(snapshot.tasks.find((t:any)=>t.id==='finish').maxModelCalls,8);
   assert.equal(snapshot.budgetHistory.calls,2);assert.equal(snapshot.budgetHistory.tasks.finish.calls,1);
   assert.deepEqual(snapshot.completedCheckpoints,['prepare']);assert.equal(providerRequests,1);
 });
@@ -357,7 +407,7 @@ test('overlapping task lifetime ceilings need only their next bounded tranches i
     body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1})});
   const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
   const context=JSON.parse(resourcePlanningMessages[1].content);
-  assert.equal(context.tasks.reduce((sum:number,task:any)=>sum+task.nextRequestCount,0),18);
+  assert.equal(context.tasks.reduce((sum:number,task:any)=>sum+task.nextRequestCount,0),21);
   assert.ok(context.tasks.every((task:any)=>task.minimumCallLimit===40&&task.usedCalls===0));
   assert.equal(candidate.proposal.maxModelCalls,100);assert.equal(providerRequests,1);
 });

@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1636.6253ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (190.3342ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (124.6268ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (216.7508ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (145.4836ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (150.3391ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (139.18ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (157.5994ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (128.3905ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (101.135ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (278.1011ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (152.9767ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (190.1473ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (261.5246ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (108.5065ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (141.0862ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (150.1599ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (189.2269ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (205.1868ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1242.363ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6582.0764

@@ -1,0 +1,21 @@
+{
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom-20261013",
+  "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder4-20261012",
+  "packetSha256": "52fece784eb1bce79274652141cfd34acc8c081a646abda4bde315aae3c89086",
+  "projectCount": 10,
+  "usageBefore": 516,
+  "modelCalls": 0,
+  "dependencies": "existing pinned directories reused",
+  "newDependenciesInstalled": false,
+  "passed": true,
+  "usageAfter": 516,
+  "mainPID": "443101",
+  "projectStatePreserved": true,
+  "usagePreserved": true,
+  "originalArchivesPreserved": true,
+  "archiveEvidence": {
+    "files": 484,
+    "bytes": 402990108,
+    "manifestSha256": "1224c0da147fe66d33bc9301da9932a8dd7ca886f29001f402c9686d9743fc2f"
+  }
+}

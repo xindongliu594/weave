@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGoalContract, assertGoalContract } from '../packages/contracts/goal-contract.mjs';
 import { applyRecoveryResources, recoveryResourceProposalSchema, recoveryTaskMinimumBudget, verifiedResourceEdge } from '../apps/api/src/recovery-resource-plan.ts';
+import * as resources from '../apps/api/src/recovery-resource-plan.ts';
 const {ExecutionBudget}=await import(new URL('../services/agent-runtime/budget.mjs',import.meta.url).href);
 
 function fixture() {
@@ -141,4 +142,76 @@ test('explicit call ceilings extend only unfinished resources and keep every his
   assert.equal(verifiedResourceEdge(next,old,'parent',['develop','qa']),true);
   next.resourceApproval.callCeilings.maxTaskModelCalls=16;next.goalContract=createGoalContract(next);
   assert.equal(verifiedResourceEdge(next,old,'parent',['develop','qa']),false);
+});
+
+const correctionVersion='handoff-correction-v1';
+function correctionFixture(){
+  const old=fixture();old.policy.maxModelCalls=48;old.policy.maxTaskModelCalls=32;
+  old.tasks[1].maxModelCalls=32;old.tasks[2].maxModelCalls=32;old.goalContract=createGoalContract(old);
+  return old;
+}
+function requirements(old:any,history:any,done=['develop'],ceilings={maxModelCalls:64,maxTaskModelCalls:40}){
+  assert.equal(typeof (resources as any).recoveryCallRequirements,'function','missing shared handoff-correction requirements');
+  return (resources as any).recoveryCallRequirements(old,history,done,ceilings);
+}
+test('recovery counts six work requests plus one correction for each unfinished task',()=>{
+  const old=correctionFixture(),before=structuredClone(old),history={calls:48,tasks:{qa:{calls:32}}};
+  const result=requirements(old,history);
+  assert.equal(result.tasks.qa.workRequests,6);assert.equal(result.tasks.qa.handoffCorrectionRequests,1);
+  assert.equal(result.tasks.qa.nextRequestCount,7);assert.equal(result.tasks.qa.minimumCallLimit,39);
+  assert.equal(result.tasks.accept.minimumCallLimit,32);assert.equal(result.minimumTotalCalls,62);
+  assert.equal(result.tasks.develop,undefined);assert.deepEqual(old,before);assert.equal(history.tasks.qa.calls,32);
+});
+test('recovery preserves a correction when only two node calls remain and rejects zero or one',()=>{
+  const old=correctionFixture();
+  const result=requirements(old,{calls:54,tasks:{qa:{calls:38}}});
+  assert.equal(result.tasks.qa.workRequests,1);assert.equal(result.tasks.qa.handoffCorrectionRequests,1);
+  assert.equal(result.tasks.qa.minimumCallLimit,40);assert.equal(result.minimumTotalCalls,63);
+  for(const calls of [39,40])assert.throws(()=>requirements(old,{calls:54,tasks:{qa:{calls}}}),
+    (error:any)=>error.code==='RESOURCE_CALLS_INSUFFICIENT');
+});
+test('shared project calls must cover all next tranches and malformed history never creates headroom',()=>{
+  const old=correctionFixture();
+  assert.throws(()=>requirements(old,{calls:51,tasks:{qa:{calls:32}}}),
+    (error:any)=>error.code==='RESOURCE_CALLS_INSUFFICIENT');
+  for(const history of [{calls:-1,tasks:{}},{calls:1.5,tasks:{}},{calls:48,tasks:{qa:{calls:NaN}}}])
+    assert.throws(()=>requirements(old,history));
+});
+test('versioned confirmation rechecks actual history and rejects an underfunded or omitted next tranche',()=>{
+  const old=correctionFixture(),history={calls:48,tasks:{qa:{calls:32}}};
+  const change={maxBudget:.18,maxModelCalls:64,taskCallLimits:{qa:39,accept:32},taskBudgetLimits:{qa:.18,accept:.18},rationale:'Keep each correction within existing authorization'};
+  const opts={...options,completedTaskIds:['develop'],history,callCeilings:{maxModelCalls:64,maxTaskModelCalls:40},callRequirementVersion:correctionVersion} as any;
+  const good=applyRecoveryResources(old,change,opts);assert.equal(good.tasks[1].maxModelCalls,39);
+  for(const altered of [{...change,taskCallLimits:{qa:38,accept:32}},{...change,maxModelCalls:61},
+    {...change,taskCallLimits:{qa:39}}])assert.throws(()=>applyRecoveryResources(old,altered,opts));
+  assert.throws(()=>applyRecoveryResources(old,change,{...opts,history:{calls:49,tasks:{qa:{calls:33}}}}));
+});
+test('versioned node money must cover work and correction with old spend and holds preserved',()=>{
+  const old=correctionFixture();old.policy.maxBudget=1;old.policy.contextBytes=48000;
+  old.agents[0].modelId='m';old.modelRoutes[0]={id:'m',inputRate:.3,outputRate:1.2,maxOutputTokens:2048};
+  old.tasks[2].assignee='e';old.tasks[2].maxBudget=.05;old.goalContract=createGoalContract(old);
+  const history={calls:48,tasks:{accept:{calls:32,cost:.03,reserved:.01,requestOverheadBytes:6969}}};
+  const change={maxBudget:1, maxModelCalls:64,taskCallLimits:{accept:39},taskBudgetLimits:{accept:.18},rationale:'Fund the complete correction tranche'};
+  const opts={...options,completedTaskIds:['develop','qa'],history,ceiling:1,callCeilings:{maxModelCalls:64,maxTaskModelCalls:40},callRequirementVersion:correctionVersion} as any;
+  assert.throws(()=>applyRecoveryResources(old,{...change,taskBudgetLimits:{accept:.06}},opts));
+  const next=applyRecoveryResources(old,change,opts);assert.equal(next.tasks[2].maxBudget,.18);
+  assert.deepEqual(history.tasks.accept,{calls:32,cost:.03,reserved:.01,requestOverheadBytes:6969});
+});
+test('unknown requirement versions are rejected while historical approved edges remain verifiable',()=>{
+  assert.throws(()=>applyRecoveryResources(fixture(),proposal,{...options,callRequirementVersion:'future-rule'} as any));
+  const old=fixture(),next=applyRecoveryResources(old,proposal,options);
+  next.resourceApproval={format:'run-resource-approval-v1',revision:1,sourceRunId:'parent',sourceGoalContract:old.goalContract,
+    ceiling:.18,proposal,previewId:'00000000-0000-4000-8000-000000000001',usageId:'00000000-0000-4000-8000-000000000002'};
+  next.goalContract=createGoalContract(next);
+  assert.equal(verifiedResourceEdge(next,old,'parent',['develop','qa']),true);
+});
+test('shared money floor counts only unfinished next requests and includes project spend and holds',()=>{
+  const old=correctionFixture();old.policy.contextBytes=48000;
+  old.agents[0].modelId='m';old.modelRoutes[0]={id:'m',inputRate:.3,outputRate:1.2,maxOutputTokens:2048};
+  old.tasks[1].assignee='e';old.tasks[2].assignee='e';
+  assert.equal(typeof (resources as any).recoveryMinimumProjectBudget,'function');
+  const floor=(resources as any).recoveryMinimumProjectBudget(old,{calls:48,tasks:{qa:{calls:32}}},['develop'],
+    {maxModelCalls:64,maxTaskModelCalls:40},{recordedCost:.2,reserved:.01});
+  const reservation=((48000+13+1024)*.3+2048*1.2)/1e6;
+  assert.ok(Math.abs(floor-(.21+14*reservation))<1e-8);
 });

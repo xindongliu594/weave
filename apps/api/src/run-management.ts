@@ -17,7 +17,7 @@ import { readRun, openRunArchive } from '../../../services/agent-runtime/trace-s
 import { listArtifacts, artifactFile, command, SANDBOX_IMAGE, RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
 import { inspectRecoveryConditions, recoveryProjectBudgetIssues, recoveryHistoryBudgetIssues, assertRecoveryBudgetIssues } from './recovery-conditions.ts';
 import { assertGoalRecovery } from './goal-recovery.ts';
-import { approvedRecoveryResources } from './recovery-resource-plan.ts';
+import { approvedRecoveryResources, recoveryMinimumProjectBudget, recoveryCallRequirementVersion } from './recovery-resource-plan.ts';
 import { recoveryResourceRouter } from './recovery-resource-router.ts';
 export function runManagementRouter(traceRoot:string){
  const router=Router();
@@ -94,6 +94,10 @@ export function runManagementRouter(traceRoot:string){
    }
    if(!snapshot.tasks.some((task:any)=>!done.has(task.id)))throw new AppError(409,'所有任务已有完成记录，请查看交付结果，无需重跑');
    const costReadiness=await requireProjectCostReady(client,old.project_id,input.retainUncertainCosts,snapshot.policy.maxBudget);
+   if(input.budgetPreviewId&&snapshot.resourceApproval?.callRequirementVersion===recoveryCallRequirementVersion&&
+      recoveryMinimumProjectBudget(snapshot,history,[...done.keys()],snapshot.resourceApproval.callCeilings??
+       {maxModelCalls:snapshot.policy.maxModelCalls??100,maxTaskModelCalls:snapshot.policy.maxTaskModelCalls??40},costReadiness)>snapshot.policy.maxBudget)
+     throw new AppError(422,'确认时项目净额不足工作与交接纠正的完整请求预留，请重新规划','RESOURCE_BUDGET_INSUFFICIENT');
    await assertRunAuthorization(old,client);
    snapshot.executionBudget=costReadiness.availableBudget;snapshot.costCarryover=projectCostCarryover(costReadiness,input.retainUncertainCosts);
    assertRecoveryBudgetIssues(recoveryProjectBudgetIssues(costReadiness,snapshot.policy.maxBudget));

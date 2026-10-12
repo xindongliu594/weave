@@ -1,0 +1,11 @@
+{
+  "reviewer": "recovery_headroom_review",
+  "scope": "working diff since 42c11858a1696e7dc4d6f5ddf72a5e5671048859",
+  "critical": [],
+  "important": [],
+  "minor": [],
+  "independentResourceTests": {"passed": 18, "failed": 0},
+  "checkedEvidence": {"resourceAndLineage": 28, "cost": 11, "nativeRuntime": 58},
+  "declinedToJudge": ["Real model QA and manager completion within remaining resources; no SSH, production DB or paid model access."],
+  "modelCallsToProductProvider": 0
+}

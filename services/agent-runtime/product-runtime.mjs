@@ -141,6 +141,8 @@ export class ProductDshRuntime {
         // resume. Keep the approved run deadline/cancellation, not a short poll
         // deadline that can invalidate an otherwise successful task transition.
         status = await host.call(captain, 'agent_teams_status', {}, job.controller.signal);
+        // A member may fail while native status awaits its cold Host lifecycle.
+        if (runtimeFailure) throw runtimeFailure;
         if (status.members.some(member => member.spawn_error)) throw new Error('AgentTeams member startup failed');
         if (status.deliverable) { await host.verifyDeliverable(job.controller.signal); break; }
         if (host.hasBlockingFailure(status.tasks)) throw new Error('前置任务失败，相关下游未执行；请检查记录后重新制定方案');

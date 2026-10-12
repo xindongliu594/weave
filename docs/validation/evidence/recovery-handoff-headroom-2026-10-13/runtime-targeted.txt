@@ -1,0 +1,48 @@
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (336.1728ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (104.9369ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (108.5184ms)
+✔ a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own (240.3619ms)
+✔ the production Host reminder accepts only the real native handoff and excludes the captain (774.2412ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (711.0361ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (365.5002ms)
+✔ sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal (408.2711ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (353.8038ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (2616.6844ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (468.3467ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (504.4411ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (666.0601ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (641.609ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (630.2308ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.8886ms)
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (20342.4005ms)
+✔ user cancellation still aborts native cold resume without executing a later task (2484.2699ms)
+✖ missing formal QA handoff stops product admission before a coordinator or manager can take over (2734.6571ms)
+✔ a formal negative QA verdict remains a failed review and never unlocks manager acceptance (3462.4566ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (15193.2048ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 20
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44695.8168
+
+✖ failing tests:
+
+test at services\agent-runtime\status-lifecycle.test.mjs:141:1
+✖ missing formal QA handoff stops product admission before a coordinator or manager can take over (2734.6571ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /HANDOFF_NOT_SUBMITTED/. Input:
+  
+  '前置任务失败，相关下游未执行；请检查记录后重新制定方案'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/status-lifecycle.test.mjs:143:48)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '前置任务失败，相关下游未执行；请检查记录后重新制定方案',
+    expected: /HANDOFF_NOT_SUBMITTED/,
+    operator: 'match',
+    diff: 'simple'
+  }

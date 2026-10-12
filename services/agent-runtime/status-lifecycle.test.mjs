@@ -25,7 +25,7 @@ const contract = (id, assignee, dependencies, extra = {}) => ({ id, subject: id,
   kind: 'work', objective: 'Inspect or deliver this synthetic fixture.', dependencies,
   acceptanceCriteria: ['fixture task complete'], inputs: [], outputs: [], verify: [], maxOutputTokens: 512, maxModelCalls: 12, ...extra });
 
-async function lifecycle(t, { resumeDelayMs = 0, cancelOnResume = false, deadlineDuringResume = false, deadlineSeconds = 45 } = {}) {
+async function lifecycle(t, { resumeDelayMs = 0, cancelOnResume = false, deadlineDuringResume = false, deadlineSeconds = 45, qaOutcome } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'status-lifecycle-')), id = randomUUID();
   const snapshot = { mode: 'product', projectId: randomUUID(), planVersion: 8, requirement: 'Disposable engineering lifecycle fixture',
     executionBudget: 1, approval: { kind: 'project', projectVersion: 8 },
@@ -69,7 +69,12 @@ async function lifecycle(t, { resumeDelayMs = 0, cancelOnResume = false, deadlin
     if (receipt.taskId === 'qa_verify') actions.push(['filesystem', { path: fixturePath }], ['terminal_test', { command }], update(), ['agent_teams_send_message', { to: 'captain', content: 'Synthetic QA verification complete; scheduler owns the next assignment.' }]);
     if (receipt.taskId === 'qa_review') actions.push(['filesystem', { path: fixturePath }], ['terminal_test', { command }], update({ verdict: 'pass' }));
     if (receipt.taskId === 'manager_accept') actions.push(['filesystem', { path: fixturePath }], ['artifact_write', { path: 'report.txt', content: 'Synthetic lifecycle complete' }], update({ changedPaths: ['report.txt'], commandsRun: [] }));
-    const action = receipt.taskId ? actions[step] : undefined;
+    let action = receipt.taskId ? actions[step] : undefined;
+    if(receipt.taskId==='qa_review'&&qaOutcome==='missing'&&step>=2)action=undefined;
+    if(receipt.taskId==='qa_review'&&qaOutcome==='reject'&&step===4)
+      action=['agent_teams_update_task',{task_id:receipt.runtimeTaskId,attempt_id:receipt.attemptId,status:'failed',
+        output:'Synthetic independent review rejected this fixture.',verdict:'reject',
+        findings:[{id:'fixture-rejection',severity:'high',problem:'Synthetic acceptance mismatch',requiredFix:'Correct the fixture'}]}];
     result.setHeader('content-type', 'application/json');
     result.end(JSON.stringify({ choices: [{ message: action ? { content: null, tool_calls: [{ id: randomUUID(), type: 'function', function: { name: action[0], arguments: JSON.stringify(action[1]) } }] } : { content: 'Synthetic turn complete.' }, finish_reason: action ? 'tool_calls' : 'stop' }], usage: { prompt_tokens: 17, completion_tokens: 5 } }));
   });
@@ -129,7 +134,31 @@ test('user cancellation still aborts native cold resume without executing a late
   assert.equal(outcome.status, 'cancelled'); assert.equal(archive.integrity, 'ok');
   assert.ok(!wires.some(row => row.taskId === 'qa_review' || row.taskId === 'manager_accept'));
   assert.ok(archive.events.some(e => e.type === 'handoff/accepted' && e.data.taskId === 'qa_verify'));
+  assert.ok(!archive.events.some(e=>e.type==='handoff/reminder'));
   assert.equal(archive.events.at(-1).type, 'run/finished');
+});
+
+test('missing formal QA handoff stops product admission before a coordinator or manager can take over', {timeout:20000},async t=>{
+  const {outcome,archive,wires,usage}=await lifecycle(t,{qaOutcome:'missing'});
+  assert.equal(outcome.status,'failed');assert.match(outcome.message,/HANDOFF_NOT_SUBMITTED/);
+  assert.equal(archive.integrity,'ok');
+  assert.equal(archive.events.filter(e=>e.type==='handoff/reminder').length,1);
+  assert.equal(archive.events.filter(e=>e.type==='handoff/missing').length,1);
+  assert.deepEqual(archive.events.filter(e=>e.type==='handoff/accepted').map(e=>e.data.taskId),['dev','qa_verify']);
+  assert.equal(wires.filter(row=>row.taskId==='qa_review').length,4);
+  assert.ok(!wires.some(row=>row.taskId==='manager_accept'));
+  const stopped=archive.events.find(e=>e.type==='handoff/missing').seq;
+  assert.ok(!archive.events.some(e=>e.type==='model/wire-request'&&e.seq>stopped),'failure closes every new model admission');
+  assert.equal(usage.length,wires.length,'every already dispatched fixture request settles');
+});
+
+test('a formal negative QA verdict remains a failed review and never unlocks manager acceptance', {timeout:20000},async t=>{
+  const {outcome,archive,wires}=await lifecycle(t,{qaOutcome:'reject'});
+  assert.equal(outcome.status,'failed');
+  assert.ok(archive.events.some(e=>e.type==='quality/review-submitted'&&e.data.taskId==='qa_review'&&e.data.verdict==='reject'));
+  assert.deepEqual(archive.events.filter(e=>e.type==='handoff/accepted').map(e=>e.data.taskId),['dev','qa_verify']);
+  assert.ok(!wires.some(row=>row.taskId==='manager_accept'));
+  assert.ok(!archive.events.some(e=>e.type==='handoff/reminder'));
 });
 
 test('the approved run deadline still aborts native cold resume and preserves accepted predecessors', { timeout: 25000 }, async t => {

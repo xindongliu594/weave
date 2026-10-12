@@ -11,3 +11,4 @@ docs/validation/evidence/hybrid-retrieval-2026-10-12/** -text whitespace=blank-a
 docs/validation/evidence/rag-relevance-2026-10-12/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 docs/validation/evidence/reuse-publication-continuation-2026-10-12/** -text -whitespace
+docs/validation/evidence/recovery-handoff-headroom-2026-10-13/** -text -whitespace

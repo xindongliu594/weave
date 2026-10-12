@@ -10,7 +10,8 @@ import { assertGoalRecovery } from './goal-recovery.ts';
 import { completedTasks } from './handoff-checkpoints.ts';
 import { budgetHistory } from './budget-history.ts';
 import { extractPlanningObject, PlanningOutputError, planningOutputDiagnostic, planningSchemaMessage } from './planning-output.ts';
-import { applyRecoveryResources, recoveryResourceProposalSchema, recoveryTaskMinimumBudget } from './recovery-resource-plan.ts';
+import { applyRecoveryResources, recoveryResourceProposalSchema, recoveryTaskMinimumBudget, recoveryCallRequirements,
+  recoveryCallRequirementVersion, recoveryMinimumProjectBudget } from './recovery-resource-plan.ts';
 
 export function recoveryResourceRouter(traceRoot:string) {
   const router=Router(),planning=new Set<string>();
@@ -42,34 +43,32 @@ export function recoveryResourceRouter(traceRoot:string) {
         originalBudget:task.maxBudget??row.snapshot.policy.maxBudget,usedCost:history.tasks[task.id]?.cost??0,
         reserved:history.tasks[task.id]?.reserved??0}));
       const taskMaximum=callCeilings.maxTaskModelCalls;
+      const requirements=recoveryCallRequirements(row.snapshot,history,done,callCeilings);
       for(const task of tasks){
-        task.minimumCallLimit=Math.max(task.originalCallLimit,task.usedCalls+Math.min(6,taskMaximum-task.usedCalls));
-        if(!task.completed&&(task.minimumCallLimit<=task.usedCalls||history.calls>=callCeilings.maxModelCalls))
-          throw new AppError(422,'允许的累计调用次数已用尽，请先明确提高次数上限','RESOURCE_CALLS_INSUFFICIENT');
-        task.nextRequestCount=Math.max(1,Math.min(6,taskMaximum-task.usedCalls,callCeilings.maxModelCalls-history.calls));
+        Object.assign(task,requirements.tasks[task.id]??{minimumCallLimit:task.originalCallLimit,nextRequestCount:0,workRequests:0,handoffCorrectionRequests:0});
         const original=(row.snapshot.approvedTasks??row.snapshot.tasks).find((item:any)=>item.id===task.id);
         task.minimumBudget=recoveryTaskMinimumBudget(row.snapshot,original,task.usedCost,task.reserved,history.tasks[task.id]?.requestOverheadBytes,task.nextRequestCount);
         if(!task.completed&&task.minimumBudget>input.maxBudget)throw new AppError(422,'节点完整请求所需累计上限超过本次允许额度，请先重新分配预算','RESOURCE_BUDGET_INSUFFICIENT');
       }
-      const minimumTotalCalls=Math.max(row.snapshot.policy.maxModelCalls??100,history.calls+
-        tasks.filter((task:any)=>!task.completed).reduce((sum:number,task:any)=>sum+task.nextRequestCount,0));
-      if(minimumTotalCalls>callCeilings.maxModelCalls)throw new AppError(422,'允许的总次数不足以覆盖未完成节点的下一段调用，请重新分配次数','RESOURCE_CALLS_INSUFFICIENT');
+      const minimumTotalCalls=requirements.minimumTotalCalls;
+      const costs=await projectCostReadiness(pool,row.project_id,row.snapshot.policy.maxBudget);
+      const minimumProjectBudget=Math.max(row.snapshot.policy.maxBudget,recoveryMinimumProjectBudget(row.snapshot,history,done,callCeilings,costs));
+      if(minimumProjectBudget>input.maxBudget)throw new AppError(422,'项目净额不足所有未完成节点的工作与交接纠正，请重新分配预算','RESOURCE_BUDGET_INSUFFICIENT');
       const callLimits=z.object(Object.fromEntries(tasks.filter((task:any)=>!task.completed).map((task:any)=>[task.id,z.number().int()
         .min(task.minimumCallLimit).max(taskMaximum)]))).strict();
       const budgetLimits=z.object(Object.fromEntries(tasks.filter((task:any)=>!task.completed).map((task:any)=>[task.id,z.number().finite()
         .min(task.minimumBudget).positive().max(input.maxBudget)]))).strict();
-      const boundedSchema=recoveryResourceProposalSchema.extend({maxBudget:z.number().finite().min(row.snapshot.policy.maxBudget).max(input.maxBudget),
+      const boundedSchema=recoveryResourceProposalSchema.extend({maxBudget:z.number().finite().min(minimumProjectBudget).max(input.maxBudget),
         maxModelCalls:input.maxModelCalls===undefined?z.number().int().min(minimumTotalCalls).max(callCeilings.maxModelCalls).optional():
           z.number().int().min(minimumTotalCalls).max(callCeilings.maxModelCalls),
         taskCallLimits:callLimits,taskBudgetLimits:budgetLimits});
-      const costs=await projectCostReadiness(pool,row.project_id,row.snapshot.policy.maxBudget);
       const messages=[{role:'system',content:'只规划续跑的资源，不改变任务、验收、权限，不生成交付物。返回一个简短JSON对象：'+JSON.stringify(z.toJSONSchema(boundedSchema))+
-        `\nmaxBudget是项目累计总额，包含已用费用和预留，不是新增费用；必须在 ${row.snapshot.policy.maxBudget} 到 ${input.maxBudget} 美元之间。maxModelCalls是含已用次数与所有未完成节点下一段调用的项目累计上限，不能只提高节点次数而保留不足的总次数。taskCallLimits和taskBudgetLimits只填未完成任务。调用次数也是累计上限，包含usedCalls，不是新增或剩余次数；每个节点必须至少为minimumCallLimit，不超过maxTaskModelCalls。节点金额也是累计上限，至少为minimumBudget，扣除usedCost与reserved后才是节点净额；minimumBudget覆盖nextRequestCount次完整请求的保守余量，最多6次且不超剩余调用次数，不代表足以完成任务。不能仅提高项目总额却保留已不足的节点金额。各节点仍共享项目门禁，不得把节点额度当成额外项目预算。恢复后仍需读取、逐次审批真实测试、处理结果和正式交接，尽量给每个未完成节点至少6次剩余调用和完整上下文费用余量；不减少旧额度，且不超过原maxTaskModelCalls。rationale用一两句说明。`},
+        `\nmaxBudget是项目累计总额，包含已用费用和预留，不是新增费用；必须在 ${minimumProjectBudget} 到 ${input.maxBudget} 美元之间。maxModelCalls是含已用次数与所有未完成节点下一段调用的项目累计上限，不能只提高节点次数而保留不足的总次数。taskCallLimits和taskBudgetLimits只填未完成任务。调用次数也是累计上限，包含usedCalls，不是新增或剩余次数；每个节点必须至少为minimumCallLimit，不超过本次允许的maxTaskModelCalls。节点金额也是累计上限，至少为minimumBudget，扣除usedCost与reserved后才是节点净额；minimumBudget覆盖nextRequestCount次完整请求，包含workRequests（最多6次工作，含认领、读取、验收、正式交接）和handoffCorrectionRequests（1次已有交接提醒后的纠正），不代表足以完成任务。不能只给工作段额度而使提醒触发后无法提交交接。各节点共享项目门禁，不得把节点额度当成额外预算。不要重复已核对的读取或重跑完成节点；按真实结果提交原生agent_teams_update_task及必需证据。允许上限内仍无法完成时明确说明，不编造通过。不减少旧额度、不超过本次允许上限。rationale用一两句说明。`},
         {role:'user',content:JSON.stringify({requirement:row.snapshot.requirement,ceiling:input.maxBudget,originalBudget:row.snapshot.policy.maxBudget,
           costs:{recordedCost:costs.recordedCost,reserved:costs.reserved,availableAtOriginal:costs.availableBudget,
             availableAtCeiling:input.maxBudget-costs.recordedCost-costs.reserved},
           budgetInstruction:'旧费用和预留不会清零。请核对原净额能否容纳恢复与正式验收；净额很少时应在用户ceiling内提高预算，不能只保留原费用与原调用次数。',
-          maxTaskModelCalls:taskMaximum,totalCallLimit:callCeilings.maxModelCalls,originalTotalCallLimit:row.snapshot.policy.maxModelCalls??100,usedTotalCalls:history.calls,tasks})}];
+          maxTaskModelCalls:taskMaximum,totalCallLimit:callCeilings.maxModelCalls,minimumProjectBudget,originalTotalCallLimit:row.snapshot.policy.maxModelCalls??100,usedTotalCalls:history.calls,tasks})}];
       // The small proposal still uses the original project cap. Confirmation,
       // not a planning request, grants the new execution ceiling.
       const response=await completeBudgeted(model,messages,512,{purpose:'预算补充规划',projectId:row.project_id,
@@ -81,10 +80,13 @@ export function recoveryResourceRouter(traceRoot:string) {
         throw Object.assign(new AppError(422,'AI没有返回有效资源方案，旧运行和额度未改变；本次用量已记录。'+planningSchemaMessage(reason.schema),'RESOURCE_PROPOSAL_INVALID'),
           {outputDiagnostic:planningOutputDiagnostic(response.choices[0].message.content,response.choices[0].finish_reason,reason)});
       }
-      applyRecoveryResources(row.snapshot,proposal,{newRevision:(row.snapshot.resourceRevision??0)+1,completedTaskIds:done,history,ceiling:input.maxBudget,callCeilings});
+      applyRecoveryResources(row.snapshot,proposal,{newRevision:(row.snapshot.resourceRevision??0)+1,completedTaskIds:done,history,ceiling:input.maxBudget,callCeilings,callRequirementVersion:recoveryCallRequirementVersion});
+      const settledCosts=await projectCostReadiness(pool,row.project_id,row.snapshot.policy.maxBudget);
+      if(recoveryMinimumProjectBudget(row.snapshot,history,done,callCeilings,settledCosts)>proposal.maxBudget)
+        throw new AppError(422,'规划用量已记录，项目净额不足工作与交接纠正，旧运行未改变','RESOURCE_BUDGET_INSUFFICIENT');
       const previewId=randomUUID(),data={kind:'run-resource-proposal',sourceRunId:id,projectId:row.project_id,projectVersion:row.project_version,
         sourceGoalContract:row.snapshot.goalContract,sourceResourceRevision:row.snapshot.resourceRevision??0,ceiling:input.maxBudget,
-        modelId:model.id,usageId:response.usageId,proposal,callCeilings};
+        modelId:model.id,usageId:response.usageId,proposal,callCeilings,callRequirementVersion:recoveryCallRequirementVersion};
       const client=await pool.connect();
       try{await client.query('BEGIN');await client.query('INSERT INTO organization_previews(id,data,project_id) VALUES($1,$2,$3)',[previewId,data,row.project_id]);
         await client.query('UPDATE usage SET planning_preview_id=$1 WHERE id=$2',[previewId,response.usageId]);await client.query('COMMIT');}

@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-10-12T16:29:27.675735+00:00",
+  "service": [
+    "ActiveState=active",
+    "SubState=running",
+    "MainPID=432957"
+  ],
+  "database": "connected",
+  "projectCount": 10,
+  "activeProjectCount": 0,
+  "usageRows": 516,
+  "known": 2.3765427,
+  "held": 0.0711849,
+  "occupied": 2.4477276,
+  "cumulativeCap": 2.6,
+  "stageOccupied": 0.3769092,
+  "stageCap": 0.52,
+  "runId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "status": "failed",
+  "integrity": "ok",
+  "projectCosts": {
+    "recordedCost": 0.2501061,
+    "reserved": 0,
+    "availableBudget": 0.04989389999999999
+  },
+  "calls": {
+    "used": 54,
+    "limit": 64,
+    "remaining": 10
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "recordedCost": 0.018502499999999998,
+      "reserved": 0,
+      "budgetLimit": 0.05,
+      "calls": 5,
+      "callLimit": 16,
+      "completed": true
+    },
+    {
+      "id": "t2-qa",
+      "recordedCost": 0.1310121,
+      "reserved": 0,
+      "budgetLimit": 0.2231997,
+      "calls": 38,
+      "callLimit": 38,
+      "completed": false
+    },
+    {
+      "id": "t3-review",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.2,
+      "calls": 0,
+      "callLimit": 32,
+      "completed": false
+    }
+  ],
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "unknownOperationCount": 0,
+  "knowledgePins": [
+    {
+      "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+      "version": 1,
+      "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+    },
+    {
+      "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+      "version": 1,
+      "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+    }
+  ],
+  "delivery": {
+    "bytes": 2742,
+    "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+  },
+  "modelCalls": 0
+}
