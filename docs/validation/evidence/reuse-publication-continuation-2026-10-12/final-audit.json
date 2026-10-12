@@ -1,0 +1,65 @@
+{
+  "checkedAt": "2026-10-12T07:44:19.581955+00:00",
+  "service": [
+    "ActiveState=active",
+    "SubState=running",
+    "MainPID=432957"
+  ],
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder4-20261012",
+  "database": "connected",
+  "projectCount": 10,
+  "usageRows": 516,
+  "known": 2.3765427,
+  "held": 0.0711849,
+  "occupied": 2.4477276,
+  "cumulativeCap": 2.6,
+  "stageOccupied": 0.3769092,
+  "stageCap": 0.52,
+  "runId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "status": "failed",
+  "integrity": "ok",
+  "wireRequests": 6,
+  "coordinatorWireRequests": 0,
+  "reminderEvents": 1,
+  "recoveryCalls": {
+    "used": 54,
+    "limit": 64,
+    "remaining": 10
+  },
+  "recoveryBlocked": true,
+  "unknownOperationCount": 0,
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "calls": 5,
+      "callLimit": 16,
+      "completed": true
+    },
+    {
+      "id": "t2-qa",
+      "calls": 38,
+      "callLimit": 38,
+      "completed": false
+    },
+    {
+      "id": "t3-review",
+      "calls": 0,
+      "callLimit": 32,
+      "completed": false
+    }
+  ],
+  "originalKnowledgePinsPreserved": true,
+  "knowledgeDocumentCount": 2,
+  "delivery": {
+    "bytes": 2742,
+    "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+  },
+  "successfulWorkCounts": [
+    2
+  ],
+  "candidateCount": 0,
+  "verificationModelCalls": 0
+}

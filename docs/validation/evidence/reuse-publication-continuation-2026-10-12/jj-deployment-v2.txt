@@ -1,0 +1,110 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (920.151399ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (60.459941ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (89.811498ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (643.007088ms)
+✔ single-employee shared-method use with an employee-private source never enters department knowledge (133.154271ms)
+✔ publication rehashes the source revision after candidate generation (67.594329ms)
+✔ reuse scans do not traverse unbounded earlier archives to calculate baselines (50.876517ms)
+✔ a bounded history window still generates proved candidates and preserves older pending evidence (343.021152ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (96.239643ms)
+✔ bounded background batches eventually visit every department (166.440483ms)
+✔ accepted reuse flows through reviewed publication into an authorized lazy skill with a fixed recovery revision (309.669679ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4139.388775
+✔ full corpus retrieval covers late chunks, stays permission scoped and pins compact immutable versions (1716.479067ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1992.854211
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (2.69756ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.749604ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.670874ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.472554ms)
+✔ restored task holds remain occupied without charging the global carryover twice or releasing an older request (1.187637ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (41.806082ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.89274ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (4.408865ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (3.842456ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (2.202725ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (200.45024ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (104.008456ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (67.013098ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (95.763681ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (67.515602ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (55.155501ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (80.644307ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (274.992944ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (76.214307ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (97.504832ms)
+✖ the production Host reminder accepts only the real native handoff and excludes the captain (291.753836ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (348.300863ms)
+✔ failed employee setup leaves no published Agent or resident Host (47.198601ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (63.027174ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (290.890679ms)
+✔ fixture: valid files flow through independent sessions with the same model (1368.838764ms)
+✔ fixture: real output 1798 fails the oracle, preapproved repair produces 4095 (950.616891ms)
+✔ fixture: failed upstream task keeps all dependents pending (338.826141ms)
+✔ production handoff gate rejects missing output and never dispatches the dependent (273.295665ms)
+✔ production input gate stops a changed accepted file before the consumer model request (367.757803ms)
+✔ fixture oracle rejects a changed input version; this is not a production scheduling gate (1.336239ms)
+✔ fixture graph oracle catches cycles, undeclared input edges and concurrent writers (0.626084ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (457.234785ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (180.586864ms)
+✔ sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal (188.708328ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (111.825977ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (353.699334ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (124.406496ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (144.208445ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (195.129813ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (170.348604ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (175.746118ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.569009ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (1272.522986ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (867.062149ms)
+✔ out-of-scope finding cannot create a repair task (243.010802ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (322.66184ms)
+✔ explicit reject stops the loop even with spare rework allowance (230.020718ms)
+✔ repair model calls share the original task allowance (344.330062ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (354.759285ms)
+✔ repair cannot overwrite a changed file with a stale hash (363.49328ms)
+✔ duplicate finding IDs cannot authorize a repair graph (225.23562ms)
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (17811.52537ms)
+✔ user cancellation still aborts native cold resume without executing a later task (642.336898ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (15052.813682ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 54
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33828.847229
+
+✖ failing tests:
+
+test at services/agent-runtime/employee-handoff-reminder.test.mjs:71:1
+✖ the production Host reminder accepts only the real native handoff and excludes the captain (291.753836ms)
+  TypeError: Cannot read properties of undefined (reading 'whenIdle')
+      at TestContext.<anonymous> (file:///home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder2-20261012/services/agent-runtime/employee-handoff-reminder.test.mjs:110:87)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+Traceback (most recent call last):
+  File "/home/jj/.local/share/weiwu/staging/handoff-reminder2-20261012/apply.py", line 68, in <module>
+    subprocess.run(['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node','--test','services/agent-runtime/employee-handoff-reminder.test.mjs','services/agent-runtime/employee-hosts.test.mjs','services/agent-runtime/employee-checkpoint-policy.test.mjs','services/agent-runtime/handoff-fixtures.test.mjs','services/agent-runtime/rework.test.mjs','services/agent-runtime/status-lifecycle.test.mjs','services/agent-runtime/product-concurrency.test.mjs','services/agent-runtime/budget.test.mjs'],cwd=new,check=True,timeout=120)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node', '--test', 'services/agent-runtime/employee-handoff-reminder.test.mjs', 'services/agent-runtime/employee-hosts.test.mjs', 'services/agent-runtime/employee-checkpoint-policy.test.mjs', 'services/agent-runtime/handoff-fixtures.test.mjs', 'services/agent-runtime/rework.test.mjs', 'services/agent-runtime/status-lifecycle.test.mjs', 'services/agent-runtime/product-concurrency.test.mjs', 'services/agent-runtime/budget.test.mjs']' returned non-zero exit status 1.

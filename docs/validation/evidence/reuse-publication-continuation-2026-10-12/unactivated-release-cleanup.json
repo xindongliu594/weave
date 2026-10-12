@@ -1,0 +1,22 @@
+{
+  "removed": [
+    {
+      "path": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder1-20261012",
+      "files": 414,
+      "bytes": 6391267,
+      "packetSha256": "eb04172d5df9de1b0730d9d6257b5e49e3fe2a9db08bd57e5f0e6982de31afc3"
+    },
+    {
+      "path": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder2-20261012",
+      "files": 431,
+      "bytes": 6528150,
+      "packetSha256": "79a6ac459c11e75a9aeeda782f06d3102dfd235ecd63e5c9bc60396353da0db5"
+    }
+  ],
+  "recoveredBytes": 12919417,
+  "recoverableCodePacketsRetained": true,
+  "productionDataTargets": 0,
+  "usageRowsBefore": 516,
+  "usageRowsAfter": 516,
+  "modelCalls": 0
+}

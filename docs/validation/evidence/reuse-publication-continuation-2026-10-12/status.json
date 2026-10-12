@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-12T06:22:26.168204+00:00",
+  "runId": "e87cbe51-9632-4dba-ad40-3cbc5104a776",
+  "parentRunId": "62c5db8a-617b-41db-9394-c8000f58997d",
+  "status": "failed",
+  "integrity": "ok",
+  "wireRequests": 11,
+  "accepted": [],
+  "checkpoint": [
+    {
+      "taskId": "t1-doc",
+      "status": "completed"
+    },
+    {
+      "taskId": "t2-qa",
+      "status": "in_progress"
+    },
+    {
+      "taskId": "t3-review",
+      "status": "pending"
+    }
+  ],
+  "errors": [
+    {
+      "type": "budget/stopped",
+      "code": "TURN_LIMIT",
+      "reason": "项目方案的模型调用次数已达上限"
+    }
+  ],
+  "runKnownCost": 0.0384606,
+  "runInputTokens": 118922,
+  "runOutputTokens": 2320,
+  "occupied": 2.4237981,
+  "projectKnown": 0.22617659999999998,
+  "projectHeld": 0,
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

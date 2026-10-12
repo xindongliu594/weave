@@ -1,0 +1,94 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (877.122775ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (70.521313ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (88.578637ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (602.429835ms)
+✔ single-employee shared-method use with an employee-private source never enters department knowledge (151.936297ms)
+✔ publication rehashes the source revision after candidate generation (77.189395ms)
+✔ reuse scans do not traverse unbounded earlier archives to calculate baselines (44.961323ms)
+✔ a bounded history window still generates proved candidates and preserves older pending evidence (350.000908ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (107.366965ms)
+✔ bounded background batches eventually visit every department (167.626734ms)
+✔ accepted reuse flows through reviewed publication into an authorized lazy skill with a fixed recovery revision (342.831063ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4078.784831
+✔ full corpus retrieval covers late chunks, stays permission scoped and pins compact immutable versions (1657.363916ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1907.108771
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (2.581861ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.139589ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.566174ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.438166ms)
+✔ restored task holds remain occupied without charging the global carryover twice or releasing an older request (0.732098ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (36.928227ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.813532ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.49994ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (4.127116ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.503961ms)
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (146.433731ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (129.313006ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (83.598797ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (89.722621ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (60.004941ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (76.732793ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (70.329236ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (233.39013ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (89.752688ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (80.469992ms)
+✔ the production Host reminder accepts only the real native handoff and excludes the captain (319.100187ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (347.43477ms)
+✔ failed employee setup leaves no published Agent or resident Host (51.459855ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (54.049534ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (292.194416ms)
+✔ fixture: valid files flow through independent sessions with the same model (1347.613802ms)
+✔ fixture: real output 1798 fails the oracle, preapproved repair produces 4095 (844.405379ms)
+✔ fixture: failed upstream task keeps all dependents pending (332.989441ms)
+✔ production handoff gate rejects missing output and never dispatches the dependent (266.479926ms)
+✔ production input gate stops a changed accepted file before the consumer model request (358.896546ms)
+✔ fixture oracle rejects a changed input version; this is not a production scheduling gate (1.55203ms)
+✔ fixture graph oracle catches cycles, undeclared input edges and concurrent writers (0.540227ms)
+✔ Host attests a superseded own output only after a real known CAS write and refuses foreign scope (454.621369ms)
+✔ sealed Host pauses unauthorized file write before executor and refuses later admission (189.113961ms)
+✔ sealed Host rejects an undeclared read before execution but permits correcting the read without losing the goal (155.311777ms)
+✔ sealed Host checks original criteria after an attempted compaction-context rewrite (132.621191ms)
+✔ a shell-created file outside approved scope pauses further tool admissions (248.873477ms)
+✔ fixed task inputs cannot lose their protection after an allowed write (114.06562ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (137.033885ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (166.056416ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (174.710609ms)
+✔ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (150.112952ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.562965ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (1218.224037ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (809.161531ms)
+✔ out-of-scope finding cannot create a repair task (239.975647ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (274.439955ms)
+✔ explicit reject stops the loop even with spare rework allowance (236.523694ms)
+✔ repair model calls share the original task allowance (355.62443ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (368.018814ms)
+✔ repair cannot overwrite a changed file with a stale hash (357.621642ms)
+✔ duplicate finding IDs cannot authorize a repair graph (217.577448ms)
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (17726.768497ms)
+✔ user cancellation still aborts native cold resume without executing a later task (646.123173ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (15044.756869ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 55
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33768.512771
+{"release": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder4-20261012", "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-reminder3-20261012", "packetSha256": "d16e200ef364a1d302171700dc004116b3a65f961ff9d4e18dd364d92f4a55ba", "projectCount": 10, "usageBefore": 516, "modelCalls": 0, "dependencies": "existing pinned directories reused", "newDependenciesInstalled": false, "passed": true, "usageAfter": 516, "mainPID": "432957", "projectStatePreserved": true, "usagePreserved": true, "originalArchivesPreserved": true, "archiveEvidence": {"files": 484, "bytes": 402990108, "manifestSha256": "1224c0da147fe66d33bc9301da9932a8dd7ca886f29001f402c9686d9743fc2f"}}

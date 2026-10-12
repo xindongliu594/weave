@@ -218,6 +218,10 @@ test('overlapping current-task writes use the real local executor: one old SHA c
 
 test('an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts', { timeout: 15000 }, () => fixture({ twoReaders: true }, async f => {
   const employee=f.member('first'),task=f.current('first'),second=f.current('second');
+  const claim=await f.host.call(employee,'agent_teams_claim_task',{task_id:'work-first'});
+  assert.equal(claim.task_id,task.id);assert.equal(claim.attempt_id,task.attemptId);
+  assert.equal(f.current('first').attempt,task.attempt,'alias claims cannot create a new attempt');
+  await assert.rejects(f.host.call(employee,'agent_teams_claim_task',{task_id:'work-second'}),/TASK_NOT_ACTIVE/);
   await assert.rejects(f.host.call(employee,'agent_teams_update_task',{task_id:'work-second',attempt_id:second.attemptId,status:'completed',output:'foreign'}),/TASK_NOT_ACTIVE/);
   await assert.rejects(f.host.call(employee,'agent_teams_update_task',{task_id:'work-first',attempt_id:randomUUID(),status:'completed',output:'stale'}),/STALE_ATTEMPT/);
   assert.notEqual(f.current('first').status,'completed');

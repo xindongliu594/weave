@@ -1,0 +1,21 @@
+{
+  "runId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "parentRunId": "e87cbe51-9632-4dba-ad40-3cbc5104a776",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "proposal": {
+    "maxBudget": 0.3,
+    "maxModelCalls": 64,
+    "taskCallLimits": {
+      "t2-qa": 38,
+      "t3-review": 32
+    },
+    "taskBudgetLimits": {
+      "t2-qa": 0.2231997,
+      "t3-review": 0.2
+    },
+    "rationale": "t1 已完成；剩余 QA 与经理各预留 6 次完整上下文调用，QA 上限 38 次/0.2232 美元，经理 32 次/0.20 美元，项目总上限 64 次/0.30 美元，覆盖已用与未完成恢复。"
+  }
+}

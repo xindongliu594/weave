@@ -1,6 +1,6 @@
 import { Context } from '@deepseek-ai/cordis';
 import { emitAgentEvent } from '@deepseek-ai/dsh-agent';
-import { LlmAdapter, HarnessError } from '@deepseek-ai/dsh-llm';
+import { LlmAdapter, HarnessError, createUserMessage } from '@deepseek-ai/dsh-llm';
 import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
 import { randomUUID } from 'node:crypto';
 import { installEmployeeContext } from './employee-context.mjs';
@@ -12,11 +12,12 @@ const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, onIncompleteCompletion }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, onIncompleteCompletion });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
+    this.completionReminders = new Set();
   }
 
   createAgent(ownerCtx, options) { return this.materialize(ownerCtx, options, false); }
@@ -115,6 +116,24 @@ export class EmployeeHostFactory {
       }
       const setup = async (agentCtx, agent) => {
         const prepared = await options.setup?.(agentCtx, agent);
+        if (this.pendingCompletion) agentCtx.on('agent/turn-stopping', event => {
+          event.signal.throwIfAborted();
+          const work = this.pendingCompletion(event.agent);
+          if (!work) return;
+          const key = JSON.stringify([event.agent.id, work.taskId, work.attemptId]);
+          const ref = { sessionId: event.agent.id, taskId: work.taskId, attemptId: work.attemptId };
+          if (this.completionReminders.has(key)) {
+            const error = Object.assign(Error('HANDOFF_NOT_SUBMITTED: 员工回复已结束，但当前任务仍缺少正式交接'), { code: 'HANDOFF_NOT_SUBMITTED' });
+            this.archive?.append('handoff/missing', { ...work, code: error.code, message: error.message }, ref);
+            this.onIncompleteCompletion?.(error);
+            throw error;
+          }
+          this.completionReminders.add(key);
+          this.archive?.append('handoff/reminder', { ...work }, ref);
+          event.agent.inject(createUserMessage({ content: [{ type: 'text', text:
+            `宿主尚未收到当前任务的正式交接，普通文字不能完成节点。不要重新认领或重复读取已有证据；继续核对仍缺的验收，然后调用 agent_teams_update_task，task_id=${work.runtimeTaskId}、attempt_id=${work.attemptId}，用output提交真实结果及合同必需证据。全部满足才提交status=completed；未满足则status=failed，按合同提交verdict与findings。不能编造通过、改目标或增加权限。此纠正仍计入原预算和调用次数；再次不交接将停止项目。` }],
+            source: { kind: 'plugin', plugin: 'weiwu-handoff', form: 'notice', summary: '当前任务缺少正式交接；一次纠正机会' } }));
+        });
         if (this.protectedContext) agentCtx.on('agent/pre-step', async (event, next) => {
           // Assembly precedes native membership admission. Refresh only the
           // admitted snapshot, before the loop durably appends these messages.

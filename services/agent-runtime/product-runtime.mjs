@@ -111,7 +111,7 @@ export class ProductDshRuntime {
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
       host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
-        product: { snapshot, sandbox, gate, supervisor, goal, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; } } });
+        product: { snapshot, sandbox, gate, supervisor, goal, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; supervisor.stop(error); adapter.stopAdmission(error); } } });
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');

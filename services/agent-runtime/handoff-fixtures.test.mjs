@@ -83,7 +83,6 @@ async function runScenario(scenario) {
       () => call('agent_teams_claim_task', { task_id: taskId }),
       () => update('in_progress'), ...work,
       () => { if (task === 'verify') assert.equal(files.events.at(-1)?.accepted, true); return update(finalStatus, output(task)); },
-      () => call('agent_teams_send_message', { to: 'captain', content: output(task) }),
     ];
   }
   class ScriptedAdapter extends LlmAdapter {
@@ -169,13 +168,15 @@ async function runScenario(scenario) {
     assert.ok(early.tasks.slice(1).every(task => task.status === 'pending'));
     releaseLibrary();
     let status;
-    const expectedReports = ['failed-upstream', 'missing-file', 'stale-input'].includes(scenario) ? 1 : 5;
+    const expectedSeals = ['happy', 'repair'].includes(scenario) ? 5 : scenario === 'stale-input' ? 1 : 0;
     await until(async () => {
       status = await host.call(captain, 'agent_teams_status');
       assert.ok(status.members.every(member => !member.spawn_error));
-      const reports = toolResults.filter(item => item.name === 'agent_teams_send_message' && !item.result.isError).length;
-      return reports >= expectedReports && (['happy', 'repair'].includes(scenario) ? status.deliverable : ['missing-file', 'stale-input'].includes(scenario) ? host.handoffStatus().length > 0 : status.tasks.some(task => task.status === 'failed'));
+      const seals = readRun(root, archive.id).events.filter(event => event.type === 'handoff/accepted').length;
+      return seals >= expectedSeals && (['happy', 'repair'].includes(scenario) ? status.deliverable : ['missing-file', 'stale-input'].includes(scenario) ? host.handoffStatus().length > 0 :
+        status.tasks.some(task => task.status === 'failed') && toolResults.some(item => item.name === 'agent_teams_update_task' && item.args.status === 'failed' && !item.result.isError));
     });
+    await host.ctx.subagents.drainContinuableDescendants([captain]);
     await captain.whenIdle();
     await host.close(); host = undefined;
     const unexpectedErrors = toolResults.filter(item => item.result.isError && !(scenario === 'missing-file' && item.name === 'agent_teams_update_task' && item.args.status === 'completed'));
@@ -202,7 +203,8 @@ async function runScenario(scenario) {
       assert.ok(!toolResults.some(item => item.name === 'filesystem'));
     } else if (scenario === 'missing-file') {
       assert.deepEqual([...firstByTask.keys()], ['library']);
-      assert.equal(status.tasks[0].status, 'in_progress');
+      assert.notEqual(status.tasks[0].status, 'completed');
+      assert.equal(readRun(root, archive.id).events.filter(e => e.type === 'handoff/accepted').length, 0);
       assert.ok(status.tasks.slice(1).every(task => task.status === 'pending' && task.attempt === 0));
       assert.equal(inspectInput(join(root, 'artifacts'), { path: 'lib/money.mjs' }).reason, 'MISSING_FILE');
       assert.ok(toolResults.some(item => item.name === 'agent_teams_update_task' && item.result.isError));
@@ -229,7 +231,7 @@ async function runScenario(scenario) {
     const trace = readRun(root, archive.id);
     assert.equal(trace.integrity, 'ok');
     assert.ok(trace.events.some(event => event.type === 'model/request'));
-    assert.ok(trace.events.some(event => event.type === 'team/operation' && event.data.name === 'agent_teams_send_message'));
+    assert.ok(trace.events.some(event => event.type === 'team/operation' && event.data.name === 'agent_teams_update_task'));
     if (process.env.HANDOFF_REPORT_DIR) {
       const out = resolve(process.env.HANDOFF_REPORT_DIR, scenario);
       mkdirSync(out, { recursive: true });

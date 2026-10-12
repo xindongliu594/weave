@@ -1,0 +1,12 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+Could not find 'tests/knowledge-reuse.test.ts'
+Could not find 'tests/knowledge.test.ts'
+Traceback (most recent call last):
+  File "/home/jj/.local/share/weiwu/staging/handoff-reminder1-20261012/apply.py", line 67, in <module>
+    subprocess.run(['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node','scripts/test-integration.mjs','tests/knowledge-reuse.test.ts','tests/knowledge.test.ts'],cwd=new,check=True,timeout=120)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node', 'scripts/test-integration.mjs', 'tests/knowledge-reuse.test.ts', 'tests/knowledge.test.ts']' returned non-zero exit status 1.

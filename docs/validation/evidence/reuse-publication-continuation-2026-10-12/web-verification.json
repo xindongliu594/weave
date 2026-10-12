@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-12T07:32:17.645Z",
+  "url": "http://127.0.0.1:4312/#run/70d82bac-8714-41e2-ac78-921e53cea106",
+  "runId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "projectBudget": 0.3,
+  "recordedCost": 0.2501061,
+  "modelCallsUsed": 54,
+  "modelCallsLimit": 64,
+  "completedNodesPreserved": 1,
+  "recoveryBlocked": true,
+  "resumeDisabled": true,
+  "retryDisabled": true,
+  "browserAction": "read-only recovery check",
+  "modelCallsForBrowserVerification": 0
+}

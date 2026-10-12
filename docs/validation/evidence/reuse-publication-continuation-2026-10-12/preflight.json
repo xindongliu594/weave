@@ -1,0 +1,206 @@
+{
+  "checkedAt": "2026-10-12T06:16:43.176453+00:00",
+  "service": [
+    "ActiveState=active",
+    "SubState=running",
+    "MainPID=1887970"
+  ],
+  "health": {
+    "database": "connected",
+    "runtime": {
+      "ready": true,
+      "reason": "DSH + AgentTeams：员工独立宿主、受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。"
+    },
+    "version": "0.2.0",
+    "workspace": {
+      "kind": "local",
+      "database": "pglite",
+      "workspacesPath": "/home/jj/.local/share/weiwu/data/pilot/workspaces",
+      "executionTarget": {
+        "kind": "local",
+        "deviceId": "5b34cfd1-eee6-45fd-9be7-9000c4daf9d8",
+        "grantId": "7ffb9e55-18e1-4a9c-aeed-befddb39a6b3"
+      }
+    }
+  },
+  "runId": "62c5db8a-617b-41db-9394-c8000f58997d",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "runStatus": "failed",
+  "integrity": "ok",
+  "ledger": {
+    "known": 2.3136414,
+    "held": 0.0711849,
+    "occupied": 2.3848263,
+    "cumulativeCap": 2.6,
+    "stageBaseline": 2.0708184,
+    "stageCap": 0.45,
+    "stageOccupied": 0.3140079,
+    "stageRemaining": 0.1359921,
+    "usageRows": 497
+  },
+  "project": {
+    "cap": 0.2,
+    "known": 0.18720479999999998,
+    "held": 0,
+    "net": 0.012795200000000034
+  },
+  "calls": {
+    "used": 37,
+    "limit": 48,
+    "remaining": 11
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "subject": "生成 inventory-cases.md 验收用例检查表",
+      "recordedCost": 0.018502499999999998,
+      "reserved": 0,
+      "budgetLimit": 0.05,
+      "availableBudget": 0.031497500000000005,
+      "calls": 5,
+      "callLimit": 16,
+      "remainingCalls": 11,
+      "completed": true,
+      "wireOverheadBytes": 13,
+      "conservativeRequestReserve": 0.017168700000000002,
+      "nextTrancheCalls": 6,
+      "minimumCumulativeNodeBudget": 0.1215147
+    },
+    {
+      "id": "t2-qa",
+      "subject": "只读逐项独立核算 inventory-cases.md",
+      "recordedCost": 0.0890262,
+      "reserved": 0,
+      "budgetLimit": 0.2,
+      "availableBudget": 0.11097380000000001,
+      "calls": 27,
+      "callLimit": 32,
+      "remainingCalls": 5,
+      "completed": false,
+      "wireOverheadBytes": 6969,
+      "conservativeRequestReserve": 0.019255499999999995,
+      "nextTrancheCalls": 5,
+      "minimumCumulativeNodeBudget": 0.2
+    },
+    {
+      "id": "t3-review",
+      "subject": "经理只读验收 inventory-cases.md 与 QA 回执",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.2,
+      "availableBudget": 0.2,
+      "calls": 0,
+      "callLimit": 32,
+      "remainingCalls": 32,
+      "completed": false,
+      "wireOverheadBytes": 13,
+      "conservativeRequestReserve": 0.017168700000000002,
+      "nextTrancheCalls": 6,
+      "minimumCumulativeNodeBudget": 0.2
+    }
+  ],
+  "recovery": {
+    "unknownOperationCount": 0,
+    "resume": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 422,
+          "code": "BUDGET_RETRY_DISABLED",
+          "message": "项目费用已达到预算的 90%，不能通过重试增加调用；请检查已有结果并重新制定方案"
+        }
+      ],
+      "completedTaskIds": [
+        "t1-doc"
+      ]
+    },
+    "retry": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 422,
+          "code": "BUDGET_RETRY_DISABLED",
+          "message": "项目费用已达到预算的 90%，不能通过重试增加调用；请检查已有结果并重新制定方案"
+        },
+        {
+          "status": 409,
+          "code": "RESOURCE_RESUME_ONLY",
+          "message": "资源补充只批准未完成节点，完整重试需要另外批准方案"
+        }
+      ],
+      "completedTaskIds": []
+    }
+  },
+  "reuse": {
+    "successCounts": [
+      2
+    ],
+    "candidateCount": 0
+  },
+  "delivery": {
+    "bytes": 2742,
+    "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+  },
+  "diagnostic": {
+    "latestTools": [
+      {
+        "sequence": 17,
+        "name": "agent_teams_create",
+        "isError": false
+      },
+      {
+        "sequence": 20,
+        "name": "agent_teams_create_task",
+        "isError": false
+      },
+      {
+        "sequence": 23,
+        "name": "agent_teams_create_task",
+        "isError": false
+      },
+      {
+        "sequence": 26,
+        "name": "agent_teams_create_task",
+        "isError": false
+      },
+      {
+        "sequence": 43,
+        "name": "agent_teams_approve",
+        "isError": false
+      },
+      {
+        "sequence": 58,
+        "name": "agent_teams_status",
+        "isError": false
+      },
+      {
+        "sequence": 78,
+        "name": "agent_teams_claim_task",
+        "isError": false
+      },
+      {
+        "sequence": 105,
+        "name": "agent_teams_update_task",
+        "isError": false
+      },
+      {
+        "sequence": 112,
+        "name": "agent_teams_status",
+        "isError": false
+      },
+      {
+        "sequence": 119,
+        "name": "filesystem",
+        "isError": false
+      },
+      {
+        "sequence": 150,
+        "name": "knowledge_read",
+        "isError": false
+      }
+    ],
+    "latestErrors": [],
+    "latestResponseMetadata": []
+  },
+  "verificationModelCalls": 0
+}

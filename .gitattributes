@@ -9,3 +9,5 @@ docs/validation/evidence/retrieval-research-2026-10-12/** -text whitespace=blank
 docs/validation/evidence/retrieval-comparison-2026-10-12/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/validation/evidence/hybrid-retrieval-2026-10-12/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/validation/evidence/rag-relevance-2026-10-12/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+docs/validation/evidence/reuse-publication-continuation-2026-10-12/** -text -whitespace

@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ distinct accepted works aggregate fixed sources while retries, reads and failed attempts do not count (1715.7078ms)
+✔ fixed versions remain separate and private or changed archives cannot seed public statistics (297.6018ms)
+✔ background reuse candidates use configurable thresholds and do not overwrite reviewed content (277.7776ms)
+✔ manual candidates are preserved and automatic candidates respect a bounded storage quota (1303.3986ms)
+✔ single-employee shared-method use with an employee-private source never enters department knowledge (529.7938ms)
+✔ publication rehashes the source revision after candidate generation (316.6583ms)
+✔ reuse scans do not traverse unbounded earlier archives to calculate baselines (124.4212ms)
+✔ a bounded history window still generates proved candidates and preserves older pending evidence (1206.9386ms)
+✔ candidate publishing rechecks the actual accepted work and current grants (256.8472ms)
+✔ bounded background batches eventually visit every department (414.3524ms)
+✔ accepted reuse flows through reviewed publication into an authorized lazy skill with a fixed recovery revision (1015.6501ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9420.5034
+✔ full corpus retrieval covers late chunks, stays permission scoped and pins compact immutable versions (3159.9574ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3657.583

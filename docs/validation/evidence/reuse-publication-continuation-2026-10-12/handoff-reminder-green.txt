@@ -1,0 +1,12 @@
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (334.367ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (98.5388ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (106.841ms)
+✔ the production Host reminder accepts only the real native handoff and excludes the captain (717.2884ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1656.0982

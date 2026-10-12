@@ -307,11 +307,20 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     await mount('@deepseek-ai/dsh-session-query');
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
       context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
+      pendingCompletion: handoff ? agent => {
+        if (agent.id === captainId) return;
+        let work;
+        try { work = activeWork(agent); }
+        catch (error) { if (error.message.startsWith('TASK_NOT_ACTIVE:')) return; throw error; }
+        if (handoff.committed.get(work.taskId)?.attemptId === work.attemptId) return;
+        return { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId };
+      } : undefined,
+      onIncompleteCompletion: product?.onHandoffBlocked,
       prepareToolArguments: handoff ? (agent,name,args) => {
-        if(name!=='agent_teams_update_task'||nativeTaskId(args.task_id)===args.task_id)return args;
+        if(!['agent_teams_claim_task','agent_teams_update_task'].includes(name)||nativeTaskId(args.task_id)===args.task_id)return args;
         // Resolve a unique approved alias before the native registry freezes input.
         const work=activeWork(agent,args.task_id);
-        if(args.attempt_id!==work.attemptId)throw Error('STALE_ATTEMPT: 任务更新需要当前任务凭证');
+        if(name==='agent_teams_update_task'&&args.attempt_id!==work.attemptId)throw Error('STALE_ATTEMPT: 任务更新需要当前任务凭证');
         return {...args,task_id:work.task.id};
       } : undefined,
       concludesAcceptedTask: handoff ? exec => {

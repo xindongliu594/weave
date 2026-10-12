@@ -1,0 +1,47 @@
+✖ a plain final answer gets one native same-attempt handoff reminder, never automatic success (1365.4293ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (101.9072ms)
+✖ the reminder stops when the same task becomes sealed; no third model request follows (99.3497ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 1
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1956.4349
+
+✖ failing tests:
+
+test at services\agent-runtime\employee-handoff-reminder.test.mjs:39:1
+✖ a plain final answer gets one native same-attempt handoff reminder, never automatic success (1365.4293ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-handoff-reminder.test.mjs:41:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\employee-handoff-reminder.test.mjs:58:1
+✖ the reminder stops when the same task becomes sealed; no third model request follows (99.3497ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-handoff-reminder.test.mjs:64:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

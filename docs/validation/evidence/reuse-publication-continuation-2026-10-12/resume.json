@@ -1,0 +1,21 @@
+{
+  "runId": "e87cbe51-9632-4dba-ad40-3cbc5104a776",
+  "parentRunId": "62c5db8a-617b-41db-9394-c8000f58997d",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "proposal": {
+    "maxBudget": 0.28,
+    "maxModelCalls": 48,
+    "taskCallLimits": {
+      "t2-qa": 32,
+      "t3-review": 32
+    },
+    "taskBudgetLimits": {
+      "t2-qa": 0.2,
+      "t3-review": 0.2
+    },
+    "rationale": "在用户ceiling内将累计预算提至0.28，仅恢复QA与经理节点的原累计调用和金额上限；t1已完成且不新增，三个节点仍共享同一项目门禁。"
+  }
+}

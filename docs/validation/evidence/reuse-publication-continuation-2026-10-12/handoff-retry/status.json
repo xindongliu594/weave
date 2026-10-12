@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-12T07:13:35.907723+00:00",
+  "runId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "parentRunId": "e87cbe51-9632-4dba-ad40-3cbc5104a776",
+  "status": "failed",
+  "integrity": "ok",
+  "wireRequests": 6,
+  "accepted": [],
+  "checkpoint": [
+    {
+      "taskId": "t1-doc",
+      "status": "completed"
+    },
+    {
+      "taskId": "t2-qa",
+      "status": "failed"
+    },
+    {
+      "taskId": "t3-review",
+      "status": "pending"
+    }
+  ],
+  "errors": [
+    {
+      "type": "budget/stopped",
+      "code": "TASK_TURN_LIMIT",
+      "reason": "此员工在该任务的模型调用次数已达上限"
+    }
+  ],
+  "runKnownCost": 0.0233454,
+  "runInputTokens": 69802,
+  "runOutputTokens": 2004,
+  "occupied": 2.4477276,
+  "projectKnown": 0.2501061,
+  "projectHeld": 0,
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

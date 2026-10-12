@@ -1,0 +1,20 @@
+✖ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (1006.8594ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1437.212
+
+✖ failing tests:
+
+test at services\agent-runtime\product-concurrency.test.mjs:219:1
+✖ an assigned semantic task alias completes through its native ID without accepting foreign or stale attempts (1006.8594ms)
+  Error: agent_teams_claim_task: {"message":"no task \"work-first\" in team \"isolated-concurrency\" — use agent_teams_status to list tasks","info":{"name":"HarnessError","code":"COORDINATOR_TOOL_FAILED"}}
+      at Object.call (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/host.mjs:403:37)
+      at async file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:221:15
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:89:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
