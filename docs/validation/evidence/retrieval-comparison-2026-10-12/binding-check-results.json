@@ -1,0 +1,599 @@
+{
+  "checkedAt": "2026-10-12T02:31:57.380Z",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics        ",
+  "memoryBytes": 33521246208,
+  "versions": {
+    "meilisearch": "1.54.3",
+    "jieba": "2.0.4"
+  },
+  "concurrency": 1,
+  "meilisearchIndexingThreads": 2,
+  "modelCalls": 0,
+  "sourceHashes": {
+    "originalStore": "4995ba1d99dc326f8cf1edbe5e9d701cf9394a70036a8253a1b49936314a747d",
+    "isolatedJiebaStore": "0d3efe5aa086dc4d33d9e12fe096d760641102180a147b442200bb86111fc5a0"
+  },
+  "scale": [],
+  "quality": [
+    {
+      "label": "quality",
+      "authorizedChunks": 8,
+      "authorizedDocuments": 8,
+      "corpusHash": "0a526064808c5bcb648988ca06dc4ba770d7c8cddc56a2c46fffa4d9f041c3f9",
+      "corpusUtf8Bytes": 493,
+      "indexImportMs": 402.73139999999876,
+      "originalDatabaseRelationBytes": 106496,
+      "jiebaDatabaseRelationBytes": 106496,
+      "meilisearchStats": {
+        "databaseSize": 405504,
+        "usedDatabaseSize": 217088,
+        "lastUpdate": "2026-10-12T02:32:04.4480647Z",
+        "indexes": {
+          "compare-quality": {
+            "numberOfDocuments": 11,
+            "indexSize": 110592,
+            "usedIndexSize": 69632,
+            "rawDocumentDbSize": 4096,
+            "avgDocumentSize": 364,
+            "isIndexing": false,
+            "numberOfEmbeddings": 0,
+            "numberOfEmbeddedDocuments": 0,
+            "fieldDistribution": {
+              "content": 11,
+              "documentId": 11,
+              "id": 11,
+              "lineEnd": 11,
+              "lineStart": 11,
+              "version": 11,
+              "versionKey": 11
+            }
+          }
+        }
+      },
+      "permissionAndPinnedVersionChecks": "passed",
+      "queries": [
+        {
+          "query": "退款",
+          "methods": {
+            "original": {
+              "samples": 10,
+              "medianMs": 4.0394000000014785,
+              "p95Ms": 4.834400000001551,
+              "maxMs": 4.834400000001551,
+              "returned": 3,
+              "ids": [
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef",
+                "96ca04c1e33da6c1e3bdf5ff68a1fd5b405a30763a8ad2f9a9d3b44f5ff9327c",
+                "ec7a0536ef96e52742cf06eb2ab92386c8dc5e1d40bc0edc9c2fbdaff7a43f00"
+              ],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [
+                "refund",
+                "style",
+                "retire"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.3333333333333333,
+              "recallAt6": 1,
+              "falsePositiveHits": 2
+            },
+            "jieba": {
+              "samples": 10,
+              "medianMs": 4.510299999999916,
+              "p95Ms": 5.048399999999674,
+              "maxMs": 5.048399999999674,
+              "returned": 1,
+              "ids": [
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef"
+              ],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [
+                "refund"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            },
+            "meilisearchVerified": {
+              "samples": 10,
+              "medianMs": 15.28479999999945,
+              "p95Ms": 16.187200000000303,
+              "maxMs": 16.187200000000303,
+              "returned": 1,
+              "ids": [
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef"
+              ],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [
+                "refund"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            },
+            "meilisearchStrictVerified": {
+              "samples": 10,
+              "medianMs": 15.875899999999092,
+              "p95Ms": 16.514200000001438,
+              "maxMs": 16.514200000001438,
+              "returned": 1,
+              "ids": [
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef"
+              ],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [
+                "refund"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            }
+          },
+          "meilisearchEngineOnly": {
+            "samples": 20,
+            "medianMs": 15.250400000000809,
+            "p95Ms": 16.464100000001054,
+            "maxMs": 17.326599999998507
+          }
+        },
+        {
+          "query": "库存调整",
+          "methods": {
+            "original": {
+              "samples": 10,
+              "medianMs": 4.135599999999613,
+              "p95Ms": 5.120300000000498,
+              "maxMs": 5.120300000000498,
+              "returned": 4,
+              "ids": [
+                "27a4d506c2171a535c01129cb79f6245f8d1ee27027ebaab5009c2e2526cce8d",
+                "dbb3de987fe3350cbcc5b2b81b19e7ce8676a02cb4df5a00c0b6939c2a72266a",
+                "96ca04c1e33da6c1e3bdf5ff68a1fd5b405a30763a8ad2f9a9d3b44f5ff9327c",
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef"
+              ],
+              "expectedDocumentIds": [
+                "inventory"
+              ],
+              "returnedDocumentIds": [
+                "inventory",
+                "permissions",
+                "style",
+                "refund"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.25,
+              "recallAt6": 1,
+              "falsePositiveHits": 3
+            },
+            "jieba": {
+              "samples": 10,
+              "medianMs": 3.9827000000004773,
+              "p95Ms": 4.466599999999744,
+              "maxMs": 4.466599999999744,
+              "returned": 2,
+              "ids": [
+                "27a4d506c2171a535c01129cb79f6245f8d1ee27027ebaab5009c2e2526cce8d",
+                "dbb3de987fe3350cbcc5b2b81b19e7ce8676a02cb4df5a00c0b6939c2a72266a"
+              ],
+              "expectedDocumentIds": [
+                "inventory"
+              ],
+              "returnedDocumentIds": [
+                "inventory",
+                "permissions"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.5,
+              "recallAt6": 1,
+              "falsePositiveHits": 1
+            },
+            "meilisearchVerified": {
+              "samples": 10,
+              "medianMs": 15.48410000000149,
+              "p95Ms": 16.787199999998847,
+              "maxMs": 16.787199999998847,
+              "returned": 1,
+              "ids": [
+                "27a4d506c2171a535c01129cb79f6245f8d1ee27027ebaab5009c2e2526cce8d"
+              ],
+              "expectedDocumentIds": [
+                "inventory"
+              ],
+              "returnedDocumentIds": [
+                "inventory"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            },
+            "meilisearchStrictVerified": {
+              "samples": 10,
+              "medianMs": 15.903800000000047,
+              "p95Ms": 16.826499999999214,
+              "maxMs": 16.826499999999214,
+              "returned": 1,
+              "ids": [
+                "27a4d506c2171a535c01129cb79f6245f8d1ee27027ebaab5009c2e2526cce8d"
+              ],
+              "expectedDocumentIds": [
+                "inventory"
+              ],
+              "returnedDocumentIds": [
+                "inventory"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            }
+          },
+          "meilisearchEngineOnly": {
+            "samples": 20,
+            "medianMs": 15.59649999999965,
+            "p95Ms": 16.714500000000044,
+            "maxMs": 49.35729999999967
+          }
+        },
+        {
+          "query": "部署回滚",
+          "methods": {
+            "original": {
+              "samples": 10,
+              "medianMs": 4.159600000000864,
+              "p95Ms": 4.708800000000338,
+              "maxMs": 4.708800000000338,
+              "returned": 2,
+              "ids": [
+                "4af1a99e727b630d4df24d92e474bb38d2e91a6ce4782c26aa460a9327a8717d",
+                "97135f063b2b58d87fdee42386d88d6b2a04c2b6131a8dd1c2bf61ac5ab81edd"
+              ],
+              "expectedDocumentIds": [
+                "deploy"
+              ],
+              "returnedDocumentIds": [
+                "deploy",
+                "config"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.5,
+              "recallAt6": 1,
+              "falsePositiveHits": 1
+            },
+            "jieba": {
+              "samples": 10,
+              "medianMs": 4.154599999999846,
+              "p95Ms": 4.536799999999857,
+              "maxMs": 4.536799999999857,
+              "returned": 2,
+              "ids": [
+                "4af1a99e727b630d4df24d92e474bb38d2e91a6ce4782c26aa460a9327a8717d",
+                "97135f063b2b58d87fdee42386d88d6b2a04c2b6131a8dd1c2bf61ac5ab81edd"
+              ],
+              "expectedDocumentIds": [
+                "deploy"
+              ],
+              "returnedDocumentIds": [
+                "deploy",
+                "config"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.5,
+              "recallAt6": 1,
+              "falsePositiveHits": 1
+            },
+            "meilisearchVerified": {
+              "samples": 10,
+              "medianMs": 15.547599999999875,
+              "p95Ms": 16.14810000000034,
+              "maxMs": 16.14810000000034,
+              "returned": 2,
+              "ids": [
+                "4af1a99e727b630d4df24d92e474bb38d2e91a6ce4782c26aa460a9327a8717d",
+                "97135f063b2b58d87fdee42386d88d6b2a04c2b6131a8dd1c2bf61ac5ab81edd"
+              ],
+              "expectedDocumentIds": [
+                "deploy"
+              ],
+              "returnedDocumentIds": [
+                "deploy",
+                "config"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.5,
+              "recallAt6": 1,
+              "falsePositiveHits": 1
+            },
+            "meilisearchStrictVerified": {
+              "samples": 10,
+              "medianMs": 15.624100000000908,
+              "p95Ms": 16.027100000001155,
+              "maxMs": 16.027100000001155,
+              "returned": 1,
+              "ids": [
+                "4af1a99e727b630d4df24d92e474bb38d2e91a6ce4782c26aa460a9327a8717d"
+              ],
+              "expectedDocumentIds": [
+                "deploy"
+              ],
+              "returnedDocumentIds": [
+                "deploy"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            }
+          },
+          "meilisearchEngineOnly": {
+            "samples": 20,
+            "medianMs": 15.283899999998539,
+            "p95Ms": 16.47060000000056,
+            "maxMs": 16.97519999999895
+          }
+        },
+        {
+          "query": "zzznomatch",
+          "methods": {
+            "original": {
+              "samples": 10,
+              "medianMs": 3.2538000000004104,
+              "p95Ms": 3.3649999999997817,
+              "maxMs": 3.3649999999997817,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 1,
+              "recallAt6": null,
+              "falsePositiveHits": 0
+            },
+            "jieba": {
+              "samples": 10,
+              "medianMs": 3.0223000000005413,
+              "p95Ms": 4.06919999999991,
+              "maxMs": 4.06919999999991,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 1,
+              "recallAt6": null,
+              "falsePositiveHits": 0
+            },
+            "meilisearchVerified": {
+              "samples": 10,
+              "medianMs": 15.67529999999897,
+              "p95Ms": 16.49539999999979,
+              "maxMs": 16.49539999999979,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 1,
+              "recallAt6": null,
+              "falsePositiveHits": 0
+            },
+            "meilisearchStrictVerified": {
+              "samples": 10,
+              "medianMs": 15.529300000000148,
+              "p95Ms": 16.461999999999534,
+              "maxMs": 16.461999999999534,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 1,
+              "recallAt6": null,
+              "falsePositiveHits": 0
+            }
+          },
+          "meilisearchEngineOnly": {
+            "samples": 20,
+            "medianMs": 15.687000000001717,
+            "p95Ms": 16.415800000000672,
+            "maxMs": 17.07589999999982
+          }
+        },
+        {
+          "query": "检索不存在的测试词zetaomega",
+          "methods": {
+            "original": {
+              "samples": 10,
+              "medianMs": 4.145700000000943,
+              "p95Ms": 4.603900000000067,
+              "maxMs": 4.603900000000067,
+              "returned": 3,
+              "ids": [
+                "7981c459fe7ba08c9df15311be0d809442cc6d0c80a7e6c4e2f4da636b18c9a4",
+                "27a4d506c2171a535c01129cb79f6245f8d1ee27027ebaab5009c2e2526cce8d",
+                "97135f063b2b58d87fdee42386d88d6b2a04c2b6131a8dd1c2bf61ac5ab81edd"
+              ],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [
+                "testing",
+                "inventory",
+                "config"
+              ],
+              "relevantHits": 0,
+              "precisionReturned": 0,
+              "recallAt6": null,
+              "falsePositiveHits": 3
+            },
+            "jieba": {
+              "samples": 10,
+              "medianMs": 3.39429999999993,
+              "p95Ms": 4.440300000000207,
+              "maxMs": 4.440300000000207,
+              "returned": 1,
+              "ids": [
+                "7981c459fe7ba08c9df15311be0d809442cc6d0c80a7e6c4e2f4da636b18c9a4"
+              ],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [
+                "testing"
+              ],
+              "relevantHits": 0,
+              "precisionReturned": 0,
+              "recallAt6": null,
+              "falsePositiveHits": 1
+            },
+            "meilisearchVerified": {
+              "samples": 10,
+              "medianMs": 15.464900000000853,
+              "p95Ms": 16.03570000000036,
+              "maxMs": 16.03570000000036,
+              "returned": 1,
+              "ids": [
+                "7981c459fe7ba08c9df15311be0d809442cc6d0c80a7e6c4e2f4da636b18c9a4"
+              ],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [
+                "testing"
+              ],
+              "relevantHits": 0,
+              "precisionReturned": 0,
+              "recallAt6": null,
+              "falsePositiveHits": 1
+            },
+            "meilisearchStrictVerified": {
+              "samples": 10,
+              "medianMs": 15.297700000000987,
+              "p95Ms": 16.211699999999837,
+              "maxMs": 16.211699999999837,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 1,
+              "recallAt6": null,
+              "falsePositiveHits": 0
+            }
+          },
+          "meilisearchEngineOnly": {
+            "samples": 20,
+            "medianMs": 15.574099999999817,
+            "p95Ms": 16.940599999999904,
+            "maxMs": 17.033900000000358
+          }
+        },
+        {
+          "query": "退回订单金额",
+          "methods": {
+            "original": {
+              "samples": 10,
+              "medianMs": 4.032700000001569,
+              "p95Ms": 4.35149999999885,
+              "maxMs": 4.35149999999885,
+              "returned": 3,
+              "ids": [
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef",
+                "ec7a0536ef96e52742cf06eb2ab92386c8dc5e1d40bc0edc9c2fbdaff7a43f00",
+                "4af1a99e727b630d4df24d92e474bb38d2e91a6ce4782c26aa460a9327a8717d"
+              ],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [
+                "refund",
+                "retire",
+                "deploy"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 0.3333333333333333,
+              "recallAt6": 1,
+              "falsePositiveHits": 2
+            },
+            "jieba": {
+              "samples": 10,
+              "medianMs": 3.7880999999997584,
+              "p95Ms": 3.979800000000978,
+              "maxMs": 3.979800000000978,
+              "returned": 1,
+              "ids": [
+                "69b844a4a067d405554eb31925d31a23c761e3b255f76af9fb781eab7a4f64ef"
+              ],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [
+                "refund"
+              ],
+              "relevantHits": 1,
+              "precisionReturned": 1,
+              "recallAt6": 1,
+              "falsePositiveHits": 0
+            },
+            "meilisearchVerified": {
+              "samples": 10,
+              "medianMs": 15.111100000000079,
+              "p95Ms": 49.409599999999045,
+              "maxMs": 49.409599999999045,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 0,
+              "recallAt6": 0,
+              "falsePositiveHits": 0
+            },
+            "meilisearchStrictVerified": {
+              "samples": 10,
+              "medianMs": 15.358699999998862,
+              "p95Ms": 16.531999999999243,
+              "maxMs": 16.531999999999243,
+              "returned": 0,
+              "ids": [],
+              "expectedDocumentIds": [
+                "refund"
+              ],
+              "returnedDocumentIds": [],
+              "relevantHits": 0,
+              "precisionReturned": 0,
+              "recallAt6": 0,
+              "falsePositiveHits": 0
+            }
+          },
+          "meilisearchEngineOnly": {
+            "samples": 20,
+            "medianMs": 15.673999999999069,
+            "p95Ms": 16.48489999999947,
+            "maxMs": 16.537599999999657
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Synthetic corpus and sequential warmed queries, not employee acceptance or concurrent throughput.",
+    "PGlite SQL versus native Meilisearch loopback HTTP; engines are different.",
+    "Meilisearch verified timing includes the same original database version check plus original result-content/scope validation.",
+    "Jieba isolated store changes only the tokenizer import and stored tokens; SQL/ranking are original.",
+    "No vector embedding, reranker or paid inference; no production configuration changed."
+  ],
+  "completed": true,
+  "exactResultBindingSelfChecks": 6,
+  "bindingOnly": true,
+  "helperStopped": true
+}

@@ -1,0 +1,15 @@
+{
+  "completed": true,
+  "scaleChecks": 2,
+  "qualityQueries": 6,
+  "exactBindingSelfChecks": 6,
+  "bindingServerChecks": "passed",
+  "helpersStopped": true,
+  "paidModelCalls": 0,
+  "productionChanges": 0,
+  "sourceSha256": {
+    "comparison-source.ts": "2d0e1e8416aa17e2303035abcbfee4c2fb11436a3760fb83ef24cf72565c2a7d",
+    "binding-check-source.ts": "70d2bf4d05869d4b65e53abae9dbff59c2404503558b83c69a2cf923ac22daf4",
+    "setup-source.py": "39728b443f57798ed5656a9592a5d6f64745d4aea5bd883d61066b5af5121e82"
+  }
+}

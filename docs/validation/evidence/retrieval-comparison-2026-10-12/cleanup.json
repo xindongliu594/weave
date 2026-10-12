@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-12T02:37:01.0491617+00:00",
+  "target": ".data/retrieval-compare-20261012",
+  "verifiedAbsoluteWithinWorkspace": true,
+  "ownershipMarkerChecked": true,
+  "helpersStoppedBeforeCleanup": true,
+  "scratchFilesRemoved": 23,
+  "removedLogicalFileBytes": 365849647.0,
+  "logicalBytesAreNotAllocatedDiskBytes": true,
+  "scratchDirectoryAbsent": true,
+  "productionDataModified": false
+}

@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-12T01:58:26.752623+00:00",
+  "endpoint": "http://127.0.0.1:4310/api/knowledge/search",
+  "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+  "agentId": "qa-1",
+  "mode": "keyword",
+  "concurrency": 1,
+  "network": "JJ urllib loopback HTTP, invoked over SSH; excludes SSH RTT",
+  "queries": [
+    {"query": "整数", "warmupQueries": 2, "measuredSamples": 10, "firstHttpMs": 7.504916982725263, "medianHttpMs": 5.771331023424864, "p95HttpMs": 7.707173004746437, "returnedChunks": 2},
+    {"query": "退款", "warmupQueries": 2, "measuredSamples": 10, "firstHttpMs": 5.753319012001157, "medianHttpMs": 6.450029090046883, "p95HttpMs": 14.012811006978154, "returnedChunks": 1},
+    {"query": "库存", "warmupQueries": 2, "measuredSamples": 10, "firstHttpMs": 6.164521910250187, "medianHttpMs": 5.251892143860459, "p95HttpMs": 5.939152091741562, "returnedChunks": 0},
+    {"query": "检索不存在的测试词zetaomega", "warmupQueries": 2, "measuredSamples": 10, "firstHttpMs": 5.136816995218396, "medianHttpMs": 6.219893926754594, "p95HttpMs": 7.070936029776931, "returnedChunks": 2}
+  ],
+  "resultDocumentVersions": [
+    {"documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6", "version": 1, "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"},
+    {"documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192", "version": 1, "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"}
+  ],
+  "usageRecordsBefore": 497,
+  "usageRecordsAfter": 497,
+  "knownCostBefore": 2.3136414,
+  "knownCostAfter": 2.3136414,
+  "unknownHoldsBefore": 0.0711849,
+  "unknownHoldsAfter": 0.0711849,
+  "measurementModelCalls": 0,
+  "limitations": [
+    "Small existing authorized test corpus; not a large-corpus throughput test.",
+    "Includes JJ loopback HTTP and current-version interactive authorization; fixed-manifest worker SQL is measured separately.",
+    "10 measured samples per query; P95 is effectively the slowest sample.",
+    "Local Windows tunnel 4312 was refused; measurement succeeded through SSH on JJ loopback 4310. No service configuration changed.",
+    "Summary transcribed from the actual SSH JSON output; per-query result metadata collapsed to the two unique fixed document versions."
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "checkedAt": "2026-10-12T01:56:00.926Z",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics        ",
+  "memoryBytes": 33521246208,
+  "engine": "actual queryKnowledge with injected fresh in-memory PGlite, existing GIN/document indexes",
+  "concurrency": 1,
+  "modelCalls": 0,
+  "limitations": [
+    "Synthetic corpus, repeated warm sequential queries; not JJ production throughput.",
+    "No HTTP, socket or network latency. No vector embedding/model cold start measured."
+  ],
+  "results": [
+    {
+      "authorizedChunks": 100,
+      "authorizedDocuments": 5,
+      "corpusUtf8Bytes": 495938,
+      "queries": [
+        {
+          "query": "needleomega",
+          "returned": 1,
+          "firstLookupMs": 5.343899999999849,
+          "samples": 20,
+          "medianMs": 4.850500000000466,
+          "p95Ms": 5.614799999999377,
+          "maxMs": 7.367899999997462
+        },
+        {
+          "query": "库存调整",
+          "returned": 6,
+          "firstLookupMs": 31.22240000000238,
+          "samples": 20,
+          "medianMs": 7.258200000000215,
+          "p95Ms": 8.271100000001752,
+          "maxMs": 8.311000000001513
+        },
+        {
+          "query": "验收流程",
+          "returned": 6,
+          "firstLookupMs": 11.463499999998021,
+          "samples": 20,
+          "medianMs": 11.495199999997567,
+          "p95Ms": 13.1762000000017,
+          "maxMs": 13.355100000000675
+        },
+        {
+          "query": "zzznomatch",
+          "returned": 0,
+          "firstLookupMs": 4.200100000001839,
+          "samples": 20,
+          "medianMs": 3.718400000001566,
+          "p95Ms": 4.17790000000241,
+          "maxMs": 4.340200000002369
+        }
+      ],
+      "catalog50": {
+        "samples": 20,
+        "medianMs": 1.7263000000020838,
+        "p95Ms": 2.9495999999999185,
+        "maxMs": 4.07499999999709
+      },
+      "permissionAndPinnedVersionChecks": "passed"
+    },
+    {
+      "authorizedChunks": 1000,
+      "authorizedDocuments": 50,
+      "corpusUtf8Bytes": 4960370,
+      "queries": [
+        {
+          "query": "needleomega",
+          "returned": 6,
+          "firstLookupMs": 6.478399999999965,
+          "samples": 20,
+          "medianMs": 7.277099999999336,
+          "p95Ms": 8.13379999999961,
+          "maxMs": 9.03099999999904
+        },
+        {
+          "query": "库存调整",
+          "returned": 6,
+          "firstLookupMs": 22.789200000002893,
+          "samples": 20,
+          "medianMs": 25.268700000000536,
+          "p95Ms": 34.069400000000314,
+          "maxMs": 34.77130000000034
+        },
+        {
+          "query": "验收流程",
+          "returned": 6,
+          "firstLookupMs": 76.53679999999804,
+          "samples": 20,
+          "medianMs": 71.90710000000036,
+          "p95Ms": 79.41869999999835,
+          "maxMs": 81.78789999999935
+        },
+        {
+          "query": "zzznomatch",
+          "returned": 0,
+          "firstLookupMs": 7.130999999997584,
+          "samples": 20,
+          "medianMs": 5.978000000002794,
+          "p95Ms": 6.952999999997701,
+          "maxMs": 7.264200000001438
+        }
+      ],
+      "catalog50": {
+        "samples": 20,
+        "medianMs": 2.262800000000425,
+        "p95Ms": 2.4519000000000233,
+        "maxMs": 3.173899999997957
+      },
+      "permissionAndPinnedVersionChecks": "passed"
+    },
+    {
+      "authorizedChunks": 10000,
+      "authorizedDocuments": 500,
+      "corpusUtf8Bytes": 49613690,
+      "queries": [
+        {
+          "query": "needleomega",
+          "returned": 6,
+          "firstLookupMs": 47.02629999999772,
+          "samples": 20,
+          "medianMs": 47.86899999999878,
+          "p95Ms": 51.974300000001676,
+          "maxMs": 53.5541000000012
+        },
+        {
+          "query": "库存调整",
+          "returned": 6,
+          "firstLookupMs": 204.2856000000029,
+          "samples": 20,
+          "medianMs": 219.8307000000059,
+          "p95Ms": 239.264700000007,
+          "maxMs": 241.84449999999924
+        },
+        {
+          "query": "验收流程",
+          "returned": 6,
+          "firstLookupMs": 656.8583999999973,
+          "samples": 20,
+          "medianMs": 626.5700999999972,
+          "p95Ms": 656.6327000000019,
+          "maxMs": 695.452200000007
+        },
+        {
+          "query": "zzznomatch",
+          "returned": 0,
+          "firstLookupMs": 34.78139999999985,
+          "samples": 20,
+          "medianMs": 30.29950000000099,
+          "p95Ms": 38.72590000000491,
+          "maxMs": 38.95530000000144
+        }
+      ],
+      "catalog50": {
+        "samples": 20,
+        "medianMs": 1.8899000000019441,
+        "p95Ms": 2.320800000001327,
+        "maxMs": 2.336699999999837
+      },
+      "permissionAndPinnedVersionChecks": "passed"
+    }
+  ]
+}

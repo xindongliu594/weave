@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-12T02:23:37.889Z",
+  "platform": "win32",
+  "node": "v24.19.0",
+  "cpu": "AMD Ryzen 9 8940HX with Radeon Graphics        ",
+  "memoryBytes": 33521246208,
+  "versions": {
+    "meilisearch": "1.54.3",
+    "jieba": "2.0.4"
+  },
+  "concurrency": 1,
+  "meilisearchIndexingThreads": 2,
+  "modelCalls": 0,
+  "sourceHashes": {
+    "originalStore": "4995ba1d99dc326f8cf1edbe5e9d701cf9394a70036a8253a1b49936314a747d",
+    "isolatedJiebaStore": "0d3efe5aa086dc4d33d9e12fe096d760641102180a147b442200bb86111fc5a0"
+  },
+  "scale": [],
+  "quality": [],
+  "limitations": [
+    "Synthetic corpus and sequential warmed queries, not employee acceptance or concurrent throughput.",
+    "PGlite SQL versus native Meilisearch loopback HTTP; engines are different.",
+    "Meilisearch verified timing includes the same original database version check plus original result-content/scope validation.",
+    "Jieba isolated store changes only the tokenizer import and stored tokens; SQL/ranking are original.",
+    "No vector embedding, reranker or paid inference; no production configuration changed."
+  ],
+  "helperStopped": true
+}
