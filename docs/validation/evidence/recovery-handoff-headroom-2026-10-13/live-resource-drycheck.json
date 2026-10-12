@@ -24,6 +24,8 @@
   },
   "projectCap": 0.3,
   "minimumProjectBudget": 0.408798,
+  "planningCostAllowance": 0.003,
+  "minimumWithPlanningCost": 0.411798,
   "currentBudgetSufficient": false,
   "recordedCost": 0.2501061,
   "retained": 0,

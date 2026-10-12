@@ -52,8 +52,9 @@ export function recoveryResourceRouter(traceRoot:string) {
       }
       const minimumTotalCalls=requirements.minimumTotalCalls;
       const costs=await projectCostReadiness(pool,row.project_id,row.snapshot.policy.maxBudget);
-      const minimumProjectBudget=Math.max(row.snapshot.policy.maxBudget,recoveryMinimumProjectBudget(row.snapshot,history,done,callCeilings,costs));
-      if(minimumProjectBudget>input.maxBudget)throw new AppError(422,'项目净额不足所有未完成节点的工作与交接纠正，请重新分配预算','RESOURCE_BUDGET_INSUFFICIENT');
+      const minimumProjectBudget=Math.max(row.snapshot.policy.maxBudget,
+        Math.ceil((recoveryMinimumProjectBudget(row.snapshot,history,done,callCeilings,costs)+input.maxPlanningCost)*1e8)/1e8);
+      if(minimumProjectBudget>input.maxBudget)throw new AppError(422,'项目净额不足本次规划与所有未完成节点的工作及交接纠正，请重新分配预算','RESOURCE_BUDGET_INSUFFICIENT');
       const callLimits=z.object(Object.fromEntries(tasks.filter((task:any)=>!task.completed).map((task:any)=>[task.id,z.number().int()
         .min(task.minimumCallLimit).max(taskMaximum)]))).strict();
       const budgetLimits=z.object(Object.fromEntries(tasks.filter((task:any)=>!task.completed).map((task:any)=>[task.id,z.number().finite()
@@ -68,7 +69,8 @@ export function recoveryResourceRouter(traceRoot:string) {
           costs:{recordedCost:costs.recordedCost,reserved:costs.reserved,availableAtOriginal:costs.availableBudget,
             availableAtCeiling:input.maxBudget-costs.recordedCost-costs.reserved},
           budgetInstruction:'旧费用和预留不会清零。请核对原净额能否容纳恢复与正式验收；净额很少时应在用户ceiling内提高预算，不能只保留原费用与原调用次数。',
-          maxTaskModelCalls:taskMaximum,totalCallLimit:callCeilings.maxModelCalls,minimumProjectBudget,originalTotalCallLimit:row.snapshot.policy.maxModelCalls??100,usedTotalCalls:history.calls,tasks})}];
+          maxTaskModelCalls:taskMaximum,totalCallLimit:callCeilings.maxModelCalls,minimumProjectBudget,planningCostAllowance:input.maxPlanningCost,
+          originalTotalCallLimit:row.snapshot.policy.maxModelCalls??100,usedTotalCalls:history.calls,tasks})}];
       // The small proposal still uses the original project cap. Confirmation,
       // not a planning request, grants the new execution ceiling.
       const response=await completeBudgeted(model,messages,512,{purpose:'预算补充规划',projectId:row.project_id,

@@ -1,0 +1,7 @@
+{
+  "url": "http://127.0.0.1:4312/",
+  "pageStatus": 200,
+  "database": "connected",
+  "modelCalls": 0,
+  "verification": "HTTP reachability only; no new browser workflow"
+}

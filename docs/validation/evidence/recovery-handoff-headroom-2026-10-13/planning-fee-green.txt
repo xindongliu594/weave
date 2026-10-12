@@ -1,0 +1,52 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1732.5107ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (189.7622ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (146.2485ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (223.4127ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (150.8014ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (165.7704ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (153.3551ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (157.9654ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (114.7331ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (118.1871ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (292.9056ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (154.3939ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (190.513ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (265.8296ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (122.9998ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (155.9233ms)
+✔ shared project money rejects a full correction tranche before planning despite sufficient node money (117.4ms)
+✔ late project expenses prevent confirming a previously valid correction candidate (109.3818ms)
+✔ next-tranche floor also reserves the bounded planning request before paid admission (112.5633ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (152.1291ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (201.3664ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (173.0881ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1293.639ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7193.9294
+✔ demand discussion records actual usage without estimating or reserving an execution budget (1313.2741ms)
+✔ usage-only accounting cannot be applied to execution or project identities (29.1107ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (104.9278ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (162.397ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (243.2101ms)
+✔ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (145.3639ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (364.7974ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (169.089ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (188.6668ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (109.0127ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (394.7712ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4961.5692

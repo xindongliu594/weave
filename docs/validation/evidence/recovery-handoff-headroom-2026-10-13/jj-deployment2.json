@@ -1,0 +1,23 @@
+{
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom2-20261013",
+  "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom-20261013",
+  "packetSha256": "0c1b3c5889b3789a149089efeb46e8303b519679d305cc3d1567807a3514de8f",
+  "projectCount": 10,
+  "usageBefore": 516,
+  "modelCalls": 0,
+  "dependencies": "existing pinned directories reused",
+  "newDependenciesInstalled": false,
+  "previousNativeTestsPassed": 58,
+  "nativeRuntimeCodeUnchanged": true,
+  "passed": true,
+  "usageAfter": 516,
+  "mainPID": "604548",
+  "projectStatePreserved": true,
+  "usagePreserved": true,
+  "originalArchivesPreserved": true,
+  "archiveEvidence": {
+    "files": 484,
+    "bytes": 402990108,
+    "manifestSha256": "1224c0da147fe66d33bc9301da9932a8dd7ca886f29001f402c9686d9743fc2f"
+  }
+}

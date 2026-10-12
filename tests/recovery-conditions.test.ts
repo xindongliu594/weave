@@ -66,13 +66,13 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false) {
+async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
   const planTasks=declaredReads?tasks.map(task=>({...task,inputs:[]})):tasks;
   const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
-    title: 'Recovery fixture', templateVersion: 'fixture', policy, tasks:planTasks, approvedTasks:planTasks,approval:{kind:'project',approvedAt:new Date().toISOString()},
+    title: 'Recovery fixture', templateVersion: 'fixture', policy:{...policy,maxBudget:originalBudget}, tasks:planTasks, approvedTasks:planTasks,approval:{kind:'project',approvedAt:new Date().toISOString()},
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
     modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1),...(pricedRoutes?{inputRate:2,outputRate:10,maxOutputTokens:512}:{}) }],
     departmentBudgets: { [departmentId]: .99 }, executionBudget: .99, budgetVersion: 1, budgetHistory: { calls: 0, tasks: {} } };
@@ -355,6 +355,18 @@ test('late project expenses prevent confirming a previously valid correction can
     [randomUUID(),modelId,projectId,'isolated late confirmed expense']);
   const before=await state();
   const response=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  assert.equal(response.status,422);assert.equal((await response.json() as any).code,'RESOURCE_BUDGET_INSUFFICIENT');
+  assert.equal(providerRequests,0);assert.deepEqual(await state(),before);
+});
+
+test('next-tranche floor also reserves the bounded planning request before paid admission', {skip:!isolated},async()=>{
+  const {runId,projectId}=await seed(true,false,true,1.3);
+  await pool.query('INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES($1,$2,$3,1,1,.75,$4)',
+    [randomUUID(),modelId,projectId,'isolated project history']);
+  const before=await state();
+  resourcePlanningReply={maxBudget:1.42,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},rationale:'Tranche fits but full allowed planning amount does not'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.42,maxPlanningCost:.1,retainUncertainCosts:true})});
   assert.equal(response.status,422);assert.equal((await response.json() as any).code,'RESOURCE_BUDGET_INSUFFICIENT');
   assert.equal(providerRequests,0);assert.deepEqual(await state(),before);
 });

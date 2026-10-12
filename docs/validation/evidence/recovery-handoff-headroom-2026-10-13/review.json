@@ -7,5 +7,10 @@
   "independentResourceTests": {"passed": 18, "failed": 0},
   "checkedEvidence": {"resourceAndLineage": 28, "cost": 11, "nativeRuntime": 58},
   "declinedToJudge": ["Real model QA and manager completion within remaining resources; no SSH, production DB or paid model access."],
-  "modelCallsToProductProvider": 0
+  "modelCallsToProductProvider": 0,
+  "postReviewSelfCheck": {
+    "issue": "Minimum candidate amount must also include the bounded planning request itself.",
+    "verification": "API fixture RED 200 != 422; GREEN recovery 23/23 + cost 11/11; typecheck exit0.",
+    "secondReviewDispatched": false
+  }
 }
