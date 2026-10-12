@@ -1,0 +1,28 @@
+{
+  "historicalRunsRemoved": false,
+  "removedOwnedOnly": [
+    {
+      "logicalBytes": 48220509.0,
+      "files": 2,
+      "path": ".data/hybrid-retrieval-20261012"
+    },
+    {
+      "logicalBytes": 2003,
+      "files": 1,
+      "path": ".data/hybrid-fetch.py"
+    },
+    {
+      "logicalBytes": 748,
+      "files": 1,
+      "path": ".data/hybrid-preflight.py"
+    },
+    {
+      "logicalBytes": 2894,
+      "files": 1,
+      "path": ".data/hybrid-install-native.ps1"
+    }
+  ],
+  "scratchExists": false,
+  "checkedAt": "2026-10-12T04:11:17.5992550Z",
+  "productionDataRemoved": false
+}

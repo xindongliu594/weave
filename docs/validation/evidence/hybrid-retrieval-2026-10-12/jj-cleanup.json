@@ -1,0 +1,19 @@
+{
+  "root": "/home/jj/.local/share/weiwu/validation/hybrid-retrieval-20261012",
+  "helperRunning": false,
+  "removedOwnedOnly": [
+    {
+      "path": "isolated-index",
+      "logicalBytes": 336006
+    },
+    {
+      "path": "meilisearch-private.log",
+      "logicalBytes": 114242
+    }
+  ],
+  "retainedVerifiedCacheBytes": 492413903,
+  "retainedCachePurpose": "Pinned model and fixed binary retained once for follow-up experiments, not per employee/run",
+  "privateFixtureAndRawEvidenceKeptOnJJ": true,
+  "productionFilesRemoved": false,
+  "rootPermissions": "0o700"
+}

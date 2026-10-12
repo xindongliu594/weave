@@ -1,0 +1,1543 @@
+{
+  "startedAt": "2026-10-12T04:01:14.810Z",
+  "finishedAt": "2026-10-12T04:01:31.599Z",
+  "node": "v24.19.0",
+  "platform": "linux",
+  "cpu": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+  "memoryBytes": 16010936320,
+  "concurrency": 1,
+  "samplesPerQuery": 5,
+  "limit": 3,
+  "semanticRatio": 0.5,
+  "embeddingVersion": "Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78:transformers-4.3.0:q8:mean:normalized:windows-v1",
+  "modelCalls": 0,
+  "sourceHashes": {
+    "services/embedding/local.mjs": "745c2249c5b8370df74ae5a14ee5e72254b3389216c1b3fa4377b6cf99286149",
+    "services/embedding/model-lock.json": "ed8a213a67a0ac3359e8a400730f02bcd61bd5811f1ff084a8d4b2471883e106",
+    "services/agent-runtime/knowledge.mjs": "e9b0a4ffc1f4c4e7ee7ed54bc765fb99e85c992e80d5b3a7bf79dc0213e634f6",
+    "apps/api/src/knowledge-store.ts": "4995ba1d99dc326f8cf1edbe5e9d701cf9394a70036a8253a1b49936314a747d",
+    "apps/api/src/knowledge-vector.ts": "562651ae13568a66c4a13003023626f43e88e3e152f7383fde26fd3b4002c941"
+  },
+  "evaluatorSha256": "5cd671582f51965a954fa7baddf141f2256fd9bbc430447287a987ab0b17ae11",
+  "caseSha256": "d611fb7b4f713a0458d1e012f87b73b75ad77c9dfa7c4e5748eacf47110a0c52",
+  "embeddingColdStartMs": 1846.418225,
+  "completed": true,
+  "helperStopped": true,
+  "limitations": [
+    "Two approved test methods are not a representative company corpus. Synthetic topics are reported separately.",
+    "Tiny corpus, sequential warm tests; P95 is the maximum of five observations. No concurrency or scale throughput claim.",
+    "PGlite WASM SQL versus native Meilisearch loopback HTTP; not production PostgreSQL.",
+    "Keyword indexes content only; vectors include title plus content, matching the current application. This affects cross-channel quality.",
+    "End-to-end hybrid time includes fresh local query embedding and pinned version checks. No paid model or reranker.",
+    "Meilisearch filter and result binding are experiment adapters, not a production integration.",
+    "No relevance rejection threshold; nearest-vector results do not prove the source contains an answer."
+  ],
+  "corpora": [
+    {
+      "label": "approvedMethods",
+      "documentCount": 2,
+      "sentinelCount": 3,
+      "vectorIndexMs": 107.21135099999992,
+      "meiliImportMs": 439.8940130000001,
+      "engines": {
+        "original": {
+          "positiveQueries": 6,
+          "top1Hits": 4,
+          "mrr": 0.75,
+          "returned": 10,
+          "relevant": 5,
+          "positiveQueryRecall": 0.8333333333333334,
+          "noAnswerQueries": 3,
+          "noAnswerFalseHits": 3,
+          "noAnswerFalseQueries": 2,
+          "medianOfQueryMediansMs": 2.1778269999995246
+        },
+        "localRrf": {
+          "positiveQueries": 6,
+          "top1Hits": 6,
+          "mrr": 1,
+          "returned": 12,
+          "relevant": 6,
+          "positiveQueryRecall": 1,
+          "noAnswerQueries": 3,
+          "noAnswerFalseHits": 6,
+          "noAnswerFalseQueries": 3,
+          "medianOfQueryMediansMs": 10.334482000000207
+        },
+        "meiliStrict": {
+          "positiveQueries": 6,
+          "top1Hits": 3,
+          "mrr": 0.5,
+          "returned": 3,
+          "relevant": 3,
+          "positiveQueryRecall": 0.5,
+          "noAnswerQueries": 3,
+          "noAnswerFalseHits": 0,
+          "noAnswerFalseQueries": 0,
+          "medianOfQueryMediansMs": 4.4190400000006775
+        },
+        "meiliHybrid": {
+          "positiveQueries": 6,
+          "top1Hits": 6,
+          "mrr": 1,
+          "returned": 12,
+          "relevant": 6,
+          "positiveQueryRecall": 1,
+          "noAnswerQueries": 3,
+          "noAnswerFalseHits": 6,
+          "noAnswerFalseQueries": 3,
+          "medianOfQueryMediansMs": 51.92719600000055
+        }
+      },
+      "cases": [
+        {
+          "index": 0,
+          "kind": "literal",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.74307299999964,
+                "p95Ms": 2.942525000000387,
+                "maxMs": 2.942525000000387
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.008566999999857,
+                "p95Ms": 12.753294999999525,
+                "maxMs": 12.753294999999525
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.4190400000006775,
+                "p95Ms": 4.668039999999564,
+                "maxMs": 4.668039999999564
+              },
+              "returned": 1,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.981362000000445,
+                "p95Ms": 52.04571600000054,
+                "maxMs": 52.04571600000054
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 1,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.065907000000152,
+                "p95Ms": 3.0093570000008185,
+                "maxMs": 3.0093570000008185
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 12.967677999999978,
+                "p95Ms": 15.595593000000008,
+                "maxMs": 15.595593000000008
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 3.9569540000002235,
+                "p95Ms": 6.116576999999779,
+                "maxMs": 6.116576999999779
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 52.86431400000038,
+                "p95Ms": 53.79017500000009,
+                "maxMs": 53.79017500000009
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 2,
+          "kind": "mixed",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.9995940000007977,
+                "p95Ms": 2.3700730000000476,
+                "maxMs": 2.3700730000000476
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.294436999998652,
+                "p95Ms": 11.041096999999354,
+                "maxMs": 11.041096999999354
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 5.6987109999990935,
+                "p95Ms": 6.137844000000769,
+                "maxMs": 6.137844000000769
+              },
+              "returned": 1,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.03705700000137,
+                "p95Ms": 52.8449070000006,
+                "maxMs": 52.8449070000006
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 3,
+          "kind": "literal",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.9333960000003572,
+                "p95Ms": 2.2646569999997155,
+                "maxMs": 2.2646569999997155
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.285431999998764,
+                "p95Ms": 13.318021000000954,
+                "maxMs": 13.318021000000954
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 5.249673999998777,
+                "p95Ms": 5.618454999999813,
+                "maxMs": 5.618454999999813
+              },
+              "returned": 1,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.18828100000064,
+                "p95Ms": 50.979121000000305,
+                "maxMs": 50.979121000000305
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 4,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.5925070000012056,
+                "p95Ms": 3.3810360000006767,
+                "maxMs": 3.3810360000006767
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 0.5,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 11.384566999999151,
+                "p95Ms": 11.97491699999955,
+                "maxMs": 11.97491699999955
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.056124999999156,
+                "p95Ms": 4.19430999999895,
+                "maxMs": 4.19430999999895
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 51.92719600000055,
+                "p95Ms": 52.13615000000027,
+                "maxMs": 52.13615000000027
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 5,
+          "kind": "mixed",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.1778269999995246,
+                "p95Ms": 2.647448000001532,
+                "maxMs": 2.647448000001532
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.334482000000207,
+                "p95Ms": 11.167625000000044,
+                "maxMs": 11.167625000000044
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.665052000000287,
+                "p95Ms": 5.413941000000705,
+                "maxMs": 5.413941000000705
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 51.971912000000884,
+                "p95Ms": 52.06924700000127,
+                "maxMs": 52.06924700000127
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 6,
+          "kind": "no-answer",
+          "expectedCount": 0,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.6562990000002173,
+                "p95Ms": 3.2876460000006773,
+                "maxMs": 3.2876460000006773
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.412739999999758,
+                "p95Ms": 11.560279999999693,
+                "maxMs": 11.560279999999693
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.201327000000674,
+                "p95Ms": 4.952891999999338,
+                "maxMs": 4.952891999999338
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.060403000001315,
+                "p95Ms": 51.880795999999464,
+                "maxMs": 51.880795999999464
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            }
+          }
+        },
+        {
+          "index": 7,
+          "kind": "no-answer",
+          "expectedCount": 0,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.7885799999985466,
+                "p95Ms": 2.049901000000318,
+                "maxMs": 2.049901000000318
+              },
+              "returned": 1,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 1
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.405198000000382,
+                "p95Ms": 11.275829999998678,
+                "maxMs": 11.275829999998678
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.009985000000597,
+                "p95Ms": 4.155338999999003,
+                "maxMs": 4.155338999999003
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 53.958731999999145,
+                "p95Ms": 55.067807999999786,
+                "maxMs": 55.067807999999786
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            }
+          }
+        },
+        {
+          "index": 8,
+          "kind": "no-answer",
+          "expectedCount": 0,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.8582989999995334,
+                "p95Ms": 3.0121460000009392,
+                "maxMs": 3.0121460000009392
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 12.303743999998915,
+                "p95Ms": 13.69684899999993,
+                "maxMs": 13.69684899999993
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.425662999999986,
+                "p95Ms": 4.738636000000042,
+                "maxMs": 4.738636000000042
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 51.96190299999944,
+                "p95Ms": 53.983077000000776,
+                "maxMs": 53.983077000000776
+              },
+              "returned": 2,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "label": "synthetic",
+      "documentCount": 8,
+      "sentinelCount": 3,
+      "vectorIndexMs": 108.16928799999914,
+      "meiliImportMs": 227.60693699999865,
+      "engines": {
+        "original": {
+          "positiveQueries": 8,
+          "top1Hits": 8,
+          "mrr": 1,
+          "returned": 22,
+          "relevant": 8,
+          "positiveQueryRecall": 1,
+          "noAnswerQueries": 2,
+          "noAnswerFalseHits": 3,
+          "noAnswerFalseQueries": 1,
+          "medianOfQueryMediansMs": 2.016776000000391
+        },
+        "localRrf": {
+          "positiveQueries": 8,
+          "top1Hits": 8,
+          "mrr": 1,
+          "returned": 24,
+          "relevant": 8,
+          "positiveQueryRecall": 1,
+          "noAnswerQueries": 2,
+          "noAnswerFalseHits": 6,
+          "noAnswerFalseQueries": 2,
+          "medianOfQueryMediansMs": 9.760164999999688
+        },
+        "meiliStrict": {
+          "positiveQueries": 8,
+          "top1Hits": 3,
+          "mrr": 0.375,
+          "returned": 3,
+          "relevant": 3,
+          "positiveQueryRecall": 0.375,
+          "noAnswerQueries": 2,
+          "noAnswerFalseHits": 0,
+          "noAnswerFalseQueries": 0,
+          "medianOfQueryMediansMs": 4.292515999999523
+        },
+        "meiliHybrid": {
+          "positiveQueries": 8,
+          "top1Hits": 8,
+          "mrr": 1,
+          "returned": 24,
+          "relevant": 8,
+          "positiveQueryRecall": 1,
+          "noAnswerQueries": 2,
+          "noAnswerFalseHits": 6,
+          "noAnswerFalseQueries": 2,
+          "medianOfQueryMediansMs": 50.88605499999903
+        }
+      },
+      "cases": [
+        {
+          "index": 0,
+          "kind": "literal",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.064753999999084,
+                "p95Ms": 2.1368319999983214,
+                "maxMs": 2.1368319999983214
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 8.745675999998639,
+                "p95Ms": 9.64479399999982,
+                "maxMs": 9.64479399999982
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.660616000001028,
+                "p95Ms": 5.111748000001171,
+                "maxMs": 5.111748000001171
+              },
+              "returned": 1,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.020323000000644,
+                "p95Ms": 52.77726199999961,
+                "maxMs": 52.77726199999961
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 1,
+          "kind": "literal",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 3.382900000000518,
+                "p95Ms": 3.5961309999984223,
+                "maxMs": 3.5961309999984223
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.598907999999938,
+                "p95Ms": 10.908728999998857,
+                "maxMs": 10.908728999998857
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.291572000000087,
+                "p95Ms": 4.963319000000411,
+                "maxMs": 4.963319000000411
+              },
+              "returned": 1,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 49.96383900000001,
+                "p95Ms": 52.90198999999848,
+                "maxMs": 52.90198999999848
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 2,
+          "kind": "literal",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.9656310000009398,
+                "p95Ms": 2.247047000000748,
+                "maxMs": 2.247047000000748
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.496884999998656,
+                "p95Ms": 12.215749999999389,
+                "maxMs": 12.215749999999389
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.53374999999869,
+                "p95Ms": 4.618318999999246,
+                "maxMs": 4.618318999999246
+              },
+              "returned": 1,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.91247699999985,
+                "p95Ms": 53.05782399999953,
+                "maxMs": 53.05782399999953
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 3,
+          "kind": "no-answer",
+          "expectedCount": 0,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.6488470000003872,
+                "p95Ms": 1.7352189999983239,
+                "maxMs": 1.7352189999983239
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.6256429999994,
+                "p95Ms": 13.743449999999939,
+                "maxMs": 13.743449999999939
+              },
+              "returned": 3,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 3
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 5.186461000001145,
+                "p95Ms": 6.233704999998736,
+                "maxMs": 6.233704999998736
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 49.072260999999344,
+                "p95Ms": 52.14780300000166,
+                "maxMs": 52.14780300000166
+              },
+              "returned": 3,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 3
+            }
+          }
+        },
+        {
+          "index": 4,
+          "kind": "no-answer",
+          "expectedCount": 0,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.8337609999998676,
+                "p95Ms": 1.9697680000008404,
+                "maxMs": 1.9697680000008404
+              },
+              "returned": 3,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 3
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.298641000001226,
+                "p95Ms": 11.60638199999994,
+                "maxMs": 11.60638199999994
+              },
+              "returned": 3,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 3
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.427080000001297,
+                "p95Ms": 4.660546999999497,
+                "maxMs": 4.660546999999497
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.88605499999903,
+                "p95Ms": 51.99121799999921,
+                "maxMs": 51.99121799999921
+              },
+              "returned": 3,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 3
+            }
+          }
+        },
+        {
+          "index": 5,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.141890000000785,
+                "p95Ms": 2.458223999999973,
+                "maxMs": 2.458223999999973
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.247685000000274,
+                "p95Ms": 9.8239569999987,
+                "maxMs": 9.8239569999987
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.292515999999523,
+                "p95Ms": 4.636929999998756,
+                "maxMs": 4.636929999998756
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.037045999999464,
+                "p95Ms": 51.18984099999943,
+                "maxMs": 51.18984099999943
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 6,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 3.3542990000005375,
+                "p95Ms": 3.4723140000005515,
+                "maxMs": 3.4723140000005515
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 11.591793999999936,
+                "p95Ms": 13.901496000000407,
+                "maxMs": 13.901496000000407
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 3.9862950000006094,
+                "p95Ms": 4.080300999999963,
+                "maxMs": 4.080300999999963
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 52.02954999999929,
+                "p95Ms": 53.073771999999735,
+                "maxMs": 53.073771999999735
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 7,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.9398799999980838,
+                "p95Ms": 2.0917149999986577,
+                "maxMs": 2.0917149999986577
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 9.760164999999688,
+                "p95Ms": 11.208948999999848,
+                "maxMs": 11.208948999999848
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.282358000000386,
+                "p95Ms": 4.988185000001977,
+                "maxMs": 4.988185000001977
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 51.02735500000199,
+                "p95Ms": 52.33466200000112,
+                "maxMs": 52.33466200000112
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 8,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 1.9946080000008806,
+                "p95Ms": 3.004004000002169,
+                "maxMs": 3.004004000002169
+              },
+              "returned": 2,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.095173000001523,
+                "p95Ms": 12.511347999999998,
+                "maxMs": 12.511347999999998
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.048881999999139,
+                "p95Ms": 5.9285539999982575,
+                "maxMs": 5.9285539999982575
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.00119800000175,
+                "p95Ms": 53.144867000002705,
+                "maxMs": 53.144867000002705
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        },
+        {
+          "index": 9,
+          "kind": "paraphrase",
+          "expectedCount": 1,
+          "engines": {
+            "original": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 2.016776000000391,
+                "p95Ms": 2.213543000001664,
+                "maxMs": 2.213543000001664
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "localRrf": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 10.37006300000212,
+                "p95Ms": 12.514968999999837,
+                "maxMs": 12.514968999999837
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            },
+            "meiliStrict": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 4.149222999996709,
+                "p95Ms": 5.2708740000016405,
+                "maxMs": 5.2708740000016405
+              },
+              "returned": 0,
+              "relevant": 0,
+              "reciprocalRank": 0,
+              "top1Correct": false,
+              "falseHits": 0
+            },
+            "meiliHybrid": {
+              "timing": {
+                "samples": 5,
+                "medianMs": 50.918384000000515,
+                "p95Ms": 53.08162400000219,
+                "maxMs": 53.08162400000219
+              },
+              "returned": 3,
+              "relevant": 1,
+              "reciprocalRank": 1,
+              "top1Correct": true,
+              "falseHits": 0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "guards": [
+    {
+      "label": "approvedMethods",
+      "engine": "original",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "localRrf",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "meiliStrict",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "meiliHybrid",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "original",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "localRrf",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "meiliStrict",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "meiliHybrid",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "original",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "localRrf",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "meiliStrict",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "engine": "meiliHybrid",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "check": "ungrantedEmployee",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "check": "sixTamperedResultBindings",
+      "passed": true
+    },
+    {
+      "label": "approvedMethods",
+      "check": "missingPinnedRevisionRejectedByAllFour",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "original",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "localRrf",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "meiliStrict",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "meiliHybrid",
+      "check": "privateonlyzeta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "original",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "localRrf",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "meiliStrict",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "meiliHybrid",
+      "check": "latestonlyomega",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "original",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "localRrf",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "meiliStrict",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "engine": "meiliHybrid",
+      "check": "deletedonlytheta",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "check": "ungrantedEmployee",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "check": "sixTamperedResultBindings",
+      "passed": true
+    },
+    {
+      "label": "synthetic",
+      "check": "missingPinnedRevisionRejectedByAllFour",
+      "passed": true
+    }
+  ],
+  "provenance": {
+    "model": {
+      "repository": "Xenova/multilingual-e5-small",
+      "revision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+      "downloadHost": "hf-mirror.com",
+      "verification": "Every file matches the repository model-lock.json SHA256",
+      "files": [
+        {
+          "file": "onnx/model_quantized.onnx",
+          "sha256": "f80102d3f2a1229f387d3c81909990d8945513e347b0eab049f7de3c6f98c193",
+          "bytes": 118308185,
+          "seconds": 22.749629861908033,
+          "cached": false
+        },
+        {
+          "file": "tokenizer.json",
+          "sha256": "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
+          "bytes": 17082730,
+          "seconds": 3.9933595969341695,
+          "cached": false
+        },
+        {
+          "file": "config.json",
+          "sha256": "cb99455288675345e1a4f411438d5d0adbba5fbd3a67ea4fb03c015433b996c1",
+          "bytes": 658,
+          "seconds": 0.8630680369678885,
+          "cached": false
+        },
+        {
+          "file": "tokenizer_config.json",
+          "sha256": "a1d6bc8734a6f635dc158508bef000f8e2e5a759c7d92f984b2c86e5ff53425b",
+          "bytes": 443,
+          "seconds": 2.0770619800314307,
+          "cached": false
+        },
+        {
+          "file": "special_tokens_map.json",
+          "sha256": "d05497f1da52c5e09554c0cd874037a083e1dc1b9cfd48034d1c717f1afc07a7",
+          "bytes": 167,
+          "seconds": 1.2072985810227692,
+          "cached": false
+        }
+      ]
+    },
+    "meilisearch": {
+      "version": "1.54.3",
+      "url": "https://github.com/meilisearch/meilisearch/releases/download/v1.54.3/meilisearch-linux-amd64",
+      "sha256": "0ece934f9791f0db83e1184f4f505a38eae7d93ff1c47efaa9426cf2b3a12ba7",
+      "bytes": 357021720,
+      "seconds": 71.20206917379983,
+      "digestSource": "https://github.com/meilisearch/meilisearch/releases/expanded_assets/v1.54.3"
+    }
+  },
+  "productionPreservation": {
+    "before": {
+      "retrieval": {
+        "mode": "keyword",
+        "version": 1,
+        "installed": false,
+        "model": "Xenova/multilingual-e5-small",
+        "embeddingVersion": "Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78:transformers-4.3.0:q8:mean:normalized:windows-v1",
+        "dimensions": 384,
+        "total": 17,
+        "indexed": 0,
+        "running": false,
+        "error": null
+      },
+      "usageCount": 497,
+      "registeredCost": 2.3136414,
+      "retainedCost": 0.0711849
+    },
+    "after": {
+      "retrieval": {
+        "mode": "keyword",
+        "version": 1,
+        "installed": false,
+        "model": "Xenova/multilingual-e5-small",
+        "embeddingVersion": "Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78:transformers-4.3.0:q8:mean:normalized:windows-v1",
+        "dimensions": 384,
+        "total": 17,
+        "indexed": 0,
+        "running": false,
+        "error": null
+      },
+      "usageCount": 497,
+      "registeredCost": 2.3136414,
+      "retainedCost": 0.0711849
+    },
+    "unchanged": true,
+    "paidModelCallsAdded": 0
+  }
+}

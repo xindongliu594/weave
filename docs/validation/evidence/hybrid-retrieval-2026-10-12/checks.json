@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-12T04:12:29.192Z",
+  "integration": {
+    "command": "node scripts/test-integration.mjs tests/knowledge.test.ts",
+    "chunk_id": "041ebb",
+    "wall_time_seconds": 0.0000251,
+    "exit_code": 0,
+    "original_token_count": 59,
+    "output": "✔ full corpus retrieval covers late chunks, stays permission scoped and pins compact immutable versions (14546.9463ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 15145.9332\n"
+  },
+  "chunks": {
+    "command": "node --test services/agent-runtime/knowledge-chunks.test.mjs",
+    "chunk_id": "6fb299",
+    "wall_time_seconds": 1.235003,
+    "exit_code": 0,
+    "original_token_count": 52,
+    "output": "✔ identical fragments of one long line retain distinct stable chunk identities (4.4162ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 163.9471\n"
+  },
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0,
+    "output": "",
+    "verifiedAt": "2026-10-12T04:08:20.157Z"
+  },
+  "build": {
+    "command": "node node_modules/vite/bin/vite.js build",
+    "chunk_id": "4e205e",
+    "wall_time_seconds": 0.0000208,
+    "exit_code": 0,
+    "original_token_count": 161,
+    "output": "✓ 1706 modules transformed.\nrendering chunks...\ncomputing gzip size...\n../../dist/web/index.html                   0.56 kB │ gzip:   0.43 kB\n../../dist/web/assets/index-CzCbk_YO.css   52.49 kB │ gzip:  11.11 kB\n../../dist/web/assets/index-Bj5Q6g8r.js   605.29 kB │ gzip: 187.14 kB\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n✓ built in 15.39s\n"
+  },
+  "initialEnvironmentFailures": [
+    "Local integration socket was blocked by sandbox EACCES; same isolated test passed after allowing loopback socket access.",
+    "Vite source realpath was blocked by sandbox EPERM; same build passed with workspace access."
+  ],
+  "browser": "Not rerun: experiment adds no UI or production feature."
+}
