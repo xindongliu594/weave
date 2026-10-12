@@ -51,7 +51,7 @@
 - [x] 原生8个相关文件58/58；包括上述两文件及 status-lifecycle 等原回归。
 - [x] Run `node node_modules/typescript/bin/tsc --noEmit` 和 `node node_modules/vite/bin/vite.js build`；仅在新增变化或失败需要时扩大回归。
 - [x] 保存 RED/GREEN、独立审查结论与精确改动清单；通过后部署新 JJ 版本，核对原数据、文件哈希和计数不变。该部署不产生模型调用。
-- [ ] 精确暂存本轮代码和证据，按已有授权提交并推送当前分支。
+- [x] 精确暂存本轮代码和证据，按已有授权提交并推送当前分支；修复提交 `cfd2e4d`。
 
 ## 真实验收后续安排
 
