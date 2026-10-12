@@ -1,0 +1,42 @@
+{
+  "calibration": [
+    {"corpus":"methods","intent":"cli-invalid-args","query":"传入错误参数时命令行应该怎样反馈","expected":["cli"]},
+    {"corpus":"methods","intent":"integer-input-type","query":"整数加法能否接受非整数作为输入","expected":["sum"]},
+    {"corpus":"methods","intent":"nonsense-cal","query":"qzxunavailable","expected":[]},
+    {"corpus":"methods","intent":"database-permissions","query":"如何测试 SQL 注入和数据库访问权限","expected":[]},
+    {"corpus":"methods","intent":"combined-cal","query":"命令行参数检查和 Kubernetes 扩容验收的完整方法","expected":[],"partialSupport":true},
+    {"corpus":"methods","intent":"decimal-cal","query":"两个浮点数的误差上限是多少","expected":[]},
+    {"corpus":"synthetic","intent":"refund-cal","query":"退回付款时怎样确定退款金额","expected":["refund"]},
+    {"corpus":"synthetic","intent":"inventory-cal","query":"仓库入库与出库需要改什么数量","expected":["inventory"]},
+    {"corpus":"synthetic","intent":"permission-cal","query":"更改员工访问权限需要走什么步骤","expected":["permissions"]},
+    {"corpus":"synthetic","intent":"deploy-cal","query":"发布失败后如何恢复已确认的版本","expected":["deploy"]},
+    {"corpus":"synthetic","intent":"nonsense-synthetic-cal","query":"loremunknownzeta","expected":[]},
+    {"corpus":"synthetic","intent":"warranty-cal","query":"退货商品的保修期限如何计算","expected":[]},
+    {"corpus":"synthetic","intent":"combined-synthetic-cal","query":"库存数量变动及员工薪资结算的完整操作","expected":[],"partialSupport":true},
+    {"corpus":"synthetic","intent":"similar-topic-cal","query":"设备退役残值折旧怎样报税","expected":[]}
+  ],
+  "holdout": [
+    {"corpus":"methods","intent":"cli-output","query":"命令行验收要核对控制台输出的什么内容","expected":["cli"]},
+    {"corpus":"methods","intent":"cli-exit","query":"程序退出时应该检查哪个返回状态","expected":["cli"]},
+    {"corpus":"methods","intent":"sum-signed","query":"加法函数的两个负整数应怎样选测试数据","expected":["sum"]},
+    {"corpus":"methods","intent":"sum-zero","query":"整数计算的零值情况需要用什么输入和预期","expected":["sum"]},
+    {"corpus":"methods","intent":"sum-boundary","query":"对整型加法写测试前要先确认什么范围","expected":["sum"]},
+    {"corpus":"methods","intent":"nonsense-holdout","query":"vexquuxabsent","expected":[]},
+    {"corpus":"methods","intent":"auth-holdout","query":"不同公司的账户共享加法服务如何防止越权","expected":[]},
+    {"corpus":"methods","intent":"time-holdout","query":"命令行运行超过期限时的超时阈值是多少","expected":[]},
+    {"corpus":"methods","intent":"combined-holdout","query":"验证整数负数相加，并给出并发压力测试的方法和性能门槛","expected":[],"partialSupport":true},
+    {"corpus":"methods","intent":"decimal-holdout","query":"小数相加采用银行家舍入时如何确定结果","expected":[]},
+    {"corpus":"synthetic","intent":"refund-holdout","query":"客户要求把订单款退还，需要核实什么凭据","expected":["refund"]},
+    {"corpus":"synthetic","intent":"inventory-holdout","query":"货物进仓再领出后库存台账要修改什么","expected":["inventory"]},
+    {"corpus":"synthetic","intent":"deploy-holdout","query":"线上版本发布出错，应恢复到哪一个版本","expected":["deploy"]},
+    {"corpus":"synthetic","intent":"config-holdout","query":"正式上线之前要核查哪些环境设置和服务端口","expected":["config"]},
+    {"corpus":"synthetic","intent":"testing-holdout","query":"测试员工应先读取哪类方法再自己做验证","expected":["testing"]},
+    {"corpus":"synthetic","intent":"style-holdout","query":"产品外观的配色和款式设计需要整理什么","expected":["style"]},
+    {"corpus":"synthetic","intent":"long-tail","query":"在长篇文档末尾执行尾部状态码ZK73确认","expected":["long"],"requiredText":"尾部状态码ZK73"},
+    {"corpus":"synthetic","intent":"nonsense-synthetic-holdout","query":"nexistencyomega","expected":[]},
+    {"corpus":"synthetic","intent":"similar-topic-holdout","query":"库存货品超过保质期多久可以销毁","expected":[]},
+    {"corpus":"synthetic","intent":"unsupported-holdout","query":"回滚时最多允许停机多少秒且如何补偿用户","expected":[]},
+    {"corpus":"synthetic","intent":"combined-synthetic-holdout","query":"退款的核验步骤及法律诉讼管辖法院如何确定","expected":[],"partialSupport":true},
+    {"corpus":"synthetic","intent":"similar-config-holdout","query":"环境变量里的数据库密码应该每几天轮换","expected":[]}
+  ]
+}

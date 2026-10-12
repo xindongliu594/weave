@@ -1,0 +1,6 @@
+{
+  "mutation": "remove threshold filter",
+  "exitCode": 1,
+  "caughtByAssertions": true,
+  "output": "\u2716 calibration separates strong evidence from unsupported candidates (2.8981ms)\n\u2714 equal scores cannot be advertised as perfect answerability separation (0.3883ms)\n\u2714 gate rejects invalid scores and leaves candidate metadata intact (1.9057ms)\n\u2139 tests 3\n\u2139 suites 0\n\u2139 pass 2\n\u2139 fail 1\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 194.7613\n\n\u2716 failing tests:\n\ntest at .data\\rag-gate-mutation-20261012\\gates.test.mjs:5:1\n\u2716 calibration separates strong evidence from unsupported candidates (2.8981ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0.5 !== 1\n  \n      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.data/rag-gate-mutation-20261012/gates.test.mjs:9:10)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1382:25)\n      at Test.start (node:internal/test_runner/test:1242:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0.5,\n    expected: 1,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+}

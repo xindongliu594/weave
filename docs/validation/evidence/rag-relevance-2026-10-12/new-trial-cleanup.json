@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-12T04:51:00Z",
+  "localTrialStopped": true,
+  "heavyTrialArtifactsRemoved": [
+    {
+      "path": "venv",
+      "logicalBytes": 186817385
+    },
+    {
+      "path": "models",
+      "logicalBytes": 169532805
+    },
+    {
+      "path": "ms-marco-MultiBERT-L-12.zip",
+      "logicalBytes": 103473926
+    },
+    {
+      "path": "meili-calibration",
+      "logicalBytes": 1032582
+    },
+    {
+      "path": "meili-holdout",
+      "logicalBytes": 1036678
+    },
+    {
+      "path": "helpers-private.log",
+      "logicalBytes": 170880
+    },
+    {
+      "path": "pip-26.2.1-py3-none-any.whl",
+      "logicalBytes": 1816632
+    }
+  ],
+  "productionFilesRemoved": false,
+  "historicalRunsRemoved": false,
+  "smallEvidenceRetainedOnJJ": true
+}

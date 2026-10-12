@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-12T04:52:40Z",
+  "reason": "User chooses cloud API instead of local model execution",
+  "removedTrialCaches": [
+    {
+      "path": "models",
+      "logicalBytes": 135392183
+    },
+    {
+      "path": "meilisearch",
+      "logicalBytes": 357021720
+    }
+  ],
+  "privateKnowledgeAndOriginalEvidenceRetained": true,
+  "productionFilesRemoved": false
+}

@@ -1,0 +1,5109 @@
+{
+  "calibration": {
+    "phase": "calibration",
+    "startedAt": "2026-10-12T04:41:17.782Z",
+    "finishedAt": "2026-10-12T04:41:59.083Z",
+    "casesHash": "a072249e44e415ad581f8cb4673d7597484d0b9d34e4fe67c4e83c8ea462c94b",
+    "sourceHashes": {
+      "evaluate.ts": "96abd126b5623f1fc00d8f53b24f5cb65c848c82cb9f50113642f69028de33bc",
+      "gates.mjs": "494295b558a44b2a3cacd20a6473900900175e863cea37c2a9b984f819e0433f",
+      "rerank-worker.py": "ea7b69b6e0dd9109ce9288aa6c287b6f2f3a00eabe10c2416f91b826f8f1862e"
+    },
+    "completed": true,
+    "helpersStopped": true,
+    "workerReady": {
+      "ready": true,
+      "startupMs": 486.2041410524398,
+      "threads": 2,
+      "maxTokens": 512,
+      "peakRssKiB": 361336
+    },
+    "workerStartupWallMs": 1070.149593,
+    "workerPeakRssKiB": 997660,
+    "nodePeakRssBytes": 1759010816,
+    "thresholds": {
+      "e5Gate": {
+        "threshold": 0.8916112486702329,
+        "balancedAccuracy": 0.9166666666666667,
+        "top1": 0.8333333333333334,
+        "specificity": 1,
+        "recall": 0.8333333333333334,
+        "irrelevant": 0
+      },
+      "meiliGate": {
+        "threshold": 0.9458056688308716,
+        "balancedAccuracy": 0.9166666666666667,
+        "top1": 0.8333333333333334,
+        "specificity": 1,
+        "recall": 0.8333333333333334,
+        "irrelevant": 0
+      },
+      "flashGate": {
+        "threshold": 0.9745559096336365,
+        "balancedAccuracy": 0.9166666666666667,
+        "top1": 0.8333333333333334,
+        "specificity": 1,
+        "recall": 0.8333333333333334,
+        "irrelevant": 0
+      }
+    },
+    "calibrationQueries": [
+      {
+        "intent": "cli-invalid-args",
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "integer-input-type",
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "nonsense-cal",
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "database-permissions",
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "combined-cal",
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "decimal-cal",
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "refund-cal",
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "inventory-cal",
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "permission-cal",
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "deploy-cal",
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "nonsense-synthetic-cal",
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "warranty-cal",
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "combined-synthetic-cal",
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      },
+      {
+        "intent": "similar-topic-cal",
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false
+          }
+        }
+      }
+    ],
+    "guards": [
+      {
+        "corpus": "methods",
+        "check": "scopeAndFiveTamperedBindings",
+        "passed": true
+      },
+      {
+        "corpus": "methods",
+        "check": "missingPinnedRevisionRejected",
+        "passed": true
+      },
+      {
+        "corpus": "synthetic",
+        "check": "scopeAndFiveTamperedBindings",
+        "passed": true
+      },
+      {
+        "corpus": "synthetic",
+        "check": "missingPinnedRevisionRejected",
+        "passed": true
+      }
+    ]
+  },
+  "test": {
+    "phase": "holdout",
+    "startedAt": "2026-10-12T04:43:21.807Z",
+    "finishedAt": "2026-10-12T04:48:40.688Z",
+    "casesHash": "a072249e44e415ad581f8cb4673d7597484d0b9d34e4fe67c4e83c8ea462c94b",
+    "sourceHashes": {
+      "evaluate.ts": "96abd126b5623f1fc00d8f53b24f5cb65c848c82cb9f50113642f69028de33bc",
+      "gates.mjs": "494295b558a44b2a3cacd20a6473900900175e863cea37c2a9b984f819e0433f",
+      "rerank-worker.py": "ea7b69b6e0dd9109ce9288aa6c287b6f2f3a00eabe10c2416f91b826f8f1862e"
+    },
+    "completed": true,
+    "helpersStopped": true,
+    "workerReady": {
+      "ready": true,
+      "startupMs": 485.3861730080098,
+      "threads": 2,
+      "maxTokens": 512,
+      "peakRssKiB": 360752
+    },
+    "workerStartupWallMs": 1220.151402,
+    "workerPeakRssKiB": 997776,
+    "nodePeakRssBytes": 1522896896,
+    "frozenThresholdsSha256": "ca391357e4a584be8adef5e3836a6341883e3bd627e6bd52a876424dd44f67a8",
+    "thresholds": {
+      "e5Gate": {
+        "threshold": 0.8916112486702329,
+        "balancedAccuracy": 0.9166666666666667,
+        "top1": 0.8333333333333334,
+        "specificity": 1,
+        "recall": 0.8333333333333334,
+        "irrelevant": 0
+      },
+      "meiliGate": {
+        "threshold": 0.9458056688308716,
+        "balancedAccuracy": 0.9166666666666667,
+        "top1": 0.8333333333333334,
+        "specificity": 1,
+        "recall": 0.8333333333333334,
+        "irrelevant": 0
+      },
+      "flashGate": {
+        "threshold": 0.9745559096336365,
+        "balancedAccuracy": 0.9166666666666667,
+        "top1": 0.8333333333333334,
+        "specificity": 1,
+        "recall": 0.8333333333333334,
+        "irrelevant": 0
+      }
+    },
+    "queries": [
+      {
+        "corpus": "methods",
+        "intent": "cli-output",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 120,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.4761899999994057,
+              2.515031999999337,
+              2.672742000000653,
+              3.0886049999990064,
+              2.576391999999032
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.622056000000157,
+              10.817144000000553,
+              10.641433999999208,
+              12.063555000000633,
+              10.774263000001156
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.622056000000157,
+              10.817144000000553,
+              10.641433999999208,
+              12.063555000000633,
+              10.774263000001156
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.06507099999908,
+              9.928463999998712,
+              9.897671000000628,
+              10.872739000000365,
+              13.752289999998538
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.239346000000296,
+              10.810692000000927,
+              10.761215000000448,
+              10.167348999999376,
+              13.014744000000064
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              170.21162200000072,
+              174.46691400000054,
+              178.3930599999985,
+              171.25208999999995,
+              183.78078500000083
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              170.21162200000072,
+              174.46691400000054,
+              178.3930599999985,
+              171.25208999999995,
+              183.78078500000083
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "cli-exit",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 117,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.4317340000015975,
+              3.415420000001177,
+              2.5003429999997024,
+              2.5877660000005562,
+              3.011566999999559
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.85449399999925,
+              16.154600000001665,
+              11.886895999999979,
+              12.403059000000212,
+              12.363855000001422
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.85449399999925,
+              16.154600000001665,
+              11.886895999999979,
+              12.403059000000212,
+              12.363855000001422
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.827469000001656,
+              11.889241999999285,
+              11.07354099999975,
+              11.398660000000746,
+              10.19297799999913
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.061104000000341,
+              13.404483000000255,
+              11.445999000001393,
+              11.455746999999974,
+              9.230815999999322
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              168.38118199999917,
+              179.81783000000178,
+              204.22014599999966,
+              187.54875300000094,
+              167.8012260000014
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              168.38118199999917,
+              179.81783000000178,
+              204.22014599999966,
+              187.54875300000094,
+              167.8012260000014
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "sum-signed",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 120,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.2200429999993503,
+              3.60515900000064,
+              2.5055130000000645,
+              2.367808999999397,
+              2.3480689999996684
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.382931000000099,
+              10.361802999999782,
+              11.083733000001303,
+              9.96324900000036,
+              10.476253999999244
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.382931000000099,
+              10.361802999999782,
+              11.083733000001303,
+              9.96324900000036,
+              10.476253999999244
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.06870600000002,
+              9.766233999998803,
+              10.116496999999072,
+              10.092799000000014,
+              9.98786999999902
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.438577000000805,
+              11.366900999999416,
+              10.709930999999415,
+              9.927599999999074,
+              10.051864000000933
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              181.89432300000044,
+              173.4848979999988,
+              180.7654280000006,
+              187.1589980000008,
+              169.99403600000005
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              181.89432300000044,
+              173.4848979999988,
+              180.7654280000006,
+              187.1589980000008,
+              169.99403600000005
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "sum-zero",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 121,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.1771960000005492,
+              2.2099969999999303,
+              2.3523629999999685,
+              2.1615289999990637,
+              2.3474420000002283
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.84439999999995,
+              10.535955999999715,
+              11.175030999998853,
+              13.279441000000588,
+              10.201321999998981
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.84439999999995,
+              10.535955999999715,
+              11.175030999998853,
+              13.279441000000588,
+              10.201321999998981
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.79643600000054,
+              9.901254000000336,
+              14.137980999999854,
+              12.489795999999842,
+              9.930511000000479
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.260702999999921,
+              10.310774999999921,
+              14.391051000000516,
+              11.977031999998871,
+              9.995853000000352
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              178.72328899999957,
+              163.92746700000134,
+              165.51623199999995,
+              171.6106319999999,
+              167.83916299999873
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              178.72328899999957,
+              163.92746700000134,
+              165.51623199999995,
+              171.6106319999999,
+              167.83916299999873
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "sum-boundary",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 119,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.3286989999996877,
+              2.283564999999726,
+              2.434863000000405,
+              2.4892479999998613,
+              2.924497000001793
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.305091000000175,
+              10.48780700000134,
+              12.773702000000412,
+              10.085343000000648,
+              10.857593000000634
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.305091000000175,
+              10.48780700000134,
+              12.773702000000412,
+              10.085343000000648,
+              10.857593000000634
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.147337000000334,
+              9.832354000000123,
+              13.15525400000115,
+              9.776337999999669,
+              9.808118999999351
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.908730999999534,
+              9.772265999999945,
+              13.28566200000023,
+              10.093902000000526,
+              10.279413000000204
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              188.8426760000002,
+              177.6789630000003,
+              171.46384000000035,
+              190.01142199999958,
+              177.42411300000094
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              188.8426760000002,
+              177.6789630000003,
+              171.46384000000035,
+              190.01142199999958,
+              177.42411300000094
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "nonsense-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 109,
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.0223189999996976,
+              2.1326650000009977,
+              2.9526890000015555,
+              1.9566730000005919,
+              2.023572999998578
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              9.359506000000692,
+              8.858660999998392,
+              10.463988999999856,
+              8.59349999999904,
+              8.274953000000096
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.359506000000692,
+              8.858660999998392,
+              10.463988999999856,
+              8.59349999999904,
+              8.274953000000096
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              10.186165000000983,
+              8.555983999998716,
+              9.743672000000515,
+              8.46291900000142,
+              7.940580999998929
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.630143000000317,
+              8.881445999999414,
+              11.053211999998894,
+              8.033510000001115,
+              8.035572000000684
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              176.60003999999935,
+              160.7122249999993,
+              149.89274600000135,
+              164.7016599999988,
+              148.8798820000011
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              176.60003999999935,
+              160.7122249999993,
+              149.89274600000135,
+              164.7016599999988,
+              148.8798820000011
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "auth-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 121,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.9238860000004934,
+              2.3501609999984794,
+              2.6926230000026408,
+              2.1963419999992766,
+              2.3475259999977425
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              10.343495000000985,
+              14.059987000000547,
+              10.929400999997597,
+              10.102596999997331,
+              10.162294000001566
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.343495000000985,
+              14.059987000000547,
+              10.929400999997597,
+              10.102596999997331,
+              10.162294000001566
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              9.621319999998377,
+              10.575886999999057,
+              9.60177499999918,
+              9.67017300000225,
+              9.335634999999456
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.046980999999505,
+              9.865570000001753,
+              11.678291999996873,
+              9.807698999997228,
+              9.61968799999886
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              172.9306260000012,
+              168.236657999998,
+              185.2054209999951,
+              173.42485399999714,
+              166.79400299999907
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              172.9306260000012,
+              168.236657999998,
+              185.2054209999951,
+              173.42485399999714,
+              166.79400299999907
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "time-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 120,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.1208710000028077,
+              2.2904060000000754,
+              2.20429299999887,
+              2.2423730000009527,
+              2.2455360000021756
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              10.029983000000357,
+              10.51553100000092,
+              12.64337599999999,
+              10.103947999999946,
+              10.695463000000018
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.029983000000357,
+              10.51553100000092,
+              12.64337599999999,
+              10.103947999999946,
+              10.695463000000018
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              10.05849500000113,
+              9.99185800000123,
+              10.70834399999876,
+              10.092414999999164,
+              9.95221500000116
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.009721999998874,
+              9.974748000000545,
+              10.480784999999742,
+              9.960140999999567,
+              10.042749000000185
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              170.70718699999998,
+              168.94029200000296,
+              173.4313949999996,
+              171.42168899999888,
+              171.21561099999963
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              170.70718699999998,
+              168.94029200000296,
+              173.4313949999996,
+              171.42168899999888,
+              171.21561099999963
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "combined-holdout",
+        "regression": false,
+        "partialSupport": true,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 128,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.8858780000009574,
+              2.934571000001597,
+              2.400036999999429,
+              2.2414409999983036,
+              2.9990800000014133
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              15.295648999999685,
+              15.332182000001922,
+              11.799281000003248,
+              11.143803999999363,
+              14.789095000000088
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              15.295648999999685,
+              15.332182000001922,
+              11.799281000003248,
+              11.143803999999363,
+              14.789095000000088
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              14.3135970000003,
+              13.748329999998532,
+              10.706558000001678,
+              13.099114000000554,
+              14.812885999999708
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              15.151337999999669,
+              13.833796999999322,
+              11.15787999999884,
+              14.534845000001951,
+              13.911883000000671
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              192.29667300000074,
+              188.9961990000047,
+              180.1930610000054,
+              184.39975499999855,
+              190.49359999999797
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              192.29667300000074,
+              188.9961990000047,
+              180.1930610000054,
+              184.39975499999855,
+              190.49359999999797
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "decimal-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 120,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.324601000000257,
+              2.2384279999969294,
+              2.616566000000603,
+              2.3736020000033022,
+              2.2495459999991
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              13.19127799999842,
+              11.471344000001409,
+              10.100442999999359,
+              9.803412000001117,
+              10.055249000000913
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              13.19127799999842,
+              11.471344000001409,
+              10.100442999999359,
+              9.803412000001117,
+              10.055249000000913
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.183593999998266,
+              10.365077999998903,
+              10.285221999998612,
+              9.596252999999706,
+              9.731356999996933
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.035174999997253,
+              9.958274000000529,
+              10.120914999999513,
+              10.237338999999338,
+              9.948792000002868
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              171.47400800000105,
+              182.3854969999993,
+              178.37407800000074,
+              167.14933100000053,
+              170.6448100000016
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              171.47400800000105,
+              182.3854969999993,
+              178.37407800000074,
+              167.14933100000053,
+              170.6448100000016
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "refund-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3126,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.2303130000000237,
+              4.879282999998395,
+              3.3551490000027115,
+              3.155258999999205,
+              2.5651570000045467
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              17.90654100000029,
+              13.12230599999748,
+              16.106472999999824,
+              15.789138000000094,
+              13.362946000001102
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              17.90654100000029,
+              13.12230599999748,
+              16.106472999999824,
+              15.789138000000094,
+              13.362946000001102
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              15.618069000000105,
+              12.047297000000981,
+              14.040205999997852,
+              12.382183000001532,
+              12.53337100000499
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.268927999997686,
+              11.619151999999303,
+              14.536621999999625,
+              12.874781999998959,
+              12.568099000003713
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3946.509120999999,
+              3824.1789029999964,
+              3844.52981,
+              3966.7389509999994,
+              3922.4634339999975
+            ]
+          },
+          "flashGate": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3946.509120999999,
+              3824.1789029999964,
+              3844.52981,
+              3966.7389509999994,
+              3922.4634339999975
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "inventory-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3124,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.6663790000020526,
+              2.514191000002029,
+              3.019954000003054,
+              2.4414840000026743,
+              3.6693000000013853
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              14.03081899999961,
+              11.599293000006583,
+              11.20369500000379,
+              12.094988000004378,
+              16.397585000006075
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              14.03081899999961,
+              11.599293000006583,
+              11.20369500000379,
+              12.094988000004378,
+              16.397585000006075
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.462709999999788,
+              11.495272999993176,
+              10.699577000006684,
+              11.375155999994604,
+              13.851821000003838
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.754672000002756,
+              11.490168999996968,
+              11.099871000005805,
+              11.297772999998415,
+              10.748417000002519
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3938.107871,
+              3908.0195500000045,
+              3870.560737000007,
+              3840.981832000005,
+              3839.8276380000025
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3938.107871,
+              3908.0195500000045,
+              3870.560737000007,
+              3840.981832000005,
+              3839.8276380000025
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "deploy-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3125,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.394610000003013,
+              2.7655910000030417,
+              2.4605999999912456,
+              2.656646000003093,
+              2.6702490000025136
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.719263999999384,
+              10.832037000000128,
+              11.273016999999527,
+              14.366059000007226,
+              10.868004000003566
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.719263999999384,
+              10.832037000000128,
+              11.273016999999527,
+              14.366059000007226,
+              10.868004000003566
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.144742999997106,
+              12.08843399999023,
+              10.533872999993037,
+              13.370172000009916,
+              10.889130999988993
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.02159100001154,
+              11.679675000006682,
+              9.73335500000394,
+              12.697462999989511,
+              11.115011000001687
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3847.847320999994,
+              3850.8521610000025,
+              3878.1682239999936,
+              3914.01683600001,
+              3886.039392000006
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3847.847320999994,
+              3850.8521610000025,
+              3878.1682239999936,
+              3914.01683600001,
+              3886.039392000006
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "config-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3127,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.7222700000129407,
+              3.2297620000026654,
+              2.692868999991333,
+              3.920010000001639,
+              2.4969879999989644
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.697047999987262,
+              12.338042999996105,
+              12.173146000000997,
+              13.272138000000268,
+              14.759021000005305
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.697047999987262,
+              12.338042999996105,
+              12.173146000000997,
+              13.272138000000268,
+              14.759021000005305
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.099872999999207,
+              11.583230000003823,
+              13.976226999991923,
+              12.99642500000482,
+              14.415041000000201
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.994984999997541,
+              12.014280999996117,
+              10.771378999997978,
+              13.0373169999948,
+              15.329364000004716
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3867.1701869999815,
+              4063.260242999997,
+              4062.126952000006,
+              4030.805496999994,
+              3977.075628999999
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3867.1701869999815,
+              4063.260242999997,
+              4062.126952000006,
+              4030.805496999994,
+              3977.075628999999
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "testing-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3125,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.5595290000055684,
+              2.799068000007537,
+              2.529242999997223,
+              2.9119080000091344,
+              2.653061000019079
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.242759999993723,
+              13.563313999999082,
+              11.853541000004043,
+              14.276796999998624,
+              11.943885999993654
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.242759999993723,
+              13.563313999999082,
+              11.853541000004043,
+              14.276796999998624,
+              11.943885999993654
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.503754000004847,
+              11.106918000004953,
+              11.361948000005214,
+              15.668319000018528,
+              11.140463999996427
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.606142000004184,
+              11.353764999992563,
+              12.842491000003065,
+              12.334768999979133,
+              11.197213999985252
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3846.229389,
+              3855.485495999994,
+              4098.217718999993,
+              4111.101955999999,
+              4094.2784499999834
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3846.229389,
+              3855.485495999994,
+              4098.217718999993,
+              4111.101955999999,
+              4094.2784499999834
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "style-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3125,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.7986629999941215,
+              3.9579710000252817,
+              2.6268029999919236,
+              2.5850609999906737,
+              2.832655000005616
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.00777100000414,
+              15.49995399999898,
+              13.29784300000756,
+              11.646734000009019,
+              10.909803999995347
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.00777100000414,
+              15.49995399999898,
+              13.29784300000756,
+              11.646734000009019,
+              10.909803999995347
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.472321999986889,
+              13.011304999992717,
+              10.370197999989614,
+              12.547544000000926,
+              10.547732000006363
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.959631000005174,
+              13.18381399998907,
+              12.00207399998908,
+              11.16105999998399,
+              10.454412999999477
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3992.4345029999968,
+              4088.25239899999,
+              4149.81808300002,
+              4130.589339000027,
+              4111.947742999968
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3992.4345029999968,
+              4088.25239899999,
+              4149.81808300002,
+              4130.589339000027,
+              4111.947742999968
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "long-tail",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3127,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.028722999995807,
+              2.494258999999147,
+              2.4144760000053793,
+              2.914254000002984,
+              3.6920489999756683
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.640180000016699,
+              11.660799000004772,
+              11.561935000005178,
+              15.005589000007603,
+              12.53872300000512
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.640180000016699,
+              11.660799000004772,
+              11.561935000005178,
+              15.005589000007603,
+              12.53872300000512
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.878679999994347,
+              13.476242000004277,
+              10.40834399999585,
+              10.233058999991044,
+              10.353556999994908
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.593936000019312,
+              14.956449999997858,
+              11.004799000016646,
+              10.924348000000464,
+              13.646393999981228
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              4032.45705300002,
+              4016.152017000015,
+              4167.877907999995,
+              4127.789745000016,
+              3949.5527909999946
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              4032.45705300002,
+              4016.152017000015,
+              4167.877907999995,
+              4127.789745000016,
+              3949.5527909999946
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "nonsense-synthetic-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3113,
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.069534999987809,
+              2.168820999999298,
+              2.3890989999927115,
+              2.368266000004951,
+              2.1549989999912214
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              9.119441999995615,
+              9.733711000008043,
+              10.715219999983674,
+              12.0860709999979,
+              9.668428000004496
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.119441999995615,
+              9.733711000008043,
+              10.715219999983674,
+              12.0860709999979,
+              9.668428000004496
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              8.789458000013838,
+              10.58986099998583,
+              10.00936999998521,
+              11.113547999993898,
+              9.623451000021305
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.658270000014454,
+              10.03999799999292,
+              10.978903999988688,
+              11.63371900000493,
+              10.76747299998533
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              3966.6523769999912,
+              3990.1995590000006,
+              4047.465639000002,
+              3957.598136000015,
+              4053.5154320000147
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3966.6523769999912,
+              3990.1995590000006,
+              4047.465639000002,
+              3957.598136000015,
+              4053.5154320000147
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "similar-topic-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3122,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.326059000013629,
+              2.5510469999862835,
+              2.3006980000063777,
+              2.377408000000287,
+              2.519486999983201
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.79134999998496,
+              10.833405000012135,
+              10.832993000018178,
+              13.895300999982283,
+              13.416361999989022
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.79134999998496,
+              10.833405000012135,
+              10.832993000018178,
+              13.895300999982283,
+              13.416361999989022
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              12.552816000010353,
+              10.119647000014083,
+              13.335940999997547,
+              11.2880470000091,
+              13.599752000009175
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.551903999992646,
+              9.72049400000833,
+              12.154242000018712,
+              10.295157999993535,
+              13.998583999986295
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              3998.032725999976,
+              3989.8026320000063,
+              3954.8419150000263,
+              4169.250814999978,
+              4120.459308999998
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3998.032725999976,
+              3989.8026320000063,
+              3954.8419150000263,
+              4169.250814999978,
+              4120.459308999998
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "unsupported-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3126,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.8624889999919105,
+              3.853367999981856,
+              3.284230999997817,
+              2.82391799998004,
+              2.6164609999977984
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              14.695268000010401,
+              15.649513999989722,
+              13.359368999983417,
+              11.286025999987032,
+              12.0584899999958
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              14.695268000010401,
+              15.649513999989722,
+              13.359368999983417,
+              11.286025999987032,
+              12.0584899999958
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              13.25889399999869,
+              12.852080999989994,
+              11.676210000005085,
+              9.835453000006964,
+              12.255192999989958
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              14.239879999979166,
+              13.15221699999529,
+              11.765972000022884,
+              10.198470000002999,
+              10.56663000001572
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              4053.170017000026,
+              3997.4887689999887,
+              4093.0364559999725,
+              4001.4327169999888,
+              4009.170352999994
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              4053.170017000026,
+              3997.4887689999887,
+              4093.0364559999725,
+              4001.4327169999888,
+              4009.170352999994
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "combined-synthetic-holdout",
+        "regression": false,
+        "partialSupport": true,
+        "expectedCount": 0,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3127,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.5728959999978542,
+              2.558695000014268,
+              3.65669999999227,
+              2.88683500001207,
+              2.485259000037331
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.525089000002481,
+              15.686750000051688,
+              11.142568999959622,
+              11.445582999964245,
+              11.846149000048172
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.525089000002481,
+              15.686750000051688,
+              11.142568999959622,
+              11.445582999964245,
+              11.846149000048172
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.491222999989986,
+              15.707618000044022,
+              11.143725999980234,
+              13.170577999961097,
+              14.208580000034999
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.61979899997823,
+              13.053416999988258,
+              10.849053999991156,
+              13.597226000041701,
+              13.485346999950707
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              3973.128032000037,
+              3978.441436000052,
+              3972.198456999962,
+              3982.152035999985,
+              3959.9559690000024
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3973.128032000037,
+              3978.441436000052,
+              3972.198456999962,
+              3982.152035999985,
+              3959.9559690000024
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "similar-config-holdout",
+        "regression": false,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 1,
+        "maxPairTokens": 3125,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.9884949999977835,
+              3.477000000013504,
+              3.3634210000163876,
+              2.9880030000349507,
+              2.4337219999870285
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.05116299999645,
+              12.361814000003505,
+              12.308141999994405,
+              10.656113000004552,
+              13.588476999953855
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.05116299999645,
+              12.361814000003505,
+              12.308141999994405,
+              10.656113000004552,
+              13.588476999953855
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              10.208549999981187,
+              11.51667300000554,
+              12.047893000009935,
+              12.127740999974776,
+              12.37332900002366
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.202879999997094,
+              11.057253999984823,
+              12.00971200002823,
+              13.738848999957554,
+              14.274338999995962
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              4034.296460999991,
+              4163.548673000012,
+              4142.434997999982,
+              4143.9523630000185,
+              4110.419499999902
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              4034.296460999991,
+              4163.548673000012,
+              4142.434997999982,
+              4143.9523630000185,
+              4110.419499999902
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-0",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 110,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              4.482247999985702
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.533707000024151
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.533707000024151
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.906724000000395
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.196653000020888
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              174.35193599999184
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              174.35193599999184
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-1",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 119,
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.2796619999571703
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.30442999996012
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.30442999996012
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              13.011333999980707
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              13.894429999985732
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              185.4847389999777
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              185.4847389999777
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-2",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 108,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.967199000006076
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.566381999989972
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.566381999989972
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.715133999998216
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.556473000033293
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              161.70691599999554
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              161.70691599999554
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-3",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 106,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.404517000017222
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.161682999983896
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.161682999983896
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.545397000038065
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.989059000043198
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              167.13541699998314
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              167.13541699998314
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-4",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 120,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.9851729999645613
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              14.764446999994107
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              14.764446999994107
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.94651999999769
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              15.014135999954306
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              185.57924599997932
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              185.57924599997932
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-5",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 111,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.5826649999944493
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.143062999995891
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.143062999995891
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.349369000003207
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.56433400005335
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              171.57197500002803
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              171.57197500002803
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-6",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 107,
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.095762000011746
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.698902000032831
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.698902000032831
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              9.60965599998599
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.137145999993663
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              163.52373200003058
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              163.52373200003058
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-7",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 118,
+        "engines": {
+          "original": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.330558000016026
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              12.835069000022486
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.835069000022486
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              12.551940000033937
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.191538999963086
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              180.56543000001693
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              180.56543000001693
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "methods",
+        "intent": "regression-methods-8",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 115,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.458204999973532
+            ]
+          },
+          "localRrf": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              12.359271999972407
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.359271999972407
+            ]
+          },
+          "meiliRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              9.18299499998102
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.198921000002883
+            ]
+          },
+          "flashRaw": {
+            "returned": 2,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              195.8486939999857
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              195.8486939999857
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-0",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 31,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.5789479999803007
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.512780000048224
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.512780000048224
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              7.707625999988522
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.074378999997862
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              188.34897600009572
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              188.34897600009572
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-1",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 33,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.4177200000267476
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.921690999995917
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.921690999995917
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.875440999981947
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.218258999986574
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              194.44444799999474
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              194.44444799999474
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-2",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 33,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.3497520000091754
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.39688799995929
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.39688799995929
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.262351000041235
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.105056000000332
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": false,
+            "reciprocalRank": 0.5,
+            "noAnswerFalse": false,
+            "timesMs": [
+              186.23401699995156
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              186.23401699995156
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-3",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 34,
+        "engines": {
+          "original": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              3.177903999981936
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              9.217162000015378
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.217162000015378
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              8.881656000041403
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.251302999968175
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              202.13770800002385
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              202.13770800002385
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-4",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 0,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 41,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              2.7136959999916144
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              12.258723000006285
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.258723000006285
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              11.9159009999712
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.80281499994453
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": true,
+            "timesMs": [
+              237.32867999997688
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              237.32867999997688
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-5",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 35,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.7866639999556355
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.853108000010252
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.853108000010252
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.827288000029512
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              8.583526999980677
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              204.26366699999198
+            ]
+          },
+          "flashGate": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              204.26366699999198
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-6",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 43,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.861341999960132
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.087874999968335
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.087874999968335
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.621026999957394
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.671220000018366
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              267.5339779999922
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              267.5339779999922
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-7",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 39,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.7374410000047646
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.286682999983896
+            ]
+          },
+          "e5Gate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.286682999983896
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.261666000005789
+            ]
+          },
+          "meiliGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.296877999964636
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              221.18759399995906
+            ]
+          },
+          "flashGate": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              221.18759399995906
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-8",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 38,
+        "engines": {
+          "original": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.5034229999873787
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.254778000002261
+            ]
+          },
+          "e5Gate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.254778000002261
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.267684000020381
+            ]
+          },
+          "meiliGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              9.101754000002984
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              219.02453000005335
+            ]
+          },
+          "flashGate": {
+            "returned": 0,
+            "relevant": 0,
+            "top1Correct": false,
+            "reciprocalRank": 0,
+            "noAnswerFalse": false,
+            "timesMs": [
+              219.02453000005335
+            ]
+          }
+        }
+      },
+      {
+        "corpus": "synthetic",
+        "intent": "regression-synthetic-9",
+        "regression": true,
+        "partialSupport": false,
+        "expectedCount": 1,
+        "truncatedCandidates": 0,
+        "maxPairTokens": 43,
+        "engines": {
+          "original": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              2.616630000004079
+            ]
+          },
+          "localRrf": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.45738400000846
+            ]
+          },
+          "e5Gate": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              10.45738400000846
+            ]
+          },
+          "meiliRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              11.218561000016052
+            ]
+          },
+          "meiliGate": {
+            "returned": 2,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              12.552175000018906
+            ]
+          },
+          "flashRaw": {
+            "returned": 3,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              249.14437900000485
+            ]
+          },
+          "flashGate": {
+            "returned": 1,
+            "relevant": 1,
+            "top1Correct": true,
+            "reciprocalRank": 1,
+            "noAnswerFalse": false,
+            "timesMs": [
+              249.14437900000485
+            ]
+          }
+        }
+      }
+    ],
+    "guards": [
+      {
+        "corpus": "methods",
+        "check": "scopeAndFiveTamperedBindings",
+        "passed": true
+      },
+      {
+        "corpus": "methods",
+        "check": "missingPinnedRevisionRejected",
+        "passed": true
+      },
+      {
+        "corpus": "synthetic",
+        "check": "scopeAndFiveTamperedBindings",
+        "passed": true
+      },
+      {
+        "corpus": "synthetic",
+        "check": "missingPinnedRevisionRejected",
+        "passed": true
+      }
+    ]
+  },
+  "userDecision": "Switch to configured cloud API; stop local deployment after resource inspection",
+  "paraphraseRecheckIntents": [
+    "inventory-holdout",
+    "deploy-holdout"
+  ],
+  "provenance": {
+    "model": {
+      "repository": "prithivida/flashrank",
+      "revision": "858a1ac046a05663a35367eac852d7f76feeefdd",
+      "archiveSha256": "2c8ae5542f1538e355e9f295d349fc030b5cf7d398c8728c362f0e5129776971",
+      "archiveBytes": 103473926,
+      "downloadSeconds": 21.040964704938233,
+      "license": "cc-by-sa-4.0",
+      "files": {
+        "__MACOSX/._ms-marco-MultiBERT-L-12": {
+          "sha256": "2f1bdc9ebab5349fe8011c0ac0da76fc0bb7f307add1d67c03ee7f160e0898c1",
+          "bytes": 176
+        },
+        "ms-marco-MultiBERT-L-12/config.json": {
+          "sha256": "b32201ee1c654b59f4c97b2139286edcae9cce525217c6d2131425fa50161946",
+          "bytes": 696
+        },
+        "ms-marco-MultiBERT-L-12/vocab.txt": {
+          "sha256": "87b44292b452f6c05afa49b2e488e7eedf79ea4f4c39db6f2f4b37764228ef3f",
+          "bytes": 871891
+        },
+        "ms-marco-MultiBERT-L-12/flashrank-MultiBERT-L12_Q.onnx": {
+          "sha256": "ff24c4abf96a982ce24b021bab80d9d8a1c3c2ba6926fb41e372a9be1d8cba9b",
+          "bytes": 168184839
+        },
+        "ms-marco-MultiBERT-L-12/special_tokens_map.json": {
+          "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3",
+          "bytes": 112
+        },
+        "ms-marco-MultiBERT-L-12/tokenizer_config.json": {
+          "sha256": "eaf913a687e8eed3010b6479d0d84631038212aa50c14d9b812e08cbc891d925",
+          "bytes": 525
+        },
+        "ms-marco-MultiBERT-L-12/.DS_Store": {
+          "sha256": "09b8c39ecd0e3839cf12f3afae2cf566d04909bf2ad5c8cca4d5ce55c2afadfb",
+          "bytes": 6148
+        },
+        "ms-marco-MultiBERT-L-12/tokenizer.json": {
+          "sha256": "ce64fce797c24f68df90b40a3f74f579b336a493db14bd583fd520ea0d8c9a98",
+          "bytes": 466062
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._flashrank-MultiBERT-L12_Q.onnx": {
+          "sha256": "ef956da50ddd498fee71b354af9dac4d1a46dc4e3108f591b7bc8bf3983dc344",
+          "bytes": 219
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._config.json": {
+          "sha256": "6d9313da5abdc5192e731f927477f3ab2a82240cb050850618c31111d7b8ec75",
+          "bytes": 275
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._tokenizer_config.json": {
+          "sha256": "dca3f4aa9034114b69f34f9c033c6cbbe56237f23c6e37589eb2d7325cb800d3",
+          "bytes": 556
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._vocab.txt": {
+          "sha256": "57733999bea98d8f7da0747ac6fed3be130ff7abbc76306bcc4927281ab27243",
+          "bytes": 516
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._tokenizer.json": {
+          "sha256": "a7b69c7a4c4007c92add112512e4ec83f254ff1e4b7feaca4a5126fed7b5c4a8",
+          "bytes": 451
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._special_tokens_map.json": {
+          "sha256": "5ecf2333fcb627f8224dfdcbaf6e91dde27d8d9b79e14bb9f072299cb4c93a9e",
+          "bytes": 219
+        },
+        "__MACOSX/ms-marco-MultiBERT-L-12/._.DS_Store": {
+          "sha256": "2f380f4a3d05a8d90c2106f50da75064e9ce57a598599dc5404f8f69a0223aa9",
+          "bytes": 120
+        }
+      }
+    },
+    "packages": [
+      {
+        "name": "FlashRank",
+        "version": "0.2.10",
+        "url": "https://files.pythonhosted.org/packages/ec/99/72639cc1c9221c5bc77a2df1c2d352fe11965553bdf7d3e0856e7fcc8fd6/FlashRank-0.2.10-py3-none-any.whl",
+        "sha256": "5d3272ae657d793c132d1e7917ed9e2adf49e0e1c60735583a67b051c6f0434a"
+      },
+      {
+        "name": "onnxruntime",
+        "version": "1.31.0",
+        "url": "https://files.pythonhosted.org/packages/30/2e/5c6ec7e26a097e97ee70f2dee68b8ca4d9d26701f2f33c3f8ab585cb89fe/onnxruntime-1.31.0-cp314-cp314-manylinux_2_28_x86_64.whl",
+        "sha256": "e4efa4a1a0bb0b5173c6a3292c181d518b8323f9d56e978635d0c09d38c94d1a"
+      },
+      {
+        "name": "numpy",
+        "version": "2.5.4",
+        "url": "https://files.pythonhosted.org/packages/16/d5/928078d2b28f26829b138b4a6c3980045022fb409f570657a224ae60ef4e/numpy-2.5.4-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "d549420b8858885cea8838a727842249218b9c1da24dd517e25c9c7a948310a3"
+      },
+      {
+        "name": "tokenizers",
+        "version": "0.23.3",
+        "url": "https://files.pythonhosted.org/packages/3a/40/6706b82693715581457c6d5423eaa7faae576bb0526c5738a57085eb4449/tokenizers-0.23.3-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "sha256": "376851d22bcf9d650a5c3090bb83e6cf9e895fbf0595369fa4cd43c1f69b5f87"
+      },
+      {
+        "name": "huggingface_hub",
+        "version": "2.2.0",
+        "url": "https://files.pythonhosted.org/packages/eb/b0/0f7b430fd100b3a3b037fdbb314878200241082e607b3383c63d91a13a72/huggingface_hub-2.2.0-py3-none-any.whl",
+        "sha256": "1667f145dc56dc210d60966069397df9ecfca9607a5d43db88b308c89dae56b3"
+      },
+      {
+        "name": "click",
+        "version": "8.5.0",
+        "url": "https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl",
+        "sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360"
+      },
+      {
+        "name": "hf-xet",
+        "version": "1.7.0",
+        "url": "https://files.pythonhosted.org/packages/a3/4c/2bf3b66c215d409655f28de1622393dde04c9461280d48c7924bb3b2decd/hf_xet-1.7.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "sha256": "2814a6e999d13464c4d679b788cc5d784eb5a4edfc638a31f10e9a11ab531ef8"
+      },
+      {
+        "name": "httpx2",
+        "version": "2.13.1",
+        "url": "https://files.pythonhosted.org/packages/d8/9c/6fe8931fd9f381042a9e4c7d5a7b4cbf7016b252bec0c99a49fce42c3326/httpx2-2.13.1-py3-none-any.whl",
+        "sha256": "6dff50fabc270ee5fd25d845d0b078ed20564579744d6d962850975996d2f9a4"
+      },
+      {
+        "name": "httpcore2",
+        "version": "2.13.1",
+        "url": "https://files.pythonhosted.org/packages/09/ba/a4568248771ce81957bfb7cc600264a40fbcda092391ee1c415c50be4bea/httpcore2-2.13.1-py3-none-any.whl",
+        "sha256": "e1e05d4f25f7d7d496bfb96748f6f4b67657b03da069b3a68c36069f3db73d0a"
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1",
+        "url": "https://files.pythonhosted.org/packages/12/b8/4bd346e22b28902df4d651910f5242c28d84e4a5c2435ca5c3f797ed7e2e/anyio-4.15.1-py3-none-any.whl",
+        "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101"
+      },
+      {
+        "name": "filelock",
+        "version": "4.1.1",
+        "url": "https://files.pythonhosted.org/packages/d7/8b/f837f52905395ba4510fe61f753c24833fb0a9c76e21267bb9f828b664a9/filelock-4.1.1-py3-none-any.whl",
+        "sha256": "3f4a557945a7b0f95efeb1f432267affe5d45ac8ddde2aed1b97ebb62382c089"
+      },
+      {
+        "name": "fsspec",
+        "version": "2026.9.0",
+        "url": "https://files.pythonhosted.org/packages/6c/c0/a98505f18594f1bce828bb159cec0fcf9860562f1a2c85913409fc8f3d9e/fsspec-2026.9.0-py3-none-any.whl",
+        "sha256": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f"
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0",
+        "url": "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl",
+        "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"
+      },
+      {
+        "name": "idna",
+        "version": "3.20",
+        "url": "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl",
+        "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3",
+        "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+        "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+      },
+      {
+        "name": "protobuf",
+        "version": "7.36.2",
+        "url": "https://files.pythonhosted.org/packages/db/f3/3996583dd2906297a637af12114deddf7658af6e683fedb83be061983fb5/protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl",
+        "sha256": "89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2"
+      },
+      {
+        "name": "PyYAML",
+        "version": "6.0.3",
+        "url": "https://files.pythonhosted.org/packages/88/f9/16491d7ed2a919954993e48aa941b200f38040928474c9e85ea9e64222c3/pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5"
+      },
+      {
+        "name": "tqdm",
+        "version": "4.70.1",
+        "url": "https://files.pythonhosted.org/packages/a7/03/921a3d3c75785aca9ebfbfcabfbc3a1be12e2ab5265deb026d55a5a3f83e/tqdm-4.70.1-py3-none-any.whl",
+        "sha256": "c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73"
+      },
+      {
+        "name": "truststore",
+        "version": "0.10.4",
+        "url": "https://files.pythonhosted.org/packages/19/97/56608b2249fe206a67cd573bc93cd9896e1efb9e98bce9c163bcdc704b88/truststore-0.10.4-py3-none-any.whl",
+        "sha256": "adaeaecf1cbb5f4de3b1959b42d41f6fab57b2b1666adb59e89cb0b53361d981"
+      },
+      {
+        "name": "typing_extensions",
+        "version": "4.16.0",
+        "url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+        "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+      },
+      {
+        "name": "flatbuffers",
+        "version": "25.12.19",
+        "url": "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl",
+        "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4"
+      },
+      {
+        "name": "requests",
+        "version": "2.34.2",
+        "url": "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl",
+        "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0"
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.5.2",
+        "url": "https://files.pythonhosted.org/packages/18/24/bad3ac4271589df29cf5ce2f5ae490518a5739358052bd0d61209e6fea54/charset_normalizer-3.5.2-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "34276fd796040bf0993ab33a369aa572e6979c7aab225a88893667ad8eac8f7a"
+      },
+      {
+        "name": "urllib3",
+        "version": "2.8.0",
+        "url": "https://files.pythonhosted.org/packages/92/9d/c4e665119135114480843e7ab388fa94d8480650450e6f8e26b70d323a4c/urllib3-2.8.0-py3-none-any.whl",
+        "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3"
+      },
+      {
+        "name": "certifi",
+        "version": "2026.7.22",
+        "url": "https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl",
+        "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775"
+      }
+    ]
+  },
+  "productionPreservation": {
+    "unchanged": true,
+    "before": {
+      "retrieval": {
+        "mode": "keyword",
+        "version": 1,
+        "installed": false,
+        "model": "Xenova/multilingual-e5-small",
+        "embeddingVersion": "Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78:transformers-4.3.0:q8:mean:normalized:windows-v1",
+        "dimensions": 384,
+        "total": 17,
+        "indexed": 0,
+        "running": false,
+        "error": null
+      },
+      "usageCount": 497,
+      "registeredCost": 2.3136414,
+      "retainedCost": 0.0711849
+    },
+    "after": {
+      "retrieval": {
+        "mode": "keyword",
+        "version": 1,
+        "installed": false,
+        "model": "Xenova/multilingual-e5-small",
+        "embeddingVersion": "Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78:transformers-4.3.0:q8:mean:normalized:windows-v1",
+        "dimensions": 384,
+        "total": 17,
+        "indexed": 0,
+        "running": false,
+        "error": null
+      },
+      "usageCount": 497,
+      "registeredCost": 2.3136414,
+      "retainedCost": 0.0711849
+    },
+    "paidCallsAdded": 0
+  }
+}
