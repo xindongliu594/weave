@@ -1,0 +1,14 @@
+{
+  "url": "http://127.0.0.1:4312/#run/f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "browser": "Codex in-app browser",
+  "failed": true,
+  "truncationShown": true,
+  "completedDeveloper": true,
+  "managerPending": true,
+  "deliveryAvailable": true,
+  "retainedFeeShown": true,
+  "screenshot": "run-result.jpg",
+  "tunnelSession": 62089,
+  "businessWrites": 0,
+  "modelCalls": 0
+}

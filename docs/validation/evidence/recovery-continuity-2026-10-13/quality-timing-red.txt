@@ -1,0 +1,66 @@
+Release=weiwu-recovery-headroom2-20261013 Exit=1
+{"timingProbe":true,"status":"failed","downstream":"pending","seals":0,"missing":["HANDOFF_NOT_SUBMITTED"]}
+✖ failed native acceptance rolls back the provisional host seal and leaves downstream pending (486.662202ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 663.064935
+
+✖ failing tests:
+
+test at services/agent-runtime/.quality-timing-repro.test.mjs:110:1
+✖ failed native acceptance rolls back the provisional host seal and leaves downstream pending (486.662202ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'in_progress'
+  
+      at qualityScenario (file:///home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom2-20261013/services/agent-runtime/.quality-timing-repro.test.mjs:96:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'in_progress',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+Release=weiwu-recovery-continuity-20261013 Exit=1
+{"timingProbe":true,"status":"failed","downstream":"pending","seals":0,"missing":["HANDOFF_NOT_SUBMITTED"]}
+✖ failed native acceptance rolls back the provisional host seal and leaves downstream pending (465.35036ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 654.265706
+
+✖ failing tests:
+
+test at services/agent-runtime/.quality-timing-repro.test.mjs:110:1
+✖ failed native acceptance rolls back the provisional host seal and leaves downstream pending (465.35036ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'in_progress'
+  
+      at qualityScenario (file:///home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013/services/agent-runtime/.quality-timing-repro.test.mjs:96:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'in_progress',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+

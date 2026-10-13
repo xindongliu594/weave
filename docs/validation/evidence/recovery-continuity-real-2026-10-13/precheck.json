@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-13T08:38:57.832054+00:00",
+  "readOnlyBusinessState": true,
+  "modelCalls": 0,
+  "catalog": {
+    "reachable": true,
+    "modelCount": 39,
+    "targetListed": true
+  },
+  "modelStatus": "available",
+  "modelWire": "deepseek-v4.1-flash",
+  "runId": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "status": "failed",
+  "integrity": "ok",
+  "actualPolicy": {
+    "maxBudget": 0.42,
+    "maxModelCalls": 64,
+    "maxTaskModelCalls": 40
+  },
+  "calls": {
+    "used": 56,
+    "limit": 64,
+    "remaining": 8
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "calls": 5,
+      "callLimit": 16,
+      "completed": true
+    },
+    {
+      "id": "t2-qa",
+      "calls": 40,
+      "callLimit": 40,
+      "completed": false
+    },
+    {
+      "id": "t3-review",
+      "calls": 0,
+      "callLimit": 40,
+      "completed": false
+    }
+  ],
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "unknownOperations": 0,
+  "resumeReasons": [
+    {
+      "status": 422,
+      "code": "TASK_BUDGET_EXHAUSTED",
+      "message": "\u4efb\u52a1\u300c\u53ea\u8bfb\u9010\u9879\u72ec\u7acb\u6838\u7b97 inventory-cases.md\u300d\u5df2\u8fbe\u5230\u8d39\u7528\u6216\u8c03\u7528\u6b21\u6570\u4e0a\u9650\uff0c\u8bf7\u8c03\u6574\u65b9\u6848\u540e\u91cd\u65b0\u6279\u51c6",
+      "taskId": "t2-qa"
+    }
+  ],
+  "costReadiness": {
+    "recordedCost": 0.2569848,
+    "reserved": 0.0025932,
+    "availableBudget": 0.16042199999999998,
+    "pendingCount": 0,
+    "uncertainCount": 1
+  },
+  "known": 2.3834214,
+  "held": 0.07377809999999999,
+  "occupied": 2.4571995,
+  "fullyAllocatedWorstCase": 2.7076214999999997,
+  "globalCap": 2.72,
+  "stageCap": 0.64,
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+  "knowledgePins": [
+    {
+      "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+      "version": 1,
+      "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+    },
+    {
+      "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+      "version": 1,
+      "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+    }
+  ],
+  "successWorkCounts": [
+    2
+  ],
+  "candidateCount": 0,
+  "servicePID": "977263"
+}

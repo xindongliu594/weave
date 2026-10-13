@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-10-13T08:46:25.801039+00:00",
+  "browser": "Codex in-app browser",
+  "url": "http://127.0.0.1:4312/#run/e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "connected": true,
+  "failureShown": true,
+  "completedNodeShown": true,
+  "retainedCostChoice": true,
+  "deliveryLink": true,
+  "recoveryEntry": true,
+  "businessMutations": 0,
+  "modelCalls": 0,
+  "tabbitFallback": "installed launcher returned exit1 without output; used in-app browser"
+}

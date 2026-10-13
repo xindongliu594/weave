@@ -1,0 +1,12 @@
+{
+  "stage": "failed",
+  "pid": 728392,
+  "time": 1791878963.4838464,
+  "modelCalls": 0,
+  "error": "('native', 1)",
+  "changed": false,
+  "rollbackApplied": false,
+  "completedChecks": [],
+  "processRunning": false,
+  "logTail": "Traceback (most recent call last):\n  File \"/home/jj/.local/share/weiwu/staging/recovery-continuity-20261013/continue-existing-release.py\", line 70, in <module>\n    assert result.returncode==0,(name,result.returncode)\n           ^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('native', 1)\n"
+}

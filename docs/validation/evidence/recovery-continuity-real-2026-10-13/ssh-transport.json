@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-13T08:49:31.358168+00:00",
+  "exitCode": 0,
+  "transport": [
+    "debug1: Connecting to 100.90.190.33 [100.90.190.33] port 22.",
+    "debug1: Connection established.",
+    "debug1: Local version string SSH-2.0-OpenSSH_for_Windows_9.5",
+    "debug1: Remote protocol version 2.0, remote software version OpenSSH_10.2p1 Ubuntu-2ubuntu3.2",
+    "Authenticated to 100.90.190.33 ([100.90.190.33]:22) using \"publickey\"."
+  ],
+  "service": "ActiveState=active\nMainPID=977263\n",
+  "modelCalls": 0
+}

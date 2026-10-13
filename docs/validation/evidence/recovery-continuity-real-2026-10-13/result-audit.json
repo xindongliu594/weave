@@ -1,0 +1,210 @@
+{
+  "checkedAt": "2026-10-13T09:01:12.878719+00:00",
+  "runId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "status": "failed",
+  "runFields": {
+    "error": null,
+    "result": null,
+    "finishedAt": null
+  },
+  "integrity": "ok",
+  "diagnostic": [
+    {
+      "seq": 4,
+      "type": "goal/anchored",
+      "sessionId": null,
+      "taskId": null,
+      "data": {}
+    },
+    {
+      "seq": 54,
+      "type": "goal/node-started",
+      "sessionId": null,
+      "taskId": null,
+      "data": {
+        "taskId": "t2-qa",
+        "attemptId": "dc382aa7-7c5a-443a-a97a-844e8fc75092"
+      }
+    },
+    {
+      "seq": 55,
+      "type": "handoff/inputs-bound",
+      "sessionId": null,
+      "taskId": null,
+      "data": {
+        "taskId": "t2-qa",
+        "attemptId": "dc382aa7-7c5a-443a-a97a-844e8fc75092"
+      }
+    },
+    {
+      "seq": 236,
+      "type": "run/finished",
+      "sessionId": null,
+      "taskId": null,
+      "data": {
+        "status": "failed",
+        "message": "\u6a21\u578b deepseek-v4.1-flash \u7684\u6267\u884c\u8f93\u51fa\u8fbe\u5230\u672c\u6b21 2048 Token \u4e0a\u9650\u800c\u88ab\u622a\u65ad\uff1b\u672a\u91c7\u7eb3\u4e3a\u5b8c\u6210\u7ed3\u679c\u6216\u6267\u884c\u5de5\u5177\u3002\u5b9e\u9645\u7528\u91cf\u5df2\u8bb0\u5f55\uff0c\u4e0d\u4f1a\u81ea\u52a8\u7eed\u5199\u6216\u91cd\u8bd5\u3002\u8bf7\u7f29\u77ed\u5355\u6b21\u7ed3\u679c\uff0c\u6216\u5728\u9879\u76ee\u4e2d\u91cd\u65b0\u5236\u5b9a\u5e76\u786e\u8ba4\u65b9\u6848\u3002"
+      }
+    }
+  ],
+  "updates": [
+    {
+      "seq": 106,
+      "taskId": "t2-qa",
+      "status": "in_progress",
+      "verdict": null,
+      "output": "",
+      "findings": null,
+      "acceptanceResults": null
+    }
+  ],
+  "requestTools": [
+    {
+      "wireSeq": 60,
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "tools": [
+        "agent_teams_claim_task"
+      ],
+      "directOperations": [
+        {
+          "type": "capability/searched",
+          "seq": 82
+        }
+      ],
+      "usageId": "bfc31c5c-02df-4fa8-bd75-18d7398b5c04",
+      "maxOutputTokens": 2048,
+      "usage": {
+        "inputTokens": 9339,
+        "outputTokens": 107,
+        "cost": 0.0029300999999999997,
+        "purpose": "\u9879\u76ee\u6267\u884c"
+      }
+    },
+    {
+      "wireSeq": 91,
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "tools": [
+        "agent_teams_update_task",
+        "filesystem",
+        "knowledge_read"
+      ],
+      "directOperations": [
+        {
+          "type": "knowledge/citation",
+          "seq": 125
+        }
+      ],
+      "usageId": "c08a338c-5de6-4554-b5be-0b50370714ff",
+      "maxOutputTokens": 2048,
+      "usage": {
+        "inputTokens": 10693,
+        "outputTokens": 223,
+        "cost": 0.0034755,
+        "purpose": "\u9879\u76ee\u6267\u884c"
+      }
+    },
+    {
+      "wireSeq": 134,
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "tools": [],
+      "directOperations": [
+        {
+          "type": "capability/adopted",
+          "seq": 154
+        }
+      ],
+      "usageId": "9859507a-8496-4144-8683-63964cfd9ead",
+      "maxOutputTokens": 2048,
+      "usage": {
+        "inputTokens": 12698,
+        "outputTokens": 265,
+        "cost": 0.0041274,
+        "purpose": "\u9879\u76ee\u6267\u884c"
+      }
+    },
+    {
+      "wireSeq": 163,
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "tools": [],
+      "directOperations": [],
+      "usageId": "52b01a00-51bf-4335-b1be-dec3bd5ac5b2",
+      "maxOutputTokens": 2048,
+      "usage": {
+        "inputTokens": 11751,
+        "outputTokens": 2048,
+        "cost": 0.005982899999999999,
+        "purpose": "\u9879\u76ee\u6267\u884c"
+      }
+    }
+  ],
+  "planningUsage": {
+    "id": "0b2d1cdb-554c-4916-903a-e544b9498415",
+    "inputTokens": 1385,
+    "outputTokens": 108,
+    "cost": 0.0005451000000000001,
+    "purpose": "\u9884\u7b97\u8865\u5145\u89c4\u5212"
+  },
+  "recoveredQaHintNames": [
+    "agent_teams_claim_task",
+    "filesystem",
+    "knowledge_read"
+  ],
+  "costs": {
+    "known": 2.4004824,
+    "held": 0.07377809999999999,
+    "project": {
+      "recordedCost": 0.2740458,
+      "reserved": 0.0025932,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "availableBudget": 0.203361
+    }
+  },
+  "calls": {
+    "used": 60,
+    "limit": 72,
+    "remaining": 12
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "completed": true,
+      "calls": 5,
+      "callLimit": 16
+    },
+    {
+      "id": "t2-qa",
+      "completed": false,
+      "calls": 44,
+      "callLimit": 45
+    },
+    {
+      "id": "t3-review",
+      "completed": false,
+      "calls": 0,
+      "callLimit": 45
+    }
+  ],
+  "knowledgePins": [
+    {
+      "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+      "version": 1,
+      "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+    },
+    {
+      "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+      "version": 1,
+      "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+    }
+  ],
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+  "successWorkCounts": [
+    2
+  ],
+  "candidateCount": 0,
+  "additionalModelCallsByAudit": 0
+}

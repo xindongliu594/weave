@@ -1,0 +1,56 @@
+{
+  "stage": "passed",
+  "pid": 973455,
+  "time": 1791880244.1131675,
+  "modelCalls": 0,
+  "proof": {
+    "passed": true,
+    "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013",
+    "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom2-20261013",
+    "packetSha256": "a1eaa9529e715474fd29e2d6e8d86c3eeb33b92ebbc50787061ac9e2e5e6413b",
+    "sourceFilesVerified": 13,
+    "missingTestSha256": "579c7abde86e4f8f572ed497da59c06ac8f7df67e57870cf891673ff7630f391",
+    "supplementSha256": "070b1d97b595703adc6d57bd9764a2a60b4cbb34a470a266d57b1848d55dfe65",
+    "projectCount": 10,
+    "usageBefore": 519,
+    "usageAfter": 519,
+    "mainPID": "977263",
+    "checks": [
+      {
+        "name": "native",
+        "exitCode": 0,
+        "tests": 155
+      },
+      {
+        "name": "lineage",
+        "exitCode": 0,
+        "tests": 28
+      },
+      {
+        "name": "types",
+        "exitCode": 0,
+        "tests": 0
+      },
+      {
+        "name": "isolated",
+        "exitCode": 0,
+        "tests": 53
+      }
+    ],
+    "testsPassed": 236,
+    "projectStatePreserved": true,
+    "usagePreserved": true,
+    "uncertainFeesPreserved": true,
+    "originalArchivesPreserved": true,
+    "archiveEvidence": {
+      "files": 493,
+      "bytes": 403920415,
+      "manifestSha256": "529dd05f1930231732f2dd9c24bb528c158fcd5771ed57ff871fde402ae10d1b"
+    },
+    "modelCalls": 0,
+    "newDependenciesInstalled": false,
+    "continuation": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013/recovery-continuity-continuation-3",
+    "reusedChecks": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013/recovery-continuity-continuation-2/progress.json"
+  },
+  "processRunning": false
+}

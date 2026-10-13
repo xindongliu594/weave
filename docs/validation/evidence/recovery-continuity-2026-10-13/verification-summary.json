@@ -13,14 +13,19 @@
   "existingBuildWarning": "605KB main chunk",
   "realModelCalls": 0,
   "acceptanceClaim": "local protocol and engineering verification only; real QA/manager and publication remain blocked",
-  "sourceState": "local checks passed; JJ deployment outcome unknown after SSH disconnect",
+  "sourceState": "JJ deployment passed after reconnection and bounded continuation",
   "lifecycleTestsIncludedInNative": 5,
   "postReviewFixPass": 1,
   "importantFindings": 2,
   "importantFindingsFixed": 2,
   "finalTypeCheckExit": 0,
   "frontendSourcesChangedAfterBuild": false,
-  "deploymentState": "unknown",
-  "postDeploymentDataInvariantsVerified": false,
-  "sourcePacketCheckedAgainstCurrentBytes": true
+  "deploymentState": "passed",
+  "postDeploymentDataInvariantsVerified": true,
+  "sourcePacketCheckedAgainstCurrentBytes": true,
+  "jjTestsPassed": 236,
+  "jjTypeCheckExit": 0,
+  "extraTestTimingFix": true,
+  "missingExistingTestAddedToRelease": true,
+  "sourceFilesVerifiedOnJJ": 13
 }

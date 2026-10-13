@@ -75,7 +75,7 @@ async function qualityScenario(mode) {
     const deadline=Date.now()+5000;
     while(Date.now()<deadline){
       status=await host.call(captain,'agent_teams_status');
-      if(['forged-command','failed-acceptance'].includes(mode)?results.some(r=>r.name==='agent_teams_update_task'&&r.args.status==='completed'):mode==='review-revision'?results.some(r=>r.args.verdict==='needs_revision'):status.deliverable)break;
+      if(['forged-command','failed-acceptance'].includes(mode)?status.tasks[0].status==='failed'&&results.some(r=>r.name==='agent_teams_update_task'&&r.args.status==='completed'):mode==='review-revision'?results.some(r=>r.args.verdict==='needs_revision'):status.deliverable)break;
       await new Promise(resolve=>setTimeout(resolve,10));
     }
     if(status.deliverable) await host.verifyDeliverable();
@@ -87,7 +87,9 @@ async function qualityScenario(mode) {
     assert.ok(status);assert.equal(status.tasks.length,2,'no unapproved repair/review task may appear');
     const events=readRun(root,archive.id).events,seals=events.filter(e=>e.type==='handoff/accepted');
     if(mode==='forged-command'||mode==='failed-acceptance'){
-      assert.equal(status.tasks[0].status,'in_progress');assert.equal(status.tasks[1].status,'pending');assert.equal(seals.length,0);assert.ok(!requests.includes('review'));
+      // Observe the final native failure after rejection, rather than a stale pre-tool status poll.
+      assert.equal(status.tasks[0].status,'failed');assert.equal(status.tasks[1].status,'pending');assert.equal(status.deliverable,false);assert.equal(seals.length,0);assert.ok(!requests.includes('review'));
+      assert.ok(events.some(e=>e.type==='handoff/missing'&&e.data.code==='HANDOFF_NOT_SUBMITTED'));
       assert.ok(results.some(r=>r.args.status==='completed'&&r.result.isError));
       if(mode==='forged-command')assert.equal(approvals,0);
     }else if(mode==='review-revision'){

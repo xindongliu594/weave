@@ -1,0 +1,13 @@
+{
+  "ready": true,
+  "existingReleaseVerified": true,
+  "sourceFiles": 11,
+  "projectCount": 10,
+  "usageRecords": 519,
+  "archiveEvidence": {
+    "files": 493,
+    "bytes": 403920415,
+    "manifestSha256": "529dd05f1930231732f2dd9c24bb528c158fcd5771ed57ff871fde402ae10d1b"
+  },
+  "modelCalls": 0
+}

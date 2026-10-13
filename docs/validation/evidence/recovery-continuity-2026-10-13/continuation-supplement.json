@@ -1,0 +1,9 @@
+{
+  "basePacketSha256": "a1eaa9529e715474fd29e2d6e8d86c3eeb33b92ebbc50787061ac9e2e5e6413b",
+  "path": "services/agent-runtime/quality-handoff.test.mjs",
+  "sha256": "070b1d97b595703adc6d57bd9764a2a60b4cbb34a470a266d57b1848d55dfe65",
+  "gitBaseline": "5902ab37960a1a0e38816a39a3fe299b7501ce8a7f39f5e85c681b677c812957",
+  "change": "Wait for final native failure and require no seal, no downstream and HANDOFF_NOT_SUBMITTED; runtime unchanged",
+  "sourceFilesIncludingSupplement": 12,
+  "modelCalls": 0
+}

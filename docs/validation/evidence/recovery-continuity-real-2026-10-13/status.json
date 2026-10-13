@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-13T08:52:33.272447+00:00",
+  "runId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "parentRunId": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "status": "failed",
+  "integrity": "ok",
+  "wireRequests": 4,
+  "accepted": [],
+  "checkpoint": [
+    {
+      "taskId": "t1-doc",
+      "status": "completed"
+    },
+    {
+      "taskId": "t2-qa",
+      "status": "failed"
+    },
+    {
+      "taskId": "t3-review",
+      "status": "pending"
+    }
+  ],
+  "handoffReminderCount": 0,
+  "unknownOperations": 0,
+  "errors": [],
+  "runKnownCost": 0.0165159,
+  "runInputTokens": 44481,
+  "runOutputTokens": 2643,
+  "occupied": 2.4742605,
+  "projectKnown": 0.2740458,
+  "projectHeld": 0.0025932,
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

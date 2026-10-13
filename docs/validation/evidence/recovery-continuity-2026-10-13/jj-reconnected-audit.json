@@ -1,0 +1,132 @@
+{
+  "readOnly": true,
+  "modelCalls": 0,
+  "unit": "[Unit]\nDescription=Weiwu local MVP on JJ (private data, SSH access)\nStartLimitIntervalSec=120\nStartLimitBurst=3\n\n[Service]\nEnvironment=WEIWU_STORAGE_BASE=/home/jj/.local/share/weiwu\nType=simple\nWorkingDirectory=/home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom2-20261013\nEnvironment=WEIWU_OPENRIG_CONFIG=/home/jj/.local/share/weiwu/data/pilot/openrig/bridge-config.json\nExecStart=/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node scripts/local.mjs --production --data-dir=/home/jj/.local/share/weiwu/data/pilot\nEnvironment=HOME=/home/jj/.local/share/weiwu/home\nEnvironment=PATH=/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\nEnvironment=TMPDIR=/home/jj/.local/share/weiwu/cache/tmp\nEnvironment=npm_config_cache=/home/jj/.local/share/weiwu/cache/npm\nEnvironment=npm_config_userconfig=/home/jj/.local/share/weiwu/home/.npmrc\nEnvironment=npm_config_globalconfig=/dev/null\nEnvironment=ONNXRUNTIME_NODE_INSTALL=skip\nEnvironment=LANG=C.UTF-8\nEnvironment=LOCAL_OPENSHELL_CONFIG=/home/jj/.local/share/weiwu/config/openshell-node-v012.json\nUMask=0077\nRestart=on-failure\nRestartSec=5\nKillSignal=SIGTERM\nKillMode=mixed\nTimeoutStopSec=120\nStandardOutput=append:/home/jj/.local/share/weiwu/logs/service.txt\nStandardError=append:/home/jj/.local/share/weiwu/logs/service.txt\n\n[Install]\nWantedBy=default.target\n",
+  "service": "ActiveState=active\nSubState=running\nMainPID=604548\n",
+  "newReleaseExists": true,
+  "deploymentProof": null,
+  "deploymentProcesses": [],
+  "sourceHashes": {
+    "apps/api/src/run-coordinator.ts": "52b310810b03c587fff99729a29c91c5633a20a3833290f7d9083f3b5a6b142b",
+    "services/agent-runtime/checkpoint-context.mjs": "66819200e4590bdf2105bc72186aed85c4da1b83e69e6ca26bc168e000aef9a3",
+    "services/agent-runtime/checkpoint-context.test.mjs": "ea12448dd3c6cc691f88410641de0fe40b8d39b46c5383619c98ea5a550e15de",
+    "services/agent-runtime/employee-context.mjs": "dde75247da0e4b572584282f81cb3d19af87fd4840c0ae5922352a74b56f2c67",
+    "services/agent-runtime/employee-context.test.mjs": "e5fd08a11b8a35489a7a17cf454fb78e6afa4beea0d7e97a8d546419de8bc8e4",
+    "services/agent-runtime/employee-handoff-reminder.test.mjs": "7caeda09b306586629e183acec4678efe2aac91067ca521ec716d08a98560024",
+    "services/agent-runtime/employee-hosts.mjs": "e0eb04515eef5ff4b3a43470f9a712bf47425ae428fe75b5a2d1afafb47f76b9",
+    "services/agent-runtime/host.mjs": "a165cbe74f8f7711dd44a462cfc7870bfcc66c65955bef633c4db6da2ad440b9",
+    "services/agent-runtime/openai-compatible.d.mts": "f562a256f3dba8f033646e7d8f844a67c950dd6adcf1e36a1346f9dca35ca740",
+    "services/agent-runtime/openai-compatible.mjs": "e6fa217004e38177aaf03a75d9819586380e27876b8749594ad8513a2f790b0c",
+    "services/agent-runtime/openai-compatible.test.mjs": "6ba9acfe0c8dfad402a891c17b7857076fb6d553e2652cbf059ddb26f73003ef"
+  },
+  "originalUnitBackupExists": false,
+  "health": {
+    "database": "connected",
+    "runtime": {
+      "ready": true,
+      "reason": "DSH + AgentTeams\uff1a\u5458\u5de5\u72ec\u7acb\u5bbf\u4e3b\u3001\u53d7\u9650\u5de5\u4f5c\u533a\u3001\u5de5\u5177\u5ba1\u6279\u3001\u77e5\u8bc6\u5f15\u7528\u3001\u9884\u7b97\u4e0e\u5e76\u53d1\u63a7\u5236\u5df2\u63a5\u5165\u3002\u771f\u5b9e\u6a21\u578b\u517c\u5bb9\u6027\u9700\u5355\u72ec\u9a8c\u8bc1\u3002"
+    },
+    "version": "0.2.0",
+    "workspace": {
+      "kind": "local",
+      "database": "pglite",
+      "workspacesPath": "/home/jj/.local/share/weiwu/data/pilot/workspaces",
+      "executionTarget": {
+        "kind": "local",
+        "deviceId": "5b34cfd1-eee6-45fd-9be7-9000c4daf9d8",
+        "grantId": "7ffb9e55-18e1-4a9c-aeed-befddb39a6b3"
+      }
+    }
+  },
+  "projects": [
+    {
+      "id": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "version": 3,
+      "status": "FAILED"
+    },
+    {
+      "id": "acc5411f-e128-4dc4-98ef-6a43a110b228",
+      "version": 2,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "cf082432-c6e7-42d2-8068-0ef9bbdd7dee",
+      "version": 2,
+      "status": "DRAFT"
+    },
+    {
+      "id": "d4f37ca9-a891-4d32-b705-6a170f103a6b",
+      "version": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "1d432498-6e6a-4da5-9833-4e946283f29b",
+      "version": 2,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "d3633183-19b5-4852-940b-f34758ebe8fd",
+      "version": 2,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "cf00d8a8-078b-43ae-847b-fb8607a23575",
+      "version": 2,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "591c8468-febf-4d71-9414-2ee3b987f671",
+      "version": 3,
+      "status": "COMPLETED"
+    },
+    {
+      "id": "c547e45b-393a-4848-b707-defa6005a26f",
+      "version": 1,
+      "status": "DRAFT"
+    },
+    {
+      "id": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+      "version": 14,
+      "status": "COMPLETED"
+    }
+  ],
+  "usage": {
+    "records": 519,
+    "knownCost": 2.3834214
+  },
+  "costs": {
+    "summary": null,
+    "calls": [
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "status": "uncertain",
+        "amount": 0.0192111
+      },
+      {
+        "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+        "status": "uncertain",
+        "amount": 0.03529379999999999
+      },
+      {
+        "id": "f865392a-f575-4f5b-9041-59954d407986",
+        "status": "uncertain",
+        "amount": 0.00037109999999999997
+      },
+      {
+        "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+        "status": "uncertain",
+        "amount": 0.014085
+      },
+      {
+        "id": "26e850af-4ed9-4a5e-abd8-6bf84ec76599",
+        "status": "uncertain",
+        "amount": 0.0022239
+      },
+      {
+        "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+        "status": "uncertain",
+        "amount": 0.0025932
+      }
+    ]
+  }
+}

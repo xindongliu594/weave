@@ -1,0 +1,28 @@
+{
+  "stage": "failed",
+  "pid": 893238,
+  "time": 1791879864.706112,
+  "modelCalls": 0,
+  "error": "('isolated', 1)",
+  "changed": false,
+  "rollbackApplied": false,
+  "completedChecks": [
+    {
+      "name": "native",
+      "exitCode": 0,
+      "tests": 155
+    },
+    {
+      "name": "lineage",
+      "exitCode": 0,
+      "tests": 28
+    },
+    {
+      "name": "types",
+      "exitCode": 0,
+      "tests": 0
+    }
+  ],
+  "processRunning": false,
+  "logTail": "Traceback (most recent call last):\n  File \"/home/jj/.local/share/weiwu/staging/recovery-continuity-20261013/continue-existing-release-v2.py\", line 74, in <module>\n    assert result.returncode==0,(name,result.returncode)\n           ^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('isolated', 1)\n"
+}
