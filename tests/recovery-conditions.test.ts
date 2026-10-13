@@ -66,12 +66,13 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1) {
+async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1,detailed=false) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
-  const planTasks=tasks.map(task=>({...task,...(declaredReads?{inputs:[]}:{}),...(pricedRoutes?{maxOutputTokens:512}:{})}));
-  const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
+  const planTasks=tasks.map(task=>({...task,...(declaredReads?{inputs:[]}:{}),...(pricedRoutes?{maxOutputTokens:512}:{}),
+    ...(detailed?{objective:'只读核算输入、输出、边界值和错误结果，并引用固定版本资料。'.repeat(17)}:{})}));
+  const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: detailed?'库存 API 验收资料。'.repeat(50):'Read-only recovery budget fixture',
     title: 'Recovery fixture', templateVersion: 'fixture', policy:{...policy,maxBudget:originalBudget}, tasks:planTasks, approvedTasks:planTasks,approval:{kind:'project',approvedAt:new Date().toISOString()},
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
     modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1),...(pricedRoutes?{inputRate:2,outputRate:10,maxOutputTokens:512}:{}) }],
@@ -330,6 +331,22 @@ test('output resource candidate is explicit, persisted and applied only to a new
   assert.equal(child.resourceApproval.maxTaskOutputTokens,16384);
   assert.deepEqual(child.tasks.find((t:any)=>t.id==='prepare'),old.tasks.find((t:any)=>t.id==='prepare'));
   assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot,old);
+});
+
+test('detailed output recovery planning fits the approved small planning request without dropping task context',{skip:!isolated},async()=>{
+  const prior=(await pool.query('SELECT data FROM models WHERE id=$1',[modelId])).rows[0].data;
+  try{
+    await pool.query('UPDATE models SET data=$1 WHERE id=$2',[{...prior,inputRate:.3,outputRate:1.2},modelId]);
+    const {runId}=await seed(true,false,true,1,true);
+    resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},taskOutputLimits:{finish:8192},rationale:'Use the approved output space within the same planning fee'};
+    const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.003,retainUncertainCosts:true,maxTaskOutputTokens:8192})});
+    const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+    const context=JSON.parse(resourcePlanningMessages[1].content);
+    assert.equal(context.requirement,'库存 API 验收资料。'.repeat(50));
+    assert.equal(context.tasks.find((task:any)=>task.id==='finish').objective,'只读核算输入、输出、边界值和错误结果，并引用固定版本资料。'.repeat(17));
+    assert.equal(providerRequests,1);assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
+  }finally{await pool.query('UPDATE models SET data=$1 WHERE id=$2',[prior,modelId]);}
 });
 
 test('output planning cannot store a candidate funded only for the old output limit',{skip:!isolated},async()=>{

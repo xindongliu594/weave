@@ -1,0 +1,14 @@
+{
+  "proposal": {
+    "pid": 3482141,
+    "processExists": false,
+    "output": "{\"operation\": \"resource-proposal\", \"httpStatus\": 422, \"code\": \"RESOURCE_PROPOSAL_INVALID\", \"messageChars\": 150}\n",
+    "error": ""
+  },
+  "resume": {
+    "pid": null,
+    "processExists": false,
+    "output": "",
+    "error": ""
+  }
+}

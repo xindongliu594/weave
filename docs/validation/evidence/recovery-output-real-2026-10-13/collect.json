@@ -1,0 +1,14 @@
+{
+  "proposal": {
+    "pid": 3332400,
+    "processExists": false,
+    "output": "{\"operation\": \"resource-proposal\", \"httpStatus\": 422, \"code\": \"CALL_BUDGET_EXCEEDED\", \"messageChars\": 16}\n",
+    "error": ""
+  },
+  "resume": {
+    "pid": null,
+    "processExists": false,
+    "output": "",
+    "error": ""
+  }
+}

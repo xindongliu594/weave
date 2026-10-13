@@ -1,0 +1,180 @@
+{
+  "checkedAt": "2026-10-13T12:41:20.356354+00:00",
+  "runId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "status": "failed",
+  "integrity": "ok",
+  "calls": {
+    "used": 60,
+    "limit": 72,
+    "remaining": 12
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "subject": "生成 inventory-cases.md 验收用例检查表",
+      "recordedCost": 0.018502499999999998,
+      "reserved": 0,
+      "budgetLimit": 0.05,
+      "availableBudget": 0.031497500000000005,
+      "calls": 5,
+      "callLimit": 16,
+      "remainingCalls": 11,
+      "completed": true
+    },
+    {
+      "id": "t2-qa",
+      "subject": "只读逐项独立核算 inventory-cases.md",
+      "recordedCost": 0.1538322,
+      "reserved": 0,
+      "budgetLimit": 0.2335938,
+      "availableBudget": 0.07976159999999999,
+      "calls": 44,
+      "callLimit": 45,
+      "remainingCalls": 1,
+      "completed": false
+    },
+    {
+      "id": "t3-review",
+      "subject": "经理只读验收 inventory-cases.md 与 QA 回执",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.2,
+      "availableBudget": 0.2,
+      "calls": 0,
+      "callLimit": 45,
+      "remainingCalls": 45,
+      "completed": false
+    }
+  ],
+  "projectCap": 0.48,
+  "outputCaps": [
+    {
+      "id": "t1-doc",
+      "maxOutputTokens": 2048
+    },
+    {
+      "id": "t2-qa",
+      "maxOutputTokens": 2048
+    },
+    {
+      "id": "t3-review",
+      "maxOutputTokens": 2048
+    }
+  ],
+  "planningFailure": {
+    "status": "http-error",
+    "httpStatus": 422,
+    "result": {
+      "code": "RESOURCE_PROPOSAL_INVALID",
+      "message": "AI没有返回有效资源方案，旧运行和额度未改变；本次用量已记录。字段问题：maxBudget：需要 number（invalid_type）；maxModelCalls：需要 number（invalid_type）；<field>：需要 object（invalid_type）；其它问题见诊断清单。",
+      "diagnostic": {
+        "finishReason": "stop",
+        "originalOutputSHA": "0f541979f4b9eeb0b69984d761d206b033f790f4b539607299a8d44ae37988c7",
+        "outputBytes": 1096,
+        "reason": "PLAN_SCHEMA_INVALID",
+        "position": null,
+        "schemaIssues": [
+          {
+            "path": [
+              "maxBudget"
+            ],
+            "code": "invalid_type",
+            "expected": {
+              "type": "number"
+            }
+          },
+          {
+            "path": [
+              "maxModelCalls"
+            ],
+            "code": "invalid_type",
+            "expected": {
+              "type": "number"
+            }
+          },
+          {
+            "path": [
+              "<field>"
+            ],
+            "code": "invalid_type",
+            "expected": {
+              "type": "object"
+            }
+          },
+          {
+            "path": [
+              "<field>"
+            ],
+            "code": "invalid_type",
+            "expected": {
+              "type": "object"
+            }
+          },
+          {
+            "path": [
+              "<field>"
+            ],
+            "code": "invalid_type",
+            "expected": {
+              "type": "object"
+            }
+          },
+          {
+            "path": [
+              "rationale"
+            ],
+            "code": "invalid_type",
+            "expected": {
+              "type": "string"
+            }
+          },
+          {
+            "path": [],
+            "code": "unrecognized_keys",
+            "expected": {
+              "rule": "unknown-fields-not-allowed"
+            }
+          }
+        ],
+        "schemaIssueCount": 7,
+        "schemaIssuesTruncated": false
+      }
+    }
+  },
+  "newPlanningUsage": [
+    {
+      "id": "e995ddea-0474-4d5f-9140-7c2ae951a875",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "runId": null,
+      "purpose": "预算补充规划",
+      "inputTokens": 1646,
+      "outputTokens": 327,
+      "cost": 0.0008862,
+      "createdAt": "2026-10-13T12:37:01.992Z",
+      "planningPreviewId": null
+    }
+  ],
+  "usageRows": 525,
+  "occupied": 2.4751467000000003,
+  "phaseOccupied": 0.4043283000000004,
+  "costReadiness": {
+    "recordedCost": 0.274932,
+    "reserved": 0.0025932,
+    "availableBudget": 0.20247479999999998,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+        "amount": 0.0025932,
+        "status": "uncertain"
+      }
+    ]
+  },
+  "unknownOperationCount": 0,
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+  "resumed": false,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-output-compact-20261013",
+  "readOnlyAuditModelCalls": 0
+}

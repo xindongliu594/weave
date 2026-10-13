@@ -1,0 +1,16 @@
+{
+  "source": "User approved call_690751bc35c64393b0840e997e8fe5aa: 批准这次有限续验",
+  "cumulativeCap": 2.8,
+  "stageCap": 0.72,
+  "projectCap": 0.56,
+  "futureProjectCap": 0.03,
+  "projectCallCap": 72,
+  "taskCallCap": 48,
+  "newQaCalls": 4,
+  "newManagerCalls": 7,
+  "outputCeiling": 8192,
+  "planningCap": 0.003,
+  "retainUnknownCosts": true,
+  "permissionChanges": false,
+  "attempts": 1
+}

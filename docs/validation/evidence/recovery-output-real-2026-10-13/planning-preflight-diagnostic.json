@@ -1,0 +1,15 @@
+{
+  "inputBytes": 9316,
+  "requestedOutput": 512,
+  "inputRate": 0.3,
+  "outputRate": 1.2,
+  "reservation": 0.0034092,
+  "allowed": 0.003,
+  "requirementBytes": 1457,
+  "systemBytes": 2470,
+  "contextBytes": 5384,
+  "taskBytes": 2858,
+  "usageRows": 524,
+  "occupied": 2.474260500000001,
+  "modelCalls": 0
+}
