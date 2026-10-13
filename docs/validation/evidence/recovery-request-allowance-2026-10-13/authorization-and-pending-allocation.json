@@ -1,0 +1,21 @@
+{
+  "authorizationSource": "user message following the failed finite continuation",
+  "requestCountIncreaseAuthorized": true,
+  "chosenProposedCallCeilings": {
+    "maxModelCalls": 72,
+    "maxTaskModelCalls": 45
+  },
+  "applied": false,
+  "paidCalls": 0,
+  "reasonNotApplied": "Existing $0.42 project cap is below the $0.4764432 reservation floor; per-project money redistribution not yet confirmed.",
+  "pendingRedistribution": {
+    "inventoryMaxBudget": 0.48,
+    "laterProjectMaxBudget": 0.03,
+    "stageCap": 0.64,
+    "cumulativeCap": 2.72,
+    "stageWorstCase": 0.6368031,
+    "cumulativeWorstCase": 2.7076215
+  },
+  "oldHistoryReset": false,
+  "permissionExpansion": false
+}
