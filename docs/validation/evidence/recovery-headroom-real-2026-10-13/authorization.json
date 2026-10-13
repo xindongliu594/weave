@@ -1,0 +1,17 @@
+{
+  "source": "Explicit human reply in the current Codex task on 2026-10-13",
+  "answer": "批准新增授权 $0.12，续验一次",
+  "cumulativeCap": 2.72,
+  "stageCap": 0.64,
+  "inventoryCap": 0.42,
+  "postPublicationProjectCap": 0.09,
+  "maxModelCalls": 64,
+  "maxTaskModelCalls": 40,
+  "maxPlanningCost": 0.003,
+  "maximumProposals": 1,
+  "maximumContinuations": 1,
+  "stopOnFailure": true,
+  "permissionsExpanded": false,
+  "oldUncertainCostsRetained": true,
+  "completedDevelopmentRerun": false
+}

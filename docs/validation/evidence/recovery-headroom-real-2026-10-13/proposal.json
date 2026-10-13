@@ -1,0 +1,30 @@
+{
+  "previewId": "77c3ac3a-8193-4e7f-a833-795d1a54a1d2",
+  "sourceRunId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "projectVersion": 3,
+  "sourceResourceRevision": 7,
+  "usageId": "a0b9522d-fee9-4bb4-8afe-cfb16effe5af",
+  "ceiling": 0.42,
+  "callCeilings": {
+    "maxModelCalls": 64,
+    "maxTaskModelCalls": 40
+  },
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "callRequirementVersion": "handoff-correction-v1",
+  "proposal": {
+    "maxBudget": 0.42,
+    "maxModelCalls": 64,
+    "taskCallLimits": {
+      "t2-qa": 40,
+      "t3-review": 40
+    },
+    "taskBudgetLimits": {
+      "t2-qa": 0.2231997,
+      "t3-review": 0.2
+    }
+  },
+  "rationaleChars": 116
+}

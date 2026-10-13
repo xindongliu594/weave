@@ -1,0 +1,786 @@
+{
+  "runId": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "status": "failed",
+  "eventCounts": {
+    "run/created": 1,
+    "run/queued": 1,
+    "runtime/supervision": 1,
+    "goal/anchored": 1,
+    "runtime/operation-start": 1,
+    "local/operation-queued": 2,
+    "runtime/operation-finished": 1,
+    "local/device-bound": 1,
+    "runtime/architecture": 1,
+    "skill/catalog": 2,
+    "runtime/tool-schema-filtered": 2,
+    "session/created": 2,
+    "agent/created": 2,
+    "runtime/created": 2,
+    "run/captain": 1,
+    "tool/start": 20,
+    "tool/result": 9,
+    "team/operation": 6,
+    "run/task-mapping": 1,
+    "recovery/restored": 1,
+    "team/checkpoint": 2,
+    "run/approved": 1,
+    "session/subagent/descriptor": 1,
+    "session/agent/inbox/spliced": 6,
+    "session/turn/start": 2,
+    "session/subagent/catalog": 1,
+    "run/started": 1,
+    "session/step/start": 4,
+    "session/system/message": 2,
+    "session/user/message": 8,
+    "session/request/header": 2,
+    "session/request/context": 2,
+    "goal/node-started": 1,
+    "handoff/inputs-bound": 1,
+    "model/request": 3,
+    "team/snapshot": 1,
+    "runtime/status": 3,
+    "model/wire-request": 2,
+    "runtime/status-poll": 11,
+    "billing/provider-response": 2,
+    "billing/usage": 2,
+    "model/usage": 2,
+    "model/finish": 3,
+    "session/assistant/message": 2,
+    "session/tool/call": 4,
+    "session/tool/result": 4,
+    "capability/searched": 1,
+    "session/step/end": 4,
+    "context/compacted": 1,
+    "local/operation-finished": 1,
+    "artifact/updated": 1,
+    "knowledge/citation": 1,
+    "context/read-evidence": 1,
+    "budget/stopped": 1,
+    "session/assistant/attempt": 2,
+    "session/turn/end": 2,
+    "runtime/disposed": 2,
+    "run/finished": 1
+  },
+  "timeline": [
+    {
+      "seq": 16,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 17,
+      "type": "tool/result",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "team_id",
+        "team_name",
+        "state_dir",
+        "phase",
+        "task_planning",
+        "members",
+        "tasks"
+      ]
+    },
+    {
+      "seq": 19,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create_task",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 20,
+      "type": "tool/result",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create_task",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "task_id",
+        "subject",
+        "status",
+        "kind",
+        "assignee"
+      ]
+    },
+    {
+      "seq": 22,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create_task",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 23,
+      "type": "tool/result",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create_task",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "task_id",
+        "subject",
+        "status",
+        "kind",
+        "assignee"
+      ]
+    },
+    {
+      "seq": 25,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create_task",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 26,
+      "type": "tool/result",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_create_task",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "task_id",
+        "subject",
+        "status",
+        "kind",
+        "assignee"
+      ]
+    },
+    {
+      "seq": 32,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_approve",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 43,
+      "type": "tool/result",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_approve",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "status",
+        "team_id",
+        "members",
+        "tasks"
+      ]
+    },
+    {
+      "seq": 53,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 56,
+      "type": "model/request",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "purpose": "execution",
+      "dataKeys": [
+        "provider",
+        "model",
+        "purpose",
+        "messages",
+        "tools",
+        "maxTokens"
+      ]
+    },
+    {
+      "seq": 57,
+      "type": "tool/result",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "team_id",
+        "team_name",
+        "description",
+        "phase",
+        "halted",
+        "escalated",
+        "loop_state",
+        "loop_summary",
+        "deliverable",
+        "coverage",
+        "delivery",
+        "viewer",
+        "members",
+        "tasks",
+        "captain_inbox",
+        "member_inbox",
+        "member_inboxes",
+        "mailbox_warnings",
+        "mailbox_warning_count"
+      ]
+    },
+    {
+      "seq": 60,
+      "type": "model/wire-request",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2-qa",
+      "purpose": null,
+      "dataKeys": [
+        "usageId",
+        "sessionId",
+        "requestId",
+        "taskId",
+        "attemptId",
+        "agentId",
+        "employeeId",
+        "runtimeTaskId",
+        "requestPurpose",
+        "modelId",
+        "protocol",
+        "path",
+        "body",
+        "reservation"
+      ]
+    },
+    {
+      "seq": 61,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 63,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 65,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 67,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 69,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 75,
+      "type": "session/assistant/message",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "dataKeys": [
+        "turn",
+        "step",
+        "message",
+        "usage",
+        "stream"
+      ],
+      "dataChars": 2004,
+      "blockTypes": [
+        "text",
+        "tool-call",
+        "tool-call"
+      ],
+      "textChars": 74,
+      "toolNames": [
+        "agent_teams_claim_task",
+        "capability_search"
+      ]
+    },
+    {
+      "seq": 76,
+      "type": "session/tool/call",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "agent_teams_claim_task",
+      "args": {
+        "task_id": "t2-qa"
+      },
+      "textChars": {}
+    },
+    {
+      "seq": 77,
+      "type": "tool/start",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "agent_teams_claim_task",
+      "args": {
+        "task_id": "t2"
+      },
+      "textChars": {}
+    },
+    {
+      "seq": 78,
+      "type": "tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "agent_teams_claim_task",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "task_details",
+        "task_id",
+        "status",
+        "assignee",
+        "attempt",
+        "attempt_id"
+      ]
+    },
+    {
+      "seq": 80,
+      "type": "session/tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": null,
+      "isError": null,
+      "resultKeys": [],
+      "dataKeys": [
+        "turn",
+        "step",
+        "message"
+      ],
+      "valueKeys": []
+    },
+    {
+      "seq": 81,
+      "type": "session/tool/call",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "capability_search",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 83,
+      "type": "session/tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": null,
+      "isError": null,
+      "resultKeys": [],
+      "dataKeys": [
+        "turn",
+        "step",
+        "message"
+      ],
+      "valueKeys": []
+    },
+    {
+      "seq": 87,
+      "type": "model/request",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "purpose": "execution",
+      "dataKeys": [
+        "provider",
+        "model",
+        "purpose",
+        "messages",
+        "tools",
+        "maxTokens"
+      ]
+    },
+    {
+      "seq": 88,
+      "type": "context/compacted",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": null,
+      "diagnostic": {}
+    },
+    {
+      "seq": 89,
+      "type": "model/wire-request",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2-qa",
+      "purpose": null,
+      "dataKeys": [
+        "usageId",
+        "sessionId",
+        "requestId",
+        "taskId",
+        "attemptId",
+        "agentId",
+        "employeeId",
+        "runtimeTaskId",
+        "requestPurpose",
+        "modelId",
+        "protocol",
+        "path",
+        "body",
+        "reservation"
+      ]
+    },
+    {
+      "seq": 90,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 92,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 94,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 96,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 102,
+      "type": "session/assistant/message",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "dataKeys": [
+        "turn",
+        "step",
+        "message",
+        "usage",
+        "stream"
+      ],
+      "dataChars": 2162,
+      "blockTypes": [
+        "text",
+        "tool-call",
+        "tool-call"
+      ],
+      "textChars": 83,
+      "toolNames": [
+        "filesystem",
+        "knowledge_read"
+      ]
+    },
+    {
+      "seq": 103,
+      "type": "session/tool/call",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "filesystem",
+      "args": {
+        "path": "inventory-cases.md"
+      },
+      "textChars": {}
+    },
+    {
+      "seq": 104,
+      "type": "tool/start",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": null,
+      "name": "filesystem",
+      "args": {
+        "path": "inventory-cases.md"
+      },
+      "textChars": {}
+    },
+    {
+      "seq": 106,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 109,
+      "type": "tool/start",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "name": "agent_teams_status",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 112,
+      "type": "tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "filesystem",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "path",
+        "sha256",
+        "content",
+        "storage",
+        "artifacts",
+        "execution",
+        "localWorkspace",
+        "workspaceRevision"
+      ]
+    },
+    {
+      "seq": 113,
+      "type": "session/tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": null,
+      "isError": null,
+      "resultKeys": [],
+      "dataKeys": [
+        "turn",
+        "step",
+        "message"
+      ],
+      "valueKeys": []
+    },
+    {
+      "seq": 114,
+      "type": "session/tool/call",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "knowledge_read",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 115,
+      "type": "tool/start",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": null,
+      "name": "knowledge_read",
+      "args": {},
+      "textChars": {}
+    },
+    {
+      "seq": 118,
+      "type": "tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": "knowledge_read",
+      "isError": false,
+      "resultKeys": [
+        "isError",
+        "content",
+        "value"
+      ],
+      "dataKeys": [
+        "name",
+        "result"
+      ],
+      "valueKeys": [
+        "id",
+        "documentId",
+        "version",
+        "lineStart",
+        "lineEnd",
+        "content",
+        "title",
+        "spaceId",
+        "sha256",
+        "source"
+      ]
+    },
+    {
+      "seq": 119,
+      "type": "session/tool/result",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "name": null,
+      "isError": null,
+      "resultKeys": [],
+      "dataKeys": [
+        "turn",
+        "step",
+        "message"
+      ],
+      "valueKeys": []
+    },
+    {
+      "seq": 125,
+      "type": "model/request",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "purpose": "execution",
+      "dataKeys": [
+        "provider",
+        "model",
+        "purpose",
+        "messages",
+        "tools",
+        "maxTokens"
+      ]
+    },
+    {
+      "seq": 126,
+      "type": "budget/stopped",
+      "sessionId": null,
+      "taskId": "t2-qa",
+      "diagnostic": {
+        "kind": "stopped",
+        "taskId": "t2-qa",
+        "limit": 0.2231997,
+        "calls": 40,
+        "code": "TASK_TURN_LIMIT"
+      }
+    },
+    {
+      "seq": 130,
+      "type": "session/turn/end",
+      "sessionId": "19a53f48-3de2-4002-b224-df4eca2480a2",
+      "taskId": "t2",
+      "dataKeys": [
+        "turn",
+        "reason"
+      ],
+      "dataChars": 111,
+      "reason": {
+        "kind": "error",
+        "error": {
+          "message": "此员工在该任务的模型调用次数已达上限",
+          "code": "TASK_TURN_LIMIT"
+        }
+      }
+    },
+    {
+      "seq": 145,
+      "type": "session/turn/end",
+      "sessionId": "8725f1c9-6cac-4367-b83a-0507316d7b2e",
+      "taskId": null,
+      "dataKeys": [
+        "turn",
+        "reason"
+      ],
+      "dataChars": 111,
+      "reason": {
+        "kind": "error",
+        "error": {
+          "message": "此员工在该任务的模型调用次数已达上限",
+          "code": "TASK_TURN_LIMIT"
+        }
+      }
+    }
+  ],
+  "verificationModelCalls": 0
+}

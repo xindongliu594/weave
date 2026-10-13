@@ -1,0 +1,20 @@
+{
+  "runId": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "parentRunId": "70d82bac-8714-41e2-ac78-921e53cea106",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "proposal": {
+    "maxBudget": 0.42,
+    "maxModelCalls": 64,
+    "taskCallLimits": {
+      "t2-qa": 40,
+      "t3-review": 40
+    },
+    "taskBudgetLimits": {
+      "t2-qa": 0.2231997,
+      "t3-review": 0.2
+    }
+  }
+}
