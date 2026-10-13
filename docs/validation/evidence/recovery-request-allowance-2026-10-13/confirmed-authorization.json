@@ -1,0 +1,22 @@
+{
+  "authorizationSource": "User reply: 同意重新分配，继续验收",
+  "requestCountIncreaseAuthorized": true,
+  "chosenProposedCallCeilings": {
+    "maxModelCalls": 72,
+    "maxTaskModelCalls": 45
+  },
+  "applied": false,
+  "paidCalls": 0,
+  "pendingRedistribution": {
+    "inventoryMaxBudget": 0.48,
+    "laterProjectMaxBudget": 0.03,
+    "stageCap": 0.64,
+    "cumulativeCap": 2.72,
+    "stageWorstCase": 0.6368031,
+    "cumulativeWorstCase": 2.7076215
+  },
+  "oldHistoryReset": false,
+  "permissionExpansion": false,
+  "allocationApproved": true,
+  "operationScope": "One real resource proposal and one resume; stop on terminal failure; no automatic repeat."
+}

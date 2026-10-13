@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-13T02:01:04.216255+00:00",
+  "runId": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "sourceStatus": "failed",
+  "integrity": "ok",
+  "operationStatus": "http-error",
+  "apiHttpStatus": 502,
+  "code": "GATEWAY_REJECTED",
+  "upstreamStatus": 429,
+  "receipts": [
+    {
+      "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+      "purpose": "预算补充规划",
+      "amount": 0.0025932,
+      "status": "uncertain",
+      "createdAt": "2026-10-13T01:54:36.780Z",
+      "providerStatus": 429
+    }
+  ],
+  "usageRows": 519,
+  "known": 2.3834214,
+  "held": 0.0737781,
+  "occupied": 2.4571995,
+  "stageOccupied": 0.3863811,
+  "projectCosts": {
+    "recordedCost": 0.2569848,
+    "reserved": 0.0025932,
+    "availableBudget": 0.16042199999999998,
+    "pendingCount": 0,
+    "uncertainCount": 1
+  },
+  "calls": {
+    "used": 56,
+    "limit": 64,
+    "remaining": 8
+  },
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "unknownOperationCount": 0,
+  "candidateCreated": false,
+  "resumeSubmitted": false,
+  "employeeRequestsDispatched": 0,
+  "responseUsagePresent": false,
+  "verificationModelCalls": 0,
+  "newDispatchedPlanningRequests": 1,
+  "planningInputTokens": null,
+  "planningOutputTokens": null
+}

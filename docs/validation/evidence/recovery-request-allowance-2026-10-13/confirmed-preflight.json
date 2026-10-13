@@ -1,0 +1,93 @@
+{
+  "checkedAt": "2026-10-13T01:53:57.426072+00:00",
+  "service": [
+    "ActiveState=active",
+    "SubState=running",
+    "MainPID=604548"
+  ],
+  "database": "connected",
+  "projectCount": 10,
+  "activeProjectCount": 0,
+  "usageRows": 519,
+  "known": 2.3834214,
+  "held": 0.0711849,
+  "occupied": 2.4546063,
+  "cumulativeCap": 2.72,
+  "stageOccupied": 0.3837879,
+  "stageCap": 0.64,
+  "planningUsage": [
+    {
+      "usageId": "a0b9522d-fee9-4bb4-8afe-cfb16effe5af",
+      "cost": 0.0005745,
+      "inputTokens": 1375,
+      "outputTokens": 135
+    }
+  ],
+  "runId": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+  "status": "failed",
+  "integrity": "ok",
+  "projectCosts": {
+    "recordedCost": 0.2569848,
+    "reserved": 0,
+    "availableBudget": 0.16301519999999997
+  },
+  "calls": {
+    "used": 56,
+    "limit": 64,
+    "remaining": 8
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "recordedCost": 0.018502499999999998,
+      "reserved": 0,
+      "budgetLimit": 0.05,
+      "calls": 5,
+      "callLimit": 16,
+      "completed": true
+    },
+    {
+      "id": "t2-qa",
+      "recordedCost": 0.1373163,
+      "reserved": 0,
+      "budgetLimit": 0.2231997,
+      "calls": 40,
+      "callLimit": 40,
+      "completed": false
+    },
+    {
+      "id": "t3-review",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.2,
+      "calls": 0,
+      "callLimit": 40,
+      "completed": false
+    }
+  ],
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "unknownOperationCount": 0,
+  "successWorkCounts": [
+    2
+  ],
+  "candidateCount": 0,
+  "knowledgePins": [
+    {
+      "documentId": "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+      "version": 1,
+      "sha256": "3cbf433b3ac0d7fb3067b6bf11c9b29272a9c4453464a3468ec564314ff0698f"
+    },
+    {
+      "documentId": "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+      "version": 1,
+      "sha256": "e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f"
+    }
+  ],
+  "delivery": {
+    "bytes": 2742,
+    "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+  },
+  "verificationModelCalls": 0
+}
