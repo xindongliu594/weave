@@ -12,6 +12,7 @@ import { EmployeeHostFactory } from './employee-hosts.mjs';
 import { createRunArchive, readRun } from './trace-store.mjs';
 import { stageApprovedTeam, teamTaskPlan } from './handoff.mjs';
 import { Semaphore } from './limits.mjs';
+import { ExecutionBudget } from './budget.mjs';
 
 const reply = text => [
   { type: 'block-start', index: 0, blockType: 'text' },
@@ -19,7 +20,7 @@ const reply = text => [
   { type: 'finish', reason: { kind: 'stop' } },
 ];
 const task = { taskId: 'approved-qa', runtimeTaskId: 't2', attemptId: 'fixed-attempt' };
-async function fixture(t, pending, stream) {
+async function fixture(t, pending, stream, handoffClosure) {
   const root = await mkdtemp(join(tmpdir(), 'handoff-reminder-'));
   const requests = [], blocked = [];
   const adapter = new class extends LlmAdapter {
@@ -29,7 +30,7 @@ async function fixture(t, pending, stream) {
   const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions') });
   const require = createRequire(import.meta.url), baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
   const factory = new EmployeeHostFactory({ coordinator: host.ctx, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
-    pendingCompletion: pending, onIncompleteCompletion: error => blocked.push(error),
+    pendingCompletion: pending, handoffClosure, onIncompleteCompletion: error => blocked.push(error),
     loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
   t.after(async () => { await factory.close(); await host.close(); await rm(root, { recursive: true, force: true }); });
   const handle = await factory.createAgent(host.ctx, { sessionId: randomUUID(), meta: { cwd: root }, agentOptions: { provider: 'fixture', model: 'fixture' } });
@@ -38,6 +39,54 @@ async function fixture(t, pending, stream) {
   return { requests, blocked, events: readRun(join(root, 'runs'), archive.id).events, agent: handle.agent,
     factory,host,handle,root,archive };
 }
+
+test('the last-call native pre-step notice runs before dispatch and unsealed text stops without another request',async t=>{
+ const f=await fixture(t,()=>task,()=>reply('No formal handoff submitted.'),()=>task);
+ assert.equal(f.requests.length,1,'cannot issue a second request after using the last allowance');
+ const notice=f.requests[0].messages.find(m=>m.source?.summary==='最后一次调用仅用于正式交接');
+ assert.ok(notice);assert.match(JSON.stringify(notice),/agent_teams_update_task/);
+ assert.equal(f.events.filter(e=>e.type==='handoff/closure-started').length,1);
+ assert.equal(f.events.filter(e=>e.type==='handoff/reminder').length,0);
+ assert.equal(f.blocked[0]?.code,'HANDOFF_NOT_SUBMITTED');
+});
+
+for(const scope of ['task','project'])test(`production Host detects the last ${scope} call and seals the native assigned attempt`,{timeout:15000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'native-closure-')),requests=[],blocked=[];
+ const task={id:'qa',kind:'work',subject:'Closure protocol only',assignee:'qa',dependencies:[],inputs:[],outputs:[],maxModelCalls:scope==='task'?2:4};
+ const snapshot={policy:{maxBudget:1,maxModelCalls:scope==='project'?2:4,maxTaskModelCalls:4,contextBytes:64000},tasks:[task],agents:[{id:'manager',role:'manager',modelId:'manager',tools:[]},{id:'qa',role:'member',modelId:'qa',tools:[]}]};
+ const archive=createRunArchive(join(root,'runs'),snapshot),artifacts=join(root,'artifacts');await mkdir(artifacts);
+ const adapter=new class extends LlmAdapter {
+  budget=new ExecutionBudget({maxBudget:1,maxModelCalls:scope==='project'?2:4,tasks:[task]});
+  async *stream(options){
+   if(options.model!=='qa'){yield*reply('Fixture captain');return;}
+   requests.push(options);
+   const ticket=this.budget.reserve(.001,{taskId:'qa'});ticket.settle(.00001);
+   const {runtimeTaskId:id,attemptId:attempt}=this.attribution(options.sessionId);
+   yield {type:'block-start',index:0,blockType:'tool-call'};
+   yield {type:'block-end',index:0,block:{type:'tool-call',id:randomUUID(),name:'agent_teams_update_task',arguments:JSON.stringify({task_id:id,attempt_id:attempt,status:requests.length===1?'in_progress':'completed',output:'Native protocol result; no real model acceptance.'})}};
+   yield {type:'finish',reason:{kind:'tool-calls'}};
+  }
+ }();
+ const host=await createTeamHost({adapter,provider:'fixture',archive,sessionRoot:join(root,'sessions'),product:{snapshot,sandbox:{root:artifacts,revision:()=> 'fixture'},gate:new Semaphore(1),onHandoffBlocked:e=>blocked.push(e)}});
+ t.after(async()=>{await host.close();await rm(root,{recursive:true,force:true});});
+ const captain=await host.captain({cwd:root,model:'manager'});
+ const created=await stageApprovedTeam(host,captain,{name:'closure-fixture',members:[{name:'qa',provider:'fixture',model:'qa'}],tasks:teamTaskPlan(snapshot.tasks)});
+ host.bindTaskMapping(created.tasks,created.team_id);
+ await host.call(captain,'agent_teams_approve',{confirmation:'Disposable native closure fixture'});
+ const deadline=Date.now()+10000;
+ while(Date.now()<deadline&&!blocked.length&&!readRun(join(root,'runs'),archive.id).events.some(e=>e.type==='handoff/accepted')){
+  await host.call(captain,'agent_teams_status',{},AbortSignal.timeout(10000));
+  await new Promise(done=>setTimeout(done,25));
+ }
+ const events=readRun(join(root,'runs'),archive.id).events;
+ assert.equal(requests.length,2,JSON.stringify(events.filter(e=>['tool/result','model/error','handoff/blocked','handoff/closure-started'].includes(e.type)).map(e=>({type:e.type,name:e.data.name,error:e.data.result?.error,code:e.data.code}))));
+ assert.equal(events.filter(e=>e.type==='handoff/closure-started').length,1,JSON.stringify(events.filter(e=>e.type==='model/error'||e.type==='handoff/blocked').map(e=>e.data)));
+ assert.deepEqual(events.filter(e=>e.type==='handoff/accepted').map(e=>e.data.taskId),['qa']);
+ assert.equal(adapter.budget.tasks.get('qa').calls,2);assert.equal(blocked.length,0);
+ assert.ok(requests[1].messages.some(m=>m.source?.summary==='最后一次调用仅用于正式交接'));
+ assert.ok(!requests[0].messages.some(m=>m.source?.summary==='最后一次调用仅用于正式交接'));
+ assert.equal(events.some(e=>e.type==='handoff/closure-started'&&e.sessionId===captain.id),false);
+});
 
 test('a plain final answer gets one native same-attempt handoff reminder, never automatic success', async t => {
   const f = await fixture(t, () => task, () => reply('I have finished reviewing the fixture.'));

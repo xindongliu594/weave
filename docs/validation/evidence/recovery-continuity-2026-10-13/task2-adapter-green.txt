@@ -1,0 +1,10 @@
+✔ host handoff phase restricts the final request and never spends its allowance on compaction (7.1505ms)
+✔ handoff response cannot dispatch other tools or a nonterminal update; real usage is still recorded (36.4284ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 226.9847

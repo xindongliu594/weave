@@ -1,0 +1,13 @@
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (20842.5688ms)
+✔ user cancellation still aborts native cold resume without executing a later task (2532.4254ms)
+✔ missing formal QA handoff stops product admission before a coordinator or manager can take over (2709.3219ms)
+✔ a formal negative QA verdict remains a failed review and never unlocks manager acceptance (3010.0943ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (15194.4413ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44749.0145

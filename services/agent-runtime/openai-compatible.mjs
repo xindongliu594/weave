@@ -388,8 +388,16 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const source = [...(options.system ? [{ role: 'system', content: options.system }] : []), ...options.messages.map(toWireMessage)];
     const limit = Math.min(this.contextBytes, route.contextBytes ?? this.contextBytes);
     const checkpoint = options.messages.findLastIndex(message => message.source?.kind === 'plugin' && message.source.plugin === 'compact');
-    const tools = options.tools?.map(tool => ({ type: 'function', function: { name: tool.name, description: tool.description, parameters: structuredClone(tool.parameters) } }));
     const attribution={ ...(this.attribution?.(options.sessionId)??{sessionId:options.sessionId}), requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution' };
+    const closure=this.handoffClosure?.(options.sessionId);
+    if(closure){
+      if(closure.taskId!==attribution.taskId||closure.attemptId!==attribution.attemptId)throw new LlmError('交接阶段与当前任务身份不一致','HANDOFF_IDENTITY');
+      if(options.purpose==='compaction')throw new LlmError('最后一次调用保留用于正式交接，不能用于上下文压缩','HANDOFF_CALL_RESERVED');
+      if(!options.tools?.some(tool=>tool.name==='agent_teams_update_task'))throw new LlmError('交接阶段缺少正式任务更新工具，未发送请求','HANDOFF_TOOL_MISSING');
+      attribution.requestPurpose='handoff';
+      attribution.handoffTaskStatus=closure.taskStatus;
+    }
+    const tools = options.tools?.filter(tool=>!closure||tool.name==='agent_teams_update_task').map(tool => ({ type: 'function', function: { name: tool.name, description: tool.description, parameters: structuredClone(tool.parameters) } }));
     const fallback = !!options.fallbackAttempted || !!attribution.reworkRound;
     // A known truncated summary never grants permission to discard its source.
     // The trusted employee context gate applies to preview AND dispatch, so a
@@ -492,7 +500,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const activeRequest = { id: usageId, dispatched: false, done: new Promise(resolve => { finishRequest = resolve; }) };
     this.activeRequests.set(usageId, activeRequest);
     try {
-      if(fitted.removed || fitted.deduplicatedGroups || fitted.supersededRuntimeSnapshots) this.onContext?.({ sessionId: options.sessionId, modelId: route.id, requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution', removedGroups: fitted.removed,
+      if(fitted.removed || fitted.deduplicatedGroups || fitted.supersededRuntimeSnapshots) this.onContext?.({ sessionId: options.sessionId, modelId: route.id, requestPurpose: attribution.requestPurpose, removedGroups: fitted.removed,
         deduplicatedGroups:fitted.deduplicatedGroups,deduplicatedBytes:fitted.deduplicatedBytes,evidenceDuplicates:fitted.evidenceDuplicates,supersededReads:fitted.supersededReads,
         supersededRuntimeSnapshots:fitted.supersededRuntimeSnapshots,
         beforeBytes:fitted.beforeBytes,afterBytes:fitted.afterBytes,inputUpperBound:fitted.inputUpperBound,reservation,availableBudget:fitted.availableBudget,maxTokens,
@@ -549,6 +557,8 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       catch (error) { throw new LlmError(error.message, error.code ?? 'INVALID_RESPONSE'); }
       const message = payload.choices?.[0]?.message;
       if (!message || typeof message !== 'object') throw new LlmError('中转站响应缺少 assistant message', 'INVALID_RESPONSE');
+      if(attribution.requestPurpose==='handoff'&&!message.tool_calls?.length)
+        throw new LlmError('最后一次请求未提交正式交接，实际费用已记录，停止后续调用','HANDOFF_NOT_SUBMITTED');
       // Execution cannot treat a capped response (text or tool arguments) as
       // completed work. Known usage has already been durably recorded above.
       // Compaction owns its separate incomplete-checkpoint/retained-source gate.
@@ -560,6 +570,13 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       if (Array.isArray(message.tool_calls)) {
         for (const call of message.tool_calls) {
           if (!call || typeof call.id !== 'string' || typeof call.function?.name !== 'string' || typeof call.function?.arguments !== 'string') throw new LlmError('中转站返回了无效工具调用', 'INVALID_RESPONSE');
+          if(attribution.requestPurpose==='handoff'){
+            let args;try{args=JSON.parse(call.function.arguments);}catch{throw new LlmError('交接参数不是完整JSON，未执行工具','HANDOFF_ONLY');}
+            if(call.function.name!=='agent_teams_update_task'||!['completed','failed'].includes(args?.status))
+              throw new LlmError('最后一次调用仅能提交正式完成或失败交接，未执行其他操作','HANDOFF_ONLY');
+            if(args.status==='completed'&&attribution.handoffTaskStatus==='claimed')
+              throw new LlmError('任务尚未进入进行中，不能从已认领直接提交完成；未执行交接','HANDOFF_ONLY');
+          }
           if (protocol === 'responses' && !body.tools?.some(tool => tool.name === call.function.name)) throw new LlmError('Responses 返回了本轮未授权的工具调用', 'INVALID_RESPONSE');
           // The known fee was awaited above. Check every call before yielding
           // any block; a capped, incomplete JSON call cannot reach native tools.

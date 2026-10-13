@@ -47,7 +47,7 @@ export class RunCoordinator {
     const agent=run?.snapshot?.agents?.find((item:any)=>item.id===u.agentId||item.employeeId===u.employeeId);
     const departmentId=agent?.sourceDepartmentId??run?.snapshot?.departmentId??null;
     await pool.query(`INSERT INTO usage(id,model_id,project_id,department_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
-      SELECT $1,$2,project_id,$7,id,$3,$4,$5,$15,$8,$9,$10,$11,$12,$13,$14 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,departmentId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null,u.requestPurpose==='compaction'?'上下文摘要':'项目执行']);
+      SELECT $1,$2,project_id,$7,id,$3,$4,$5,$15,$8,$9,$10,$11,$12,$13,$14 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,departmentId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null,u.requestPurpose==='compaction'?'上下文摘要':u.requestPurpose==='handoff'?'正式交接':'项目执行']);
   }
   async reserve(runId:string,data:any,signal?:AbortSignal){
     signal?.throwIfAborted();
@@ -65,7 +65,7 @@ export class RunCoordinator {
     const agent=run.snapshot.agents.find((item:any)=>item.id===data.agentId||item.employeeId===data.employeeId)??(!data.agentId&&!data.employeeId?run.snapshot.agents[0]:undefined);
     if(!agent)throw new AppError(422,'调用员工不在批准快照中');
     const billingDepartmentId=agent.sourceDepartmentId??run.snapshot.departmentId;
-    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,signal,authorize:async(db,row)=>{await assertRunModels(row.snapshot,db);await assertRunAuthorization(row,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
+    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':data.requestPurpose==='handoff'?'正式交接':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,signal,authorize:async(db,row)=>{await assertRunModels(row.snapshot,db);await assertRunAuthorization(row,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();

@@ -7,6 +7,50 @@ import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
 const route = { id: 'model-record', name: 'Relay model', wireModel: 'upstream-model', baseUrl: 'https://relay.invalid/v1', apiKey: 'not-a-real-key', inputRate: 1, outputRate: 2, maxOutputTokens: 1000 };
 const message = { id: 'message-1', role: 'user', source: { kind: 'user' }, content: [{ type: 'text', text: 'Do the task' }] };
 
+test('host handoff phase restricts the final request and never spends its allowance on compaction',()=>{
+ const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,maxModelCalls:5,tasks:[{id:'qa',maxModelCalls:3}]});
+ const identity={taskId:'qa',runtimeTaskId:'t2',attemptId:'current'};
+ adapter.attribution=()=>identity;adapter.handoffClosure=()=>identity;
+ const tools=['filesystem','knowledge_read','agent_teams_update_task'].map(name=>({name,parameters:{type:'object'}}));
+ const options={model:route.id,sessionId:'worker',messages:[message],tools};
+ const request=adapter.prepareRequest(options);
+ assert.deepEqual(request.body.tools.map(t=>t.function.name),['agent_teams_update_task']);
+ assert.equal(request.attribution.requestPurpose,'handoff');
+ assert.throws(()=>adapter.prepareRequest({...options,purpose:'compaction'}),error=>error.code==='HANDOFF_CALL_RESERVED');
+ assert.throws(()=>adapter.prepareRequest({...options,tools:tools.slice(0,2)}),error=>error.code==='HANDOFF_TOOL_MISSING');
+ assert.equal(adapter.budget.run.calls,0);assert.equal(adapter.budget.tasks.get('qa').calls,0);
+ adapter.attribution=()=>({...identity,attemptId:'foreign'});
+ assert.throws(()=>adapter.prepareRequest(options),error=>error.code==='HANDOFF_IDENTITY');
+});
+
+test('handoff response cannot dispatch other tools or a nonterminal update; real usage is still recorded',async()=>{
+ const original=globalThis.fetch;
+ try {
+  for(const [name,args,taskStatus] of [['filesystem',{path:'cases.md'}],['agent_teams_update_task',{status:'in_progress'}],['agent_teams_update_task',{status:'completed'},'claimed']]){
+   const usage=[],adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,onUsage:u=>usage.push(u)});
+   const identity={taskId:'qa',runtimeTaskId:'t2',attemptId:'current',taskStatus};
+   adapter.attribution=()=>identity;adapter.handoffClosure=()=>identity;
+   globalThis.fetch=async()=>new Response(JSON.stringify({choices:[{message:{tool_calls:[{id:'call',function:{name,arguments:JSON.stringify(args)}}]},finish_reason:'tool_calls'}],usage:{prompt_tokens:10,completion_tokens:2}}),{status:200});
+   const blocks=[];
+   await assert.rejects(async()=>{for await(const block of adapter.stream({model:route.id,sessionId:'worker',messages:[message],tools:[{name:'agent_teams_update_task',parameters:{type:'object'}}]}))blocks.push(block);},error=>error.code==='HANDOFF_ONLY');
+   assert.equal(blocks.some(block=>block.type==='block-end'),false);
+   assert.equal(usage.length,1);assert.equal(usage[0].requestPurpose,'handoff');
+  }
+ }finally{globalThis.fetch=original;}
+});
+
+test('handoff-only plain text cannot cause another request after a concurrent last-call transition',async()=>{
+ const original=globalThis.fetch,usage=[],requests=[];
+ try {
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,onUsage:u=>usage.push(u),onRequest:r=>requests.push(r)});
+  const identity={taskId:'qa',attemptId:'fresh'};adapter.attribution=()=>identity;adapter.handoffClosure=()=>identity;
+  globalThis.fetch=async()=>new Response(JSON.stringify({choices:[{message:{content:'Plain text is not a formal handoff.'},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:2}}),{status:200});
+  const blocks=[];
+  await assert.rejects(async()=>{for await(const block of adapter.stream({model:route.id,sessionId:'worker',messages:[message],tools:[{name:'agent_teams_update_task',parameters:{type:'object'}}]}))blocks.push(block);},e=>e.code==='HANDOFF_NOT_SUBMITTED');
+  assert.equal(requests.length,1);assert.equal(usage.length,1);assert.equal(blocks.some(b=>b.type==='block-end'),false);
+ }finally{globalThis.fetch=original;}
+});
+
 const runtimeSnapshot=(text,extra=[])=>{
   const sections=[{name:'department:approved-context',text},...extra];
   return {role:'user',source:{kind:'plugin',plugin:'@deepseek-ai/dsh-system-prompt',form:'snapshot',sections},content:[{type:'text',text:joinContextSections(sections)}]};

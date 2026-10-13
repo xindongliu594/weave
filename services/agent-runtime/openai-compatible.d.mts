@@ -1,6 +1,6 @@
 import type { CompletionProtocol } from './completion-protocol.mjs';
 export type RelayRoute = { id: string; name: string; wireModel: string; baseUrl: string; apiKey: string; inputRate: number; outputRate: number; maxOutputTokens: number; contextBytes?: number; contextWindowTokens?: number; protocol?: CompletionProtocol; thinkingMode?: 'disabled' };
-export type RuntimeUsage = { id: string; modelId: string; inputTokens: number; outputTokens: number; cost: number; sessionId?: string; agentId?: string; employeeId?: string; taskId?: string; runtimeTaskId?: string; reworkRound?: number; attemptId?: string; requestId?: string; durationMs?: number; requestPurpose?: 'compaction'|'execution' };
+export type RuntimeUsage = { id: string; modelId: string; inputTokens: number; outputTokens: number; cost: number; sessionId?: string; agentId?: string; employeeId?: string; taskId?: string; runtimeTaskId?: string; reworkRound?: number; attemptId?: string; requestId?: string; durationMs?: number; requestPurpose?: 'compaction'|'execution'|'handoff' };
 export type RuntimeResponseMetadata = { id: string; providerStatus: number; providerRequestId?: string; upstreamRequestId?: string; responseRequestId?: string };
 export type RuntimeCallError = { id: string; dispatched: boolean; code: string; providerStatus?: number; providerRequestId?: string; upstreamRequestId?: string; responseRequestId?: string };
 export type PreparedRelayRequest = {

@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-13T07:51:56.091985+00:00",
+  "deploymentOutcome": "unknown",
+  "attempts": 1,
+  "precheck": {
+    "ready": true,
+    "projectCount": 10,
+    "usageRecords": 519,
+    "packetVerified": true,
+    "modelCalls": 0
+  },
+  "packetSha256": "a1eaa9529e715474fd29e2d6e8d86c3eeb33b92ebbc50787061ac9e2e5e6413b",
+  "expectedNewRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013",
+  "previousConfirmedRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-headroom2-20261013",
+  "applyOutput": "jj-deployment.txt",
+  "applyEnd": "SSH connection reset during tests; no final proof or complete test summary received",
+  "postDisconnectChecks": [
+    {
+      "operation": "read-only service/release/fees audit",
+      "outcome": "local timeout after 45 seconds; no usable response"
+    },
+    {
+      "operation": "read-only SSH process/service audit",
+      "outcome": "SSH connection to 100.90.190.33:22 timed out",
+      "output": "jj-process-readonly.txt"
+    },
+    {
+      "operation": "Windows 4312 health GET",
+      "outcome": "connection refused"
+    }
+  ],
+  "activeReleaseConfirmed": false,
+  "remoteDeploymentProcessConfirmed": false,
+  "remotePassedProofReceived": false,
+  "rollbackConfirmed": false,
+  "postDeploymentDataInvariantsVerified": false,
+  "applyReplayed": false,
+  "realModelCallsInPhase": 0,
+  "unknownFeesReleased": 0,
+  "nextAction": "Read service, release proof and process first when JJ is reachable; do not rerun apply blindly"
+}

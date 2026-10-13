@@ -1,0 +1,87 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (8213.0475ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (567.9523ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (216.2249ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (255.0869ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (200.6978ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (192.2284ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (170.6627ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (182.3131ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (148.432ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (125.9857ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (274.3746ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (187.4838ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (208.4906ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (325.5225ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (137.0604ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (171.1574ms)
+✔ shared project money rejects a full correction tranche before planning despite sufficient node money (140.855ms)
+✔ late project expenses prevent confirming a previously valid correction candidate (140.7573ms)
+✔ next-tranche floor also reserves the bounded planning request before paid admission (134.0755ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (182.1966ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (234.8394ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (234.1858ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1436.7078ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31843.9382
+✔ demand discussion records actual usage without estimating or reserving an execution budget (4187.1131ms)
+✔ usage-only accounting cannot be applied to execution or project identities (38.5477ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (112.1084ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (195.6664ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (283.4615ms)
+✔ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (153.6316ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (400.5705ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (179.5867ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (202.0455ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (93.8662ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (370.3008ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8187.9948
+✔ normal execution includes the saved planning cost in project spend (1.423ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (10.2355ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.4119ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.5725ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (0.8839ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (0.7502ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 916.9146
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (798.7284ms)
+✔ resource history retains full wire schema overhead without counting message contents or inherited history (174.47ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (202.5202ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (326.2133ms)
+✔ other project/version registration cannot leak into this exact version (225.9069ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (246.0535ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (88.2698ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (99.0828ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (59.049ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (219.3251ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (89.1651ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (93.0385ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (31.9657ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4816.9466

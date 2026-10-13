@@ -16,7 +16,7 @@ const prompt = text => createUserMessage({ content: [{ type: 'text', text }], so
 // Local transport fixtures exercise the installed DSH summarizer's real
 // truncation, durable replacement and shared admission seams, not model quality.
 async function checkpointCapFixture({ legacy = false, taskCap = 2048, routeCap = 2048, defaultEntry = false, pressureAfterSummary = false,
-  omitSummaryUsage = false, rejectSummaryFee = false, unknownSummaryHop = false } = {}) {
+  omitSummaryUsage = false, rejectSummaryFee = false, unknownSummaryHop = false,callLimit=10 } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'context-approved-summary-cap-'));
   const archive = createRunArchive(root, { title: 'approved checkpoint output cap' });
   const route = { id: 'summary-cap', name: 'local fixture', wireModel: 'local-fixture', baseUrl: 'https://fixture.invalid/v1',
@@ -44,9 +44,9 @@ async function checkpointCapFixture({ legacy = false, taskCap = 2048, routeCap =
         prompt_tokens: summary ? 8000 : ++executions === 1 ? 7000 : pressureAfterSummary ? 19000 : executions === 2 ? 12000 : 2000,
         completion_tokens: summary ? Math.min(summaryTokens, body.max_tokens) : 5 } }) });
   });
-  const task = { id: 'dev', assigneeId: 'developer', maxOutputTokens: taskCap, maxBudget: .4, maxModelCalls: 10 };
+  const task = { id: 'dev', assigneeId: 'developer', maxOutputTokens: taskCap, maxBudget: .4, maxModelCalls: callLimit };
   const adapter = new OpenAiCompatibleAdapter({ routes: unknownSummaryHop ? [route, backup] : [route], tasks: [task], contextBytes: 64000, maxBudget: .4,
-    maxModelCalls: 10, beforeRequest: async () => {},
+    maxModelCalls: callLimit, beforeRequest: async () => {},
     onCallError: data => archive.append('billing/unconfirmed', data),
     onFallback: data => archive.append('model/fallback', data, { sessionId: data.sessionId }),
     onRequest: data => {
@@ -88,6 +88,27 @@ const reply = text => [
 ];
 async function turn(agent, text) { agent.followup(prompt(text)); await agent.whenIdle(); }
 async function seed(agent, marker) { await turn(agent, marker + 'x'.repeat(4500)); await turn(agent, 'recent work ' + 'y'.repeat(3000)); }
+
+test('last-call handoff skips automatic summary pressure, keeps original evidence and still obeys the hard size limit',{timeout:15000},async()=>{
+ for(const [oversized,late] of [[false,false],[false,true],[true,false],[true,true]]){
+  const f=await checkpointCapFixture({callLimit:3});
+  try{
+   await f.seed();
+   let checks=0;
+   f.adapter.handoffClosure=id=>++checks===1&&late?undefined:f.adapter.budget.run.maxCalls-f.adapter.budget.run.calls===1?f.adapter.attribution(id):undefined;
+   await turn(f.agent,oversized?'OVERSIZED_LAST_HANDOFF '+'q'.repeat(70000):'Submit the last handoff.');
+   assert.equal(f.wires.filter(w=>w.summary).length,0,'no paid compaction consumes the handoff allowance');
+   assert.ok(readRun(f.root,f.archive.id).events.some(e=>e.type==='context/summary-skipped-for-handoff'),JSON.stringify({oversized,late,checks,errors:f.agent.session.snapshotEvents().filter(e=>e.type==='turn/end'||e.type==='compaction/end').map(e=>e.data)}));
+   assert.ok(JSON.stringify(f.agent.session.deriveMessages()).includes('ORIGINAL_SOURCE_EVIDENCE'));
+   if(oversized){assert.equal(f.wires.length,2);assert.equal(f.adapter.budget.run.calls,2);}
+   else{
+    assert.equal(f.wires.length,3);assert.equal(f.usages.at(-1).requestPurpose,'handoff');
+    assert.ok(JSON.stringify(f.wires.at(-1).body).includes('ORIGINAL_SOURCE_EVIDENCE'));
+    assert.equal(f.adapter.budget.run.calls,3);
+   }
+  }finally{await f.close();}
+ }
+});
 
 test('installed DSH discards a known-fee truncated checkpoint and continues with complete original history without a paid summary retry', { timeout: 15000 }, async () => {
   const f = await checkpointCapFixture({ legacy: true });

@@ -12,12 +12,13 @@ const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, onIncompleteCompletion }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, onIncompleteCompletion });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
     this.completionReminders = new Set();
+    this.closureNotices = new Set();
   }
 
   createAgent(ownerCtx, options) { return this.materialize(ownerCtx, options, false); }
@@ -116,6 +117,19 @@ export class EmployeeHostFactory {
       }
       const setup = async (agentCtx, agent) => {
         const prepared = await options.setup?.(agentCtx, agent);
+        if(this.handoffClosure)agentCtx.on('agent/pre-step',async(event,next)=>{
+          const decision=await next();
+          if(decision.kind!=='enter'||event.signal.aborted)return decision;
+          const work=this.handoffClosure(event.agent);if(!work)return decision;
+          const key=JSON.stringify([event.agent.id,work.taskId,work.attemptId]);
+          if(this.closureNotices.has(key))return decision;
+          this.closureNotices.add(key);this.completionReminders.add(key);
+          this.archive?.append('handoff/closure-started',{...work,reason:'last-authorized-call'},{sessionId:event.agent.id,taskId:work.taskId,attemptId:work.attemptId});
+          const notice=createUserMessage({content:[{type:'text',text:
+            `这是当前任务或项目最后一次已授权调用，仅用于正式交接。不要认领、检索、读取、写文件或再调用其他工具。根据已经核对的真实证据调用 agent_teams_update_task：task_id=${work.runtimeTaskId}、attempt_id=${work.attemptId}。${work.taskStatus==='claimed'?'当前仍为claimed，未进入in_progress，不能直接提交完成；请status=failed报告无法完成本次验收。':''}验收全部满足才status=completed；证据不足则status=failed，output如实报告缺项，按合同填写verdict、findings及必需字段。不编造成功，不改变额度或权限；文字回复不能完成任务，本轮未交接即停止。`}],
+            source:{kind:'plugin',plugin:'weiwu-handoff',form:'notice',summary:'最后一次调用仅用于正式交接'}});
+          return {...decision,messages:[...decision.messages,notice]};
+        });
         if (this.pendingCompletion) agentCtx.on('agent/turn-stopping', event => {
           event.signal.throwIfAborted();
           const work = this.pendingCompletion(event.agent);

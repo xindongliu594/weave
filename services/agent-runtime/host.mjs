@@ -70,6 +70,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     }
     const notifyRetained = employeeContext.onRetainOriginal;
     employeeContext = { ...employeeContext, requestPreview: options => adapter.prepareRequest(options),
+      shouldDeferSummary:sessionId=>Boolean(adapter.handoffClosure?.(sessionId)),
       onRetainOriginal(sessionId, retained) {
         if (retained) guard.sessions.add(sessionId); else guard.sessions.delete(sessionId);
         notifyRetained?.(sessionId, retained);
@@ -305,16 +306,26 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     // Idle continuable members can be disposed between assignments. Their next
     // task needs the public query service to read and resume the saved session.
     await mount('@deepseek-ai/dsh-session-query');
-    employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
-      context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
-      pendingCompletion: handoff ? agent => {
+    const pendingCompletion=handoff ? agent => {
         if (agent.id === captainId) return;
         let work;
         try { work = activeWork(agent); }
         catch (error) { if (error.message.startsWith('TASK_NOT_ACTIVE:')) return; throw error; }
         if (handoff.committed.get(work.taskId)?.attemptId === work.attemptId) return;
-        return { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId };
-      } : undefined,
+        return { taskId: work.taskId, runtimeTaskId: work.task.id, attemptId: work.attemptId,taskStatus:work.task.status };
+      } : undefined;
+    const handoffClosure=agent=>{
+      const work=pendingCompletion?.(agent),budget=adapter.budget;
+      if(!work||!budget?.run)return;
+      const task=budget.tasks.get(work.taskId);if(!task)return;
+      if(Math.min(task.maxCalls-task.calls,budget.run.maxCalls-budget.run.calls)===1)return work;
+    };
+    if(handoff)adapter.handoffClosure=sessionId=>{
+      const agent=ctx.agents.get(sessionId);return agent&&handoffClosure(agent);
+    };
+    employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
+      context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
+      pendingCompletion,handoffClosure:handoff?handoffClosure:undefined,
       onIncompleteCompletion: product?.onHandoffBlocked,
       prepareToolArguments: handoff ? (agent,name,args) => {
         if(!['agent_teams_claim_task','agent_teams_update_task'].includes(name)||nativeTaskId(args.task_id)===args.task_id)return args;

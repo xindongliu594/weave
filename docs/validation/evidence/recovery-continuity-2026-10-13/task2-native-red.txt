@@ -1,0 +1,28 @@
+✖ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (1580.4764ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6170.9206
+
+✖ failing tests:
+
+test at services\agent-runtime\employee-handoff-reminder.test.mjs:42:1
+✖ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (1580.4764ms)
+  AssertionError [ERR_ASSERTION]: cannot issue a second request after using the last allowance
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-handoff-reminder.test.mjs:44:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

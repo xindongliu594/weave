@@ -1,0 +1,46 @@
+✖ production Host detects the last task call and seals the native assigned attempt (797.885ms)
+✖ production Host detects the last project call and seals the native assigned attempt (526.4793ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1763.7663
+
+✖ failing tests:
+
+test at services\agent-runtime\employee-handoff-reminder.test.mjs:53:39
+✖ production Host detects the last task call and seals the native assigned attempt (797.885ms)
+  AssertionError [ERR_ASSERTION]: []
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-handoff-reminder.test.mjs:83:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\employee-handoff-reminder.test.mjs:53:39
+✖ production Host detects the last project call and seals the native assigned attempt (526.4793ms)
+  AssertionError [ERR_ASSERTION]: []
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-handoff-reminder.test.mjs:83:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

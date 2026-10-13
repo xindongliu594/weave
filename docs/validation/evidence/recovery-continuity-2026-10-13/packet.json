@@ -1,0 +1,31 @@
+{
+  "sha256": "a1eaa9529e715474fd29e2d6e8d86c3eeb33b92ebbc50787061ac9e2e5e6413b",
+  "members": [
+    "apps/api/src/run-coordinator.ts",
+    "services/agent-runtime/checkpoint-context.mjs",
+    "services/agent-runtime/checkpoint-context.test.mjs",
+    "services/agent-runtime/employee-context.mjs",
+    "services/agent-runtime/employee-context.test.mjs",
+    "services/agent-runtime/employee-handoff-reminder.test.mjs",
+    "services/agent-runtime/employee-hosts.mjs",
+    "services/agent-runtime/host.mjs",
+    "services/agent-runtime/openai-compatible.d.mts",
+    "services/agent-runtime/openai-compatible.mjs",
+    "services/agent-runtime/openai-compatible.test.mjs"
+  ],
+  "sourceSha256": {
+    "apps/api/src/run-coordinator.ts": "52b310810b03c587fff99729a29c91c5633a20a3833290f7d9083f3b5a6b142b",
+    "services/agent-runtime/checkpoint-context.mjs": "66819200e4590bdf2105bc72186aed85c4da1b83e69e6ca26bc168e000aef9a3",
+    "services/agent-runtime/checkpoint-context.test.mjs": "ea12448dd3c6cc691f88410641de0fe40b8d39b46c5383619c98ea5a550e15de",
+    "services/agent-runtime/employee-context.mjs": "dde75247da0e4b572584282f81cb3d19af87fd4840c0ae5922352a74b56f2c67",
+    "services/agent-runtime/employee-context.test.mjs": "e5fd08a11b8a35489a7a17cf454fb78e6afa4beea0d7e97a8d546419de8bc8e4",
+    "services/agent-runtime/employee-handoff-reminder.test.mjs": "7caeda09b306586629e183acec4678efe2aac91067ca521ec716d08a98560024",
+    "services/agent-runtime/employee-hosts.mjs": "e0eb04515eef5ff4b3a43470f9a712bf47425ae428fe75b5a2d1afafb47f76b9",
+    "services/agent-runtime/host.mjs": "a165cbe74f8f7711dd44a462cfc7870bfcc66c65955bef633c4db6da2ad440b9",
+    "services/agent-runtime/openai-compatible.d.mts": "f562a256f3dba8f033646e7d8f844a67c950dd6adcf1e36a1346f9dca35ca740",
+    "services/agent-runtime/openai-compatible.mjs": "e6fa217004e38177aaf03a75d9819586380e27876b8749594ad8513a2f790b0c",
+    "services/agent-runtime/openai-compatible.test.mjs": "6ba9acfe0c8dfad402a891c17b7857076fb6d553e2652cbf059ddb26f73003ef"
+  },
+  "modelCalls": 0,
+  "newDependencies": 0
+}

@@ -1,0 +1,48 @@
+✖ explicit unknown mutation outcome outranks the subsequent native error and only matching host confirmation clears it (12.4184ms)
+✖ last-call handoff skips automatic summary pressure, keeps original evidence and still obeys the hard size limit (488.8307ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 934.434
+
+✖ failing tests:
+
+test at services\agent-runtime\checkpoint-context.test.mjs:111:1
+✖ explicit unknown mutation outcome outranks the subsequent native error and only matching host confirmation clears it (12.4184ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'unknown'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/checkpoint-context.test.mjs:120:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'unknown',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\employee-context.test.mjs:92:1
+✖ last-call handoff skips automatic summary pressure, keeps original evidence and still obeys the hard size limit (488.8307ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(readRun(f.root,f.archive.id).events.some(e=>e.type==='context/summary-skipped-for-handoff'))
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-context.test.mjs:100:11)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,0 +1,10 @@
+✔ explicit unknown mutation outcome outranks the subsequent native error and only matching host confirmation clears it (12.1022ms)
+✔ last-call handoff skips automatic summary pressure, keeps original evidence and still obeys the hard size limit (1849.6744ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2411.4335

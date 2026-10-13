@@ -152,7 +152,7 @@ function addedHistoryTokens(session, measurement, checkpoint) {
 
 /** Each employee owns its meter, durable surface replacements and cancellation. */
 export async function installEmployeeContext(ctx, mount, { mode = 'summary', archive, compaction = {}, pruning = {}, summaryGrowthTokens = 2400,
-  requestPreview, onRetainOriginal } = {}) {
+  requestPreview, onRetainOriginal,shouldDeferSummary } = {}) {
   if (mode === 'off') return;
   await mount('@deepseek-ai/dsh-token-meter');
   await mount(EvidencePruner, { thresholdChars: 6000, headChars: 1800, tailChars: 600, ...pruning });
@@ -176,6 +176,12 @@ export async function installEmployeeContext(ctx, mount, { mode = 'summary', arc
     }
     const outcome = { provider: options.provider, model: options.model, completed: false };
     attempts.set(options.sessionId, outcome);
+    // Recheck after async preparation, before entering the downstream stream.
+    // Keep host-owned evidence: upstream can turn thrown errors into finish text.
+    if(shouldDeferSummary?.(options.sessionId)){
+      outcome.handoffDeferred=true;
+      throw Error('最后一次调用保留用于正式交接；未发送压缩请求');
+    }
     // Production emits usage only after the actual fee has been persisted.
     // A rejected, aborted or missing-usage stream cannot enable degradation.
     for await (const chunk of next()) {
@@ -210,6 +216,11 @@ export async function installEmployeeContext(ctx, mount, { mode = 'summary', arc
   };
   ctx.on('agent/pre-step', async ({ agent, signal }, next) => {
     signal.throwIfAborted();
+    const deferHandoff=()=>{
+      onRetainOriginal?.(agent.id,true);
+      archive?.append('context/summary-skipped-for-handoff',{retained:'original',reason:'最后一次调用留给正式交接；不压缩或剪裁原文，仍受原字节、费用及输出门禁约束。'},{sessionId:agent.id});
+    };
+    if(shouldDeferSummary?.(agent.id)){deferHandoff();return next();}
     const result = ctx.toolResultPruner.pruneSession(agent.session);
     if (result.pruned.length) archive?.append('context/pruned', result, { sessionId: agent.id });
     if (mode === 'summary' && agent.session.requestHeader()) {
@@ -242,6 +253,13 @@ export async function installEmployeeContext(ctx, mount, { mode = 'summary', arc
           const pressure = /^compaction still above threshold after \d+ compaction attempts \((\d+) estimated tokens >= threshold (\d+)\)$/.exec(error?.message ?? '');
           const completed = pressure ? completedCheckpoint(agent.session) : undefined;
           if (signal.aborted) throw error;
+          // Another employee can take a project call during async preparation.
+          // Only our stream gate's unsent refusal permits this original-prefix path.
+          if(attempts.get(agent.id)?.handoffDeferred===true&&shouldDeferSummary?.(agent.id)&&
+            agent.session.surface.replaceGeneration===generation&&surfaceNodes.length===agent.session.surface.nodes.length&&
+            surfaceNodes.every((seq,index)=>seq===agent.session.surface.nodes[index])){
+            deferHandoff();return next();
+          }
           if (completed && completed.summarySeq >= beforeSeq && agent.session.surface.replaceGeneration > generation) {
             compacted = completed;
             archive?.append('context/summary-pressure-retained', { compactionId: completed.compactionId,
