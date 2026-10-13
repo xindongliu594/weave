@@ -1,0 +1,172 @@
+✖ output allowance reaches the runtime wire and approved lineage without changing completed tasks (9.5583ms)
+✖ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (12.9033ms)
+✖ larger output must fit retained node money even when money is not changed (2.3972ms)
+✔ resource approval preserves original semantics, grants and source snapshot (3.9156ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (3.5607ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (2.2227ms)
+✔ subsequent resource approval retains each ancestor once (1.085ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (6.8738ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (5.22ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (2.964ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (2.4016ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.5674ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.3015ms)
+✔ explicit call ceilings extend only unfinished resources and keep every historical attempt (4.8999ms)
+✔ recovery counts six work requests plus one correction for each unfinished task (1.2492ms)
+✔ recovery preserves a correction when only two node calls remain and rejects zero or one (0.7271ms)
+✔ shared project calls must cover all next tranches and malformed history never creates headroom (0.6955ms)
+✔ versioned confirmation rechecks actual history and rejects an underfunded or omitted next tranche (2.4364ms)
+✔ versioned node money must cover work and correction with old spend and holds preserved (1.3753ms)
+✔ unknown requirement versions are rejected while historical approved edges remain verifiable (3.5506ms)
+✔ shared money floor counts only unfinished next requests and includes project spend and holds (0.7379ms)
+✖ output allowance is visible before planning and confirmation shows per-task change (23.7581ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (2.5975ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.5405ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (0.9922ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (0.8302ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 22
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3757.0628
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:2227
+✖ output allowance reaches the runtime wire and approved lineage without changing completed tasks (9.5583ms)
+  ZodError: [
+    {
+      "code": "unrecognized_keys",
+      "keys": [
+        "taskOutputLimits"
+      ],
+      "path": [],
+      "message": "Unrecognized key: \"taskOutputLimits\""
+    }
+  ]
+      at applyRecoveryResources (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\recovery-resource-plan.ts:61:49)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:33:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at tests\recovery-resource-plan.test.ts:1:4126
+✖ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (12.9033ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /共享/. Input:
+  
+  '[\n' +
+    '  {\n' +
+    '    "code": "unrecognized_keys",\n' +
+    '    "keys": [\n' +
+    '      "taskOutputLimits"\n' +
+    '    ],\n' +
+    '    "path": [],\n' +
+    '    "message": "Unrecognized key: \\"taskOutputLimits\\""\n' +
+    '  }\n' +
+    ']'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:58:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: ZodError: [
+      {
+        "code": "unrecognized_keys",
+        "keys": [
+          "taskOutputLimits"
+        ],
+        "path": [],
+        "message": "Unrecognized key: \"taskOutputLimits\""
+      }
+    ]
+        at applyRecoveryResources (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\recovery-resource-plan.ts:61:49)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:58:21)
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:58:10)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1382:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+        at Test.postRun (node:internal/test_runner/test:1522:19)
+        at Test.run (node:internal/test_runner/test:1447:12),
+    expected: /共享/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\recovery-resource-plan.test.ts:1:5013
+✖ larger output must fit retained node money even when money is not changed (2.3972ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /完整请求/. Input:
+  
+  '[\n' +
+    '  {\n' +
+    '    "code": "unrecognized_keys",\n' +
+    '    "keys": [\n' +
+    '      "taskOutputLimits"\n' +
+    '    ],\n' +
+    '    "path": [],\n' +
+    '    "message": "Unrecognized key: \\"taskOutputLimits\\""\n' +
+    '  }\n' +
+    ']'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:63:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: ZodError: [
+      {
+        "code": "unrecognized_keys",
+        "keys": [
+          "taskOutputLimits"
+        ],
+        "path": [],
+        "message": "Unrecognized key: \"taskOutputLimits\""
+      }
+    ]
+        at applyRecoveryResources (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\recovery-resource-plan.ts:61:49)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:63:21)
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:63:10)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1382:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+        at Test.postRun (node:internal/test_runner/test:1522:19)
+        at Test.run (node:internal/test_runner/test:1447:12),
+    expected: /完整请求/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\run-resource-resume.test.ts:1:839
+✖ output allowance is visible before planning and confirmation shows per-task change (23.7581ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(form.includes('允许的单次输出上限（Token）'))
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-resource-resume.test.ts:13:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

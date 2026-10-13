@@ -1,0 +1,49 @@
+✔ output allowance reaches the runtime wire and approved lineage without changing completed tasks (28.6443ms)
+✖ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (8.0084ms)
+✔ larger output must fit retained node money even when money is not changed (1.3118ms)
+✔ resource approval preserves original semantics, grants and source snapshot (0.9443ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (1.6076ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (0.9589ms)
+✔ subsequent resource approval retains each ancestor once (0.7206ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (2.1649ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.4188ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (1.1888ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.9105ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.2936ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.4401ms)
+✔ explicit call ceilings extend only unfinished resources and keep every historical attempt (3.0024ms)
+✔ recovery counts six work requests plus one correction for each unfinished task (0.703ms)
+✔ recovery preserves a correction when only two node calls remain and rejects zero or one (0.4393ms)
+✔ shared project calls must cover all next tranches and malformed history never creates headroom (0.4475ms)
+✔ versioned confirmation rechecks actual history and rejects an underfunded or omitted next tranche (1.8871ms)
+✔ versioned node money must cover work and correction with old spend and holds preserved (1.1047ms)
+✔ unknown requirement versions are rejected while historical approved edges remain verifiable (1.2392ms)
+✔ shared money floor counts only unfinished next requests and includes project spend and holds (0.5007ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 20
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1965.7518
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:4126
+✖ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (8.0084ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: missing task identity must not select an employee with an absent alias
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:60:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /输出额度/,
+    operator: 'throws',
+    diff: 'simple'
+  }

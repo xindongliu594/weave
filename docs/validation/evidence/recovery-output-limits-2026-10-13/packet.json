@@ -1,0 +1,25 @@
+{
+  "sha256": "90601dfa8f5f1ab4d38d4297a305274b336b6b7aeb96448d06bfecee448d26f5",
+  "members": [
+    "apps/api/src/recovery-resource-plan.ts",
+    "apps/api/src/recovery-resource-router.ts",
+    "apps/web/src/RunResourceResume.tsx",
+    "tests/recovery-resource-plan.test.ts",
+    "tests/recovery-conditions.test.ts",
+    "tests/run-resource-resume.test.ts",
+    "dist/web/index.html",
+    "dist/web/assets/index-CzCbk_YO.css",
+    "dist/web/assets/index-mJcDyaDY.js"
+  ],
+  "sourceSha256": {
+    "apps/api/src/recovery-resource-plan.ts": "d638543503ba6642841a7aa056b4cc788356eec607f05009bb8deb42ab41ecce",
+    "apps/api/src/recovery-resource-router.ts": "d4befb6091b97fb7183b0e5ca3f89edbf4cfd3a2ee91fafc6ab09282c7441292",
+    "apps/web/src/RunResourceResume.tsx": "6c7c7e35dcce8d5c0e5b10220bdef72845a2cf0ad6fbc33ae602f623a4bab6d8",
+    "tests/recovery-resource-plan.test.ts": "56f8300b16e7d0f24247b87d53aa21b1a7218151dca9a7a2125dc1c736a13fb8",
+    "tests/recovery-conditions.test.ts": "05851a3bbfa5c09043a6f4c1b968e447c5214dc76253e3994d0e0eff371423eb",
+    "tests/run-resource-resume.test.ts": "da7ac4339325a7ba652f83e100b7d421ab808351ece92919fd474c71e0f188d1",
+    "dist/web/index.html": "b6418cf8d8a67c19c0d153584f2d52c9d18f3c39945f7ddcc3ee84f239dc7539",
+    "dist/web/assets/index-CzCbk_YO.css": "51932f4c987a372505465411953b8b09e84760345140c32699bbc477d5d4e2d5",
+    "dist/web/assets/index-mJcDyaDY.js": "4ae43a8174a7c1b96eb91df8e319e55c81263aeafa4e78726e17cd4cad2ff1de"
+  }
+}

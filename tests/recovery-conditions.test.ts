@@ -70,7 +70,7 @@ async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,origin
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
-  const planTasks=declaredReads?tasks.map(task=>({...task,inputs:[]})):tasks;
+  const planTasks=tasks.map(task=>({...task,...(declaredReads?{inputs:[]}:{}),...(pricedRoutes?{maxOutputTokens:512}:{})}));
   const snapshot:any = { projectId, planVersion: 1, departmentId, departmentIds: [departmentId], requirement: 'Read-only recovery budget fixture',
     title: 'Recovery fixture', templateVersion: 'fixture', policy:{...policy,maxBudget:originalBudget}, tasks:planTasks, approvedTasks:planTasks,approval:{kind:'project',approvedAt:new Date().toISOString()},
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
@@ -311,6 +311,35 @@ test('AI resource planning keeps the original project admission cap and only sto
   assert.equal(resumedSnapshot.tasks.find((task:any)=>task.id==='finish').maxBudget,1.2);
   assert.equal(resumedSnapshot.resourceApproval.callRequirementVersion,'handoff-correction-v1');
   assert.equal(resumedSnapshot.budgetHistory.tasks.finish.cost,context.tasks.find((task:any)=>task.id==='finish').usedCost);
+});
+
+test('output resource candidate is explicit, persisted and applied only to a new recovery snapshot',{skip:!isolated},async()=>{
+  const {runId}=await seed(true,false,true),old=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},taskOutputLimits:{finish:8192},rationale:'Allow the unfinished report to fit without repeating completed work'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true,maxTaskOutputTokens:16384})});
+  const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+  assert.equal(candidate.maxTaskOutputTokens,16384);assert.equal(candidate.proposal.taskOutputLimits.finish,8192);
+  assert.equal(providerRequests,1);assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
+  const schema=JSON.parse(resourcePlanningMessages[0].content.slice(resourcePlanningMessages[0].content.indexOf('{'),resourcePlanningMessages[0].content.indexOf('\n')));
+  assert.equal(schema.properties.taskOutputLimits.properties.finish.maximum,16384);
+  const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  const result=await confirmed.json() as any;assert.equal(confirmed.status,202,JSON.stringify(result));
+  const child=(await pool.query('SELECT snapshot FROM project_runs WHERE parent_run_id=$1',[runId])).rows[0].snapshot;
+  assert.equal(child.tasks.find((t:any)=>t.id==='finish').maxOutputTokens,8192);assert.equal(child.modelRoutes[0].maxOutputTokens,8192);
+  assert.equal(child.resourceApproval.maxTaskOutputTokens,16384);
+  assert.deepEqual(child.tasks.find((t:any)=>t.id==='prepare'),old.tasks.find((t:any)=>t.id==='prepare'));
+  assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot,old);
+});
+
+test('output planning cannot store a candidate funded only for the old output limit',{skip:!isolated},async()=>{
+  const {runId}=await seed(true,false,true);
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:.55},taskOutputLimits:{finish:8192},rationale:'Insufficient new output reserve fixture'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true,maxTaskOutputTokens:16384})});
+  const value=await response.json() as any;assert.equal(response.status,422,JSON.stringify(value));
+  assert.match(value.message,/完整请求/);assert.equal(providerRequests,1);
+  assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs')).rows[0].n,1);
 });
 
 test('one remaining node call is rejected before paid resource planning or any data changes', {skip:!isolated},async()=>{

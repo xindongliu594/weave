@@ -1,0 +1,99 @@
+{
+  "checkedAt": "2026-10-13T11:40:10.532500+00:00",
+  "runId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "status": "failed",
+  "integrity": "ok",
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013",
+  "calls": {
+    "used": 60,
+    "limit": 72,
+    "remaining": 12
+  },
+  "tasks": [
+    {
+      "id": "t1-doc",
+      "subject": "生成 inventory-cases.md 验收用例检查表",
+      "recordedCost": 0.018502499999999998,
+      "reserved": 0,
+      "budgetLimit": 0.05,
+      "availableBudget": 0.031497500000000005,
+      "calls": 5,
+      "callLimit": 16,
+      "remainingCalls": 11,
+      "completed": true
+    },
+    {
+      "id": "t2-qa",
+      "subject": "只读逐项独立核算 inventory-cases.md",
+      "recordedCost": 0.1538322,
+      "reserved": 0,
+      "budgetLimit": 0.2335938,
+      "availableBudget": 0.07976159999999999,
+      "calls": 44,
+      "callLimit": 45,
+      "remainingCalls": 1,
+      "completed": false
+    },
+    {
+      "id": "t3-review",
+      "subject": "经理只读验收 inventory-cases.md 与 QA 回执",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.2,
+      "availableBudget": 0.2,
+      "calls": 0,
+      "callLimit": 45,
+      "remainingCalls": 45,
+      "completed": false
+    }
+  ],
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "unknownOperationCount": 0,
+  "costReadiness": {
+    "recordedCost": 0.2740458,
+    "reserved": 0.0025932,
+    "availableBudget": 0.203361,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+        "amount": 0.0025932,
+        "status": "uncertain"
+      }
+    ]
+  },
+  "projectCap": 0.48,
+  "taskCallCap": 45,
+  "outputCaps": [
+    {
+      "id": "t1-doc",
+      "maxOutputTokens": 2048
+    },
+    {
+      "id": "t2-qa",
+      "maxOutputTokens": 2048
+    },
+    {
+      "id": "t3-review",
+      "maxOutputTokens": 2048
+    }
+  ],
+  "routes": [
+    {
+      "id": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "wireModel": "deepseek-v4.1-flash",
+      "maxOutputTokens": 2048,
+      "contextWindowTokens": 131072,
+      "inputRate": 0.3,
+      "outputRate": 1.2
+    }
+  ],
+  "occupied": 2.4742605,
+  "phaseOccupied": 0.40344210000000036,
+  "usageRows": 524,
+  "deliverySha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+  "modelCalls": 0
+}

@@ -1,0 +1,100 @@
+{
+  "runId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "currentProjectCap": 0.48,
+  "currentCallCeiling": 72,
+  "currentTaskCallCeiling": 45,
+  "contextBytes": 48000,
+  "history": {
+    "calls": 60,
+    "tasks": {
+      "t1-doc": {
+        "calls": 5,
+        "cost": 0.018502499999999998,
+        "reserved": 0,
+        "requestOverheadBytes": 7040
+      },
+      "t2-qa": {
+        "calls": 44,
+        "cost": 0.1538322,
+        "reserved": 0,
+        "requestOverheadBytes": 6969
+      },
+      "t3-review": {
+        "calls": 0,
+        "cost": 0,
+        "reserved": 0,
+        "requestOverheadBytes": 13
+      }
+    }
+  },
+  "rows": [
+    {
+      "taskCallCeiling": 45,
+      "outputLimit": 8192,
+      "code": "RESOURCE_CALLS_INSUFFICIENT",
+      "message": "允许的调用次数不足以覆盖恢复工作与一次正式交接纠正，请重新分配次数"
+    },
+    {
+      "taskCallCeiling": 45,
+      "outputLimit": 16384,
+      "code": "RESOURCE_CALLS_INSUFFICIENT",
+      "message": "允许的调用次数不足以覆盖恢复工作与一次正式交接纠正，请重新分配次数"
+    },
+    {
+      "taskCallCeiling": 48,
+      "outputLimit": 8192,
+      "minimumTotalCalls": 72,
+      "nextRequests": {
+        "t2-qa": {
+          "workRequests": 3,
+          "handoffCorrectionRequests": 1,
+          "nextRequestCount": 4,
+          "minimumCallLimit": 48
+        },
+        "t3-review": {
+          "workRequests": 6,
+          "handoffCorrectionRequests": 1,
+          "nextRequestCount": 7,
+          "minimumCallLimit": 45
+        }
+      },
+      "minimumProjectBudget": 0.5549427,
+      "planningAllowance": 0.003,
+      "minimumIncludingPlanning": 0.5579427,
+      "nodeMinimum": {
+        "t2-qa": 0.2603454,
+        "t3-review": 0.2
+      },
+      "fitsCurrentProject": false
+    },
+    {
+      "taskCallCeiling": 48,
+      "outputLimit": 16384,
+      "minimumTotalCalls": 72,
+      "nextRequests": {
+        "t2-qa": {
+          "workRequests": 3,
+          "handoffCorrectionRequests": 1,
+          "nextRequestCount": 4,
+          "minimumCallLimit": 48
+        },
+        "t3-review": {
+          "workRequests": 6,
+          "handoffCorrectionRequests": 1,
+          "nextRequestCount": 7,
+          "minimumCallLimit": 45
+        }
+      },
+      "minimumProjectBudget": 0.6630771,
+      "planningAllowance": 0.003,
+      "minimumIncludingPlanning": 0.6660771,
+      "nodeMinimum": {
+        "t2-qa": 0.299667,
+        "t3-review": 0.24060331
+      },
+      "fitsCurrentProject": false
+    }
+  ],
+  "modelCalls": 0,
+  "productionMutations": 0
+}

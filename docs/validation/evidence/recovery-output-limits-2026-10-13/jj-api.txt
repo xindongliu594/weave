@@ -1,0 +1,75 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1018.404976ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (87.630205ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (55.038078ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (77.241306ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (61.73655ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (57.597458ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (58.375923ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (64.733847ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (43.912003ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (37.566213ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (88.514656ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (59.848152ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (66.401759ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (104.348592ms)
+✔ output resource candidate is explicit, persisted and applied only to a new recovery snapshot (84.244785ms)
+✔ output planning cannot store a candidate funded only for the old output limit (54.337726ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (44.922836ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (52.711317ms)
+✔ shared project money rejects a full correction tranche before planning despite sufficient node money (40.061488ms)
+✔ late project expenses prevent confirming a previously valid correction candidate (42.6456ms)
+✔ next-tranche floor also reserves the bounded planning request before paid admission (48.733374ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (53.989268ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (72.209153ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (57.045952ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (311.567512ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3123.960106
+✔ demand discussion records actual usage without estimating or reserving an execution budget (819.355632ms)
+✔ usage-only accounting cannot be applied to execution or project identities (16.178022ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (42.55242ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (73.195534ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (90.969158ms)
+✔ resource planning uses only the latest stopped same-version sealed approval, never an arbitrary new ceiling (67.064756ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (136.749729ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (72.593666ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (81.091874ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (41.856941ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (186.490852ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2630.738217
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (211.358532ms)
+✔ resource history retains full wire schema overhead without counting message contents or inherited history (26.851148ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (35.195193ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (52.797226ms)
+✔ other project/version registration cannot leak into this exact version (46.768879ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (48.496816ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (24.663048ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (31.145764ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (27.078083ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (57.832443ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (24.818417ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (31.696481ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (17.410945ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1651.209023

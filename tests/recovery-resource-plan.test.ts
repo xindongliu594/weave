@@ -19,6 +19,61 @@ function fixture() {
 const proposal={maxBudget:.18,taskCallLimits:{accept:10},rationale:'Preserve the completed nodes and fund four further manager calls.'};
 const options={newRevision:1,completedTaskIds:['develop','qa'],history:{calls:23,tasks:{accept:{calls:5}}},ceiling:.18};
 
+function outputFixture(){
+  const old=fixture();old.policy.maxBudget=1;old.policy.contextBytes=4000;
+  old.agents[0].modelId='m';
+  old.modelRoutes=[{id:'m',configurationHash:'fixed',inputRate:.3,outputRate:1.2,maxOutputTokens:2048,contextWindowTokens:64000}];
+  old.tasks.forEach((t:any)=>{t.assignee='e';t.maxOutputTokens=2048;t.maxBudget=1;});
+  old.goalContract=createGoalContract(old);return old;
+}
+test('output allowance reaches the runtime wire and approved lineage without changing completed tasks',async()=>{
+  const old=outputFixture(),before=structuredClone(old);
+  const change={...proposal,maxBudget:1,taskOutputLimits:{accept:8192}};
+  const opts={...options,ceiling:1,maxTaskOutputTokens:16384};
+  const next=applyRecoveryResources(old,change,opts);
+  assert.deepEqual(old,before);assert.deepEqual(next.tasks.slice(0,2),old.tasks.slice(0,2));
+  assert.equal(next.tasks[2].maxOutputTokens,8192);assert.equal(next.modelRoutes[0].maxOutputTokens,8192);
+  assert.deepEqual(next.agents,old.agents);assert.deepEqual(next.knowledge,old.knowledge);
+  const {OpenAiCompatibleAdapter}=await import(new URL('../services/agent-runtime/openai-compatible.mjs',import.meta.url).href);
+  const route={...next.modelRoutes[0],baseUrl:'https://fixture.invalid/v1',wireModel:'fixture'};
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],tasks:next.tasks,maxBudget:1});
+  adapter.attribution=()=>({taskId:'accept'});
+  const request=adapter.prepareRequest({model:'m',messages:[{role:'user',content:[{type:'text',text:'Check the preserved employee report'}]}]});
+  assert.equal(request.body.max_tokens,8192);assert.ok(request.reservation>=8192*1.2/1e6);
+  next.resourceApproval={format:'run-resource-approval-v1',revision:1,sourceRunId:'parent',sourceGoalContract:old.goalContract,
+    ceiling:1,maxTaskOutputTokens:16384,proposal:change,previewId:'00000000-0000-4000-8000-000000000001',usageId:'00000000-0000-4000-8000-000000000002'};
+  next.goalContract=createGoalContract(next);
+  assert.equal(verifiedResourceEdge(next,old,'parent',['develop','qa']),true);
+  next.tasks[2].maxOutputTokens=16384;next.approvedTasks[2].maxOutputTokens=16384;next.goalContract=createGoalContract(next);
+  assert.equal(verifiedResourceEdge(next,old,'parent',['develop','qa']),false);
+});
+test('output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion',()=>{
+  const old=outputFixture(),change={...proposal,maxBudget:1,taskOutputLimits:{accept:8192}},opts={...options,ceiling:1,maxTaskOutputTokens:16384};
+  assert.throws(()=>applyRecoveryResources(old,change,{...options,ceiling:1}));
+  for(const taskOutputLimits of [{accept:32768},{accept:0},{accept:1000},{qa:8192},{unknown:8192}])
+    assert.throws(()=>applyRecoveryResources(old,{...change,taskOutputLimits},opts));
+  old.modelRoutes[0].contextWindowTokens=8192;old.goalContract=createGoalContract(old);
+  assert.throws(()=>applyRecoveryResources(old,change,opts));
+  old.modelRoutes[0].contextWindowTokens=64000;delete old.tasks[1].maxOutputTokens;old.goalContract=createGoalContract(old);
+  assert.throws(()=>applyRecoveryResources(old,change,{...opts,completedTaskIds:['develop']}),/共享/);
+  old.tasks[1].maxOutputTokens=2048;delete old.tasks[2].assignee;old.goalContract=createGoalContract(old);
+  assert.throws(()=>applyRecoveryResources(old,change,opts),/输出额度/,'missing task identity must not select an employee with an absent alias');
+});
+test('larger output must fit retained node money even when money is not changed',()=>{
+  const old=outputFixture();old.tasks[2].maxBudget=.014;old.goalContract=createGoalContract(old);
+  const opts={...options,ceiling:1,maxTaskOutputTokens:16384,history:{calls:23,tasks:{accept:{calls:5,cost:.006}}}};
+  assert.throws(()=>applyRecoveryResources(old,{...proposal,maxBudget:1,taskOutputLimits:{accept:8192}},opts),/完整请求/);
+  const next=applyRecoveryResources(old,{...proposal,maxBudget:1,taskOutputLimits:{accept:8192},taskBudgetLimits:{accept:.04}},opts);
+  assert.equal(next.tasks[2].maxBudget,.04);
+});
+
+test('a completed legacy task keeps its old output cap if review later requests rework',()=>{
+  const old=outputFixture();delete old.tasks[0].maxOutputTokens;old.goalContract=createGoalContract(old);
+  assert.throws(()=>applyRecoveryResources(old,{...proposal,maxBudget:1,taskOutputLimits:{accept:8192}},
+    {...options,ceiling:1,maxTaskOutputTokens:16384}),/共享/);
+  assert.equal(old.modelRoutes[0].maxOutputTokens,2048);
+});
+
 test('resource approval preserves original semantics, grants and source snapshot',()=>{
   const old=fixture(),before=structuredClone(old);
   const next=applyRecoveryResources(old,proposal,options);

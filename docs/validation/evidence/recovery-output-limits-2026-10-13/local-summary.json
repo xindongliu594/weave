@@ -1,0 +1,10 @@
+{
+  "unit": 37,
+  "isolatedApi": 49,
+  "total": 86,
+  "typecheckExitCode": 0,
+  "buildExitCode": 0,
+  "knownBuildWarning": "bundle >500KB",
+  "modelCalls": 0,
+  "newDependencies": 0
+}

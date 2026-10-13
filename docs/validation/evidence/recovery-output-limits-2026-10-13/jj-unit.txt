@@ -1,0 +1,45 @@
+✔ output allowance reaches the runtime wire and approved lineage without changing completed tasks (16.344525ms)
+✔ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (2.783258ms)
+✔ larger output must fit retained node money even when money is not changed (0.855777ms)
+✔ a completed legacy task keeps its old output cap if review later requests rework (0.455126ms)
+✔ resource approval preserves original semantics, grants and source snapshot (0.627195ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (1.116749ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (0.579563ms)
+✔ subsequent resource approval retains each ancestor once (0.519154ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (1.619525ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (1.57602ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (0.725224ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.623563ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.186162ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.120717ms)
+✔ explicit call ceilings extend only unfinished resources and keep every historical attempt (2.238168ms)
+✔ recovery counts six work requests plus one correction for each unfinished task (0.470856ms)
+✔ recovery preserves a correction when only two node calls remain and rejects zero or one (0.317802ms)
+✔ shared project calls must cover all next tranches and malformed history never creates headroom (0.312414ms)
+✔ versioned confirmation rechecks actual history and rejects an underfunded or omitted next tranche (1.32949ms)
+✔ versioned node money must cover work and correction with old spend and holds preserved (0.76364ms)
+✔ unknown requirement versions are rejected while historical approved edges remain verifiable (1.143374ms)
+✔ shared money floor counts only unfinished next requests and includes project spend and holds (0.345486ms)
+✔ explicit resource approval preserves exact inherited QA evidence across ordinary later recovery (20.636312ms)
+✔ a resource boundary cannot authorize changed goal, completed contract or counterfeit parent (8.772039ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (2.125791ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (2.192565ms)
+✔ ancestry has an explicit maximum depth (2.603227ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (9.10644ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (24.092643ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (0.911081ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (13.884921ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (3.464581ms)
+✔ output allowance is visible before planning and confirmation shows per-task change (11.837818ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (0.629601ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.346199ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (1.487745ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (0.599675ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1312.971655

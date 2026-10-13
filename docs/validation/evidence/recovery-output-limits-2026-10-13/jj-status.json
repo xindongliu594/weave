@@ -1,0 +1,31 @@
+{
+  "proof": {
+    "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-output-limits-20261013",
+    "previousRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013",
+    "packetSha256": "90601dfa8f5f1ab4d38d4297a305274b336b6b7aeb96448d06bfecee448d26f5",
+    "projectCount": 10,
+    "usageBefore": 524,
+    "modelCalls": 0,
+    "dependencies": "existing pinned directories reused",
+    "newDependenciesInstalled": false,
+    "checks": [
+      "unit37",
+      "api25+11+13",
+      "types"
+    ],
+    "testsPassed": 86,
+    "passed": true,
+    "usageAfter": 524,
+    "mainPID": "3112472",
+    "projectStatePreserved": true,
+    "usagePreserved": true,
+    "originalArchivesPreserved": true,
+    "archiveEvidence": {
+      "files": 502,
+      "bytes": 405225962,
+      "manifestSha256": "3d8e69e9bb5201525ea5e40fbdfce51dd9b903fb6c89fc2920522681cc3ff8d9"
+    }
+  },
+  "processExists": false,
+  "tail": "{\"release\": \"/home/jj/.local/share/weiwu/releases/weiwu-recovery-output-limits-20261013\", \"previousRelease\": \"/home/jj/.local/share/weiwu/releases/weiwu-recovery-continuity-20261013\", \"packetSha256\": \"90601dfa8f5f1ab4d38d4297a305274b336b6b7aeb96448d06bfecee448d26f5\", \"projectCount\": 10, \"usageBefore\": 524, \"modelCalls\": 0, \"dependencies\": \"existing pinned directories reused\", \"newDependenciesInstalled\": false, \"checks\": [\"unit37\", \"api25+11+13\", \"types\"], \"testsPassed\": 86, \"passed\": true, \"usageAfter\": 524, \"mainPID\": \"3112472\", \"projectStatePreserved\": true, \"usagePreserved\": true, \"originalArchivesPreserved\": true, \"archiveEvidence\": {\"files\": 502, \"bytes\": 405225962, \"manifestSha256\": \"3d8e69e9bb5201525ea5e40fbdfce51dd9b903fb6c89fc2920522681cc3ff8d9\"}}\n"
+}
