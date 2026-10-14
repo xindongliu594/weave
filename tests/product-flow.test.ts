@@ -587,10 +587,9 @@ test('resource-approved recovery carries frozen knowledge and real QA seals to t
     taskOutputLimits:{review:8192,accept:8192},rationale:'Local scripted recovery regression; no real model acceptance.'};
   const countRuns=async()=>Number((await pool.query('SELECT count(*)::int AS n FROM project_runs WHERE project_id=$1',[projectId])).rows[0].n);
   const beforePlanning=contextRequests.length,rowsBefore=await countRuns();
-  // Keep the original fixture's cumulative QA cap of 12: one inherited call
-  // leaves 11. Its seven scripted task actions also consume a compaction call;
-  // an eight-call grant reaches the final-call context gate in this 16k fixture.
-  const candidate=await call('/runs/'+parent+'/resource-proposal','POST',{modelId,maxBudget:2,maxPlanningCost:.1,maxModelCalls:100,maxTaskModelCalls:40,maxTaskOutputTokens:8192,retainUncertainCosts:true,taskContinuationLimits:{review:11,accept:7}});
+  // Seven scripted task actions plus one actual compaction consume eight
+  // calls. The last call must submit the formal handoff with complete evidence.
+  const candidate=await call('/runs/'+parent+'/resource-proposal','POST',{modelId,maxBudget:2,maxPlanningCost:.1,maxModelCalls:100,maxTaskModelCalls:40,maxTaskOutputTokens:8192,retainUncertainCosts:true,taskContinuationLimits:{review:8,accept:7}});
   assert.equal(candidate.kind,'run-resource-proposal');assert.deepEqual(candidate.completedTaskIds,['produce']);
   assert.equal(contextRequests.length,beforePlanning+1);assert.equal(await countRuns(),rowsBefore,'planning cannot start employees');
   assert.deepEqual((await run(parent)).snapshot,frozen,'a candidate cannot mutate the original approval');
@@ -601,8 +600,8 @@ test('resource-approved recovery carries frozen knowledge and real QA seals to t
   const qaApproval=await pendingApproval(child),running=await run(child);
   assert.deepEqual(running.snapshot.completedCheckpoints,['produce']);
   assert.equal(running.snapshot.resourceApproval.previewId,candidate.previewId);
-  assert.deepEqual(candidate.taskContinuationLimits,{review:11,accept:7});
-  assert.deepEqual(running.snapshot.resourceApproval.taskCallCeilings,{review:12,accept:7});
+  assert.deepEqual(candidate.taskContinuationLimits,{review:8,accept:7});
+  assert.deepEqual(running.snapshot.resourceApproval.taskCallCeilings,{review:9,accept:7});
   assert.equal(running.snapshot.budgetHistory.calls,originalCalls.length);
   assert.equal(running.snapshot.budgetHistory.tasks.review.calls,1);
   assert.ok(Math.abs(running.snapshot.costCarryover.reserved-retained)<1e-8);
@@ -649,9 +648,13 @@ test('resource-approved recovery carries frozen knowledge and real QA seals to t
     Object.fromEntries(['execution','compaction','handoff'].map(purpose=>[purpose,events.filter(event=>(event.data.taskId??'unattributed')===taskId&&
       (event.data.requestPurpose??'execution')===purpose).length]))]));
   const requestPurposeCounts=purposes(wireRequests);
-  assert.deepEqual(requestPurposeCounts.review,{execution:7,compaction:1,handoff:0},'all eight QA requests consume the frozen allowance, including compaction');
+  assert.deepEqual(requestPurposeCounts.review,{execution:6,compaction:1,handoff:1},'all eight QA requests consume the frozen allowance, including compaction');
   assert.deepEqual(purposes(result.events.filter((event:any)=>event.type==='billing/usage')),requestPurposeCounts,'every request purpose has a real recorded receipt');
-  assert.deepEqual(result.snapshot.resourceApproval.taskCallCeilings,{review:12,accept:7});
+  assert.deepEqual(result.snapshot.resourceApproval.taskCallCeilings,{review:9,accept:7});
+  const closure=result.events.find((event:any)=>event.type==='handoff/closure-started'&&event.data.taskId==='review');
+  assert.equal(closure?.data.reason,'last-authorized-call');
+  const normalized=result.events.find((event:any)=>event.type==='context/compacted'&&event.data.requestPurpose==='handoff');
+  assert.ok(normalized?.data.supersededRuntimeSnapshots>0);assert.equal(normalized?.data.removedGroups,0,'final handoff keeps all original non-snapshot history');
   evidence.push({scenario:'resource-approved-recovery-qa-manager',model:'localhost scripted responses only',parent,child,previewId:candidate.previewId,
     developerSha256:devSeal.outputs[0].sha256,retainedUnknownReceiptIds:unknown.map(row=>row.id),retainedUnknownAmount:retained,outputLimit:8192,knowledgeVersion:1,
     qaSealSequence:qaSeal.seq,managerFirstRequestSequence:managerWire.seq,status:result.status,taskContinuationLimits:candidate.taskContinuationLimits,

@@ -373,8 +373,12 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     let configured;
     try { configured = modelCompletionOptions(route); }
     catch (error) { throw new LlmError(error.message, error.code); }
-    const retainOriginal = options.purpose !== 'compaction' && this.requireCompleteContext?.(options.sessionId) === true;
-    const runtimeSnapshots=options.purpose==='compaction'||retainOriginal?{messages:options.messages,removed:0}:currentRuntimeMessages(options.messages);
+    const closure=this.handoffClosure?.(options.sessionId);
+    const retainOriginal = options.purpose !== 'compaction' && (Boolean(closure) || this.requireCompleteContext?.(options.sessionId) === true);
+    // The last-call gate retains every evidence/history message, but native
+    // snapshots still replace covered older snapshots. Keeping those stale
+    // copies can make the final request larger than the preceding work request.
+    const runtimeSnapshots=options.purpose==='compaction'||retainOriginal&&!closure?{messages:options.messages,removed:0}:currentRuntimeMessages(options.messages);
     options={...options,messages:runtimeSnapshots.messages};
     const fullEnvelope = route.protocol === 'responses' || route.thinkingMode !== undefined;
     if (route.protocol === 'responses') {
@@ -389,7 +393,6 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const limit = Math.min(this.contextBytes, route.contextBytes ?? this.contextBytes);
     const checkpoint = options.messages.findLastIndex(message => message.source?.kind === 'plugin' && message.source.plugin === 'compact');
     const attribution={ ...(this.attribution?.(options.sessionId)??{sessionId:options.sessionId}), requestPurpose: options.purpose === 'compaction' ? 'compaction' : 'execution' };
-    const closure=this.handoffClosure?.(options.sessionId);
     if(closure){
       if(closure.taskId!==attribution.taskId||closure.attemptId!==attribution.attemptId)throw new LlmError('交接阶段与当前任务身份不一致','HANDOFF_IDENTITY');
       if(options.purpose==='compaction')throw new LlmError('最后一次调用保留用于正式交接，不能用于上下文压缩','HANDOFF_CALL_RESERVED');

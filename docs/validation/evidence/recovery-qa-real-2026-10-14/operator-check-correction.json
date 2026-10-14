@@ -1,0 +1,12 @@
+{
+  "kind": "operator-script-validation-correction",
+  "paidProposalSucceeded": true,
+  "mistake": "Script required manager output to equal 8192 although the user authorized a ceiling and AI selected 2048 for manager. QA is 8192 as required.",
+  "correction": "Require QA 8192 and manager within original 2048 through authorized 8192; reuse the same receipt-backed proposal. No extra planning request.",
+  "previewId": "d01e5bbd-665b-43c1-9376-8cc932fef0a6",
+  "usageId": "86b44a72-c015-4b61-b9b7-9b1cf3116109",
+  "taskContinuationLimits": {
+    "t2-qa": 4,
+    "t3-review": 7
+  }
+}

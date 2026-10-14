@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-14T02:06:51.030215+00:00",
+  "runId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+  "status": "failed",
+  "integrity": "ok",
+  "calls": {
+    "t2-qa": 3,
+    "t3-review": 0
+  },
+  "totalNewCalls": 3,
+  "requestPurposes": [
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    }
+  ],
+  "accepted": [],
+  "errors": [
+    {
+      "type": "run/finished",
+      "code": null,
+      "message": "CONTEXT_LIMIT: Chat Completions 完整受保护请求超过字节或上下文上限；没有发送模型请求"
+    }
+  ],
+  "pendingApprovals": [],
+  "newKnownCost": 0.0107475,
+  "inputTokens": 33705,
+  "outputTokens": 530,
+  "occupied": 2.486592,
+  "projectKnown": 0.2863773,
+  "projectHeld": 0.0025932,
+  "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

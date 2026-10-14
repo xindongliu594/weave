@@ -1,0 +1,19 @@
+{
+  "database": "connected",
+  "runtime": {
+    "ready": true,
+    "reason": "DSH + AgentTeams\uff1a\u5458\u5de5\u72ec\u7acb\u5bbf\u4e3b\u3001\u53d7\u9650\u5de5\u4f5c\u533a\u3001\u5de5\u5177\u5ba1\u6279\u3001\u77e5\u8bc6\u5f15\u7528\u3001\u9884\u7b97\u4e0e\u5e76\u53d1\u63a7\u5236\u5df2\u63a5\u5165\u3002\u771f\u5b9e\u6a21\u578b\u517c\u5bb9\u6027\u9700\u5355\u72ec\u9a8c\u8bc1\u3002"
+  },
+  "version": "0.2.0",
+  "workspace": {
+    "kind": "local",
+    "database": "pglite",
+    "workspacesPath": "/home/jj/.local/share/weiwu/data/pilot/workspaces",
+    "executionTarget": {
+      "kind": "local",
+      "deviceId": "5b34cfd1-eee6-45fd-9be7-9000c4daf9d8",
+      "grantId": "7ffb9e55-18e1-4a9c-aeed-befddb39a6b3"
+    }
+  },
+  "workingDirectory": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-context-20261014"
+}

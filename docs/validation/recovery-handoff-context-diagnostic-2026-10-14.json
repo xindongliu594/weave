@@ -1,0 +1,314 @@
+{
+  "executor": "bounded test double",
+  "model": "simulated HTTP gateway",
+  "scenarios": [],
+  "contextDiagnostics": [
+    {
+      "stage": "entered",
+      "messages": [
+        {
+          "role": "system",
+          "source": {
+            "plugin": "@deepseek-ai/dsh-system-prompt"
+          },
+          "bytes": 5055
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "compact"
+          },
+          "bytes": 495
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "@deepseek-ai/dsh-system-prompt",
+            "form": "snapshot"
+          },
+          "bytes": 11551
+        },
+        {
+          "role": "assistant",
+          "source": {},
+          "bytes": 153
+        },
+        {
+          "role": "user",
+          "source": {},
+          "bytes": 714
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "@deepseek-ai/dsh-system-prompt",
+            "form": "snapshot"
+          },
+          "bytes": 11552
+        },
+        {
+          "role": "assistant",
+          "source": {},
+          "bytes": 192
+        },
+        {
+          "role": "user",
+          "source": {},
+          "bytes": 684
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "@deepseek-ai/dsh-system-prompt",
+            "form": "snapshot"
+          },
+          "bytes": 11552
+        },
+        {
+          "role": "assistant",
+          "source": {},
+          "bytes": 132
+        },
+        {
+          "role": "user",
+          "source": {},
+          "bytes": 530
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "@deepseek-ai/dsh-system-prompt",
+            "form": "snapshot"
+          },
+          "bytes": 11552
+        },
+        {
+          "role": "assistant",
+          "source": {},
+          "bytes": 145
+        },
+        {
+          "role": "user",
+          "source": {},
+          "bytes": 417
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "@deepseek-ai/dsh-system-prompt",
+            "form": "snapshot"
+          },
+          "bytes": 11552
+        },
+        {
+          "role": "user",
+          "source": {
+            "plugin": "weiwu-handoff",
+            "form": "notice"
+          },
+          "bytes": 560
+        }
+      ]
+    },
+    {
+      "contextBytes": 64000,
+      "modelContext": 16384,
+      "systemBytes": 0,
+      "messages": [
+        {
+          "index": 0,
+          "role": "system",
+          "plugin": "@deepseek-ai/dsh-system-prompt",
+          "wireEstimateBytes": 5058
+        },
+        {
+          "index": 1,
+          "role": "user",
+          "plugin": "compact",
+          "wireEstimateBytes": 448
+        },
+        {
+          "index": 2,
+          "role": "user",
+          "plugin": "@deepseek-ai/dsh-system-prompt",
+          "form": "snapshot",
+          "wireEstimateBytes": 11552,
+          "snapshotSections": [
+            {
+              "name": "department:approved-context",
+              "textBytes": 10045
+            },
+            {
+              "name": "subagent:delegation",
+              "textBytes": 350
+            },
+            {
+              "name": "department:capabilities",
+              "textBytes": 399
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "role": "assistant",
+          "wireEstimateBytes": 208
+        },
+        {
+          "index": 4,
+          "role": "user",
+          "wireEstimateBytes": 838
+        },
+        {
+          "index": 5,
+          "role": "user",
+          "plugin": "@deepseek-ai/dsh-system-prompt",
+          "form": "snapshot",
+          "wireEstimateBytes": 11553,
+          "snapshotSections": [
+            {
+              "name": "department:approved-context",
+              "textBytes": 10046
+            },
+            {
+              "name": "subagent:delegation",
+              "textBytes": 350
+            },
+            {
+              "name": "department:capabilities",
+              "textBytes": 399
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "role": "assistant",
+          "wireEstimateBytes": 247
+        },
+        {
+          "index": 7,
+          "role": "user",
+          "wireEstimateBytes": 804
+        },
+        {
+          "index": 8,
+          "role": "user",
+          "plugin": "@deepseek-ai/dsh-system-prompt",
+          "form": "snapshot",
+          "wireEstimateBytes": 11553,
+          "snapshotSections": [
+            {
+              "name": "department:approved-context",
+              "textBytes": 10046
+            },
+            {
+              "name": "subagent:delegation",
+              "textBytes": 350
+            },
+            {
+              "name": "department:capabilities",
+              "textBytes": 399
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "role": "assistant",
+          "wireEstimateBytes": 187
+        },
+        {
+          "index": 10,
+          "role": "user",
+          "wireEstimateBytes": 648
+        },
+        {
+          "index": 11,
+          "role": "user",
+          "plugin": "@deepseek-ai/dsh-system-prompt",
+          "form": "snapshot",
+          "wireEstimateBytes": 11553,
+          "snapshotSections": [
+            {
+              "name": "department:approved-context",
+              "textBytes": 10046
+            },
+            {
+              "name": "subagent:delegation",
+              "textBytes": 350
+            },
+            {
+              "name": "department:capabilities",
+              "textBytes": 399
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "role": "assistant",
+          "wireEstimateBytes": 200
+        },
+        {
+          "index": 13,
+          "role": "user",
+          "wireEstimateBytes": 507
+        },
+        {
+          "index": 14,
+          "role": "user",
+          "plugin": "@deepseek-ai/dsh-system-prompt",
+          "form": "snapshot",
+          "wireEstimateBytes": 11553,
+          "snapshotSections": [
+            {
+              "name": "department:approved-context",
+              "textBytes": 10046
+            },
+            {
+              "name": "subagent:delegation",
+              "textBytes": 350
+            },
+            {
+              "name": "department:capabilities",
+              "textBytes": 399
+            }
+          ]
+        },
+        {
+          "index": 15,
+          "role": "user",
+          "plugin": "weiwu-handoff",
+          "form": "notice",
+          "wireEstimateBytes": 561
+        }
+      ],
+      "nativeSnapshotCount": 5,
+      "current": {
+        "ok": false,
+        "code": "CONTEXT_LIMIT",
+        "message": "CONTEXT_LIMIT: 岗位、当前任务与最新工具响应超过上下文上限"
+      },
+      "withoutHandoffNotice": {
+        "ok": false,
+        "code": "CONTEXT_LIMIT",
+        "message": "CONTEXT_LIMIT: 岗位、当前任务与最新工具响应超过上下文上限"
+      },
+      "onlyCoveredSnapshotsRemoved": {
+        "ok": true,
+        "afterBytes": 23373,
+        "removed": 0,
+        "maxTokens": 8192,
+        "reservation": 0.040781,
+        "toolNames": [
+          "agent_teams_update_task"
+        ]
+      },
+      "before": {
+        "projectCalls": 14,
+        "taskCalls": 8
+      },
+      "after": {
+        "projectCalls": 14,
+        "taskCalls": 8
+      }
+    }
+  ]
+}

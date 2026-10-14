@@ -1,0 +1,11 @@
+✔ last handoff replaces only covered native snapshots while retaining complete original evidence and the same call allowance (67.9605ms)
+✔ last-handoff snapshot normalization fails closed for real oversized evidence, unmatched snapshots and other sessions (2.2954ms)
+✔ late handoff closure protects complete history without a pre-step retention flag (2.8999ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 708.6565

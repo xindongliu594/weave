@@ -1,0 +1,292 @@
+{
+  "runId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+  "status": "failed",
+  "policyContextBytes": 48000,
+  "routeLimits": [
+    {
+      "id": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "maxOutputTokens": 8192,
+      "contextBytes": null,
+      "contextWindowTokens": 131072,
+      "model": null,
+      "wireModel": "deepseek-v4.1-flash"
+    }
+  ],
+  "events": [
+    {
+      "seq": 89,
+      "type": "context/compacted",
+      "data": {
+        "sessionId": "e1815bf8-17fa-471a-8f53-b5a6494f738d",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "requestPurpose": "execution",
+        "removedGroups": 0,
+        "deduplicatedGroups": 0,
+        "deduplicatedBytes": 0,
+        "evidenceDuplicates": [],
+        "supersededReads": [],
+        "supersededRuntimeSnapshots": 1,
+        "beforeBytes": 42161,
+        "afterBytes": 42161,
+        "inputUpperBound": 43185,
+        "reservation": 0.0227859,
+        "availableBudget": 0.1034949,
+        "maxTokens": 8192,
+        "note": "完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。"
+      }
+    },
+    {
+      "seq": 125,
+      "type": "context/compacted",
+      "data": {
+        "sessionId": "e1815bf8-17fa-471a-8f53-b5a6494f738d",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "requestPurpose": "execution",
+        "removedGroups": 0,
+        "deduplicatedGroups": 0,
+        "deduplicatedBytes": 0,
+        "evidenceDuplicates": [],
+        "supersededReads": [],
+        "supersededRuntimeSnapshots": 2,
+        "beforeBytes": 47978,
+        "afterBytes": 47978,
+        "inputUpperBound": 49002,
+        "reservation": 0.024531,
+        "availableBudget": 0.10002449999999999,
+        "maxTokens": 8192,
+        "note": "完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。"
+      }
+    },
+    {
+      "seq": 157,
+      "type": "handoff/closure-started",
+      "data": {
+        "taskId": "t2-qa",
+        "runtimeTaskId": "t2",
+        "attemptId": "dabbd20f-d62b-4c25-8ec0-9462bd7b2507",
+        "taskStatus": "in_progress",
+        "reason": "last-authorized-call"
+      }
+    },
+    {
+      "seq": 184,
+      "type": "run/finished",
+      "data": {
+        "status": "failed",
+        "message": "CONTEXT_LIMIT: Chat Completions 完整受保护请求超过字节或上下文上限；没有发送模型请求",
+        "usageCost": 0.0107475
+      }
+    }
+  ],
+  "requests": [
+    {
+      "seq": 60,
+      "taskId": "t2-qa",
+      "bytes": 36981,
+      "messages": [
+        {
+          "role": "system",
+          "bytes": 7099,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 5788,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 16257,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 863,
+          "toolCalls": []
+        }
+      ]
+    },
+    {
+      "seq": 90,
+      "taskId": "t2-qa",
+      "bytes": 42161,
+      "messages": [
+        {
+          "role": "system",
+          "bytes": 7099,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 5788,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 863,
+          "toolCalls": []
+        },
+        {
+          "role": "assistant",
+          "bytes": 464,
+          "toolCalls": [
+            "agent_teams_claim_task",
+            "capability_search"
+          ]
+        },
+        {
+          "role": "tool",
+          "bytes": 2548,
+          "toolCalls": []
+        },
+        {
+          "role": "tool",
+          "bytes": 2153,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 16269,
+          "toolCalls": []
+        }
+      ]
+    },
+    {
+      "seq": 126,
+      "taskId": "t2-qa",
+      "bytes": 47978,
+      "messages": [
+        {
+          "role": "system",
+          "bytes": 7099,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 5788,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 863,
+          "toolCalls": []
+        },
+        {
+          "role": "assistant",
+          "bytes": 464,
+          "toolCalls": [
+            "agent_teams_claim_task",
+            "capability_search"
+          ]
+        },
+        {
+          "role": "tool",
+          "bytes": 2548,
+          "toolCalls": []
+        },
+        {
+          "role": "tool",
+          "bytes": 2153,
+          "toolCalls": []
+        },
+        {
+          "role": "assistant",
+          "bytes": 478,
+          "toolCalls": [
+            "filesystem",
+            "knowledge_read"
+          ]
+        },
+        {
+          "role": "tool",
+          "bytes": 4415,
+          "toolCalls": []
+        },
+        {
+          "role": "tool",
+          "bytes": 921,
+          "toolCalls": []
+        },
+        {
+          "role": "user",
+          "bytes": 16269,
+          "toolCalls": []
+        }
+      ]
+    }
+  ],
+  "lastEventTypes": [
+    {
+      "seq": 167,
+      "type": "session/agent/inbox/spliced"
+    },
+    {
+      "seq": 168,
+      "type": "session/turn/start"
+    },
+    {
+      "seq": 169,
+      "type": "session/agent/inbox/spliced"
+    },
+    {
+      "seq": 170,
+      "type": "session/agent/inbox/spliced"
+    },
+    {
+      "seq": 171,
+      "type": "session/step/start"
+    },
+    {
+      "seq": 172,
+      "type": "session/system/message"
+    },
+    {
+      "seq": 173,
+      "type": "session/user/message"
+    },
+    {
+      "seq": 174,
+      "type": "session/user/message"
+    },
+    {
+      "seq": 175,
+      "type": "session/user/message"
+    },
+    {
+      "seq": 176,
+      "type": "session/request/header"
+    },
+    {
+      "seq": 177,
+      "type": "session/request/context"
+    },
+    {
+      "seq": 178,
+      "type": "session/assistant/attempt"
+    },
+    {
+      "seq": 179,
+      "type": "session/step/end"
+    },
+    {
+      "seq": 180,
+      "type": "session/turn/end"
+    },
+    {
+      "seq": 181,
+      "type": "session/agent/inbox/spliced"
+    },
+    {
+      "seq": 182,
+      "type": "runtime/disposed"
+    },
+    {
+      "seq": 183,
+      "type": "team/checkpoint"
+    },
+    {
+      "seq": 184,
+      "type": "run/finished"
+    }
+  ]
+}

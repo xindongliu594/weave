@@ -1,0 +1,5 @@
+{
+  "services/agent-runtime/openai-compatible.mjs": "6da989921307ebce2c9efe731e12518ccc3633d45f668bebd9e06568431f72eb",
+  "services/agent-runtime/openai-compatible.test.mjs": "1045ac36f3663210459b62ae3d6cf244cf514e7a4ebc5d4de380440a724eb281",
+  "tests/product-flow.test.ts": "cba4ccb9e1cbdb06f1f39c05d5ed1ad06a6fc02b293ae6ec9955666364d0a284"
+}

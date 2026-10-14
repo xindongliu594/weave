@@ -1,0 +1,10 @@
+{
+  "proposal": {
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/home/jj/.local/share/weiwu/validation/recovery-qa-real-20261014/live.py\", line 61, in <module>\n    plan=validate(candidate)\n  File \"/home/jj/.local/share/weiwu/validation/recovery-qa-real-20261014/live.py\", line 54, in validate\n    assert plan['taskOutputLimits']=={'t2-qa':8192,'t3-review':8192}\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  "resume": {
+    "stdout": "{\"runId\": \"b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf\", \"parentRunId\": \"f89af7d2-300f-4557-ae90-c229a2027fdf\", \"completedCheckpoints\": [\"t1-doc\"]}\n",
+    "stderr": ""
+  }
+}

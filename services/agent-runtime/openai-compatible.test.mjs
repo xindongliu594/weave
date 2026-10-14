@@ -55,6 +55,87 @@ const runtimeSnapshot=(text,extra=[])=>{
   const sections=[{name:'department:approved-context',text},...extra];
   return {role:'user',source:{kind:'plugin',plugin:'@deepseek-ai/dsh-system-prompt',form:'snapshot',sections},content:[{type:'text',text:joinContextSections(sections)}]};
 };
+test('last handoff replaces only covered native snapshots while retaining complete original evidence and the same call allowance',async()=>{
+  const identity={sessionId:'qa-session',taskId:'qa',runtimeTaskId:'t2',attemptId:'current',taskStatus:'in_progress'};
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,contextBytes:10000,maxModelCalls:10,priorModelCalls:2,
+    tasks:[{id:'qa',maxModelCalls:3}],taskUsage:{qa:{calls:2}}});
+  adapter.attribution=()=>identity;adapter.handoffClosure=sessionId=>sessionId===identity.sessionId?identity:undefined;
+  adapter.requireCompleteContext=()=>true;
+  const file={path:'result.json',sha256:'a'.repeat(64),content:'COMPLETE_FILE_EVIDENCE '.repeat(30)};
+  const knowledge={documentId:'fixed',version:1,sha256:'b'.repeat(64),content:'COMPLETE_FIXED_KNOWLEDGE '.repeat(30)};
+  const evidence=[message,
+    {role:'assistant',content:[{type:'tool-call',id:'read-file',name:'filesystem',arguments:'{"path":"result.json"}'}]},
+    {role:'user',content:[{type:'tool-result',toolCallId:'read-file',content:[{type:'text',text:JSON.stringify(file)}]}]},
+    {role:'assistant',content:[{type:'tool-call',id:'read-knowledge',name:'knowledge_read',arguments:'{"chunkId":"fixed"}'}]},
+    {role:'user',content:[{type:'tool-result',toolCallId:'read-knowledge',content:[{type:'text',text:JSON.stringify(knowledge)}]}]}];
+  const latest=runtimeSnapshot('CURRENT '.repeat(550)),notice={role:'user',source:{kind:'plugin',plugin:'weiwu-handoff',form:'notice'},
+    content:[{type:'text',text:'Only submit the current formal handoff from the complete observed evidence.'}]};
+  const options={model:route.id,sessionId:identity.sessionId,system:'Original approved role and limits.',
+    tools:[{name:'filesystem',parameters:{type:'object'}},{name:'agent_teams_update_task',parameters:{type:'object'}}],
+    messages:[runtimeSnapshot('OLDER '.repeat(750)),...evidence,runtimeSnapshot('OLD '.repeat(1100)),latest,notice]};
+  const before=structuredClone(options),original=globalThis.fetch,receipts=[];
+  adapter.onUsage=usage=>receipts.push(usage);
+  try{
+    const prepared=adapter.prepareRequest(options);
+    assert.equal(prepared.fitted.supersededRuntimeSnapshots,2);assert.equal(prepared.fitted.removed,0);
+    assert.equal(prepared.fitted.deduplicatedGroups,0);assert.equal(prepared.attribution.requestPurpose,'handoff');
+    assert.equal(prepared.body.max_tokens,route.maxOutputTokens);assert.equal(adapter.contextBytes,10000);
+    assert.deepEqual(prepared.body.tools.map(tool=>tool.function.name),['agent_teams_update_task']);
+    assert.ok(prepared.body.messages.some(item=>item.content===JSON.stringify(file)));
+    assert.ok(prepared.body.messages.some(item=>item.content===JSON.stringify(knowledge)));
+    assert.ok(prepared.body.messages.some(item=>item.content===message.content[0].text));
+    assert.ok(prepared.body.messages.some(item=>item.content===latest.content[0].text));
+    assert.ok(prepared.body.messages.some(item=>item.content===notice.content[0].text));
+    assert.equal(adapter.budget.tasks.get('qa').calls,2);assert.deepEqual(options,before);
+    let fetched=0;globalThis.fetch=async(_url,init)=>{fetched++;assert.equal(init.body,JSON.stringify(prepared.body));return Response.json({choices:[{message:{tool_calls:[{id:'done',function:{name:'agent_teams_update_task',arguments:'{"status":"completed"}'}}]},finish_reason:'tool_calls'}],usage:{prompt_tokens:10,completion_tokens:2}});};
+    for await(const _ of adapter.stream(options)){}
+    assert.equal(fetched,1);assert.equal(receipts.length,1);assert.equal(receipts[0].requestPurpose,'handoff');
+    assert.equal(adapter.budget.tasks.get('qa').calls,3);assert.equal(adapter.budget.run.calls,3);
+    assert.throws(()=>adapter.prepareRequest(options),error=>error.code==='TASK_TURN_LIMIT');assert.deepEqual(options,before);
+  }finally{globalThis.fetch=original;}
+});
+test('last-handoff snapshot normalization fails closed for real oversized evidence, unmatched snapshots and other sessions',()=>{
+  const identity={sessionId:'qa-session',taskId:'qa',runtimeTaskId:'t2',attemptId:'current'};
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,contextBytes:5000,tasks:[{id:'qa',maxModelCalls:3}]});
+  adapter.attribution=()=>identity;adapter.handoffClosure=sessionId=>sessionId===identity.sessionId?identity:undefined;adapter.requireCompleteContext=()=>true;
+  const latest=runtimeSnapshot('CURRENT '.repeat(300)),old=runtimeSnapshot('OLD '.repeat(800));
+  const options={model:route.id,sessionId:identity.sessionId,tools:[{name:'agent_teams_update_task',parameters:{type:'object'}}],messages:[old,latest]};
+  const unmatched=structuredClone(old);unmatched.content[0].text+='uncovered original instruction';
+  const foreign=structuredClone(old);foreign.source.plugin='different-plugin';
+  const uncovered=runtimeSnapshot('OLD '.repeat(800),[{name:'original-only',text:'Preserve the original extra instruction.'}]);
+  for(const previous of [unmatched,foreign,uncovered,{...message,content:[{type:'text',text:'REAL_EVIDENCE '.repeat(600)}]}])
+    assert.throws(()=>adapter.prepareRequest({...options,messages:[previous,latest]}),error=>error.code==='CONTEXT_LIMIT');
+  assert.throws(()=>adapter.prepareRequest({...options,sessionId:'other-session'}),error=>error.code==='CONTEXT_LIMIT');
+  assert.throws(()=>adapter.prepareRequest({...options,purpose:'compaction'}),error=>error.code==='HANDOFF_CALL_RESERVED');
+  adapter.attribution=()=>({...identity,attemptId:'foreign-attempt'});
+  assert.throws(()=>adapter.prepareRequest(options),error=>error.code==='HANDOFF_IDENTITY');
+  assert.equal(adapter.budget.run.calls,0);assert.equal(adapter.budget.tasks.get('qa').calls,0);assert.equal(adapter.budget.run.reserved,0);
+});
+test('late handoff closure protects complete history without a pre-step retention flag',()=>{
+  const identity={sessionId:'qa-session',taskId:'qa',runtimeTaskId:'t2',attemptId:'current'};
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,contextBytes:5000,tasks:[{id:'qa',maxModelCalls:3}]});
+  adapter.attribution=()=>identity;
+  const history={...message,content:[{type:'text',text:'ORIGINAL_PENDING_DECISION '.repeat(180)}]};
+  const latest=runtimeSnapshot('CURRENT '.repeat(100));
+  const knowledge={documentId:'fixed',version:1,sha256:'b'.repeat(64),content:'COMPLETE_KNOWLEDGE'};
+  const options={model:route.id,sessionId:identity.sessionId,tools:[{name:'agent_teams_update_task',parameters:{type:'object'}}],messages:[history,
+    {role:'assistant',content:[{type:'tool-call',id:'read',name:'knowledge_read',arguments:'{"chunkId":"fixed"}'}]},
+    {role:'user',content:[{type:'tool-result',toolCallId:'read',content:[{type:'text',text:JSON.stringify(knowledge)}]}]},latest]};
+  assert.ok(adapter.prepareRequest(options).fitted.removed>0,'ordinary fitting demonstrates that the older user history is otherwise removable');
+  adapter.handoffClosure=()=>identity;
+  const before=structuredClone(options);
+  assert.equal(adapter.requireCompleteContext,undefined,'the shared allowance reached its last call after pre-step');
+  assert.throws(()=>adapter.prepareRequest(options),error=>error.code==='CONTEXT_LIMIT');
+  const smaller={...options,messages:[{...history,content:[{type:'text',text:'ORIGINAL_PENDING_DECISION'}]},...options.messages.slice(1)]};
+  const retained=adapter.prepareRequest(smaller);
+  assert.equal(retained.fitted.removed,0);assert.equal(retained.attribution.requestPurpose,'handoff');
+  assert.ok(retained.body.messages.some(item=>item.content==='ORIGINAL_PENDING_DECISION'));
+  assert.ok(retained.body.messages.some(item=>item.content===JSON.stringify(knowledge)));
+  assert.throws(()=>adapter.prepareRequest({...smaller,purpose:'compaction'}),error=>error.code==='HANDOFF_CALL_RESERVED');
+  adapter.attribution=()=>({...identity,attemptId:'another-attempt'});
+  assert.throws(()=>adapter.prepareRequest(smaller),error=>error.code==='HANDOFF_IDENTITY');
+  assert.deepEqual(options,before);assert.equal(adapter.budget.run.calls,0);assert.equal(adapter.budget.run.reserved,0);
+});
 test('current native runtime snapshot replaces older covered snapshots without dropping task evidence or the latest tool result',()=>{
   const old=runtimeSnapshot('OLD contract and budget'),latest=runtimeSnapshot('CURRENT contract and budget');
   const file={path:'inventory-cases.md',sha256:'a'.repeat(64),content:'Complete employee delivery'};

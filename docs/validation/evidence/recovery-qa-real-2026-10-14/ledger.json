@@ -1,0 +1,54 @@
+{
+  "usageCount": 529,
+  "receipts": [
+    {
+      "id": "34ac598a-0ec5-42fb-8d47-2fd90454f5a4",
+      "runId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 12960,
+      "outputTokens": 309,
+      "cost": 0.0042588,
+      "createdAt": "2026-10-14T02:06:01.317Z"
+    },
+    {
+      "id": "d11cce5c-77c0-4003-a5e8-4ff462297d42",
+      "runId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11072,
+      "outputTokens": 124,
+      "cost": 0.0034704000000000002,
+      "createdAt": "2026-10-14T02:05:56.580Z"
+    },
+    {
+      "id": "a51bd863-6169-4b2f-81d9-289d9534244e",
+      "runId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 9673,
+      "outputTokens": 97,
+      "cost": 0.0030183000000000002,
+      "createdAt": "2026-10-14T02:05:54.604Z"
+    },
+    {
+      "id": "86b44a72-c015-4b61-b9b7-9b1cf3116109",
+      "runId": null,
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 1674,
+      "outputTokens": 163,
+      "cost": 0.0006977999999999999,
+      "createdAt": "2026-10-14T02:01:38.100Z"
+    }
+  ],
+  "pendingCount": 0,
+  "projectHolds": [
+    {
+      "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+      "status": "uncertain",
+      "amount": 0.0025932,
+      "runId": null
+    }
+  ]
+}

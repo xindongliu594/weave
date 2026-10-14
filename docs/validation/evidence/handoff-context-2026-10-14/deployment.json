@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-context-20261014",
+  "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-qa-chain-v2-20261014",
+  "historicalState": {
+    "runCount": 46,
+    "usageCount": 529,
+    "usageSHA": "ee6f85575ad0d7ff64f8908f1051449d298aacb076e73b634211b43f84b4aeb0",
+    "holdsSHA": "526cedec4c3dfc4e5e3aee88beeda6721c88718ac14a5aa6dcab7d8a5cada2c4",
+    "sourceRunSHA": "8404bd91a193cef9e6358f67dc60d8975329350e34af91fc1d1d7c8f1e5bb273",
+    "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+    "occupied": 2.486592
+  },
+  "modelCalls": 0,
+  "checkedAt": "2026-10-14T02:28:39.104661+00:00"
+}

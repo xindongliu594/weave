@@ -1,0 +1,33 @@
+{
+  "status": "returned",
+  "previewId": "d01e5bbd-665b-43c1-9376-8cc932fef0a6",
+  "sourceRunId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "usageId": "86b44a72-c015-4b61-b9b7-9b1cf3116109",
+  "proposal": {
+    "maxBudget": 0.56,
+    "maxModelCalls": 72,
+    "taskCallLimits": {
+      "t2-qa": 48,
+      "t3-review": 48
+    },
+    "taskBudgetLimits": {
+      "t2-qa": 0.2603454,
+      "t3-review": 0.2
+    },
+    "taskOutputLimits": {
+      "t2-qa": 8192,
+      "t3-review": 2048
+    },
+    "rationale": "在用户ceiling内将项目净额提至0.56：t2-qa按4次后续工作与1次交接纠正预留，并选8192输出版本同步提高预算；t3-review保持8次调用与0.2预算、2048输出。已用与预留全部装入新净额，满足三节点合计不超净额。"
+  },
+  "taskContinuationLimits": {
+    "t2-qa": 4,
+    "t3-review": 7
+  },
+  "usage": {
+    "id": "86b44a72-c015-4b61-b9b7-9b1cf3116109",
+    "inputTokens": 1674,
+    "outputTokens": 163,
+    "cost": 0.0006977999999999999
+  }
+}

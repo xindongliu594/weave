@@ -1,0 +1,116 @@
+Final-call context correction: offline RED -> GREEN, 2026-10-14
+
+Scope
+Only services/agent-runtime/openai-compatible.mjs, its adjacent unit test, and
+the existing tests/product-flow.test.ts fixture were changed by this subtask.
+No real provider request, production retry, budget increase, deployment, or
+production delivery was performed. The API integration model is a localhost
+script; the runtime unit models are in-memory fetch doubles.
+
+Root cause
+employee-context.mjs defers paid compaction on the last authorized call and
+enables onRetainOriginal(true). host.mjs passes this as requireCompleteContext.
+The adapter then disabled currentRuntimeMessages and protected all source
+messages, including every older native runtime snapshot that a later complete
+snapshot had already replaced. It was the contextBytes guard, not the model's
+declared token window, that rejected the final request.
+
+Controlled pre-fix measurement
+The QA+8 joint fixture was reproduced in a temporary sibling test, with the
+same production code and only side-effect-free request-preview diagnostics.
+At the last call it contained five host snapshots, each approximately 11553
+wire-estimate bytes. Each included about 10046 UTF-8 bytes of approved context.
+The final handoff notice was only 561 wire-estimate bytes. The unchanged byte
+limit was 64000; the fixture model declared a 16384-token window.
+- Original request: CONTEXT_LIMIT.
+- Remove only the final handoff notice: still CONTEXT_LIMIT.
+- Remove only four fully covered native snapshots, retaining every other
+  original message under the complete-history guard: preview succeeded with
+  afterBytes=23373, maxTokens=8192, reservation=0.040781 and only the formal
+  agent_teams_update_task schema. Fitted removed groups=0.
+- Preview before/after counters both remained projectCalls=14, QA calls=8.
+The original unchanged stream still failed; diagnostics did not grant or
+dispatch an extra call. The temporary sibling was deleted.
+Evidence: recovery-handoff-context-diagnostic-2026-10-14.json and .txt.
+The initial diagnostic helper needed a Windows file-URL correction and an
+undefined-system measurement correction; only the final saved run supplies
+the measurements above.
+
+Minimal correction
+Resolve the current host handoff closure before snapshot normalization. When
+that closure exists, reuse existing currentRuntimeMessages even while
+retainOriginal is true. A closure also enables retainOriginal itself, so a
+shared-budget transition after pre-step cannot allow old work history to be
+clipped on the last call. No changes were made to snapshot validity/coverage
+checks, source messages, file/knowledge evidence deduplication, ordinary
+non-handoff clipping, the budget, call counts, output cap, tools, permissions,
+handoff response validation, or summary source handling.
+Outside handoff, incomplete-summary source retention behaves as before.
+
+Validation
+1. New focused unit tests were written first.
+   Command: node --test --test-name-pattern=last.handoff services/agent-runtime/openai-compatible.test.mjs
+   RED: 1 failed / 1 passed; the success scenario failed CONTEXT_LIMIT before
+   the production edit. GREEN: 2/2, exit 0.
+   The tests retain the full original task message, file, fixed-version
+   knowledge, latest snapshot and handoff notice; preserve byte/output limits;
+   prove serialized dispatch equals preview; consume exactly the last call and
+   reject the next one. Foreign, unmatched or uncovered snapshot sections,
+   actual oversized evidence, another session, wrong attempt and compaction
+   remain rejected without admissions or counters changing.
+   Logs: recovery-handoff-context-unit-red-2026-10-14.txt,
+   recovery-handoff-context-unit-green-2026-10-14.txt.
+   A third RED test covers a late closure without requireCompleteContext: the
+   old code removed ordinary original history and did not reject the oversized
+   request. It failed with Missing expected exception before the additional
+   retention correction. All three focused tests then passed, exit 0.
+   Logs: recovery-handoff-late-context-unit-red-2026-10-14.txt and
+   recovery-handoff-context-unit-final-2026-10-14.txt.
+
+2. Related native regression group:
+   Command: node --test services/agent-runtime/openai-compatible.test.mjs services/agent-runtime/request-preflight.test.mjs services/agent-runtime/employee-context.test.mjs services/agent-runtime/budget.test.mjs services/agent-runtime/runtime-budget-prompt.test.mjs
+   Result: 89/89 passed, exit 0, 9239.277 ms. A first sandbox run produced
+   employee-host teardown failures; the same group passed with local runtime
+   permission. Both outputs are retained. A subsequent extra serialization
+   assertion was corrected to compare the serialized wire body (undefined
+   description fields are omitted by JSON); focused 2/2 was rerun after that
+   test-only correction. Production code did not change after the 89/89 run.
+   Logs: recovery-handoff-context-native-2026-10-14.txt and
+   recovery-handoff-context-native-sandbox-2026-10-14.txt.
+   After the late-closure correction the entire group was rerun: 90/90 passed,
+   exit 0, 10003.2003 ms. Final log:
+   recovery-handoff-context-native-final-2026-10-14.txt.
+
+3. Joint API/runtime regression reverted from QA+11 to QA+8, manager+7.
+   Command: node scripts/test-integration.mjs '--test-name-pattern=resource-approved recovery' tests/product-flow.test.ts
+   Result: 1/1 passed, exit 0, 12996.2258 ms. QA used exactly 8 child calls:
+   6 execution + 1 compaction + 1 handoff. The absolute QA cap remained 9,
+   including the inherited dispatched request. The last-call context event
+   removed covered native snapshots with removedGroups=0. The manager started
+   after formal QA acceptance; frozen knowledge v1, developer SHA/no replay,
+   actual usage and unknown reservations all remained checked.
+   Evidence: recovery-handoff-context-product-2026-10-14.txt and
+   recovery-handoff-context-product-receipts-2026-10-14.json.
+   This supersedes the earlier QA+11 fixture workaround. It does not establish
+   that any real finite grant is sufficient for task completion.
+   Rerun after the late-closure correction: 1/1 passed, exit 0, 13970.7423 ms.
+   Final log: recovery-handoff-context-product-final-2026-10-14.txt; the receipt
+   JSON above was refreshed with the final run.
+
+4. node node_modules/typescript/bin/tsc --noEmit: exit 0.
+   git diff --check on the three modified code/test files: exit 0.
+   Log: recovery-handoff-context-types-2026-10-14.txt.
+
+Limits
+Both the observed complete-history=true path and the adapter's late-closure
+path are covered. The latter is a deterministic adapter regression, not a
+claim to reproduce all concurrent scheduling permutations. No claim is made
+about completion of the real failed run; only local test doubles were used.
+
+Stable SHA256
+services/agent-runtime/openai-compatible.mjs
+6da989921307ebce2c9efe731e12518ccc3633d45f668bebd9e06568431f72eb
+services/agent-runtime/openai-compatible.test.mjs
+1045ac36f3663210459b62ae3d6cf244cf514e7a4ebc5d4de380440a724eb281
+tests/product-flow.test.ts
+cba4ccb9e1cbdb06f1f39c05d5ed1ad06a6fc02b293ae6ec9955666364d0a284

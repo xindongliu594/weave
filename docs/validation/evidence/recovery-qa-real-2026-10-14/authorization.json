@@ -1,0 +1,20 @@
+{
+  "source": "User reply to call_6c5ddcce1d2c48359d1b0cfdb1827d38: 允许同额度续验一次",
+  "cumulativeCap": 2.8,
+  "stageCap": 0.72,
+  "projectCap": 0.56,
+  "futureProjectCap": 0.03,
+  "planningCap": 0.003,
+  "outputCeiling": 8192,
+  "projectCallCap": 72,
+  "taskCallCap": 48,
+  "additionalCalls": {
+    "t2-qa": 4,
+    "t3-review": 7
+  },
+  "attempts": 1,
+  "stopOnFailure": true,
+  "permissionChanges": false,
+  "preserveUnknownCosts": true,
+  "codeCommit": "4b6294c"
+}
