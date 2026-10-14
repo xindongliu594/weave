@@ -1,0 +1,32 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ explicit continuation grant is previewed, sealed and exhausted across ordinary resume (1636.6297ms)
+✔ invalid continuation grants are rejected before any paid planning request (121.0773ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2627.4652
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:26554
+✖ explicit continuation grant is previewed, sealed and exhausted across ordinary resume (1636.6297ms)
+  AssertionError [ERR_ASSERTION]: {"message":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"taskContinuationLimits\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"taskContinuationLimits\\\"\"\n  }\n]"}
+
+  500 !== 200
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:325:55)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

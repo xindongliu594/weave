@@ -1,0 +1,19 @@
+{
+  "runId": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+  "sourceRunsChecked": 10,
+  "requests": {
+    "t2-qa": 4,
+    "t3-review": 7
+  },
+  "inputBytes": 7903,
+  "planningReservation": 0.0029853,
+  "planningAllowance": 0.003,
+  "planningFits": true,
+  "minimumProjectBudgetWith8192": 0.55582891,
+  "withPlanningAllowance": 0.55882891,
+  "executionFits": true,
+  "usageRows": 525,
+  "occupied": 2.475146700000001,
+  "modelCalls": 0,
+  "productionWrites": 0
+}

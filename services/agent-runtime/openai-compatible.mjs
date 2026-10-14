@@ -315,7 +315,7 @@ async function upstreamErrorSummary(response, apiKey, signal) {
 }
 
 export class OpenAiCompatibleAdapter extends LlmAdapter {
-  constructor({ routes, maxBudget, onUsage, onError, maxModelCalls = 100, contextBytes = 64000, signal, onContext, onRequest, onResponse, onFallback, priorSpend=0,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},onBudget,beforeRequest,onCallError }) {
+  constructor({ routes, maxBudget, onUsage, onError, maxModelCalls = 100, contextBytes = 64000, signal, onContext, onRequest, onResponse, onFallback, priorSpend=0,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},taskCallCeilings,onBudget,beforeRequest,onCallError }) {
     super();
     this.routes = new Map(routes.map(route => [route.id, Object.freeze({ ...route })]));
     this.maxBudget = maxBudget;
@@ -325,7 +325,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     this.reserved = 0;
     this.maxModelCalls=maxModelCalls; this.calls=0; this.contextBytes=contextBytes; this.signal=signal; this.onContext=onContext;
     this.onRequest=onRequest;this.onFallback=onFallback;this.sessionPolicies=new Map();
-    this.budget=new ExecutionBudget({maxBudget,priorSpend,maxModelCalls,priorModelCalls,tasks,maxTaskModelCalls,taskUsage,onEvent:onBudget});
+    this.budget=new ExecutionBudget({maxBudget,priorSpend,maxModelCalls,priorModelCalls,tasks,maxTaskModelCalls,taskUsage,taskCallCeilings,onEvent:onBudget});
     this.taskOutputCaps = new Map();
     for (const task of tasks) if (task.maxOutputTokens !== undefined) {
       if (!Number.isSafeInteger(task.maxOutputTokens) || task.maxOutputTokens < 1 || task.maxOutputTokens > 32768)

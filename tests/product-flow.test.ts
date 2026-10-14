@@ -25,6 +25,7 @@ const hash = (value: string | Buffer) => createHash('sha256').update(value).dige
 let app: any, server: http.Server, gateway: http.Server, pool: pg.Pool, directory: string, url: string;
 let modelId: string, mode = 'pass', commands = 0, summaryCalls = 0,readFaults=0,mutations=0;
 let verificationCommand='check-fixed-result';
+let resourcePaused = false, resourcePlanningReply: any, resourceKnowledge: any;
 const {LocalDeviceClient}=createRequire(import.meta.url)('../apps/desktop/local-client.cjs');
 const contextRequests: any[] = [];
 const steps = new Map<string, number>(), assignments: string[] = [], evidence: any[] = [];
@@ -35,6 +36,7 @@ before(async () => {
   process.env.DATABASE_URL = dbURL.toString();
   directory = await mkdtemp(join(tmpdir(), 'product-flow-'));
   process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, '.data', 'runs');
+  process.env.OBSIDIAN_VAULT = join(directory, 'obsidian-vault');
   // Replace the readiness boundary directly on every OS. No shell shim or
   // PATH mutation; accidental real container operations must fail loudly.
   mock.method(RunSandbox, 'assertReady', async (signal?: AbortSignal) => { signal?.throwIfAborted(); });
@@ -85,11 +87,19 @@ before(async () => {
       message = tool('capability_probe', { nonce: body.tools[0].function.parameters.properties.nonce.enum[0] }, 'probe');
     } else if (messages.some((m: any) => m.role === 'tool' && m.tool_call_id === 'probe')) {
       message = { content: JSON.parse(messages.find((m: any) => m.tool_call_id === 'probe').content).result };
+    } else if (mode === 'resource-recovery' && messages[0]?.content?.includes('只规划未完成任务的资源')) {
+      assert.ok(resourcePlanningReply, 'only the explicitly requested localhost resource planner may reply');
+      message = { content: JSON.stringify(resourcePlanningReply) };
     } else if (messages.at(-1)?.content?.includes('Output EXACTLY the Markdown structure below:')) {
       summaryCalls++;
       message = { content: 'Task unchanged. Continue from approved context and observed tool results.' };
     } else {
       const pinned = fixtureTaskContext(messages);
+      if (mode === 'resource-recovery' && pinned?.task.id === 'review' && !pinned.recovery) {
+        // A genuinely dispatched localhost request has no response. Cancellation
+        // must retain its unknown reservation through the real billing path.
+        contextRequests.push(body); resourcePaused = true; return;
+      }
       // Rework contracts keep the original subject; native follow-up labels use
       // the approved reworkRound and must not select the original write branch.
       const subject = pinned?.task.kind === 'repair' ? `repair-round-${pinned.task.reworkRound + 1}` :
@@ -111,6 +121,14 @@ before(async () => {
           actions.push(update('completed', { output: 'fixed report', changedPaths: ['result.json'], acceptanceResults: [{ criterion: repair?'Set result.json reviewStage to final':'result correct', status: 'passed', evidence: 'fixed fixture' }], commandsRun: [{ command: verificationCommand, status: 'passed', exitCode: 0, evidence: 'model claim' }] }));
           if(mode==='c3-repeat-action')actions.splice(3,actions.length-3,...Array.from({length:12},()=>['filesystem',{path:'result.json'}]));
           if(mode==='c3-repeat-error')actions.splice(2,actions.length-2,...Array.from({length:6},()=>['filesystem',{path:'review.json'}]));
+        } else if (mode === 'resource-recovery' && label === 'review') {
+          const search = messages.filter((m:any)=>m.role==='tool').map((m:any)=>{try{return JSON.parse(m.content);}catch{return undefined;}})
+            .findLast((value:any)=>Array.isArray(value)&&value.some((hit:any)=>hit.documentId===resourceKnowledge.id));
+          actions.push(['knowledge_search',{query:'frozen-boundary-reference'}],['knowledge_read',{chunkId:search?.[0]?.id??'await-search-result'}],
+            ['filesystem',{path:'result.json'}],['terminal_test',{command:'check-fixed-result'}],
+            update('completed',{output:'Scripted QA inspected the frozen reference and actual host verification.',verdict:'pass'}));
+        } else if (mode === 'resource-recovery' && label === 'accept') {
+          actions.push(update('completed',{output:'Scripted manager received committed QA evidence.'}));
         } else if(label==='consume') {
           actions.push(['filesystem',{path:'result.json'}],['terminal_test',{command:'check-fixed-result'}],['artifact_write',{path:'review.json',content:'{"accepted":true}'}],update('completed',{output:'delivered checkpoint result'}));
         } else {
@@ -135,7 +153,7 @@ before(async () => {
         }
       }
     }
-    if (mode === 'context'||mode==='resume-review') contextRequests.push(body);
+    if (mode === 'context'||mode==='resume-review'||mode==='resource-recovery') contextRequests.push(body);
     const inputTokens = mode === 'context' ? Math.ceil(JSON.stringify({ messages, tools: body.tools }).length / 4) : 50;
     const outputTokens = mode === 'context' ? Math.ceil(JSON.stringify(message).length / 4) : 10;
     res.setHeader('content-type', 'application/json');
@@ -174,12 +192,19 @@ async function waitFor(read: () => Promise<any>, accept: (value: any) => boolean
 }
 async function launch(nextMode: string,executionTarget?:any) {
   mode = nextMode; commands = 0; summaryCalls = 0;readFaults=0;mutations=0; contextRequests.length = 0; assignments.length = 0; steps.clear();
+  resourcePaused=false; resourcePlanningReply=undefined; resourceKnowledge=undefined;
+  if(mode==='resource-recovery'){
+    const space=await call('/knowledge/spaces','POST',{name:'Recovery fixture reference',scope:'company'},201);
+    const document=await call('/knowledge/documents','POST',{spaceId:space.id,title:'Frozen QA reference',content:'frozen-boundary-reference: compare the exact approved result before accepting.'},201);
+    resourceKnowledge=(await call('/knowledge/documents')).find((row:any)=>row.id===document.id);
+  }
   const localCode=nextMode==='local-long'?"require('fs').writeFileSync('command-started.txt','started');setTimeout(()=>console.log('long command complete'),25000)":"const result=require('./result.json');require('node:assert/strict').deepEqual(result,JSON.parse(Buffer.from('"+Buffer.from(JSON.stringify(expected)).toString('base64')+"','base64').toString()));console.log('local validation passed')";
   verificationCommand=nextMode.startsWith('local-')?'node -e "'+localCode+'"':'check-fixed-result';
   const agents = [
     { id: 'manager', role: 'manager', name: '经理', tools: [] },
     { id: 'producer', role: 'member', name: '产出者', tools: nextMode.startsWith('rework')||nextMode.startsWith('c3-')?['filesystem','artifact_write','terminal_test']:['artifact_write', 'terminal_test'] },
-    { id: 'reviewer', role: 'member', name: '审查者', tools: ['rework-checkpoint','resume-review'].includes(nextMode)?['filesystem','artifact_write','terminal_test']:['filesystem', 'artifact_write'] },
+    { id: 'reviewer', role: 'member', name: '审查者', tools: nextMode==='resource-recovery'?['filesystem','terminal_test','knowledge_search','knowledge_read']:['rework-checkpoint','resume-review'].includes(nextMode)?['filesystem','artifact_write','terminal_test']:['filesystem', 'artifact_write'],
+      ...(resourceKnowledge?{knowledgeSpaceIds:[resourceKnowledge.spaceId]}:{}) },
   ].map(a => ({ ...a, title: a.name, instructions: 'Execute only the approved fixture tasks', modelId }));
   const department = await call('/departments', 'POST', { name: 'Flow ' + mode, description: 'Integration fixture', agents }, 201);
   const project = await call('/projects', 'POST', { departmentId: department.id, requirement: '生成固定测试报告并由另一位员工独立审查，核对文件版本和审批。', policy: { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 60,...(executionTarget?{executionTarget}:{}) } }, 201);
@@ -195,6 +220,12 @@ async function launch(nextMode: string,executionTarget?:any) {
   }
   if(mode==='rework-checkpoint')plan.tasks.push({...common,id:'deliver',subject:'[flow:consume]',objective:'Deliver after independent review',assigneeId:'reviewer',dependencies:['review'],acceptanceCriteria:['delivery correct'],kind:'work',inputs:[{path:'result.json',producerTaskId:'produce'}],outputs:[{path:'review.json',format:'json',expectedValues:{accepted:true}}]});
   if(mode==='resume-review')plan.tasks[1].maxModelCalls=40;
+  if(mode==='resource-recovery'){
+    for(const task of plan.tasks)task.maxOutputTokens=2048;
+    Object.assign(plan.tasks[1],{outputs:[],verify:['check-fixed-result'],maxModelCalls:8});
+    plan.tasks.push({...common,id:'accept',subject:'[flow:accept]',objective:'Inspect committed independent QA evidence',assigneeId:'manager',dependencies:['review'],
+      acceptanceCriteria:['QA has a current host seal'],kind:'work',inputs:[],outputs:[],maxModelCalls:7,maxOutputTokens:2048});
+  }
   if(mode==='local-long'){plan.tasks[0].inScope.push('command-started.txt');plan.tasks[0].outputs.push({path:'command-started.txt',format:'text',nonEmpty:true});}
   await call('/projects/' + project.id + '/plan', 'PUT', { version: 1, plan });
   const saved = (await call('/projects')).find((p: any) => p.id === project.id); assert.equal(saved.validation.valid, true, JSON.stringify(saved.validation));
@@ -395,7 +426,13 @@ test('approved API rework repairs, independently re-reviews and bills the origin
 test('API rework stops at its call allowance and full retry cannot reset the task counter', {timeout:35000},async()=>{
   const id=await launch('rework-budget'),result=await finishRework(id);assert.equal(result.status,'failed');
   assert.equal(result.events.filter((e:any)=>e.type==='quality/rework-created').length,1);
-  assert.ok(result.events.some((e:any)=>e.type==='budget/stopped'&&e.data.code==='TASK_TURN_LIMIT'));
+  // The final authorized request is reserved for handoff. This fixture asks
+  // for another file read, so the handoff gate rejects it before turn exhaustion.
+  const closure=result.events.find((e:any)=>e.type==='handoff/closure-started'&&e.data.taskId==='produce');
+  assert.ok(closure);assert.equal(closure.data.reason,'last-authorized-call');
+  assert.ok(result.events.some((e:any)=>e.type==='session/turn/end'&&e.sessionId===closure.sessionId&&e.seq>closure.seq&&e.data.reason?.error?.code==='HANDOFF_ONLY'));
+  assert.ok(!result.events.some((e:any)=>e.type==='runtime/operation-start'&&e.seq>closure.seq),'no ordinary operation may execute after the last-call handoff gate');
+  assert.ok(!result.events.some((e:any)=>e.type==='handoff/accepted'&&e.data.attemptId===closure.data.attemptId),'the rejected repair cannot publish a new delivery');
   const producer=(await call('/usage')).filter((u:any)=>u.runId===id&&u.taskId==='produce');assert.equal(producer.length,8);
   const resumed=await call('/runs/'+id+'/retry','POST',{resume:true},409);assert.match(resumed.message??resumed.error,/完整重试/);
   const response=await fetch(url+'/runs/'+id+'/retry',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({resume:false})}),retried=await response.json();
@@ -524,6 +561,101 @@ test('checkpoint resume returns the active child without duplicate rows or model
  }finally{
   if(child){await call('/runs/'+child+'/cancel','POST',{},202);await stopped(child);}
  }
+});
+
+test('resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay', {timeout:90000},async()=>{
+  const parent=await launch('resource-recovery'),approval=await pendingApproval(parent);
+  await call('/approvals/'+approval.id,'POST',{decision:'approved'});
+  await waitFor(async()=>resourcePaused,value=>value,'parent QA request dispatched to the localhost fixture');
+  await call('/runs/'+parent+'/cancel','POST',{},202);
+  const original=await stopped(parent),projectId=original.snapshot.projectId;
+  assert.equal(original.status,'cancelled');assert.equal(original.integrity,'ok');
+  const devSeal=original.events.find((event:any)=>event.type==='handoff/accepted'&&event.data.taskId==='produce').data;
+  assert.deepEqual(original.events.filter((event:any)=>event.type==='handoff/accepted').map((event:any)=>event.data.taskId),['produce']);
+  const unknown=(await pool.query("SELECT id,amount,status,context FROM model_reservations WHERE run_id=$1 AND status='uncertain' ORDER BY id",[parent])).rows;
+  const qaUnknown=unknown.filter(row=>row.context.taskId==='review');
+  assert.equal(qaUnknown.length,1,'the cancelled dispatched QA request must retain its real unknown fee');
+  const retained=unknown.reduce((sum,row)=>sum+Number(row.amount),0);assert.ok(retained>0);
+  const frozen=structuredClone(original.snapshot),originalCalls=original.events.filter((event:any)=>event.type==='model/wire-request');
+  const parentArtifact=await fetch(url+'/runs/'+parent+'/artifact?path=result.json');assert.equal(parentArtifact.status,200);
+  assert.equal(hash(Buffer.from(await parentArtifact.arrayBuffer())),devSeal.outputs[0].sha256);
+  await call('/knowledge/documents/'+resourceKnowledge.id,'PUT',{spaceId:resourceKnowledge.spaceId,title:resourceKnowledge.title,version:1,content:'VERSION_TWO_MUST_NOT_REPLACE_APPROVED_REFERENCE'});
+
+  await app.locals.shutdown();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));
+  const {createApp}=await import('../apps/api/src/app.ts');app=createApp();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
+  resourcePlanningReply={maxBudget:2,maxModelCalls:100,taskCallLimits:{review:12,accept:7},taskBudgetLimits:{review:1.2,accept:1.2},
+    taskOutputLimits:{review:8192,accept:8192},rationale:'Local scripted recovery regression; no real model acceptance.'};
+  const countRuns=async()=>Number((await pool.query('SELECT count(*)::int AS n FROM project_runs WHERE project_id=$1',[projectId])).rows[0].n);
+  const beforePlanning=contextRequests.length,rowsBefore=await countRuns();
+  // Keep the original fixture's cumulative QA cap of 12: one inherited call
+  // leaves 11. Its seven scripted task actions also consume a compaction call;
+  // an eight-call grant reaches the final-call context gate in this 16k fixture.
+  const candidate=await call('/runs/'+parent+'/resource-proposal','POST',{modelId,maxBudget:2,maxPlanningCost:.1,maxModelCalls:100,maxTaskModelCalls:40,maxTaskOutputTokens:8192,retainUncertainCosts:true,taskContinuationLimits:{review:11,accept:7}});
+  assert.equal(candidate.kind,'run-resource-proposal');assert.deepEqual(candidate.completedTaskIds,['produce']);
+  assert.equal(contextRequests.length,beforePlanning+1);assert.equal(await countRuns(),rowsBefore,'planning cannot start employees');
+  assert.deepEqual((await run(parent)).snapshot,frozen,'a candidate cannot mutate the original approval');
+  const planningUsage=(await pool.query('SELECT planning_preview_id,purpose,cost FROM usage WHERE id=$1',[candidate.usageId])).rows[0];
+  assert.equal(planningUsage.planning_preview_id,candidate.previewId);assert.equal(planningUsage.purpose,'预算补充规划');assert.ok(Number(planningUsage.cost)>0);
+  const beforeChild=contextRequests.length;
+  const child=(await call('/runs/'+parent+'/retry','POST',{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'},202)).id;
+  const qaApproval=await pendingApproval(child),running=await run(child);
+  assert.deepEqual(running.snapshot.completedCheckpoints,['produce']);
+  assert.equal(running.snapshot.resourceApproval.previewId,candidate.previewId);
+  assert.deepEqual(candidate.taskContinuationLimits,{review:11,accept:7});
+  assert.deepEqual(running.snapshot.resourceApproval.taskCallCeilings,{review:12,accept:7});
+  assert.equal(running.snapshot.budgetHistory.calls,originalCalls.length);
+  assert.equal(running.snapshot.budgetHistory.tasks.review.calls,1);
+  assert.ok(Math.abs(running.snapshot.costCarryover.reserved-retained)<1e-8);
+  assert.equal(running.snapshot.budgetHistory.tasks.review.reserved,Number(qaUnknown[0].amount));
+  assert.deepEqual(running.snapshot.knowledge,frozen.knowledge);
+  assert.deepEqual(running.snapshot.tasks.find((task:any)=>task.id==='produce'),frozen.tasks.find((task:any)=>task.id==='produce'));
+  for(const id of ['review','accept'])assert.equal(running.snapshot.tasks.find((task:any)=>task.id===id).maxOutputTokens,8192);
+  assert.ok(!running.events.some((event:any)=>event.type==='model/wire-request'&&event.data.taskId==='accept'),'manager waits for formal QA acceptance');
+  await call('/approvals/'+qaApproval.id,'POST',{decision:'approved'});
+  const result=await stopped(child);assert.equal(result.status,'completed',JSON.stringify({
+    stops:result.events.filter((event:any)=>['run/finished','model/error','handoff/blocked','handoff/closure-started','budget/stopped'].includes(event.type))
+      .map((event:any)=>({seq:event.seq,type:event.type,taskId:event.data.taskId,code:event.data.code,reason:event.data.reason,message:event.data.message})),
+    wires:result.events.filter((event:any)=>event.type==='model/wire-request').map((event:any)=>({seq:event.seq,taskId:event.data.taskId,purpose:event.data.requestPurpose}))}));
+  assert.equal(result.integrity,'ok');assert.equal(commands,2);assert.equal(mutations,1);
+  const childRequests=contextRequests.slice(beforeChild).filter(body=>fixtureTaskContext(body.messages)?.task&&
+    !body.messages.at(-1)?.content?.includes('Output EXACTLY the Markdown structure below:'));
+  assert.ok(childRequests.length>0);assert.ok(childRequests.every(body=>body.max_tokens===8192),JSON.stringify(childRequests.map(body=>({taskId:fixtureTaskContext(body.messages).task.id,maxTokens:body.max_tokens}))));
+  assert.ok(childRequests.every(body=>['review','accept'].includes(fixtureTaskContext(body.messages).task.id)));
+  assert.ok(result.events.filter((event:any)=>event.type==='model/wire-request').every((event:any)=>event.data.taskId!=='produce'));
+  const seals=result.events.filter((event:any)=>event.type==='handoff/accepted');assert.deepEqual(seals.map((event:any)=>event.data.taskId),['review','accept']);
+  const qaSeal=seals[0],managerWire=result.events.find((event:any)=>event.type==='model/wire-request'&&event.data.taskId==='accept');
+  assert.ok(managerWire.seq>qaSeal.seq,'manager first dispatch follows durable QA acceptance');
+  const managerContext=fixtureTaskContext(childRequests.find(body=>fixtureTaskContext(body.messages).task.id==='accept').messages);
+  const qaEvidence=managerContext.runEvidence.completedAncestors.find((item:any)=>item.taskId==='review');
+  assert.equal(qaEvidence.attemptId,qaSeal.data.attemptId);assert.equal(qaEvidence.commands[0].exitCode,0);
+  assert.equal(qaEvidence.commands[0].approval.approvalId,qaApproval.id);assert.equal(qaEvidence.commands[0].validAtAccepted,true);
+  assert.equal(qaEvidence.commands[0].output.sha256,hash('fixed JSON oracle passed'));
+  assert.ok(!JSON.stringify(managerContext).includes(resourceKnowledge.content));
+  assert.ok(childRequests.some(body=>fixtureTaskContext(body.messages).task.id==='review'&&JSON.stringify(body.messages).includes(resourceKnowledge.content)));
+  assert.ok(childRequests.every(body=>!JSON.stringify(body.messages).includes('VERSION_TWO_MUST_NOT_REPLACE_APPROVED_REFERENCE')));
+  assert.ok(childRequests.filter(body=>fixtureTaskContext(body.messages).task.id==='accept').every(body=>!JSON.stringify(body.messages).includes(resourceKnowledge.content)));
+  const citation=result.events.find((event:any)=>event.type==='knowledge/citation'&&event.data.operation==='read');
+  assert.ok(citation);const source=citation.data.sources.find((item:any)=>item.documentId===resourceKnowledge.id);
+  assert.equal(source.version,1);assert.equal(source.sha256,resourceKnowledge.sha256);
+  const read=await call('/runs/'+child+'/citations/'+source.chunkId);assert.equal(read.content,resourceKnowledge.content+'\n');
+  const childArtifact=await fetch(url+'/runs/'+child+'/artifact?path=result.json');assert.equal(childArtifact.status,200);
+  assert.equal(hash(Buffer.from(await childArtifact.arrayBuffer())),devSeal.outputs[0].sha256);
+  assert.deepEqual((await run(parent)).snapshot,frozen);
+  assert.deepEqual((await pool.query('SELECT id,amount,status,context FROM model_reservations WHERE id=ANY($1) ORDER BY id',[unknown.map(row=>row.id)])).rows,unknown);
+  const childUsage=(await pool.query('SELECT id FROM usage WHERE run_id=$1',[child])).rows;
+  const wireRequests=result.events.filter((event:any)=>event.type==='model/wire-request');
+  assert.equal(childUsage.length,wireRequests.length);
+  const purposes=(events:any[])=>Object.fromEntries(['review','accept','unattributed'].map(taskId=>[taskId,
+    Object.fromEntries(['execution','compaction','handoff'].map(purpose=>[purpose,events.filter(event=>(event.data.taskId??'unattributed')===taskId&&
+      (event.data.requestPurpose??'execution')===purpose).length]))]));
+  const requestPurposeCounts=purposes(wireRequests);
+  assert.deepEqual(requestPurposeCounts.review,{execution:7,compaction:1,handoff:0},'all eight QA requests consume the frozen allowance, including compaction');
+  assert.deepEqual(purposes(result.events.filter((event:any)=>event.type==='billing/usage')),requestPurposeCounts,'every request purpose has a real recorded receipt');
+  assert.deepEqual(result.snapshot.resourceApproval.taskCallCeilings,{review:12,accept:7});
+  evidence.push({scenario:'resource-approved-recovery-qa-manager',model:'localhost scripted responses only',parent,child,previewId:candidate.previewId,
+    developerSha256:devSeal.outputs[0].sha256,retainedUnknownReceiptIds:unknown.map(row=>row.id),retainedUnknownAmount:retained,outputLimit:8192,knowledgeVersion:1,
+    qaSealSequence:qaSeal.seq,managerFirstRequestSequence:managerWire.seq,status:result.status,taskContinuationLimits:candidate.taskContinuationLimits,
+    taskCallCeilings:result.snapshot.resourceApproval.taskCallCeilings,inheritedCalls:result.snapshot.budgetHistory.calls,requestPurposeCounts});
 });
 
 test('checkpoint recovery preserves the DAG, unfinished files and history across two interruptions', {timeout:90000},async()=>{

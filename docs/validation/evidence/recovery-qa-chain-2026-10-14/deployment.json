@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-qa-chain-v2-20261014",
+  "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-output-compact-20261013",
+  "historicalState": {
+    "runCount": 45,
+    "usageCount": 525,
+    "usageSHA": "690b517d0f404ceac045d1a98b2116b3563eac470fa99e3c502bcf077aaf72c0",
+    "holdsSHA": "526cedec4c3dfc4e5e3aee88beeda6721c88718ac14a5aa6dcab7d8a5cada2c4",
+    "sourceRunSHA": "245a80242a3ecb7a0cf891cedc80128ed50bde837b791d5bbc2754a61f3e0778",
+    "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+    "occupied": 2.4751467000000003
+  },
+  "modelCalls": 0,
+  "checkedAt": "2026-10-14T01:44:24.645570+00:00"
+}

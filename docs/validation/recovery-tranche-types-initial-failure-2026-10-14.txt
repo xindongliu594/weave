@@ -1,0 +1,4 @@
+tests/run-resource-resume.test.ts(21,50): error TS2345: Argument of type '{ qa: string; accept?: undefined; completed?: undefined; } | { qa: string; accept: string; completed?: undefined; } | { qa: string; accept: string; completed: string; }' is not assignable to parameter of type 'Record<string, string>'.
+  Type '{ qa: string; accept?: undefined; completed?: undefined; }' is not assignable to type 'Record<string, string>'.
+    Property 'accept' is incompatible with index signature.
+      Type 'undefined' is not assignable to type 'string'.

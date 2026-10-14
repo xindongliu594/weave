@@ -1,0 +1,28 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ API rework stops at its call allowance and full retry cannot reset the task counter (7777.9437ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8432.3017
+
+✖ failing tests:
+
+test at tests\product-flow-baseline.audit.ts:1:33677
+✖ API rework stops at its call allowance and full retry cannot reset the task counter (7777.9437ms)
+  AssertionError [ERR_ASSERTION]: [{"type":"handoff/closure-started","data":{"taskId":"produce","runtimeTaskId":"t3","attemptId":"a5ab4215-f864-4ead-88be-acd166de771b","taskStatus":"in_progress","reason":"last-authorized-call"}},{"type":"run/finished","data":{"status":"failed","message":"最后一次调用仅能提交正式完成或失败交接，未执行其他操作","usageCost":0.0010499999999999997}}]
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product-flow-baseline.audit.ts:398:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

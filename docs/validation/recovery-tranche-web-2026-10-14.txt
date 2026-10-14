@@ -1,0 +1,15 @@
+✔ confirmation displays explicit continuation calls separately from the cumulative task cap (7.1721ms)
+✔ optional continuation input requires all inspected unfinished tasks and preserves omission (2.6657ms)
+✔ output allowance is visible before planning and confirmation shows per-task change (1.0246ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (0.5029ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.2027ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (0.4973ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (0.4291ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 364.3389

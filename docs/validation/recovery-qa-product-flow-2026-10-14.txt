@@ -1,0 +1,77 @@
+Command: node scripts/test-integration.mjs tests/product-flow.test.ts
+Captured tool output from execution session 32241; chunks combined in emitted order.
+Exit code: 1
+
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (11606.4346ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (7734.2222ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2608.2827ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (4867.648ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (3984.1649ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (4453.0239ms)
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (7982.0752ms)
+✖ API rework stops at its call allowance and full retry cannot reset the task counter (4552.4939ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (18712.0039ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3120.6371ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (2446.8417ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (1771.8741ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (5653.6104ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (4541.3104ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (6453.9432ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (8530.8483ms)
+✔ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (7979.8054ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (10165.54ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (11494.9668ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 129372.4562
+
+✖ failing tests:
+
+test at tests\product-flow.test.ts:1:36134
+✖ API rework stops at its call allowance and full retry cannot reset the task counter (4552.4939ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(result.events.some((e:any)=>e.type==='budget/stopped'&&e.data.code==='TASK_TURN_LIMIT'))
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product-flow.test.ts:429:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+Independent targeted command: node scripts/test-integration.mjs '--test-name-pattern=resource-approved recovery' tests/product-flow.test.ts
+Execution session 36731; exit code 0.
+✔ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (11182.5725ms)
+ℹ tests 1
+ℹ pass 1
+ℹ fail 0
+ℹ duration_ms 11817.7681
+
+Type command: node node_modules/typescript/bin/tsc --noEmit
+Execution session 76683; exit code 0; stdout/stderr empty.
+
+Initial sandbox execution failed in the before hook with connect EACCES to its own localhost PGlite socket; reruns used the approved local-network escalation. That environment failure is not a product RED.
+Initial new-fixture assertions were corrected for multiple real unknown receipts, separate summary output limits, and normalized chunk trailing newline; those failures were fixture assumptions, not production defects. No production file was changed by this subtask.
+
+The existing rework-budget failure reproduced alone; see recovery-qa-rework-recheck-2026-10-14.txt.
+Control experiment used git HEAD:tests/product-flow.test.ts in a temporary sibling file, with only an added assertion diagnostic. It reproduced the same failure without any new resource-recovery mode/global changes. The temporary file was removed.
+The control emitted handoff/closure-started for produce/t3 with reason last-authorized-call, followed by run/finished status failed and message: 最后一次调用仅能提交正式完成或失败交接，未执行其他操作.
+See recovery-qa-rework-baseline-2026-10-14.txt. The existing assertion requires budget/stopped TASK_TURN_LIMIT, but this fixture now safely stops earlier at the final-call tool gate. Its original budget, usage and retry assertions were not weakened or changed.
+
+After explicit authorization, the stale stop-reason assertion was narrowly updated to require the actual produce last-authorized-call closure, same-session HANDOFF_ONLY error, no later ordinary operation, and no accepted handoff for the rejected repair attempt. The original 8-call usage, rejected retry, preserved 8-call history and no-child assertions remain unchanged and were reached successfully.
+Final targeted rerun: 1/1 pass, exit 0, duration 9545.4775 ms; recovery-qa-rework-final-2026-10-14.txt.
+Final full product-flow rerun: 19/19 pass, exit 0, duration 125648.8176 ms; recovery-qa-product-flow-final-2026-10-14.txt.
+Final typecheck: exit 0; recovery-qa-types-final-2026-10-14.txt.

@@ -18,6 +18,7 @@ export class OpenAiCompatibleAdapter {
   drain(timeoutMs?: number, signal?: AbortSignal): Promise<{pendingRequests:number;finishedRequests:number;timedOut:boolean;aborted:boolean}>;
   constructor(input: { routes: RelayRoute[]; maxBudget: number; priorSpend?: number; priorModelCalls?: number; maxModelCalls?: number; maxTaskModelCalls?: number;
     tasks?: {id:string;assigneeId?:string;maxBudget?:number;maxModelCalls?:number;maxOutputTokens?:number}[]; taskUsage?:Record<string,{cost:number;calls:number;reserved?:number}>;
+    taskCallCeilings?:Record<string,number>;
     contextBytes?:number;signal?:AbortSignal;onUsage?: (usage: RuntimeUsage) => void | Promise<void>; onError?: (error: unknown) => void;
     beforeRequest?:(event:any,signal?:AbortSignal)=>Promise<void>;onResponse?:(event:RuntimeResponseMetadata)=>void|Promise<void>;onCallError?:(event:RuntimeCallError)=>void|Promise<void>;onBudget?:(event:any)=>void;onRequest?:(event:any)=>void;onContext?:(event:any)=>void;onFallback?:(event:any)=>void });
 }

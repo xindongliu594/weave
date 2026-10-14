@@ -1,0 +1,35 @@
+✖ confirmation displays explicit continuation calls separately from the cumulative task cap (20.4895ms)
+✔ output allowance is visible before planning and confirmation shows per-task change (3.1213ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (1.0691ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.5641ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (1.0258ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (0.8045ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 600.4163
+
+✖ failing tests:
+
+test at tests\run-resource-resume.test.ts:1:839
+✖ confirmation displays explicit continuation calls separately from the cumulative task cap (20.4895ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(html.includes('经理验收 · 本段最多新增 3 次调用'))
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-resource-resume.test.ts:13:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

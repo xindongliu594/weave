@@ -1,0 +1,54 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ DeepSeek resource planning sends JSON mode through the actual budgeted request (2138.3294ms)
+✖ missing fields, wrapped plans and schema echoes remain paid failures with no automatic retry (184.7336ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3120.1735
+
+✖ failing tests:
+
+test at tests\recovery-conditions.test.ts:1:36430
+✖ DeepSeek resource planning sends JSON mode through the actual budgeted request (2138.3294ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + undefined
+  - {
+  -   type: 'json_object'
+  - }
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:448:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { type: 'json_object' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\recovery-conditions.test.ts:1:37426
+✖ missing fields, wrapped plans and schema echoes remain paid failures with no automatic retry (184.7336ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(result.diagnostic.schemaIssues.some((issue:any)=>issue.path[0]==='taskCallLimits'))
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-conditions.test.ts:462:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

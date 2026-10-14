@@ -1,0 +1,25 @@
+C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-resource-resume.test.ts:5
+import {ResourceResumeConfirmation,resourceResumeBody,RunResourceResume,resourceContinuationLimits} from '../apps/web/src/RunResourceResume.tsx';
+                                                                        ^
+SyntaxError: The requested module '../apps/web/src/RunResourceResume.tsx' does not provide an export named 'resourceContinuationLimits'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:326:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:429:5)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0
+✖ tests\run-resource-resume.test.ts (505.1563ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 518.6013
+
+✖ failing tests:
+
+test at tests\run-resource-resume.test.ts:1:1
+✖ tests\run-resource-resume.test.ts (505.1563ms)
+  'test failed'

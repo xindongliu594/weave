@@ -1,0 +1,46 @@
+✔ one exact object, one fence, or short surrounding prose preserves the whole candidate (3.3647ms)
+✔ actual plan schema issues retain field, expected type, length, enum and numeric constraint without received values (7.0233ms)
+✔ record keys, unknown fields and nested union input never enter a safe schema diagnostic (3.415ms)
+✔ multiple issue summaries are capped and only schema fields, bounded array indexes and safe constraints survive (0.5277ms)
+✔ normal candidate parsing and accepted unknown-field stripping retain original schema behavior (1.0719ms)
+✔ quoted braces, escaped quotes/backslashes/newlines and nested containers never split the object (0.3306ms)
+✔ multiple candidates, alternative scalar values and malformed fence boundaries are rejected (0.9115ms)
+✔ truncated strings/containers, invalid escape/control characters and syntax are never repaired (0.6683ms)
+✔ output byte, nesting depth and outside text ceilings are exact and do not clip data (9.0259ms)
+✔ failure diagnostics contain safe scalars and original SHA without echoing provider text or keys (0.5684ms)
+✔ output choices quote the whole next tranche with old fees and leave the approved snapshot unchanged (5.2484ms)
+✔ output allowance reaches the runtime wire and approved lineage without changing completed tasks (30.6526ms)
+✔ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (4.4823ms)
+✔ larger output must fit retained node money even when money is not changed (1.2773ms)
+✔ a completed legacy task keeps its old output cap if review later requests rework (0.8577ms)
+✔ resource approval preserves original semantics, grants and source snapshot (0.932ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (1.6664ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (0.8532ms)
+✔ subsequent resource approval retains each ancestor once (0.9298ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (2.3062ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.1698ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (0.9783ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.8749ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.2628ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.192ms)
+✔ explicit call ceilings extend only unfinished resources and keep every historical attempt (2.9486ms)
+✔ recovery counts six work requests plus one correction for each unfinished task (0.7363ms)
+✔ recovery preserves a correction when only two node calls remain and rejects zero or one (0.4378ms)
+✔ shared project calls must cover all next tranches and malformed history never creates headroom (0.4833ms)
+✔ versioned confirmation rechecks actual history and rejects an underfunded or omitted next tranche (2.1617ms)
+✔ versioned node money must cover work and correction with old spend and holds preserved (1.1403ms)
+✔ unknown requirement versions are rejected while historical approved edges remain verifiable (1.3726ms)
+✔ shared money floor counts only unfinished next requests and includes project spend and holds (0.554ms)
+✔ output allowance is visible before planning and confirmation shows per-task change (13.3873ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (1.0783ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.5554ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (0.9808ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (0.8645ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2569.6533

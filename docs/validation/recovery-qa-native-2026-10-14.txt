@@ -1,0 +1,29 @@
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (146.9143ms)
+✔ historical command bootstrap stays within its 8KB cap with long Unicode history and never includes arbitrary evidence payloads (2.5356ms)
+✔ recovery keeps paired own tool progress and authorized locators without replaying private tool bodies (6.1722ms)
+✔ explicit unknown mutation outcome outranks the subsequent native error and only matching host confirmation clears it (4.2233ms)
+✔ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (1412.0285ms)
+✔ production Host detects the last task call and seals the native assigned attempt (676.6603ms)
+✔ production Host detects the last project call and seals the native assigned attempt (521.6748ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (156.9962ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (158.178ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (157.6047ms)
+✔ a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own (252.1464ms)
+✔ the production Host reminder accepts only the real native handoff and excludes the captain (727.0826ms)
+✔ native developer → QA → manager sees real command hashes/counts with no private knowledge or extra tools (3930.3719ms)
+✔ native resumed QA/manager inherit source budget and exact developer seal without repeating completed developer execution (2910.4546ms)
+✔ first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch (1882.1467ms)
+✔ cold native restore retains completed attempts, fixed SHA, unknown task holds and the original per-call cap without producer replay (830.5904ms)
+✔ an independently owned employee capped final text records MAX_TOKENS and known fees without a handoff or automatic continuation (570.404ms)
+✔ compact product mapping changes only duplicated description while generic mapping and immutable contracts retain their complete hashes (5.8144ms)
+✔ compact mapping fails closed without a verified host context instead of producing placeholder contracts (1.4836ms)
+✔ generic native host cannot opt into context-backed descriptions or dispatch before failed assertion (956.5026ms)
+✔ native restored task claim retains canonical file hashes and quality fields without replaying the completed producer or repeating requirement in its receipt (1034.657ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11109.0206

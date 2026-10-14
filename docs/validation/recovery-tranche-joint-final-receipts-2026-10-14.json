@@ -1,0 +1,50 @@
+{
+  "executor": "bounded test double",
+  "model": "simulated HTTP gateway",
+  "scenarios": [
+    {
+      "scenario": "resource-approved-recovery-qa-manager",
+      "model": "localhost scripted responses only",
+      "parent": "c11b4c78-d4f2-4503-b49c-7775b208c3f6",
+      "child": "6a069993-b1e8-4ea5-afef-6f572018942c",
+      "previewId": "6ed6e8e8-9d65-4796-b57b-24b7ad30e7bb",
+      "developerSha256": "6517133f6c33cd581a9105abe9a510600f1b8f1c3a3ea8f400b3ee82f885c175",
+      "retainedUnknownReceiptIds": [
+        "2f97409f-8dd2-476d-ae0e-4d07c89a3e1e",
+        "be97c6e9-24f0-46b3-89ed-c11fa6a8b1e8"
+      ],
+      "retainedUnknownAmount": 0.058691,
+      "outputLimit": 8192,
+      "knowledgeVersion": 1,
+      "qaSealSequence": 196,
+      "managerFirstRequestSequence": 230,
+      "status": "completed",
+      "taskContinuationLimits": {
+        "review": 11,
+        "accept": 7
+      },
+      "taskCallCeilings": {
+        "accept": 7,
+        "review": 12
+      },
+      "inheritedCalls": 7,
+      "requestPurposeCounts": {
+        "review": {
+          "execution": 7,
+          "compaction": 1,
+          "handoff": 0
+        },
+        "accept": {
+          "execution": 3,
+          "compaction": 0,
+          "handoff": 0
+        },
+        "unattributed": {
+          "execution": 2,
+          "compaction": 0,
+          "handoff": 0
+        }
+      }
+    }
+  ]
+}

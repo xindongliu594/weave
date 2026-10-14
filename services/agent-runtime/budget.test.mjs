@@ -46,6 +46,21 @@ test('retry counters are retained and a task cannot exceed the policy turn cap',
  assert.equal(budget.tasks.get('a').spent,.1);
 });
 
+test('sealed recovery ceilings retain the absolute counter across another resume and reject malformed grants',()=>{
+ const tasks=[{id:'qa',maxModelCalls:48},{id:'manager',maxModelCalls:45}],taskCallCeilings={qa:48,manager:7};
+ const resumed=new ExecutionBudget({maxBudget:1,maxModelCalls:72,priorModelCalls:70,tasks,taskCallCeilings,
+  taskUsage:{qa:{calls:48},manager:{calls:6}}});
+ resumed.reserve(.001,{taskId:'manager'}).settle(.0001);
+ assert.throws(()=>resumed.peekAvailable({taskId:'manager'}),e=>e.code==='TASK_TURN_LIMIT');
+ assert.throws(()=>resumed.reserve(.001,{taskId:'manager'}),e=>e.code==='TASK_TURN_LIMIT');
+ assert.equal(resumed.run.calls,71);assert.equal(resumed.tasks.get('manager').calls,7);
+ const legacy=new ExecutionBudget({maxBudget:1,tasks,taskUsage:{manager:{calls:7}}});
+ legacy.reserve(.001,{taskId:'manager'}).release();assert.equal(legacy.tasks.get('manager').calls,8);
+ for(const invalid of [null,[],{}, {manager:NaN},{manager:0},{manager:7.5},{manager:46},{unknown:1}])
+  assert.throws(()=>new ExecutionBudget({maxBudget:1,tasks,taskCallCeilings:invalid}),e=>e.code==='INVALID_TASK_CALL_CEILING');
+ assert.deepEqual(tasks,[{id:'qa',maxModelCalls:48},{id:'manager',maxModelCalls:45}]);
+});
+
 test('restored task holds remain occupied without charging the global carryover twice or releasing an older request',()=>{
  const actor={taskId:'a',employeeId:'e'};
  const budget=new ExecutionBudget({maxBudget:.65,priorSpend:.35,priorModelCalls:2,tasks:[{id:'a',assigneeId:'e',maxBudget:.4}],taskUsage:{a:{cost:.1,reserved:.25,calls:2}}});
@@ -65,6 +80,20 @@ test('restored task holds remain occupied without charging the global carryover 
 const route={id:'m',name:'fixture',wireModel:'fixture',baseUrl:'https://fixture.invalid/v1',inputRate:0,outputRate:1,maxOutputTokens:10};
 const options={model:'m',sessionId:'session',messages:[{role:'user',content:[{type:'text',text:'work'}]}]};
 const consume=async adapter=>{const chunks=[];for await(const c of adapter.stream(options))chunks.push(c);return chunks;};
+test('recovery admits QA four and manager seven requests but blocks the eighth manager request before dispatch',async()=>{
+ const original=globalThis.fetch;let fetched=0;const admissions=[];
+ globalThis.fetch=async()=>{fetched++;return Response.json({choices:[{message:{content:'ok'}}],usage:{prompt_tokens:0,completion_tokens:1}});};
+ try{
+  const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,maxModelCalls:72,priorModelCalls:60,
+   tasks:[{id:'qa',maxModelCalls:48},{id:'manager',maxModelCalls:45}],taskUsage:{qa:{calls:44},manager:{calls:0}},
+   taskCallCeilings:{qa:48,manager:7},beforeRequest:async data=>admissions.push(data)});
+  adapter.attribution=()=>({taskId:'qa'});for(let i=0;i<4;i++)await consume(adapter);
+  adapter.attribution=()=>({taskId:'manager'});for(let i=0;i<7;i++)await consume(adapter);
+  await assert.rejects(consume(adapter),e=>e.code==='TASK_TURN_LIMIT');
+  assert.equal(fetched,11);assert.equal(admissions.length,11);assert.equal(adapter.budget.run.calls,71);
+  assert.equal(adapter.budget.tasks.get('qa').calls,48);assert.equal(adapter.budget.tasks.get('manager').calls,7);
+ }finally{globalThis.fetch=original;}
+});
 test('adapter counts fallback against the same task and refuses it before a second fetch',async()=>{
  const original=globalThis.fetch;let calls=0;
  globalThis.fetch=async()=>{calls++;return new Response('',{status:429});};

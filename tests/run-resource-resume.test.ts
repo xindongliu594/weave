@@ -2,10 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {ResourceResumeConfirmation,resourceResumeBody,RunResourceResume} from '../apps/web/src/RunResourceResume.tsx';
+import {ResourceResumeConfirmation,resourceResumeBody,RunResourceResume,resourceContinuationLimits} from '../apps/web/src/RunResourceResume.tsx';
 const candidate:any={previewId:'preview',sourceRunId:'source',projectVersion:2,sourceGoalContract:{format:'approved-goal-v1',sha256:'fixed'},
   ceiling:.18,proposal:{maxBudget:.18,taskCallLimits:{accept:10},rationale:'Only finish the remaining manager review'},completedTaskIds:['develop','qa']};
 const snapshot:any={planVersion:2,goalContract:candidate.sourceGoalContract,policy:{maxBudget:.13},tasks:[{id:'accept',subject:'经理验收',maxModelCalls:6}]};
+
+test('confirmation displays explicit continuation calls separately from the cumulative task cap',()=>{
+  const value={...candidate,taskContinuationLimits:{accept:3}};
+  const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot,retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
+  assert.ok(html.includes('经理验收 · 本段最多新增 3 次调用'));
+});
+
+test('optional continuation input requires all inspected unfinished tasks and preserves omission',()=>{
+  const tasks=[{id:'qa',subject:'QA'},{id:'accept',subject:'经理验收'}];
+  assert.equal(resourceContinuationLimits({},tasks),undefined);
+  assert.deepEqual(resourceContinuationLimits({qa:'4',accept:'7'},tasks),{qa:4,accept:7});
+  const invalid:Record<string,string>[]=[{qa:'4'},{qa:'1',accept:'7'},{qa:'4',accept:'NaN'},{qa:'4',accept:'2.5'},{qa:'4',accept:'7',completed:'1'}];
+  for(const values of invalid)
+    assert.throws(()=>resourceContinuationLimits(values,tasks));
+  assert.throws(()=>resourceContinuationLimits({qa:'4'},undefined));
+  const form=renderToStaticMarkup(createElement(RunResourceResume,{id:'source',snapshot,retained:0,retainUncertainCosts:true,disabled:false,continuationTasks:tasks}));
+  assert.ok(form.includes('QA · 本段最多新增调用次数'));assert.ok(form.includes('经理验收 · 本段最多新增调用次数'));
+});
 
 test('output allowance is visible before planning and confirmation shows per-task change',()=>{
   const original={...snapshot,tasks:[{...snapshot.tasks[0],maxOutputTokens:2048}]};

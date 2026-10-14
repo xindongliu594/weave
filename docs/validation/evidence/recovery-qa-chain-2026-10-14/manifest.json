@@ -1,0 +1,18 @@
+{
+  "apps/api/src/planning-output.ts": "590794a87b1aafd2d69809a60a1054dd143eb78d7dcfd902bd0382e4df9ed127",
+  "apps/api/src/recovery-conditions.ts": "1351250cf947719d46301d871663a51407a85b702f878212b0723aad0e0c2eca",
+  "apps/api/src/recovery-resource-plan.ts": "c742e9617fa2b8b5390d5960a86f0c9650a13747b4ec453e34047315586dfa64",
+  "apps/api/src/recovery-resource-router.ts": "1120c6235ea9c496fa34b24e474abc448af12001cf168f883d91a9a9305e61b7",
+  "apps/web/src/RunExtras.tsx": "4b35a3496286d343073d21712f3c21b13724e023432773d07dfc021f790521ed",
+  "apps/web/src/RunResourceResume.tsx": "6512f8fd52e4bfc88e378f51f241628a4fe364098da26b635ff4780c8c004f3c",
+  "services/agent-runtime/budget.mjs": "545030020940a37f888a2d5247cf5a74430359cd31e7971be4eee3b868bf8ef6",
+  "services/agent-runtime/budget.test.mjs": "6df6c895995fc3088eaa4c62901cd6cd47319d0f0238b57ceddd1515197bd374",
+  "services/agent-runtime/openai-compatible.d.mts": "be2688ac09683936841e7787456e0c156bfd9c7ddeced1316577be29280ea6f6",
+  "services/agent-runtime/openai-compatible.mjs": "f93011f4ae9ebce71f8ec2365eab06c6ac51130913504b2c815bce7b21398c34",
+  "services/agent-runtime/product-runtime.mjs": "80111ed9a545e999fc7e93a0d4739ee1d48c1a4d4394294b76fd2744a39cd8d7",
+  "tests/planning-output.test.ts": "3e8fd5d1a7b0103fafe105e27ed1d7c43d2bea97d683e2e21aa240107417d48d",
+  "tests/product-flow.test.ts": "fff3752a8c676a221a1fa5748fbd50f74a59c3940020746087bd7dc345f5d90f",
+  "tests/recovery-conditions.test.ts": "28e1d412f3e29064b7b15b0cc50ba75d65bfb0eac297cc462366208051bab3fc",
+  "tests/recovery-resource-plan.test.ts": "b388f6e9f52f22b46ba4123674c3439648782732d14f9017b5e5fd47a50cbda8",
+  "tests/run-resource-resume.test.ts": "cdf3e98eb838ae0c05a7800f4c30a342c56247931a559701f3981837fe07b5ef"
+}

@@ -5,10 +5,19 @@ const reached=(left,right)=>!over(right,left);
 // Reservations and counters are changed synchronously before fetch, so concurrent employees
 // cannot both spend the same remaining allowance. Actual receipts are recorded even on overrun.
 export class ExecutionBudget {
-  constructor({maxBudget,priorSpend=0,maxModelCalls=100,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},onEvent}) {
+  constructor({maxBudget,priorSpend=0,maxModelCalls=100,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},taskCallCeilings,onEvent}) {
+    if(taskCallCeilings!==undefined){
+      const invalid=()=>new LlmError('恢复阶段的累计调用上限无效','INVALID_TASK_CALL_CEILING');
+      if(!taskCallCeilings||typeof taskCallCeilings!=='object'||Array.isArray(taskCallCeilings)||!Object.keys(taskCallCeilings).length)throw invalid();
+      for(const [id,limit] of Object.entries(taskCallCeilings)){
+        const task=tasks.find(task=>task.id===id);
+        if(!task||!Number.isSafeInteger(limit)||limit<1||limit>Math.min(task.maxModelCalls??maxTaskModelCalls,maxModelCalls))throw invalid();
+      }
+    }
     this.run={scope:'project',limit:maxBudget+priorSpend,spent:priorSpend,reserved:0,calls:priorModelCalls,maxCalls:maxModelCalls,warnings:new Set()};
     this.tasks=new Map(tasks.map(task=>[task.id,{scope:'task',taskId:task.id,employeeId:task.assigneeId,limit:task.maxBudget??this.run.limit,
-      spent:taskUsage[task.id]?.cost??0,reserved:taskUsage[task.id]?.reserved??0,calls:taskUsage[task.id]?.calls??0,maxCalls:task.maxModelCalls??maxTaskModelCalls,warnings:new Set()}]));
+      spent:taskUsage[task.id]?.cost??0,reserved:taskUsage[task.id]?.reserved??0,calls:taskUsage[task.id]?.calls??0,
+      maxCalls:Math.min(task.maxModelCalls??maxTaskModelCalls,taskCallCeilings&&Object.hasOwn(taskCallCeilings,task.id)?taskCallCeilings[task.id]:Infinity),warnings:new Set()}]));
     this.onEvent=onEvent;
   }
   emit(bucket,kind,extra={}) {

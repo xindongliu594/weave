@@ -177,6 +177,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
    allowRetry:recoveryConditionsAllow(checkedRecovery?.data,checkedRecovery?.key,checkKey,false)&&!runContinuationBlocked(costs,{busy,legacyCostBlocked:recovery?.costBlocked,unknownCount:unknown.length,acknowledged,resume:false})}}
    check={intent=>checkRecovery(costs,intent.acknowledged)} submit={intent=>api<{id:string}>('/runs/'+intent.runId+'/retry','POST',{resume:intent.resume,acknowledgeUnknownOperations:intent.acknowledged,retainUncertainCosts:intent.retainUncertainCosts})} onError={setError}/>
   {snapshot.goalContract&&<RunResourceResume key={'resource-resume:'+id} id={id} snapshot={snapshot} retained={costs.readiness?.reserved??0} retainUncertainCosts={costs.retainUncertainCosts}
+    continuationTasks={recoveryStale?undefined:checkedRecovery?.data.tasks.filter(task=>!task.completed).map(task=>({id:task.id,subject:task.subject}))}
     disabled={busy||checkingRecovery||integrity!=='ok'||unknown.length>0||costs.blocked||events.some(event=>event.type==='goal/blocked')}/>}
  </div>}
  {escalation&&<div className="banner error" role="status"><strong>返工已停止，需要你处理</strong><p>{escalation.message}</p><p>检查下方问题和现有交付物；需要新增权限、扩大范围或增加额度时，在项目中保存新方案并重新批准。</p></div>}

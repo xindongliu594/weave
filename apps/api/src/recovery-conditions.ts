@@ -10,6 +10,7 @@ import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
 import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { hasUnplannedTasks, planningRequiredMessage } from '../../../packages/contracts/index.ts';
 import { assertGoalRecovery } from './goal-recovery.ts';
+import { recoveryTaskCallLimit } from './recovery-resource-plan.ts';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type History = Awaited<ReturnType<typeof budgetHistory>>;
@@ -44,7 +45,7 @@ export function recoveryHistoryBudgetIssues(snapshot: any, history: History, com
     if (completed.has(task.id)) continue;
     const used = history.tasks[task.id];
     if (used && (used.cost + (used.reserved ?? 0) >= (task.maxBudget ?? snapshot.policy.maxBudget)
-      || used.calls >= (task.maxModelCalls ?? snapshot.policy.maxTaskModelCalls ?? 40)))
+      || used.calls >= recoveryTaskCallLimit(snapshot,task)))
       reasons.push(issue(422, 'TASK_BUDGET_EXHAUSTED', `任务「${task.subject ?? task.id}」已达到费用或调用次数上限，请调整方案后重新批准`, task.id));
   }
   return reasons;
@@ -124,7 +125,7 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
       remaining: Math.max(0, (snapshot.policy.maxModelCalls ?? 100) - history.calls) } } : {}),
     tasks: history ? snapshot.tasks.map((task: any) => {
       const used = history!.tasks[task.id] ?? { cost: 0, reserved: 0, calls: 0 };
-      const budgetLimit = task.maxBudget ?? maxBudget, callLimit = task.maxModelCalls ?? snapshot.policy.maxTaskModelCalls ?? 40;
+      const budgetLimit = task.maxBudget ?? maxBudget, callLimit = recoveryTaskCallLimit(snapshot,task);
       return { id: task.id, subject: task.subject ?? task.id, recordedCost: used.cost, reserved: used.reserved ?? 0,
         budgetLimit, availableBudget: budgetLimit - used.cost - (used.reserved ?? 0), calls: used.calls,
         callLimit, remainingCalls: Math.max(0, callLimit - used.calls), completed: done.has(task.id) };

@@ -1,0 +1,33 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (9797.7187ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10510.1191
+
+✖ failing tests:
+
+test at tests\product-flow.test.ts:4:685
+✖ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (9797.7187ms)
+  AssertionError [ERR_ASSERTION]: [{"seq":209,"at":"2026-10-14T01:35:58.016Z","type":"run/finished","data":{"status":"failed","message":"CONTEXT_LIMIT: 岗位、当前任务与最新工具响应超过上下文上限","usageCost":0.0004899999999999999}}]
+  + actual - expected
+
+  + 'failed'
+  - 'completed'
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product-flow.test.ts:614:44)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

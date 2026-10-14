@@ -1,0 +1,172 @@
+{
+  "executor": "bounded test double",
+  "model": "simulated HTTP gateway",
+  "scenarios": [
+    {
+      "scenario": "resource-approved-recovery-qa-manager",
+      "model": "localhost scripted responses only",
+      "parent": "5aa08872-b404-48de-8d14-3b187b685b7c",
+      "child": "d92a95d5-647a-40e2-8ab7-5875458f9004",
+      "previewId": "e54a8df6-046b-4cca-aaa8-6067b5faa94e",
+      "developerSha256": "6517133f6c33cd581a9105abe9a510600f1b8f1c3a3ea8f400b3ee82f885c175",
+      "retainedUnknownReceiptIds": [
+        "4940fe90-f780-429f-8501-385116868d5b",
+        "bcb2226e-3f37-43e2-bf22-185f796507a7"
+      ],
+      "retainedUnknownAmount": 0.058691,
+      "outputLimit": 8192,
+      "knowledgeVersion": 1,
+      "qaSealSequence": 197,
+      "managerFirstRequestSequence": 230,
+      "status": "completed",
+      "inheritedCalls": 7,
+      "wireRequests": [
+        {
+          "seq": 53,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 69,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 85,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 105,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 120,
+          "taskId": "review",
+          "purpose": "compaction",
+          "maxTokens": 2464
+        },
+        {
+          "seq": 134,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 152,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 179,
+          "taskId": "review",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 230,
+          "taskId": "accept",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 233,
+          "taskId": null,
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 256,
+          "taskId": "accept",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 272,
+          "taskId": "accept",
+          "purpose": "execution",
+          "maxTokens": 8192
+        },
+        {
+          "seq": 302,
+          "taskId": null,
+          "purpose": "execution",
+          "maxTokens": 8192
+        }
+      ],
+      "usage": [
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "compaction",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "review",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "accept",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": null,
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "accept",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": "accept",
+          "purpose": "execution",
+          "cost": 0.00007
+        },
+        {
+          "taskId": null,
+          "purpose": "execution",
+          "cost": 0.00007
+        }
+      ]
+    }
+  ]
+}

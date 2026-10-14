@@ -92,6 +92,7 @@ export class ProductDshRuntime {
         priorSpend: Math.max(0,snapshot.policy.maxBudget-snapshot.executionBudget),
         priorModelCalls: snapshot.budgetHistory?.calls??0,
         taskUsage: snapshot.budgetHistory?.tasks??{},
+        taskCallCeilings: snapshot.resourceApproval?.taskCallCeilings,
         tasks: snapshot.tasks,
         maxTaskModelCalls: snapshot.policy.maxTaskModelCalls??40,
         onBudget: data=>archive.append('budget/'+data.kind,data,{taskId:data.taskId}),

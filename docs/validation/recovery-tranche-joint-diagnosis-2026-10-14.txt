@@ -1,0 +1,51 @@
+Offline joint recovery fixture diagnosis, 2026-10-14
+
+Scope: localhost scripted model, PGlite and the actual API/DSH/runtime. This is
+software regression evidence, not real model acceptance or a production grant.
+Only tests/product-flow.test.ts and these evidence files were changed here.
+
+1. Baseline control kept the earlier successful fixture's cumulative QA cap 12,
+   without the newly added taskContinuationLimits field. A temporary sibling
+   test copied the current test with only that field/assertion removed and
+   receipt diagnostics added. It was deleted after the comparison.
+   Command: node scripts/test-integration.mjs '--test-name-pattern=resource-approved recovery' tests/recovery-tranche-diagnostic.test.ts
+   Result: 1/1 passed, exit 0, 12779.5115 ms.
+   Log: recovery-tranche-joint-original-2026-10-14.txt
+   Receipts: recovery-tranche-joint-original-receipts-2026-10-14.json
+   Child QA consumed 8 requests: 7 execution, 1 compaction. Manager consumed 3
+   execution requests; captain/unattributed consumed 2. The inherited history
+   had 7 calls, including one dispatched QA request with an uncertain fee.
+   The QA compaction request used max_tokens 2464; task execution used 8192.
+
+2. An explicit QA grant of 8 (absolute cumulative cap 9) was insufficient for
+   this fixture's final-call path. The first run failed with CONTEXT_LIMIT; a
+   diagnostic rerun reproduced the same stop. The second run had 7 QA wires:
+   6 execution and 1 compaction, followed by handoff/closure-started reason
+   last-authorized-call at sequence 174. No eighth wire was sent; run/finished
+   at sequence 209 reported that protected context exceeded the context limit.
+   Both runs exited 1. This was a safe stop, not a quota bypass.
+   Command: node scripts/test-integration.mjs '--test-name-pattern=resource-approved recovery' tests/product-flow.test.ts
+   Logs: recovery-tranche-joint-eight-first-2026-10-14.txt and
+   recovery-tranche-joint-eight-diagnostic-2026-10-14.txt
+
+3. Final fixture explicitly grants QA 11 and manager 7, preserving the earlier
+   approved cumulative QA cap 12 (one historical QA call plus eleven), and
+   manager cap 7. Production limits and the 16k fixture context were unchanged.
+   The test asserts the frozen snapshot before/after completion, actual QA
+   request purposes (7 execution + 1 compaction), matching billing receipts,
+   8192 task output wires, retained unknown fees, pinned knowledge v1, no
+   developer replay/SHA change, and formal QA evidence before manager dispatch.
+   Command: node scripts/test-integration.mjs '--test-name-pattern=resource-approved recovery' tests/product-flow.test.ts
+   Result: 1/1 passed, exit 0, 13103.6311 ms.
+   Log: recovery-tranche-joint-final-2026-10-14.txt
+   Receipts: recovery-tranche-joint-final-receipts-2026-10-14.json
+   QA used 8, manager 3 and captain/unattributed 2 child requests. These are
+   observed scripted-fixture counts; the test does not prove that a real QA4 /
+   manager7 grant or any other finite grant will complete real work.
+
+Final tests/product-flow.test.ts SHA256:
+fff3752a8c676a221a1fa5748fbd50f74a59c3940020746087bd7dc345f5d90f
+
+No production code, production delivery, external model, or JJ deployment was
+accessed or changed by this diagnostic subtask. Full product-flow was not rerun
+locally in this subtask; the parent handles isolated JJ validation separately.
