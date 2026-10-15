@@ -1,0 +1,489 @@
+{
+  "checkedAt": "2026-10-15T02:36:44.716Z",
+  "runId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+  "status": "failed",
+  "integrity": "ok",
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "lineage": [
+    {
+      "id": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "70d82bac-8714-41e2-ac78-921e53cea106",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "e87cbe51-9632-4dba-ad40-3cbc5104a776",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "62c5db8a-617b-41db-9394-c8000f58997d",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "0f9e41af-d1b7-4dd3-9e74-f3555bdd9fa8",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "5f29bf80-3375-4864-94a8-563cffbb555a",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "c606a446-0f99-4293-a7f8-1294a93a967c",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "17d69bed-27ee-4ddc-af56-961e9eb37458",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "63acb941-1485-4d67-a7fc-7f1a180ddfa8",
+      "status": "failed",
+      "integrity": "ok"
+    }
+  ],
+  "history": {
+    "calls": 63,
+    "tasks": {
+      "t1-doc": {
+        "calls": 5,
+        "cost": 0.018502499999999998,
+        "reserved": 0,
+        "requestOverheadBytes": 7040
+      },
+      "t2-qa": {
+        "calls": 47,
+        "cost": 0.1645797,
+        "reserved": 0,
+        "requestOverheadBytes": 6969
+      },
+      "t3-review": {
+        "calls": 0,
+        "cost": 0,
+        "reserved": 0
+      }
+    }
+  },
+  "costs": {
+    "usageRows": 529,
+    "occupied": 2.4865920000000004,
+    "stageOccupied": 0.4157736000000005,
+    "pendingCount": 0,
+    "projectKnown": 0.2863773,
+    "projectHeld": 0.0025932,
+    "maximumOccupiedIfProjectAndFutureFill": 2.7876215
+  },
+  "matrix": [
+    {
+      "grants": {
+        "t2-qa": 4,
+        "t3-review": 4
+      },
+      "callCeilings": {
+        "maxModelCalls": 72,
+        "maxTaskModelCalls": 51
+      },
+      "minimumProjectBudget": 0.4641585,
+      "withPlanningAllowance": 0.4671585,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 4,
+        "t3-review": 5
+      },
+      "callCeilings": {
+        "maxModelCalls": 72,
+        "maxTaskModelCalls": 51
+      },
+      "minimumProjectBudget": 0.4813272,
+      "withPlanningAllowance": 0.4843272,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 4,
+        "t3-review": 6
+      },
+      "callCeilings": {
+        "maxModelCalls": 73,
+        "maxTaskModelCalls": 51
+      },
+      "minimumProjectBudget": 0.4984959,
+      "withPlanningAllowance": 0.5014959,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 4,
+        "t3-review": 7
+      },
+      "callCeilings": {
+        "maxModelCalls": 74,
+        "maxTaskModelCalls": 51
+      },
+      "minimumProjectBudget": 0.5156646,
+      "withPlanningAllowance": 0.5186646,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 5,
+        "t3-review": 4
+      },
+      "callCeilings": {
+        "maxModelCalls": 72,
+        "maxTaskModelCalls": 52
+      },
+      "minimumProjectBudget": 0.4907868,
+      "withPlanningAllowance": 0.4937868,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 5,
+        "t3-review": 5
+      },
+      "callCeilings": {
+        "maxModelCalls": 73,
+        "maxTaskModelCalls": 52
+      },
+      "minimumProjectBudget": 0.5079555,
+      "withPlanningAllowance": 0.5109555,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 5,
+        "t3-review": 6
+      },
+      "callCeilings": {
+        "maxModelCalls": 74,
+        "maxTaskModelCalls": 52
+      },
+      "minimumProjectBudget": 0.52512421,
+      "withPlanningAllowance": 0.52812421,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 5,
+        "t3-review": 7
+      },
+      "callCeilings": {
+        "maxModelCalls": 75,
+        "maxTaskModelCalls": 52
+      },
+      "minimumProjectBudget": 0.54229291,
+      "withPlanningAllowance": 0.54529291,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 6,
+        "t3-review": 4
+      },
+      "callCeilings": {
+        "maxModelCalls": 73,
+        "maxTaskModelCalls": 53
+      },
+      "minimumProjectBudget": 0.5174151,
+      "withPlanningAllowance": 0.5204151,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 6,
+        "t3-review": 5
+      },
+      "callCeilings": {
+        "maxModelCalls": 74,
+        "maxTaskModelCalls": 53
+      },
+      "minimumProjectBudget": 0.53458381,
+      "withPlanningAllowance": 0.53758381,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 6,
+        "t3-review": 6
+      },
+      "callCeilings": {
+        "maxModelCalls": 75,
+        "maxTaskModelCalls": 53
+      },
+      "minimumProjectBudget": 0.55175251,
+      "withPlanningAllowance": 0.55475251,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 6,
+        "t3-review": 7
+      },
+      "callCeilings": {
+        "maxModelCalls": 76,
+        "maxTaskModelCalls": 53
+      },
+      "minimumProjectBudget": 0.5689212,
+      "withPlanningAllowance": 0.5719212,
+      "fits": false
+    },
+    {
+      "grants": {
+        "t2-qa": 7,
+        "t3-review": 4
+      },
+      "callCeilings": {
+        "maxModelCalls": 74,
+        "maxTaskModelCalls": 54
+      },
+      "minimumProjectBudget": 0.54404341,
+      "withPlanningAllowance": 0.54704341,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 7,
+        "t3-review": 5
+      },
+      "callCeilings": {
+        "maxModelCalls": 75,
+        "maxTaskModelCalls": 54
+      },
+      "minimumProjectBudget": 0.5612121,
+      "withPlanningAllowance": 0.5642121,
+      "fits": false
+    },
+    {
+      "grants": {
+        "t2-qa": 7,
+        "t3-review": 6
+      },
+      "callCeilings": {
+        "maxModelCalls": 76,
+        "maxTaskModelCalls": 54
+      },
+      "minimumProjectBudget": 0.5783808,
+      "withPlanningAllowance": 0.5813808,
+      "fits": false
+    },
+    {
+      "grants": {
+        "t2-qa": 7,
+        "t3-review": 7
+      },
+      "callCeilings": {
+        "maxModelCalls": 77,
+        "maxTaskModelCalls": 54
+      },
+      "minimumProjectBudget": 0.5955495,
+      "withPlanningAllowance": 0.5985495,
+      "fits": false
+    },
+    {
+      "grants": {
+        "t2-qa": 8,
+        "t3-review": 4
+      },
+      "callCeilings": {
+        "maxModelCalls": 75,
+        "maxTaskModelCalls": 55
+      },
+      "minimumProjectBudget": 0.54404341,
+      "withPlanningAllowance": 0.54704341,
+      "fits": true
+    },
+    {
+      "grants": {
+        "t2-qa": 8,
+        "t3-review": 5
+      },
+      "callCeilings": {
+        "maxModelCalls": 76,
+        "maxTaskModelCalls": 55
+      },
+      "minimumProjectBudget": 0.5612121,
+      "withPlanningAllowance": 0.5642121,
+      "fits": false
+    },
+    {
+      "grants": {
+        "t2-qa": 8,
+        "t3-review": 6
+      },
+      "callCeilings": {
+        "maxModelCalls": 77,
+        "maxTaskModelCalls": 55
+      },
+      "minimumProjectBudget": 0.5783808,
+      "withPlanningAllowance": 0.5813808,
+      "fits": false
+    },
+    {
+      "grants": {
+        "t2-qa": 8,
+        "t3-review": 7
+      },
+      "callCeilings": {
+        "maxModelCalls": 78,
+        "maxTaskModelCalls": 55
+      },
+      "minimumProjectBudget": 0.5955495,
+      "withPlanningAllowance": 0.5985495,
+      "fits": false
+    }
+  ],
+  "modelCalls": 0,
+  "productionWrites": 0,
+  "selected": {
+    "input": {
+      "maxBudget": 0.56,
+      "maxPlanningCost": 0.003,
+      "maxModelCalls": 75,
+      "maxTaskModelCalls": 53,
+      "taskContinuationLimits": {
+        "t2-qa": 6,
+        "t3-review": 6
+      }
+    },
+    "requestInputBytes": 7272,
+    "planningReservation": 0.002796,
+    "planningFits": true,
+    "minimumProjectBudget": 0.56,
+    "proposalValidation": "passed",
+    "tasks": [
+      {
+        "id": "t1-doc",
+        "completed": true,
+        "usedCalls": 5,
+        "originalCallLimit": 16,
+        "minimumCallLimit": 16,
+        "nextRequestCount": 0,
+        "minimumBudget": 0.05
+      },
+      {
+        "id": "t2-qa",
+        "completed": false,
+        "usedCalls": 47,
+        "originalCallLimit": 48,
+        "minimumCallLimit": 53,
+        "nextRequestCount": 6,
+        "minimumBudget": 0.3243495
+      },
+      {
+        "id": "t3-review",
+        "completed": false,
+        "usedCalls": 0,
+        "originalCallLimit": 48,
+        "minimumCallLimit": 48,
+        "nextRequestCount": 6,
+        "minimumBudget": 0.2
+      }
+    ],
+    "protectedOutputLimits": [
+      {
+        "id": "t1-doc",
+        "maxOutputTokens": 2048
+      },
+      {
+        "id": "t2-qa",
+        "maxOutputTokens": 8192
+      },
+      {
+        "id": "t3-review",
+        "maxOutputTokens": 2048
+      }
+    ]
+  },
+  "recoveryReadiness": {
+    "resume": {
+      "allowed": true,
+      "reasons": [],
+      "completedTaskIds": [
+        "t1-doc"
+      ]
+    },
+    "unknownOperationCount": 0,
+    "costReadiness": {
+      "recordedCost": 0.2863773,
+      "reserved": 0.0025932,
+      "availableBudget": 0.27102950000000003,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+          "amount": 0.0025932,
+          "status": "uncertain"
+        }
+      ]
+    },
+    "calls": {
+      "used": 63,
+      "limit": 72,
+      "remaining": 9
+    },
+    "tasks": [
+      {
+        "id": "t1-doc",
+        "subject": "生成 inventory-cases.md 验收用例检查表",
+        "recordedCost": 0.018502499999999998,
+        "reserved": 0,
+        "budgetLimit": 0.05,
+        "availableBudget": 0.031497500000000005,
+        "calls": 5,
+        "callLimit": 16,
+        "remainingCalls": 11,
+        "completed": true
+      },
+      {
+        "id": "t2-qa",
+        "subject": "只读逐项独立核算 inventory-cases.md",
+        "recordedCost": 0.1645797,
+        "reserved": 0,
+        "budgetLimit": 0.2603454,
+        "availableBudget": 0.09576570000000001,
+        "calls": 47,
+        "callLimit": 48,
+        "remainingCalls": 1,
+        "completed": false
+      },
+      {
+        "id": "t3-review",
+        "subject": "经理只读验收 inventory-cases.md 与 QA 回执",
+        "recordedCost": 0,
+        "reserved": 0,
+        "budgetLimit": 0.2,
+        "availableBudget": 0.2,
+        "calls": 0,
+        "callLimit": 7,
+        "remainingCalls": 7,
+        "completed": false
+      }
+    ]
+  },
+  "selectedScriptSHA": "aff9398a7facf7ac80c438b380274c2fa92f42d92afda73bea2d4788e7231423"
+}

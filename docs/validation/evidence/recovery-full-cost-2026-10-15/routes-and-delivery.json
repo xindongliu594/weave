@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-15T02:56:17.894872+00:00",
+  "routes": [
+    {
+      "taskId": "t2-qa",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "wireModel": "deepseek-v4.1-flash",
+      "protocol": "chat-completions",
+      "thinkingMode": "disabled",
+      "maxOutputTokens": 8192,
+      "taskOutputTokens": 8192,
+      "fullEnvelope": true
+    },
+    {
+      "taskId": "t3-review",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "wireModel": "deepseek-v4.1-flash",
+      "protocol": "chat-completions",
+      "thinkingMode": "disabled",
+      "maxOutputTokens": 8192,
+      "taskOutputTokens": 2048,
+      "fullEnvelope": true
+    }
+  ],
+  "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+  "modelCalls": 0,
+  "productionWrites": 0
+}

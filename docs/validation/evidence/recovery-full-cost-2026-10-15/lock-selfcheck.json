@@ -1,0 +1,8 @@
+{
+  "concurrentStarters": 2,
+  "mockDispatches": 1,
+  "exclusiveLock": "passed",
+  "replayAfterReturn": "blocked",
+  "modelCalls": 0,
+  "productionWrites": 0
+}

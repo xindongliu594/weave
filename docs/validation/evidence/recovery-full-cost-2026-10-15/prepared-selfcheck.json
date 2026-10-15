@@ -1,0 +1,10 @@
+{
+  "parse": "passed",
+  "absentOutputMap": "accepted",
+  "emptyOutputMap": "accepted",
+  "maxBudget": "rejected",
+  "maxModelCalls": "rejected",
+  "taskOutputLimits": "rejected",
+  "modelCalls": 0,
+  "productionWrites": 0
+}
