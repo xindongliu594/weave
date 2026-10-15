@@ -1,0 +1,1 @@
+{"stage":"general-filter","status":"returned","inputSHA":"c590ed59a11dee870e83e91d788e85fb829ff4bfc94742efe98c5253ea6d69d9","estimate":{"inputBytes":6064,"reservation":0.003048},"usageId":"b86db2a6-9c4b-4fb9-a5b5-2963d7b7caf4","usage":{"prompt_tokens":1179,"completion_tokens":1},"text":"bad","finishReason":"stop"}

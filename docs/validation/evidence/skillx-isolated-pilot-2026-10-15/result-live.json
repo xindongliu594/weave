@@ -1,0 +1,58 @@
+{
+  "epochs": [
+    {
+      "epoch": 1,
+      "plans": {},
+      "extracted_skills": [
+        {
+          "option": "add",
+          "skill": {
+            "name": "read-only deliverable acceptance audit against qa receipt",
+            "document": "Perform a read-only acceptance audit of a workspace deliverable by cross-checking its raw content against a supplied QA computation receipt and a referenced knowledge snapshot, then classify each acceptance objective as passed or unfinished.\n\nParameters\n----------\ndeliverable_path : str\n    Workspace-relative path of the deliverable to audit (e.g. 'inventory-cases.md').\nqa_receipt : str\n    The structured QA receipt text containing per-case computations, coverage claims, a diff/declaration review, and an overall conclusion. Treated as read-only evidence.\nknowledge_chunk_id : str\n    Chunk id used with knowledge_read to retrieve the referenced source/original knowledge text for semantic cross-checking.\nacceptance_objectives : list[str]\n    The list of acceptance goals that must each be classified as passed or unfinished.\n\nOutputs\n-------\nresult : dict\n    Dictionary with keys:\n      'deliverable'          : dict with path, sha256, size (from filesystem result)\n      'qa_receipt'           : dict with producer/source identifiers (from the receipt)\n      'objective_results'    : list[dict], each {'objective': str, 'status': 'passed'|'unfinished', 'evidence': str}\n      'unfinished_items'     : list[dict], each {'item': str, 'severity': str, 'blocking': bool, 'note': str}\n      'overall_conclusion'   : str\n\nNotes:\n-------\n1. Read-only: do NOT write files, do NOT run code, do NOT widen permissions or budget; use only filesystem and knowledge_read.\n2. Verify identity before trusting content: match the deliverable's sha256, byte size, and producer id reported by filesystem against the identifiers quoted in the QA receipt; only audit when they agree.\n3. Recompute at least the numeric/edge cases independently rather than echoing the QA receipt; flag any receipt case whose stated arithmetic does not reproduce.\n4. Keep non-blocking findings (low-severity wording inaccuracies, ambiguity in expected-value phrasing) labelled as non-blocking 'unfinished/attention' items; do not upgrade them to failed objectives unless they break correctness.\n5. The final conclusion is a task-completion reply only; it must not rewrite or substitute for the developer's or QA's own conclusions.\n",
+            "content": "# read the deliverable raw content (read-only)\ndeliv = filesystem(path=deliverable_path)\ndeliv_sha = deliv[\"sha256\"]\ndeliv_size = deliv[\"size\"]\ndeliv_text = deliv[\"content\"]\n\n# read the referenced source/original knowledge slice\nknow = knowledge_read(chunkId=knowledge_chunk_id)\nknow_text = know[\"content\"]\n\n# --- identity check: deliverable must match the artifact the QA receipt cites ---\n# extract the sha prefix/size/producer quoted in the QA receipt and compare\nimport re  # declared only; not installed/used for side effects beyond parsing strings\nquoted_hashes = re.findall(r\"[0-9a-f]{6,64}\", qa_receipt)\nidentity_ok = any(deliv_sha.startswith(h) for h in quoted_hashes)\n\n# --- independent recomputation of per-case arithmetic from the deliverable ---\n# collect the numeric movements per case row and recompute the sum,\n# so the audit does not merely trust the QA receipt's per-case verdicts.\ncase_rows = [ln for ln in deliv_text.splitlines() if ln.startswith(\"| C\")]\nrecomputed = []\nfor row in case_rows:\n    cell = row.split(\"|\")[3].strip()          # input column, e.g. `+5, +3`\n    nums = []\n    ok = True\n    for tok in cell.replace(\"`\", \"\").split(\",\"):\n        tok = tok.strip()\n        if tok in (\"\",):\n            continue\n        try:\n            nums.append(int(tok))\n        except ValueError:\n            ok = False           # non-integer token -> rejection case\n    if ok:\n        recomputed.append({\"input\": cell, \"sum\": sum(nums)})\n    else:\n        recomputed.append({\"input\": cell, \"sum\": None, \"reject\": True})\n\n# --- classify each acceptance objective, attaching its concrete evidence ---\nobjective_results = []\nfor obj in acceptance_objectives:\n    obj_l = obj.lower()\n    if \"non-integer\" in obj_l or \"边界\" in obj or \"boundary\" in obj_l:\n        status = \"passed\" if any(n.get(\"reject\") for n in recomputed) else \"unfinished\"\n    else:\n        status = \"passed\" if identity_ok and recomputed else \"unfinished\"\n    objective_results.append({\n        \"objective\": obj,\n        \"status\": status,\n        \"evidence\": f\"deliverable sha={deliv_sha[:8]}... size={deliv_size}; \"\n                    f\"independent recompute n={len(recomputed)}; knowledge chunk={knowledge_chunk_id}\"\n    })\n\n# --- carry over the QA receipt's non-blocking findings verbatim as unfinished/attention ---\nunfinished_items = []\nfor m in re.findall(r\"(低severity|轻微歧义|表述不精确|低|轻微)[^。；]*\", qa_receipt):\n    unfinished_items.append({\n        \"item\": m.strip(),\n        \"severity\": \"low\",\n        \"blocking\": False,\n        \"note\": \"carried from QA receipt; does not break case correctness\"\n    })\n\nblocking = [u for u in unfinished_items if u[\"blocking\"]]\nblocked_objectives = [o for o in objective_results if o[\"status\"] == \"unfinished\"]\noverall_conclusion = (\n    \"all acceptance objectives passed\" if not blocked_objectives and not blocking\n    else \"unfinished objectives/blocking items remain\"\n)\n\nresult = {\n    \"deliverable\": {\"path\": deliverable_path, \"sha256\": deliv_sha, \"size\": deliv_size},\n    \"qa_receipt\": {\"identity_ok\": identity_ok},\n    \"objective_results\": objective_results,\n    \"unfinished_items\": unfinished_items,\n    \"overall_conclusion\": overall_conclusion,\n}",
+            "tools": [
+              "filesystem",
+              "knowledge_read"
+            ]
+          },
+          "skill_type": "functional"
+        }
+      ],
+      "filtered_skills": [],
+      "merged_skills": [],
+      "statistics": {
+        "input_trajectories": 1,
+        "successful_trajectories": 1,
+        "extracted_skills": 1,
+        "filtered_skills": 0
+      }
+    }
+  ],
+  "total_trajectories": 1,
+  "final_skills_count": 0,
+  "statistics": {
+    "total_epochs": 1,
+    "total_trajectories": 1,
+    "functional_skills": 0,
+    "atomic_skills": 0,
+    "planning_skills": 0,
+    "expansion_enabled": false
+  },
+  "skills": {
+    "version": "1.0",
+    "benchmark": "weiwu",
+    "created_at": "2026-10-15T14:40:27.630060",
+    "skills": {
+      "planning": {},
+      "functional": [],
+      "atomic": []
+    },
+    "embeddings": {
+      "model": "Qwen3-Embedding-8B",
+      "index_type": "FAISS-HNSW"
+    }
+  },
+  "modelRequestsRequested": 2,
+  "adapterStopped": false,
+  "mode": "live"
+}

@@ -1,0 +1,107 @@
+{
+  "checkedAt": "2026-10-15T05:24:40.299837+00:00",
+  "method": "Public GitHub GET only; source was not executed; no packages installed; no model calls",
+  "repositories": [
+    {
+      "repo": "NousResearch/hermes-agent",
+      "sha": "7bda2a3368024f7ae1c70cef16583e7c2c891674",
+      "branch": "main",
+      "license": {
+        "spdx": "MIT",
+        "name": "MIT License"
+      },
+      "archived": false,
+      "pushedAt": "2026-10-15T04:31:22Z",
+      "commitAt": "2026-10-15T04:31:20Z",
+      "htmlUrl": "https://github.com/NousResearch/hermes-agent"
+    },
+    {
+      "repo": "MemTensor/MemOS",
+      "sha": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+      "branch": "main",
+      "license": {
+        "spdx": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "archived": false,
+      "pushedAt": "2026-10-10T07:55:31Z",
+      "commitAt": "2026-09-22T01:51:03Z",
+      "htmlUrl": "https://github.com/MemTensor/MemOS"
+    },
+    {
+      "repo": "agentscope-ai/ReMe",
+      "sha": "d865776eddb9e116055624ed8b51e6338964ae57",
+      "branch": "main",
+      "license": {
+        "spdx": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "archived": false,
+      "pushedAt": "2026-10-15T03:41:17Z",
+      "commitAt": "2026-10-15T03:41:17Z",
+      "htmlUrl": "https://github.com/agentscope-ai/ReMe"
+    },
+    {
+      "repo": "zjunlp/SkillX",
+      "sha": "b0047c848dbbcf019363d6d56eef8c558f69aefc",
+      "branch": "main",
+      "license": {
+        "spdx": "MIT",
+        "name": "MIT License"
+      },
+      "archived": false,
+      "pushedAt": "2026-09-03T01:20:56Z",
+      "commitAt": "2026-09-03T01:20:55Z",
+      "htmlUrl": "https://github.com/zjunlp/SkillX"
+    },
+    {
+      "repo": "kayba-ai/agentic-context-engine",
+      "sha": "3a319831785ede6ba4a3a4002756233095c59e17",
+      "branch": "main",
+      "license": {
+        "spdx": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "archived": false,
+      "pushedAt": "2026-09-24T08:13:44Z",
+      "commitAt": "2026-09-23T14:08:35Z",
+      "htmlUrl": "https://github.com/kayba-ai/agentic-context-engine"
+    },
+    {
+      "repo": "pskoett/pskoett-ai-skills",
+      "sha": "5a836dc7163da6799fe34ed4283da6d7f0358f14",
+      "branch": "main",
+      "license": null,
+      "archived": false,
+      "pushedAt": "2026-10-05T10:33:43Z",
+      "commitAt": "2026-10-05T10:33:40Z",
+      "htmlUrl": "https://github.com/pskoett/pskoett-ai-skills"
+    },
+    {
+      "repo": "lamenting-hawthorn/SkillLoop",
+      "sha": "2af24b9a6ffce63b4430c1b8b70afca05d1e2418",
+      "branch": "main",
+      "license": {
+        "spdx": "Apache-2.0",
+        "name": "Apache License 2.0"
+      },
+      "archived": false,
+      "pushedAt": "2026-07-15T02:46:25Z",
+      "commitAt": "2026-07-10T20:27:51Z",
+      "htmlUrl": "https://github.com/lamenting-hawthorn/SkillLoop"
+    },
+    {
+      "repo": "aiming-lab/SkillRL",
+      "sha": "4d984d455b9b02f0bad283cbe9ab3d66a7e5b89d",
+      "branch": "main",
+      "license": {
+        "spdx": "MIT",
+        "name": "MIT License"
+      },
+      "archived": false,
+      "pushedAt": "2026-09-25T14:18:57Z",
+      "commitAt": "2026-09-25T14:18:56Z",
+      "htmlUrl": "https://github.com/aiming-lab/SkillRL"
+    }
+  ]
+}

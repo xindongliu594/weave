@@ -1,0 +1,55 @@
+{
+  "sourceRunId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+  "sourceEventSeqs": [
+    81,
+    90,
+    123,
+    128
+  ],
+  "upstreamCommit": "b0047c848dbbcf019363d6d56eef8c558f69aefc",
+  "extractedCandidates": 1,
+  "acceptedCandidates": 0,
+  "generalFilterResponse": "bad",
+  "toolFilterExecuted": false,
+  "receipts": [
+    {
+      "stage": "extract",
+      "usageId": "082c8ae9-8947-486b-b86e-a1f98443a4f7",
+      "inputTokens": 5253,
+      "outputTokens": 1523,
+      "cost": 0.0034035
+    },
+    {
+      "stage": "general-filter",
+      "usageId": "b86db2a6-9c4b-4fb9-a5b5-2963d7b7caf4",
+      "inputTokens": 1179,
+      "outputTokens": 1,
+      "cost": 0.00035489999999999995
+    }
+  ],
+  "cost": 0.0037584,
+  "inputTokens": 6432,
+  "outputTokens": 1524,
+  "occupiedBefore": 2.5632984000000008,
+  "occupiedAfter": 2.5670568000000005,
+  "oldHoldCount": 6,
+  "preserved": {
+    "source": true,
+    "snapshot": true,
+    "events": true,
+    "files": true,
+    "oldHolds": true
+  },
+  "candidatePythonSyntaxValid": true,
+  "missingResponseFields": [
+    {
+      "tool": "filesystem",
+      "field": "size",
+      "line": 4
+    }
+  ],
+  "candidateExecuted": false,
+  "candidatePublished": false,
+  "localLLMInstalled": false,
+  "qualityConclusion": "rejected; not ready for reuse"
+}

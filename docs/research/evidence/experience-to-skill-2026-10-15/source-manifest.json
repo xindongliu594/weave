@@ -1,0 +1,108 @@
+[
+  {
+    "repo": "NousResearch/hermes-agent",
+    "path": "agent/background_review.py",
+    "sha": "7bda2a3368024f7ae1c70cef16583e7c2c891674",
+    "bytes": 79092,
+    "sha256": "b177b1cfe8b06f9e787e37920fd9a7b023a038ecbac951bde4e81535d88aa4dc",
+    "url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/7bda2a3368024f7ae1c70cef16583e7c2c891674/agent/background_review.py"
+  },
+  {
+    "repo": "NousResearch/hermes-agent",
+    "path": "tools/skill_manager_tool.py",
+    "sha": "7bda2a3368024f7ae1c70cef16583e7c2c891674",
+    "bytes": 47255,
+    "sha256": "131d3720957659c37addd27430693d5d0b7dec0b5176a83b2bedad783b7edcd7",
+    "url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/7bda2a3368024f7ae1c70cef16583e7c2c891674/tools/skill_manager_tool.py"
+  },
+  {
+    "repo": "MemTensor/MemOS",
+    "path": "apps/memos-local-plugin/core/skill/crystallize.ts",
+    "sha": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+    "bytes": 25238,
+    "sha256": "41e16aebcd15f933b710ead1b92089186417d2c8a2cae562c5d60583bec774fa",
+    "url": "https://raw.githubusercontent.com/MemTensor/MemOS/a7367d07e55db61099f7b4e2c1108bc5831a24f3/apps/memos-local-plugin/core/skill/crystallize.ts"
+  },
+  {
+    "repo": "MemTensor/MemOS",
+    "path": "apps/memos-local-plugin/core/skill/lifecycle.ts",
+    "sha": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+    "bytes": 7010,
+    "sha256": "8da7cd7dc3d9d9d1de27e88dae61ddcc6fede8eff093e5c0866db1d063826ad6",
+    "url": "https://raw.githubusercontent.com/MemTensor/MemOS/a7367d07e55db61099f7b4e2c1108bc5831a24f3/apps/memos-local-plugin/core/skill/lifecycle.ts"
+  },
+  {
+    "repo": "MemTensor/MemOS",
+    "path": "apps/memos-local-plugin/package.json",
+    "sha": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+    "bytes": 4632,
+    "sha256": "ac4d7e8c8fc91c19a266485583a29a98d557e0f7631c78ae7d18659b872c1327",
+    "url": "https://raw.githubusercontent.com/MemTensor/MemOS/a7367d07e55db61099f7b4e2c1108bc5831a24f3/apps/memos-local-plugin/package.json",
+    "package": {
+      "name": "@memtensor/memos-local-plugin",
+      "version": "2.0.16-beta.1",
+      "license": "MIT",
+      "peerDependencies": {
+        "@deepseek-ai/cordis": "^4.0.1",
+        "@deepseek-ai/dsh-agent": ">=0.1.0-rc.5 <0.2.0",
+        "@deepseek-ai/dsh-llm": ">=0.1.0-rc.5 <0.2.0",
+        "@deepseek-ai/dsh-session": ">=0.1.0-rc.5 <0.2.0",
+        "@deepseek-ai/dsh-system-prompt": ">=0.1.0-rc.5 <0.2.0",
+        "@deepseek-ai/dsh-timeout": ">=0.1.0-rc.5 <0.2.0",
+        "@deepseek-ai/dsh-tools": ">=0.1.0-rc.5 <0.2.0",
+        "@deepseek-ai/schemastery": "^3.18.1"
+      },
+      "engines": {
+        "node": ">=20.0.0"
+      }
+    }
+  },
+  {
+    "repo": "agentscope-ai/ReMe",
+    "path": "integrations/dsh/package.json",
+    "sha": "d865776eddb9e116055624ed8b51e6338964ae57",
+    "bytes": 3309,
+    "sha256": "b2a8f2211e1a5f856bbefd4d46275191024eec5fb842cdf6abfc0248e6e85e43",
+    "url": "https://raw.githubusercontent.com/agentscope-ai/ReMe/d865776eddb9e116055624ed8b51e6338964ae57/integrations/dsh/package.json",
+    "package": {
+      "name": "@agentscope-ai/reme-dsh-plugin",
+      "version": "0.1.1",
+      "license": "Apache-2.0",
+      "peerDependencies": {
+        "@deepseek-ai/cordis": "~4.0.4",
+        "@deepseek-ai/dsh-client-ui-primitives": "0.1.7-rc.2",
+        "@deepseek-ai/dsh-llm": "0.1.7-rc.2",
+        "@deepseek-ai/dsh-tools": "0.1.7-rc.2",
+        "@deepseek-ai/dsh-typert-protocol": "0.1.7-rc.2",
+        "@deepseek-ai/schemastery": "~3.18.4"
+      },
+      "engines": {
+        "node": "^22.19.0 || >=24.0.0"
+      }
+    }
+  },
+  {
+    "repo": "agentscope-ai/ReMe",
+    "path": "integrations/dsh/README.md",
+    "sha": "d865776eddb9e116055624ed8b51e6338964ae57",
+    "bytes": 17444,
+    "sha256": "84cb8385c8fe423b38bd289ae98316e35c71fe8b0a2db2e5a1a3106c5f26c443",
+    "url": "https://raw.githubusercontent.com/agentscope-ai/ReMe/d865776eddb9e116055624ed8b51e6338964ae57/integrations/dsh/README.md"
+  },
+  {
+    "repo": "zjunlp/SkillX",
+    "path": "llm/client.py",
+    "sha": "b0047c848dbbcf019363d6d56eef8c558f69aefc",
+    "bytes": 8938,
+    "sha256": "ce1347d925f2c0b1b8bba259c293180c8387b646b2b0b21c74995e7c23397b67",
+    "url": "https://raw.githubusercontent.com/zjunlp/SkillX/b0047c848dbbcf019363d6d56eef8c558f69aefc/llm/client.py"
+  },
+  {
+    "repo": "kayba-ai/agentic-context-engine",
+    "path": "pyproject.toml",
+    "sha": "3a319831785ede6ba4a3a4002756233095c59e17",
+    "bytes": 4588,
+    "sha256": "d9ce30d9be81e5d67affc7b332a3fe4bfdf6dd0ee22895b5fa30816606c2c240",
+    "url": "https://raw.githubusercontent.com/kayba-ai/agentic-context-engine/3a319831785ede6ba4a3a4002756233095c59e17/pyproject.toml"
+  }
+]

@@ -1,0 +1,11 @@
+✔ complete three-request worst-case fits the unchanged pilot cap (1.5205ms)
+✔ budget, pending and dispatch ceilings fail closed before the provider (1.254ms)
+✔ source, price, stage and request size cannot be widened by a runner (0.533ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 139.1298
