@@ -1,0 +1,110 @@
+{
+  "at": "2026-10-15T08:18:36.993Z",
+  "runId": "10d6906e-8b7b-4131-9f99-fa29551f72a8",
+  "done": [
+    "develop"
+  ],
+  "history": {
+    "calls": 16,
+    "tasks": {
+      "develop": {
+        "cost": 0.022641599999999998,
+        "calls": 6,
+        "requestOverheadBytes": 7040
+      },
+      "qa-check": {
+        "cost": 0.0215574,
+        "calls": 6,
+        "requestOverheadBytes": 6536
+      }
+    },
+    "callsBasis": "durable-admissions-and-archived-wire-requests"
+  },
+  "costs": {
+    "recordedCost": 0.0630936,
+    "reserved": 0.014085,
+    "availableBudget": 0.0728214,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+        "amount": 0.014085,
+        "status": "uncertain"
+      }
+    ]
+  },
+  "options": [
+    {
+      "remainingCallsEach": 2,
+      "minimumProjectBudget": 0.18195840000000002,
+      "taskBudgets": [
+        {
+          "id": "qa-check",
+          "minimum": 0.0745542
+        },
+        {
+          "id": "accept",
+          "minimum": 0.049083
+        }
+      ]
+    },
+    {
+      "remainingCallsEach": 3,
+      "minimumProjectBudget": 0.23299830000000002,
+      "taskBudgets": [
+        {
+          "id": "qa-check",
+          "minimum": 0.1010526
+        },
+        {
+          "id": "accept",
+          "minimum": 0.07362451
+        }
+      ]
+    },
+    {
+      "remainingCallsEach": 4,
+      "minimumProjectBudget": 0.28403819999999996,
+      "taskBudgets": [
+        {
+          "id": "qa-check",
+          "minimum": 0.127551
+        },
+        {
+          "id": "accept",
+          "minimum": 0.098166
+        }
+      ]
+    },
+    {
+      "remainingCallsEach": 5,
+      "minimumProjectBudget": 0.3350781,
+      "taskBudgets": [
+        {
+          "id": "qa-check",
+          "minimum": 0.1540494
+        },
+        {
+          "id": "accept",
+          "minimum": 0.1227075
+        }
+      ]
+    },
+    {
+      "remainingCallsEach": 6,
+      "minimumProjectBudget": 0.38611799999999996,
+      "taskBudgets": [
+        {
+          "id": "qa-check",
+          "minimum": 0.1805478
+        },
+        {
+          "id": "accept",
+          "minimum": 0.14724901
+        }
+      ]
+    }
+  ],
+  "modelCalls": 0
+}

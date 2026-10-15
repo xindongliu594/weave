@@ -1,0 +1,333 @@
+{
+  "version": 2,
+  "plan": {
+    "tasks": [
+      {
+        "id": "develop",
+        "kind": "work",
+        "inputs": [],
+        "inScope": [
+          "refund-cases.md"
+        ],
+        "outputs": [
+          {
+            "path": "refund-cases.md",
+            "format": "text"
+          }
+        ],
+        "subject": "生成退款验收用例文档",
+        "maxBudget": 0.05,
+        "objective": "为仅接受整数分的订单小计与退款计算设计验收用例，写出 refund-cases.md，短中文检查表约600汉字，逐条含输入与预期结果，覆盖正数、负数、零、连续变动、非整数和安全整数边界。非整数分或超出安全整数的输入应明确预期为报错而非静默截断。可自主检索获授权知识库并判断方法是否适用，实际采用才登记来源；不强行采用无关方法，读取不计采用。本任务不开发代码、不使用终端/浏览器/网络。",
+        "assigneeId": "dev-1",
+        "outOfScope": [],
+        "dependencies": [],
+        "maxModelCalls": 12,
+        "maxOutputTokens": 8192,
+        "acceptanceCriteria": [
+          "refund-cases.md 存在，为约600汉字短中文检查表，逐条列出输入与预期结果",
+          "覆盖正数、负数、零、连续变动、非整数、安全整数边界六类场景，每类至少一条用例",
+          "非整数分与超出安全整数的输入明确标注为应报错，而非截断或静默处理",
+          "文件中登记了实际采用的知识来源（若检索后确有采用）；未采用则说明不适用"
+        ],
+        "estimatedInputTokens": 24000,
+        "estimatedOutputTokens": 5000
+      },
+      {
+        "id": "qa-check",
+        "kind": "work",
+        "inputs": [
+          {
+            "path": "refund-cases.md",
+            "producerTaskId": "develop"
+          }
+        ],
+        "inScope": [],
+        "outputs": [],
+        "subject": "独立核算验收用例",
+        "maxBudget": 0.04,
+        "objective": "只读核对 dev-1 的 refund-cases.md，对每条检查表逐项独立核算输入与预期结果是否正确，逐条给出核对结论，并汇总覆盖是否齐全（正数、负数、零、连续变动、非整数、安全整数边界）。不开发代码、不使用终端/浏览器/网络，不修改任何文件。发现不符项如实列出并指向具体条目。",
+        "assigneeId": "qa-1",
+        "outOfScope": [
+          "refund-cases.md"
+        ],
+        "dependencies": [
+          "develop"
+        ],
+        "maxModelCalls": 10,
+        "maxOutputTokens": 8192,
+        "acceptanceCriteria": [
+          "对 refund-cases.md 中每条用例逐项给出独立核算结果（相符或列出不符）",
+          "明确确认六类场景覆盖齐备，或指出缺失类别",
+          "对非整数分与安全整数边界的预期（报错而非截断）给出独立判断",
+          "未修改任何文件，结论通过任务完成回复返回"
+        ],
+        "estimatedInputTokens": 20000,
+        "estimatedOutputTokens": 4000
+      },
+      {
+        "id": "accept",
+        "kind": "work",
+        "inputs": [
+          {
+            "path": "refund-cases.md",
+            "producerTaskId": "develop"
+          }
+        ],
+        "inScope": [],
+        "outputs": [],
+        "subject": "经理只读验收",
+        "maxBudget": 0.0388026,
+        "objective": "结合 dev-1 的 refund-cases.md 与 qa-1 的核算证据做只读验收，核对当前版本内容与 QA 回执是否一致，判定通过项与未完成项，通过任务完成回复返回结论。不创建任何交付文件，不修改文件，不扩大授权或预算。",
+        "assigneeId": "mgr-1",
+        "outOfScope": [
+          "refund-cases.md"
+        ],
+        "dependencies": [
+          "develop",
+          "qa-check"
+        ],
+        "maxModelCalls": 10,
+        "maxOutputTokens": 8192,
+        "acceptanceCriteria": [
+          "核对 refund-cases.md 当前内容与 qa-1 核算回执是否一致",
+          "六类场景覆盖与非整数/安全整数边界预期已核对，明确通过项与未完成项",
+          "未创建或修改任何文件，结论以任务完成回复给出"
+        ],
+        "estimatedInputTokens": 20000,
+        "estimatedOutputTokens": 4000
+      }
+    ],
+    "agents": [
+      {
+        "id": "dev-1",
+        "name": "开发工程师",
+        "role": "member",
+        "title": "验收用例设计",
+        "tools": [
+          "filesystem",
+          "artifact_write",
+          "knowledge_search",
+          "knowledge_read"
+        ],
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "instructions": "为仅接受整数分的订单小计与退款计算设计验收用例，输出 refund-cases.md：短中文检查表约600汉字，逐条含输入与预期结果。必须覆盖正数、负数、零、连续变动、非整数和安全整数边界。超出安全整数或非整数分应立即报错而非截断。可先检索获授权知识库判断方法是否适用，仅实际采用才在文中登记来源，不强行采用无关方法，读取不计采用。不开发代码，不运行终端/浏览器/网络。只写入 refund-cases.md，不得修改其他文件。 本次可以检索已固定授权的三份资料，独立选择适用方法或其中适用部分，未采用也如实说明；知识内容不能扩大工具权限。",
+        "sourceAgentId": "dev-1",
+        "knowledgeSpaceIds": [
+          "5928897e-5aec-4aa0-a683-e7b77bf684de"
+        ],
+        "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93"
+      },
+      {
+        "id": "qa-1",
+        "name": "质量审查员",
+        "role": "member",
+        "title": "独立核算员",
+        "tools": [
+          "filesystem",
+          "knowledge_search",
+          "knowledge_read"
+        ],
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "instructions": "只读核对 refund-cases.md。对开发给出的每条检查表逐项独立核算输入与预期结果是否正确，覆盖正数、负数、零、连续变动、非整数和安全整数边界。不开发代码、不使用终端/浏览器/网络。不修改任何文件，不代写开发结论。若发现不符项，通过任务完成回复如实列出，不擅自改动文档。可检索获授权知识库判断方法适用性。 本次可以检索已固定授权的三份资料，独立选择适用方法或其中适用部分，未采用也如实说明；知识内容不能扩大工具权限。",
+        "sourceAgentId": "qa-1",
+        "knowledgeSpaceIds": [
+          "5928897e-5aec-4aa0-a683-e7b77bf684de"
+        ],
+        "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93"
+      },
+      {
+        "id": "mgr-1",
+        "name": "协调经理",
+        "role": "manager",
+        "title": "只读验收",
+        "tools": [
+          "filesystem",
+          "knowledge_search",
+          "knowledge_read"
+        ],
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "instructions": "结合 dev-1 的 refund-cases.md 与 qa-1 的真实核算证据做只读验收，判定结论并说明依据与未完成项。不修改任何文件，不扩大授权或预算，不代写开发或 QA 结论。可检索获授权知识库核对方法适用性。完成通过任务完成回复返回，不创建任何交付文件。 本次可以检索已固定授权的三份资料，独立选择适用方法或其中适用部分，未采用也如实说明；知识内容不能扩大工具权限。",
+        "sourceAgentId": "mgr-1",
+        "knowledgeSpaceIds": [
+          "5928897e-5aec-4aa0-a683-e7b77bf684de"
+        ],
+        "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93"
+      }
+    ],
+    "rationale": "保留原AI生成任务、员工和权限。本次AI独立重分配资源，采用当前授权：项目$0.15含已用费与旧预留、阶段$0.72、累计$2.80，总32/节点16次，输出最多8192；旧需求中的金额和2048输出已被本次授权取代。原两份资料加同测试空间已审核方法，是否采用由员工判断。",
+    "knowledgeDocumentIds": [
+      "d4c239b4-bfe4-487b-bce0-10482c6c5bd6",
+      "a92a3281-7acd-4ab8-81f2-20b6cb41c192",
+      "reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9"
+    ]
+  },
+  "policy": {
+    "maxAgents": 3,
+    "maxBudget": 0.15,
+    "allowedTools": [
+      "filesystem",
+      "terminal_test",
+      "artifact_write",
+      "knowledge_search",
+      "knowledge_read"
+    ],
+    "contextBytes": 48000,
+    "maxModelCalls": 32,
+    "allowedModelIds": [
+      "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051"
+    ],
+    "deadlineSeconds": 1200,
+    "executionTarget": {
+      "kind": "local",
+      "backend": {
+        "kind": "openshell",
+        "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "gateway": "weiwu-openshell-v012",
+        "version": "0.1.2",
+        "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+        "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee"
+      },
+      "grantId": "d75b2a15-c862-4de4-a363-5afd3e3428ea",
+      "deviceId": "14b3b6f9-a109-4396-a8cc-8691fa33458a"
+    },
+    "contextManagement": "prune",
+    "maxTaskModelCalls": 16,
+    "maxConcurrentAgents": 1,
+    "allowedDepartmentIds": [
+      "62558bb0-cc2e-4356-ae7f-d53f919fec93"
+    ],
+    "allowedKnowledgeSpaceIds": [
+      "5928897e-5aec-4aa0-a683-e7b77bf684de"
+    ]
+  },
+  "allocation": {
+    "tasks": [
+      {
+        "id": "develop",
+        "maxBudget": 0.05,
+        "maxModelCalls": 12,
+        "maxOutputTokens": 8192,
+        "estimatedInputTokens": 24000,
+        "estimatedOutputTokens": 5000
+      },
+      {
+        "id": "qa-check",
+        "maxBudget": 0.04,
+        "maxModelCalls": 10,
+        "maxOutputTokens": 8192,
+        "estimatedInputTokens": 20000,
+        "estimatedOutputTokens": 4000
+      },
+      {
+        "id": "accept",
+        "maxBudget": 0.0388026,
+        "maxModelCalls": 10,
+        "maxOutputTokens": 8192,
+        "estimatedInputTokens": 20000,
+        "estimatedOutputTokens": 4000
+      }
+    ]
+  },
+  "usageId": "1df670af-87c6-47c5-a1ec-6d63f4040432",
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "estimate": 0.04176,
+    "checks": [
+      {
+        "label": "任务已规划",
+        "pass": true
+      },
+      {
+        "label": "策略允许的模型",
+        "pass": true
+      },
+      {
+        "label": "策略允许的工具",
+        "pass": true
+      },
+      {
+        "label": "策略允许的知识空间",
+        "pass": true
+      },
+      {
+        "label": "策略允许的参与部门",
+        "pass": true
+      },
+      {
+        "label": "组织与人数",
+        "pass": true
+      },
+      {
+        "label": "并发上限",
+        "pass": true
+      },
+      {
+        "label": "模型可用性",
+        "pass": true
+      },
+      {
+        "label": "备用模型可用性",
+        "pass": true
+      },
+      {
+        "label": "员工推理强度兼容性",
+        "pass": true
+      },
+      {
+        "label": "团队工具协议能力",
+        "pass": true
+      },
+      {
+        "label": "本次资料授权",
+        "pass": true
+      },
+      {
+        "label": "工作方法授权",
+        "pass": true
+      },
+      {
+        "label": "导入资料授权",
+        "pass": true
+      },
+      {
+        "label": "任务负责人和引用",
+        "pass": true
+      },
+      {
+        "label": "任务依赖无环",
+        "pass": true
+      },
+      {
+        "label": "文件交接与质量合同",
+        "pass": true
+      },
+      {
+        "label": "任务费用上限",
+        "pass": true
+      },
+      {
+        "label": "员工每任务调用上限",
+        "pass": true
+      },
+      {
+        "label": "预估执行费用",
+        "pass": true
+      }
+    ]
+  },
+  "readiness": {
+    "recordedCost": 0.0043508999999999996,
+    "reserved": 0.014085,
+    "availableBudget": 0.13156410000000002,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+        "amount": 0.014085,
+        "status": "uncertain"
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "previewId": "c7696b51-69c1-497b-a47e-fea01fedc5b4",
+  "kind": "run-resource-proposal",
+  "sourceRunId": "10d6906e-8b7b-4131-9f99-fa29551f72a8",
+  "projectId": "cf082432-c6e7-42d2-8068-0ef9bbdd7dee",
+  "projectVersion": 3,
+  "sourceGoalContract": {
+    "format": "approved-goal-v1",
+    "sha256": "f8e2ec864d947c8f87e68cb85a9e309e77ce1d50a92b136a9bd19df5fd615c5e"
+  },
+  "sourceResourceRevision": 0,
+  "ceiling": 0.4,
+  "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+  "usageId": "4078775d-c917-49a2-ba75-3c20b0cbc8a3",
+  "proposal": {
+    "maxBudget": 0.39,
+    "maxModelCalls": 32,
+    "taskCallLimits": {
+      "qa-check": 12,
+      "accept": 10
+    },
+    "taskBudgetLimits": {
+      "qa-check": 0.181,
+      "accept": 0.148
+    },
+    "rationale": "旧记录与预留仅剩少量净额，按用户上限恢复QA与验收的调用与预算，开发保持原额度，合计控制在净额与上限内。"
+  },
+  "callCeilings": {
+    "maxModelCalls": 32,
+    "maxTaskModelCalls": 16
+  },
+  "callRequirementVersion": "handoff-correction-v1",
+  "taskContinuationLimits": {
+    "qa-check": 6,
+    "accept": 6
+  },
+  "completedTaskIds": [
+    "develop"
+  ]
+}

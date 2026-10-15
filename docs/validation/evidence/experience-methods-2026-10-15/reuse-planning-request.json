@@ -1,0 +1,17 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Allocate resources only. Return one JSON object, no markdown: {\"tasks\":[{\"id\":\"...\",\"maxBudget\":0.04,\"maxModelCalls\":10,\"maxOutputTokens\":8192,\"estimatedInputTokens\":20000,\"estimatedOutputTokens\":4000}]}. No other keys. USD rates: input .3 / output 1.2 per million. Token estimates total across all calls. Each call repeats tools/context; allow about 4000-7000 input tokens. Reserve is conservative input bytes plus maximum output. Final report needs room; prefer 8192 output. Tools results require subsequent model calls to interpret and finish."
+    },
+    {
+      "role": "user",
+      "content": "{\"task\":\"Existing refund checklist task, only reallocate resources; do not create deliverables.\",\"availableAfterPlanning\":0.1288026,\"maxCalls\":32,\"maxNodeCalls\":16,\"maxOutput\":8192,\"tasks\":[{\"id\":\"develop\",\"work\":\"生成退款验收用例文档\",\"steps\":\"claim, search, read, adopt if useful, write 600 Chinese characters checklist, complete\"},{\"id\":\"qa-check\",\"work\":\"独立核算验收用例\",\"steps\":\"claim, search/read optional method, read producer file, independently check or accept QA report, complete\"},{\"id\":\"accept\",\"work\":\"经理只读验收\",\"steps\":\"claim, search/read optional method, read producer file, independently check or accept QA report, complete\"}]}"
+    }
+  ],
+  "estimate": {
+    "inputBytes": 2477,
+    "reservation": 0.0019719
+  },
+  "projectVersion": 2
+}

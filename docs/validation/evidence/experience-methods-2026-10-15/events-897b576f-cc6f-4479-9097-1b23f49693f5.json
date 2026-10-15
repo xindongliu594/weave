@@ -1,0 +1,233 @@
+[
+  {
+    "seq": 29,
+    "at": "2026-10-15T08:22:27.371Z",
+    "type": "recovery/restored",
+    "data": {
+      "sourceRunId": "10d6906e-8b7b-4131-9f99-fa29551f72a8",
+      "completed": [
+        "develop"
+      ],
+      "files": [
+        {
+          "path": "refund-cases.md",
+          "size": 3056,
+          "state": "accepted",
+          "sha256": "6b14ce351d6cce8914ba4df3b7e7d9dd1942292771536fb9ac462cf4efd1ec40",
+          "producerTaskId": "develop"
+        }
+      ]
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "requestId": "0d654a5a-86a7-449f-b0fd-ed85892a3fca",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "seq": 74,
+    "at": "2026-10-15T08:22:30.740Z",
+    "type": "billing/usage",
+    "data": {
+      "id": "25732527-287b-4497-af70-868b6d2d774c",
+      "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+      "requestId": "0d654a5a-86a7-449f-b0fd-ed85892a3fca",
+      "taskId": "qa-check",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "agentId": "employee-2",
+      "employeeId": "qa-1",
+      "runtimeTaskId": "t2",
+      "requestPurpose": "execution",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "durationMs": 3261,
+      "inputTokens": 9832,
+      "outputTokens": 100,
+      "cost": 0.0030696
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "requestId": "cb6bb5b1-d07b-425f-b94e-d38b42f9ede7",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "seq": 101,
+    "at": "2026-10-15T08:22:33.059Z",
+    "type": "billing/usage",
+    "data": {
+      "id": "ee7ae603-531f-4e6d-9a72-a5d9dcd9ece3",
+      "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+      "requestId": "cb6bb5b1-d07b-425f-b94e-d38b42f9ede7",
+      "taskId": "qa-check",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "agentId": "employee-2",
+      "employeeId": "qa-1",
+      "runtimeTaskId": "t2",
+      "requestPurpose": "execution",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "durationMs": 2235,
+      "inputTokens": 12030,
+      "outputTokens": 144,
+      "cost": 0.0037818
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "requestId": "8769be2a-bf46-4e54-a561-b7601b80b7bc",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "seq": 141,
+    "at": "2026-10-15T08:22:36.641Z",
+    "type": "billing/usage",
+    "data": {
+      "id": "b023ba05-d112-403c-98be-fb9a5671265f",
+      "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+      "requestId": "8769be2a-bf46-4e54-a561-b7601b80b7bc",
+      "taskId": "qa-check",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "agentId": "employee-2",
+      "employeeId": "qa-1",
+      "runtimeTaskId": "t2",
+      "requestPurpose": "execution",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "durationMs": 2353,
+      "inputTokens": 13645,
+      "outputTokens": 103,
+      "cost": 0.0042171000000000005
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "seq": 147,
+    "at": "2026-10-15T08:22:36.696Z",
+    "type": "knowledge/citation",
+    "data": {
+      "agentId": "employee-2",
+      "operation": "read",
+      "sources": [
+        {
+          "documentId": "reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9",
+          "version": 1,
+          "chunkId": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e",
+          "title": "经验方法：在只读约束下，将已封存的QA核算回执与同一交付原文及参照知识逐项对照，输出通过项、未完成项与不阻断的已知不足。",
+          "lineStart": 46,
+          "lineEnd": 57,
+          "sha256": "cc25280e125ef3f8af5844de6cad664f658718046f4da63a7a3d8f7d4e5d49dc",
+          "source": {
+            "note": "人工审查的知识候选 reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9；原文 d4c239b4-bfe4-487b-bce0-10482c6c5bd6:v1 SHA256 e27bd9d41060f6390fc23f1a5f4156a45e4c48534b7fcadf89619c67d6d1db2f",
+            "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+            "vaultPath": "department/能力选用验收资料-5928897e/经验方法：在只读约束下，将已封存的QA核算回执与同一交付原文及参照知识逐项对照，输出通过项、未完成项与不阻断的已知不足。-reuse-7f.md"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "requestId": "1e1db3a4-d713-4c64-8940-179add8afc91",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "seq": 178,
+    "at": "2026-10-15T08:22:42.318Z",
+    "type": "billing/usage",
+    "data": {
+      "id": "362e537f-0000-43c9-be62-4842c2e6917a",
+      "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+      "requestId": "1e1db3a4-d713-4c64-8940-179add8afc91",
+      "taskId": "qa-check",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "agentId": "employee-2",
+      "employeeId": "qa-1",
+      "runtimeTaskId": "t2",
+      "requestPurpose": "execution",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "durationMs": 5532,
+      "inputTokens": 10846,
+      "outputTokens": 63,
+      "cost": 0.0033293999999999997
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "requestId": "71f567ed-0c53-4978-9382-4c3ff35ef40b",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "seq": 210,
+    "at": "2026-10-15T08:22:46.723Z",
+    "type": "billing/usage",
+    "data": {
+      "id": "7685965d-291e-4772-9a33-e179b244a8e3",
+      "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+      "requestId": "71f567ed-0c53-4978-9382-4c3ff35ef40b",
+      "taskId": "qa-check",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "agentId": "employee-2",
+      "employeeId": "qa-1",
+      "runtimeTaskId": "t2",
+      "requestPurpose": "execution",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "durationMs": 4309,
+      "inputTokens": 13719,
+      "outputTokens": 370,
+      "cost": 0.0045597
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "callId": "call_00_o4e5hq3q3y3u2zynjc10wsxo",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "sourceKey": "capability-use:5a7f57610a3ca84e8e2b4b4c7766d4aaa71f2d4bca1ca3dca9ccb5e10356dd51",
+    "seq": 215,
+    "at": "2026-10-15T08:22:46.805Z",
+    "type": "capability/adopted",
+    "data": {
+      "agentId": "employee-2",
+      "taskId": "qa-check",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "kind": "knowledge",
+      "id": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e",
+      "source": {
+        "documentId": "reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9",
+        "version": 1,
+        "sha256": "cc25280e125ef3f8af5844de6cad664f658718046f4da63a7a3d8f7d4e5d49dc",
+        "chunkId": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e"
+      },
+      "note": "采用其“逐项复算输入与预期是否相符，而非仅确认用例表存在”与“比较覆盖类别是否有缺项”两步，用于对 refund-cases.md 的 A1–F5 逐条独立复算与六类覆盖比对；未采用其经理验收部分（本任务为 QA 核算）。",
+      "validation": "pending"
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "seq": 220,
+    "at": "2026-10-15T08:22:46.837Z",
+    "type": "context/summary-skipped-for-handoff",
+    "data": {
+      "retained": "original",
+      "reason": "最后一次调用留给正式交接；不压缩或剪裁原文，仍受原字节、费用及输出门禁约束。"
+    }
+  },
+  {
+    "sessionId": "c02d42d9-5c71-4d1b-a93d-81aab7bed29e",
+    "taskId": "qa-check",
+    "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+    "seq": 221,
+    "at": "2026-10-15T08:22:46.839Z",
+    "type": "handoff/closure-started",
+    "data": {
+      "taskId": "qa-check",
+      "runtimeTaskId": "t2",
+      "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+      "taskStatus": "in_progress",
+      "reason": "last-authorized-call"
+    }
+  },
+  {
+    "seq": 248,
+    "at": "2026-10-15T08:22:47.187Z",
+    "type": "run/finished",
+    "data": {
+      "status": "failed",
+      "message": "CONTEXT_LIMIT: Chat Completions 完整受保护请求超过字节或上下文上限；没有发送模型请求",
+      "usageCost": 0.0189576
+    }
+  }
+]

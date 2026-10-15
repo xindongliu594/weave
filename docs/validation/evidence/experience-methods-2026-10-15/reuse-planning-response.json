@@ -1,0 +1,15 @@
+{
+  "choices": [
+    {
+      "message": {
+        "content": "{\"tasks\":[{\"id\":\"develop\",\"maxBudget\":0.05,\"maxModelCalls\":12,\"maxOutputTokens\":8192,\"estimatedInputTokens\":24000,\"estimatedOutputTokens\":5000},{\"id\":\"qa-check\",\"maxBudget\":0.04,\"maxModelCalls\":10,\"maxOutputTokens\":8192,\"estimatedInputTokens\":20000,\"estimatedOutputTokens\":4000},{\"id\":\"accept\",\"maxBudget\":0.0388026,\"maxModelCalls\":10,\"maxOutputTokens\":8192,\"estimatedInputTokens\":20000,\"estimatedOutputTokens\":4000}]}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 295,
+    "completion_tokens": 125
+  },
+  "usageId": "1df670af-87c6-47c5-a1ec-6d63f4040432"
+}

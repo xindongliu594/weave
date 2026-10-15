@@ -1,0 +1,15 @@
+✔ original pending version is updated once and a known lost response is read back (1.2468ms)
+✔ concurrent edits, published candidates and changed provenance cannot be overwritten (0.5071ms)
+✔ readback accepts the API trimmed payload without repeating its update (0.2503ms)
+✔ two worst-case requests fit the shared original allowance including previous trial (1.3616ms)
+✔ exact source, outstanding calls, shared cap and call sequence are guarded (0.6616ms)
+✔ resource-only allocation preserves business tasks and permissions (2.429ms)
+✔ reject budgets beyond net balance, excess calls, changed task IDs or extra permissions (0.7397ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 170.1103

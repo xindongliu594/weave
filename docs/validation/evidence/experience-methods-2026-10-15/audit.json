@@ -1,0 +1,208 @@
+{
+  "runs": [
+    {
+      "runId": "10d6906e-8b7b-4131-9f99-fa29551f72a8",
+      "status": "failed",
+      "integrity": "ok",
+      "startedAt": "2026-10-15T08:13:24.503Z",
+      "endedAt": "2026-10-15T08:14:53.227Z",
+      "modelCalls": 16,
+      "byTask": {
+        "develop": {
+          "calls": 6,
+          "inputTokens": 64756,
+          "outputTokens": 2679,
+          "cost": 0.022641599999999998,
+          "modelDurationMs": 44973
+        },
+        "qa-check": {
+          "calls": 6,
+          "inputTokens": 65342,
+          "outputTokens": 1629,
+          "cost": 0.0215574,
+          "modelDurationMs": 18278
+        },
+        "unattributed": {
+          "calls": 4,
+          "inputTokens": 42619,
+          "outputTokens": 1465,
+          "cost": 0.0145437,
+          "modelDurationMs": 19057
+        }
+      },
+      "completedCheckpoints": [],
+      "artifact": {
+        "path": "refund-cases.md",
+        "bytes": 3056,
+        "sha256": "6b14ce351d6cce8914ba4df3b7e7d9dd1942292771536fb9ac462cf4efd1ec40"
+      },
+      "newMethodAdoptions": [
+        {
+          "seq": 716,
+          "agentId": "employee-2",
+          "taskId": "qa-check",
+          "attemptId": "b8f07bb2-2ca6-4ba5-acac-8a78f29bde6d",
+          "kind": "knowledge",
+          "id": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e",
+          "source": {
+            "documentId": "reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9",
+            "version": 1,
+            "sha256": "cc25280e125ef3f8af5844de6cad664f658718046f4da63a7a3d8f7d4e5d49dc",
+            "chunkId": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e"
+          },
+          "note": "采用其三步核对骨架：一、对每个用例独立复算输入与预期是否相符，而非仅确认用例表存在；二、比较覆盖类别是否有缺项；三、比较差异声明与参照知识原文语义，口径被收窄但结论仍成立时标注而非判未通过。据此对A1–F5共17条手工逐条复算并核六类覆盖。",
+          "validation": "pending"
+        }
+      ],
+      "failure": {
+        "status": "failed",
+        "message": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 64620 字节，精简前预留 $0.02952360；当前请求字节上限 48000；可用预算 $0.01844260；输出上限 8192 tokens 保持不变；单次完整上下文最低预留 $0.02293710，至少另需 $0.00449450",
+        "usageCost": 0.05874270000000001
+      }
+    },
+    {
+      "runId": "897b576f-cc6f-4479-9097-1b23f49693f5",
+      "status": "failed",
+      "integrity": "ok",
+      "startedAt": "2026-10-15T08:22:25.801Z",
+      "endedAt": "2026-10-15T08:22:47.187Z",
+      "modelCalls": 5,
+      "byTask": {
+        "qa-check": {
+          "calls": 5,
+          "inputTokens": 60072,
+          "outputTokens": 780,
+          "cost": 0.0189576,
+          "modelDurationMs": 17690
+        }
+      },
+      "completedCheckpoints": [
+        "develop"
+      ],
+      "artifact": {
+        "path": "refund-cases.md",
+        "bytes": 3056,
+        "sha256": "6b14ce351d6cce8914ba4df3b7e7d9dd1942292771536fb9ac462cf4efd1ec40"
+      },
+      "newMethodAdoptions": [
+        {
+          "seq": 215,
+          "agentId": "employee-2",
+          "taskId": "qa-check",
+          "attemptId": "5ce5e418-ea39-49eb-b23c-7bb4728cc0be",
+          "kind": "knowledge",
+          "id": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e",
+          "source": {
+            "documentId": "reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9",
+            "version": 1,
+            "sha256": "cc25280e125ef3f8af5844de6cad664f658718046f4da63a7a3d8f7d4e5d49dc",
+            "chunkId": "f2c294455c05496050ad53c3ea651d107212f261f87b6349f892d6736d0a1b7e"
+          },
+          "note": "采用其“逐项复算输入与预期是否相符，而非仅确认用例表存在”与“比较覆盖类别是否有缺项”两步，用于对 refund-cases.md 的 A1–F5 逐条独立复算与六类覆盖比对；未采用其经理验收部分（本任务为 QA 核算）。",
+          "validation": "pending"
+        }
+      ],
+      "failure": {
+        "status": "failed",
+        "message": "CONTEXT_LIMIT: Chat Completions 完整受保护请求超过字节或上下文上限；没有发送模型请求",
+        "usageCost": 0.0189576
+      }
+    }
+  ],
+  "receipts": [
+    {
+      "id": "4078775d-c917-49a2-ba75-3c20b0cbc8a3",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "cf082432-c6e7-42d2-8068-0ef9bbdd7dee",
+      "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": null,
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 1504,
+      "outputTokens": 118,
+      "cost": 0.0005928,
+      "purpose": "预算补充规划",
+      "createdAt": "2026-10-15T08:22:06.662Z",
+      "agentName": null
+    },
+    {
+      "id": "1df670af-87c6-47c5-a1ec-6d63f4040432",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "cf082432-c6e7-42d2-8068-0ef9bbdd7dee",
+      "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": null,
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 295,
+      "outputTokens": 125,
+      "cost": 0.0002385,
+      "purpose": "经验跨任务验收资源规划 2026-10-15",
+      "createdAt": "2026-10-15T08:12:38.123Z",
+      "agentName": null
+    },
+    {
+      "id": "d3d35097-2292-4e56-8d0a-649bfcf53bf5",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": null,
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 5445,
+      "outputTokens": 65,
+      "cost": 0.0017115,
+      "purpose": "经验文档提炼 2026-10-15/general-filter",
+      "createdAt": "2026-10-15T07:41:52.178Z",
+      "agentName": null
+    },
+    {
+      "id": "ba985536-3e97-4fdf-abe4-afbe93be6dd1",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": null,
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 4376,
+      "outputTokens": 1602,
+      "cost": 0.0032351999999999997,
+      "purpose": "经验文档提炼 2026-10-15/extract",
+      "createdAt": "2026-10-15T07:31:20.812Z",
+      "agentName": null
+    }
+  ],
+  "oldHoldCount": 6,
+  "oldHoldsPreserved": true,
+  "occupied": 2.6505351,
+  "phaseOccupied": 0.5797167000000001,
+  "published": {
+    "id": "reuse-7fc6493f431e89a7b2e2c0de541d424c02cff6c9",
+    "version": 1,
+    "sha256": "cc25280e125ef3f8af5844de6cad664f658718046f4da63a7a3d8f7d4e5d49dc",
+    "versionCount": 1,
+    "ordinaryKnowledge": true
+  },
+  "fullAcceptance": false,
+  "efficiencyImprovement": null,
+  "limitation": "No matched baseline; QA not sealed and manager not executed. Model self-reported adoption alone is not successful work."
+}
