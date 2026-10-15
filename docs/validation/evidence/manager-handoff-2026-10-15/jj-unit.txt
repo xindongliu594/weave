@@ -1,0 +1,37 @@
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (13.573515ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (2.716089ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (3.108538ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (2.664131ms)
+✔ web exposes manager requirements and sealed reports with source/version, without treating them as live acceptance (12.491774ms)
+✔ manager handoff survives plan schema; invalid and duplicate keys are rejected (7.673891ms)
+✔ authorized repaired reports survive independent review and two recovery admissions (35.861705ms)
+✔ recovery preserves contracted report and rejects absent seals or changed manager requirements (1.88245ms)
+✔ new AI candidate cannot pin an external old hash after an upstream writer (3.070436ms)
+✔ new AI candidate requires a real minimum count for each Node test mapping (0.473265ms)
+✔ fixed source files remain valid when no earlier task writes them (0.32385ms)
+✔ Node flags cannot bypass the supported test-count parser in a new candidate (0.278595ms)
+✔ one exact object, one fence, or short surrounding prose preserves the whole candidate (2.189915ms)
+✔ actual plan schema issues retain field, expected type, length, enum and numeric constraint without received values (5.162461ms)
+✔ record keys, unknown fields and nested union input never enter a safe schema diagnostic (3.050355ms)
+✔ multiple issue summaries are capped and only schema fields, bounded array indexes and safe constraints survive (0.374903ms)
+✔ normal candidate parsing and accepted unknown-field stripping retain original schema behavior (0.788081ms)
+✔ quoted braces, escaped quotes/backslashes/newlines and nested containers never split the object (0.222629ms)
+✔ multiple candidates, alternative scalar values and malformed fence boundaries are rejected (0.704218ms)
+✔ truncated strings/containers, invalid escape/control characters and syntax are never repaired (0.449782ms)
+✔ output byte, nesting depth and outside text ceilings are exact and do not clip data (9.754523ms)
+✔ failure diagnostics contain safe scalars and original SHA without echoing provider text or keys (0.586119ms)
+✔ approved file contracts survive parsing and valid producer/consumer plans pass (9.017718ms)
+✔ missing source edges, unknown output and unordered writers/readers fail product validation (1.306731ms)
+✔ downstream cannot name an older writer after an upstream replacement (0.567747ms)
+✔ schema rejects unsafe paths, unpinned external files and incompatible JSON checks (4.468374ms)
+✔ quality tasks require command grants, scope, valid references and an independent reviewer (0.901764ms)
+✔ declared outputs must fit host file scopes before any employee executes (0.879527ms)
+✔ automatic rework is explicit, bounded, read-only in review and gates all consumers (2.916798ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 499.148009

@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-manager-handoff-20261015",
+  "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-context-20261015",
+  "historicalState": {
+    "runCount": 51,
+    "usageCount": 578,
+    "usageSHA": "7b22fe01ad331b14711bad90d22762a8b0faf2a4630c7224a3442b5fff6dcf55",
+    "holdsSHA": "526cedec4c3dfc4e5e3aee88beeda6721c88718ac14a5aa6dcab7d8a5cada2c4",
+    "sourceRunSHA": "5376d41fa802b1de5449b5625dce9f6f6869e8e1f625cbfd3fb9b659f3aa0eea",
+    "deliverySHA": "6b14ce351d6cce8914ba4df3b7e7d9dd1942292771536fb9ac462cf4efd1ec40",
+    "occupied": 2.6505351
+  },
+  "modelCalls": 0,
+  "checkedAt": "2026-10-15T15:22:10.484340+00:00"
+}

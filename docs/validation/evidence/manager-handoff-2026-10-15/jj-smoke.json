@@ -1,0 +1,9 @@
+{
+  "service": "ActiveState=active\nWorkingDirectory=/home/jj/.local/share/weiwu/releases/weiwu-manager-handoff-20261015",
+  "database": "connected",
+  "runtimeReady": true,
+  "homepageMatchesBuild": true,
+  "assetCount": 2,
+  "assetsMatchBuild": true,
+  "modelCalls": 0
+}
