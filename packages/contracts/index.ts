@@ -73,6 +73,11 @@ export const taskSchema = z.object({
   subject: z.string().trim().min(1).max(200), objective: z.string().trim().min(1).max(5000),
   assigneeId: z.string().min(1), dependencies: z.array(z.string()).max(100),
   acceptanceCriteria: z.array(z.string().trim().min(1).max(2000)).min(1).max(20),
+  handoff: z.object({sections:z.array(z.object({
+    key:z.string().regex(/^[a-z][a-z0-9_]{0,39}$/),
+    requirement:z.string().trim().min(1).max(1000),
+  }).strict()).min(1).max(8).refine(items=>new Set(items.map(item=>item.key)).size===items.length,'交接章节 key 不能重复')}).strict().optional()
+    .describe('经理派工时定义员工必须回答的交接章节；例如 usage=运行方法，coverage=测试覆盖与不足。员工用现有任务更新工具提交，不能替代文件和实际验收证据。'),
   acceptanceChecks: z.array(z.object({
     criterionIndex: z.number().int().min(0).max(19),
     command: z.string().trim().min(1).max(5000),

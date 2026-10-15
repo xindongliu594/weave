@@ -4,5 +4,6 @@ export function inspectArtifact(root: string, declaration: any): { path: string;
 export function workspaceRevision(root: string): string;
 export class HandoffGate {
   constructor(options:any);
+  prepare(taskId:string,attemptId:string,update:any):any;
   commit(record:any):void;
 }

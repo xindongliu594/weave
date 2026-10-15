@@ -13,6 +13,8 @@ export const PLANNING_SCHEMA_ISSUE_LIMIT=12;
 const schemaFields=new Set('rationale agents tasks knowledgeDocumentIds runInputs workFileSelections id name role title instructions modelId tools browserOrigins mcpConnections connectionId version roleVersion templateId systemConstraints outputFormat reasoningEffort knowledgeSpaceIds fallbackModelId sourceDepartmentId sourceAgentId subject objective assigneeId dependencies acceptanceCriteria estimatedInputTokens estimatedOutputTokens maxOutputTokens maxBudget maxModelCalls kind inputs outputs inScope outOfScope verify reviewedTaskId sourceTaskId sourceFindingIds maxReworkRounds path producerTaskId sha256 format requiredKeys expectedValues content agentIds snapshotId paths mode'.split(' '));
 const arrayFields=new Set('agents tasks knowledgeDocumentIds runInputs workFileSelections tools browserOrigins mcpConnections knowledgeSpaceIds dependencies acceptanceCriteria inputs outputs inScope outOfScope verify sourceFindingIds requiredKeys agentIds paths'.split(' '));
 for(const field of ['taskCallLimits','taskBudgetLimits','taskOutputLimits'])schemaFields.add(field);
+for(const field of ['handoff','sections','key','requirement'])schemaFields.add(field);
+arrayFields.add('sections');
 const issueCodes=new Set('invalid_type too_big too_small invalid_format invalid_value invalid_union invalid_key invalid_element unrecognized_keys not_multiple_of custom'.split(' '));
 const schemaTypes=new Set('string number int boolean array object null undefined record'.split(' '));
 const schemaFormats=new Set('regex url uuid email datetime date time duration'.split(' '));

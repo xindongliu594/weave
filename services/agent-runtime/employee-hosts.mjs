@@ -7,13 +7,14 @@ import { installEmployeeContext } from './employee-context.mjs';
 import { PRODUCT_TOOL_NAMES } from './product-tools.mjs';
 import { installApprovedSkills } from './approved-skills.mjs';
 import { installEmployeeCapabilities } from './employee-capabilities.mjs';
+import { projectAssignmentReports, projectClaimReport } from './assignment-reports.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion });
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -90,6 +91,8 @@ export class EmployeeHostFactory {
         text: context => this.protectedContext(context.agent) });
       const concludesAcceptedTask = this.concludesAcceptedTask;
       const prepareToolArguments = this.prepareToolArguments;
+      const claimReport=(agent,value)=>this.protectedContext&&this.assignmentReports
+        ? projectClaimReport(value,JSON.parse(this.protectedContext(agent)),this.assignmentReports(agent)):value;
       for (const schema of coordinator.tools.schemas()) {
         const definition = coordinator.tools.get(schema.name);
         ctx.tools.register({ ...definition, async execute(args, exec) {
@@ -102,7 +105,7 @@ export class EmployeeHostFactory {
           // evidence. End at the official tool boundary without another model
           // request merely to restate that success.
           if (result.concludesTurn || concludesAcceptedTask?.(exec)) exec.concludeTurn();
-          return result.value;
+          return schema.name==='agent_teams_claim_task'?claimReport(exec.agent,result.value):result.value;
         } });
       }
       ctx.on('system-prompt/assemble', async (assembly, context, next) => {
@@ -165,7 +168,7 @@ export class EmployeeHostFactory {
           const sections = message.source.sections.map(section => section.name === 'department:approved-context' ? { ...section, text } : section);
           const messages = [...decision.messages];
           messages[index] = { ...message, source: { ...message.source, sections }, content: [{ type: 'text', text: joinContextSections(sections) }] };
-          return { ...decision, messages };
+          return { ...decision, messages:this.assignmentReports?projectAssignmentReports(messages,JSON.parse(text),this.assignmentReports(event.agent)):messages };
         }, { prepend: true });
         const employee = this.identify?.(agent);
         if (employee) {

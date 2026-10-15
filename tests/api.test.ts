@@ -61,7 +61,7 @@ before(async () => {
       const sequence = [
         ['agent_teams_claim_task', { task_id: 't1' }],
         ['agent_teams_update_task', { task_id: 't1', attempt_id: attemptId, status: 'in_progress' }],
-        ['agent_teams_update_task', { task_id: 't1', attempt_id: attemptId, status: 'completed', output: '已整理需求范围和验收标准。' }],
+        ['agent_teams_update_task', { task_id: 't1', attempt_id: attemptId, status: 'completed', output: JSON.stringify({summary:'已整理需求范围和验收标准。',sections:{scope:'接口范围和逐项验收标准已整理'},risks:[]}),acceptanceResults:[{criterion:'列出接口范围和逐项验收标准',status:'passed',evidence:'隔离协议测试数据'}] }],
         ['agent_teams_send_message', { to: 'captain', content: '任务完成：已整理需求范围和验收标准。' }],
       ] as const;
       if (step < sequence.length) {
@@ -134,6 +134,7 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.equal((await call(`/projects/${p.data.id}/plan`, 'PUT', { version: 1, plan: project.plan })).status, 409);
   // Tool execution and permission checks have their own sandbox contract tests.
   const textOnlyPlan = { ...project.plan, agents: project.plan.agents.map((agent: any) => ({ ...agent, tools: [] })),tasks:project.plan.tasks.map((task:any)=>({...task,maxBudget:1,maxModelCalls:20})) };
+  textOnlyPlan.tasks[0].handoff={sections:[{key:'scope',requirement:'说明接口范围和逐项验收标准'}]};
   assert.equal((await call(`/projects/${p.data.id}/plan`, 'PUT', { version: 2, plan: textOnlyPlan })).status, 200);
   project = (await call('/projects')).data[0]; assert.equal(project.version, 3);
   const approved = await call(`/projects/${p.data.id}/approve`, 'POST', { version: project.version });
@@ -144,6 +145,8 @@ test('gateway discovery, formal execution, versioned plans and deletion preserve
   assert.equal(run.data.status, 'completed', JSON.stringify(run.data.events.slice(-20).map((event: any) => ({ type: event.type, data: event.data }))));
   assert.equal(run.data.mode, 'product');
   assert.equal(run.data.snapshot.tasks[0].maxBudget,1);assert.equal(run.data.snapshot.tasks[0].maxModelCalls,20);
+  assert.deepEqual(run.data.snapshot.tasks[0].handoff,textOnlyPlan.tasks[0].handoff);
+  assert.equal(run.data.events.find((event:any)=>event.type==='handoff/accepted').data.employeeReport.sections.scope,'接口范围和逐项验收标准已整理');
   assert.equal(JSON.stringify(run.data.snapshot).includes('test-key-not-real'), false);
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'team/snapshot'));
   assert.ok(run.data.events.some((event: { type: string }) => event.type === 'billing/usage'));

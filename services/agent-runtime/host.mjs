@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 import { randomUUID, createHash } from 'node:crypto';
-import { isAbsolute,join } from 'node:path';
+import { isAbsolute,join,dirname } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { Context } from '@deepseek-ai/cordis';
@@ -16,10 +16,14 @@ import { restoreStagedCheckpoints } from './checkpoint-team.mjs';
 import { executionBudgetContext } from './budget-context.mjs';
 import { readOnlyEvidenceSignature, completedWriteEvidenceSignature } from './request-context.mjs';
 import { captureBudgetEvidence, taskRunEvidence } from './run-evidence.mjs';
+import { handoffReportGuidance } from '../../packages/contracts/handoff-report.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
 const baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
+// Pinned AgentTeams 0.1.20 exports these pure helpers from its installed
+// scheduler module. Reuse its exact truncation/ordering for byte attestation.
+const { collectCompletedDependencyOutputs, formatDependencyOutputs } = await import(pathToFileURL(join(dirname(require.resolve('@nanmicoder/dsh-agent-teams/package.json')),'lib/scheduler.js')).href);
 const completeContextGuards = new WeakMap();
 export function reviewCompletionGuidance(contract, outputLimit) {
   if (!['review', 'requirements'].includes(contract?.kind)) return undefined;
@@ -181,6 +185,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ...(goal ? { approvedGoal: { ...goal, requirement: undefined } } : {}),
       completionGuidance: reviewCompletionGuidance(contract, budget?.task?.configuredOutputLimit ?? contract.maxOutputTokens),
       runEvidence: taskRunEvidence({ snapshot: product.snapshot, taskId: contract.id, state, taskIds, handoff, budget: adapter.budget, runId: archive.id }),
+      handoffGuidance: handoffReportGuidance(contract),
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
   async function mount(name, config) {
@@ -326,6 +331,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
       context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
       pendingCompletion,handoffClosure:handoff?handoffClosure:undefined,
+      assignmentReports:handoff?agent=>{const work=activeWork(agent);return formatDependencyOutputs(collectCompletedDependencyOutputs(teamState().tasks,work.task.id));}:undefined,
       onIncompleteCompletion: product?.onHandoffBlocked,
       prepareToolArguments: handoff ? (agent,name,args) => {
         if(!['agent_teams_claim_task','agent_teams_update_task'].includes(name)||nativeTaskId(args.task_id)===args.task_id)return args;

@@ -6,6 +6,7 @@ import { commandEvidence } from './run-evidence.mjs';
 import { taskContractErrors } from '../../packages/contracts/task-contracts.mjs';
 import { canonicalManifest } from '../../apps/desktop/local-executor.cjs';
 import { observeAcceptanceChecks, assertAcceptanceChecks } from './acceptance-checks.mjs';
+import { createHandoffReport, handoffContractError, handoffReportGuidance } from '../../packages/contracts/handoff-report.mjs';
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export function inspectArtifact(root, declaration) {
@@ -49,6 +50,7 @@ export class HandoffGate {
     // begin/sameVersion; new approvals reject the ambiguous contract in validatePlan.
     const errors = taskContractErrors(snapshot.tasks ?? [], snapshot.agents, snapshot.handoffCheckpoints, { allowHistoricalPinnedProducerInputs: true });
     if (errors.length) throw Error('INVALID_HANDOFF_CONTRACT: ' + errors.join('；'));
+    for (const task of this.tasks.values()) { const error=handoffContractError(task.handoff); if(error) throw Error('INVALID_HANDOFF_CONTRACT: '+error); }
   }
   async exclusive(signal, work) {
     const release = await this.mutex.acquire(signal);
@@ -133,11 +135,13 @@ export class HandoffGate {
       if (!actual || actual.exitCode !== expectedExit || actual.workspaceRevision !== revision) throw Error('UNVERIFIED_COMMAND: ' + command);
     }
     const acceptanceChecks = assertAcceptanceChecks(task, observed, revision);
+    const employeeReport = createHandoffReport(task, update);
     if (['implementation', 'repair'].includes(task.kind)) {
       const actual = [...(this.writes.get(key)?.keys() ?? [])].sort();
       if (JSON.stringify([...(update.changedPaths ?? [])].sort()) !== JSON.stringify(actual)) throw Error('CHANGED_PATHS_MISMATCH: 必须提交实际修改的路径');
     }
     return { taskId, attemptId, runId: this.archive.id, workspaceRevision: revision, inputs: this.bindings.get(key) ?? [], outputs, commands: observed,
+      ...(employeeReport ? { employeeReport } : {}),
       ...(task.acceptanceChecks !== undefined ? { acceptanceChecks } : {}), acceptedAt: new Date().toISOString() };
   }
   stage(record) { this.accepted.set(record.taskId, record); }
@@ -168,7 +172,8 @@ export function teamTaskPlan(tasks, { hostContext = false, assertHostContext } =
   // Profile task aliases resolve dependencies/review references inside AgentTeams.
   return tasks.map(task => ({ id: task.id, subject: task.subject, assignee: task.assignee, dependencies: task.dependencies,
     description: (compact ? '完整需求、当前批准合同、恢复记录和预算见最新 department:approved-context；按当前任务及原生 attempt 执行。' : (task.taskPrompt ?? task.objective ?? '')) +
-      '\n\n文件合同（由宿主核验；未就绪不得完成）：\n' + JSON.stringify({ inputs: task.inputs ?? [], outputs: task.outputs ?? [] }),
+      '\n\n文件合同（由宿主核验；未就绪不得完成）：\n' + JSON.stringify({ inputs: task.inputs ?? [], outputs: task.outputs ?? [] }) +
+      (task.handoff ? '\n经理交接要求：'+JSON.stringify(task.handoff)+'\n'+handoffReportGuidance(task) : ''),
     kind: task.kind ?? 'work', objective: task.objective ?? task.taskPrompt ?? task.subject,
     acceptance: task.acceptanceCriteria ?? [],
     ...Object.fromEntries(['inScope', 'outOfScope', 'verify', 'reviewedTaskId', 'sourceTaskId', 'sourceFindingIds'].filter(k => task[k] !== undefined).map(k => [k, task[k]])),

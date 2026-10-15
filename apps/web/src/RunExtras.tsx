@@ -11,6 +11,7 @@ import { runResultView } from './run-result-view.ts';
 import { createRunRecoveryConfirmation, type RunRecoveryContext, type RunRecoveryIntent } from './run-recovery-confirmation.ts';
 import {RunInheritedEvidence} from './RunInheritedEvidence.tsx';
 import {RunAcceptanceChecks} from './RunAcceptanceChecks.tsx';
+import {RunHandoffReports} from './RunHandoffReports.tsx';
 import {RunGoalChecks} from './RunGoalChecks.tsx';
 import {RunResourceResume} from './RunResourceResume.tsx';
 import type {RunLineageEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
@@ -162,6 +163,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  {snapshot.resourceRevision>0&&<p className="notice-box">原任务方案 v{snapshot.planVersion} · 资源补充审批第 {snapshot.resourceRevision} 次 · 本次续跑项目累计上限 ${snapshot.policy.maxBudget}。原项目草案保留，旧费用、预留和调用次数继续计入；补充审批只允许未完成节点续跑。</p>}
  <RunGoalChecks snapshot={snapshot} events={events}/>
  <RunAcceptanceChecks runId={id} snapshot={snapshot} evidence={lineage}/>
+ <RunHandoffReports snapshot={snapshot} events={events}/>
  <RunInheritedEvidence runId={id} snapshot={snapshot} evidence={lineage} error={lineageError} taskName={taskName}/>
  {tests.length>0&&<div className="lower"><h3>真实测试结果</h3><p className="subcopy">以下命令与输出来自本机执行回执，包含实际失败和修复后的复测；以当前文件版本的最终复验为准。</p>{tests.map(operation=><details key={operation.id}><summary>{operation.payload.arguments.command} · {operation.result.exitCode===0?'通过':'失败'} · 退出码 {operation.result.exitCode}</summary><pre className="product-pre">{operation.result.output}</pre></details>)}</div>}
  {snapshot.executionTarget?.kind==='local'&&<div className="lower"><h3>执行环境</h3><p>{snapshot.executionTarget.name} · {snapshot.executionTarget.platform} · {snapshot.executionTarget.label} / {id}</p><p className="subcopy">模型与审批由后端协调；文件和命令在这台设备执行。设备断线后停止在途操作，不自动重放修改或命令。</p>{isolation&&<p className="notice-box">OpenShell 沙箱已有执行回执 · Node {isolation.node} · 用户 {isolation.uid} · 1 核 / 512 MiB<br/>沙箱：{isolation.sandboxId}</p>}<details><summary>执行操作回执（{localOperations.length}）</summary>{localOperations.map(operation=><div className="knowledge-result" key={operation.id}><strong>{operation.payload.name} · {({queued:'等待设备领取',claimed:'设备已领取',started:'已开始',completed:'已完成',failed:'失败',cancelled:'已停止'}as any)[operation.status]??operation.status}</strong><p>{operation.result?.localWorkspace??operation.lateResult?.localWorkspace}</p>{operation.result?.execution?.kind==='openshell'&&<small>OpenShell {operation.result.execution.version} · {operation.result.execution.sandboxName}</small>}{operation.result?.error&&<p>{operation.result.error.message}</p>}{operation.lateResult&&<p>收到迟到回执，未重新执行。{operation.lateResult.ok?'设备报告已完成，请核对本机文件。':operation.lateResult.error?.message}</p>}{(operation.result?.output??operation.lateResult?.output)&&<pre className="product-pre">{operation.result?.output??operation.lateResult?.output}</pre>}</div>)}</details></div>}

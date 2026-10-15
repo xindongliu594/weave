@@ -3,9 +3,11 @@ import { taskContractErrors } from '../../../packages/contracts/task-contracts.m
 import { ancestors } from '../../../services/agent-runtime/checkpoint-context.mjs';
 import { assertAcceptanceChecks } from '../../../services/agent-runtime/acceptance-checks.mjs';
 import { canonicalEvidence } from '../../../packages/contracts/run-lineage-evidence.ts';
+import { assertHandoffReport, handoffContractDigest, reportTaskFor } from '../../../packages/contracts/handoff-report.mjs';
 
 /** Retain only host seals belonging to the exact completed attempt in the archive. */
 export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string) {
+  const reportContracts = new Map<string,any>();
   // Collapse a rework graph only at an independently accepted boundary. A
   // half-finished repair/review must retain native identities and is not replayed.
   for (const event of events.filter(event=>event.type==='quality/rework-created')) {
@@ -16,6 +18,14 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
       throw Error('返工尚未形成独立验收通过的检查点，请检查产物后完整重试，或重新批准方案');
     const reviewed=events.findLast(item=>item.type==='quality/reviewed'&&item.data.taskId===review.id&&item.data.attemptId===(completed.get(review.id).attempt_id??completed.get(review.id).attemptId));
     if(reviewed?.data.verdict!=='pass')throw Error('返工缺少宿主独立复验记录，不能跳过，请完整重试');
+    // Only the already authorized, independently accepted native repair graph
+    // may change the evidence contract used to validate its report.
+    for (const effective of [event.data.repairContract,event.data.reviewContract]) {
+      const approved=snapshot.tasks.find((task:any)=>task.id===effective?.id);
+      if (!approved || effective.reworkRound!==event.data.round) continue;
+      if(canonicalEvidence(effective.handoff)!==canonicalEvidence(approved.handoff)) throw Error('HANDOFF_REPORT: 返工不能改写经理交接要求');
+      reportContracts.set(effective.id,effective);
+    }
   }
   const records = new Map<string,any>();
   for (const [id, task] of completed) {
@@ -31,6 +41,11 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
       if (canonicalEvidence(checks) !== canonicalEvidence(accepted.acceptanceChecks)) throw Error(`任务 ${id} 的逐项验收凭据已变化`);
     }
     if (accepted) records.set(id,accepted);
+    if (contract.handoff !== undefined) {
+      const effective=reportContracts.get(id)??reportTaskFor(contract,accepted??{});
+      assertHandoffReport(effective,accepted?.employeeReport);
+      if(reportContracts.has(id)) records.set(id,{...accepted,reportContract:{task:effective,approvedSha256:handoffContractDigest(contract)}});
+    }
     if (!accepted) records.set(id,{taskId:id,attemptId:attemptId??`checkpoint:${id}`,inputs:[],outputs:[],commands:[]});
     if (['review','requirements'].includes(contract?.kind)&&task.verdict!=='pass') throw Error(`任务 ${id} 缺少通过的审查结论，不能恢复`);
     for(const dependency of contract?.dependencies??[])if(!completed.has(dependency))throw Error(`任务 ${id} 的前置 ${dependency} 尚未完成，不能跳过`);

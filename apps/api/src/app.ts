@@ -436,7 +436,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
           dependencies: task.dependencies, taskPrompt: approvedTaskPrompt(project.requirement, task, project.version),
           acceptanceCriteria: task.acceptanceCriteria, ...(task.acceptanceChecks !== undefined ? { acceptanceChecks: task.acceptanceChecks } : {}), estimatedInputTokens: task.estimatedInputTokens, estimatedOutputTokens: task.estimatedOutputTokens,
           maxBudget: task.maxBudget, maxModelCalls: task.maxModelCalls, maxOutputTokens: task.maxOutputTokens, objective: task.objective,
-          ...Object.fromEntries(['kind','inputs','outputs','inScope','outOfScope','verify','reviewedTaskId','sourceTaskId','sourceFindingIds','maxReworkRounds'].filter(key=>task[key]!==undefined).map(key=>[key,task[key]])) }));
+          ...Object.fromEntries(['handoff','kind','inputs','outputs','inScope','outOfScope','verify','reviewedTaskId','sourceTaskId','sourceFindingIds','maxReworkRounds'].filter(key=>task[key]!==undefined).map(key=>[key,task[key]])) }));
         const routes = routeRows.map(row => {
           const model = requireRow(catalog.find(item => item.id === row.id));
           const assigned = project.plan.tasks.filter((task: any) => project.plan.agents.some((agent: any) => agent.id === task.assigneeId && (agent.modelId === row.id || agent.fallbackModelId === row.id)));

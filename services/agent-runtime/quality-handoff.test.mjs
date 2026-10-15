@@ -24,9 +24,15 @@ async function qualityScenario(mode) {
     snapshot.tasks[1].assignee='manager';snapshot.tasks[1].maxOutputTokens=2048;snapshot.tasks[1].outputs=[];
   }
   for(const task of snapshot.tasks) task.assigneeId='original-'+task.assignee;
+  if(mode==='manager-contract') snapshot.tasks[0].handoff={sections:[{key:'usage',requirement:'说明如何核验结果'}]};
+  if(mode==='manager-contract-chain') {
+    snapshot.agents.push({id:'auditor',employeeId:'auditor',role:'member',tools:[]});
+    snapshot.tasks.push({id:'accept',subject:'[quality:accept]',assignee:'auditor',assigneeId:'original-auditor',kind:'work',objective:'Read QA handoff',dependencies:['review'],acceptanceCriteria:['QA reviewed'],outputs:[]});
+    for(const task of snapshot.tasks)task.handoff={sections:[{key:'usage',requirement:'说明核验结论'}]};
+  }
   for(const employee of snapshot.agents) employee.modelId=employee.role==='manager'?'captain':'same-model';
   const archive=createRunArchive(root,snapshot),steps=new Map(),results=[],requests=[],hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-  let approvals=0,host,status,postHandoffRequests=0;
+  let approvals=0,host,status,postHandoffRequests=0;const leaked=[];
   // Test executor: only one fixed file and one recognized check. No shell or API.
   const sandbox={root:artifacts,revision:()=>hash(JSON.stringify(listArtifacts(artifacts))),async execute(name,args){
     if(name==='artifact_write'){
@@ -43,22 +49,34 @@ async function qualityScenario(mode) {
       requests.push(match?.[2]);
       if(match){
         const [,id,task]=match,key=options.sessionId+':'+attempt,step=steps.get(key)??0;steps.set(key,step+1);
+        if(mode==='manager-contract-chain'&&task==='accept') {
+          leaked.push(...options.messages.filter(message=>JSON.stringify(message).includes('INDIRECT_DEV_REPORT_MARKER')).map(message=>({role:message.role,source:message.source,content:message.content})));
+          assert.ok(!JSON.stringify(options.messages).includes('INDIRECT_DEV_REPORT_MARKER'),'indirect report must not arrive through native assignment text: '+JSON.stringify(options.messages.filter(message=>JSON.stringify(message).includes('INDIRECT_DEV_REPORT_MARKER')).map(message=>({role:message.role,source:message.source,start:message.content?.[0]?.text?.slice(0,120)}))));
+          assert.ok(JSON.stringify(options.messages).includes('DIRECT_QA_REPORT_MARKER'));
+        }
         if(task==='review'){
           const message=options.messages.findLast(item=>item.source?.sections?.some(section=>section.name==='department:approved-context'));
           const context=JSON.parse(message.source.sections.find(section=>section.name==='department:approved-context').text);
           assert.match(context.completionGuidance,/agent_teams_update_task/);assert.match(context.completionGuidance,/600中文字/);
           assert.equal(context.task.kind,'review');assert.equal(context.task.reviewedTaskId,'implement');
+          if(mode==='manager-contract') {
+            const source=context.runEvidence.completedAncestors.find(item=>item.taskId==='implement');
+            assert.equal(source.employeeReport.sections.usage,'读取 result.txt，并核对真实检查回执');
+            assert.equal(source.commands[0].exitCode,0);
+          }
           if(mode==='manager-review'){assert.equal(context.task.assignee,'manager');assert.equal(context.task.maxOutputTokens,2048);assert.deepEqual(context.task.outputs,[]);assert.match(context.completionGuidance,/2048 Token/);}
         }
         const update=(status,more={})=>['agent_teams_update_task',{task_id:id,attempt_id:attempt,status,...more}];
         const finish={output:'fixture quality evidence',changedPaths:['result.txt'],acceptanceResults:[{criterion:'result correct',status:mode==='failed-acceptance'?'failed':'passed',evidence:'fixture result'}],commandsRun:[{command:'check-fixture',status:'passed',exitCode:0,evidence:'claimed check'}]};
+        if(mode==='manager-contract') finish.output=JSON.stringify({summary:'已完成',sections:{usage:'读取 result.txt，并核对真实检查回执'},risks:[]});
+        if(mode==='manager-contract-chain') finish.output=JSON.stringify({summary:'已完成',sections:{usage:'INDIRECT_DEV_REPORT_MARKER'},risks:[]});
         const actions=[['agent_teams_claim_task',{task_id:id}],update('in_progress')];
         if(task==='implement'){
           actions.push(['artifact_write',{path:'result.txt',content:'expected'}]);
           if(mode!=='forged-command')actions.push(['terminal_test',{command:'check-fixture'}]);
           if(mode==='stale-attempt')actions.push(['agent_teams_update_task',{task_id:id,attempt_id:'stale',status:'completed',...finish}]);
           actions.push(update('completed',finish));
-        }else actions.push(mode==='review-revision'?update('failed',{verdict:'needs_revision',findings:[{id:'F1',severity:'high',problem:'fixture issue',requiredFix:'fix result'}]}):update('completed',{verdict:'pass',output:'independent fixture review'}));
+        }else actions.push(mode==='review-revision'?update('failed',{verdict:'needs_revision',findings:[{id:'F1',severity:'high',problem:'fixture issue',requiredFix:'fix result'}]}):update('completed',{verdict:'pass',output:mode==='manager-contract-chain'?JSON.stringify({summary:'已核验',sections:{usage:task==='review'?'DIRECT_QA_REPORT_MARKER':'final reviewed'},risks:[]}):'independent fixture review',...(mode==='manager-contract-chain'?{acceptanceResults:[{criterion:task==='review'?'implementation meets goal':'QA reviewed',status:'passed',evidence:'fixture protocol check'}]}:{})}));
         if(step<actions.length){const [name,args]=actions[step];yield{type:'block-start',index:0,blockType:'tool-call'};yield{type:'block-end',index:0,block:{type:'tool-call',id:randomUUID(),name,arguments:JSON.stringify(args)}};yield{type:'finish',reason:{kind:'tool-calls'}};return;}
         if(mode==='bounded-completion'){postHandoffRequests++;throw Object.assign(Error('No model call remains after the accepted handoff'),{code:'TASK_TURN_LIMIT'});}
       }
@@ -84,7 +102,7 @@ async function qualityScenario(mode) {
       await new Promise(resolve=>setTimeout(resolve,100));
       assert.equal(postHandoffRequests,0,'accepted handoff must end its turn before another model request');
     }
-    assert.ok(status);assert.equal(status.tasks.length,2,'no unapproved repair/review task may appear');
+    assert.ok(status);assert.equal(status.tasks.length,mode==='manager-contract-chain'?3:2,'no unapproved repair/review task may appear');
     const events=readRun(root,archive.id).events,seals=events.filter(e=>e.type==='handoff/accepted');
     if(mode==='forged-command'||mode==='failed-acceptance'){
       // Observe the final native failure after rejection, rather than a stale pre-tool status poll.
@@ -95,13 +113,15 @@ async function qualityScenario(mode) {
     }else if(mode==='review-revision'){
       assert.equal(seals.length,1);assert.notEqual(status.tasks[1].status,'completed');assert.ok(events.some(e=>e.type==='handoff/blocked'&&e.data.message.includes('REPLAN_REQUIRED')));
     }else{
-      assert.equal(status.deliverable,true);assert.equal(seals.length,2);assert.equal(approvals,1);
+      assert.equal(status.deliverable,true,JSON.stringify({leaked,requests,tasks:status.tasks.map(task=>({id:task.id,status:task.status})),errors:results.filter(item=>item.result.isError).map(item=>item.result.error)}));assert.equal(seals.length,mode==='manager-contract-chain'?3:2);assert.equal(approvals,1);
       assert.equal(status.tasks[0].kind,'implementation');assert.equal(status.tasks[1].kind,'review');assert.equal(status.tasks[1].verdict,'pass');
       if(mode==='stale-attempt')assert.ok(results.some(r=>r.args.attempt_id==='stale'&&r.result.isError));
     }
   }finally{await host?.close();await rm(root,{recursive:true,force:true});}
 }
 test('native quality contracts receive actual file and command evidence before independent review',()=>qualityScenario('pass'));
+test('native DSH tool accepts contracted employee report and passes its seal to independent reviewer',()=>qualityScenario('manager-contract'));
+test('native three-stage handoff does not inject indirect reports through assignment messages',()=>qualityScenario('manager-contract-chain'));
 test('model claims of a passed command cannot unlock native quality work',()=>qualityScenario('forged-command'));
 test('failed native acceptance rolls back the provisional host seal and leaves downstream pending',()=>qualityScenario('failed-acceptance'));
 test('review revision cannot create an unapproved automatic repair graph',()=>qualityScenario('review-revision'));

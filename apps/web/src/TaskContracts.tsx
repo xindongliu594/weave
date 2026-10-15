@@ -17,8 +17,8 @@ function JsonValues({value,onChange}:{value:Record<string,string|number|boolean|
   }}/>{error&&<small className="validation-error">{error}</small>}</label>;
 }
 export function TaskContractSummary({task}:{task:Task}) {
-  if(!task.inputs?.length&&!task.outputs?.length&&!task.kind)return null;
-  return <p className="subcopy">{names[task.kind??'work']}{task.inputs?.length?` · 读取：${task.inputs.map(f=>f.path).join('、')}`:''}{task.outputs?.length?` · 交付：${task.outputs.map(f=>f.path).join('、')}`:''}{task.maxReworkRounds?` · 最多返工 ${task.maxReworkRounds} 轮`:''}</p>;
+  if(!task.inputs?.length&&!task.outputs?.length&&!task.kind&&!task.handoff)return null;
+  return <div className="subcopy"><p>{names[task.kind??'work']}{task.inputs?.length?` · 读取：${task.inputs.map(f=>f.path).join('、')}`:''}{task.outputs?.length?` · 交付：${task.outputs.map(f=>f.path).join('、')}`:''}{task.maxReworkRounds?` · 最多返工 ${task.maxReworkRounds} 轮`:''}</p>{task.handoff&&<details><summary>经理要求的交接内容</summary><ul>{task.handoff.sections.map(section=><li key={section.key}>{section.requirement}</li>)}</ul></details>}</div>;
 }
 export function TaskContracts({task,tasks,update}:{task:Task;tasks:Task[];update:(patch:Partial<Task>)=>void}) {
   const inputs=task.inputs??[],outputs=task.outputs??[];
@@ -26,6 +26,9 @@ export function TaskContracts({task,tasks,update}:{task:Task;tasks:Task[];update
   const showScope=requiresScope||task.inScope!==undefined||task.outOfScope!==undefined||outputs.length>0;
   const lines=(text:string)=>text.split('\n').map(s=>s.trim()).filter(Boolean);
   return <details className="lower-small"><summary>文件交接与质量检查</summary>
+    <h4>经理要求的交接内容</h4><p className="subcopy">由 AI 在派工时组织，员工逐项回答。文件版本与真实测试仍须独立核验；修改后随新方案版本确认。</p>
+    {(task.handoff?.sections??[]).map((section,index)=><label className="field" key={index}>必答项 {index+1}<textarea required maxLength={1000} value={section.requirement} onChange={event=>update({handoff:{sections:task.handoff!.sections.map((item,i)=>i===index?{...item,requirement:event.target.value}:item)}})}/><button type="button" onClick={()=>{const sections=task.handoff!.sections.filter((_,i)=>i!==index);update({handoff:sections.length?{sections}:undefined});}}>删除必答项</button></label>)}
+    <button type="button" disabled={(task.handoff?.sections.length??0)>=8} onClick={()=>{const sections=task.handoff?.sections??[];let n=1;while(sections.some(item=>item.key===`section_${n}`))n++;update({handoff:{sections:[...sections,{key:`section_${n}`,requirement:''}]}});}}>添加必答项</button>
     <AcceptanceCheckEditor task={task} update={update}/>
     <label className="field">任务类型<select value={task.kind??'work'} onChange={e=>update({kind:e.target.value as Task['kind'],...(['implementation','review'].includes(e.target.value)?{inputs:task.inputs??[],outputs:task.outputs??[]}:{}),maxReworkRounds:undefined})}>{Object.entries(names).map(([key,label])=><option value={key} key={key}>{label}</option>)}</select></label>
     <p className="subcopy">声明输出后，文件写入仅限这些路径。上游实际文件、版本和检查结果满足合同后，才允许下游开始工作。</p>
