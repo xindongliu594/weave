@@ -27,6 +27,53 @@ function outputFixture(){
   old.tasks.forEach((t:any)=>{t.assignee='e';t.maxOutputTokens=2048;t.maxBudget=1;});
   old.goalContract=createGoalContract(old);return old;
 }
+function contextFixture(){
+  const old=outputFixture();old.policy.contextBytes=48000;old.modelRoutes[0].contextWindowTokens=131072;
+  old.tasks[2].maxBudget=.02;old.goalContract=createGoalContract(old);return old;
+}
+test('context resources change only the approved new snapshot and price each future request at the new byte limit',()=>{
+  const old=contextFixture(),before=structuredClone(old),change={...proposal,maxBudget:1,contextBytes:64000,taskBudgetLimits:{accept:.05}};
+  const next=applyRecoveryResources(old,change,{...options,ceiling:1,contextBytes:64000} as any);
+  assert.equal(next.policy.contextBytes,64000);assert.deepEqual(old,before);
+  assert.deepEqual(next.tasks.slice(0,2),old.tasks.slice(0,2));assert.deepEqual(next.modelRoutes,old.modelRoutes);
+  assert.deepEqual(next.knowledge,old.knowledge);assert.deepEqual(next.agents,old.agents);
+  const task={...next.tasks[2],maxBudget:0};
+  assert.equal(recoveryTaskMinimumBudget(next,task,0,0,13,2),.0439374);
+  assert.throws(()=>applyRecoveryResources(old,{...change,taskBudgetLimits:{accept:.02}},{...options,ceiling:1,contextBytes:64000} as any),/完整请求/);
+  assert.throws(()=>applyRecoveryResources(old,{...change,taskBudgetLimits:undefined},{...options,ceiling:1,contextBytes:64000} as any),/完整请求/);
+});
+test('context resources reject missing consent, reductions and routes lacking full input output and guard capacity',()=>{
+  const old=contextFixture(),change={...proposal,maxBudget:1,contextBytes:64000,taskBudgetLimits:{accept:.05}},opts={...options,ceiling:1,contextBytes:64000};
+  assert.throws(()=>applyRecoveryResources(old,change,{...options,ceiling:1}));
+  assert.throws(()=>applyRecoveryResources(old,{...change,contextBytes:65000},opts as any));
+  assert.throws(()=>applyRecoveryResources(old,{...change,contextBytes:47999},{...opts,contextBytes:47999} as any));
+  for(const route of [{contextBytes:63999},{contextWindowTokens:undefined},{contextWindowTokens:67071},{maxOutputTokens:undefined}]){
+    const altered=structuredClone(old);Object.assign(altered.modelRoutes[0],route);altered.goalContract=createGoalContract(altered);
+    assert.throws(()=>applyRecoveryResources(altered,change,opts as any),JSON.stringify(route));
+  }
+  assert.throws(()=>applyRecoveryResources(old,{...proposal,maxBudget:1},opts as any),'an approved adjustment must be explicit in the candidate');
+});
+test('context consent is sealed through confirmation and lineage while later unadjusted recovery inherits the new limit',async()=>{
+  const old=contextFixture(),history={calls:23,tasks:{accept:{calls:5}}},previewId='00000000-0000-4000-8000-000000000001',usageId='00000000-0000-4000-8000-000000000002';
+  const change={...proposal,maxBudget:1,contextBytes:64000,taskBudgetLimits:{accept:.2}};
+  const preview:any={kind:'run-resource-proposal',sourceRunId:'parent',projectId:'p',projectVersion:2,sourceResourceRevision:0,
+    sourceGoalContract:old.goalContract,modelId:'m',usageId,proposal:change,ceiling:1,contextBytes:64000,callRequirementVersion:'handoff-correction-v1',taskContinuationLimits:{accept:2}};
+  const db={query:async(sql:string)=>({rows:sql.startsWith('SELECT data')?[{data:preview}]:[{id:usageId}]})};
+  const next=await resources.approvedRecoveryResources(db,{id:'parent',project_id:'p',project_version:2,snapshot:old},previewId,['develop','qa'],history);
+  assert.equal(next.policy.contextBytes,64000);assert.equal(next.resourceApproval.contextBytes,64000);
+  assert.deepEqual(next.resourceApproval.taskCallCeilings,{accept:7});assert.equal(verifiedResourceEdge(next,old,'parent',['develop','qa']),true);
+  for(const mutate of [(s:any)=>s.policy.contextBytes=65000,(s:any)=>s.resourceApproval.contextBytes=65000,(s:any)=>delete s.resourceApproval.contextBytes]){
+    const forged=structuredClone(next);mutate(forged);forged.goalContract=createGoalContract(forged);
+    assert.equal(verifiedResourceEdge(forged,old,'parent',['develop','qa']),false);
+  }
+  Object.assign(preview,{sourceRunId:'child',sourceResourceRevision:1,sourceGoalContract:next.goalContract,
+    proposal:{...proposal,maxBudget:1,taskBudgetLimits:{accept:.2}}});
+  delete preview.contextBytes;delete preview.taskContinuationLimits;
+  const inherited=await resources.approvedRecoveryResources(db,{id:'child',project_id:'p',project_version:2,snapshot:next},previewId,['develop','qa'],history);
+  assert.equal(inherited.policy.contextBytes,64000);assert.equal(inherited.resourceApproval.contextBytes,undefined);
+  assert.equal(verifiedResourceEdge(inherited,next,'child',['develop','qa']),true);
+  assert.equal(verifiedResourceEdge(structuredClone(next),next,'child',['develop','qa']),true);
+});
 test('output choices quote the whole next tranche with old fees and leave the approved snapshot unchanged',()=>{
   const old=outputFixture();old.tasks[2].maxBudget=.014;old.goalContract=createGoalContract(old);
   const before=structuredClone(old);

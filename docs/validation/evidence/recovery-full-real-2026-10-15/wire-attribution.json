@@ -1,0 +1,98 @@
+[
+  {
+    "seq": 60,
+    "taskId": "t2-qa",
+    "sessionId": "c5b8ecd5-7601-457c-857b-754c34cfbbdd",
+    "requestPurpose": "execution",
+    "bytes": 36874,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 87,
+    "taskId": "t2-qa",
+    "sessionId": "c5b8ecd5-7601-457c-857b-754c34cfbbdd",
+    "requestPurpose": "execution",
+    "bytes": 42002,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 166,
+    "taskId": "t2-qa",
+    "sessionId": "c5b8ecd5-7601-457c-857b-754c34cfbbdd",
+    "requestPurpose": "execution",
+    "bytes": 47622,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 232,
+    "taskId": "t2-qa",
+    "sessionId": "c5b8ecd5-7601-457c-857b-754c34cfbbdd",
+    "requestPurpose": "execution",
+    "bytes": 42996,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 387,
+    "taskId": "t3-review",
+    "sessionId": "06cfc486-8798-49ad-8337-0852e3b44b50",
+    "requestPurpose": "execution",
+    "bytes": 36217,
+    "maxTokens": 2048
+  },
+  {
+    "seq": 411,
+    "taskId": null,
+    "sessionId": "82eed8bf-679e-4fbe-bba2-31f1e2eea1b6",
+    "requestPurpose": "execution",
+    "bytes": 35622,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 432,
+    "taskId": "t3-review",
+    "sessionId": "06cfc486-8798-49ad-8337-0852e3b44b50",
+    "requestPurpose": "execution",
+    "bytes": 43588,
+    "maxTokens": 2048
+  },
+  {
+    "seq": 461,
+    "taskId": null,
+    "sessionId": "82eed8bf-679e-4fbe-bba2-31f1e2eea1b6",
+    "requestPurpose": "execution",
+    "bytes": 40359,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 503,
+    "taskId": null,
+    "sessionId": "82eed8bf-679e-4fbe-bba2-31f1e2eea1b6",
+    "requestPurpose": "execution",
+    "bytes": 42444,
+    "maxTokens": 8192
+  },
+  {
+    "seq": 523,
+    "taskId": "t3-review",
+    "sessionId": "06cfc486-8798-49ad-8337-0852e3b44b50",
+    "requestPurpose": "execution",
+    "bytes": 41009,
+    "maxTokens": 2048
+  },
+  {
+    "seq": 559,
+    "taskId": "t3-review",
+    "sessionId": "06cfc486-8798-49ad-8337-0852e3b44b50",
+    "requestPurpose": "execution",
+    "bytes": 44380,
+    "maxTokens": 2048
+  },
+  {
+    "seq": 580,
+    "taskId": null,
+    "sessionId": "82eed8bf-679e-4fbe-bba2-31f1e2eea1b6",
+    "requestPurpose": "execution",
+    "bytes": 47408,
+    "maxTokens": 8192
+  }
+]

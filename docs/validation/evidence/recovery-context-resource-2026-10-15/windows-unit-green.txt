@@ -1,0 +1,42 @@
+✔ context resources change only the approved new snapshot and price each future request at the new byte limit (10.7858ms)
+✔ context resources reject missing consent, reductions and routes lacking full input output and guard capacity (4.0191ms)
+✔ context consent is sealed through confirmation and lineage while later unadjusted recovery inherits the new limit (8.848ms)
+✔ output choices quote the whole next tranche with old fees and leave the approved snapshot unchanged (1.6341ms)
+✔ output allowance reaches the runtime wire and approved lineage without changing completed tasks (27.8449ms)
+✔ output changes reject absent consent, completed tasks, unsupported context and incidental shared-route expansion (3.5532ms)
+✔ larger output must fit retained node money even when money is not changed (1.1979ms)
+✔ a completed legacy task keeps its old output cap if review later requests rework (0.6718ms)
+✔ resource approval preserves original semantics, grants and source snapshot (1.0654ms)
+✔ resource proposal rejects semantic fields and invalid or completed task changes (1.9472ms)
+✔ new version and inherited lineage must be trustworthy and bound to approved seal (0.9948ms)
+✔ subsequent resource approval retains each ancestor once (0.7599ms)
+✔ unfinished node money can be reallocated under the original project ceiling without resetting spend (2.3858ms)
+✔ node money changes cannot alter completed tasks, lower caps, exceed the project or discard holds (2.2746ms)
+✔ a money proposal must fund a complete bounded request after retained task spend (1.085ms)
+✔ the request floor includes archived wire schemas and envelope fields, beyond the message cap (0.9414ms)
+✔ runtime employee identity takes precedence over source aliases and absent IDs never match (0.2499ms)
+✔ planning funds the next bounded tranche rather than only the first resumed request (0.1654ms)
+✔ explicit call ceilings extend only unfinished resources and keep every historical attempt (3.1573ms)
+✔ resource confirmation seals the next absolute call ceilings without lowering original task contracts (4.8064ms)
+✔ explicit continuation allowance rejects missing tasks, insufficient tranches and excessive cumulative grants (12.169ms)
+✔ explicit shorter continuation bounds both the sealed allowance and its work-plus-correction fee floor (2.1077ms)
+✔ a new resource confirmation without an explicit continuation grant preserves the prior sealed ceiling (3.1128ms)
+✔ a new unfinished-task grant retains completed-task ceilings across later rework (6.9689ms)
+✔ planning without a new grant respects the sealed remainder and rejects zero or one available request (1.7735ms)
+✔ cumulative call floors fund the full explicit grant while fee estimates retain the bounded work tranche (1.8693ms)
+✔ resource lineage rejects invalid ceiling maps and unsealed edits while accepting a preserved ordinary-resume edge (5.8765ms)
+✔ recovery counts six work requests plus one correction for each unfinished task (0.4785ms)
+✔ recovery preserves a correction when only two node calls remain and rejects zero or one (0.4755ms)
+✔ shared project calls must cover all next tranches and malformed history never creates headroom (0.5318ms)
+✔ versioned confirmation rechecks actual history and rejects an underfunded or omitted next tranche (1.6663ms)
+✔ versioned node money must cover work and correction with old spend and holds preserved (1.0973ms)
+✔ unknown requirement versions are rejected while historical approved edges remain verifiable (1.312ms)
+✔ shared money floor counts only unfinished next requests and includes project spend and holds (0.3437ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2735.9527

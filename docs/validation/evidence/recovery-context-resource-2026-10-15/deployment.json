@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-recovery-context-20261015",
+  "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-resource-schema-20261015",
+  "historicalState": {
+    "runCount": 48,
+    "usageCount": 547,
+    "usageSHA": "461a891a90ffe9108c0c606b22a03e9c0874538462934a8ac1027385eb5e5288",
+    "holdsSHA": "526cedec4c3dfc4e5e3aee88beeda6721c88718ac14a5aa6dcab7d8a5cada2c4",
+    "sourceRunSHA": "d298bbdf50f7114140e566febf78228696af5aa371e6029f8457ffa3ad3ba082",
+    "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+    "occupied": 2.5476714
+  },
+  "modelCalls": 0,
+  "checkedAt": "2026-10-15T03:55:44.423296+00:00"
+}

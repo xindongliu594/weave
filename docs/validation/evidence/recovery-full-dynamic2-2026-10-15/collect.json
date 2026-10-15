@@ -1,0 +1,10 @@
+{
+  "proposal": {
+    "stdout": "{\"previewId\": \"a74d7efc-8797-494f-9881-60e61fa81133\", \"sourceRunId\": \"5327ddc6-a15d-40b6-a85c-7fa69dd49176\", \"projectId\": \"02428911-26c3-47cc-84c2-7db1ee7c2b5d\", \"projectVersion\": 3, \"usageId\": \"cfd99546-7cdb-4562-ba8d-04118be060dd\", \"completedTaskIds\": [\"t1-doc\", \"t2-qa\"], \"taskContinuationLimits\": {\"t3-review\": 6}, \"proposal\": {\"maxBudget\": 0.56, \"maxModelCalls\": 85, \"taskCallLimits\": {\"t3-review\": 53}, \"taskBudgetLimits\": {\"t3-review\": 0.56}, \"rationale\": \"\\u5df2\\u5b8c\\u6210t1\\u3001t2\\u65e0\\u9700\\u6539\\u9884\\u7b97\\uff1bt3\\u4ec5\\u9700\\u5c11\\u91cf\\u8c03\\u7528\\uff0c\\u4f46\\u4e3a\\u8986\\u76d6\\u5df2\\u53d1\\u751f\\u8d39\\u7528\\u4e0e\\u6b63\\u5f0f\\u4ea4\\u63a5\\uff0c\\u5c06\\u5355\\u8282\\u70b9\\u9884\\u7b97\\u5728\\u7528\\u6237ceiling\\u5185\\u540c\\u6b65\\u63d0\\u9ad8\\u3002\"}}\n",
+    "stderr": ""
+  },
+  "resume": {
+    "stdout": "",
+    "stderr": ""
+  }
+}

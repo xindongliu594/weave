@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {ResourceResumeConfirmation,resourceResumeBody,RunResourceResume,resourceContinuationLimits} from '../apps/web/src/RunResourceResume.tsx';
+import * as resourceUi from '../apps/web/src/RunResourceResume.tsx';
 const candidate:any={previewId:'preview',sourceRunId:'source',projectVersion:2,sourceGoalContract:{format:'approved-goal-v1',sha256:'fixed'},
   ceiling:.18,proposal:{maxBudget:.18,taskCallLimits:{accept:10},rationale:'Only finish the remaining manager review'},completedTaskIds:['develop','qa']};
 const snapshot:any={planVersion:2,goalContract:candidate.sourceGoalContract,policy:{maxBudget:.13},tasks:[{id:'accept',subject:'经理验收',maxModelCalls:6}]};
@@ -57,4 +58,22 @@ test('confirmation names a larger total call ceiling while preserving shared dol
   const value={...candidate,proposal:{...candidate.proposal,maxModelCalls:48}};
   const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot:{...snapshot,policy:{...snapshot.policy,maxModelCalls:32}},retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
   assert.ok(html.includes('项目累计调用上限 32 → 48'));assert.ok(html.includes('旧调用次数继续计入'));
+});
+
+test('context resource input is optional, bounded and cannot reduce the original request limit',()=>{
+  const parse=(resourceUi as any).resourceContextBytes;assert.equal(typeof parse,'function');
+  assert.equal(parse('',48000),undefined);assert.equal(parse('   ',48000),undefined);
+  assert.equal(parse('64000',48000),64000);
+  for(const value of ['47999','64000.5','NaN','Infinity','1000001','-1'])assert.throws(()=>parse(value,48000));
+  assert.throws(()=>parse('48000',64000));
+});
+
+test('context changes are visible before confirmation while approval still uses the sealed candidate',()=>{
+  const original={...snapshot,policy:{...snapshot.policy,contextBytes:48000}};
+  const form=renderToStaticMarkup(createElement(RunResourceResume,{id:'source',snapshot:original,retained:0,retainUncertainCosts:true,disabled:false}));
+  assert.ok(form.includes('本次上下文上限（字节，可选）'));assert.ok(form.includes('费用预留'));
+  const value={...candidate,proposal:{...candidate.proposal,contextBytes:64000}};
+  const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot:original,retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
+  assert.ok(html.includes('单次上下文上限 48000 → 64000 字节'));
+  assert.equal(Object.hasOwn(resourceResumeBody(value,'source',original,true),'contextBytes'),false,'confirmation sends the sealed candidate id, not an editable context override');
 });

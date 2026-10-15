@@ -1,0 +1,26 @@
+{
+  "url": "http://127.0.0.1:4312/#run/e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+  "backend": "JJ via loopback-only SSH tunnel",
+  "method": "Codex In-app Browser / cua_repl",
+  "observed": [
+    "正式项目 已完成",
+    "开发、QA、经理均已完成",
+    "经理正式交接 #193",
+    "项目累计费用 $0.363084 / $0.560000",
+    "旧未知费用预留 $0.002593",
+    "恢复自69a02efb；保留2项已完成任务",
+    "固定2份知识版本；知识引用1条",
+    "交付文件下载入口及预览文本C1-C12"
+  ],
+  "screenshots": [
+    "web-completed.jpg",
+    "web-manager.jpg",
+    "web-delivery-preview.jpg"
+  ],
+  "paidRequestsFromBrowser": 0,
+  "notes": [
+    "仅打开及预览，不再次生成或确认资源方案",
+    "顶部全局已记录费用为$2.48952，不含hold；$2.5632984为全部账本占用，两者口径不同"
+  ],
+  "recordedAt": "2026-10-15T04:07:43.571217+00:00"
+}

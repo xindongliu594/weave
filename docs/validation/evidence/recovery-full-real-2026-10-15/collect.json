@@ -1,0 +1,10 @@
+{
+  "proposal": {
+    "stdout": "{\"previewId\": \"9b61275e-b5cf-4440-8f71-b755087e1acc\", \"sourceRunId\": \"b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf\", \"projectId\": \"02428911-26c3-47cc-84c2-7db1ee7c2b5d\", \"projectVersion\": 3, \"usageId\": \"5631ab7c-5cc9-4c31-9349-052850dfa170\", \"completedTaskIds\": [\"t1-doc\"], \"taskContinuationLimits\": {\"t2-qa\": 6, \"t3-review\": 6}, \"proposal\": {\"maxBudget\": 0.56, \"maxModelCalls\": 75, \"taskCallLimits\": {\"t2-qa\": 53, \"t3-review\": 53}, \"taskBudgetLimits\": {\"t2-qa\": 0.3483495, \"t3-review\": 0.2}, \"rationale\": \"\\u65e7\\u51c0\\u989d\\u4e0d\\u8db3\\u6062\\u590dQA\\u9884\\u7559\\uff0c\\u5728ceiling\\u5185\\u63d0\\u9ad8\\u9879\\u76ee\\u603b\\u989d\\uff1bQA\\u5728\\u5df2\\u75280.1646\\u57fa\\u7840\\u4e0a\\u8ffd\\u52a0\\u7ea60.1838\\u8986\\u76d66\\u6b21\\u4ea4\\u63a5\\u7ea0\\u6b63\\uff08\\u6700\\u5c11\\u9700\\u65b0\\u589e\\u7ea60.0518\\uff09\\uff0c\\u7ecf\\u7406\\u4fdd\\u75590.2\\u6ee1\\u8db3\\u539f\\u8981\\u6c42\\uff0c\\u5df2\\u5728\\u51c0\\u989d\\u88c5\\u5165\\u89c4\\u5212\\u8d39\\u3002\"}}\n",
+    "stderr": ""
+  },
+  "resume": {
+    "stdout": "",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "source": "Actual model-issued agent_teams_update_task, copied from trace for evidence; no project artifact was authored by Codex",
+  "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+  "handoff": {
+    "attempt_id": "427bdd6f-84c3-473e-9691-e3cc78bbe52e",
+    "task_id": "t2",
+    "status": "completed",
+    "acceptanceResults": [
+      {
+        "criterion": "逐用例给出独立核算过程与通过/未通过结论",
+        "status": "passed",
+        "evidence": "C1-C12 每条按输入重新求和或判定拒绝，12/12 通过；见回执逐条过程"
+      },
+      {
+        "criterion": "确认正负调整、零变化、组合变动、非整数拒绝、整数边界六类是否全覆盖",
+        "status": "passed",
+        "evidence": "C1正、C2负、C3/C4零变化、C5/C6组合、C7-C9非整数拒绝、C10-C12整数边界；无缺类"
+      },
+      {
+        "criterion": "核对整数边界与非整数拒绝用例的预期结果是否正确",
+        "status": "passed",
+        "evidence": "C7 2.5 非整数→拒绝；C8 整串拒绝不部分累加；C9 1/2 与 \"5\" 非整数域→拒绝；C10 2147483647+1=2147483648>2^31-1 越界；C11 -2147483648-1=-2147483649<-2^31 越界；C12 2147483647-2147483647=0；均正确"
+      },
+      {
+        "criterion": "核对库存业务约束与通用加法差异声明是否成立并指出未通过项",
+        "status": "passed",
+        "evidence": "差异 1/2/4/5 条成立；第 3 条表述不精确（通用整数加法本身即拒绝非整数含 1/2，差异实质新增为字符串/缺失值），已列为低severity未通过表述项"
+      }
+    ],
+    "output": "QA 只读核算回执（未修改文件、未运行代码）\n依据：inventory-cases.md（sha256 57f22107…842f，2742字节，producerTaskId t1-doc）真实原文；参照知识原文 sum-checklist（documentId d4c239b4…，行7）。\n逐用例独立计算：\nC1 +5,+3 → 5+3=8，两笔正号=入库 → 通过\nC2 -5,-3 → -5+(-3)=-8 → 通过\nC3 0,0 → 0+0=0，无业务方向 → 通过\nC4 +7,-7 → 7-7=0，出入相抵 → 通过\nC5 +10,-3,+4,-1 → 10-3=7，7+4=11，11-1=10=+10；入库14/出库4 → 通过\nC6 -10,+6,-1 → -10+6=-4，-4-1=-5；入库6/出库11 → 通过\nC7 +2.5 → 非整数，拒绝且不改库存 → 通过\nC8 +3,-1.2 → 含非整数，整串拒绝、不部分累加 → 通过\nC9 1/2 与 \"5\" → 分数与字符串均非整数域取值，拒绝 → 通过\nC10 2147483647+1=2147483648>2^31-1 → 越界，拒绝/报错不得回绕 → 通过\nC11 -2147483648-1=-2147483649<-2^31 → 越界，拒绝/报错不得回绕为正 → 通过\nC12 2147483647+(-2147483647)=0 → 精确相抵，库存不变 → 通过\n覆盖：正调整C1、负调整C2、零变化C3/C4、组合变动C5/C6、非整数拒绝C7-C9、整数边界C10-C12，六类全覆盖，无遗漏。\n差异声明核对：第1条符号即业务、第2条零值语义、第4条边界后果、第5条前置校验均成立，与原文语义一致；第3条部分不精确——知识原文为\"明确拒绝非整数\"，通用整数加法本身即拒绝 1/2 这类分数，库存真正新增的拒绝面是字符串/缺失值等非数值表示，文中\"通用加法只需拒绝小数\"缩小了通用方法口径（低severity，不影响 C7-C9 预期正确性）。\n未通过/未覆盖条目：用例计算错误 0 项、类别缺项 0 项；低severity 1 项（差异第3条表述不精确）；轻微歧义 1 项（C10/C11 预期为\"拒绝或报错\"二选一，非单一确定预期，不影响正确性）。\n结论：12/12 用例独立核算通过；六类覆盖完整；差异声明总体成立，含 1 处表述不精确需下游注意。本回执不代替开发或经理结论。"
+  },
+  "accepted": [
+    {
+      "seq": 354,
+      "data": {
+        "taskId": "t2-qa",
+        "attemptId": "427bdd6f-84c3-473e-9691-e3cc78bbe52e",
+        "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+        "workspaceRevision": "4432028926278afe53894f57029a5e373c24b83c7ce7348efe5259b876ab411b",
+        "inputs": [
+          {
+            "path": "inventory-cases.md",
+            "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+            "size": 2742,
+            "producerTaskId": "t1-doc"
+          }
+        ],
+        "outputs": [],
+        "commands": [],
+        "acceptedAt": "2026-10-15T03:03:43.800Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+          "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+          "projectVersion": 3,
+          "capturedAt": "2026-10-15T03:03:43.800Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.56,
+            "occupied": 0.3124149,
+            "activeReserved": 0,
+            "available": 0.24758510000000006,
+            "callsUsed": 67,
+            "callLimit": 75,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.28698629999999997,
+            "retainedUnknownReservation": 0.0025932,
+            "availableBudget": 0.27042050000000006,
+            "callsUsed": 63,
+            "callsBasis": "durable-admissions-and-archived-wire-requests",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    }
+  ]
+}

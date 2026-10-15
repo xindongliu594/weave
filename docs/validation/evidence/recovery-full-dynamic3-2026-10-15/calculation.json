@@ -1,0 +1,583 @@
+{
+  "checkedAt": "2026-10-15T03:56:09.608Z",
+  "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+  "status": "failed",
+  "integrity": "ok",
+  "completedTaskIds": [
+    "t1-doc",
+    "t2-qa"
+  ],
+  "lineage": [
+    {
+      "id": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "f89af7d2-300f-4557-ae90-c229a2027fdf",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "e8f42f61-7ae9-48a8-8846-0b7a9fa2fc4f",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "70d82bac-8714-41e2-ac78-921e53cea106",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "e87cbe51-9632-4dba-ad40-3cbc5104a776",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "62c5db8a-617b-41db-9394-c8000f58997d",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "0f9e41af-d1b7-4dd3-9e74-f3555bdd9fa8",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "5f29bf80-3375-4864-94a8-563cffbb555a",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "c606a446-0f99-4293-a7f8-1294a93a967c",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "17d69bed-27ee-4ddc-af56-961e9eb37458",
+      "status": "failed",
+      "integrity": "ok"
+    },
+    {
+      "id": "63acb941-1485-4d67-a7fc-7f1a180ddfa8",
+      "status": "failed",
+      "integrity": "ok"
+    }
+  ],
+  "history": {
+    "calls": 78,
+    "tasks": {
+      "t1-doc": {
+        "calls": 5,
+        "cost": 0.018502499999999998,
+        "reserved": 0,
+        "requestOverheadBytes": 7040
+      },
+      "t2-qa": {
+        "calls": 51,
+        "cost": 0.1874151,
+        "reserved": 0,
+        "requestOverheadBytes": 6969
+      },
+      "t3-review": {
+        "calls": 7,
+        "cost": 0.0249309,
+        "reserved": 0,
+        "requestOverheadBytes": 6969
+      }
+    }
+  },
+  "policy": {
+    "maxAgents": 3,
+    "maxBudget": 0.56,
+    "allowedTools": [
+      "filesystem",
+      "terminal_test",
+      "artifact_write",
+      "knowledge_search",
+      "knowledge_read"
+    ],
+    "contextBytes": 48000,
+    "maxModelCalls": 85,
+    "allowedModelIds": [
+      "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051"
+    ],
+    "deadlineSeconds": 1200,
+    "executionTarget": {
+      "kind": "local",
+      "backend": {
+        "kind": "openshell",
+        "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "gateway": "weiwu-openshell-v012",
+        "version": "0.1.2",
+        "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+        "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee"
+      },
+      "grantId": "d75b2a15-c862-4de4-a363-5afd3e3428ea",
+      "deviceId": "14b3b6f9-a109-4396-a8cc-8691fa33458a"
+    },
+    "contextManagement": "prune",
+    "maxTaskModelCalls": 53,
+    "maxConcurrentAgents": 1,
+    "allowedDepartmentIds": [
+      "62558bb0-cc2e-4356-ae7f-d53f919fec93"
+    ],
+    "allowedKnowledgeSpaceIds": [
+      "5928897e-5aec-4aa0-a683-e7b77bf684de"
+    ]
+  },
+  "check": {
+    "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+    "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+    "planVersion": 3,
+    "checkedAt": "2026-10-15T03:56:08.747Z",
+    "originalBudget": 0.56,
+    "costReadiness": {
+      "recordedCost": 0.3474567,
+      "reserved": 0.0025932,
+      "availableBudget": 0.20995010000000006,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+          "amount": 0.0025932,
+          "status": "uncertain"
+        }
+      ]
+    },
+    "choices": {
+      "retainUncertainCosts": true,
+      "acknowledgeUnknownOperations": false
+    },
+    "nativeRequestChecked": false,
+    "unknownOperationCount": 0,
+    "unknownOperationIds": [],
+    "calls": {
+      "used": 78,
+      "limit": 85,
+      "remaining": 7
+    },
+    "tasks": [
+      {
+        "id": "t1-doc",
+        "subject": "生成 inventory-cases.md 验收用例检查表",
+        "recordedCost": 0.018502499999999998,
+        "reserved": 0,
+        "budgetLimit": 0.05,
+        "availableBudget": 0.031497500000000005,
+        "calls": 5,
+        "callLimit": 16,
+        "remainingCalls": 11,
+        "completed": true
+      },
+      {
+        "id": "t2-qa",
+        "subject": "只读逐项独立核算 inventory-cases.md",
+        "recordedCost": 0.1874151,
+        "reserved": 0,
+        "budgetLimit": 0.3483495,
+        "availableBudget": 0.16093439999999998,
+        "calls": 51,
+        "callLimit": 53,
+        "remainingCalls": 2,
+        "completed": true
+      },
+      {
+        "id": "t3-review",
+        "subject": "经理只读验收 inventory-cases.md 与 QA 回执",
+        "recordedCost": 0.0249309,
+        "reserved": 0,
+        "budgetLimit": 0.56,
+        "availableBudget": 0.5350691000000001,
+        "calls": 7,
+        "callLimit": 10,
+        "remainingCalls": 3,
+        "completed": false
+      }
+    ],
+    "resume": {
+      "allowed": true,
+      "reasons": [],
+      "completedTaskIds": [
+        "t1-doc",
+        "t2-qa"
+      ]
+    },
+    "retry": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 409,
+          "code": "RESOURCE_RESUME_ONLY",
+          "message": "资源补充只批准未完成节点，完整重试需要另外批准方案"
+        }
+      ],
+      "completedTaskIds": []
+    }
+  },
+  "costs": {
+    "usageRows": 547,
+    "occupied": 2.547671400000001,
+    "stageOccupied": 0.4768530000000011,
+    "pendingCount": 0,
+    "projectKnown": 0.3474567,
+    "projectHeld": 0.0025932,
+    "maximumOccupiedIfProjectAndFutureFill": 2.7876215000000006
+  },
+  "matrix": [
+    {
+      "grants": {
+        "t3-review": 6
+      },
+      "callCeilings": {
+        "maxModelCalls": 85,
+        "maxTaskModelCalls": 53
+      },
+      "minimumProjectBudget": 0.5174229,
+      "coordinatorRequests": 1,
+      "coordinatorRequestReservation": 0.0331776,
+      "coordinatorAllowance": 0.0331776,
+      "withPlanningAndCoordination": 0.55360051,
+      "fits": true
+    }
+  ],
+  "candidates": [
+    {
+      "input": {
+        "maxBudget": 0.56,
+        "maxPlanningCost": 0.003,
+        "contextBytes": 76800,
+        "maxModelCalls": 85,
+        "maxTaskModelCalls": 53,
+        "taskContinuationLimits": {
+          "t3-review": 6
+        }
+      },
+      "requestInputBytes": 6440,
+      "planningReservation": 0.0025464,
+      "planningFits": true,
+      "minimumProjectBudget": 0.56,
+      "proposalValidation": "passed",
+      "tasks": [
+        {
+          "id": "t1-doc",
+          "completed": true,
+          "usedCalls": 5,
+          "originalCallLimit": 16,
+          "minimumCallLimit": 16,
+          "nextRequestCount": 0,
+          "minimumBudget": 0.05
+        },
+        {
+          "id": "t2-qa",
+          "completed": true,
+          "usedCalls": 51,
+          "originalCallLimit": 53,
+          "minimumCallLimit": 53,
+          "nextRequestCount": 0,
+          "minimumBudget": 0.3483495
+        },
+        {
+          "id": "t3-review",
+          "completed": false,
+          "usedCalls": 7,
+          "originalCallLimit": 53,
+          "minimumCallLimit": 53,
+          "nextRequestCount": 6,
+          "minimumBudget": 0.56
+        }
+      ],
+      "protectedOutputLimits": [
+        {
+          "id": "t1-doc",
+          "maxOutputTokens": 2048
+        },
+        {
+          "id": "t2-qa",
+          "maxOutputTokens": 8192
+        },
+        {
+          "id": "t3-review",
+          "maxOutputTokens": 2048
+        }
+      ]
+    }
+  ],
+  "recent": [
+    {
+      "seq": 16,
+      "type": "tool/start",
+      "name": "agent_teams_create"
+    },
+    {
+      "seq": 17,
+      "type": "tool/result",
+      "name": "agent_teams_create",
+      "isError": false
+    },
+    {
+      "seq": 19,
+      "type": "tool/start",
+      "name": "agent_teams_create_task"
+    },
+    {
+      "seq": 20,
+      "type": "tool/result",
+      "name": "agent_teams_create_task",
+      "isError": false
+    },
+    {
+      "seq": 22,
+      "type": "tool/start",
+      "name": "agent_teams_create_task"
+    },
+    {
+      "seq": 23,
+      "type": "tool/result",
+      "name": "agent_teams_create_task",
+      "isError": false
+    },
+    {
+      "seq": 25,
+      "type": "tool/start",
+      "name": "agent_teams_create_task"
+    },
+    {
+      "seq": 26,
+      "type": "tool/result",
+      "name": "agent_teams_create_task",
+      "isError": false
+    },
+    {
+      "seq": 32,
+      "type": "tool/start",
+      "name": "agent_teams_approve"
+    },
+    {
+      "seq": 50,
+      "type": "tool/result",
+      "name": "agent_teams_approve",
+      "isError": false
+    },
+    {
+      "seq": 56,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 57,
+      "type": "tool/result",
+      "name": "agent_teams_status",
+      "isError": false
+    },
+    {
+      "seq": 61,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 63,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 65,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 67,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 69,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 77,
+      "type": "tool/start",
+      "name": "agent_teams_claim_task"
+    },
+    {
+      "seq": 78,
+      "type": "tool/result",
+      "name": "agent_teams_claim_task",
+      "isError": false
+    },
+    {
+      "seq": 90,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 92,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 94,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 96,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 98,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 100,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 102,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 110,
+      "type": "tool/start",
+      "name": "agent_teams_update_task",
+      "status": "in_progress"
+    },
+    {
+      "seq": 111,
+      "type": "tool/result",
+      "name": "agent_teams_update_task",
+      "isError": false
+    },
+    {
+      "seq": 115,
+      "type": "tool/start",
+      "name": "filesystem"
+    },
+    {
+      "seq": 117,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 118,
+      "type": "tool/result",
+      "name": "agent_teams_status",
+      "isError": false
+    },
+    {
+      "seq": 121,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 125,
+      "type": "tool/result",
+      "name": "filesystem",
+      "isError": false
+    },
+    {
+      "seq": 128,
+      "type": "tool/start",
+      "name": "knowledge_read"
+    },
+    {
+      "seq": 131,
+      "type": "tool/result",
+      "name": "knowledge_read",
+      "isError": false
+    },
+    {
+      "seq": 139,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 142,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 144,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 146,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 148,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 150,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 161,
+      "type": "tool/start",
+      "name": "agent_teams_status"
+    },
+    {
+      "seq": 162,
+      "type": "tool/result",
+      "name": "agent_teams_status",
+      "isError": false
+    }
+  ],
+  "taskSpecifications": [
+    {
+      "id": "t1-doc",
+      "kind": "work",
+      "objective": "为整数库存入库与出库的变动合计设计短中文验收用例检查表，覆盖正负库存调整、零变化、组合变动、非整数拒绝和整数边界，并声明库存业务约束与通用加法方法的差异。输入与预期结果均由本任务给出。可检索获授权知识，判断是否适用，仅实际采用时登记。不编写测试、不运行代码。",
+      "acceptanceCriteria": [
+        "产出 inventory-cases.md，内容为约600汉字中文检查表",
+        "用例覆盖正库存调整、负库存调整、零变化、组合变动、非整数拒绝、整数边界六类",
+        "每项用例给出明确输入与预期结果，且预期结果与该输入自洽",
+        "显式声明库存业务约束与通用加法方法的差异"
+      ]
+    },
+    {
+      "id": "t2-qa",
+      "kind": "work",
+      "objective": "只读读取开发产出的 inventory-cases.md，对每项用例的输入与预期结果独立核算，核对六类覆盖与整数边界及非整数拒绝的正确性，核对库存业务约束与通用加法差异声明是否成立，给出核算回执。不修改被审文件、不运行代码。",
+      "acceptanceCriteria": [
+        "逐用例给出独立核算过程与通过/未通过结论",
+        "确认正负调整、零变化、组合变动、非整数拒绝、整数边界六类是否全覆盖",
+        "核对整数边界与非整数拒绝用例的预期结果是否正确",
+        "核对库存业务约束与通用加法差异声明是否成立并指出未通过项"
+      ]
+    },
+    {
+      "id": "t3-review",
+      "kind": "work",
+      "objective": "只读结合 QA 核算回执核对同一交付 inventory-cases.md 是否满足全部验收目标，给出通过项与未完成项，结论通过任务完成回复返回。不写文件、不扩大权限与预算。",
+      "acceptanceCriteria": [
+        "逐项对照四个验收目标列出通过/未通过并附证据出处",
+        "明确未完成项或确认全部完成",
+        "结论基于 T1 原文与 T2 真实核算回执，无新增或代写内容"
+      ]
+    }
+  ],
+  "modelCalls": 0,
+  "productionWrites": 0
+}

@@ -1,0 +1,10 @@
+{
+  "proposal": {
+    "stdout": "{\"previewId\": \"1bf07291-754a-4a33-9876-d2000b17a3b3\", \"sourceRunId\": \"69a02efb-bdd9-40fa-bae1-946d39c5c8d9\", \"projectId\": \"02428911-26c3-47cc-84c2-7db1ee7c2b5d\", \"projectVersion\": 3, \"usageId\": \"e5ffd995-5a38-4239-8b64-f476acf42029\", \"completedTaskIds\": [\"t1-doc\", \"t2-qa\"], \"taskContinuationLimits\": {\"t3-review\": 6}, \"proposal\": {\"maxBudget\": 0.56, \"maxModelCalls\": 85, \"taskCallLimits\": {\"t3-review\": 53}, \"taskBudgetLimits\": {\"t3-review\": 0.56}, \"rationale\": \"\\u4ec5t3-review\\u672a\\u5b8c\\u6210\\uff0c\\u5728\\u9879\\u76ee/\\u9636\\u6bb5\\u4e0a\\u96500.56\\u5185\\u4fdd\\u7559\\u517653\\u6b21\\u8c03\\u7528\\u4e0e0.56\\u9884\\u7b97\\uff0c\\u8986\\u76d6\\u5269\\u4f596\\u6b21\\u8bf7\\u6c42\\u3001\\u4ea4\\u63a5\\u4e0e\\u7ea0\\u6b63\\uff1b\\u5176\\u4ed6\\u8282\\u70b9\\u5df2\\u5b8c\\u6210\\uff0c\\u4e0d\\u8ffd\\u52a0\\u3002\", \"contextBytes\": 76800}}\n",
+    "stderr": ""
+  },
+  "resume": {
+    "stdout": "{\"runId\": \"e5b2acfd-ecc4-4127-bd2f-4e65aad60baa\", \"parentRunId\": \"69a02efb-bdd9-40fa-bae1-946d39c5c8d9\", \"completedCheckpoints\": [\"t1-doc\", \"t2-qa\"]}\n",
+    "stderr": ""
+  }
+}

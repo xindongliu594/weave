@@ -71,7 +71,7 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1,detailed=false,wideCalls=false) {
+async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1,detailed=false,wideCalls=false,context?:{bytes:number;route:Record<string,any>}) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
@@ -82,6 +82,7 @@ async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,origin
     agents: [{ ...employee, model: model.name, rolePrompt: employee.instructions, roleVersion: 1 }],
     modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1),...(pricedRoutes?{inputRate:2,outputRate:10,maxOutputTokens:512}:{}) }],
     departmentBudgets: { [departmentId]: .99 }, executionBudget: .99, budgetVersion: 1, budgetHistory: { calls: 0, tasks: {} } };
+  if(context){snapshot.policy.contextBytes=context.bytes;Object.assign(snapshot.modelRoutes[0],context.route);}
   if(sealGoal)snapshot.goalContract=createGoalContract(snapshot);
   await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
     [projectId, departmentId, '恢复检查隔离部门', snapshot.requirement, { ...policy, maxBudget: 2 }, { rationale: 'Concrete bounded text work', agents: [employee], tasks:planTasks }, 'manual']);
@@ -351,6 +352,84 @@ test('invalid continuation grants are rejected before any paid planning request'
     assert.ok(response.status>=400);assert.equal(providerRequests,0);
   }
   assert.deepEqual(await state(),before);
+});
+
+test('resource planning without an output grant omits output adjustments from its schema and preserves the pinned limits',{skip:!isolated},async()=>{
+  const {runId}=await seed(true,false,true),old=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},rationale:'Continue the unfinished task with its existing output limits'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+  const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+  const prompt=resourcePlanningMessages[0].content,schema=JSON.parse(prompt.slice(prompt.indexOf('{'),prompt.indexOf('\n')));
+  assert.equal(Object.hasOwn(schema.properties,'taskOutputLimits'),false);
+  assert.equal(schema.additionalProperties,false);assert.equal(Object.hasOwn(candidate.proposal,'taskOutputLimits'),false);
+  const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  assert.equal(confirmed.status,202);const child=(await confirmed.json() as any).id;
+  const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[child])).rows[0].snapshot;
+  assert.deepEqual(snapshot.modelRoutes,old.modelRoutes);
+  assert.deepEqual(snapshot.tasks.map((t:any)=>t.maxOutputTokens),old.tasks.map((t:any)=>t.maxOutputTokens));
+  assert.equal(providerRequests,1);
+});
+
+test('resource planning without an output grant rejects unsolicited output fields without storing a candidate',{skip:!isolated},async()=>{
+  for(const taskOutputLimits of [{},{finish:8192}]){
+    const {runId}=await seed(true,false,true),old=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
+    resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},taskOutputLimits,rationale:'Unsolicited output adjustment fixture'};
+    const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+    const result=await response.json() as any;assert.equal(response.status,422,JSON.stringify(result));
+    assert.equal(result.code,'RESOURCE_PROPOSAL_INVALID');
+    assert.equal((await pool.query("SELECT count(*)::int AS n FROM organization_previews WHERE data->>'sourceRunId'=$1",[runId])).rows[0].n,0);
+    assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot,old);
+    assert.equal((await pool.query("SELECT count(*)::int AS n FROM usage WHERE project_id=(SELECT project_id FROM project_runs WHERE id=$1) AND purpose='预算补充规划'",[runId])).rows[0].n,1);
+  }
+  assert.equal(providerRequests,2);
+});
+
+test('context resource planning advertises only the exact authorized limit and applies it to a new snapshot',{skip:!isolated},async()=>{
+  const {runId}=await seed(true,false,true,1,false,false,{bytes:48000,route:{contextWindowTokens:131072}});
+  const original=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},contextBytes:64000,rationale:'Retain full review evidence within the approved expanded input limit'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true,contextBytes:64000})});
+  const candidate=await response.json() as any;assert.equal(response.status,200,JSON.stringify(candidate));
+  assert.equal(candidate.contextBytes,64000);assert.equal(candidate.proposal.contextBytes,64000);
+  const prompt=resourcePlanningMessages[0].content,schema=JSON.parse(prompt.slice(prompt.indexOf('{'),prompt.indexOf('\n')));
+  assert.equal(schema.properties.contextBytes.const,64000);assert.ok(schema.required.includes('contextBytes'));
+  const context=JSON.parse(resourcePlanningMessages[1].content);assert.equal(context.originalContextBytes,48000);assert.equal(context.contextBytes,64000);
+  const confirmed=await resourceRetry(runId,{resume:true,retainUncertainCosts:true,budgetPreviewId:candidate.previewId,confirmation:'APPROVE_RESOURCES_AND_RESUME'});
+  const child=await confirmed.json() as any;assert.equal(confirmed.status,202,JSON.stringify(child));
+  const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[child.id])).rows[0].snapshot;
+  assert.equal(snapshot.policy.contextBytes,64000);assert.equal(snapshot.resourceApproval.contextBytes,64000);
+  assert.deepEqual(snapshot.modelRoutes,original.modelRoutes);assert.deepEqual(snapshot.agents,original.agents);assert.deepEqual(snapshot.completedCheckpoints,['prepare']);
+  assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot,original);assert.equal(providerRequests,1);
+});
+
+test('context resource planning rejects unsupported capacity reductions and insufficient full request money before calling a model',{skip:!isolated},async()=>{
+  for(const fixture of [
+    {bytes:47999,route:{contextWindowTokens:131072}},
+    {bytes:64000,route:{contextWindowTokens:undefined}},
+    {bytes:64000,route:{contextWindowTokens:65535}},
+    {bytes:64000,route:{contextWindowTokens:131072,contextBytes:63999}},
+    {bytes:500000,route:{contextWindowTokens:2000000}},
+  ]){
+    const {runId}=await seed(true,false,true,1,false,false,{bytes:48000,route:fixture.route}),before=await state();
+    const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true,contextBytes:fixture.bytes})});
+    const result=await response.json() as any;assert.equal(response.status,422,JSON.stringify(result));
+    assert.equal(providerRequests,0);assert.deepEqual(await state(),before);
+  }
+});
+
+test('unrequested context fields are absent from the planning schema and cannot produce a candidate',{skip:!isolated},async()=>{
+  const {runId}=await seed(true,false,true);
+  resourcePlanningReply={maxBudget:1.5,taskCallLimits:{finish:3},taskBudgetLimits:{finish:1.2},contextBytes:64000,rationale:'Unrequested context expansion must not be authorized'};
+  const response=await fetch(url+'/runs/'+runId+'/resource-proposal',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({modelId,maxBudget:1.5,maxPlanningCost:.1,retainUncertainCosts:true})});
+  assert.equal(response.status,422);assert.equal((await response.json() as any).code,'RESOURCE_PROPOSAL_INVALID');
+  const prompt=resourcePlanningMessages[0].content,schema=JSON.parse(prompt.slice(prompt.indexOf('{'),prompt.indexOf('\n')));
+  assert.equal(Object.hasOwn(schema.properties,'contextBytes'),false);
+  assert.equal((await pool.query("SELECT count(*)::int AS n FROM organization_previews WHERE data->>'sourceRunId'=$1",[runId])).rows[0].n,0);assert.equal(providerRequests,1);
 });
 
 test('output resource candidate is explicit, persisted and applied only to a new recovery snapshot',{skip:!isolated},async()=>{

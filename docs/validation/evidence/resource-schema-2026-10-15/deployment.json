@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-resource-schema-20261015",
+  "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-context-20261014",
+  "historicalState": {
+    "runCount": 47,
+    "usageCount": 543,
+    "usageSHA": "41270560156f1cb790f9913196996e9c13aa037225886224fd6c4c46c722dc77",
+    "holdsSHA": "526cedec4c3dfc4e5e3aee88beeda6721c88718ac14a5aa6dcab7d8a5cada2c4",
+    "sourceRunSHA": "f983c86b8e793b0aefb29fa4dec206f779ddd138179f7b2f53f7e05491dbd21a",
+    "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+    "occupied": 2.5360254
+  },
+  "modelCalls": 0,
+  "checkedAt": "2026-10-15T03:21:39.793588+00:00"
+}

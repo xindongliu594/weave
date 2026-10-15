@@ -1,0 +1,25 @@
+{
+  "previewId": "a74d7efc-8797-494f-9881-60e61fa81133",
+  "sourceRunId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "projectVersion": 3,
+  "usageId": "cfd99546-7cdb-4562-ba8d-04118be060dd",
+  "completedTaskIds": [
+    "t1-doc",
+    "t2-qa"
+  ],
+  "taskContinuationLimits": {
+    "t3-review": 6
+  },
+  "proposal": {
+    "maxBudget": 0.56,
+    "maxModelCalls": 85,
+    "taskCallLimits": {
+      "t3-review": 53
+    },
+    "taskBudgetLimits": {
+      "t3-review": 0.56
+    },
+    "rationale": "已完成t1、t2无需改预算；t3仅需少量调用，但为覆盖已发生费用与正式交接，将单节点预算在用户ceiling内同步提高。"
+  }
+}

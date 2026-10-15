@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-10-15T03:03:36.326460+00:00",
+  "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+  "status": "unfinished",
+  "integrity": "ok",
+  "calls": {
+    "t2-qa": 4,
+    "t3-review": 0
+  },
+  "totalNewCalls": 4,
+  "countBasis": "calls counts wire dispatches; admittedCalls includes durable admission attempts",
+  "admittedCalls": {
+    "t2-qa": 4,
+    "t3-review": 0
+  },
+  "projectAdmittedCalls": 4,
+  "planningUsageId": "5631ab7c-5cc9-4c31-9349-052850dfa170",
+  "planningKnownCost": 0.000609,
+  "totalNewKnownCost": 0.0150399,
+  "requestPurposes": [
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    }
+  ],
+  "accepted": [],
+  "errors": [],
+  "pendingApprovals": [],
+  "newKnownCost": 0.0144309,
+  "inputTokens": 33751,
+  "outputTokens": 3588,
+  "occupied": 2.5246682999999996,
+  "projectKnown": 0.3014172,
+  "projectHeld": 0.025629600000000002,
+  "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

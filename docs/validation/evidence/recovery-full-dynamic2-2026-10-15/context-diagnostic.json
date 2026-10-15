@@ -1,0 +1,287 @@
+{
+  "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+  "requestSeq": 167,
+  "policyContextBytes": 48000,
+  "results": [
+    {
+      "size": 48000,
+      "passed": false,
+      "code": "CONTEXT_LIMIT",
+      "message": "CONTEXT_LIMIT: Chat Completions 完整受保护请求超过字节或上下文上限；没有发送模型请求"
+    },
+    {
+      "size": 56000,
+      "passed": true,
+      "bytes": 55196,
+      "reservation": 0.0193236,
+      "removedGroups": 2,
+      "removedSnapshots": 3,
+      "maxTokens": 2048
+    },
+    {
+      "size": 64000,
+      "passed": true,
+      "bytes": 63779,
+      "reservation": 0.021898499999999998,
+      "removedGroups": 0,
+      "removedSnapshots": 3,
+      "maxTokens": 2048
+    },
+    {
+      "size": 80000,
+      "passed": true,
+      "bytes": 63779,
+      "reservation": 0.021898499999999998,
+      "removedGroups": 0,
+      "removedSnapshots": 3,
+      "maxTokens": 2048
+    }
+  ],
+  "messages": [
+    {
+      "role": "system",
+      "source": "@deepseek-ai/dsh-system-prompt",
+      "sourceKind": "plugin",
+      "bytes": 7142,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    },
+    {
+      "role": "user",
+      "sourceKind": "user",
+      "bytes": 7717,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    },
+    {
+      "role": "user",
+      "source": "@deepseek-ai/dsh-system-prompt",
+      "sourceKind": "plugin",
+      "bytes": 16043,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    },
+    {
+      "role": "user",
+      "sourceKind": "skill-catalog",
+      "bytes": 862,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    },
+    {
+      "role": "assistant",
+      "sourceKind": "model",
+      "bytes": 404,
+      "types": [
+        "text",
+        "tool-call",
+        "tool-call"
+      ],
+      "toolNames": [
+        "agent_teams_claim_task",
+        "capability_search"
+      ]
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 4538,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_00_29coh2f8fljcuqm3yyek9f7p"
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 2130,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_01_v6w8nswin5i65bpf47kcuw1k"
+    },
+    {
+      "role": "user",
+      "source": "@deepseek-ai/dsh-system-prompt",
+      "sourceKind": "plugin",
+      "bytes": 16051,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    },
+    {
+      "role": "assistant",
+      "sourceKind": "model",
+      "bytes": 646,
+      "types": [
+        "text",
+        "tool-call",
+        "tool-call",
+        "tool-call"
+      ],
+      "toolNames": [
+        "agent_teams_update_task",
+        "filesystem",
+        "knowledge_read"
+      ]
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 159,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_00_0f623f9whi4lq9zzptmakyka"
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 4463,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_01_v3hg2rj21b3ydrf3wbo830zu"
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 969,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_02_ql1r7s2w9870xegtd9oqdjr1"
+    },
+    {
+      "role": "user",
+      "source": "@deepseek-ai/dsh-system-prompt",
+      "sourceKind": "plugin",
+      "bytes": 16046,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    },
+    {
+      "role": "assistant",
+      "sourceKind": "model",
+      "bytes": 884,
+      "types": [
+        "text",
+        "tool-call",
+        "tool-call"
+      ],
+      "toolNames": [
+        "capability_search",
+        "agent_teams_status"
+      ]
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 2083,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_00_em7ajr6lct4skssg9c881xqm"
+    },
+    {
+      "role": "user",
+      "sourceKind": "tool",
+      "bytes": 8925,
+      "types": [
+        "tool-result"
+      ],
+      "toolNames": [],
+      "toolResultId": "call_01_8pil1h4gn9w6r8daa8bl5w6p"
+    },
+    {
+      "role": "user",
+      "source": "@deepseek-ai/dsh-system-prompt",
+      "sourceKind": "plugin",
+      "bytes": 16056,
+      "types": [
+        "text"
+      ],
+      "toolNames": []
+    }
+  ],
+  "context": [
+    {
+      "seq": 88,
+      "type": "context/compacted",
+      "data": {
+        "sessionId": "5e9b1c5a-2dd5-43e1-9f9a-cfa2b0fd4585",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "requestPurpose": "execution",
+        "removedGroups": 0,
+        "deduplicatedGroups": 0,
+        "deduplicatedBytes": 0,
+        "evidenceDuplicates": [],
+        "supersededReads": [],
+        "supersededRuntimeSnapshots": 1,
+        "beforeBytes": 45776,
+        "afterBytes": 45776,
+        "inputUpperBound": 46800,
+        "reservation": 0.016497599999999998,
+        "availableBudget": 0.2178632000000001,
+        "maxTokens": 2048,
+        "note": "完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。"
+      }
+    },
+    {
+      "seq": 130,
+      "type": "context/read-evidence",
+      "data": {
+        "callId": "call_02_ql1r7s2w9870xegtd9oqdjr1",
+        "sessionId": "5e9b1c5a-2dd5-43e1-9f9a-cfa2b0fd4585",
+        "employeeId": "mgr-1",
+        "taskId": "t3-review",
+        "attemptId": "d89e2655-cde9-4c2b-bb82-1032d9fd47b1",
+        "scopeId": "49aa57bb03623d94994a9663ca0636e0c539f5fe8ead659d68e755cf4150d21e",
+        "name": "knowledge_read",
+        "argumentsSha256": "0685e6d7efbb4f1bcb42b500ff0791182579e1c04acbbff8852294db058374e2",
+        "resultSha256": "f3d4ca46183813bf7deef48d5932fc74e82a245f41143ceadfcb9275bdea516c"
+      }
+    },
+    {
+      "seq": 137,
+      "type": "context/compacted",
+      "data": {
+        "sessionId": "5e9b1c5a-2dd5-43e1-9f9a-cfa2b0fd4585",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "requestPurpose": "execution",
+        "removedGroups": 1,
+        "deduplicatedGroups": 0,
+        "deduplicatedBytes": 0,
+        "evidenceDuplicates": [],
+        "supersededReads": [],
+        "supersededRuntimeSnapshots": 2,
+        "beforeBytes": 51925,
+        "afterBytes": 44206,
+        "inputUpperBound": 45230,
+        "reservation": 0.016026600000000002,
+        "availableBudget": 0.21389360000000007,
+        "maxTokens": 2048,
+        "note": "完整记录仍保存在追溯档案；仅精简较早完整对话组、经宿主证实的精确重复只读对，或经同任务成功CAS写入替换的过期可写输出读版本。重复对的独立说明保留，固定输入和知识版本不失去保护，新版完整代码保留；未降低输出上限或预留公式。"
+      }
+    }
+  ],
+  "fetches": 0,
+  "modelCalls": 0
+}

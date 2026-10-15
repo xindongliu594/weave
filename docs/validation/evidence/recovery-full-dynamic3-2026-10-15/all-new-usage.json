@@ -1,0 +1,496 @@
+{
+  "checkedAt": "2026-10-15T04:05:55.438534+00:00",
+  "newPaidAttempts": 22,
+  "planningAttempts": 4,
+  "executionDispatches": 18,
+  "knownCost": 0.0767064,
+  "inputTokens": 209108,
+  "outputTokens": 11645,
+  "records": [
+    {
+      "id": "00631a17-871e-4cd8-bdb1-795631325b8e",
+      "createdAt": "2026-10-15T03:59:15.384Z",
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 17087,
+      "outputTokens": 1669,
+      "cost": 0.0071289
+    },
+    {
+      "id": "bce8d36e-e598-48f8-a594-2db70cf3d239",
+      "createdAt": "2026-10-15T03:59:03.931Z",
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 14201,
+      "outputTokens": 280,
+      "cost": 0.0045963
+    },
+    {
+      "id": "2c091dbc-eb71-480e-bad0-cdaf1db5ee06",
+      "createdAt": "2026-10-15T03:59:00.214Z",
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10650,
+      "outputTokens": 131,
+      "cost": 0.0033521999999999996
+    },
+    {
+      "id": "e5ffd995-5a38-4239-8b64-f476acf42029",
+      "createdAt": "2026-10-15T03:57:16.184Z",
+      "runId": null,
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "预算补充规划",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 1344,
+      "outputTokens": 122,
+      "cost": 0.0005496
+    },
+    {
+      "id": "9b669e5b-90b1-40b3-a869-657fbe1b067b",
+      "createdAt": "2026-10-15T03:24:11.652Z",
+      "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 12333,
+      "outputTokens": 203,
+      "cost": 0.0039435
+    },
+    {
+      "id": "fc446275-acdd-4351-b0d7-ac1bd98193a8",
+      "createdAt": "2026-10-15T03:24:07.357Z",
+      "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 12356,
+      "outputTokens": 219,
+      "cost": 0.0039696
+    },
+    {
+      "id": "66ae57cf-934f-4c74-92a3-5c4f0d57ad41",
+      "createdAt": "2026-10-15T03:24:03.578Z",
+      "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10314,
+      "outputTokens": 96,
+      "cost": 0.0032094
+    },
+    {
+      "id": "cfd99546-7cdb-4562-ba8d-04118be060dd",
+      "createdAt": "2026-10-15T03:23:17.276Z",
+      "runId": null,
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "预算补充规划",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 1313,
+      "outputTokens": 108,
+      "cost": 0.0005235
+    },
+    {
+      "id": "022e19b8-f6e2-437d-a397-c12873470e07",
+      "createdAt": "2026-10-15T03:12:43.389Z",
+      "runId": null,
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "预算补充规划",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 1344,
+      "outputTokens": 131,
+      "cost": 0.0005604
+    },
+    {
+      "id": "e850c267-b839-45f5-b326-6d14ffb9e3d4",
+      "createdAt": "2026-10-15T03:04:01.848Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11575,
+      "outputTokens": 60,
+      "cost": 0.0035445
+    },
+    {
+      "id": "2ed44209-b0b4-4a33-9a3d-3992ebcbd702",
+      "createdAt": "2026-10-15T03:03:59.995Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11730,
+      "outputTokens": 191,
+      "cost": 0.0037481999999999997
+    },
+    {
+      "id": "138d021c-d541-49ff-bc56-cf89cd0eb8a6",
+      "createdAt": "2026-10-15T03:03:57.197Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11134,
+      "outputTokens": 113,
+      "cost": 0.0034758
+    },
+    {
+      "id": "c1c9360c-1368-41fc-b1ca-3710e346fce8",
+      "createdAt": "2026-10-15T03:03:55.018Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 9389,
+      "outputTokens": 79,
+      "cost": 0.0029115
+    },
+    {
+      "id": "6c5077e9-c116-40f6-b8a8-897ecd88f5f5",
+      "createdAt": "2026-10-15T03:03:52.192Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 8822,
+      "outputTokens": 130,
+      "cost": 0.0028025999999999997
+    },
+    {
+      "id": "a4738617-3be1-4245-867b-c9e952a0f5d8",
+      "createdAt": "2026-10-15T03:03:50.074Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11479,
+      "outputTokens": 183,
+      "cost": 0.0036632999999999995
+    },
+    {
+      "id": "44b4e4f7-d1c3-4994-a13e-831b7699029d",
+      "createdAt": "2026-10-15T03:03:47.821Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 7464,
+      "outputTokens": 102,
+      "cost": 0.0023615999999999997
+    },
+    {
+      "id": "5a4e1fc7-19b3-42fc-b83d-58d2a9569346",
+      "createdAt": "2026-10-15T03:03:45.776Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t3-review",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 9357,
+      "outputTokens": 95,
+      "cost": 0.0029211
+    },
+    {
+      "id": "8be165b7-8151-4ceb-99b1-edef7b7cb299",
+      "createdAt": "2026-10-15T03:03:43.739Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t2-qa",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11935,
+      "outputTokens": 4020,
+      "cost": 0.0084045
+    },
+    {
+      "id": "30566f8b-d70c-4870-8eee-72283e00e764",
+      "createdAt": "2026-10-15T03:03:17.133Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t2-qa",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 12925,
+      "outputTokens": 1872,
+      "cost": 0.0061239
+    },
+    {
+      "id": "be4fc433-f4e6-4a1a-9c1f-d8035f7ae461",
+      "createdAt": "2026-10-15T03:03:02.777Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t2-qa",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11106,
+      "outputTokens": 1622,
+      "cost": 0.005278199999999999
+    },
+    {
+      "id": "57cb2614-8661-442c-9d84-e7611a7f667a",
+      "createdAt": "2026-10-15T03:02:50.275Z",
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": "t2-qa",
+      "purpose": "项目执行",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 9720,
+      "outputTokens": 94,
+      "cost": 0.0030288000000000003
+    },
+    {
+      "id": "5631ab7c-5cc9-4c31-9349-052850dfa170",
+      "createdAt": "2026-10-15T03:01:36.245Z",
+      "runId": null,
+      "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+      "taskId": null,
+      "purpose": "预算补充规划",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 1530,
+      "outputTokens": 125,
+      "cost": 0.000609
+    }
+  ],
+  "executionPurposes": [
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 60,
+      "at": "2026-10-15T03:02:48.021Z",
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_claim_task"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 87,
+      "at": "2026-10-15T03:02:50.425Z",
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_update_task",
+        "filesystem"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 166,
+      "at": "2026-10-15T03:03:04.030Z",
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "knowledge_read"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 232,
+      "at": "2026-10-15T03:03:17.231Z",
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_update_task"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 387,
+      "at": "2026-10-15T03:03:43.948Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_claim_task"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 411,
+      "at": "2026-10-15T03:03:45.879Z",
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 432,
+      "at": "2026-10-15T03:03:47.930Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_update_task",
+        "filesystem"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 461,
+      "at": "2026-10-15T03:03:50.161Z",
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "knowledge_read"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 503,
+      "at": "2026-10-15T03:03:53.236Z",
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "filesystem"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 523,
+      "at": "2026-10-15T03:03:55.123Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 559,
+      "at": "2026-10-15T03:03:57.352Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "knowledge_read"
+      ]
+    },
+    {
+      "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+      "seq": 580,
+      "at": "2026-10-15T03:04:00.053Z",
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192,
+      "subsequentToolNames": [
+        "agent_teams_status"
+      ]
+    },
+    {
+      "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "seq": 60,
+      "at": "2026-10-15T03:24:00.757Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_claim_task"
+      ]
+    },
+    {
+      "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "seq": 89,
+      "at": "2026-10-15T03:24:03.724Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_update_task",
+        "filesystem",
+        "knowledge_read"
+      ]
+    },
+    {
+      "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+      "seq": 138,
+      "at": "2026-10-15T03:24:08.472Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status"
+      ]
+    },
+    {
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "seq": 60,
+      "at": "2026-10-15T03:58:57.472Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_claim_task",
+        "filesystem"
+      ]
+    },
+    {
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "seq": 99,
+      "at": "2026-10-15T03:59:00.961Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_update_task",
+        "knowledge_read"
+      ]
+    },
+    {
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "seq": 138,
+      "at": "2026-10-15T03:59:04.093Z",
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048,
+      "subsequentToolNames": [
+        "agent_teams_status",
+        "agent_teams_update_task"
+      ]
+    }
+  ],
+  "note": "subsequentToolNames follows each dispatch until the next dispatch; overlapping parallel employees may share an interval, so this is trace evidence rather than exact per-tool billing."
+}

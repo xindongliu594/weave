@@ -1,0 +1,27 @@
+{
+  "previewId": "9b61275e-b5cf-4440-8f71-b755087e1acc",
+  "sourceRunId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+  "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+  "projectVersion": 3,
+  "usageId": "5631ab7c-5cc9-4c31-9349-052850dfa170",
+  "completedTaskIds": [
+    "t1-doc"
+  ],
+  "taskContinuationLimits": {
+    "t2-qa": 6,
+    "t3-review": 6
+  },
+  "proposal": {
+    "maxBudget": 0.56,
+    "maxModelCalls": 75,
+    "taskCallLimits": {
+      "t2-qa": 53,
+      "t3-review": 53
+    },
+    "taskBudgetLimits": {
+      "t2-qa": 0.3483495,
+      "t3-review": 0.2
+    },
+    "rationale": "旧净额不足恢复QA预留，在ceiling内提高项目总额；QA在已用0.1646基础上追加约0.1838覆盖6次交接纠正（最少需新增约0.0518），经理保留0.2满足原要求，已在净额装入规划费。"
+  }
+}

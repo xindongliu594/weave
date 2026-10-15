@@ -1,0 +1,27 @@
+✖ context resources change only the approved new snapshot and price each future request at the new byte limit (14.2732ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2634.1864
+
+✖ failing tests:
+
+test at tests\recovery-resource-plan.test.ts:1:2553
+✖ context resources change only the approved new snapshot and price each future request at the new byte limit (14.2732ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\recovery-resource-plan.test.ts:43:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /完整请求/,
+    operator: 'throws',
+    diff: 'simple'
+  }

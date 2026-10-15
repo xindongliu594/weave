@@ -1,0 +1,29 @@
+{
+  "status": "approved",
+  "sourceRunId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+  "additionalCalls": {
+    "t3-review": 6
+  },
+  "projectCallCap": 85,
+  "taskCallCap": 53,
+  "projectCap": 0.56,
+  "cumulativeCap": 2.8,
+  "stageCap": 0.72,
+  "planningCap": 0.003,
+  "attempts": 1,
+  "stopOnFailure": true,
+  "permissionChanges": false,
+  "preserveUnknownCosts": true,
+  "source": "User reply to call_6d016d0b4d1f41dbb2c5d699e387dc54",
+  "answer": "可以，你进行动态的调整吧，要求就是这次一定要把这个续验完成",
+  "allowDynamicAdjustment": true,
+  "scope": "Proceed with verified 6+6 first; dynamic allocations stay within existing dollar and permission boundaries; record all changes.",
+  "approvedAt": "2026-10-15T03:00:49.728512+00:00",
+  "codeCommit": "46b61b0",
+  "coordinatorAllowance": 4,
+  "reason": "Retry resource planning only after one-line schema fix, preserving completed QA, same source and verified 6 manager plus4 coordination allowance.",
+  "adjustedAt": "2026-10-15T03:12:38.375696+00:00",
+  "parentAuthorization": "call_6d016d0b4d1f41dbb2c5d699e387dc54 dynamic adjustment reply",
+  "schemaFixSHA": "d3f609bcfd8c67a9fc692b560eff4e03453937c0a74439cccea67157dcae61e6",
+  "preparedAt": "2026-10-15T03:22:21.570276+00:00"
+}

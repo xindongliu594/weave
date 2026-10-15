@@ -1,0 +1,10 @@
+{
+  "proposal": {
+    "stdout": "{\"operation\": \"resource-proposal\", \"httpStatus\": 422, \"result\": {\"code\": \"RESOURCE_PROPOSAL_INVALID\", \"message\": \"\\u8f93\\u51fa\\u8c03\\u6574\\u7f3a\\u5c11\\u5141\\u8bb8\\u7684\\u5355\\u6b21\\u8f93\\u51fa\\u4e0a\\u9650\"}}\n",
+    "stderr": ""
+  },
+  "resume": {
+    "stdout": "",
+    "stderr": ""
+  }
+}

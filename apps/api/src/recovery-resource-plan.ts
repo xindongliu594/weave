@@ -1,12 +1,14 @@
 import { z } from 'zod';
 import { createGoalContract, assertGoalContract } from '../../../packages/contracts/goal-contract.mjs';
 import { AppError } from './provider.ts';
+import { policySchema } from '../../../packages/contracts/index.ts';
 
 export const recoveryResourceProposalSchema=z.object({maxBudget:z.number().finite().positive().max(10000),
   maxModelCalls:z.number().int().min(1).max(1000).optional(),
   taskCallLimits:z.record(z.string(),z.number().int().min(1).max(1000)),
   taskBudgetLimits:z.record(z.string(),z.number().finite().positive().max(10000)).optional(),
   taskOutputLimits:z.record(z.string(),z.number().int().min(1).max(32768)).optional(),
+  contextBytes:policySchema.shape.contextBytes,
   rationale:z.string().trim().min(5).max(2000)}).strict();
 export type RecoveryResourceProposal=z.infer<typeof recoveryResourceProposalSchema>;
 export const recoveryCallRequirementVersion='handoff-correction-v1' as const;
@@ -33,6 +35,25 @@ function taskRoutes(snapshot:any,task:any):any[]{
 export function recoveryTaskOutputLimit(snapshot:any,task:any):number{
   const routes=taskRoutes(snapshot,task);
   return Math.max(0,...routes.map(r=>Math.min(task.maxOutputTokens??r.maxOutputTokens,r.maxOutputTokens)));
+}
+/** The byte allowance is global, so every pinned route must support the full input, output and guard. */
+export function recoveryContextSnapshot(original:any,contextBytes?:number,authorizedBytes?:number){
+  const snapshot=structuredClone(original);
+  if(contextBytes===undefined&&authorizedBytes===undefined)return snapshot;
+  const deny=(text:string)=>new AppError(422,text,'RESOURCE_PROPOSAL_INVALID');
+  if(contextBytes===undefined||!policySchema.shape.contextBytes.safeParse(contextBytes).success||contextBytes!==authorizedBytes)
+    throw deny('上下文调整缺少匹配的明确字节授权');
+  if(contextBytes<(original.policy.contextBytes??64000))throw deny('恢复上下文上限不能低于原批准字节数');
+  if(!snapshot.modelRoutes?.length)throw deny('上下文调整缺少固定模型路线');
+  for(const route of snapshot.modelRoutes){
+    if(route.contextBytes!==undefined&&(!Number.isSafeInteger(route.contextBytes)||route.contextBytes<contextBytes))
+      throw deny('固定模型路线的字节上限不支持本次上下文调整');
+    if(!Number.isSafeInteger(route.contextWindowTokens)||!Number.isSafeInteger(route.maxOutputTokens)||route.maxOutputTokens<1||
+      contextBytes+route.maxOutputTokens+1024>route.contextWindowTokens)
+      throw deny('固定模型容量未知或不足以容纳完整上下文、原输出和安全余量');
+  }
+  snapshot.policy.contextBytes=contextBytes;
+  return snapshot;
 }
 /** Adjust only the new snapshot; route caps are request defaults, not model capabilities. */
 export function recoveryOutputSnapshot(original:any,limits:Record<string,number>|undefined,completed:string[],ceiling?:number){
@@ -111,13 +132,14 @@ export function recoveryTaskMinimumBudget(snapshot:any,task:any,spent=0,reserved
 }
 /** Price output choices using the same snapshot rules as confirmation, without granting them. */
 export function recoveryTaskOutputBudgets(snapshot:any,task:any,completed:string[],ceiling:number,
-  used:{cost?:number;reserved?:number;requestOverheadBytes?:number},requestCount:number){
+  used:{cost?:number;reserved?:number;requestOverheadBytes?:number},requestCount:number,contextBytes?:number){
   const prior=Math.max(recoveryTaskOutputLimit(snapshot,task),task.maxOutputTokens??0);
   const limits=Object.fromEntries((snapshot.approvedTasks??snapshot.tasks).filter((t:any)=>!completed.includes(t.id))
     .map((t:any)=>[t.id,Math.max(recoveryTaskOutputLimit(snapshot,t),t.maxOutputTokens??0)]));
   return [...new Set([prior,8192,16384,ceiling])].filter(n=>n>=prior&&n<=ceiling).sort((a,b)=>a-b).flatMap(maxOutputTokens=>{
     let adjusted;
-    try{adjusted=recoveryOutputSnapshot(snapshot,{...limits,[task.id]:maxOutputTokens},completed,ceiling);}
+    try{adjusted=recoveryOutputSnapshot(snapshot,{...limits,[task.id]:maxOutputTokens},completed,ceiling);
+      if(contextBytes!==undefined)adjusted=recoveryContextSnapshot(adjusted,contextBytes,contextBytes);}
     catch(error){if(error instanceof AppError&&error.code==='RESOURCE_PROPOSAL_INVALID')return [];throw error;}
     return [{maxOutputTokens,minimumBudget:recoveryTaskMinimumBudget(adjusted,adjusted.tasks.find((t:any)=>t.id===task.id),
       used.cost,used.reserved,used.requestOverheadBytes,requestCount)}];
@@ -133,7 +155,7 @@ export function recoveryMinimumProjectBudget(snapshot:any,history:RecoveryHistor
 }
 export function applyRecoveryResources(original:any,value:unknown,options:{newRevision:number;completedTaskIds:string[];
   history:RecoveryHistory;ceiling:number;callRequirementVersion?:typeof recoveryCallRequirementVersion;
-  callCeilings?:CallCeilings;maxTaskOutputTokens?:number;taskContinuationLimits?:Record<string,number>}) {
+  callCeilings?:CallCeilings;maxTaskOutputTokens?:number;taskContinuationLimits?:Record<string,number>;contextBytes?:number}) {
   if(!assertGoalContract(original))throw new AppError(409,'原运行没有固定目标，需重新批准方案','RESOURCE_GOAL_REQUIRED');
   const proposal=recoveryResourceProposalSchema.parse(value),tasks=original.approvedTasks??original.tasks;
   const denied=(message:string)=>new AppError(422,message,'RESOURCE_PROPOSAL_INVALID');
@@ -149,7 +171,8 @@ export function applyRecoveryResources(original:any,value:unknown,options:{newRe
     throw denied('方案总调用次数不在本次允许范围内；旧次数继续计入');
   const changes=Object.entries(proposal.taskCallLimits);
   const moneyChanges=Object.entries(proposal.taskBudgetLimits??{});
-  const snapshot=recoveryOutputSnapshot(original,proposal.taskOutputLimits,options.completedTaskIds,options.maxTaskOutputTokens);
+  const snapshot=recoveryContextSnapshot(recoveryOutputSnapshot(original,proposal.taskOutputLimits,options.completedTaskIds,options.maxTaskOutputTokens),
+    proposal.contextBytes,options.contextBytes);
   if(options.callRequirementVersion!==undefined){
     if(options.callRequirementVersion!==recoveryCallRequirementVersion)throw denied('不支持此恢复资源规则版本');
     const requirements=recoveryCallRequirements(original,options.history,options.completedTaskIds,ceilings,options.taskContinuationLimits);
@@ -162,7 +185,7 @@ export function applyRecoveryResources(original:any,value:unknown,options:{newRe
       if((proposal.taskBudgetLimits?.[id]??task.maxBudget??original.policy.maxBudget)<floor)throw denied('节点净额不足下一段工作与交接纠正的完整请求预留');
     }
   }
-  if(!changes.length&&!moneyChanges.length&&!Object.keys(proposal.taskOutputLimits??{}).length)throw denied('缺少未完成节点的资源额度');
+  if(!changes.length&&!moneyChanges.length&&!Object.keys(proposal.taskOutputLimits??{}).length&&proposal.contextBytes===undefined)throw denied('缺少未完成节点的资源额度');
   for(const [id,limit] of changes){
     const task=snapshot.tasks.find((task:any)=>task.id===id);
     if(!task||options.completedTaskIds.includes(id))throw denied('只能调整未完成的原节点');
@@ -180,10 +203,12 @@ export function applyRecoveryResources(original:any,value:unknown,options:{newRe
     if(limit<recoveryTaskMinimumBudget(snapshot,task,used,reserved,options.history.tasks[id]?.requestOverheadBytes))throw denied('节点净额不足一次完整请求预留，请重新规划节点费用');
     task.maxBudget=limit;
   }
-  for(const id of Object.keys(proposal.taskOutputLimits??{})){
+  const requestChanges=proposal.contextBytes===undefined?Object.keys(proposal.taskOutputLimits??{}):
+    snapshot.tasks.filter((task:any)=>!options.completedTaskIds.includes(task.id)).map((task:any)=>task.id);
+  for(const id of requestChanges){
     const task=snapshot.tasks.find((t:any)=>t.id===id),used=options.history.tasks[id];
     if((task.maxBudget??proposal.maxBudget)<recoveryTaskMinimumBudget(snapshot,task,used?.cost??0,used?.reserved??0,used?.requestOverheadBytes))
-      throw denied('新输出额度下节点净额不足一次完整请求预留');
+      throw denied('新请求额度下节点净额不足一次完整请求预留');
   }
   snapshot.policy.maxBudget=proposal.maxBudget;
   if(proposal.maxModelCalls!==undefined)snapshot.policy.maxModelCalls=totalCalls;
@@ -209,7 +234,7 @@ export async function approvedRecoveryResources(db:{query:(sql:string,args?:any[
   if(!receipt)throw new AppError(409,'资源候选缺少真实规划用量记录','RESOURCE_PREVIEW_UNVERIFIED');
   const snapshot=applyRecoveryResources(row.snapshot,preview.proposal,{newRevision:(row.snapshot.resourceRevision??0)+1,
     completedTaskIds,history,ceiling:preview.ceiling,callCeilings:preview.callCeilings,callRequirementVersion:preview.callRequirementVersion,
-    maxTaskOutputTokens:preview.maxTaskOutputTokens,taskContinuationLimits:preview.taskContinuationLimits});
+    maxTaskOutputTokens:preview.maxTaskOutputTokens,taskContinuationLimits:preview.taskContinuationLimits,contextBytes:preview.contextBytes});
   let taskCallCeilings=row.snapshot.resourceApproval?.taskCallCeilings;
   if(preview.taskContinuationLimits!==undefined){
     const limits=taskCallCeilingsSchema.parse(preview.taskContinuationLimits),requirements=recoveryCallRequirements(row.snapshot,history,completedTaskIds,
@@ -225,6 +250,7 @@ export async function approvedRecoveryResources(db:{query:(sql:string,args?:any[
   snapshot.resourceApproval={format:'run-resource-approval-v1',revision:snapshot.resourceRevision,previewId,sourceRunId:row.id,
     sourceGoalContract:row.snapshot.goalContract,ceiling:preview.ceiling,proposal:preview.proposal,...(preview.callCeilings?{callCeilings:preview.callCeilings}:{}),
     ...(preview.maxTaskOutputTokens===undefined?{}:{maxTaskOutputTokens:preview.maxTaskOutputTokens}),
+    ...(preview.contextBytes===undefined?{}:{contextBytes:preview.contextBytes}),
     ...(taskCallCeilings===undefined?{}:{taskCallCeilings}),
     callRequirementVersion:preview.callRequirementVersion,modelId:preview.modelId,usageId:preview.usageId,approvedAt:new Date().toISOString()};
   snapshot.goalContract=createGoalContract(snapshot);
@@ -249,7 +275,7 @@ export function verifiedResourceEdge(child:any,parent:any,parentRunId:string,com
     // Edges prove the sealed proposal; live history is checked at confirmation,
     // never reconstructed from fabricated zero-use counters during lineage reads.
     const expected=applyRecoveryResources(parent,approval.proposal,{newRevision:revision,completedTaskIds,
-      history:{calls:0,tasks:{}},ceiling:approval.ceiling,callCeilings:approval.callCeilings,maxTaskOutputTokens:approval.maxTaskOutputTokens});
+      history:{calls:0,tasks:{}},ceiling:approval.ceiling,callCeilings:approval.callCeilings,maxTaskOutputTokens:approval.maxTaskOutputTokens,contextBytes:approval.contextBytes});
     if(taskCallCeilings!==undefined){
       const oldLimits=parent.resourceApproval?.taskCallCeilings??{};
       if(Object.keys(oldLimits).some(id=>!Object.hasOwn(taskCallCeilings,id))||

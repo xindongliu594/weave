@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-15T03:25:07.110042+00:00",
+  "runId": "69a02efb-bdd9-40fa-bae1-946d39c5c8d9",
+  "status": "failed",
+  "integrity": "ok",
+  "calls": {
+    "t3-review": 3
+  },
+  "totalNewCalls": 3,
+  "countBasis": "calls counts wire dispatches; admittedCalls includes durable admission attempts",
+  "admittedCalls": {
+    "t3-review": 3
+  },
+  "projectAdmittedCalls": 3,
+  "planningUsageId": "cfd99546-7cdb-4562-ba8d-04118be060dd",
+  "planningKnownCost": 0.0005235,
+  "totalNewKnownCost": 0.011646,
+  "requestPurposes": [
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    },
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    },
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    }
+  ],
+  "accepted": [],
+  "errors": [
+    {
+      "type": "run/finished",
+      "code": null,
+      "message": "CONTEXT_LIMIT: Chat Completions 完整受保护请求超过字节或上下文上限；没有发送模型请求"
+    }
+  ],
+  "pendingApprovals": [],
+  "newKnownCost": 0.0111225,
+  "inputTokens": 35003,
+  "outputTokens": 518,
+  "occupied": 2.5476714,
+  "projectKnown": 0.3474567,
+  "projectHeld": 0.0025932,
+  "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

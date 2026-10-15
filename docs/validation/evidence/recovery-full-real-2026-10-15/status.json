@@ -1,0 +1,109 @@
+{
+  "checkedAt": "2026-10-15T03:05:30.093612+00:00",
+  "runId": "5327ddc6-a15d-40b6-a85c-7fa69dd49176",
+  "status": "failed",
+  "integrity": "ok",
+  "calls": {
+    "t2-qa": 4,
+    "t3-review": 4
+  },
+  "totalNewCalls": 12,
+  "countBasis": "calls counts wire dispatches; admittedCalls includes durable admission attempts",
+  "admittedCalls": {
+    "t2-qa": 4,
+    "t3-review": 4
+  },
+  "projectAdmittedCalls": 12,
+  "planningUsageId": "5631ab7c-5cc9-4c31-9349-052850dfa170",
+  "planningKnownCost": 0.000609,
+  "totalNewKnownCost": 0.048873,
+  "requestPurposes": [
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t2-qa",
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    },
+    {
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    },
+    {
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192
+    },
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    },
+    {
+      "taskId": "t3-review",
+      "purpose": "execution",
+      "maxTokens": 2048
+    },
+    {
+      "taskId": null,
+      "purpose": "execution",
+      "maxTokens": 8192
+    }
+  ],
+  "accepted": [
+    {
+      "seq": 354,
+      "taskId": "t2-qa",
+      "attemptId": "427bdd6f-84c3-473e-9691-e3cc78bbe52e"
+    }
+  ],
+  "errors": [
+    {
+      "type": "budget/stopped",
+      "code": "TURN_LIMIT",
+      "message": "项目方案的模型调用次数已达上限"
+    },
+    {
+      "type": "run/finished",
+      "code": null,
+      "message": "项目方案的模型调用次数已达上限"
+    }
+  ],
+  "pendingApprovals": [],
+  "newKnownCost": 0.048264,
+  "inputTokens": 126636,
+  "outputTokens": 8561,
+  "occupied": 2.5354650000000003,
+  "projectKnown": 0.3352503,
+  "projectHeld": 0.0025932,
+  "deliverySHA": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f"
+}

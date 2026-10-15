@@ -1,0 +1,73 @@
+{
+  "source": "run/finished employee output, copied without editing",
+  "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+  "task": {
+    "id": "t3",
+    "subject": "经理只读验收 inventory-cases.md 与 QA 回执",
+    "status": "completed",
+    "assignee": "employee-1",
+    "dependencies": [
+      "t1",
+      "t2"
+    ],
+    "attempt": 1,
+    "attempt_id": "a508bb1c-b7fe-45cc-906e-b29f6fdb2cbe",
+    "reassigning": false,
+    "kind": "work",
+    "verdict": "pass",
+    "findings_open": 0,
+    "seed_id": "t3-review",
+    "output": "经理只读验收结论（未写文件、未运行代码、未代写开发或 QA 结论）\n\n证据基准：inventory-cases.md（host 状态 accepted，sha256 57f22107…842f，2742 字节，producerTaskId t1-doc，workspaceRevision 4432028…b411）= T1；T2 QA 回执（宿主 completed 节点 t2-qa 公开 output，attemptId 427bdd6f…）；知识原文 sum-checklist（documentId d4c239b4…，chunkId 6a11c024…，行7）经 knowledge_read 核对。\n\n【验收目标1｜逐项对照四个验收目标列出通过/未通过并附证据出处】通过\n- 目标A 每项用例输入与预期结果自洽 ⇒ 通过。C1–C12 逐条（T1 一、用例表）输入与预期经独立复算相符，与 T2 逐用例结论 12/12 一致：C1 5+3=8；C2 -5+-3=-8；C3 0+0=0；C4 7-7=0；C5 10-3+4-1=10；C6 -10+6-1=-5；C12 2147483647-2147483647=0。T2 未发现计算错误（0 项）。\n- 目标B 正负/零变化/组合变动完整 ⇒ 通过。正 C1、负 C2、零 C3/C4、组合 C5/C6（T1 类别列），T2 确认六类全覆盖、类别缺项 0。\n- 目标C 非整数拒绝与整数边界覆盖 ⇒ 通过。非整数 C7/C8/C9，整数边界 C10（2147483647+1 越界）、C11（-2147483648-1 越界）、C12（上下界相抵）；T2 独立复算 C7–C12 全部通过。\n- 目标D 声明库存业务约束与通用加法方法差异 ⇒ 总体通过。T1 二、差异小节第1/2/4/5 条成立（T2 核对一致）；该节明示\"只适用于整数加法，不得假设其对任意实数成立\"，与知识原文\"此方法只适用于整数加法，不能直接用于小数\"相符，未假设 sum 接受任意实数。\n\n【验收目标2｜明确未完成项或确认全部完成】确认全部完成，无阻塞性未完成项；附 2 项已知不足（沿用 T2，不代写、不新增）\n- （低）T1 二、差异小节第3条\"通用加法只需拒绝小数\"收窄了通用方法口径，知识原文为\"明确拒绝非整数\"。与 T2 回执所述一致，不影响 C7–C9 预期正确性，不构成未通过。\n- （轻微歧义）T1 C10/C11 预期为\"拒绝或…报错\"二选一，非单一确定预期；不影响正确性。\n- 结论：四个验收目标均通过，无未完成项；上述 2 项为可选的文字精确化，非阻断。\n\n【验收目标3｜结论基于 T1 原文与 T2 真实核算回执，无新增或代写内容】通过\nT1 原文经 filesystem 直读；T2 回执取自宿主公开 output；T2 所引 sha256 57f22107…842f/2742 字节/行7 与宿主 accepted 工件及 knowledge_read 原文逐项吻合。本结论未重写开发或 QA 结论，未写任何文件，未扩大权限或预算，未使用终端。"
+  },
+  "handoff": {
+    "seq": 193,
+    "at": "2026-10-15T03:59:15.446Z",
+    "type": "handoff/accepted",
+    "data": {
+      "taskId": "t3-review",
+      "attemptId": "a508bb1c-b7fe-45cc-906e-b29f6fdb2cbe",
+      "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+      "workspaceRevision": "4432028926278afe53894f57029a5e373c24b83c7ce7348efe5259b876ab411b",
+      "inputs": [
+        {
+          "path": "inventory-cases.md",
+          "sha256": "57f22107eb69a4851d0cc0f4cded066937d78dca6c204dfa4d685505d293842f",
+          "size": 2742,
+          "producerTaskId": "t1-doc"
+        }
+      ],
+      "outputs": [],
+      "commands": [],
+      "acceptedAt": "2026-10-15T03:59:15.436Z",
+      "budgetEvidence": {
+        "version": 1,
+        "runId": "e5b2acfd-ecc4-4127-bd2f-4e65aad60baa",
+        "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+        "projectVersion": 3,
+        "capturedAt": "2026-10-15T03:59:15.436Z",
+        "point": "node-accepted",
+        "basis": "host-execution-budget",
+        "currency": "USD",
+        "project": {
+          "limit": 0.56,
+          "occupied": 0.36567689999999997,
+          "activeReserved": 0,
+          "available": 0.19432310000000008,
+          "callsUsed": 81,
+          "callLimit": 85,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "inherited": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.3480063,
+          "retainedUnknownReservation": 0.0025932,
+          "availableBudget": 0.20940050000000007,
+          "callsUsed": 78,
+          "callsBasis": "durable-admissions-and-archived-wire-requests",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        },
+        "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+      }
+    }
+  }
+}

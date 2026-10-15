@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-15T03:14:31.309331+00:00",
+  "usageRows": 543,
+  "occupied": 2.5360254,
+  "projectKnown": 0.33581069999999996,
+  "projectHolds": [
+    {
+      "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+      "status": "uncertain",
+      "amount": 0.0025932
+    }
+  ],
+  "planning": [
+    {
+      "id": "022e19b8-f6e2-437d-a397-c12873470e07",
+      "createdAt": "2026-10-15T03:12:43.389Z",
+      "inputTokens": 1344,
+      "outputTokens": 131,
+      "cost": 0.0005604,
+      "planningPreviewId": null,
+      "resourcePlanningRunId": null
+    },
+    {
+      "id": "5631ab7c-5cc9-4c31-9349-052850dfa170",
+      "createdAt": "2026-10-15T03:01:36.245Z",
+      "inputTokens": 1530,
+      "outputTokens": 125,
+      "cost": 0.000609,
+      "planningPreviewId": null,
+      "resourcePlanningRunId": null
+    },
+    {
+      "id": "86b44a72-c015-4b61-b9b7-9b1cf3116109",
+      "createdAt": "2026-10-14T02:01:38.100Z",
+      "inputTokens": 1674,
+      "outputTokens": 163,
+      "cost": 0.0006977999999999999,
+      "planningPreviewId": null,
+      "resourcePlanningRunId": null
+    },
+    {
+      "id": "e995ddea-0474-4d5f-9140-7c2ae951a875",
+      "createdAt": "2026-10-13T12:37:01.992Z",
+      "inputTokens": 1646,
+      "outputTokens": 327,
+      "cost": 0.0008862,
+      "planningPreviewId": null,
+      "resourcePlanningRunId": null
+    }
+  ]
+}

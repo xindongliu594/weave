@@ -1,0 +1,24 @@
+{
+  "status": "approved",
+  "sourceRunId": "b03ac2e1-0086-4fe7-9b6b-eca98d8e5fbf",
+  "additionalCalls": {
+    "t2-qa": 6,
+    "t3-review": 6
+  },
+  "projectCallCap": 75,
+  "taskCallCap": 53,
+  "projectCap": 0.56,
+  "cumulativeCap": 2.8,
+  "stageCap": 0.72,
+  "planningCap": 0.003,
+  "attempts": 1,
+  "stopOnFailure": true,
+  "permissionChanges": false,
+  "preserveUnknownCosts": true,
+  "source": "User reply to call_6d016d0b4d1f41dbb2c5d699e387dc54",
+  "answer": "可以，你进行动态的调整吧，要求就是这次一定要把这个续验完成",
+  "allowDynamicAdjustment": true,
+  "scope": "Proceed with verified 6+6 first; dynamic allocations stay within existing dollar and permission boundaries; record all changes.",
+  "approvedAt": "2026-10-15T03:00:49.728512+00:00",
+  "codeCommit": "46b61b0"
+}
