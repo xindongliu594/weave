@@ -70,6 +70,21 @@ test('file contracts prevent undeclared reads/writes and changedPaths must match
   gate.observe('implement','a','terminal_test',{command:'check'},{exitCode:0},afterViolation);
   assert.throws(()=>gate.prepare('implement','a',{changedPaths:['result.txt']}),/UNDECLARED_OUTPUT/);
 }));
+test('restored outputs are not current-attempt changes and mismatches report the exact observed paths',()=>fixture([
+  {id:'implement',kind:'implementation',dependencies:[],outputs:[{path:'result.txt'}],inScope:['result.txt'],verify:['check']},
+],({root,gate})=>{
+  writeFileSync(join(root,'result.txt'),'restored');
+  const before=gate.beforeFile('implement','new-attempt','terminal_test',{});
+  gate.observe('implement','new-attempt','terminal_test',{command:'check'},{exitCode:0},before);
+  assert.throws(()=>gate.prepare('implement','new-attempt',{changedPaths:['result.txt']}),/当前 attempt.*changedPaths=\[\]/);
+  assert.equal(gate.prepare('implement','new-attempt',{changedPaths:[]}).outputs.length,1);
+  const beforeWrite=gate.beforeFile('implement','new-attempt','artifact_write',{path:'result.txt'});
+  writeFileSync(join(root,'result.txt'),'updated');gate.observe('implement','new-attempt','artifact_write',{path:'result.txt'},{},beforeWrite);
+  const afterWrite=gate.beforeFile('implement','new-attempt','terminal_test',{});
+  gate.observe('implement','new-attempt','terminal_test',{command:'check'},{exitCode:0},afterWrite);
+  assert.throws(()=>gate.prepare('implement','new-attempt',{changedPaths:[]}),/changedPaths=\["result.txt"\]/);
+  assert.equal(gate.prepare('implement','new-attempt',{changedPaths:['result.txt']}).outputs.length,1);
+}));
 test('host file checks reject linked directories before reading their contents',()=>fixture([],({root})=>{
   const target=join(root,'target');mkdirSync(target);writeFileSync(join(target,'secret.txt'),'secret');
   // Windows junctions exercise the same lstat boundary without requiring

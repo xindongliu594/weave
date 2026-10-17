@@ -1,0 +1,502 @@
+{
+  "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+  "status": "failed",
+  "integrity": "ok",
+  "eventCount": 754,
+  "wireRequestCount": 4,
+  "wireSequences": [
+    57,
+    89,
+    142,
+    611
+  ],
+  "billingEvents": [
+    {
+      "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+      "requestId": "afe61c45-52f2-46c9-b9be-38118650400f",
+      "taskId": "develop",
+      "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+      "seq": 69,
+      "at": "2026-10-17T07:50:02.239Z",
+      "type": "billing/usage",
+      "data": {
+        "id": "c51acf94-1288-4ed8-aa4c-ae351b4c4519",
+        "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+        "requestId": "afe61c45-52f2-46c9-b9be-38118650400f",
+        "taskId": "develop",
+        "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+        "agentId": "employee-2",
+        "employeeId": "dev-1",
+        "runtimeTaskId": "t1",
+        "requestPurpose": "execution",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "durationMs": 3203,
+        "inputTokens": 9664,
+        "outputTokens": 99,
+        "cost": 0.003018
+      }
+    },
+    {
+      "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+      "requestId": "bd3d4204-800f-462c-9139-213a9df2f48f",
+      "taskId": "develop",
+      "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+      "seq": 104,
+      "at": "2026-10-17T07:50:05.589Z",
+      "type": "billing/usage",
+      "data": {
+        "id": "54d50f40-33e9-4a46-9b6c-de0c9f1fc4a9",
+        "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+        "requestId": "bd3d4204-800f-462c-9139-213a9df2f48f",
+        "taskId": "develop",
+        "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+        "agentId": "employee-2",
+        "employeeId": "dev-1",
+        "runtimeTaskId": "t1",
+        "requestPurpose": "execution",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "durationMs": 3272,
+        "inputTokens": 10451,
+        "outputTokens": 211,
+        "cost": 0.0033884999999999996
+      }
+    },
+    {
+      "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+      "requestId": "9f85f77d-1ce0-4798-89be-59866e7fba60",
+      "taskId": "develop",
+      "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+      "seq": 169,
+      "at": "2026-10-17T07:50:14.136Z",
+      "type": "billing/usage",
+      "data": {
+        "id": "bb35e293-e4db-4697-b518-909ef4cc63ea",
+        "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+        "requestId": "9f85f77d-1ce0-4798-89be-59866e7fba60",
+        "taskId": "develop",
+        "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+        "agentId": "employee-2",
+        "employeeId": "dev-1",
+        "runtimeTaskId": "t1",
+        "requestPurpose": "execution",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "durationMs": 6406,
+        "inputTokens": 13148,
+        "outputTokens": 85,
+        "cost": 0.0040463999999999995
+      }
+    },
+    {
+      "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+      "requestId": "0367b927-d76f-48b9-8231-937535e2d22f",
+      "taskId": "develop",
+      "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+      "seq": 726,
+      "at": "2026-10-17T07:52:35.045Z",
+      "type": "billing/usage",
+      "data": {
+        "id": "46d30cb7-7608-4150-ad08-f61f339e166e",
+        "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+        "requestId": "0367b927-d76f-48b9-8231-937535e2d22f",
+        "taskId": "develop",
+        "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+        "agentId": "employee-2",
+        "employeeId": "dev-1",
+        "runtimeTaskId": "t1",
+        "requestPurpose": "handoff",
+        "handoffTaskStatus": "in_progress",
+        "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+        "durationMs": 29898,
+        "inputTokens": 12910,
+        "outputTokens": 1236,
+        "cost": 0.0053562
+      }
+    }
+  ],
+  "handoffArgumentKeys": [],
+  "tasks": [
+    {
+      "id": "t1",
+      "status": "failed"
+    },
+    {
+      "id": "t2",
+      "status": "pending"
+    },
+    {
+      "id": "t3",
+      "status": "pending"
+    }
+  ],
+  "errors": [
+    {
+      "seq": 732,
+      "at": "2026-10-17T07:52:35.099Z",
+      "type": "handoff/blocked",
+      "data": {
+        "taskId": "develop",
+        "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+        "message": "CHANGED_PATHS_MISMATCH: 必须提交实际修改的路径"
+      }
+    }
+  ],
+  "commands": [
+    {
+      "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+      "callId": "call_6b505305f2684648af0016a7",
+      "taskId": "develop",
+      "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+      "seq": 599,
+      "at": "2026-10-17T07:52:05.094Z",
+      "type": "handoff/command-observed",
+      "data": {
+        "taskId": "develop",
+        "attemptId": "4d514ede-bb8b-4b82-bc7e-fc8935ff6af6",
+        "command": "node --check cli.mjs",
+        "exitCode": 0,
+        "workspaceRevision": "a074130d211021f8cfdcbd4f046037ad041c200521be3bd319a807ec87935665",
+        "evidence": {
+          "version": 1,
+          "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+          "observedAt": "2026-10-17T07:52:05.083Z",
+          "tool": "terminal_test",
+          "sessionId": "dbdf0c44-40ac-4c65-be9a-3d4bc29403a7",
+          "callId": "call_6b505305f2684648af0016a7",
+          "approval": {
+            "status": "available",
+            "approvalId": "018e6431-10a8-426b-972c-6555a71e663d"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "48edac16-fb3b-4230-977a-a0884cb42d7d",
+            "queuedSeq": 591,
+            "finishedSeq": 597
+          },
+          "hashBasis": "executor-result-before-archive-redaction",
+          "output": {
+            "status": "available",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0,
+            "complete": true,
+            "layout": "combined"
+          },
+          "stdout": {
+            "status": "unknown",
+            "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+          },
+          "stderr": {
+            "status": "unknown",
+            "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+          },
+          "nodeTests": {
+            "status": "unknown",
+            "reason": "NOT_SINGLE_NODE_TEST_COMMAND"
+          }
+        },
+        "acceptanceChecks": [
+          {
+            "criterionIndex": 0,
+            "ruleSha256": "ac32ef186932b254f204497cbc37953d5628126fc8c44fd2c75257ad65d1c25f",
+            "status": "passed",
+            "reason": ""
+          },
+          {
+            "criterionIndex": 1,
+            "ruleSha256": "eb880297fc2d377fa11df305de53c610a1aad181b7cf3dd573747b9edb54a14a",
+            "status": "passed",
+            "reason": ""
+          }
+        ]
+      }
+    }
+  ],
+  "acceptedHandoffs": [],
+  "toolCalls": [
+    {
+      "seq": 75,
+      "name": "agent_teams_claim_task",
+      "status": null,
+      "path": null
+    },
+    {
+      "seq": 109,
+      "name": "agent_teams_update_task",
+      "status": "in_progress",
+      "path": null
+    },
+    {
+      "seq": 114,
+      "name": "filesystem",
+      "status": null,
+      "path": "cli.mjs"
+    },
+    {
+      "seq": 127,
+      "name": "filesystem",
+      "status": null,
+      "path": "README.md"
+    },
+    {
+      "seq": 174,
+      "name": "terminal_test",
+      "status": null,
+      "path": null
+    },
+    {
+      "seq": 731,
+      "name": "agent_teams_update_task",
+      "status": "completed",
+      "path": null
+    }
+  ],
+  "ownUsage": [
+    {
+      "id": "46d30cb7-7608-4150-ad08-f61f339e166e",
+      "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 12910,
+      "outputTokens": 1236,
+      "cost": 0.0053562,
+      "createdAt": "2026-10-17T07:52:35.050Z"
+    },
+    {
+      "id": "bb35e293-e4db-4697-b518-909ef4cc63ea",
+      "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 13148,
+      "outputTokens": 85,
+      "cost": 0.0040463999999999995,
+      "createdAt": "2026-10-17T07:50:14.140Z"
+    },
+    {
+      "id": "54d50f40-33e9-4a46-9b6c-de0c9f1fc4a9",
+      "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 10451,
+      "outputTokens": 211,
+      "cost": 0.0033884999999999996,
+      "createdAt": "2026-10-17T07:50:05.594Z"
+    },
+    {
+      "id": "c51acf94-1288-4ed8-aa4c-ae351b4c4519",
+      "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 9664,
+      "outputTokens": 99,
+      "cost": 0.003018,
+      "createdAt": "2026-10-17T07:50:02.241Z"
+    },
+    {
+      "id": "7b06ad0a-2e5f-4314-b8eb-f7cec9b164cc",
+      "runId": null,
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 1845,
+      "outputTokens": 116,
+      "cost": 0.0006927000000000001,
+      "createdAt": "2026-10-17T07:49:30.424Z"
+    },
+    {
+      "id": "179204cc-9ce5-48fc-9c29-6c56f5ee58d4",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 13322,
+      "outputTokens": 862,
+      "cost": 0.005031,
+      "createdAt": "2026-10-17T06:43:38.796Z"
+    },
+    {
+      "id": "561dde0b-2704-4d5a-bcd9-27ea508305e0",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 12453,
+      "outputTokens": 873,
+      "cost": 0.0047835,
+      "createdAt": "2026-10-17T06:43:34.393Z"
+    },
+    {
+      "id": "ebd920e6-6187-4566-8561-9eb597762f70",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 11528,
+      "outputTokens": 918,
+      "cost": 0.00456,
+      "createdAt": "2026-10-17T06:43:30.317Z"
+    },
+    {
+      "id": "38a35b47-e962-43d5-98ef-0d2feb94d000",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 10857,
+      "outputTokens": 54,
+      "cost": 0.0033219,
+      "createdAt": "2026-10-17T06:40:37.282Z"
+    },
+    {
+      "id": "ef617602-90dd-4844-877c-0d30ceb1dac0",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 8453,
+      "outputTokens": 1138,
+      "cost": 0.0039015,
+      "createdAt": "2026-10-17T06:40:33.872Z"
+    },
+    {
+      "id": "e67b2f1b-0ad5-4461-816c-1d62cccf1733",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 8332,
+      "outputTokens": 101,
+      "cost": 0.0026207999999999995,
+      "createdAt": "2026-10-17T06:40:28.313Z"
+    },
+    {
+      "id": "5420f52f-6f4b-4ec2-ba9e-be6705f20c63",
+      "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 7548,
+      "outputTokens": 99,
+      "cost": 0.0023832000000000002,
+      "createdAt": "2026-10-17T06:40:26.187Z"
+    },
+    {
+      "id": "064449f4-2f52-4118-a8a7-02b7f046867c",
+      "runId": null,
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 8058,
+      "outputTokens": 3315,
+      "cost": 0.0063954,
+      "createdAt": "2026-10-17T06:39:01.498Z"
+    },
+    {
+      "id": "2e502b0c-e127-47fc-946b-318bef211ab2",
+      "runId": null,
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 7968,
+      "outputTokens": 3020,
+      "cost": 0.0060144,
+      "createdAt": "2026-10-17T06:36:31.991Z"
+    },
+    {
+      "id": "bec4c4da-25b3-4f0b-b647-11a7cc237f0d",
+      "runId": null,
+      "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+      "inputTokens": 7629,
+      "outputTokens": 2390,
+      "cost": 0.0051567,
+      "createdAt": "2026-10-17T06:34:58.011Z"
+    }
+  ],
+  "occupied": "2.71120529999999991388",
+  "projectCost": "0.0606701999999999989",
+  "historicalHoldsPreserved": true,
+  "holdCount": 6,
+  "activeRuns": [],
+  "recovery": {
+    "runId": "3c2d5fb9-3045-43a2-9579-ca6cbd51c371",
+    "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+    "planVersion": 2,
+    "checkedAt": "2026-10-17T08:09:13.781Z",
+    "originalBudget": 0.75,
+    "costReadiness": {
+      "recordedCost": 0.0606702,
+      "reserved": 0,
+      "availableBudget": 0.6893298,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    },
+    "choices": {
+      "retainUncertainCosts": true,
+      "acknowledgeUnknownOperations": false
+    },
+    "nativeRequestChecked": false,
+    "unknownOperationCount": 0,
+    "unknownOperationIds": [],
+    "calls": {
+      "used": 11,
+      "limit": 32,
+      "remaining": 21
+    },
+    "tasks": [
+      {
+        "id": "develop",
+        "subject": "实现摄氏转华氏 CLI 与使用说明",
+        "recordedCost": 0.042411,
+        "reserved": 0,
+        "budgetLimit": 0.1906011,
+        "availableBudget": 0.1481901,
+        "calls": 11,
+        "callLimit": 11,
+        "remainingCalls": 0,
+        "completed": false
+      },
+      {
+        "id": "verify",
+        "subject": "独立测试摄氏转华氏 CLI",
+        "recordedCost": 0,
+        "reserved": 0,
+        "budgetLimit": 0.2725905,
+        "availableBudget": 0.2725905,
+        "calls": 0,
+        "callLimit": 7,
+        "remainingCalls": 7,
+        "completed": false
+      },
+      {
+        "id": "accept",
+        "subject": "经理只读验收 CLI 交付",
+        "recordedCost": 0,
+        "reserved": 0,
+        "budgetLimit": 0.1947075,
+        "availableBudget": 0.1947075,
+        "calls": 0,
+        "callLimit": 5,
+        "remainingCalls": 5,
+        "completed": false
+      }
+    ],
+    "resume": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 422,
+          "code": "TASK_BUDGET_EXHAUSTED",
+          "message": "任务「实现摄氏转华氏 CLI 与使用说明」已达到费用或调用次数上限，请调整方案后重新批准",
+          "taskId": "develop"
+        }
+      ],
+      "completedTaskIds": []
+    },
+    "retry": {
+      "allowed": false,
+      "reasons": [
+        {
+          "status": 409,
+          "code": "RESOURCE_RESUME_ONLY",
+          "message": "资源补充只批准未完成节点，完整重试需要另外批准方案"
+        },
+        {
+          "status": 422,
+          "code": "TASK_BUDGET_EXHAUSTED",
+          "message": "任务「实现摄氏转华氏 CLI 与使用说明」已达到费用或调用次数上限，请调整方案后重新批准",
+          "taskId": "develop"
+        }
+      ],
+      "completedTaskIds": []
+    }
+  },
+  "artifactComparison": [
+    {
+      "path": "cli.mjs",
+      "sourceSHA256": "ac6c67627b8288453ee2958483ae70e934062cb4bada826a50a98b60b16c8374",
+      "currentSHA256": "ac6c67627b8288453ee2958483ae70e934062cb4bada826a50a98b60b16c8374",
+      "unchanged": true
+    },
+    {
+      "path": "README.md",
+      "sourceSHA256": "b75eb96c299d5e9163dd67f0139ed61942586012daf93889630b38c5d75b64f8",
+      "currentSHA256": "b75eb96c299d5e9163dd67f0139ed61942586012daf93889630b38c5d75b64f8",
+      "unchanged": true
+    }
+  ]
+}

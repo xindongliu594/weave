@@ -15,6 +15,7 @@ import { teamTaskPlan, stageApprovedTeam } from './handoff.mjs';
 async function qualityScenario(mode) {
   const root=await mkdtemp(join(tmpdir(),'quality-handoff-')),artifacts=join(root,'files');
   const {mkdirSync}=await import('node:fs');mkdirSync(artifacts);
+  if(mode==='restored-output')writeFileSync(join(artifacts,'result.txt'),'expected');
   const snapshot={agents:[{id:'manager',employeeId:'original-manager',role:'manager',tools:[]},{id:'producer',employeeId:'original-producer',role:'member',tools:['artifact_write','terminal_test']},{id:'reviewer',employeeId:'original-reviewer',role:'member',tools:[]}],tasks:[
     {id:'implement',kind:'implementation',subject:'[quality:implement]',assignee:'producer',objective:'Write a fixture result',dependencies:[],acceptanceCriteria:['result correct'],inScope:['result.txt'],verify:['check-fixture'],outputs:[{path:'result.txt',format:'text'}]},
     {id:'review',kind:'review',subject:'[quality:review]',assignee:'reviewer',objective:'Review the implementation independently',dependencies:['implement'],reviewedTaskId:'implement',acceptanceCriteria:['implementation meets goal']},
@@ -68,11 +69,19 @@ async function qualityScenario(mode) {
         }
         const update=(status,more={})=>['agent_teams_update_task',{task_id:id,attempt_id:attempt,status,...more}];
         const finish={output:'fixture quality evidence',changedPaths:['result.txt'],acceptanceResults:[{criterion:'result correct',status:mode==='failed-acceptance'?'failed':'passed',evidence:'fixture result'}],commandsRun:[{command:'check-fixture',status:'passed',exitCode:0,evidence:'claimed check'}]};
+        if(mode==='restored-output'&&task==='implement'){
+          const message=options.messages.findLast(item=>item.source?.sections?.some(section=>section.name==='department:approved-context'));
+          const context=JSON.parse(message.source.sections.find(section=>section.name==='department:approved-context').text);
+          assert.deepEqual(context.fileChanges.changedPaths,[]);
+          assert.equal(context.fileChanges.attemptId,attempt);
+          assert.match(context.fileChanges.rule,/恢复.*不.*本轮/);
+          finish.changedPaths=context.fileChanges.changedPaths;
+        }
         if(mode==='manager-contract') finish.output=JSON.stringify({summary:'已完成',sections:{usage:'读取 result.txt，并核对真实检查回执'},risks:[]});
         if(mode==='manager-contract-chain') finish.output=JSON.stringify({summary:'已完成',sections:{usage:'INDIRECT_DEV_REPORT_MARKER'},risks:[]});
         const actions=[['agent_teams_claim_task',{task_id:id}],update('in_progress')];
         if(task==='implement'){
-          actions.push(['artifact_write',{path:'result.txt',content:'expected'}]);
+          if(mode!=='restored-output')actions.push(['artifact_write',{path:'result.txt',content:'expected'}]);
           if(mode!=='forged-command')actions.push(['terminal_test',{command:'check-fixture'}]);
           if(mode==='stale-attempt')actions.push(['agent_teams_update_task',{task_id:id,attempt_id:'stale',status:'completed',...finish}]);
           actions.push(update('completed',finish));
@@ -120,6 +129,7 @@ async function qualityScenario(mode) {
   }finally{await host?.close();await rm(root,{recursive:true,force:true});}
 }
 test('native quality contracts receive actual file and command evidence before independent review',()=>qualityScenario('pass'));
+test('native resumed implementation can seal existing outputs with observed empty changes and a fresh check',()=>qualityScenario('restored-output'));
 test('native DSH tool accepts contracted employee report and passes its seal to independent reviewer',()=>qualityScenario('manager-contract'));
 test('native three-stage handoff does not inject indirect reports through assignment messages',()=>qualityScenario('manager-contract-chain'));
 test('model claims of a passed command cannot unlock native quality work',()=>qualityScenario('forged-command'));

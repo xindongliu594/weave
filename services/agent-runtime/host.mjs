@@ -186,6 +186,10 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       completionGuidance: reviewCompletionGuidance(contract, budget?.task?.configuredOutputLimit ?? contract.maxOutputTokens),
       runEvidence: taskRunEvidence({ snapshot: product.snapshot, taskId: contract.id, state, taskIds, handoff, budget: adapter.budget, runId: archive.id }),
       handoffGuidance: handoffReportGuidance(contract),
+      ...(['implementation','repair'].includes(contract.kind) ? { fileChanges: {
+        attemptId: current.attemptId, changedPaths: handoff.observedChangedPaths(contract.id,current.attemptId),
+        rule: 'changedPaths 是宿主在当前 attempt 观察到的变更路径。恢复或仅读取的旧文件不算本轮修改；没有变更时填 []，不是 outputs 清单。每次工具执行后刷新；不要为凑清单重写文件。交付文件与真实测试仍须独立核验。',
+      } } : {}),
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
   async function mount(name, config) {

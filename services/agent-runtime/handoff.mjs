@@ -63,6 +63,7 @@ export class HandoffGate {
     return Error('HANDOFF_BLOCKED: ' + taskId + ': ' + message);
   }
   key(taskId, attemptId) { return taskId + ':' + attemptId; }
+  observedChangedPaths(taskId, attemptId) { return [...(this.writes.get(this.key(taskId, attemptId))?.keys() ?? [])].sort(); }
   begin(taskId, attemptId) {
     const task = this.tasks.get(taskId);
     if (!task) throw Error('UNAPPROVED_TASK: ' + taskId);
@@ -137,8 +138,8 @@ export class HandoffGate {
     const acceptanceChecks = assertAcceptanceChecks(task, observed, revision);
     const employeeReport = createHandoffReport(task, update);
     if (['implementation', 'repair'].includes(task.kind)) {
-      const actual = [...(this.writes.get(key)?.keys() ?? [])].sort();
-      if (JSON.stringify([...(update.changedPaths ?? [])].sort()) !== JSON.stringify(actual)) throw Error('CHANGED_PATHS_MISMATCH: 必须提交实际修改的路径');
+      const actual = this.observedChangedPaths(taskId, attemptId);
+      if (JSON.stringify([...(update.changedPaths ?? [])].sort()) !== JSON.stringify(actual)) throw Error('CHANGED_PATHS_MISMATCH: 当前 attempt 的宿主观察为 changedPaths='+JSON.stringify(actual)+'；恢复或仅读取的旧文件不算本轮修改，交付文件由 outputs 独立核验。请修正清单，不要为通过校验而重写文件。');
     }
     return { taskId, attemptId, runId: this.archive.id, workspaceRevision: revision, inputs: this.bindings.get(key) ?? [], outputs, commands: observed,
       ...(employeeReport ? { employeeReport } : {}),
