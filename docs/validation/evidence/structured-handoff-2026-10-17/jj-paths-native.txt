@@ -1,0 +1,48 @@
+✔ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (170.13194ms)
+✔ production Host detects the last task call and seals the native assigned attempt (172.133334ms)
+✔ production Host detects the last project call and seals the native assigned attempt (131.897499ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (42.341477ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (38.889775ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (41.682386ms)
+✔ a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own (78.704362ms)
+✔ production Host legacy handoff retains native attempt checks and bounded correction (153.057725ms)
+✔ production Host structured handoff retains native attempt checks and bounded correction (157.997885ms)
+✔ production Host exhaust handoff retains native attempt checks and bounded correction (128.563605ms)
+✔ malformed handoff JSON is rejected with actionable diagnostics before reaching the coordinator (36.438733ms)
+✔ employee report is structured in its schema and serialized once before native validation (48.705653ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (8.757325ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (2.109625ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (3.491483ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (2.649214ms)
+✔ restored outputs are not current-attempt changes and mismatches report the exact observed paths (3.924625ms)
+✔ host file checks reject linked directories before reading their contents (1.235252ms)
+✔ host file checks reject binary content declared as text (0.988366ms)
+✔ optimistic writes reject a second editor using the same observed hash (1.457685ms)
+✔ native quality contracts receive actual file and command evidence before independent review (430.421636ms)
+✔ native resumed implementation can seal existing outputs with observed empty changes and a fresh check (221.955544ms)
+✔ native DSH tool accepts contracted employee report and passes its seal to independent reviewer (236.557149ms)
+✔ native three-stage handoff does not inject indirect reports through assignment messages (330.087177ms)
+✔ model claims of a passed command cannot unlock native quality work (157.006161ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (157.813447ms)
+✔ review revision cannot create an unapproved automatic repair graph (211.570975ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (226.255618ms)
+✔ a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate (210.353307ms)
+✔ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (311.111499ms)
+✔ source checkpoint retains durable admission call provenance while old inherited snapshots keep the wire basis (1.49019ms)
+✔ actual Node test child output yields pass/fail/skip counts and hashes without exposing any terminal body (243.661675ms)
+✔ partial, conflicting, multi-command or repeated Node summaries cannot become verified counts (0.747657ms)
+✔ operation metadata requires one exact completed run/call/attempt/approval chain and never uses a returned claimed ID (6.621891ms)
+✔ downstream evidence is limited to committed ancestors and keeps raw private fields and model claims out (11.472318ms)
+✔ recovery seals the actual latest host budget and separates inherited unknown holds from recorded fee; old missing records stay unknown (5.890438ms)
+✔ compact product mapping changes only duplicated description while generic mapping and immutable contracts retain their complete hashes (3.134834ms)
+✔ compact mapping fails closed without a verified host context instead of producing placeholder contracts (0.993554ms)
+✔ generic native host cannot opt into context-backed descriptions or dispatch before failed assertion (81.582533ms)
+✔ native restored task claim retains canonical file hashes and quality fields without replaying the completed producer or repeating requirement in its receipt (265.096602ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2754.290812

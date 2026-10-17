@@ -4,7 +4,7 @@
 
 ## 本轮结果
 
-代码已修复并发布 JJ。本页记录首次代码发布阶段，当时付费模型请求0；用户随后批准的真实续验已运行并失败，当前结果见 [真实续验报告](structured-handoff-real-continuation-2026-10-17.md)。旧费用、权限和员工产物保留。
+代码已修复并发布 JJ。本页记录首次代码发布阶段，当时付费模型请求0；之后一轮失败的历史见 [失败续验报告](structured-handoff-real-continuation-2026-10-17.md)，再次授权后的真实开发→QA→经理与服务重启恢复已通过，当前结果见 [成功验收报告](restored-handoff-continuation-2026-10-17.md)。旧费用、权限和员工产物保留。
 
 - 员工原生更新工具增加 `report` 对象（summary/sections/risks），沿用已安装 Zod 验证。程序在员工到协调器边界将其序列化成原生 output 字符串，保留 DSH AgentTeams 身份、attempt、状态、文件和测试证据门禁。
 - report/output 同时出现会被拒绝；旧 output 字符串继续支持，原存储及恢复格式不变。

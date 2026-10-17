@@ -1,0 +1,32 @@
+{
+  "after-restart:accept": {
+    "calls": 4,
+    "inputTokens": 64043,
+    "outputTokens": 1973,
+    "cost": "0.021580499999999999"
+  },
+  "after-restart:verify": {
+    "calls": 6,
+    "inputTokens": 88707,
+    "outputTokens": 3176,
+    "cost": "0.030423299999999999"
+  },
+  "before-restart:verify": {
+    "calls": 4,
+    "inputTokens": 53108,
+    "outputTokens": 1570,
+    "cost": "0.0178164000000000004"
+  },
+  "before-restart:develop": {
+    "calls": 4,
+    "inputTokens": 48012,
+    "outputTokens": 1624,
+    "cost": "0.016352399999999999"
+  },
+  "planning": {
+    "calls": 1,
+    "inputTokens": 1844,
+    "outputTokens": 129,
+    "cost": "0.0007079999999999999"
+  }
+}

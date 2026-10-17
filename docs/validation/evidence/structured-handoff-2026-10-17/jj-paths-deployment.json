@@ -1,5 +1,4 @@
 {
-  "captureSource": "successful deploy.py apply stdout returned through SSH tool before subsequent log-download timeout",
   "passed": true,
   "release": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-paths-20261017",
   "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-structured-handoff-20261017",
@@ -14,15 +13,5 @@
     "occupied": 2.7112053
   },
   "modelCalls": 0,
-  "checkedAt": "2026-10-17T08:10:05.153135+00:00",
-  "verificationCommand": "python3 /home/jj/.local/share/weiwu/validation/handoff-paths-20261017/deploy.py prepare",
-  "verificationResult": {
-    "prepared": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-paths-20261017",
-    "passed": true,
-    "modelCalls": 0
-  },
-  "detailedLogsDownloaded": false,
-  "logDownloadFailure": "SSH stdin collector timed out after 45s; SFTP fallback: connect to host 100.90.190.33 port 22: Connection timed out",
-  "detailedLogDirectory": "/home/jj/.local/share/weiwu/validation/handoff-paths-20261017",
-  "postTimeoutAvailability": "not verified"
+  "checkedAt": "2026-10-17T08:10:05.153135+00:00"
 }
