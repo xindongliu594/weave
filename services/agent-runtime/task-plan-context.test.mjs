@@ -118,9 +118,12 @@ test('native restored task claim retains canonical file hashes and quality field
     host.bindTaskMapping(created.tasks, created.team_id); await host.restoreCheckpoints(created.tasks);
     await host.call(captain, 'agent_teams_approve', { confirmation: 'Only local native contract regression' }); host.lockPlan();
     const deadline = Date.now() + 4000;
-    while (Date.now() < deadline && requests.filter(item => item.current?.task?.id === 'qa').length < 2) await new Promise(resolve => setTimeout(resolve, 20));
+    // Plain text intentionally leaves the node open: wait for the one existing
+    // handoff reminder instead of racing the loop between requests two and three.
+    while (Date.now() < deadline && requests.filter(item => item.current?.task?.id === 'qa').length < 3) await new Promise(resolve => setTimeout(resolve, 20));
     const qaRequests = requests.filter(item => item.current?.task?.id === 'qa');
-    assert.equal(qaRequests.length, 2); assert.ok(!requests.some(item => item.current?.task?.id === 'dev'), 'completed producer is not dispatched again');
+    await host.ctx.agents.get(qaRequests[0]?.options.sessionId)?.whenIdle();
+    assert.equal(qaRequests.length, 3); assert.ok(!requests.some(item => item.current?.task?.id === 'dev'), 'completed producer is not dispatched again');
     assert.equal(claims.length, 1); assert.equal(claims[0].isError, false);
     const details = claims[0].value.task_details;
     assert.ok(!details.includes(marker)); assert.ok(details.includes('department:approved-context'));

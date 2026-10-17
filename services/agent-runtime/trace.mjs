@@ -78,5 +78,14 @@ export function attachTrace(ctx, archive,taskFor,internalStatusPoll=()=>false) {
       throw error;
     } finally { if(requests.get(options.sessionId)===ref)requests.delete(options.sessionId); }
   }));
-  return { check, sessionCreated, sessionRecord, request(sessionId) { return requests.get(sessionId); }, dispose() { for (const dispose of disposers.reverse()) dispose(); } };
+  return { check, sessionCreated, sessionRecord,
+    localToolFailure(exec, result) {
+      check();
+      // A rejected employee argument never reaches the coordinator hooks. Record
+      // that rejection once using the trusted request link, not its claimed IDs.
+      const ref = { sessionId: exec.agent?.id, callId: exec.callId, ...links.get(exec.agent?.id) };
+      write('tool/start', { name: exec.name, arguments: exec.arguments, boundary: 'employee' }, ref);
+      write('tool/result', { name: exec.name, result, boundary: 'employee' }, ref);
+    },
+    request(sessionId) { return requests.get(sessionId); }, dispose() { for (const dispose of disposers.reverse()) dispose(); } };
 }

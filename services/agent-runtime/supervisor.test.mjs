@@ -39,6 +39,14 @@ test('same error and nonzero command exits are detected, successful changed file
   s.action('terminal_test',{command:'check'},{value:{exitCode:1}});s.action('terminal_test',{command:'check'},{value:{exitCode:1}});
   assert.throws(()=>s.supervisor.check(),/REPEATED_ERROR/);
 });
+
+test('different handoff format diagnostics share the existing consecutive retry limit',()=>{
+ const s=setup({repeatErrorLimit:3});
+ for(const message of ['HANDOFF_ARGUMENTS_JSON: position 12','HANDOFF_REPORT_FIELDS: report.summary','HANDOFF_REPORT_FIELDS: report.sections.usage'])
+  s.action('agent_teams_update_task',{}, {isError:true,error:{message,info:{code:'INVALID_ARGS'}}});
+ assert.throws(()=>s.supervisor.check(),/REPEATED_ERROR/);
+ assert.equal(s.events.filter(e=>e.type==='runtime/anomaly').length,1);
+});
 test('status with no attempt credential does not discard a known assignment; idle is per employee',()=>{
   const s=setup();s.supervisor.observe({type:'tool/start',sessionId:'s1',taskId:'t1',callId:'c',data:{name:'agent_teams_claim_task',arguments:{task_id:'t1'}}});
   s.supervisor.observe({type:'tool/start',sessionId:'s1',taskId:'t999',attemptId:'forged',callId:'spoof',data:{name:'agent_teams_update_task',arguments:{task_id:'t999'}}});

@@ -8,6 +8,7 @@ import { PRODUCT_TOOL_NAMES } from './product-tools.mjs';
 import { installApprovedSkills } from './approved-skills.mjs';
 import { installEmployeeCapabilities } from './employee-capabilities.mjs';
 import { projectAssignmentReports, projectClaimReport } from './assignment-reports.mjs';
+import { employeeHandoffDefinition, nativeHandoffArguments } from './employee-handoff.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
@@ -99,17 +100,28 @@ export class EmployeeHostFactory {
           const position=/position (\d+)/i.exec(String(error.message))?.[1];
           if(position)location=`（字符位置 ${position}）`;
         }
-        throw new HarnessError(`HANDOFF_ARGUMENTS_JSON: 工具 arguments 必须是合法 JSON 对象${location}；检查多余括号、引号和逗号，不能使用 commandsRun? 等 TypeScript 写法。output 是 JSON 字符串，只有它需要内层转义；其余字段保持外层对象/数组。请缩短报告并依据已有真实证据重新提交。宿主不会自动修复或执行这次非法参数，也不会重跑文件或测试；纠正仍计入原调用次数和费用。`,'INVALID_ARGS');
+        throw new HarnessError(`HANDOFF_ARGUMENTS_JSON: 工具 arguments 必须是合法 JSON 对象${location}；检查多余括号、引号和逗号，不能使用 commandsRun? 等 TypeScript 写法。经理交接使用 report 对象，不转义为 output 字符串。请缩短报告并依据已有真实证据重新提交。宿主不会自动修复或执行这次非法参数，也不会重跑文件或测试；纠正仍计入原调用次数和费用。`,'INVALID_ARGS');
       });
       const concludesAcceptedTask = this.concludesAcceptedTask;
       const prepareToolArguments = this.prepareToolArguments;
+      const forwardedCalls = new Set();
+      if (this.protectedContext) ctx.on('tools/result', (exec, result) => {
+        const forwarded = forwardedCalls.delete(exec.callId);
+        if (!forwarded && exec.name === 'agent_teams_update_task' && result.isError)
+          this.trace?.localToolFailure(exec, result);
+      });
       const claimReport=(agent,value)=>this.protectedContext&&this.assignmentReports
         ? projectClaimReport(value,JSON.parse(this.protectedContext(agent)),this.assignmentReports(agent)):value;
       for (const schema of coordinator.tools.schemas()) {
         const definition = coordinator.tools.get(schema.name);
-        ctx.tools.register({ ...definition, async execute(args, exec) {
+        const structuredHandoff = this.protectedContext && schema.name === 'agent_teams_update_task';
+        const contextForHandoff = this.protectedContext;
+        ctx.tools.register({ ...(structuredHandoff ? employeeHandoffDefinition(definition) : definition), async execute(args, exec) {
           if (coordinator.agents.get(exec.agent?.id) !== exec.agent) throw Error('EMPLOYEE_NOT_LIVE');
-          const forwarded=prepareToolArguments?.(exec.agent,schema.name,args)??args;
+          const normalized = structuredHandoff && Object.hasOwn(args,'report')
+            ? nativeHandoffArguments(args, JSON.parse(contextForHandoff(exec.agent) || '{}').task) : args;
+          const forwarded=prepareToolArguments?.(exec.agent,schema.name,normalized)??normalized;
+          if (structuredHandoff) forwardedCalls.add(exec.callId);
           const result = await coordinator.tools.execute({ callId: exec.callId, name: schema.name, arguments: forwarded, agent: exec.agent, signal: exec.signal });
           if (result.isError) throw new HarnessError(result.error.message, result.error.info?.code ?? 'COORDINATOR_TOOL_FAILED');
           for (const context of result.additionalContexts ?? []) exec.deferContext(context);
@@ -160,7 +172,7 @@ export class EmployeeHostFactory {
           this.completionReminders.add(key);
           this.archive?.append('handoff/reminder', { ...work }, ref);
           event.agent.inject(createUserMessage({ content: [{ type: 'text', text:
-            `宿主尚未收到当前任务的正式交接，普通文字不能完成节点。不要重新认领或重复读取已有证据；继续核对仍缺的验收，然后调用 agent_teams_update_task，task_id=${work.runtimeTaskId}、attempt_id=${work.attemptId}，用output提交真实结果及合同必需证据。全部满足才提交status=completed；未满足则status=failed，按合同提交verdict与findings。不能编造通过、改目标或增加权限。此纠正仍计入原预算和调用次数；再次不交接将停止项目。` }],
+            `宿主尚未收到当前任务的正式交接，普通文字不能完成节点。不要重新认领或重复读取已有证据；继续核对仍缺的验收，然后调用 agent_teams_update_task，task_id=${work.runtimeTaskId}、attempt_id=${work.attemptId}，有经理交接合同时用report对象提交真实结果；旧任务仍可用output文本。全部满足才提交status=completed；未满足则status=failed，按合同提交verdict与findings。不能编造通过、改目标或增加权限。此纠正仍计入原预算和调用次数；再次不交接将停止项目。` }],
             source: { kind: 'plugin', plugin: 'weiwu-handoff', form: 'notice', summary: '当前任务缺少正式交接；一次纠正机会' } }));
         });
         if (this.protectedContext) agentCtx.on('agent/pre-step', async (event, next) => {

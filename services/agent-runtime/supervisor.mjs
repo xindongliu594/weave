@@ -85,7 +85,13 @@ export class RuntimeSupervisor {
     const failed = result?.isError || Number(result?.value?.exitCode ?? 0) !== 0;
     const key = digest({ name, args, result });
     item.actions.push(key); if (item.actions.length > this.actionLimit * 3) item.actions.shift();
-    if (failed) { const errorKey = digest({ name, error: result?.error ?? result?.value?.exitCode }); item.errors = item.errorKey === errorKey ? item.errors + 1 : 1; item.errorKey = errorKey; }
+    if (failed) {
+      // Positions/field paths vary during repair; they are still the same bounded format-error family.
+      const formatError = name === 'agent_teams_update_task' && result?.error?.info?.code === 'INVALID_ARGS' &&
+        /^HANDOFF_(ARGUMENTS_JSON|REPORT_FIELDS):/.test(result.error.message ?? '');
+      const errorKey = digest({ name, error: formatError ? 'HANDOFF_FORMAT' : result?.error ?? result?.value?.exitCode });
+      item.errors = item.errorKey === errorKey ? item.errors + 1 : 1; item.errorKey = errorKey;
+    }
     else { item.errors = 0; item.errorKey = undefined; }
     if (item.errors >= this.errorLimit) this.fail(item, 'REPEATED_ERROR', `同类工具错误连续出现 ${item.errors} 次`);
     else if (item.actions.filter(value => value === key).length >= this.actionLimit) this.fail(item, 'REPEATED_ACTION', `相同动作与结果重复 ${this.actionLimit} 次，期间未观察到有效进展`);

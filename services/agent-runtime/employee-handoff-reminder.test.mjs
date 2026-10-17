@@ -13,6 +13,7 @@ import { createRunArchive, readRun } from './trace-store.mjs';
 import { stageApprovedTeam, teamTaskPlan } from './handoff.mjs';
 import { Semaphore } from './limits.mjs';
 import { ExecutionBudget } from './budget.mjs';
+import { RuntimeSupervisor } from './supervisor.mjs';
 
 const reply = text => [
   { type: 'block-start', index: 0, blockType: 'text' },
@@ -138,11 +139,18 @@ test('a cold EmployeeHost resume retains the same-attempt reminder and a new att
   assert.deepEqual(events.filter(e=>e.type==='handoff/reminder').map(e=>e.data.attemptId),['fixed-attempt','new-attempt']);
 });
 
-test('the production Host reminder accepts only the real native handoff and excludes the captain', { timeout: 15000 }, async t => {
+for (const mode of ['legacy', 'structured', 'exhaust']) test(`production Host ${mode} handoff retains native attempt checks and bounded correction`, { timeout: 15000 }, async t => {
+  const structured = mode !== 'legacy', exhaust = mode === 'exhaust';
   const root = await mkdtemp(join(tmpdir(), 'native-handoff-reminder-'));
   const snapshot = { tasks: [{ id: 'qa', kind: 'work', subject: 'protocol regression only', assignee: 'qa', dependencies: [], inputs: [], outputs: [] }],
     agents: [{ id: 'manager', role: 'manager', modelId: 'manager', tools: [] }, { id: 'qa', role: 'member', modelId: 'qa', tools: [] }] };
+  if (structured) snapshot.tasks[0].handoff = { sections: [{key:'result',requirement:'如实交接测试结果'}] };
+  const report = {summary:'协议回归，不是真实模型验收',sections:{result:'引号 " 与换行\n完整保存'},risks:[]};
+  const maxCalls = structured ? 5 : 4;
   const archiveRoot = join(root, 'runs'), archive = createRunArchive(archiveRoot, snapshot);
+  const supervisor = new RuntimeSupervisor({archive,policy:{repeatErrorLimit:3}});
+  const append = archive.append.bind(archive);
+  archive.append = (...args) => { const event = append(...args); if (event) supervisor.observe(event); return event; };
   const artifacts = join(root, 'artifacts'); await mkdir(artifacts);
   const requests = [];
   const adapter = new class extends LlmAdapter {
@@ -152,37 +160,58 @@ test('the production Host reminder accepts only the real native handoff and excl
       const id = /Task: (t\d+)/.exec(assignment)?.[1], attempt = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
       if (options.model !== 'qa') { yield* reply('Coordination fixture'); return; }
       const step = requests.filter(r => r.model === 'qa').length;
-      assert.ok(step <= 4, 'the protocol fixture must not retry a rejected handoff');
-      if (step === 3) { yield* reply('Plain final text cannot seal a task.'); return; }
+      assert.ok(step <= maxCalls, 'the fixture must stop at the approved protocol boundary');
+      if (step === 3 && !structured) { yield* reply('Plain final text cannot seal a task.'); return; }
       const name = step === 1 ? 'agent_teams_claim_task' : 'agent_teams_update_task';
       const args = step === 1 ? { task_id: id } : { task_id: id, attempt_id: attempt, status: step === 2 ? 'in_progress' : 'completed', output: 'Protocol fixture handoff; no real model acceptance.' };
+      if (structured && step >= 3) {
+        delete args.output; args.report = step === 3 ? {...report,sections:{}} : report;
+        args.acceptanceResults = [];
+        if (step === 4) {
+          if (exhaust) args.report = {...report,summary:42};
+          else args.attempt_id = randomUUID();
+        }
+      }
       yield { type: 'block-start', index: 0, blockType: 'tool-call' };
-      yield { type: 'block-end', index: 0, block: { type: 'tool-call', id: randomUUID(), name, arguments: JSON.stringify(args) } };
+      yield { type: 'block-end', index: 0, block: { type: 'tool-call', id: randomUUID(), name, arguments: JSON.stringify(args) + (exhaust && step === 5 ? '}' : '') } };
       yield { type: 'finish', reason: { kind: 'tool-calls' } };
     }
   }();
   const host = await createTeamHost({ adapter, provider: 'fixture', archive, sessionRoot: join(root, 'sessions'),
-    product: { snapshot, sandbox: { root: artifacts, revision: () => 'fixture' }, gate: new Semaphore(1) } });
+    product: { snapshot, sandbox: { root: artifacts, revision: () => 'fixture' }, gate: new Semaphore(1), supervisor } });
   t.after(async () => { await host.close(); await rm(root, { recursive: true, force: true }); });
   const captain = await host.captain({ cwd: root, model: 'manager' });
   const created = await stageApprovedTeam(host, captain, { name: 'protocol-fixture', members: [{ name: 'qa', provider: 'fixture', model: 'qa' }], tasks: teamTaskPlan(snapshot.tasks) });
   host.bindTaskMapping(created.tasks, created.team_id);
   await host.call(captain, 'agent_teams_approve', { confirmation: 'Disposable protocol fixture only' });
   const deadline = Date.now() + 10000;
-  while (Date.now() < deadline && !readRun(archiveRoot, archive.id).events.some(e => e.type === 'handoff/accepted')) await new Promise(done => setTimeout(done, 25));
+  while (Date.now() < deadline && !supervisor.failure && !readRun(archiveRoot, archive.id).events.some(e => e.type === 'handoff/accepted')) await new Promise(done => setTimeout(done, 25));
   const events = readRun(archiveRoot, archive.id).events;
-  assert.equal(events.filter(e => e.type === 'handoff/reminder').length, 1);
+  if (exhaust) {
+    assert.equal(supervisor.failure?.code,'REPEATED_ERROR');
+    const rejected=events.filter(e=>e.type==='tool/result'&&e.data.boundary==='employee');
+    assert.equal(rejected.length,3);assert.equal(new Set(rejected.map(e=>e.callId)).size,3);
+    assert.equal(events.filter(e=>e.type==='handoff/accepted').length,0);
+    const worker=host.ctx.agents.get(rejected[0].sessionId);await worker?.whenIdle();
+    assert.equal(requests.filter(r=>r.model==='qa').length,5,'no model request admitted after third format error');
+    return;
+  }
+  assert.equal(events.filter(e => e.type === 'handoff/reminder').length, structured ? 0 : 1);
   assert.deepEqual(events.filter(e => e.type === 'handoff/accepted').map(e => e.data.taskId), ['qa'],
     JSON.stringify(events.filter(e => e.type === 'handoff/blocked' || e.type === 'model/error' || e.type === 'tool/result' && e.data.result.isError).slice(0, 3)));
-  const reminder = events.find(e => e.type === 'handoff/reminder').data;
   const seal = events.find(e => e.type === 'handoff/accepted').data;
-  assert.equal(reminder.attemptId, seal.attemptId);
-  const worker = host.ctx.agents.get(events.find(e => e.type === 'handoff/reminder').sessionId);
+  if (structured) {
+    assert.deepEqual(seal.employeeReport.sections, report.sections);
+    const errors=events.filter(e=>e.type==='tool/result'&&e.data.result.isError).map(e=>e.data.result.error.message).join('\n');
+    assert.match(errors,/report.sections.*result/);assert.match(errors,/attempt/i);
+    assert.equal(events.filter(e=>e.type==='artifact/updated'||e.type==='handoff/command-observed').length,0,'report correction never writes or runs tests');
+  } else assert.equal(events.find(e => e.type === 'handoff/reminder').data.attemptId, seal.attemptId);
+  const worker = host.ctx.agents.get(events.find(e => e.type === 'handoff/accepted').sessionId);
   await worker?.whenIdle(); // Linux may already have disposed the successfully concluded member.
-  assert.equal(requests.filter(r => r.model === 'qa').length, 4);
+  assert.equal(requests.filter(r => r.model === 'qa').length, maxCalls);
   captain.followup(createUserMessage({ content: [{ type: 'text', text: 'Only inspect fixture coordination.' }], source: { kind: 'user' } }));
   await captain.whenIdle();
-  assert.equal(readRun(archiveRoot, archive.id).events.filter(e => e.type === 'handoff/reminder').length, 1);
+  assert.equal(readRun(archiveRoot, archive.id).events.filter(e => e.type === 'handoff/reminder').length, structured ? 0 : 1);
 });
 
 
@@ -201,4 +230,34 @@ test('malformed handoff JSON is rejected with actionable diagnostics before reac
  assert.equal(forwarded,0,'malformed input must not reach the native task updater');
  const valid=await slot.ctx.tools.execute({callId:randomUUID(),name:'agent_teams_update_task',arguments:{task_id:'nonexistent',status:'in_progress'},agent:f.agent,signal:new AbortController().signal});
  assert.equal(forwarded,1,'valid objects retain native validation');assert.equal(valid.isError,true);assert.doesNotMatch(valid.error.message,/HANDOFF_ARGUMENTS_JSON/);
+});
+
+test('employee report is structured in its schema and serialized once before native validation',async t=>{
+ const f=await fixture(t,()=>undefined,()=>reply('Protocol fixture only.'),undefined,()=> '{}');
+ const slot=[...f.factory.live.values()][0], forwarded=[];
+ const schema=slot.ctx.tools.schemas().find(s=>s.name==='agent_teams_update_task');
+ assert.equal(schema.parameters.properties.report?.type,'object');
+ assert.equal(f.host.ctx.tools.schemas().find(s=>s.name===schema.name).parameters.properties.report,undefined,'coordinator native schema stays unchanged');
+ f.host.ctx.on('tools/execute',async(exec,next)=>{if(exec.name===schema.name)forwarded.push(exec.arguments);return next();});
+ const report={summary:'引用 "测试" 和 \\ 路径',sections:{usage:'第一行\n第二行 😀'},risks:[]};
+ const args={task_id:'nonexistent',status:'completed',report};
+ const result=await slot.ctx.tools.execute({callId:randomUUID(),name:schema.name,arguments:args,agent:f.agent,signal:new AbortController().signal});
+ assert.equal(result.isError,true,'native task identity still rejects nonexistent work');
+ assert.equal(forwarded.length,1);assert.equal(forwarded[0].report,undefined);
+ assert.deepEqual(JSON.parse(forwarded[0].output),report);assert.deepEqual(args.report,report);assert.equal(args.output,undefined);
+ for(const invalid of [
+  {...args,output:'conflicting PRIVATE_MARKER'},
+  {...args,report:{...report,summary:42}},
+  {...args,report:{...report,sections:{usage:42}}},
+  {...args,report:{...report,risks:'PRIVATE_MARKER'}},
+  {...args,report:{...report,extra:'PRIVATE_MARKER'}},
+ ]){
+  const rejected=await slot.ctx.tools.execute({callId:randomUUID(),name:schema.name,arguments:invalid,agent:f.agent,signal:new AbortController().signal});
+  assert.equal(rejected.isError,true);assert.equal(rejected.error.info.code,'INVALID_ARGS');
+  assert.match(rejected.error.message,/HANDOFF_REPORT_FIELDS/);assert.doesNotMatch(rejected.error.message,/PRIVATE_MARKER/);
+ }
+ assert.equal(forwarded.length,1,'invalid reports cannot mutate native state');
+ const legacy={task_id:'nonexistent',status:'failed',output:'legacy text'};
+ await slot.ctx.tools.execute({callId:randomUUID(),name:schema.name,arguments:legacy,agent:f.agent,signal:new AbortController().signal});
+ assert.deepEqual(forwarded[1],legacy);
 });

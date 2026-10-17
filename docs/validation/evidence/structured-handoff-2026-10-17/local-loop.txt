@@ -1,0 +1,20 @@
+✔ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (288.1155ms)
+✔ production Host detects the last task call and seals the native assigned attempt (519.9578ms)
+✔ production Host detects the last project call and seals the native assigned attempt (391.9028ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (107.2203ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (96.5667ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (102.2804ms)
+✔ a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own (184.074ms)
+✔ production Host legacy handoff retains native attempt checks and bounded correction (560.9789ms)
+✔ production Host structured handoff retains native attempt checks and bounded correction (705.2504ms)
+✔ production Host exhaust handoff retains native attempt checks and bounded correction (718.8548ms)
+✔ malformed handoff JSON is rejected with actionable diagnostics before reaching the coordinator (152.8412ms)
+✔ employee report is structured in its schema and serialized once before native validation (146.6635ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4480.3645

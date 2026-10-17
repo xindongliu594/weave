@@ -1,0 +1,30 @@
+{
+  "kind": "read-only-lower-bound-not-an-approval",
+  "contextBytes": 96000,
+  "projectCap": 0.3,
+  "tasks": [
+    {
+      "taskId": "develop",
+      "plannedNextCalls": 3,
+      "requestReservationUSD": 0.040999799999999996,
+      "archivedOverheadBytes": 6874,
+      "reservationSubtotalUSD": 0.12299939999999998
+    },
+    {
+      "taskId": "verify",
+      "plannedNextCalls": 6,
+      "requestReservationUSD": 0.0389415,
+      "archivedOverheadBytes": null,
+      "reservationSubtotalUSD": 0.233649
+    },
+    {
+      "taskId": "accept",
+      "plannedNextCalls": 4,
+      "requestReservationUSD": 0.0389415,
+      "archivedOverheadBytes": null,
+      "reservationSubtotalUSD": 0.155766
+    }
+  ],
+  "minimumWithRecordedCostsUSD": 0.5565827999999999,
+  "note": "Unstarted QA/manager use fallback overhead 13; actual schema overhead and separate resource-planning cost may increase the minimum. No proposal or resume sent."
+}

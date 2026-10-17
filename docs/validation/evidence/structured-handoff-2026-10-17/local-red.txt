@@ -1,0 +1,56 @@
+✔ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (311.37ms)
+✔ production Host detects the last task call and seals the native assigned attempt (502.464ms)
+✔ production Host detects the last project call and seals the native assigned attempt (396.1825ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (104.86ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (95.59ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (102.105ms)
+✔ a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own (185.4176ms)
+✔ the production Host reminder accepts only the real native handoff and excludes the captain (552.9405ms)
+✔ malformed handoff JSON is rejected with actionable diagnostics before reaching the coordinator (97.5606ms)
+✖ employee report is structured in its schema and serialized once before native validation (103.6984ms)
+✔ approval, model and capacity waits pause progress time without hiding later stalls (4.1209ms)
+✔ coordinator polling and untrusted text do not reset evidence-based progress (0.4981ms)
+✔ identical and alternating read loops stop before another request can be admitted (0.7637ms)
+✔ same error and nonzero command exits are detected, successful changed files reset the window (2.6917ms)
+✖ different handoff format diagnostics share the existing consecutive retry limit (1.7843ms)
+✔ status with no attempt credential does not discard a known assignment; idle is per employee (0.8626ms)
+✔ idle employees wait for an active coordinator response and receive a full idle window afterward (0.8579ms)
+✔ coordinator model waits cannot hide the approved progress timeout or arbitrary polling (0.8667ms)
+✔ a coordinator handling a real tool reply is distinguished from idle polling (0.882ms)
+✔ transient read retry is bounded and cancellation/mutations never replay (2.1093ms)
+✔ waiting for approval is safe; a started mutation without an outcome requires reconciliation (1.7301ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 19
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2860.3066
+
+✖ failing tests:
+
+test at services\agent-runtime\employee-handoff-reminder.test.mjs:206:1
+✖ employee report is structured in its schema and serialized once before native validation (103.6984ms)
+  TypeError: Cannot read properties of undefined (reading 'type')
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/employee-handoff-reminder.test.mjs:210:51)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\supervisor.test.mjs:43:1
+✖ different handoff format diagnostics share the existing consecutive retry limit (1.7843ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/supervisor.test.mjs:47:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /REPEATED_ERROR/,
+    operator: 'throws',
+    diff: 'simple'
+  }
