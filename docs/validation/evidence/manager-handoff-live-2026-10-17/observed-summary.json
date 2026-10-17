@@ -1,0 +1,38 @@
+{
+  "provenance": "Transcribed from successful command responses in this session; remote raw evidence download subsequently failed with SSH timeout. This is a summary, not a downloaded raw trace.",
+  "projectId": "cb8bf583-4356-4b35-bbc7-3e92e9f186bf",
+  "runId": "0add16b9-5ac1-44a9-8506-d32c175ac819",
+  "status": "failed",
+  "failure": "REPEATED_ERROR after three malformed agent_teams_update_task arguments",
+  "planningCalls": 3,
+  "employeeCalls": 7,
+  "projectRecordedUSD": 0.0441684,
+  "newUnknownReceipts": 0,
+  "qaExecuted": false,
+  "managerAcceptanceExecuted": false,
+  "controlledRecoveryVerified": false,
+  "readOnlyRecovery": {
+    "resumeAllowed": true,
+    "nativeRequestChecked": false,
+    "developerCallsUsed": 7,
+    "developerCallsAllocated": 8,
+    "resumeStarted": false
+  },
+  "deployment": {
+    "passed": true,
+    "release": "/home/jj/.local/share/weiwu/releases/weiwu-handoff-json-20261017",
+    "priorRelease": "/home/jj/.local/share/weiwu/releases/weiwu-manager-handoff-20261015",
+    "checkedAt": "2026-10-17T07:00:03.341729+00:00",
+    "modelCalls": 0,
+    "historicalState": {
+      "runCount": 52,
+      "usageCount": 588,
+      "usageSHA": "0243fde59724e88c608b616d9de7d524fb41c523220d2173d6fdd5dc60900b2f",
+      "holdsSHA": "526cedec4c3dfc4e5e3aee88beeda6721c88718ac14a5aa6dcab7d8a5cada2c4",
+      "liveTestRunSHA": "967caadde1720734f5bf788f710dfa268d2cf8d7d10d17f4be7e2cdbcb104eaa",
+      "sourceRunSHA": "5376d41fa802b1de5449b5625dce9f6f6869e8e1f625cbfd3fb9b659f3aa0eea",
+      "deliverySHA": "6b14ce351d6cce8914ba4df3b7e7d9dd1942292771536fb9ac462cf4efd1ec40",
+      "occupied": 2.6947035
+    }
+  }
+}

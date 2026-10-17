@@ -20,7 +20,7 @@ const reply = text => [
   { type: 'finish', reason: { kind: 'stop' } },
 ];
 const task = { taskId: 'approved-qa', runtimeTaskId: 't2', attemptId: 'fixed-attempt' };
-async function fixture(t, pending, stream, handoffClosure) {
+async function fixture(t, pending, stream, handoffClosure, protectedContext) {
   const root = await mkdtemp(join(tmpdir(), 'handoff-reminder-'));
   const requests = [], blocked = [];
   const adapter = new class extends LlmAdapter {
@@ -30,7 +30,7 @@ async function fixture(t, pending, stream, handoffClosure) {
   const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions') });
   const require = createRequire(import.meta.url), baseRequire = createRequire(require.resolve('@deepseek-ai/dsh-base/package.json'));
   const factory = new EmployeeHostFactory({ coordinator: host.ctx, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
-    pendingCompletion: pending, handoffClosure, onIncompleteCompletion: error => blocked.push(error),
+    pendingCompletion: pending, handoffClosure, protectedContext, onIncompleteCompletion: error => blocked.push(error),
     loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
   t.after(async () => { await factory.close(); await host.close(); await rm(root, { recursive: true, force: true }); });
   const handle = await factory.createAgent(host.ctx, { sessionId: randomUUID(), meta: { cwd: root }, agentOptions: { provider: 'fixture', model: 'fixture' } });
@@ -183,4 +183,22 @@ test('the production Host reminder accepts only the real native handoff and excl
   captain.followup(createUserMessage({ content: [{ type: 'text', text: 'Only inspect fixture coordination.' }], source: { kind: 'user' } }));
   await captain.whenIdle();
   assert.equal(readRun(archiveRoot, archive.id).events.filter(e => e.type === 'handoff/reminder').length, 1);
+});
+
+
+test('malformed handoff JSON is rejected with actionable diagnostics before reaching the coordinator',async t=>{
+ const f=await fixture(t,()=>undefined,()=>reply('Protocol fixture only.'),undefined,()=> '{}');
+ const slot=[...f.factory.live.values()][0];let forwarded=0;
+ f.host.ctx.on('tools/execute',async(exec,next)=>{if(exec.name==='agent_teams_update_task')forwarded++;return next();});
+ for(const args of ['{"task_id":"t1","output":"PRIVATE_MARKER"}}','{"commandsRun"?:null}',null,[],42,'"PRIVATE_MARKER"']){
+  const result=await slot.ctx.tools.execute({callId:randomUUID(),name:'agent_teams_update_task',arguments:args,agent:f.agent,signal:new AbortController().signal});
+  assert.equal(result.isError,true);assert.equal(result.error.info.code,'INVALID_ARGS');
+  assert.match(result.error.message,/HANDOFF_ARGUMENTS_JSON/);
+  assert.match(result.error.message,/不会自动修复/);assert.match(result.error.message,/output/);
+  assert.doesNotMatch(result.error.message,/PRIVATE_MARKER/);
+  if(typeof args==='string'&&args.startsWith('{'))assert.match(result.error.message,/位置 \d+/);
+ }
+ assert.equal(forwarded,0,'malformed input must not reach the native task updater');
+ const valid=await slot.ctx.tools.execute({callId:randomUUID(),name:'agent_teams_update_task',arguments:{task_id:'nonexistent',status:'in_progress'},agent:f.agent,signal:new AbortController().signal});
+ assert.equal(forwarded,1,'valid objects retain native validation');assert.equal(valid.isError,true);assert.doesNotMatch(valid.error.message,/HANDOFF_ARGUMENTS_JSON/);
 });

@@ -1,0 +1,31 @@
+✔ projection removes only the exact bound native segment; identity, raw user data and legacy behavior stay intact (3.936ms)
+✔ the last-call native pre-step notice runs before dispatch and unsealed text stops without another request (317.1434ms)
+✔ production Host detects the last task call and seals the native assigned attempt (530.1609ms)
+✔ production Host detects the last project call and seals the native assigned attempt (404.5402ms)
+✔ a plain final answer gets one native same-attempt handoff reminder, never automatic success (103.1582ms)
+✔ a sealed or unassigned task ends normally without a reminder or another request (95.0587ms)
+✔ the reminder stops when the same task becomes sealed; no third model request follows (105.1671ms)
+✔ a cold EmployeeHost resume retains the same-attempt reminder and a new attempt gets its own (189.0528ms)
+✔ the production Host reminder accepts only the real native handoff and excludes the captain (562.5415ms)
+✔ malformed handoff JSON is rejected with actionable diagnostics before reaching the coordinator (99.8184ms)
+✔ manager contract rejects missing, oversized or incomplete reports and failed acceptance (22.858ms)
+✔ sealed report is separate from host evidence; only direct completed predecessors enter recipient context (10.171ms)
+✔ report never replaces real file validation and legacy contracts remain compatible (4.2549ms)
+✔ identical criterion text is matched by contract order rather than becoming impossible to submit (5.2592ms)
+✔ native quality contracts receive actual file and command evidence before independent review (1493.8939ms)
+✔ native DSH tool accepts contracted employee report and passes its seal to independent reviewer (1215.8182ms)
+✔ native three-stage handoff does not inject indirect reports through assignment messages (1590.8534ms)
+✔ model claims of a passed command cannot unlock native quality work (880.5934ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (875.2505ms)
+✔ review revision cannot create an unapproved automatic repair graph (1207.5999ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (1136.9765ms)
+✔ a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate (1182.4737ms)
+✔ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (1383.7418ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11433.8265

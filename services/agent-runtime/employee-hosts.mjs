@@ -89,6 +89,18 @@ export class EmployeeHostFactory {
       if (this.context) await installEmployeeContext(ctx, mount, { ...this.context, archive: this.archive });
       if (this.protectedContext) ctx.systemPrompt.context({ name: 'department:approved-context', order: 119,
         text: context => this.protectedContext(context.agent) });
+      // DSH preserves invalid model JSON as text. Keep rejecting it, but explain
+      // the actual syntax problem before the native object-schema error hides it.
+      if(this.protectedContext)ctx.on('tools/execute',async(exec,next)=>{
+        if(exec.name!=='agent_teams_update_task'||exec.arguments&&typeof exec.arguments==='object'&&!Array.isArray(exec.arguments))return next();
+        let location='';
+        if(typeof exec.arguments==='string')try{JSON.parse(exec.arguments);}catch(error){
+          // Never echo provider text or a parser excerpt containing private data.
+          const position=/position (\d+)/i.exec(String(error.message))?.[1];
+          if(position)location=`（字符位置 ${position}）`;
+        }
+        throw new HarnessError(`HANDOFF_ARGUMENTS_JSON: 工具 arguments 必须是合法 JSON 对象${location}；检查多余括号、引号和逗号，不能使用 commandsRun? 等 TypeScript 写法。output 是 JSON 字符串，只有它需要内层转义；其余字段保持外层对象/数组。请缩短报告并依据已有真实证据重新提交。宿主不会自动修复或执行这次非法参数，也不会重跑文件或测试；纠正仍计入原调用次数和费用。`,'INVALID_ARGS');
+      });
       const concludesAcceptedTask = this.concludesAcceptedTask;
       const prepareToolArguments = this.prepareToolArguments;
       const claimReport=(agent,value)=>this.protectedContext&&this.assignmentReports

@@ -57,5 +57,5 @@ export function assertHandoffReport(task, report) {
 }
 export function handoffReportGuidance(task) {
   if (!task?.handoff) return undefined;
-  return '经理已在任务 handoff.sections 中定义交接必答项。使用 agent_teams_update_task 的 output 字符串提交 JSON：{summary:"简短结论",sections:{章节key:"对应内容"},risks:[]}，不加 Markdown 围栏。逐项回答全部章节，合计最多20000字节；summary最多1000字符，章节各最多2000字符。验收结果另填原生 acceptanceResults（criterion逐字对应acceptanceCriteria、status、evidence）。文件和真实测试由宿主独立核验，不能以报告代替；仅全部满足才completed。未完成用failed并如实说明问题，不伪造通过。仅共享派工所需结论，不复制私有资料或完整日志；下游按原权限读取证据。';
+  return '经理已在任务 handoff.sections 中定义交接必答项。使用 agent_teams_update_task 的 output 字符串提交 JSON：{"summary":"简短结论","sections":{"章节key":"对应内容"},"risks":[]}，不加 Markdown 围栏。逐项回答全部章节，合计最多20000字节；summary最多1000字符，章节各最多2000字符。验收结果另填原生 acceptanceResults（criterion逐字对应acceptanceCriteria、status、evidence）。文件和真实测试由宿主独立核验，不能以报告代替；仅全部满足才completed。未完成用failed并如实说明问题，不伪造通过。仅共享派工所需结论，不复制私有资料或完整日志；下游按原权限读取证据。';
 }
