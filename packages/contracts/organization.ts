@@ -1,6 +1,17 @@
 import { z } from 'zod';
 import { departmentSchema, taskSchema, type DepartmentInput, type Plan } from './index.ts';
+import {orchestrationSchema,deliveryCriterionSchema} from './orchestration.ts';
 export const organizationCandidateSchema=z.object({department:departmentSchema,rationale:z.string().trim().min(1).max(5000),tasks:z.array(taskSchema).min(1).max(50)});
+export const organizationCandidateV2Schema=z.object({
+ schemaVersion:z.literal(2),
+ target:z.discriminatedUnion('kind',[
+  z.object({kind:z.literal('existing'),departmentId:z.string().min(1).max(100),departmentVersion:z.number().int().positive(),primaryAgentIds:z.array(z.string().min(1).max(180)).min(1).max(6),collaboratingAgents:z.array(z.object({departmentId:z.string().min(1).max(100),departmentVersion:z.number().int().positive(),agentId:z.string().min(1).max(180)}).strict()).max(5)}).strict(),
+  z.object({kind:z.literal('new'),department:departmentSchema}).strict(),
+ ]),
+ rationale:z.string().trim().min(1).max(5000),tasks:z.array(taskSchema).min(1).max(50),
+ orchestration:orchestrationSchema,deliveryCriteria:z.array(deliveryCriterionSchema).min(1).max(50),
+}).strict();
+export type OrganizationCandidateV2=z.infer<typeof organizationCandidateV2Schema>;
 /** A reviewable template DAG; it is not presented as model planning. */
 export function templatePlan(department:DepartmentInput,requirement:string):Plan {
  const manager=department.agents.find(a=>a.role==='manager')!;
