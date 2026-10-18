@@ -1,0 +1,71 @@
+✔ empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success (64.439ms)
+✖ a timeout while receiving a successful response body remains a read timeout, not invalid JSON (6.6613ms)
+✖ explicitly cancelled body reads preserve cancellation and failed writes remain uncertain (1.9296ms)
+✔ planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431 (1.8036ms)
+✔ a mutation retains its original key and is never retried after an empty503 response or network loss (1.3821ms)
+✔ real generation precheck/onSubmit preserves the original pending key and parameters on empty or malformed HTTP200 (2.9457ms)
+✔ organization response failures retain the same persisted pending identity unless a structured HTTP refusal is confirmed (2.0961ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1890.6673
+
+✖ failing tests:
+
+test at tests\api-response.test.ts:1:1417
+✖ a timeout while receiving a successful response body remains a read timeout, not invalid JSON (6.6613ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: 服务返回 HTTP 200，响应为空或不是有效 JSON；请查看当前状态。
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api-response.test.ts:21:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: 服务返回 HTTP 200，响应为空或不是有效 JSON；请查看当前状态。
+        at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\api.ts:8:11)
+        at readApiResponse (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\api.ts:12:16)
+        at async api (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\api.ts:28:12)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api-response.test.ts:21:3)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:831:7),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\api-response.test.ts:1:1941
+✖ explicitly cancelled body reads preserve cancellation and failed writes remain uncertain (1.9296ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   name: 'Error'
+  -   name: 'AbortError'
+    }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api-response.test.ts:29:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: 服务返回 HTTP 200，响应为空或不是有效 JSON；请查看当前状态。
+        at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\api.ts:8:11)
+        at readApiResponse (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\api.ts:12:16)
+        at async api (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\api.ts:28:12)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api-response.test.ts:29:3)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:831:7),
+    expected: { name: 'AbortError' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

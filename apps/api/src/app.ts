@@ -503,8 +503,9 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
       ? '项目有进行中或待核对的模型费用。请先在系统设置核对供应方账单，再恢复；费用和调用上限继续保留。' : undefined;
     if (!run) { if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,error:row.error,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false,recovery:{unknownOperations:[],costBlocked,costReadiness}}); }
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
+    const limit = z.coerce.number().int().min(1).max(300).default(300).parse(req.query.limit);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
-    const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, 300);
+    const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, limit);
     const recovery:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string;costBlocked?:string;costReadiness?:ProjectCostReadiness}={unknownOperations:unresolvedOperations(run.events),costBlocked,costReadiness};
     if(hasUnplannedTasks({tasks:row?.snapshot.approvedTasks??run.snapshot.tasks}))recovery.planningBlocked=planningRequiredMessage;
     if(row&&['failed','interrupted','cancelled'].includes(row.status))try{resumeHandoff({...run.snapshot,tasks:run.snapshot.approvedTasks??run.snapshot.tasks},run.events,completedTasks(run.events,run.snapshot),resolve(traceRoot,id,'artifacts'));}catch(error){recovery.checkpointBlocked=(error as Error).message;}

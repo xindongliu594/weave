@@ -1,0 +1,103 @@
+Browser tab: 1, Title: "为伍 · 一个想法，一支团队", URL: "http://127.0.0.1:4312/#work-tools".
+1 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#work-tools
+	2 container root
+		3 container
+			4 link Description: 为伍 一个想法，一支团队, Value: 127.0.0.1:4312/#dashboard
+			5 button 新建项目 ↗
+				6 image
+				7 text 新建项目
+				8 text ↗
+			9 text 工作空间
+			10 button 部门工作台
+				11 image
+				12 text 部门工作台
+			13 button 需求组建
+				14 image
+				15 text 需求组建
+			16 button 部门与员工
+				17 image
+				18 text 部门与员工
+				19 text 3
+			20 button 项目与方案
+				21 image
+				22 text 项目与方案
+			23 button 执行记录
+				24 image
+				25 text 执行记录
+			26 button 浏览器与 MCP
+				27 image
+				28 text 浏览器与 MCP
+			29 button 文件与项目导入
+				30 image
+				31 text 文件与项目导入
+			32 button 自动化与改进
+				33 image
+				34 text 自动化与改进
+			35 button 知识库
+				36 image
+				37 text 知识库
+			38 button 模型目录
+				39 image
+				40 text 模型目录
+			41 button 用量与费用
+				42 image
+				43 text 用量与费用
+			44 button 系统设置
+				45 image
+				46 text 系统设置
+			47 text 本机工作空间 数据保存在后端所在电脑 L 本地用户 个人工作空间
+			48 image
+		49 container
+			50 text 工作空间
+			51 image
+			52 text 浏览器与 MCP
+			53 container 最近确认连接：2026/10/18 14:52:58
+				54 text 后端服务已连接
+			55 container 本机已登记费用，不含未结算预留；待核对金额见用量与费用
+				56 text 已记录  $2.819252
+			57 button 查看系统状态
+				58 image
+		59 container
+			60 text 本机运行 · 可接入真实 API · 模型调用由你配置的服务计费 · 命令逐次审批 BROWSER & MCP
+			61 heading 浏览器与 MCP, Value: 1
+				62 text 浏览器与 MCP
+			63 text 浏览器使用隔离会话。连接可信的 MCP 工具服务，为员工授权具体站点和工具。
+			64 heading 隔离浏览器, Value: 3
+				65 text 隔离浏览器
+			66 text 静态页面最小版：打开网页、读取文本、截图、点击和填写。请填写最终页面地址；HTTP 重定向、JavaScript、下载、弹窗和非 GET/HEAD 请求已禁用。不共享个人浏览器登录状态。会话空闲 10 分钟后关闭。
+			67 text 未找到 Chrome / Edge。安装浏览器或设置 BROWSER_EXECUTABLE_PATH 后可用。
+			68 container
+				69 text 页面地址
+				70 text field (settable) 页面地址, Value: https://example.com
+				71 text 允许站点（每行一个 origin）
+				72 text entry area (settable) 允许站点（每行一个 origin）, Value: https://example.com
+				73 button 打开新会话
+			74 heading MCP 工具连接, Value: 3
+				75 text MCP 工具连接
+			76 text 支持 Streamable HTTP（协议 2025-03-26）、JSON / SSE 响应和 Bearer 密钥；不支持 stdio、OAuth、采样、资源订阅。只连接可信服务，只读标记由服务声明。
+			77 container
+				78 text 已保存连接
+				79 pop up button (collapsed, settable) 已保存连接, Value: 新建连接, Secondary Actions: Expand
+					80 menu
+						81 (selected) 新建连接
+				82 text 名称
+				83 text field (settable) 名称
+				84 text 完整 MCP 地址
+				85 text field (settable) 完整 MCP 地址
+				86 text Bearer 密钥（加密保存）
+				87 text field (settable) Bearer 密钥（加密保存）
+				88 checkbox (settable, integer) Description: 启用连接, Value: 1
+				89 button (collapsed) 允许使用此连接的原部门员工（默认无人）, Secondary Actions: Expand
+					90 text 允许使用此连接的原部门员工（默认无人）
+				91 button (disabled) 保存连接与授权
+				92 button (disabled) 获取工具列表
+			93 heading 原生插件工具, Value: 2
+				94 text 原生插件工具
+			95 text 启用已安装的插件后，在部门员工与项目策略中分配工具。当前支持在 OpenShell 中执行已核对的文件工具型插件；公司 Skill 仍从知识库按授权发现。
+			96 container
+				97 text @huiliyi37/dsh-office 0.2.4 已启用
+				98 button 停用
+				99 text 来源： 社区  ·  @huiliyi37/dsh-office@0.2.4 xlsx_read、xlsx_write、xlsx_edit、xlsx_recalc、xlsx_audit、pptx_create、pptx_edit、pptx_read、docx_create、docx_read 固定版本凭证： b5f22d348f38f55c 。升级仅影响新运行；停用会阻止后续调用。
+			100 text ▦  为伍  /  团队工作台 · v0.2 一个想法，一支团队
+
+The focused UI element is 1 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#work-tools

@@ -1,0 +1,127 @@
+Browser tab: 1, Title: "为伍 · 一个想法，一支团队", URL: "http://127.0.0.1:4312/#departments".
+1 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#departments
+	2 container
+		3 heading 编辑部门与员工, Value: 2
+			4 text 编辑部门与员工
+		5 text 先定义职责，再选择模型。保存后可以重复使用，也可以随时删除。
+		6 button 关闭窗口
+			7 image
+		8 container
+			9 text 部门名称
+			10 text field (settable) 部门名称, Value: 原生办公插件验收
+			11 text 部门目标
+			12 text field (settable) 部门目标, Value: 一次性小任务真实验收；原版插件与独立QA，非网站实际巡检。
+			13 text 部门每日预算（USD，可选）
+			14 stepper (settable, float) 部门每日预算（USD，可选） 按 UTC 自然日统计，包含规划与执行；留空仅受全局预算限制，0 禁止新增付费调用。, Value: 0.4000000059604645, Details: 0.4
+			15 text 按 UTC 自然日统计，包含规划与执行；留空仅受全局预算限制，0 禁止新增付费调用。
+			16 heading 团队成员 3 / 6, Value: 3
+				17 text 团队成员   / 6
+			18 button 添加员工
+				19 image
+				20 text 添加员工
+			21 text 部门经理 员工名称
+			22 text field (settable) 员工名称, Value: 办公验收经理
+			23 text 职位
+			24 text field (settable) 职位, Value: 交付经理
+			25 text 使用模型
+			26 pop up button (collapsed, settable) 使用模型, Value: Go · DeepSeek V4.1 Flash, Secondary Actions: Expand
+				27 menu
+					28 稍后配置模型
+					29 (selected) Go · DeepSeek V4.1 Flash 
+			30 text 职责与输出要求
+			31 text entry area (settable) 职责与输出要求, Value: 组织交接要求；依据原始需求、DOCX和QA记录独立验收。必须检查三项结果和2通过1失败，再正式提交经理验收。不得替员工生成报告。
+			32 checkbox (settable, integer) Description: 交付物写入, Value: 1
+			33 checkbox (settable, integer) Description: 工作区文件, Value: 1
+			34 checkbox (settable, integer) Description: 开发终端, Value: 0
+			35 checkbox (settable, integer) Description: 测试终端, Value: 0
+			36 checkbox (settable, integer) Description: 知识检索, Value: 0
+			37 checkbox (settable, integer) Description: 知识原文, Value: 0
+			38 checkbox (settable, integer) Description: 网页读取, Value: 0
+			39 checkbox (settable, integer) Description: 只读 MCP, Value: 0
+			99 checkbox (settable, integer) Description: office · xlsx_read (0.2.4), Value: 0
+			100 checkbox (settable, integer) Description: office · xlsx_write (0.2.4), Value: 0
+			101 checkbox (settable, integer) Description: office · xlsx_edit (0.2.4), Value: 0
+			102 checkbox (settable, integer) Description: office · xlsx_recalc (0.2.4), Value: 0
+			103 checkbox (settable, integer) Description: office · xlsx_audit (0.2.4), Value: 0
+			104 checkbox (settable, integer) Description: office · pptx_create (0.2.4), Value: 0
+			105 checkbox (settable, integer) Description: office · pptx_edit (0.2.4), Value: 0
+			106 checkbox (settable, integer) Description: office · pptx_read (0.2.4), Value: 0
+			107 checkbox (settable, integer) Description: office · docx_create (0.2.4), Value: 0
+			40 checkbox (settable, integer) Description: office · docx_read (0.2.4), Value: 1
+			41 button (collapsed) 岗位模板、输出规范与知识授权 · v1, Secondary Actions: Expand
+				42 text 岗位模板、输出规范与知识授权 · v
+				43 text 1
+			44 text 团队员工
+			45 button 删除员工文档员工
+				46 image
+			47 text 员工名称
+			48 text field (settable) 员工名称, Value: 文档员工
+			49 text 职位
+			50 text field (settable) 职位, Value: 文档制作
+			51 text 使用模型
+			52 pop up button (collapsed, settable) 使用模型, Value: Go · DeepSeek V4.1 Flash, Secondary Actions: Expand
+				53 menu
+					54 稍后配置模型
+					55 (selected) Go · DeepSeek V4.1 Flash 
+			56 text 职责与输出要求
+			57 text entry area (settable) 职责与输出要求, Value: 使用 capability_search 发现获授权的原版Office工具，亲自调用 docx_create 生成报告并回读。按经理交接合同正式提交。不访问外部站点、不捏造实测。
+			58 checkbox (settable, integer) Description: 交付物写入, Value: 0
+			59 checkbox (settable, integer) Description: 工作区文件, Value: 0
+			60 checkbox (settable, integer) Description: 开发终端, Value: 0
+			61 checkbox (settable, integer) Description: 测试终端, Value: 0
+			62 checkbox (settable, integer) Description: 知识检索, Value: 0
+			63 checkbox (settable, integer) Description: 知识原文, Value: 0
+			64 checkbox (settable, integer) Description: 网页读取, Value: 0
+			65 checkbox (settable, integer) Description: 只读 MCP, Value: 0
+			108 checkbox (settable, integer) Description: office · xlsx_read (0.2.4), Value: 0
+			109 checkbox (settable, integer) Description: office · xlsx_write (0.2.4), Value: 0
+			110 checkbox (settable, integer) Description: office · xlsx_edit (0.2.4), Value: 0
+			111 checkbox (settable, integer) Description: office · xlsx_recalc (0.2.4), Value: 0
+			112 checkbox (settable, integer) Description: office · xlsx_audit (0.2.4), Value: 0
+			113 checkbox (settable, integer) Description: office · pptx_create (0.2.4), Value: 0
+			114 checkbox (settable, integer) Description: office · pptx_edit (0.2.4), Value: 0
+			115 checkbox (settable, integer) Description: office · pptx_read (0.2.4), Value: 0
+			66 checkbox (settable, integer) Description: office · docx_create (0.2.4), Value: 1
+			67 checkbox (settable, integer) Description: office · docx_read (0.2.4), Value: 1
+			68 button (collapsed) 岗位模板、输出规范与知识授权 · v1, Secondary Actions: Expand
+				69 text 岗位模板、输出规范与知识授权 · v
+				70 text 1
+			71 text 团队员工
+			72 button 删除员工独立办公QA
+				73 image
+			74 text 员工名称
+			75 text field (settable) 员工名称, Value: 独立办公QA
+			76 text 职位
+			77 text field (settable) 职位, Value: 测试工程师
+			78 text 使用模型
+			79 pop up button (collapsed, settable) 使用模型, Value: Go · DeepSeek V4.1 Flash, Secondary Actions: Expand
+				80 menu
+					81 稍后配置模型
+					82 (selected) Go · DeepSeek V4.1 Flash 
+			83 text 职责与输出要求
+			84 text entry area (settable) 职责与输出要求, Value: 独立读取实际DOCX并核对原始需求；使用 artifact_write 提交简短QA证据。不能只认可作者总结；不得改写DOCX。
+			85 checkbox (settable, integer) Description: 交付物写入, Value: 1
+			86 checkbox (settable, integer) Description: 工作区文件, Value: 1
+			87 checkbox (settable, integer) Description: 开发终端, Value: 0
+			88 checkbox (settable, integer) Description: 测试终端, Value: 0
+			89 checkbox (settable, integer) Description: 知识检索, Value: 0
+			90 checkbox (settable, integer) Description: 知识原文, Value: 0
+			91 checkbox (settable, integer) Description: 网页读取, Value: 0
+			92 checkbox (settable, integer) Description: 只读 MCP, Value: 0
+			116 checkbox (settable, integer) Description: office · xlsx_read (0.2.4), Value: 0
+			117 checkbox (settable, integer) Description: office · xlsx_write (0.2.4), Value: 0
+			118 checkbox (settable, integer) Description: office · xlsx_edit (0.2.4), Value: 0
+			119 checkbox (settable, integer) Description: office · xlsx_recalc (0.2.4), Value: 0
+			120 checkbox (settable, integer) Description: office · xlsx_audit (0.2.4), Value: 0
+			121 checkbox (settable, integer) Description: office · pptx_create (0.2.4), Value: 0
+			122 checkbox (settable, integer) Description: office · pptx_edit (0.2.4), Value: 0
+			123 checkbox (settable, integer) Description: office · pptx_read (0.2.4), Value: 0
+			124 checkbox (settable, integer) Description: office · docx_create (0.2.4), Value: 0
+			93 checkbox (settable, integer) Description: office · docx_read (0.2.4), Value: 1
+			94 button (collapsed) 岗位模板、输出规范与知识授权 · v1, Secondary Actions: Expand
+				95 text 岗位模板、输出规范与知识授权 · v
+				96 text 1
+		97 button 取消
+		98 button 保存配置
+
+The focused UI element is 6 button 关闭窗口

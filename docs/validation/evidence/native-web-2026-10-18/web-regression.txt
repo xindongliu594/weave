@@ -1,0 +1,39 @@
+✔ empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success (161.0612ms)
+✔ a timeout while receiving a successful response body remains a read timeout, not invalid JSON (6.3434ms)
+✔ explicitly cancelled body reads preserve cancellation and failed writes remain uncertain (5.1357ms)
+✔ body AbortError caused by the request deadline is reported as timeout (5.7364ms)
+✔ planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431 (7.7754ms)
+✔ a mutation retains its original key and is never retried after an empty503 response or network loss (6.1193ms)
+✔ real generation precheck/onSubmit preserves the original pending key and parameters on empty or malformed HTTP200 (14.4379ms)
+✔ organization response failures retain the same persisted pending identity unless a structured HTTP refusal is confirmed (9.1979ms)
+✔ initial health reads share one in-flight request and publish connection independently (8.7916ms)
+✔ transport failure and reconnection retain confirmed workspace configuration until new health succeeds (7.8762ms)
+✔ first failed connection becomes disconnected and retries show reconnecting before any health exists (9.3397ms)
+✔ received HTTP failures are distinct from disconnection but synthetic GET timeouts are not (6.7493ms)
+✔ hidden pages have no periodic checks and becoming visible or focused shares a slow request (21.9566ms)
+✔ visible polling detects a dropped service and later restores connection without a page reset (3.7455ms)
+✔ manual refresh cancels an old poll and only the last subscriber removes wake listeners (2.5437ms)
+✔ health and usage refreshes deduplicate independently and cost notifications do not add health calls (5.3599ms)
+✔ terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages (14.8118ms)
+✔ overlapping manual refresh and polling keep the furthest cursor and newer metadata (2.1773ms)
+✔ a stale response from a different run or plan version cannot attach events or completion state (0.9752ms)
+✔ terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict (3.1457ms)
+✔ native states use approved task IDs, contracts and dependencies even when summary omits the mapping (5.206ms)
+✔ the latest rework mapping supersedes an older accepted completion regardless of native array order (2.184ms)
+✔ native completed requires acceptance for this run, plan and exact current attempt (2.9078ms)
+✔ only an explicitly inherited accepted checkpoint may show a parent completion in a child run (2.0653ms)
+✔ an ancestor seal is inherited only through the current approved snapshot after repeated recovery (1.5773ms)
+✔ seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved (2.0694ms)
+✔ the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions (234.8449ms)
+✔ hundreds of collapsed events neither serialize giant raw requests nor place their bodies in the DOM (853.0372ms)
+✔ closed body guards serialization; an explicitly opened body renders complete original JSON and attempt identity (29.1513ms)
+✔ main view omits routine status polling but preserves failures, unknown outcomes and accepted state changes (4.0471ms)
+✔ closed previews take only a bounded text prefix instead of joining the complete original message (0.9199ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7081.8216

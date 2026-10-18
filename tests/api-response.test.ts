@@ -14,6 +14,35 @@ test('empty/non-JSON HTTP failures preserve status and never echo raw bodies or 
  await assert.rejects(readApiResponse(Response.json({message:'Original safe permission denial',code:'PERMISSION_DENIED'},{status:403})),{message:'Original safe permission denial',status:403,code:'PERMISSION_DENIED'});
 });
 
+test('a timeout while receiving a successful response body remains a read timeout, not invalid JSON',async()=>{
+ const original=globalThis.fetch;
+ try {
+  globalThis.fetch=async()=>new Response(new ReadableStream({start(controller){controller.enqueue(new TextEncoder().encode('{"partial":'));controller.error(new DOMException('fixture body timeout','TimeoutError'));}}));
+  await assert.rejects(api('/runs/fixture'),error=>error instanceof ApiError&&error.code==='READ_TIMEOUT'&&error.status===408);
+ } finally {globalThis.fetch=original;}
+});
+
+test('explicitly cancelled body reads preserve cancellation and failed writes remain uncertain',async()=>{
+ const original=globalThis.fetch;
+ try {
+  globalThis.fetch=async()=>new Response(new ReadableStream({start(controller){controller.error(new DOMException('fixture cancelled','AbortError'));}}));
+  await assert.rejects(api('/runs/fixture'),{name:'AbortError'});
+  await assert.rejects(api('/projects/fixture/approve','POST',{},'original-key'),error=>error instanceof Error&&!(error instanceof ApiError)&&error.message.includes('结果尚未确认'));
+ } finally {globalThis.fetch=original;}
+});
+
+test('body AbortError caused by the request deadline is reported as timeout',async()=>{
+ const originalFetch=globalThis.fetch,originalTimeout=AbortSignal.timeout,deadline=new AbortController();
+ try {
+  AbortSignal.timeout=()=>deadline.signal;
+  globalThis.fetch=async(_input,init)=>new Response(new ReadableStream({start(controller){
+   init!.signal!.addEventListener('abort',()=>controller.error(new DOMException('body aborted','AbortError')),{once:true});
+  }}));
+  const pending=api('/runs/fixture');deadline.abort(new DOMException('deadline','TimeoutError'));
+  await assert.rejects(pending,error=>error instanceof ApiError&&error.code==='READ_TIMEOUT');
+ } finally {globalThis.fetch=originalFetch;AbortSignal.timeout=originalTimeout;}
+});
+
 test('planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431',async()=>{
  const original=globalThis.fetch,calls:Array<{url:string;init?:RequestInit}>=[],body={revisionRequest:'中'.repeat(4000),modelId:'fixture',version:1,maxPlanningCost:.2,maxOutputTokens:5000};
  globalThis.fetch=async(input,init)=>{calls.push({url:String(input),init});return new Response('',{status:431});};

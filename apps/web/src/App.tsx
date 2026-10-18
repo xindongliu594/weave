@@ -77,8 +77,7 @@ function App() {
   const [deleteDepartment, setDeleteDepartment] = useState<Department | null>(null);
   const [versions, setVersions] = useState<{ version: number; plan: Plan; policy?:Policy|null; createdAt: string }[] | null>(null);
   async function refresh() {
-    const [d, m, g, a] = await Promise.all([api<Department[]>('/departments'), api<Model[]>('/models'), api<Gateway[]>('/gateways'), api<Activity[]>('/activity'), projectSync.refresh({ fresh: true }), usageSync.refresh(), healthSync.refresh()]);
-    setDepartments(d); setModels(m); setGateways(g); setActivity(a);
+    await Promise.all([api<Department[]>('/departments').then(setDepartments), api<Model[]>('/models').then(setModels), api<Gateway[]>('/gateways').then(setGateways), api<Activity[]>('/activity').then(setActivity), projectSync.refresh({ fresh: true }), usageSync.refresh(), healthSync.refresh()]);
   }
   useEffect(() => {
     const unsubscribe = usageSync.subscribe(() => setUsage(usageSync.getSnapshot().rows));

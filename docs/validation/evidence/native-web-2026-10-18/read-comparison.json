@@ -1,0 +1,17 @@
+{
+  "originalBytes": 1513373,
+  "firstPageBytes": 343660,
+  "reductionPercent": 77.3,
+  "originalTunnel": {
+    "timeoutSeconds": 12,
+    "status": 200,
+    "bytesReceived": 98025
+  },
+  "compressedSmallPage": {
+    "seconds": 4.912924,
+    "status": 200,
+    "bytesReceived": 343660
+  },
+  "remoteLocalMilliseconds": 60,
+  "paidModelCallsAdded": 0
+}

@@ -1,0 +1,9 @@
+{
+  "source": "clicked visible run artifact link using in-app browser",
+  "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+  "name": "report.docx",
+  "bytes": 10162,
+  "sha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795",
+  "matchesEmployeeSeal": true,
+  "browserDownloadEvent": "waitForEvent timed out; locator.downloadMedia returned the completed download"
+}

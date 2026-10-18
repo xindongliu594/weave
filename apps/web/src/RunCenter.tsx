@@ -56,6 +56,7 @@ export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [selected, setSelected] = useState<string | null>(() => { const id = location.hash.split('/')[1]; return /^[a-f0-9-]{36}$/.test(id ?? '') ? id : null; });
   const [detail, setDetail] = useState<Detail | null>(null);
+  const [detailError,setDetailError]=useState(''),[detailRefresh,setDetailRefresh]=useState(0);
   const latestDetail=useRef<Detail|null>(null);latestDetail.current=detail;
   const [employee, setEmployee] = useState('');
   const [kind, setKind] = useState('all');
@@ -66,7 +67,7 @@ export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
   async function refreshDetail() {
     if (!selected) return;
     const current = latestDetail.current;
-    const more = await api<Detail>(`/runs/${selected}?after=${current?.id === selected ? current.nextCursor : 0}`);
+    const more = await api<Detail>(`/runs/${selected}?limit=30&after=${current?.id === selected ? current.nextCursor : 0}`);
     setDetail(current => current?.id === selected ? mergeRunDetailPage(current, more) : current);
   }
   useEffect(() => { refresh().catch(e => setError(e.message)).finally(() => setLoading(false)); }, []);
@@ -78,16 +79,16 @@ export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
     history.replaceState(null, '', selected ? '#run/' + selected : '#run');
     if (!selected) { setDetail(null); return; }
     let active = true;
-    setDetail(null); setEmployee(''); setError('');
-    api<Detail>(`/runs/${selected}`).then(d => { if (active) setDetail(d); }).catch(e => { if (active) setError(e.message); });
+    setDetail(null); setEmployee(''); setError('');setDetailError('');
+    api<Detail>(`/runs/${selected}?limit=30`).then(d => { if (active) setDetail(d); }).catch(e => { if (active) setDetailError(e.message); });
     return () => { active = false; };
-  }, [selected]);
+  }, [selected,detailRefresh]);
   useEffect(() => {
     if (!selected || !['unfinished','queued','running'].includes(detail?.status ?? '')) return;
     let active=true,timer:ReturnType<typeof setTimeout>;
     const poll=async()=>{
       try{
-        const more=await api<Detail>(`/runs/${selected}?after=${latestDetail.current?.nextCursor??0}`);
+        const more=await api<Detail>(`/runs/${selected}?limit=30&after=${latestDetail.current?.nextCursor??0}`);
         if(!active)return;
         setDetail(current=>current?.id===selected?mergeRunDetailPage(current,more):current);
         await refresh();
@@ -125,7 +126,7 @@ export function RunCenter({onOpenProject}:{onOpenProject:(id:string)=>void}) {
     {error && <div className="banner error" role="alert">{error}</div>}
     {!selected ? <section className="panel lower"><div className="trace-list-head"><h2>历史运行</h2><button onClick={() => refresh().catch(e => setError(e.message))}><RefreshCw size={14}/>刷新</button></div>{loading ? <p className="compact-empty">正在读取本地档案…</p> : runs.length ? runs.map(run => <button className="project-row run-list-row" key={run.id} onClick={() => setSelected(run.id)}><Clock3 size={20}/><span><strong>{run.title}</strong><small>{date(run.createdAt)} · {run.eventCount} 条事件</small></span><span className="tag">{run.mode === 'fixture' ? '测试模型' : run.mode}</span><span className={'tag ' + (run.status === 'completed' ? 'green' : 'amber')}>{stateName[run.status] ?? run.status}</span></button>) : <div className="empty"><Search size={28}/><h3>还没有执行记录</h3><p>运行一次追溯验证，查看真实采集的团队过程。</p></div>}</section> : <>
       <button className="text-button back lower" onClick={() => setSelected(null)}><ArrowLeft size={15}/>返回运行列表</button>
-      {!detail ? <p>正在读取运行记录…</p> : <>
+      {!detail ? detailError?<div className="notice-box" role="alert"><p>{detailError}</p><button onClick={()=>setDetailRefresh(value=>value+1)}>重新读取运行记录</button></div>:<p>正在读取运行记录…</p> : <>
 <section className="panel padded run-overview"><div className="run-detail-heading"><h2 className="run-detail-title" title={detail.title}>{detail.title}</h2><div className="run-detail-actions"><span className="tag">{detail.mode === 'fixture' ? '测试模型验证' : '正式项目'}</span><span className="tag">{stateName[detail.status]}</span>{detail.mode === 'product' && ['unfinished','queued','running'].includes(detail.status) && <button onClick={async () => { try { await api(`/runs/${detail.id}/cancel`, 'POST', {}); } catch (e) { setError((e as Error).message); } }}>停止运行</button>}</div></div><p className="trace-id">Run ID：{detail.id}</p><details className="run-requirement"><summary>查看完整需求</summary><div className="project-requirement-full">{detail.snapshot.requirement}</div></details><small>方案 v{detail.snapshot.planVersion} · 模板 {detail.snapshot.templateVersion} · {detail.eventCount} 条事件</small>{detail.integrity !== 'ok' && <p className="validation-error">档案完整性检查未通过，不能视为完整执行记录。</p>}</section>
         <RunExtras key={detail.id} id={detail.id} status={detail.status} integrity={detail.integrity} events={detail.summaryEvents ?? detail.events} traceEvents={detail.events} snapshot={detail.snapshot} recovery={detail.recovery} runError={detail.error} onOpenProject={onOpenProject} onRefreshDetail={refreshDetail}/>
         <div className="trace-layout lower"><aside><section className="panel padded"><h3>员工与岗位快照</h3><button className={'trace-member ' + (!employee ? 'selected' : '')} onClick={() => setEmployee('')}>全部员工与运行操作</button>{sessions.map(s => <button key={s.id} className={'trace-member ' + (employee === s.id ? 'selected' : '')} onClick={() => setEmployee(s.id)}><strong>{s.name}</strong><small>{s.model}</small></button>)}{assigned && <div className="trace-role"><span className="tag">岗位提示词 v{assigned.roleVersion}</span><p>{assigned.rolePrompt}</p></div>}</section><section className="panel padded lower"><h3>本次任务提示词</h3>{detail.snapshot.tasks.filter(t => !assigned || t.assignee === assigned.id).map(t => <details className="trace-task trace-task-prompt" key={t.id}><summary><strong>{t.subject}</strong><small>查看完整任务提示词</small></summary><p className="trace-prompt-content">{t.taskPrompt}</p><small>{t.dependencies.length ? `前置任务：${t.dependencies.join('、')}` : '无前置依赖'}</small></details>)}</section></aside>

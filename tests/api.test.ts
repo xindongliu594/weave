@@ -243,6 +243,23 @@ test('cross-origin mutations, remote host headers, and malformed data fail close
   assert.equal((await call('/departments', 'POST', { name: 'bad', agents: [] })).status, 422);
 });
 
+test('small trace pages preserve every complete event and do not change the full export', async () => {
+  const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
+  const archive=createRunArchive(join(directory,'runs'),{title:'分页测试',mode:'fixture',agents:[],tasks:[],policy:{maxBudget:0}});
+  for(let index=0;index<65;index++)archive.append('model/wire-request',{message:'完整原文-'+index+'中'.repeat(1000)});
+  const first=await call(`/runs/${archive.id}?limit=30`);
+  assert.equal(first.status,200);assert.equal(first.data.events.length,30);assert.equal(first.data.nextCursor,30);assert.equal(first.data.hasMore,true);
+  const second=await call(`/runs/${archive.id}?after=30&limit=30`);
+  const last=await call(`/runs/${archive.id}?after=60&limit=30`);
+  assert.equal(second.data.events.length,30);assert.equal(last.data.events.length,6);assert.equal(last.data.nextCursor,66);assert.equal(last.data.hasMore,false);
+  const all=[...first.data.events,...second.data.events,...last.data.events];
+  assert.deepEqual(all.map(event=>event.seq),Array.from({length:66},(_,index)=>index+1));
+  assert.equal(all[65].data.message,'完整原文-64'+'中'.repeat(1000));
+  const exported=await call(`/runs/${archive.id}/export`);assert.deepEqual(exported.data.events,all);
+  assert.equal((await call(`/runs/${archive.id}`)).data.events.length,66,'existing API consumers keep the default page size');
+  for(const limit of ['0','301','1.5','bad'])assert.equal((await call(`/runs/${archive.id}?limit=${limit}`)).status,422);
+});
+
  test('trace verification API persists a run and serves history after recreating the app', async () => {
   const result = await call('/runs/verify', 'POST', {});
   assert.equal(result.status, 201);

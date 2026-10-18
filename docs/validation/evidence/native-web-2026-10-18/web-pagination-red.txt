@@ -1,0 +1,31 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ small trace pages preserve every complete event and do not change the full export (6319.8585ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7187.1984
+
+✖ failing tests:
+
+test at tests\api.test.ts:1:21778
+✖ small trace pages preserve every complete event and do not change the full export (6319.8585ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  66 !== 30
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api.test.ts:251:41)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 66,
+    expected: 30,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

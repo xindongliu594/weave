@@ -8,7 +8,7 @@ $sshProgram = Get-Command ssh -CommandType Application -ErrorAction Stop
 if (Get-NetTCPConnection -State Listen -LocalPort $LocalPort -ErrorAction SilentlyContinue) {
     throw "本机端口 $LocalPort 已被使用。保留已有进程；请指定其他 -LocalPort。"
 }
-$arguments = @('-N', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', '-o', 'ExitOnForwardFailure=yes',
+$arguments = @('-N', '-C', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', '-o', 'ExitOnForwardFailure=yes',
     '-o', 'StrictHostKeyChecking=yes', '-o', 'ServerAliveInterval=15', '-o', 'ServerAliveCountMax=4',
     '-L', "127.0.0.1:${LocalPort}:127.0.0.1:${RemotePort}", $ComputerAlias)
 $tunnelProcess = Start-Process -FilePath $sshProgram.Source -ArgumentList $arguments -WindowStyle Hidden -PassThru

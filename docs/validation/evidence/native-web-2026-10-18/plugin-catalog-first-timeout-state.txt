@@ -1,0 +1,98 @@
+Browser tab: 1, Title: "为伍 · 一个想法，一支团队", URL: "http://127.0.0.1:4313/#work-tools".
+0 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4313/#work-tools
+	1 container root
+		2 container
+			3 link Description: 为伍 一个想法，一支团队, Value: 127.0.0.1:4313/#dashboard
+			4 button 新建项目 ↗
+				5 image
+				6 text 新建项目
+				7 text ↗
+			8 text 工作空间
+			9 button 部门工作台
+				10 image
+				11 text 部门工作台
+			12 button 需求组建
+				13 image
+				14 text 需求组建
+			15 button 部门与员工
+				16 image
+				17 text 部门与员工
+			18 button 项目与方案
+				19 image
+				20 text 项目与方案
+			21 button 执行记录
+				22 image
+				23 text 执行记录
+			24 button 浏览器与 MCP
+				25 image
+				26 text 浏览器与 MCP
+			27 button 文件与项目导入
+				28 image
+				29 text 文件与项目导入
+			30 button 自动化与改进
+				31 image
+				32 text 自动化与改进
+			33 button 知识库
+				34 image
+				35 text 知识库
+			36 button 模型目录
+				37 image
+				38 text 模型目录
+			39 button 用量与费用
+				40 image
+				41 text 用量与费用
+			42 button 系统设置
+				43 image
+				44 text 系统设置
+			45 text 本机工作空间 数据保存在后端所在电脑 L 本地用户 个人工作空间
+			46 image
+		47 container
+			48 text 工作空间
+			49 image
+			50 text 浏览器与 MCP
+			51 container 最近确认连接：2026/10/18 14:43:59
+				52 text 后端服务已连接
+			53 container 本机已登记费用，不含未结算预留；待核对金额见用量与费用
+				54 text 已记录  $2.819252
+			55 button 查看系统状态
+				56 image
+		57 container
+			73 text 本机运行 · 可接入真实 API · 模型调用由你配置的服务计费 · 命令逐次审批 BROWSER & MCP
+			321 heading 浏览器与 MCP, Value: 1
+				322 text 浏览器与 MCP
+			323 text 浏览器使用隔离会话。连接可信的 MCP 工具服务，为员工授权具体站点和工具。 读取请求超时，请刷新；后台执行和已保存记录仍然保留。
+			324 heading 隔离浏览器, Value: 3
+				325 text 隔离浏览器
+			326 text 静态页面最小版：打开网页、读取文本、截图、点击和填写。请填写最终页面地址；HTTP 重定向、JavaScript、下载、弹窗和非 GET/HEAD 请求已禁用。不共享个人浏览器登录状态。会话空闲 10 分钟后关闭。
+			327 container
+				328 text 页面地址
+				329 text field (settable) 页面地址, Value: https://example.com
+				330 text 允许站点（每行一个 origin）
+				331 text entry area (settable) 允许站点（每行一个 origin）, Value: https://example.com
+				332 button 打开新会话
+			333 heading MCP 工具连接, Value: 3
+				334 text MCP 工具连接
+			335 text 支持 Streamable HTTP（协议 2025-03-26）、JSON / SSE 响应和 Bearer 密钥；不支持 stdio、OAuth、采样、资源订阅。只连接可信服务，只读标记由服务声明。
+			336 container
+				337 text 已保存连接
+				338 pop up button (collapsed, settable) 已保存连接, Value: 新建连接, Secondary Actions: Expand
+					339 menu
+						340 (selected) 新建连接
+				341 text 名称
+				342 text field (settable) 名称
+				343 text 完整 MCP 地址
+				344 text field (settable) 完整 MCP 地址
+				345 text Bearer 密钥（加密保存）
+				346 text field (settable) Bearer 密钥（加密保存）
+				347 checkbox (settable, integer) Description: 启用连接, Value: 1
+				348 button (collapsed) 允许使用此连接的原部门员工（默认无人）, Secondary Actions: Expand
+					349 text 允许使用此连接的原部门员工（默认无人）
+				350 button (disabled) 保存连接与授权
+				351 button (disabled) 获取工具列表
+			352 heading 原生插件工具, Value: 2
+				353 text 原生插件工具
+			354 text 启用已安装的插件后，在部门员工与项目策略中分配工具。当前支持在 OpenShell 中执行已核对的文件工具型插件；公司 Skill 仍从知识库按授权发现。
+			355 text 读取请求超时，请刷新；后台执行和已保存记录仍然保留。
+			320 text ▦  为伍  /  团队工作台 · v0.2 一个想法，一支团队
+
+The focused UI element is 24 button 浏览器与 MCP

@@ -1,0 +1,321 @@
+Browser tab: 1, Title: "为伍 · 一个想法，一支团队", URL: "http://127.0.0.1:4312/#run/c6516254-6ab0-44c3-88f8-f9e86ac81592".
+1 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#run/c6516254-6ab0-44c3-88f8-f9e86ac81592
+	2 container root
+		3 container
+			4 link Description: 为伍 一个想法，一支团队, Value: 127.0.0.1:4312/#dashboard
+			5 button 新建项目 ↗
+				6 image
+				7 text 新建项目
+				8 text ↗
+			9 text 工作空间
+			10 button 部门工作台
+				11 image
+				12 text 部门工作台
+			13 button 需求组建
+				14 image
+				15 text 需求组建
+			16 button 部门与员工
+				17 image
+				18 text 部门与员工
+				19 text 3
+			20 button 项目与方案
+				21 image
+				22 text 项目与方案
+			23 button 执行记录
+				24 image
+				25 text 执行记录
+			26 button 浏览器与 MCP
+				27 image
+				28 text 浏览器与 MCP
+			29 button 文件与项目导入
+				30 image
+				31 text 文件与项目导入
+			32 button 自动化与改进
+				33 image
+				34 text 自动化与改进
+			35 button 知识库
+				36 image
+				37 text 知识库
+			38 button 模型目录
+				39 image
+				40 text 模型目录
+			41 button 用量与费用
+				42 image
+				43 text 用量与费用
+			44 button 系统设置
+				45 image
+				46 text 系统设置
+			47 text 本机工作空间 数据保存在后端所在电脑 L 本地用户 个人工作空间
+			48 image
+		49 container
+			50 text 工作空间
+			51 image
+			52 text 执行记录
+			53 container 最近确认连接：2026/10/18 14:56:44
+				54 text 后端服务已连接
+			55 container 本机已登记费用，不含未结算预留；待核对金额见用量与费用
+				56 text 已记录  $2.819252
+			57 button 查看系统状态
+				58 image
+		59 container
+			60 text 本机运行 · 可接入真实 API · 模型调用由你配置的服务计费 · 命令逐次审批 EXECUTION HISTORY
+			61 heading 执行记录, Value: 1
+				62 text 执行记录
+			63 text 查看当时的职责、任务指令和实际操作。历史快照独立保留。
+			64 button 运行追溯验证
+				65 image
+				66 text 运行追溯验证
+			67 image
+			68 text 工具执行受岗位授权约束；文件与终端按批准的执行位置操作，终端需要逐次审批。追溯验证使用测试模型，不会调用真实 API。
+			69 button 返回运行列表
+				70 image
+				71 text 返回运行列表
+			72 heading Value: 2, 这是原版办公插件真实小任务验收。仅以以下虚构测试资料制作 report.docx：检查项“首页”通过，“登录”通过，“备份”失败；总计3项，2通过，1失败。明确标注为测试资料，不能访问网站或声称做过真实巡检。文档员工先 capability
+				73 text 这是原版办公插件真实小任务验收。仅以以下虚构测试资料制作 report.docx：检查项“首页”通过，“登录”通过，“备份”失败；总计3项，2通过，1失败。明确标注为测试资料，不能访问网站或声称做过真实巡检。文档员工先 capability
+			74 text 正式项目 已完成
+			75 container
+				76 text Run ID： c6516254-6ab0-44c3-88f8-f9e86ac81592
+			77 button (collapsed) 查看完整需求, Secondary Actions: Expand
+				78 text 查看完整需求
+			79 text 方案 v 3  · 模板  department-execution-v1  ·  736  条事件
+			80 heading 任务、交付物与审批, Value: 2
+				81 text 任务、交付物与审批
+			82 container
+				83 button 刷新审批与交付
+				84 button 导出完整追溯
+			85 container
+				86 text 项目累计费用：$ 0.094944  / 预算 $ 0.400000  · 未结算预留 $0.000000 · 可用 $0.305056
+			87 container
+				88 text 本次运行 $ 0.062126  · 启动前已用 $0.032817（含方案规划及此前执行） 。按配置单价与已记录用量计算，以中转站账单为准；待核对调用可能尚未计入。
+			89 container
+				90 text 方案调用上限  23  次；每员工每任务默认  16  次。备用模型调用也计次，同一方案重试保留已用次数与任务费用。
+			91 heading 员工状态 · 本次运行已完成, Value: 3
+				92 text 员工状态 · 本次运行已完成
+			93 text 本次运行已结束，停止前的等待状态不表示员工现在仍在执行。费用和外部操作结果仍须按下方记录核对。
+			94 button (collapsed) 查看停止前原始员工状态（历史记录）, Secondary Actions: Expand
+				95 text 查看停止前原始员工状态（历史记录）
+			96 container 目标与节点检查
+				97 heading 目标与节点检查, Value: 3
+					98 text 目标与节点检查
+				99 container
+					100 text 目标合同已固定  · 方案 v 3
+				101 text 固定目标与权限防止摘要改写。交付是否符合业务目标，还须查看真实测试及独立验收证据。
+				102 button (collapsed) 原目标与节点验收标准（3 个节点）, Secondary Actions: Expand
+					103 text 原目标与节点验收标准（
+					104 text 3
+					105 text  个节点）
+			106 container
+				107 heading 逐项验收证据, Value: 3
+					108 text 逐项验收证据
+				109 text 命令结果由宿主核对；测试内容是否覆盖需求仍需独立 QA 和经理审查。历史方案未启用时不补写通过结论。
+				110 button (collapsed) 制作并回读 report.docx 测试资料报告, Secondary Actions: Expand
+					111 text 制作并回读 report.docx 测试资料报告
+				112 button (collapsed) 独立核对 report.docx 并输出 qa.json, Secondary Actions: Expand
+					113 text 独立核对 report.docx 并输出 qa.json
+				114 button (collapsed) 只读验收 DOCX 与 QA 并输出 acceptance.json, Secondary Actions: Expand
+					115 text 只读验收 DOCX 与 QA 并输出 acceptance.json
+			116 container
+				117 heading 员工交接报告, Value: 3
+					118 text 员工交接报告
+				119 text 以下是已封存的员工陈述，经理按派工要求独立核验。历史交接不代表当前项目已通过；文件和真实测试证据请结合下方记录查看。
+				120 button (collapsed) Secondary Actions: Expand, 制作并回读 report.docx 测试资料报告 · 已用原版 plugin__office__docx_create 在工作区根目录生成 report.docx（sha256 819c06a9…3795），并用 plugin__office__docx_read 回读核验通过：标题、虚构测试资料标注（未访问网站、未做真实巡检）、三行检查表（首页-通过、登录-通过、备份-失败）、统计（总计3项，2项通过，1项失败）均齐备。仅产出 report.docx，未访问网络，未创建其他文件，未声称真实巡检。
+					121 text 制作并回读 report.docx 测试资料报告
+					122 text  · 
+					123 text 已用原版 plugin__office__docx_create 在工作区根目录生成 report.docx（sha256 819c06a9…3795），并用 plugin__office__docx_read 回读核验通过：标题、虚构测试资料标注（未访问网站、未做真实巡检）、三行检查表（首页-通过、登录-通过、备份-失败）、统计（总计3项，2项通过，1项失败）均齐备。仅产出 report.docx，未访问网络，未创建其他文件，未声称真实巡检。
+				124 button (collapsed) Secondary Actions: Expand, 独立核对 report.docx 并输出 qa.json · 独立 docx_read 回读 report.docx 成功，五条核对项（虚构标注、首页=通过、登录=通过、备份=失败、总计3项/2通过/1失败）全部与原始事实一致，verdict=pass；qa.json 已写出，未修改 DOCX。
+					125 text 独立核对 report.docx 并输出 qa.json
+					126 text  · 
+					127 text 独立 docx_read 回读 report.docx 成功，五条核对项（虚构标注、首页=通过、登录=通过、备份=失败、总计3项/2通过/1失败）全部与原始事实一致，verdict=pass；qa.json 已写出，未修改 DOCX。
+				128 button (collapsed) Secondary Actions: Expand, 只读验收 DOCX 与 QA 并输出 acceptance.json · 验收通过（verdict=pass）。经理只读核对 report.docx（docx_read）与 qa.json（filesystem）：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计总计3项/2通过/1失败共 5 项事实全部一致；QA verdict=pass 且 checks/findings 与 DOCX 回读事实无矛盾。仅写入 acceptance.json，未修改 report.docx 与 qa.json，未创建其他文件。
+					129 text 只读验收 DOCX 与 QA 并输出 acceptance.json
+					130 text  · 
+					131 text 验收通过（verdict=pass）。经理只读核对 report.docx（docx_read）与 qa.json（filesystem）：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计总计3项/2通过/1失败共 5 项事实全部一致；QA verdict=pass 且 checks/findings 与 DOCX 回读事实无矛盾。仅写入 acceptance.json，未修改 report.docx 与 qa.json，未创建其他文件。
+			132 heading 执行环境, Value: 3
+				133 text 执行环境
+			134 container
+				135 text OpenShell 隔离执行设备  ·  linux  ·  workspaces  /  c6516254-6ab0-44c3-88f8-f9e86ac81592
+			136 text 模型与审批由后端协调；文件和命令在这台设备执行。设备断线后停止在途操作，不自动重放修改或命令。
+			137 text OpenShell 沙箱已有执行回执 · Node  v24.19.0  · 用户  1000  · 1 核 / 512 MiB
+			138 text 沙箱： 51e1ce88-de82-4405-837b-6c26411eb341
+			139 button (collapsed) 执行操作回执（8）, Secondary Actions: Expand
+				140 text 执行操作回执（
+				141 text 8
+				142 text ）
+			143 button (collapsed) 已核验的文件版本, Secondary Actions: Expand
+				144 text 已核验的文件版本
+			145 text write-docx （原生 t1）  ·  已完成  ·  文档员工
+			146 heading 制作并回读 report.docx 测试资料报告, Value: 3
+				147 text 制作并回读 report.docx 测试资料报告
+			148 container
+				149 text 前置： 无
+			150 text {"summary":"已用原版 plugin__office__docx_create 在工作区根目录生成 report.docx（sha256 819c06a9…3795），并用 plugin__office__docx_read 回读核验通过：标题、虚构测试资料标注（未访问网站、未做真实巡检）、三行检查表（首页-通过、登录-通过、备份-失败）、统计（总计3项，2项通过，1项失败）均齐备。仅产出 report.docx，未访问网络，未创建其他文件，未声称真实巡检。","sections":{"artifact":"最终路径：工作区根目录 report.docx（相对路径 report.docx，size=10162 字节，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）。所用工具为原版 plugin__office__docx_create：先经 capability_search 确认该原版办公插件工具可用后，单次调用 docx_create 生成共 8 个内容块，未使用任何替代或补写路径。","readback":"plugin__office__docx_read 回读成功（无报错、无截断），回读全文事实要点：①标题“测试资料报告（虚构）”；②“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；③“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”；④检查表（检查项/结果）：首页/通过、登录/通过、备份/失败；⑤统计“总计 3 项，2 项通过，1 项失败。”。回读产物 sha256 与写入一致，确认落盘内容即所建内容。","notice":"确认已标注：文档醒目标注“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”，并附加说明三条结果均为用户提供的虚构测试数据、不代表任何真实系统状态。全文无任何声称访问外部网站、执行真实巡检或存在真实实测结果的表述；本次执行未访问任何网络站点。","limits":"已知偏差或未完成点：无。说明：本任务仅负责 report.docx；qa.json 与 acceptance.json 属 outOfScope，由 QA 与经理员工分别产出，本员工未创建、未读取，故不在本报告中评判。回读文本按插件抽取顺序将表格单元格逐行输出，属工具正常提取呈现，非内容缺失。"},"risks":[]}
+			151 text qa-verify （原生 t2）  ·  已完成  ·  独立办公QA
+			152 heading 独立核对 report.docx 并输出 qa.json, Value: 3
+				153 text 独立核对 report.docx 并输出 qa.json
+			154 container
+				155 text 前置： 制作并回读 report.docx 测试资料报告
+			156 text {"summary":"独立 docx_read 回读 report.docx 成功，五条核对项（虚构标注、首页=通过、登录=通过、备份=失败、总计3项/2通过/1失败）全部与原始事实一致，verdict=pass；qa.json 已写出，未修改 DOCX。","sections":{"verdict":"pass —— 直接用 plugin__office__docx_read 回读 report.docx 的原文，虚构测试资料标注、三条检查结果与统计共 5 项核对全部逐字命中预期，无不符点，故 verdict=pass。","evidence":"qa.json 路径：qa.json（工作区根目录，3233 字节，sha256 a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）。逐项核对到的 DOCX 事实（回读 report.docx，sha256 819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795，size=10162）：①标题“测试资料报告（虚构）”；②“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；③“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”；④检查表 检查项/结果 → 首页/通过、登录/通过、备份/失败；⑤“总计 3 项，2 项通过，1 项失败。” 算术自洽：2 通过 + 1 失败 = 3 项。checks 五条 result 均为 pass、consistent 均为 true。","findings":"一致确认：虚构标注（标题与两句免责声明，全文无任何声称访问网站/真实巡检的表述）、首页=通过、登录=通过、备份=失败、统计 3/2/1 五项均与原始事实逐字一致，未发现任何不符点。证据来源为独立 docx_read 回读文本本身，未采信 writer 交接总结作为证据。限制说明（已写入 qa.json findings）：仅做内容事实核对，未做像素级版式校验；本员工未修改 report.docx（outOfScope），仅执行只读 docx_read 与 qa.json 写入，未创建其他文件、未访问网络。"},"risks":[]}
+			157 text manager-accept （原生 t3）  ·  已完成  ·  办公验收经理
+			158 heading 只读验收 DOCX 与 QA 并输出 acceptance.json, Value: 3
+				159 text 只读验收 DOCX 与 QA 并输出 acceptance.json
+			160 container
+				161 text 前置： 制作并回读 report.docx 测试资料报告 → 独立核对 report.docx 并输出 qa.json
+			162 text {"summary":"验收通过（verdict=pass）。经理只读核对 report.docx（docx_read）与 qa.json（filesystem）：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计总计3项/2通过/1失败共 5 项事实全部一致；QA verdict=pass 且 checks/findings 与 DOCX 回读事实无矛盾。仅写入 acceptance.json，未修改 report.docx 与 qa.json，未创建其他文件。","sections":{"conclusion":"最终 verdict = pass。理由：经理独立 docx_read 回读 report.docx 得到的原文事实与任务规定的 5 条要点（虚构标注、首页、登录、备份、统计）逐条一致，且 QA 结论 pass 与之一致，未发现任何不符或矛盾；故按合同给出通过。","facts":"①标注：标题“测试资料报告（虚构）”，正文“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及虚构数据说明，全文无声称真实巡检/访问网站；②检查项 首页=通过；③检查项 登录=通过；④检查项 备份=失败；⑤统计“总计 3 项，2 项通过，1 项失败。”（2+1=3，算术自洽）。QA 侧：verdict=pass，checks 5 项 result 均为 pass/consistent=true，其记录的 DOCX sha256 819c06a9…3795、size 10162 与经理回读一致。","evidence":"report.docx（工作区根目录，size=10162，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）；qa.json（工作区根目录，3233 字节，sha256=a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）；acceptance.json（工作区根目录，3079 字节，sha256=f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca）。","mismatches":"无。逐项核对未发现任何不符点或矛盾：DOCX 事实与原始虚构测试资料一致，qa.json 的 verdict/checks/findings 与经理独立回读的 DOCX 事实一致。限制如实说明：验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验；经理全程只读，report.docx 与 qa.json 未被修改。"},"risks":["验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验。"]}
+			163 heading 经理验收结果, Value: 3
+				164 text 经理验收结果
+			165 container
+				166 text 只读验收 DOCX 与 QA 并输出 acceptance.json  · 宿主已核验并接收  · #717 。完整报告见下方交付物。
+			167 text {"summary":"验收通过（verdict=pass）。经理只读核对 report.docx（docx_read）与 qa.json（filesystem）：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计总计3项/2通过/1失败共 5 项事实全部一致；QA verdict=pass 且 checks/findings 与 DOCX 回读事实无矛盾。仅写入 acceptance.json，未修改 report.docx 与 qa.json，未创建其他文件。","sections":{"conclusion":"最终 verdict = pass。理由：经理独立 docx_read 回读 report.docx 得到的原文事实与任务规定的 5 条要点（虚构标注、首页、登录、备份、统计）逐条一致，且 QA 结论 pass 与之一致，未发现任何不符或矛盾；故按合同给出通过。","facts":"①标注：标题“测试资料报告（虚构）”，正文“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及虚构数据说明，全文无声称真实巡检/访问网站；②检查项 首页=通过；③检查项 登录=通过；④检查项 备份=失败；⑤统计“总计 3 项，2 项通过，1 项失败。”（2+1=3，算术自洽）。QA 侧：verdict=pass，checks 5 项 result 均为 pass/consistent=true，其记录的 DOCX sha256 819c06a9…3795、size 10162 与经理回读一致。","evidence":"report.docx（工作区根目录，size=10162，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）；qa.json（工作区根目录，3233 字节，sha256=a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）；acceptance.json（工作区根目录，3079 字节，sha256=f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca）。","mismatches":"无。逐项核对未发现任何不符点或矛盾：DOCX 事实与原始虚构测试资料一致，qa.json 的 verdict/checks/findings 与经理独立回读的 DOCX 事实一致。限制如实说明：验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验；经理全程只读，report.docx 与 qa.json 未被修改。"},"risks":["验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验。"]}
+			168 container
+				169 text acceptance.json  ·  3079  字节 · SHA256  f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca
+			170 heading 交付物, Value: 3
+				171 text 交付物
+			172 text acceptance.json
+			173 container
+				174 text 3079  字节 ·  f5c9ef276b95
+			175 link Description: 下载, Value: 127.0.0.1:4312/api/runs/c6516254-6ab0-44c3-88f8-f9e86ac81592/artifact?path=acceptance.json
+			176 button 预览文本
+			177 text qa.json
+			178 container
+				179 text 3233  字节 ·  a620cfb6a388
+			180 link Description: 下载, Value: 127.0.0.1:4312/api/runs/c6516254-6ab0-44c3-88f8-f9e86ac81592/artifact?path=qa.json
+			181 button 预览文本
+			182 text report.docx
+			183 container
+				184 text 10162  字节 ·  819c06a9c237
+			185 link Description: 下载, Value: 127.0.0.1:4312/api/runs/c6516254-6ab0-44c3-88f8-f9e86ac81592/artifact?path=report.docx
+			186 button 预览文本
+			187 container
+				188 text 批准时已固定  0  份知识文档的版本，员工按各自授权检索。笔记后续编辑不改变本次引用。
+			189 heading 沉淀为部门知识, Value: 3
+				190 text 沉淀为部门知识
+			191 container
+				192 text 目标知识库
+				193 pop up button (collapsed, settable) 目标知识库, Value: 请选择, Secondary Actions: Expand
+					194 menu
+						195 (selected) 请选择
+						196 JJ 部署验证资料
+			197 button (disabled) 确认保存运行结果
+			198 container
+				199 heading 员工与岗位快照, Value: 3
+					200 text 员工与岗位快照
+				201 button 全部员工与运行操作
+				202 button 办公验收经理 c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051
+					203 text 办公验收经理
+					204 text c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051
+			205 container
+				206 heading 本次任务提示词, Value: 3
+					207 text 本次任务提示词
+				208 button (collapsed) 制作并回读 report.docx 测试资料报告 查看完整任务提示词, Secondary Actions: Expand
+					209 AXListMarker ▸ 
+					210 text 制作并回读 report.docx 测试资料报告
+					211 text 查看完整任务提示词
+				212 button (collapsed) 独立核对 report.docx 并输出 qa.json 查看完整任务提示词, Secondary Actions: Expand
+					213 AXListMarker ▸ 
+					214 text 独立核对 report.docx 并输出 qa.json
+					215 text 查看完整任务提示词
+				216 button (collapsed) 只读验收 DOCX 与 QA 并输出 acceptance.json 查看完整任务提示词, Secondary Actions: Expand
+					217 AXListMarker ▸ 
+					218 text 只读验收 DOCX 与 QA 并输出 acceptance.json
+					219 text 查看完整任务提示词
+			220 heading 执行时间线, Value: 2
+				221 text 执行时间线
+			222 pop up button (collapsed, settable) Description: 事件类型, Value: 主要事件, Secondary Actions: Expand
+				223 menu
+					224 (selected) 主要事件
+					225 模型请求与返回
+					226 工具调用
+					227 团队操作与状态
+					228 会话事件
+					229 全部原始事件
+			230 text 主要事件默认省略例行团队状态快照和成功轮询；可切换团队、工具或全部原始事件查看。展开事件才渲染正文，实际消息与工具定义保持完整。
+			231 button (collapsed) 创建运行档案 #1 · 13:55:30, Secondary Actions: Expand
+				232 text 创建运行档案
+				233 container
+					234 text # 1  ·  13:55:30
+			235 button (collapsed) 进入执行队列 #2 · 13:55:30, Secondary Actions: Expand
+				236 text 进入执行队列
+				237 container
+					238 text # 2  ·  13:55:30
+			239 button (collapsed) 派发获授权的本机操作 #6 · 13:55:30 prepare, Secondary Actions: Expand
+				240 text 派发获授权的本机操作
+				241 container
+					242 text # 6  ·  13:55:30
+				243 text prepare
+			244 button (collapsed) 绑定本机工作区 #8 · 13:55:33 OpenShell 隔离执行设备, Secondary Actions: Expand
+				245 text 绑定本机工作区
+				246 container
+					247 text # 8  ·  13:55:33
+				248 text OpenShell 隔离执行设备
+			249 button (collapsed) 创建员工会话 #11 · 13:55:33 · 办公验收经理, Secondary Actions: Expand
+				250 text 创建员工会话
+				251 container
+					252 text # 11  ·  13:55:33  · 办公验收经理
+			253 button (collapsed) 加载员工模型 #12 · 13:55:33 · 办公验收经理, Secondary Actions: Expand
+				254 text 加载员工模型
+				255 container
+					256 text # 12  ·  13:55:33  · 办公验收经理
+			257 button (collapsed) 绑定协调经理 #14 · 13:55:33, Secondary Actions: Expand
+				258 text 绑定协调经理
+				259 container
+					260 text # 14  ·  13:55:33
+			261 button (collapsed) 开始调用工具 #15 · 13:55:33 · 办公验收经理 agent_teams_create, Secondary Actions: Expand
+				262 text 开始调用工具
+				263 container
+					264 text # 15  ·  13:55:33  · 办公验收经理
+				265 text agent_teams_create
+			266 button (collapsed) 工具执行结果 #16 · 13:55:33 · 办公验收经理 agent_teams_create, Secondary Actions: Expand
+				267 text 工具执行结果
+				268 container
+					269 text # 16  ·  13:55:33  · 办公验收经理
+				270 text agent_teams_create
+			271 button (collapsed) 开始调用工具 #18 · 13:55:33 · 办公验收经理 agent_teams_create_task, Secondary Actions: Expand
+				272 text 开始调用工具
+				273 container
+					274 text # 18  ·  13:55:33  · 办公验收经理
+				275 text agent_teams_create_task
+			276 button (collapsed) 工具执行结果 #19 · 13:55:33 · 办公验收经理 agent_teams_create_task, Secondary Actions: Expand
+				277 text 工具执行结果
+				278 container
+					279 text # 19  ·  13:55:33  · 办公验收经理
+				280 text agent_teams_create_task
+			281 button (collapsed) 开始调用工具 #21 · 13:55:33 · 办公验收经理 agent_teams_create_task, Secondary Actions: Expand
+				282 text 开始调用工具
+				283 container
+					284 text # 21  ·  13:55:33  · 办公验收经理
+				285 text agent_teams_create_task
+			286 button (collapsed) 工具执行结果 #22 · 13:55:33 · 办公验收经理 agent_teams_create_task, Secondary Actions: Expand
+				287 text 工具执行结果
+				288 container
+					289 text # 22  ·  13:55:33  · 办公验收经理
+				290 text agent_teams_create_task
+			291 button (collapsed) 开始调用工具 #24 · 13:55:33 · 办公验收经理 agent_teams_create_task, Secondary Actions: Expand
+				292 text 开始调用工具
+				293 container
+					294 text # 24  ·  13:55:33  · 办公验收经理
+				295 text agent_teams_create_task
+			296 button (collapsed) 工具执行结果 #25 · 13:55:33 · 办公验收经理 agent_teams_create_task, Secondary Actions: Expand
+				297 text 工具执行结果
+				298 container
+					299 text # 25  ·  13:55:33  · 办公验收经理
+				300 text agent_teams_create_task
+			301 button (collapsed) 任务编号映射 #27 · 13:55:33, Secondary Actions: Expand
+				302 text 任务编号映射
+				303 container
+					304 text # 27  ·  13:55:33
+			305 button (collapsed) 确认启动 #28 · 13:55:33, Secondary Actions: Expand
+				306 text 确认启动
+				307 container
+					308 text # 28  ·  13:55:33
+			309 button (collapsed) 开始调用工具 #29 · 13:55:33 · 办公验收经理 agent_teams_approve, Secondary Actions: Expand
+				310 text 开始调用工具
+				311 container
+					312 text # 29  ·  13:55:33  · 办公验收经理
+				313 text agent_teams_approve
+			314 button 加载后续事件
+			315 container
+				316 image
+				317 text  记录来自本地持久化档案；页面刷新不会重跑任务。
+			318 text ▦  为伍  /  团队工作台 · v0.2 一个想法，一支团队
+
+The focused UI element is 1 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#run/c6516254-6ab0-44c3-88f8-f9e86ac81592

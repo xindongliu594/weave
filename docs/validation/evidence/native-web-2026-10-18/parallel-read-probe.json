@@ -1,0 +1,50 @@
+[
+  {
+    "path": "health",
+    "status": 200,
+    "bytes": 491,
+    "ms": 9330
+  },
+  {
+    "path": "projects",
+    "status": 200,
+    "bytes": 129627,
+    "ms": 18455
+  },
+  {
+    "path": "usage",
+    "status": 200,
+    "bytes": 387771,
+    "ms": 14473
+  },
+  {
+    "path": "departments",
+    "status": 200,
+    "bytes": 5583,
+    "ms": 10945
+  },
+  {
+    "path": "models",
+    "status": 200,
+    "bytes": 529,
+    "ms": 10945
+  },
+  {
+    "path": "gateways",
+    "status": 200,
+    "bytes": 162,
+    "ms": 10946
+  },
+  {
+    "path": "activity",
+    "status": 200,
+    "bytes": 4609,
+    "ms": 10947
+  },
+  {
+    "path": "capabilities/plugins",
+    "status": 200,
+    "bytes": 12541,
+    "ms": 16029
+  }
+]
