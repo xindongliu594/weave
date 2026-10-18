@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/jj/.local/share/weiwu/staging/deploy-jj.py", line 35, in <module>
+    else: raise RuntimeError('New release health check failed')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: New release health check failed

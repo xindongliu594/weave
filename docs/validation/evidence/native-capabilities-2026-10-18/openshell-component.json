@@ -1,0 +1,89 @@
+{
+  "kind": "native-openshell-component",
+  "runId": "e7b66fcc-7bb7-42bf-ab37-551a5c323ba1",
+  "grant": {
+    "id": "8554cea8-2360-498c-b4d0-bae8fc41bbb5",
+    "root": "/home/jj/.local/share/weiwu/validation/native-capabilities-20261018-v2/grant",
+    "allowCommands": false
+  },
+  "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+  "modelCalls": 0,
+  "pluginCalls": 7,
+  "firstPid": 493176,
+  "pending": null,
+  "workspaceRevision": "141218fe721a58be614c74443980e075a267384e0ed13f7e702bb89a57fca7e6",
+  "execution": {
+    "kind": "openshell",
+    "version": "0.1.2",
+    "gateway": "weiwu-openshell-v012",
+    "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+    "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+    "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104",
+    "sandboxId": "0ce550be-46c5-42a5-89c1-f9192f251899",
+    "sandboxName": "wwe-7f433b82331a",
+    "uid": 1000,
+    "gid": 1000,
+    "node": "v24.19.0",
+    "cpu": [
+      100000,
+      100000
+    ],
+    "memory": "536870912",
+    "effectivePolicyHash": "27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5"
+  },
+  "artifacts": [
+    {
+      "path": "brief.pptx",
+      "size": 45506,
+      "sha256": "54591f22b369e48029ad9956485afc0a1d5ab5ae4e528a37487a385ccd33a2f5"
+    },
+    {
+      "path": "metrics.xlsx",
+      "size": 6420,
+      "sha256": "9b0a9b96b8183c63f367111a4829a9f3d1b364d07ea47580bf37a219a600f41f"
+    },
+    {
+      "path": "report.docx",
+      "size": 9614,
+      "sha256": "fc2195af2d3dd15e3d9d34890802a7f43950a669e7f6c1316d1188f974a33e64"
+    }
+  ],
+  "lastJob": {
+    "id": "9a938770-bc66-411f-a8c6-332f81780b4e",
+    "runId": "e7b66fcc-7bb7-42bf-ab37-551a5c323ba1",
+    "grantId": "8554cea8-2360-498c-b4d0-bae8fc41bbb5",
+    "name": "native_plugin",
+    "arguments": {
+      "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+      "toolName": "plugin__office__docx_read",
+      "originalName": "docx_read",
+      "arguments": {
+        "file_path": "report.docx"
+      },
+      "readPaths": [
+        "report.docx",
+        "metrics.xlsx",
+        "brief.pptx"
+      ],
+      "writePaths": [],
+      "expectedWorkspaceRevision": "141218fe721a58be614c74443980e075a267384e0ed13f7e702bb89a57fca7e6"
+    },
+    "context": {
+      "callId": "1d077a7d-a620-49aa-adba-c8a317ccfe27"
+    }
+  },
+  "beforeRestart": {
+    "workspaceRevision": "141218fe721a58be614c74443980e075a267384e0ed13f7e702bb89a57fca7e6",
+    "sandboxId": "0ce550be-46c5-42a5-89c1-f9192f251899",
+    "pluginCalls": 6
+  },
+  "resumePid": 497126,
+  "retirement": {
+    "runId": "e7b66fcc-7bb7-42bf-ab37-551a5c323ba1",
+    "sandboxId": "0ce550be-46c5-42a5-89c1-f9192f251899",
+    "state": "retired",
+    "replayed": false
+  },
+  "passed": true,
+  "restartVerified": true
+}

@@ -4,17 +4,18 @@ import {api} from './api.ts';
 import {ContextPolicy} from './ContextPolicy.tsx';
 import {RecoveryPolicy} from './RecoveryPolicy.tsx';
 import {ExecutionTarget} from './LocalDevices.tsx';
-const tools=[['artifact_write','交付物写入'],['filesystem','工作区文件'],['terminal','开发终端'],['terminal_test','测试终端'],['knowledge_search','知识检索'],['knowledge_read','知识原文'],['browser_read','网页读取'],['mcp_call_readonly','只读 MCP']] as const;
+import {useToolOptions} from './NativeCapabilities.tsx';
 export function ProjectPolicy({policy,models,departmentId,departmentIds,onChange,demo=false}:{policy:Policy;models:Model[];departmentId:string;departmentIds?:string[];onChange?:(value:Policy)=>void;demo?:boolean}){
  const [spaces,setSpaces]=useState<any[]>([]),[error,setError]=useState('');
+ const toolCatalog=useToolOptions();
  useEffect(()=>{api<any[]>('/knowledge/spaces').then(setSpaces).catch(e=>setError(e.message));},[]);
  const groups=[
   {key:'allowedModelIds',title:'允许的模型（含规划和备用）',options:models.map(m=>({id:m.id,name:m.name}))},
-  {key:'allowedTools',title:'允许的工具',options:tools.map(([id,name])=>({id,name}))},
+  {key:'allowedTools',title:'允许的工具',options:toolCatalog.options},
   {key:'allowedKnowledgeSpaceIds',title:'允许的知识空间',options:spaces.filter(s=>s.scope==='company'||(departmentIds??policy.allowedDepartmentIds??[departmentId]).includes(s.departmentId)).map(s=>({id:s.id,name:s.name}))},
  ] as const;
  return <section className="panel padded lower-small"><h3>项目执行策略</h3><p className="subcopy">这是项目可使用的范围。员工还需单独分配权限；私有知识空间仍按所属部门和员工检查。修改策略保存为新版本后，需要重新批准。</p>
-  {error&&<p role="alert" className="form-error">{error}</p>}
+  {(error||toolCatalog.error)&&<p role="alert" className="form-error">{error||toolCatalog.error}</p>}
   {onChange&&<div className="form-grid">{([['maxBudget','项目预算（USD）',.000001,10000],['maxAgents','策略最多员工',1,6],['maxConcurrentAgents','策略并发上限',1,6],['deadlineSeconds','策略执行时限（秒）',60,86400],['maxModelCalls','策略调用上限',1,1000],['maxTaskModelCalls','策略每员工每任务调用上限',1,1000],['contextBytes','策略上下文上限（字节）',4096,1000000]] as const).map(([key,label,min,max])=><label className="field" key={key}>{label}<input type="number" required min={min} max={max} step={key==='maxBudget'?'any':1} value={policy[key]??({maxModelCalls:100,maxTaskModelCalls:40,contextBytes:64000} as any)[key]} onChange={e=>onChange({...policy,[key]:e.target.valueAsNumber})}/></label>)}</div>}
   <ContextPolicy policy={policy} onChange={onChange}/>
   {demo?<div className="lower-small"><label className="field">文件与命令执行位置<strong>本机独立演示工作区</strong></label><p className="subcopy">仅执行预置 Todo 示例和两条 Node 测试命令；每条命令都需要逐次批准。</p></div>:<ExecutionTarget policy={policy} onChange={onChange}/>}

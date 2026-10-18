@@ -183,7 +183,7 @@ test('approved domain schemas are scoped to each employee before a model request
     revisions.set('reader', 2);
     reader.agent.followup(prompt('Use updated approved task and remaining budget')); await reader.agent.whenIdle();
     checkCurrentContext(readerId, 'reader', 2); checkCurrentContext(writerId, 'writer', 1);
-    await assert.rejects(host.call(reader.agent, 'artifact_write', { path: 'fixed.mjs', content: 'not permitted' }), /UNKNOWN_TOOL/);
+    await assert.rejects(host.call(reader.agent, 'artifact_write', { path: 'fixed.mjs', content: 'not permitted' }), /TOOL_PERMISSION_DENIED/);
     const denied = await host.ctx.tools.execute({ callId: randomUUID(), name: 'artifact_write', arguments: { path: 'fixed.mjs', content: 'not permitted' }, agent: reader.agent, signal: AbortSignal.timeout(1000) });
     assert.equal(denied.isError, true); assert.match(denied.error.message, /TOOL_PERMISSION_DENIED/); assert.equal(sandboxCalls.length, 0);
     const file = await host.call(reader.agent, 'filesystem', { path: 'fixed.mjs' });
@@ -202,7 +202,7 @@ test('approved domain schemas are scoped to each employee before a model request
     reader.agent.followup(prompt('Resume with the same approved grants')); await reader.agent.whenIdle();
     checkCurrentContext(readerId, 'reader', 3); checkCurrentContext(writerId, 'writer', 1);
     assert.deepEqual(requests.filter(item => item.sessionId === readerId).at(-1).tools.filter(tool => PRODUCT_TOOL_NAMES.includes(tool.name)).map(tool => tool.name).sort(), ['filesystem', 'knowledge_search']);
-    await assert.rejects(host.call(reader.agent, 'terminal', { command: 'unapproved' }), /UNKNOWN_TOOL/);
+    await assert.rejects(host.call(reader.agent, 'terminal', { command: 'unapproved' }), /TOOL_PERMISSION_DENIED/);
     assert.deepEqual(domain(writer.agent), ['artifact_write', 'terminal_test']); assert.deepEqual(domain(captain.agent), ['filesystem']);
     const records = readRun(join(root, 'runs'), archive.id).events.filter(event => event.type === 'runtime/tool-schema-filtered' && event.data.agentId === 'reader');
     assert.deepEqual(records.map(event => event.data.resumed), [false, true]);

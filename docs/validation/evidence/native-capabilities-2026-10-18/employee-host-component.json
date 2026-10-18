@@ -1,0 +1,32 @@
+{
+  "kind": "native-employee-host-component-integration",
+  "modelCalls": 0,
+  "checks": [
+    "binary outputs sealed by existing HandoffGate",
+    "native tools discovered within employee grants",
+    "ungranted write denied before worker",
+    "employee Host reopened with original plugin identity and producer hashes",
+    "independent ZIP/XML content verification; temporary runtime removed"
+  ],
+  "runId": "6488ee7b-6608-4b4b-a79b-5fae17bf7575",
+  "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+  "artifacts": [
+    {
+      "path": "brief.pptx",
+      "size": 45503,
+      "sha256": "a8fd5fc19e7f500b58c26f4d25232f8c6910d6a616df15ebfa0578100b96aef6"
+    },
+    {
+      "path": "metrics.xlsx",
+      "size": 6420,
+      "sha256": "8d7c7e2e6311f002719fd66ae7456d49e49b54a0999d2689087d310c1d1c895f"
+    },
+    {
+      "path": "report.docx",
+      "size": 9611,
+      "sha256": "fa5c80aa4ff4cbdf9ce912b07de6c525a47f0baa7bd634918d8525858bd7049e"
+    }
+  ],
+  "pluginCalls": 7,
+  "passed": true
+}

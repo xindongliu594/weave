@@ -7,6 +7,7 @@ import { Context } from '@deepseek-ai/cordis';
 import * as teams from '@nanmicoder/dsh-agent-teams';
 import { attachTrace } from './trace.mjs';
 import { installProductTools, employeeFor } from './product-tools.mjs';
+import { installNativePluginTools } from './native-plugin-tools.mjs';
 import { assignedTask } from './task-attribution.mjs';
 import { HandoffGate } from './handoff.mjs';
 import { ReworkGate } from './rework.mjs';
@@ -233,6 +234,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         }
       });
       productDispose = installProductTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId, captureReadScope, onReadEvidence, onWriteEvidence });
+      const disposeProduct = productDispose;
+      const disposeNative = installNativePluginTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId });
+      productDispose = () => { disposeNative(); disposeProduct(); };
       ctx.on('llm/stream', async function* (options, next) {
         product.goal?.check('model');
         product.supervisor?.check();

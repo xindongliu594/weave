@@ -1,11 +1,14 @@
 import { z } from 'zod';
 import { isArtifactPath, taskContractErrors } from './task-contracts.mjs';
+import { BUILTIN_TOOL_NAMES, isNativeToolName } from './native-tool-ids.mjs';
+
+export const toolNameSchema = z.string().max(64).refine(value => BUILTIN_TOOL_NAMES.includes(value) || isNativeToolName(value), '工具名称必须来自已授权目录');
 
 export const agentSchema = z.object({
   id: z.string().min(1).max(180), name: z.string().trim().min(1).max(80),
   role: z.enum(['manager', 'member']), title: z.string().trim().min(1).max(100),
   instructions: z.string().trim().min(1).max(10000), modelId: z.string().max(100),
-  tools: z.array(z.enum(['artifact_write', 'filesystem', 'terminal_test', 'terminal', 'knowledge_search', 'knowledge_read', 'browser_read', 'mcp_call_readonly'])).max(8),
+  tools: z.array(toolNameSchema).max(64),
   browserOrigins: z.array(z.string().url().max(500).refine(value => { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) && url.origin === value && !url.username && !url.password; }, '请填写精确网站来源，如 https://example.com')).max(10).optional(),
   mcpConnections: z.array(z.object({ connectionId: z.string().min(1).max(100), version: z.number().int().positive(), tools: z.array(z.string().min(1).max(200)).max(30) })).max(10).optional(),
   roleVersion: z.number().int().positive().optional(), templateId: z.string().max(100).optional(),
@@ -53,7 +56,7 @@ export const policySchema = z.object({
   mode: z.enum(['recommended', 'automatic', 'custom']).optional(),
   preference: z.enum(['economy', 'balanced', 'quality', 'custom']).optional(),
   allowedModelIds: z.array(z.string().min(1).max(100)).max(200).optional(),
-  allowedTools: z.array(agentSchema.shape.tools.element).max(6).optional(),
+  allowedTools: z.array(agentSchema.shape.tools.element).max(64).optional(),
   allowedKnowledgeSpaceIds: z.array(z.string().min(1).max(100)).max(180).optional(),
   allowedDepartmentIds: z.array(z.string().min(1).max(100)).min(1).max(20).optional(),
 });

@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executable candidate without host mappings is rejected without save or hidden model repair (7453.7797ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (128.2086ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (243.0937ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (106.1897ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (179.1336ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (229.7493ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (93.7262ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (239.1581ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (159.1741ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (53.3965ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (595.7289ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (265.1976ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (246.4342ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (196.8624ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (217.0955ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (612.1117ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (87.3289ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (48.2314ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (316.9978ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (345.4669ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13055.0699

@@ -1,0 +1,53 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executable candidate without host mappings is rejected without save or hidden model repair (2905.486ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (37.8155ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (99.3448ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (39.8135ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (68.3108ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (80.1877ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (29.6779ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (82.7171ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (63.4208ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (30.6387ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (245.6755ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (103.9433ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (100.8884ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (89.6981ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (137.2026ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (264.3131ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (48.7068ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (36.7708ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (255.624ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (256.4098ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5521.4952
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (1965.7531ms)
+✔ active paid manager replies block export and restore before any database replacement (104.1823ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (296.9493ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3024.6284
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (6117.7879ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20580.5744ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (1768.4501ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (258.4376ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29440.62

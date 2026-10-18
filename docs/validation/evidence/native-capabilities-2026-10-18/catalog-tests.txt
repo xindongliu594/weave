@@ -1,0 +1,14 @@
+✔ native catalog binds package, config, tool schemas and file permissions in content identity (3.9989ms)
+✔ approval checks registered file effects, not merely native tool name syntax (1.5963ms)
+✔ native binding denies absent grants, mismatched identity and duplicate tool names (0.9522ms)
+✔ native file declaration resolves fallback outputs and rejects escapes before execution (1.3301ms)
+✔ local launcher stores installed plugins in the workspace, independently of its credential directory (1.4305ms)
+✔ registry admits installed bytes, preserves old version across upgrade, denies revoke/tamper and missing grants (3236.6082ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6098.7134

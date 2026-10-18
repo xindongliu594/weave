@@ -53,7 +53,8 @@ async function startOpenShell() {
     const checked=openshellBootstrap.readConfig(configFile,{fingerprint:canonicalConfigFingerprint});
     const opened=openshellBootstrap.prepareDevice({root,...checked,seal,unseal,reenable:process.env.LOCAL_ENABLE_OPENSHELL_DEVICE==='explicit'});
     if (opened.device.id===device.id || opened.device.grant.id===device.grant.id) throw Error('OpenShell 设备不得复用原本机授权');
-    const executor=new OpenShellDeviceExecutor({grant:opened.device.grant,config:checked.config,journalRoot:opened.journalRoot});
+    const {readNativeBundle}=await import('../apps/api/src/native-capabilities.ts');
+    const executor=new OpenShellDeviceExecutor({grant:opened.device.grant,config:checked.config,journalRoot:opened.journalRoot,loadNativeBundle:readNativeBundle});
     openshellClient=new LocalDeviceClient({connection:{server:`http://127.0.0.1:${apiPort}/`},device:opened.device,journalRoot:opened.journalRoot,executor,pollMs:500,onState:(state:any)=>{openshellStatus={status:state.status,deviceId:opened.device.id,backend:opened.backend};}});
     await openshellClient.start();
     openshellStatus={status:'connected',deviceId:opened.device.id,backend:opened.backend};

@@ -1,0 +1,19 @@
+{
+  "namespace": "office",
+  "package": "@huiliyi37/dsh-office",
+  "version": "0.2.4",
+  "source": {"kind": "npm", "reference": "@huiliyi37/dsh-office@0.2.4", "integrity": "sha512-cTLnwzv9MdIXGO4vfK+1QHkOziZndFF4K/T8B98Im8h3gmQn1sAUpQ1z5PliEQHJsX4j4jCbFBBPBx37XFsZGw=="},
+  "config": {"enable": {"pdf": false}},
+  "files": {
+    "docx_create": {"read": [], "write": ["destination_path"]},
+    "docx_read": {"read": ["file_path"], "write": []},
+    "xlsx_write": {"read": [], "write": ["file_path"]},
+    "xlsx_read": {"read": ["file_path"], "write": []},
+    "xlsx_edit": {"read": ["file_path"], "write": [{"field": "output_path", "fallback": "file_path"}]},
+    "xlsx_recalc": {"read": ["file_path"], "write": ["file_path"]},
+    "xlsx_audit": {"read": ["file_path"], "write": []},
+    "pptx_create": {"read": [], "write": ["destination_path"]},
+    "pptx_read": {"read": ["file_path"], "write": []},
+    "pptx_edit": {"read": ["file_path"], "write": [{"field": "output_path", "fallback": "file_path"}]}
+  }
+}

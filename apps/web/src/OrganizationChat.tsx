@@ -1,3 +1,4 @@
+import {useToolOptions} from "./NativeCapabilities.tsx";
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUp, CheckCircle2, ChevronDown, LoaderCircle, MessageSquare, Plus, Settings2, ShieldCheck, Users } from 'lucide-react';
 import { departmentSchema, planSchema, policySchema, type Model, type Policy } from '../../../packages/contracts/index.ts';
@@ -105,6 +106,8 @@ function initialDraft(): Draft {
 }
 
 export function OrganizationChat({ models, onSaved, onDepartments, onProject, onModels, demo = false, onDemo }: { models: Model[]; onSaved: () => Promise<void>; onDepartments: () => void; onProject: (projectId: string) => void; onModels: () => void; demo?: boolean; onDemo?: () => void }) {
+  const nativeToolCatalog=useToolOptions();
+  const availableToolNames={...toolNames,...Object.fromEntries(nativeToolCatalog.options.filter(tool=>tool.id.startsWith('plugin__')).map(tool=>[tool.id,tool.name]))};
   const [draft, setDraft] = useState<Draft>(initialDraft), [busy, setBusy] = useState<'chat' | 'save' | null>(null), [error, setError] = useState(''), [pending, setPending] = useState('');
   const [requestHistory, setRequestHistory] = useState<OrganizationPendingRequestHistory[]>(() => { try { return readOrganizationPendingHistory(sessionStorage); } catch { return []; } });
   const end = useRef<HTMLDivElement>(null), inputRef = useRef<HTMLTextAreaElement>(null), inFlight = useRef(false);
@@ -202,7 +205,7 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
               </div>
               <p className="organization-fee">项目预算用于确认保存后的执行。新需求对话由中转站计费，实际用量另行记录，不做预算预留，也不按项目或每日预算拦截。</p>
               <OrganizationAllowedModels policy={draft.policy} planningModelId={draft.modelId} models={models} disabled={!!busy || !!draft.pendingRequest} onChange={policy => setDraft(value => ({ ...value, policy }))}/>
-              <p className="subcopy">可为员工建议的工作能力</p><div className="organization-tool-options">{Object.entries(toolNames).map(([tool, label]) => <label key={tool}><input type="checkbox" checked={draft.policy.allowedTools?.includes(tool as any) ?? false} onChange={event => changePolicy({ allowedTools: event.target.checked ? [...(draft.policy.allowedTools ?? []), tool as any] : draft.policy.allowedTools?.filter(item => item !== tool) })}/>{label}</label>)}</div>
+              <p className="subcopy">可为员工建议的工作能力</p><div className="organization-tool-options">{Object.entries(availableToolNames).map(([tool, label]) => <label key={tool}><input type="checkbox" checked={draft.policy.allowedTools?.includes(tool as any) ?? false} onChange={event => changePolicy({ allowedTools: event.target.checked ? [...(draft.policy.allowedTools ?? []), tool as any] : draft.policy.allowedTools?.filter(item => item !== tool) })}/>{label}</label>)}</div>
               <small>创建后还需批准项目才会执行；运行测试命令需逐次确认。</small>
             </fieldset>
           </details>

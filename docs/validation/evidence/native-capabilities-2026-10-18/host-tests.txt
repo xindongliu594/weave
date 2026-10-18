@@ -1,0 +1,19 @@
+✔ employee Hosts restrict arbitrary native tools, preserve grants on resume, and reject scoped shadows (583.7846ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (293.0846ms)
+✔ failed employee setup leaves no published Agent or resident Host (94.2924ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (79.612ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (538.1555ms)
+✔ employee discovers only authorized knowledge, methods and tools without loading all bodies (274.6991ms)
+✔ adoption requires actual reads, remains pending and deduplicates on cold resume (350.1483ms)
+✔ adoption cannot cross a task attempt change while source verification is pending (230.1078ms)
+✔ company Skill provider loads only selected fixed bodies and denies forged employee access (311.0311ms)
+✔ official Skill catalog and loader isolate employees, audit reads and retain fixed content on cold resume (319.7475ms)
+✔ native worker binds verified bytes, denies ungranted file reads and writes, returns real result (1044.3547ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4133.0101

@@ -1,4 +1,5 @@
 // Shared deterministic checks. This module is also used by the runtime, without a model.
+import { isNativeToolName } from './native-tool-ids.mjs';
 export const taskKinds = ['work', 'requirements', 'implementation', 'verification', 'review', 'repair', 'integration'];
 export function isArtifactPath(value) {
   return typeof value === 'string' && value.length > 0 && value.length <= 240 && !/[\\\0]/.test(value) &&
@@ -86,8 +87,10 @@ export function taskContractErrors(tasks, agents = [], checkpoints = [], { allow
     }
     if (agents.length) {
       const employee = agents.find(a => a.id === owner(task));
-      if (task.inputs?.length && !employee?.tools?.includes('filesystem')) errors.push(`${task.id}: 输入文件需要工作区读取权限`);
-      if (task.outputs?.length && !employee?.tools?.some(t => ['artifact_write', 'terminal', 'terminal_test'].includes(t))) errors.push(`${task.id}: 输出文件需要写入工具权限`);
+      // Native schemas are syntax here; approval resolves their installed file
+      // effects and execution enforces the exact task input/output contract.
+      if (task.inputs?.length && !employee?.tools?.some(t => t === 'filesystem' || isNativeToolName(t))) errors.push(`${task.id}: 输入文件需要工作区读取权限`);
+      if (task.outputs?.length && !employee?.tools?.some(t => ['artifact_write', 'terminal', 'terminal_test'].includes(t) || isNativeToolName(t))) errors.push(`${task.id}: 输出文件需要写入工具权限`);
       if (task.verify?.length && !employee?.tools?.some(t => ['terminal', 'terminal_test'].includes(t))) errors.push(`${task.id}: 验证命令需要终端权限`);
     }
   }

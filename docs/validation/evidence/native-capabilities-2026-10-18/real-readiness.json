@@ -1,0 +1,96 @@
+{
+  "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+  "authorization": {
+    "planning": 0.02,
+    "cumulative": 3.41,
+    "project": 0.4
+  },
+  "baseline": {
+    "spent": 2.7243078,
+    "reserved": 0.07377809999999999,
+    "unknownCount": 6
+  },
+  "initialQuote": {
+    "reservation": 0.0230373,
+    "inputBytes": 44023,
+    "allowed": false
+  },
+  "authorizedToolsQuote": {
+    "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+    "version": 1,
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "revisionRequest": "只规划此小任务，保留三位员工和原获授权工具。员工输出最多8192，完整执行预算在0.38内，给每节点6~9轮请求的余量但不得超项目0.40。三任务有序串行，QA绑定writer产物、经理绑定前两节点。请按现有schema及handoffContract类型生成可批准的具体计划，不执行工具。",
+    "checkedAt": "2026-10-18T04:59:49.193Z",
+    "maxPlanningCost": 0.02,
+    "maxOutputTokens": 8192,
+    "retainUncertainCosts": false,
+    "retainedCostEvidence": {
+      "retained": false,
+      "recordedCost": 0,
+      "reserved": 0,
+      "availableBudget": 0.4,
+      "receipts": []
+    },
+    "reservation": 0.0198675,
+    "inputBytes": 33457,
+    "rates": {
+      "inputRate": 0.3,
+      "outputRate": 1.2
+    },
+    "costReadiness": {
+      "recordedCost": 0,
+      "reserved": 0,
+      "availableBudget": 0.4,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    },
+    "executionHistory": {
+      "available": false,
+      "completedTaskIds": [],
+      "files": [],
+      "budget": {
+        "available": true,
+        "projectVersion": 1,
+        "calls": 0,
+        "callsBasis": "durable-admissions-and-archived-wire-requests",
+        "tasks": {},
+        "reserved": 0,
+        "unattributedReserved": 0,
+        "unattributedCalls": 0
+      },
+      "unknownOperationIds": [],
+      "knowledge": {
+        "available": false,
+        "documents": [],
+        "citations": [],
+        "authorizations": []
+      },
+      "issues": [
+        {
+          "code": "NO_RUN_HISTORY",
+          "message": "项目还没有运行档案；不能声明已有完成节点。"
+        }
+      ],
+      "rules": [
+        "历史完成、交接与文件版本仅作为候选规划依据，不自动继承或批准执行。",
+        "不得因文件存在就标记完成；旧版本完成节点不能冒充当前方案的完成节点。",
+        "保留原费用、未知预留、工具和知识授权；新候选仍需用户确认及独立恢复/执行校验。",
+        "调用次数来自持久化登记与实际 wire 档案，每个运行保守取较大值；未归属的费用和调用不得凭猜测分摊或视为零。"
+      ]
+    },
+    "conversation": {
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "messageIds": [],
+      "count": 0,
+      "omitted": 0,
+      "pendingCount": 0
+    },
+    "savedPlanIncluded": true,
+    "allowed": true,
+    "reasons": [],
+    "nativeExecutionChecked": false
+  },
+  "actualModelRun": "not verified: SSH connection timed out before remote command",
+  "restartRule": "Inspect persistent request state and costs before any dispatch; never replay a dispatched unknown operation"
+}

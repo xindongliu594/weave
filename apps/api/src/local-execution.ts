@@ -14,6 +14,7 @@ import {withFreshLocalAdmission} from './local-admission.ts';
 import {openRunArchive} from '../../../services/agent-runtime/trace-store.mjs';
 import {executionBackendSchema} from '../../../packages/contracts/index.ts';
 import {executionBackend,assertExecutionBackendBinding,assertExecutionBackendReceipt} from './execution-backend.ts';
+import {nativeToolBinding,nativeFileAccess} from '../../../services/agent-runtime/native-capabilities.mjs';
 const {decodeFiles,exportFiles,mirrorFiles,revision}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
 const digest=(value:string)=>createHash('sha256').update(value).digest();
 function validateResult(row:any,result:any){
@@ -21,6 +22,8 @@ function validateResult(row:any,result:any){
  if(typeof result.localWorkspace!=='string'||!result.localWorkspace||result.localWorkspace.length>4096)throw new AppError(422,'缺少本机工作区位置');
  if(name==='terminal'||name==='terminal_test'){
   if(!Number.isInteger(result.exitCode)||typeof result.output!=='string')throw new AppError(422,'缺少命令退出码或输出');
+ }else if(name==='native_plugin'){
+  if(result.pluginId!==args.pluginId||result.toolName!==args.toolName||typeof result.nativeResult?.isError!=='boolean')throw new AppError(422,'原生插件回执版本或工具不匹配');
  }else if(name==='filesystem'||name==='artifact_write'){
   const file=files.find((item:any)=>item.path===args.path);
   if(result.path!==args.path||!file||result.sha256!==createHash('sha256').update(file.bytes).digest('hex'))throw new AppError(422,'文件回执与回传内容不符');
@@ -84,9 +87,17 @@ export class LocalOperationService {
    await assertRunAuthorization(run,db,{requireLocalOnline:false});const target=await localTarget(run.snapshot.policy,run.snapshot.agents,db,false);
    if(target.kind!=='local')throw new AppError(422,'此运行没有批准本机设备','LOCAL_TARGET_DENIED');
    const employee=run.snapshot.agents.find((agent:any)=>agent.id===context.agentId);
-   if(name!=='prepare'&&(!employee?.tools.includes(name)||!context.callId||!context.sessionId))throw new AppError(422,'本机操作不属于获授权员工','LOCAL_EMPLOYEE_DENIED');
+   if(name!=='prepare'&&(!employee?.tools.includes(name==='native_plugin'?args.toolName:name)||!context.callId||!context.sessionId))throw new AppError(422,'本机操作不属于获授权员工','LOCAL_EMPLOYEE_DENIED');
    if(name==='prepare')decodeFiles(files??[]);
-   else if(!['artifact_write','filesystem','terminal','terminal_test'].includes(name))throw new AppError(422,'未开放此本机工具');
+   else if(name==='native_plugin'){
+    if(target.backend?.kind!=='openshell')throw new AppError(422,'原生插件需要 OpenShell 隔离','NATIVE_BACKEND_REQUIRED');
+    const binding=nativeToolBinding(run.snapshot,args.toolName),tool=binding.manifest.tools.find((item:any)=>item.name===args.toolName);
+    const access=nativeFileAccess(tool,args.arguments),task=run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&item.assigneeId===employee.id);
+    if(!task||!Array.isArray(task.inputs)||!Array.isArray(task.outputs))throw new AppError(422,'原生插件必须固定当前任务的输入和输出合同','NATIVE_TASK_REQUIRED');
+    const readPaths=[...new Set<string>([...task.inputs,...task.outputs].map((item:any)=>item.path))],writePaths=task.outputs.map((item:any)=>item.path);
+    if(access.read.some(path=>!readPaths.includes(path))||access.write.some(path=>!writePaths.includes(path)))throw new AppError(422,'原生插件参数超出当前任务文件合同','NATIVE_PATH_DENIED');
+    args={toolName:tool.name,pluginId:binding.id,originalName:tool.originalName,arguments:args.arguments,expectedWorkspaceRevision:args.expectedWorkspaceRevision,readPaths,writePaths:access.write.length?writePaths:[]};
+   }else if(!['artifact_write','filesystem','terminal','terminal_test'].includes(name))throw new AppError(422,'未开放此本机工具');
    let approvalId=null;
    if(name==='terminal'||name==='terminal_test'){
     approvalId=z.uuid().parse(context.approvalId);

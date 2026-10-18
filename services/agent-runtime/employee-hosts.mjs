@@ -4,7 +4,7 @@ import { LlmAdapter, HarnessError, createUserMessage } from '@deepseek-ai/dsh-ll
 import { joinContextSections } from '@deepseek-ai/dsh-system-prompt';
 import { randomUUID } from 'node:crypto';
 import { installEmployeeContext } from './employee-context.mjs';
-import { PRODUCT_TOOL_NAMES } from './product-tools.mjs';
+import { installEmployeeToolAccess } from './employee-tool-access.mjs';
 import { installApprovedSkills } from './approved-skills.mjs';
 import { installEmployeeCapabilities } from './employee-capabilities.mjs';
 import { projectAssignmentReports, projectClaimReport } from './assignment-reports.mjs';
@@ -21,6 +21,9 @@ export class EmployeeHostFactory {
     this.closed = false;
     this.completionReminders = new Set();
     this.closureNotices = new Set();
+    // The factory is installed before agent-teams mounts its tools. Freeze at
+    // first admission, after that native registration phase has completed.
+    this.coordinatorDefinitions = undefined;
   }
 
   createAgent(ownerCtx, options) { return this.materialize(ownerCtx, options, false); }
@@ -28,6 +31,7 @@ export class EmployeeHostFactory {
 
   async materialize(ownerCtx, options, resume) {
     if (this.closed) throw Error('EMPLOYEE_HOSTS_CLOSED');
+    this.coordinatorDefinitions ??= new Map(this.coordinator.tools.schemas().map(schema => [schema.name, this.coordinator.tools.get(schema.name)]));
     ownerCtx.fiber.assertActive();
     const sessionId = resume ? options.resumeSessionId : options.sessionId;
     if (this.live.has(sessionId)) throw Error('EMPLOYEE_ALREADY_ACTIVE: ' + sessionId);
@@ -112,12 +116,13 @@ export class EmployeeHostFactory {
       });
       const claimReport=(agent,value)=>this.protectedContext&&this.assignmentReports
         ? projectClaimReport(value,JSON.parse(this.protectedContext(agent)),this.assignmentReports(agent)):value;
-      for (const schema of coordinator.tools.schemas()) {
-        const definition = coordinator.tools.get(schema.name);
+      for (const [name, definition] of this.coordinatorDefinitions) {
+        const schema = { name };
         const structuredHandoff = this.protectedContext && schema.name === 'agent_teams_update_task';
         const contextForHandoff = this.protectedContext;
         ctx.tools.register({ ...(structuredHandoff ? employeeHandoffDefinition(definition) : definition), async execute(args, exec) {
           if (coordinator.agents.get(exec.agent?.id) !== exec.agent) throw Error('EMPLOYEE_NOT_LIVE');
+          if (coordinator.tools.get(name) !== definition) throw new HarnessError('已批准的工具定义已变化，请重新核对运行版本', 'TOOL_DEFINITION_CHANGED');
           const normalized = structuredHandoff && Object.hasOwn(args,'report')
             ? nativeHandoffArguments(args, JSON.parse(contextForHandoff(exec.agent) || '{}').task) : args;
           const forwarded=prepareToolArguments?.(exec.agent,schema.name,normalized)??normalized;
@@ -201,12 +206,9 @@ export class EmployeeHostFactory {
           // this known employee's domain schemas before publication/assembly;
           // the coordinator's execution permission checks remain authoritative.
           if (!Array.isArray(employee.tools)) throw new HarnessError('无法核对员工已批准的工具权限', 'TOOL_PERMISSION_IDENTITY');
-          const known = new Set(ctx.tools.schemas().map(schema => schema.name));
-          const granted = PRODUCT_TOOL_NAMES.filter(name => known.has(name) && employee.tools.includes(name));
-          const denied = PRODUCT_TOOL_NAMES.filter(name => known.has(name) && !employee.tools.includes(name));
-          if (denied.length) agentCtx.tools.restrict({ deny: denied });
           installEmployeeCapabilities(ctx,{employee,agent,manifest:this.skillManifest,queryKnowledge:this.queryKnowledge,archive:this.archive,activeWork:this.activeWork});
-          this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, granted, removed: denied, resumed: resume }, { sessionId: agent.id });
+          const access = installEmployeeToolAccess(ctx, agentCtx, { agent, employee });
+          this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, ...access, resumed: resume }, { sessionId: agent.id });
         }
         return { commit: () => {
           signal.throwIfAborted(); prepared?.commit();

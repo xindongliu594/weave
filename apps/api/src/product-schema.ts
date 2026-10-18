@@ -27,6 +27,7 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE knowledge_spaces ADD COLUMN IF NOT EXISTS vault_folder text;
     ALTER TABLE knowledge_documents ADD COLUMN IF NOT EXISTS vault_path text;
     ALTER TABLE knowledge_documents ADD COLUMN IF NOT EXISTS vault_hash text;
+    CREATE TABLE IF NOT EXISTS native_capabilities(namespace text PRIMARY KEY, manifest_id text NOT NULL, enabled boolean NOT NULL DEFAULT false, updated_at timestamptz NOT NULL DEFAULT now());
     CREATE TABLE IF NOT EXISTS product_settings (id integer PRIMARY KEY CHECK(id=1), version integer NOT NULL DEFAULT 1, data jsonb NOT NULL);
     INSERT INTO product_settings(id,data) VALUES(1,'{"autoBudgetLimit":0.25,"dailyBudgetLimit":20,"maxActiveRuns":2,"retentionDays":0}') ON CONFLICT DO NOTHING;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS lease_owner text;

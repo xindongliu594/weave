@@ -4,6 +4,7 @@ const {createHash,randomUUID,randomBytes}=require('node:crypto');
 const {spawn}=require('node:child_process');
 const {validPath,canonicalManifest}=require('./local-executor.cjs');
 const {SANDBOX_STORAGE_LIMITS,storageDenied,boundedStorage,checkSandboxStorage}=require('./sandbox-storage.cjs');
+const {runNativeTool}=require('./native-plugin-worker.cjs');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const POLICY_TEXT='version: 1\nfilesystem_policy:\n  include_workdir: false\n  read_only: [/bin, /usr, /lib, /lib64, /etc, /proc, /dev/urandom, /var/tmp, /sys/fs/cgroup]\n  read_write: [/sandbox, /tmp, /dev/null]\nlandlock:\n  compatibility: hard_requirement\nprocess:\n  run_as_user: "1000"\n  run_as_group: "1000"\nnetwork_policies: {}\nnetwork_middlewares: {}\n';
@@ -70,6 +71,7 @@ const SANDBOX_STORAGE_LIMITS=${JSON.stringify(SANDBOX_STORAGE_LIMITS)};
 ${storageDenied.toString()}
 ${boundedStorage.toString()}
 ${checkSandboxStorage.toString()}
+${runNativeTool.toString()}
 function checkedPath(root,value){validPath(value);let at=root;if(!fs.lstatSync(at).isDirectory()||fs.lstatSync(at).isSymbolicLink())throw denied('沙箱工作区目录已被替换');for(const part of value.split('/')){at=path.join(at,part);try{const stat=fs.lstatSync(at);if(stat.isSymbolicLink()||stat.isFile()&&stat.nlink>1)throw denied('沙箱工作区不允许链接');}catch(error){if(error.code!=='ENOENT')throw error;}}return at;}
 function exportFiles(root){const files=[];let total=0,entries=0;function walk(dir){for(const name of fs.readdirSync(dir).sort()){if(++entries>512)throw denied('工作区项目数量超过限制','LOCAL_FILE_LIMIT');const full=path.join(dir,name),stat=fs.lstatSync(full),relative=path.relative(root,full).split(path.sep).join('/');checkedPath(root,relative);if(stat.isDirectory())walk(full);else if(stat.isFile()){if(files.length>=128||stat.size>5*1024*1024||(total+=stat.size)>20*1024*1024)throw denied('工作区文件超过限制','LOCAL_FILE_LIMIT');files.push({path:relative,content:fs.readFileSync(full).toString('base64')});}else throw denied('工作区出现非普通文件');}}walk(root);decodeFiles(files);return files;}
 function manifest(files){return canonicalManifest(decodeFiles(files).map(file=>({path:file.path,size:file.bytes.length,sha256:hash(file.bytes)})));}
@@ -100,6 +102,7 @@ process.stdin.on('end',async()=>{let request,changed=false;try{
  else if(request.name==='filesystem'){const file=checkedPath(root,args.path),stat=fs.lstatSync(file);if(!stat.isFile()||stat.size>1024*1024)throw denied('读取文件超过限制','LOCAL_FILE_LIMIT');const bytes=fs.readFileSync(file);result={path:args.path,content:bytes.toString('utf8'),sha256:hash(bytes)};}
  else if(request.name==='artifact_write'){if(typeof args.content!=='string'||Buffer.byteLength(args.content)>5*1024*1024)throw denied('写入文件超过限制','LOCAL_FILE_LIMIT');validPath(args.path);decodeFiles([...files.filter(f=>f.path!==args.path),{path:args.path,content:Buffer.from(args.content).toString('base64')}]);writeVersion(root,args.path,Buffer.from(args.content),args.expectedSha256);changed=true;result={path:args.path,bytes:Buffer.byteLength(args.content),sha256:hash(Buffer.from(args.content))};}
  else if(request.name==='terminal'||request.name==='terminal_test'){changed=true;result=await command(args.command,root);}
+ else if(request.name==='native_plugin'){changed=true;const nativeResult=await runNativeTool({root,tempRoot:'/tmp',bundle:request.bundle,originalName:args.originalName,args:args.arguments,callId:request.callId,readPaths:args.readPaths,writePaths:args.writePaths},{checkStorage:checkSandboxStorage});result={nativeResult,pluginId:args.pluginId,toolName:args.toolName};}
  else if(request.name==='storage_inspect'){}
  else throw denied('沙箱工具未开放');
  const storage=checkSandboxStorage();files=exportFiles(root);console.log(JSON.stringify({nonce:request.nonce,ok:true,result:{...result,files,artifacts:manifest(files),workspaceRevision:revision(files),storage},identity}));
@@ -108,7 +111,7 @@ process.stdin.on('end',async()=>{let request,changed=false;try{
 `;
 
 class OpenShellDeviceExecutor {
- constructor({grant,config,journalRoot,transport}={}){
+ constructor({grant,config,journalRoot,transport,loadNativeBundle}={}){
   if(!uuid.test(grant?.id))throw denied('OpenShell 目录授权不正确');
   if(transport!==undefined&&typeof transport!=='function')throw denied('OpenShell transport 必须为显式函数依赖');
   this.grant={...grant,root:canonicalPath(grant.root,{directory:true})};this.identity=fs.statSync(this.grant.root);
@@ -118,6 +121,7 @@ class OpenShellDeviceExecutor {
   if(!transport){canonicalPath(config.cliPath);if(hash(fs.readFileSync(config.cliPath))!==config.cliSha256)throw denied('OpenShell CLI 文件已经变化','OPENSHELL_CONFIG_MISMATCH');}
   if(typeof journalRoot!=='string'||!path.isAbsolute(journalRoot))throw denied('OpenShell 私有回执目录不正确');
   this.stateRoot=path.join(journalRoot,'openshell-scopes');this.transport=transport??cliTransport;this.defaultTransport=transport===undefined;
+  this.loadNativeBundle=loadNativeBundle;
   this.backend={kind:'openshell',version:config.version,gateway:config.gateway,image:config.image,policySha256:config.policyHash,fingerprint:canonicalConfigFingerprint(config)};
   this.env={PATH:'/usr/local/bin:/usr/bin:/bin',HOME:config.home,XDG_CONFIG_HOME:path.join(config.home,'.config'),OPENSHELL_COLOR:'never',LANG:'C.UTF-8'};
   this.queue=Promise.resolve();this.scopes=new Map();this.closed=false;this.closing=null;
@@ -165,7 +169,14 @@ class OpenShellDeviceExecutor {
  execute(job,signal){if(this.closing||this.closed)return Promise.reject(denied('OpenShell 执行器已关闭'));const task=this.queue.then(()=>this.perform(job,signal));this.queue=task.catch(()=>{});return task;}
  async perform(job,signal){
   signal?.throwIfAborted();this.assertGrant(job);
-  const args=job.arguments??{};if(!['prepare','filesystem','artifact_write','terminal','terminal_test'].includes(job.name))throw denied('OpenShell 工具未开放');
+  const args=job.arguments??{};if(!['prepare','filesystem','artifact_write','terminal','terminal_test','native_plugin'].includes(job.name))throw denied('OpenShell 工具未开放');
+  let bundle;
+  if(job.name==='native_plugin'){
+   if(!this.loadNativeBundle||!/^[a-f0-9]{64}$/.test(args.pluginId)||!/^plugin__[a-z][a-z0-9_]{0,19}__[a-z][a-z0-9_]{0,31}$/.test(args.toolName))throw denied('原生插件安装或工具绑定不可用','NATIVE_BUNDLE_UNAVAILABLE');
+   const installed=await this.loadNativeBundle(args.pluginId),tool=installed.manifest.tools.find(item=>item.name===args.toolName);
+   if(!tool||tool.originalName!==args.originalName)throw denied('原生插件注册定义不匹配','NATIVE_VERSION_MISMATCH');
+   bundle={...installed.manifest.bundle,compressed:installed.compressed.toString('base64'),metadata:installed.metadata.toString('base64')};
+  }
   if(['filesystem','artifact_write'].includes(job.name))validPath(args.path);
   if(['terminal','terminal_test'].includes(job.name)&&(!this.grant.allowCommands||!uuid.test(job.approvalId??'')))throw denied('沙箱命令缺少授权或逐次批准');
   if(job.name==='artifact_write'&&(typeof args.content!=='string'||Buffer.byteLength(args.content)>5*1024*1024))throw denied('写入文件超过限制','LOCAL_FILE_LIMIT');
@@ -198,7 +209,7 @@ class OpenShellDeviceExecutor {
    }
    await this.admit(scope,signal);
    const nonce=randomBytes(16).toString('hex');dispatched=true;
-   const response=await this.cli(['sandbox','exec','--name',scope.name,'--workdir','/sandbox','--no-tty','--no-login-shell','--timeout','75','--','node','-e',REMOTE_SCRIPT],signal,{input:JSON.stringify({nonce,name:job.name,arguments:args,...(job.name==='prepare'?{files:job.files??[]}:{expectedStoredRevision:scope.workspaceRevision})}),timeoutMs:90000,mutation:true});
+   const response=await this.cli(['sandbox','exec','--name',scope.name,'--workdir','/sandbox','--no-tty','--no-login-shell','--timeout','75','--','node','-e',REMOTE_SCRIPT],signal,{input:JSON.stringify({nonce,name:job.name,arguments:args,...(bundle?{bundle,callId:job.context?.callId}:{}),...(job.name==='prepare'?{files:job.files??[]}:{expectedStoredRevision:scope.workspaceRevision})}),timeoutMs:90000,mutation:true});
    let receipt;try{receipt=JSON.parse(response.stdout);}catch{throw unknown('OpenShell 操作回执不完整');}
    if(receipt.nonce!==nonce||typeof receipt.ok!=='boolean')throw unknown('OpenShell 操作回执不匹配');
    if(!receipt.ok)throw Object.assign(Error(receipt.error?.message??'OpenShell 工具失败'),{code:receipt.error?.code??'LOCAL_OPERATION_FAILED',notExecuted:receipt.error?.notExecuted===true,knownRemoteOutcome:true});
