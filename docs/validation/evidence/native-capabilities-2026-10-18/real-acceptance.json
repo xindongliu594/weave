@@ -1,0 +1,1096 @@
+{
+  "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+  "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+  "status": "completed",
+  "error": null,
+  "eventCount": 736,
+  "artifacts": [
+    {
+      "path": "acceptance.json",
+      "size": 3079,
+      "sha256": "f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca"
+    },
+    {
+      "path": "qa.json",
+      "size": 3233,
+      "sha256": "a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630"
+    },
+    {
+      "path": "report.docx",
+      "size": 10162,
+      "sha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795"
+    }
+  ],
+  "events": [
+    {
+      "sessionId": "f2ef72c4-eb48-484f-a431-f2250843fe33",
+      "callId": "call_01_c43ppm1dxfje3xpja5f80tx2",
+      "seq": 123,
+      "at": "2026-10-18T05:55:41.522Z",
+      "type": "capability/tool-used",
+      "data": {
+        "agentId": "employee-2",
+        "name": "plugin__office__docx_create",
+        "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+        "package": "@huiliyi37/dsh-office",
+        "version": "0.2.4",
+        "isError": false
+      }
+    },
+    {
+      "sessionId": "f2ef72c4-eb48-484f-a431-f2250843fe33",
+      "callId": "call_00_k2jw2e6pks80ufrojn1slvr8",
+      "seq": 162,
+      "at": "2026-10-18T05:55:45.861Z",
+      "type": "capability/tool-used",
+      "data": {
+        "agentId": "employee-2",
+        "name": "plugin__office__docx_read",
+        "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+        "package": "@huiliyi37/dsh-office",
+        "version": "0.2.4",
+        "isError": false
+      }
+    },
+    {
+      "seq": 214,
+      "at": "2026-10-18T05:55:53.171Z",
+      "type": "handoff/accepted",
+      "data": {
+        "taskId": "write-docx",
+        "attemptId": "e6210ab3-2508-48fc-b022-ec45c1f8e9f1",
+        "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+        "workspaceRevision": "fd1b2daf59baa04194104e2e97bd674055030953ab4d8566711be9060924afce",
+        "inputs": [],
+        "outputs": [
+          {
+            "path": "report.docx",
+            "sha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795",
+            "size": 10162
+          }
+        ],
+        "commands": [],
+        "employeeReport": {
+          "version": 1,
+          "contractSha256": "70d002c8869cf1a6ea79c6bc8bd43a4449f452f7ae768158d0cc212f3b166aad",
+          "summary": "已用原版 plugin__office__docx_create 在工作区根目录生成 report.docx（sha256 819c06a9…3795），并用 plugin__office__docx_read 回读核验通过：标题、虚构测试资料标注（未访问网站、未做真实巡检）、三行检查表（首页-通过、登录-通过、备份-失败）、统计（总计3项，2项通过，1项失败）均齐备。仅产出 report.docx，未访问网络，未创建其他文件，未声称真实巡检。",
+          "sections": {
+            "artifact": "最终路径：工作区根目录 report.docx（相对路径 report.docx，size=10162 字节，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）。所用工具为原版 plugin__office__docx_create：先经 capability_search 确认该原版办公插件工具可用后，单次调用 docx_create 生成共 8 个内容块，未使用任何替代或补写路径。",
+            "readback": "plugin__office__docx_read 回读成功（无报错、无截断），回读全文事实要点：①标题“测试资料报告（虚构）”；②“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；③“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”；④检查表（检查项/结果）：首页/通过、登录/通过、备份/失败；⑤统计“总计 3 项，2 项通过，1 项失败。”。回读产物 sha256 与写入一致，确认落盘内容即所建内容。",
+            "notice": "确认已标注：文档醒目标注“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”，并附加说明三条结果均为用户提供的虚构测试数据、不代表任何真实系统状态。全文无任何声称访问外部网站、执行真实巡检或存在真实实测结果的表述；本次执行未访问任何网络站点。",
+            "limits": "已知偏差或未完成点：无。说明：本任务仅负责 report.docx；qa.json 与 acceptance.json 属 outOfScope，由 QA 与经理员工分别产出，本员工未创建、未读取，故不在本报告中评判。回读文本按插件抽取顺序将表格单元格逐行输出，属工具正常提取呈现，非内容缺失。"
+          },
+          "risks": [],
+          "acceptanceResults": [
+            {
+              "criterion": "report.docx 存在且可被 docx_read 成功读出文本",
+              "status": "passed",
+              "evidence": "plugin__office__docx_create 返回 report.docx（size=10162, sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）；plugin__office__docx_read 回读成功返回全文，无报错。"
+            },
+            {
+              "criterion": "文档明确标注为虚构测试资料，未声称访问网站或真实巡检",
+              "status": "passed",
+              "evidence": "回读文本含原句“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”全文无任何声称真实巡检或访问网站的表述。"
+            },
+            {
+              "criterion": "含三行检查结果：首页=通过、登录=通过、备份=失败",
+              "status": "passed",
+              "evidence": "回读文本表格依次为 检查项/结果 → 首页/通过 → 登录/通过 → 备份/失败。"
+            },
+            {
+              "criterion": "统计为总计3项、2项通过、1项失败",
+              "status": "passed",
+              "evidence": "回读文本含“总计 3 项，2 项通过，1 项失败。”"
+            },
+            {
+              "criterion": "除 report.docx 外未创建其他交付文件",
+              "status": "passed",
+              "evidence": "本次仅调用一次 docx_create 写入 report.docx；qa.json 与 acceptance.json 属 outOfScope，由 QA/经理员工产出，本员工未创建。"
+            }
+          ]
+        },
+        "acceptedAt": "2026-10-18T05:55:53.112Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+          "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+          "projectVersion": 3,
+          "capturedAt": "2026-10-18T05:55:53.112Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.4,
+            "occupied": 0.04559339999999999,
+            "activeReserved": 0,
+            "available": 0.3544066,
+            "callsUsed": 4,
+            "callLimit": 23,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.0328173,
+            "retainedUnknownReservation": 0,
+            "availableBudget": 0.36718270000000003,
+            "callsUsed": null,
+            "callsBasis": "archived-model-wire-request-count",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    },
+    {
+      "sessionId": "2b65bad1-5c33-401f-aa75-73e4886e89b9",
+      "callId": "call_01_g1blnm39dlo4147qzpaih66l",
+      "seq": 308,
+      "at": "2026-10-18T05:56:00.602Z",
+      "type": "capability/tool-used",
+      "data": {
+        "agentId": "employee-3",
+        "name": "plugin__office__docx_read",
+        "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+        "package": "@huiliyi37/dsh-office",
+        "version": "0.2.4",
+        "isError": false
+      }
+    },
+    {
+      "seq": 404,
+      "at": "2026-10-18T05:56:13.713Z",
+      "type": "handoff/accepted",
+      "data": {
+        "taskId": "qa-verify",
+        "attemptId": "56865af0-93a6-43db-83b3-fc474ecb72d5",
+        "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+        "workspaceRevision": "0c432479f909e9dcdf6bbf1b36be1d6cf0f91dcbb9f7aaea2a7569d678eae2c8",
+        "inputs": [
+          {
+            "path": "report.docx",
+            "sha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795",
+            "size": 10162,
+            "producerTaskId": "write-docx"
+          }
+        ],
+        "outputs": [
+          {
+            "path": "qa.json",
+            "sha256": "a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630",
+            "size": 3233
+          }
+        ],
+        "commands": [],
+        "employeeReport": {
+          "version": 1,
+          "contractSha256": "ee7871237c8c5a6924a65e40bee48d576c9e2280acd395ec88a25203bbf22e07",
+          "summary": "独立 docx_read 回读 report.docx 成功，五条核对项（虚构标注、首页=通过、登录=通过、备份=失败、总计3项/2通过/1失败）全部与原始事实一致，verdict=pass；qa.json 已写出，未修改 DOCX。",
+          "sections": {
+            "verdict": "pass —— 直接用 plugin__office__docx_read 回读 report.docx 的原文，虚构测试资料标注、三条检查结果与统计共 5 项核对全部逐字命中预期，无不符点，故 verdict=pass。",
+            "evidence": "qa.json 路径：qa.json（工作区根目录，3233 字节，sha256 a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）。逐项核对到的 DOCX 事实（回读 report.docx，sha256 819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795，size=10162）：①标题“测试资料报告（虚构）”；②“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；③“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”；④检查表 检查项/结果 → 首页/通过、登录/通过、备份/失败；⑤“总计 3 项，2 项通过，1 项失败。” 算术自洽：2 通过 + 1 失败 = 3 项。checks 五条 result 均为 pass、consistent 均为 true。",
+            "findings": "一致确认：虚构标注（标题与两句免责声明，全文无任何声称访问网站/真实巡检的表述）、首页=通过、登录=通过、备份=失败、统计 3/2/1 五项均与原始事实逐字一致，未发现任何不符点。证据来源为独立 docx_read 回读文本本身，未采信 writer 交接总结作为证据。限制说明（已写入 qa.json findings）：仅做内容事实核对，未做像素级版式校验；本员工未修改 report.docx（outOfScope），仅执行只读 docx_read 与 qa.json 写入，未创建其他文件、未访问网络。"
+          },
+          "risks": [],
+          "acceptanceResults": [
+            {
+              "criterion": "qa.json 存在且含 verdict、checks、findings 三个字段",
+              "status": "passed",
+              "evidence": "artifact_write 返回 qa.json（3233 字节，sha256 a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630），内容为 JSON 对象，顶层含 verdict/checks/findings（另含 documentRead 说明项）。"
+            },
+            {
+              "criterion": "checks 覆盖首页、登录、备份三条结果与总计统计",
+              "status": "passed",
+              "evidence": "checks 共 5 项：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计（总计 3 项，2 项通过，1 项失败），每项含 expected/observed/result/consistent/evidenceQuote。"
+            },
+            {
+              "criterion": "结论与实际 DOCX 内容一致；不符时 verdict 为 fail 并记录 findings",
+              "status": "passed",
+              "evidence": "独立 plugin__office__docx_read 回读 report.docx 原文（sha256 819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）：标题“测试资料报告（虚构）”；“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；表 首页/通过、登录/通过、备份/失败；“总计 3 项，2 项通过，1 项失败。” 全部与预期一致，故 verdict=pass，无不符点。"
+            }
+          ]
+        },
+        "acceptedAt": "2026-10-18T05:56:13.629Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+          "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+          "projectVersion": 3,
+          "capturedAt": "2026-10-18T05:56:13.629Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.4,
+            "occupied": 0.059777999999999984,
+            "activeReserved": 0,
+            "available": 0.340222,
+            "callsUsed": 8,
+            "callLimit": 23,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.0328173,
+            "retainedUnknownReservation": 0,
+            "availableBudget": 0.36718270000000003,
+            "callsUsed": null,
+            "callsBasis": "archived-model-wire-request-count",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    },
+    {
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "callId": "call_01_m2bt1n7389lon4xc6dka2gzl",
+      "seq": 494,
+      "at": "2026-10-18T05:56:20.412Z",
+      "type": "capability/tool-used",
+      "data": {
+        "agentId": "employee-1",
+        "name": "plugin__office__docx_read",
+        "pluginId": "b5f22d348f38f55c912bde3bb6d55e4bd6df09ca64dedbf10f0ba10535173df4",
+        "package": "@huiliyi37/dsh-office",
+        "version": "0.2.4",
+        "isError": false
+      }
+    },
+    {
+      "seq": 717,
+      "at": "2026-10-18T05:56:56.781Z",
+      "type": "handoff/accepted",
+      "data": {
+        "taskId": "manager-accept",
+        "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+        "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+        "workspaceRevision": "a15cfbdedfd0ba0b8bb73217ffd87fc1095a20717ba72463b3614e614b008d96",
+        "inputs": [
+          {
+            "path": "report.docx",
+            "sha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795",
+            "size": 10162,
+            "producerTaskId": "write-docx"
+          },
+          {
+            "path": "qa.json",
+            "sha256": "a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630",
+            "size": 3233,
+            "producerTaskId": "qa-verify"
+          }
+        ],
+        "outputs": [
+          {
+            "path": "acceptance.json",
+            "sha256": "f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca",
+            "size": 3079
+          }
+        ],
+        "commands": [],
+        "employeeReport": {
+          "version": 1,
+          "contractSha256": "be4a561b0b23526bf9548b4d313d2b4efbac6a722a3d9ca250b5d2d6018443c9",
+          "summary": "验收通过（verdict=pass）。经理只读核对 report.docx（docx_read）与 qa.json（filesystem）：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计总计3项/2通过/1失败共 5 项事实全部一致；QA verdict=pass 且 checks/findings 与 DOCX 回读事实无矛盾。仅写入 acceptance.json，未修改 report.docx 与 qa.json，未创建其他文件。",
+          "sections": {
+            "conclusion": "最终 verdict = pass。理由：经理独立 docx_read 回读 report.docx 得到的原文事实与任务规定的 5 条要点（虚构标注、首页、登录、备份、统计）逐条一致，且 QA 结论 pass 与之一致，未发现任何不符或矛盾；故按合同给出通过。",
+            "facts": "①标注：标题“测试资料报告（虚构）”，正文“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及虚构数据说明，全文无声称真实巡检/访问网站；②检查项 首页=通过；③检查项 登录=通过；④检查项 备份=失败；⑤统计“总计 3 项，2 项通过，1 项失败。”（2+1=3，算术自洽）。QA 侧：verdict=pass，checks 5 项 result 均为 pass/consistent=true，其记录的 DOCX sha256 819c06a9…3795、size 10162 与经理回读一致。",
+            "evidence": "report.docx（工作区根目录，size=10162，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）；qa.json（工作区根目录，3233 字节，sha256=a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）；acceptance.json（工作区根目录，3079 字节，sha256=f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca）。",
+            "mismatches": "无。逐项核对未发现任何不符点或矛盾：DOCX 事实与原始虚构测试资料一致，qa.json 的 verdict/checks/findings 与经理独立回读的 DOCX 事实一致。限制如实说明：验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验；经理全程只读，report.docx 与 qa.json 未被修改。"
+          },
+          "risks": [
+            "验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验。"
+          ],
+          "acceptanceResults": [
+            {
+              "criterion": "acceptance.json 存在且含 verdict、findings、summary 三个字段",
+              "status": "passed",
+              "evidence": "artifact_write 返回 acceptance.json（工作区根目录，3079 字节，sha256 f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca），为 JSON 对象，顶层含 verdict/findings/summary 三个必需字段。"
+            },
+            {
+              "criterion": "acceptance.json 的结论与 DOCX 事实及 qa.json 一致，逐条覆盖三条结果与统计",
+              "status": "passed",
+              "evidence": "docx_read 回读 report.docx（sha256 819c06a9…3795）原文：首页/通过、登录/通过、备份/失败、“总计 3 项，2 项通过，1 项失败。”；filesystem 读取 qa.json（sha256 a620cfb6…a630）verdict=pass、checks 5 项均 pass。acceptance.json 的 findings 逐条覆盖标注+三条结果+统计+QA 一致性，结论 pass 与两者一致。"
+            },
+            {
+              "criterion": "未修改 report.docx 与 qa.json，未创建额外文件",
+              "status": "passed",
+              "evidence": "经理本次仅执行只读 docx_read 与 filesystem 读取，唯一写操作为 artifact_write(acceptance.json)；回执显示 report.docx 仍为 sha256 819c06a9…3795/size 10162、qa.json 仍为 sha256 a620cfb6…a630/size 3233，工作区共 3 个文件（report.docx、qa.json、acceptance.json），无额外文件。"
+            }
+          ]
+        },
+        "acceptedAt": "2026-10-18T05:56:56.772Z",
+        "budgetEvidence": {
+          "version": 1,
+          "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+          "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+          "projectVersion": 3,
+          "capturedAt": "2026-10-18T05:56:56.772Z",
+          "point": "node-accepted",
+          "basis": "host-execution-budget",
+          "currency": "USD",
+          "project": {
+            "limit": 0.4,
+            "occupied": 0.09494369999999999,
+            "activeReserved": 0,
+            "available": 0.30505630000000006,
+            "callsUsed": 15,
+            "callLimit": 23,
+            "callsBasis": "host-reserved-model-attempts"
+          },
+          "inherited": {
+            "basis": "run-admission-snapshot",
+            "recordedCost": 0.0328173,
+            "retainedUnknownReservation": 0,
+            "availableBudget": 0.36718270000000003,
+            "callsUsed": null,
+            "callsBasis": "archived-model-wire-request-count",
+            "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+          },
+          "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+        }
+      }
+    },
+    {
+      "seq": 736,
+      "at": "2026-10-18T05:56:57.168Z",
+      "type": "run/finished",
+      "data": {
+        "status": "completed",
+        "tasks": [
+          {
+            "id": "t1",
+            "subject": "制作并回读 report.docx 测试资料报告",
+            "status": "completed",
+            "assignee": "employee-2",
+            "dependencies": [],
+            "attempt": 1,
+            "attempt_id": "e6210ab3-2508-48fc-b022-ec45c1f8e9f1",
+            "reassigning": false,
+            "kind": "work",
+            "findings_open": 0,
+            "output": "{\"summary\":\"已用原版 plugin__office__docx_create 在工作区根目录生成 report.docx（sha256 819c06a9…3795），并用 plugin__office__docx_read 回读核验通过：标题、虚构测试资料标注（未访问网站、未做真实巡检）、三行检查表（首页-通过、登录-通过、备份-失败）、统计（总计3项，2项通过，1项失败）均齐备。仅产出 report.docx，未访问网络，未创建其他文件，未声称真实巡检。\",\"sections\":{\"artifact\":\"最终路径：工作区根目录 report.docx（相对路径 report.docx，size=10162 字节，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）。所用工具为原版 plugin__office__docx_create：先经 capability_search 确认该原版办公插件工具可用后，单次调用 docx_create 生成共 8 个内容块，未使用任何替代或补写路径。\",\"readback\":\"plugin__office__docx_read 回读成功（无报错、无截断），回读全文事实要点：①标题“测试资料报告（虚构）”；②“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；③“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”；④检查表（检查项/结果）：首页/通过、登录/通过、备份/失败；⑤统计“总计 3 项，2 项通过，1 项失败。”。回读产物 sha256 与写入一致，确认落盘内容即所建内容。\",\"notice\":\"确认已标注：文档醒目标注“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”，并附加说明三条结果均为用户提供的虚构测试数据、不代表任何真实系统状态。全文无任何声称访问外部网站、执行真实巡检或存在真实实测结果的表述；本次执行未访问任何网络站点。\",\"limits\":\"已知偏差或未完成点：无。说明：本任务仅负责 report.docx；qa.json 与 acceptance.json 属 outOfScope，由 QA 与经理员工分别产出，本员工未创建、未读取，故不在本报告中评判。回读文本按插件抽取顺序将表格单元格逐行输出，属工具正常提取呈现，非内容缺失。\"},\"risks\":[]}"
+          },
+          {
+            "id": "t2",
+            "subject": "独立核对 report.docx 并输出 qa.json",
+            "status": "completed",
+            "assignee": "employee-3",
+            "dependencies": [
+              "t1"
+            ],
+            "attempt": 1,
+            "attempt_id": "56865af0-93a6-43db-83b3-fc474ecb72d5",
+            "reassigning": false,
+            "kind": "work",
+            "verdict": "pass",
+            "findings_open": 0,
+            "output": "{\"summary\":\"独立 docx_read 回读 report.docx 成功，五条核对项（虚构标注、首页=通过、登录=通过、备份=失败、总计3项/2通过/1失败）全部与原始事实一致，verdict=pass；qa.json 已写出，未修改 DOCX。\",\"sections\":{\"verdict\":\"pass —— 直接用 plugin__office__docx_read 回读 report.docx 的原文，虚构测试资料标注、三条检查结果与统计共 5 项核对全部逐字命中预期，无不符点，故 verdict=pass。\",\"evidence\":\"qa.json 路径：qa.json（工作区根目录，3233 字节，sha256 a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）。逐项核对到的 DOCX 事实（回读 report.docx，sha256 819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795，size=10162）：①标题“测试资料报告（虚构）”；②“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；③“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”；④检查表 检查项/结果 → 首页/通过、登录/通过、备份/失败；⑤“总计 3 项，2 项通过，1 项失败。” 算术自洽：2 通过 + 1 失败 = 3 项。checks 五条 result 均为 pass、consistent 均为 true。\",\"findings\":\"一致确认：虚构标注（标题与两句免责声明，全文无任何声称访问网站/真实巡检的表述）、首页=通过、登录=通过、备份=失败、统计 3/2/1 五项均与原始事实逐字一致，未发现任何不符点。证据来源为独立 docx_read 回读文本本身，未采信 writer 交接总结作为证据。限制说明（已写入 qa.json findings）：仅做内容事实核对，未做像素级版式校验；本员工未修改 report.docx（outOfScope），仅执行只读 docx_read 与 qa.json 写入，未创建其他文件、未访问网络。\"},\"risks\":[]}"
+          },
+          {
+            "id": "t3",
+            "subject": "只读验收 DOCX 与 QA 并输出 acceptance.json",
+            "status": "completed",
+            "assignee": "employee-1",
+            "dependencies": [
+              "t1",
+              "t2"
+            ],
+            "attempt": 1,
+            "attempt_id": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+            "reassigning": false,
+            "kind": "work",
+            "verdict": "pass",
+            "findings_open": 0,
+            "output": "{\"summary\":\"验收通过（verdict=pass）。经理只读核对 report.docx（docx_read）与 qa.json（filesystem）：虚构测试资料标注、首页=通过、登录=通过、备份=失败、统计总计3项/2通过/1失败共 5 项事实全部一致；QA verdict=pass 且 checks/findings 与 DOCX 回读事实无矛盾。仅写入 acceptance.json，未修改 report.docx 与 qa.json，未创建其他文件。\",\"sections\":{\"conclusion\":\"最终 verdict = pass。理由：经理独立 docx_read 回读 report.docx 得到的原文事实与任务规定的 5 条要点（虚构标注、首页、登录、备份、统计）逐条一致，且 QA 结论 pass 与之一致，未发现任何不符或矛盾；故按合同给出通过。\",\"facts\":\"①标注：标题“测试资料报告（虚构）”，正文“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及虚构数据说明，全文无声称真实巡检/访问网站；②检查项 首页=通过；③检查项 登录=通过；④检查项 备份=失败；⑤统计“总计 3 项，2 项通过，1 项失败。”（2+1=3，算术自洽）。QA 侧：verdict=pass，checks 5 项 result 均为 pass/consistent=true，其记录的 DOCX sha256 819c06a9…3795、size 10162 与经理回读一致。\",\"evidence\":\"report.docx（工作区根目录，size=10162，sha256=819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795）；qa.json（工作区根目录，3233 字节，sha256=a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630）；acceptance.json（工作区根目录，3079 字节，sha256=f5c9ef276b956c894562ccddf2e70560b171bc6d7d7cd8371fc00d8827867dca）。\",\"mismatches\":\"无。逐项核对未发现任何不符点或矛盾：DOCX 事实与原始虚构测试资料一致，qa.json 的 verdict/checks/findings 与经理独立回读的 DOCX 事实一致。限制如实说明：验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验；经理全程只读，report.docx 与 qa.json 未被修改。\"},\"risks\":[\"验收仅基于 docx_read 文本回读与 qa.json 直接读取，未做像素级版式校验。\"]}"
+          }
+        ],
+        "summary": "",
+        "usageCost": 0.062126400000000005
+      }
+    }
+  ],
+  "recovery": {
+    "unknownOperations": [],
+    "costReadiness": {
+      "recordedCost": 0.09494369999999999,
+      "reserved": 0,
+      "availableBudget": 0.30505630000000006,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    }
+  },
+  "usage": [
+    {
+      "id": "f1a2024a-4867-40e4-bdbe-d487246a8967",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "cfa3db37-78b5-4d6d-8c5a-73602f0b6650",
+      "durationMs": 6336,
+      "inputTokens": 13136,
+      "outputTokens": 1193,
+      "cost": 0.005372399999999999,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:56.725Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "45e4dfbf-dbd0-4379-aeb4-3f319d60cb1f",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "953f0683-c642-45cc-b022-7637ee0ea753",
+      "durationMs": 1867,
+      "inputTokens": 12923,
+      "outputTokens": 47,
+      "cost": 0.0039333,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:50.303Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "5506f41c-d991-46ed-9eaa-a2a837bc35f9",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "b42a3941-a51c-40fa-88a4-9d502d51fa5d",
+      "durationMs": 11384,
+      "inputTokens": 22030,
+      "outputTokens": 1760,
+      "cost": 0.008721,
+      "purpose": "上下文摘要",
+      "createdAt": "2026-10-18T05:56:48.335Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "90e5f1ca-4a19-42f8-88e6-179ce92c12ac",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "9524a82a-7311-4a85-b39d-b766a9ab594e",
+      "durationMs": 6158,
+      "inputTokens": 14414,
+      "outputTokens": 1175,
+      "cost": 0.0057342,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:36.859Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "fc7b5ff9-39ed-48f2-b5a7-acc71baa5156",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "bbd02222-2648-46ff-ac7c-a662703dd867",
+      "durationMs": 6432,
+      "inputTokens": 12620,
+      "outputTokens": 1084,
+      "cost": 0.0050868,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:28.768Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "147c6707-1b3f-432c-87bf-7234aff4da96",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "ac2374f3-9c60-47be-ae4a-f9e33f5230b6",
+      "durationMs": 2051,
+      "inputTokens": 10430,
+      "outputTokens": 182,
+      "cost": 0.0033474,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:17.768Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "cc777e95-4631-4816-ba26-ee8c04cfa05f",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "ba120dc4-79ac-4104-814a-f7a1ad02cab3",
+      "taskId": "manager-accept",
+      "attemptId": "892674ed-12b9-413c-bbf9-a1b5f1559289",
+      "requestId": "c34bd92c-b9aa-42c8-9475-c3fd4a39e109",
+      "durationMs": 1810,
+      "inputTokens": 9506,
+      "outputTokens": 99,
+      "cost": 0.0029706,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:15.583Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "51d81f77-26c0-47ec-9d78-4142627796cd",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "2b65bad1-5c33-401f-aa75-73e4886e89b9",
+      "taskId": "qa-verify",
+      "attemptId": "56865af0-93a6-43db-83b3-fc474ecb72d5",
+      "requestId": "d99ca588-77df-418d-a615-74457ec31f14",
+      "durationMs": 5920,
+      "inputTokens": 11158,
+      "outputTokens": 1091,
+      "cost": 0.0046566,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:13.58Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "2dfbece4-b4b1-4d9d-9e3f-3cc6ec0a2156",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "2b65bad1-5c33-401f-aa75-73e4886e89b9",
+      "taskId": "qa-verify",
+      "attemptId": "56865af0-93a6-43db-83b3-fc474ecb72d5",
+      "requestId": "33f921a1-3f5f-4a1f-bae3-387b9a87d0ca",
+      "durationMs": 5161,
+      "inputTokens": 9536,
+      "outputTokens": 964,
+      "cost": 0.0040176,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:56:05.825Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "e6f084cc-9a5c-46d1-aa26-5189e3b5a7d1",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "2b65bad1-5c33-401f-aa75-73e4886e89b9",
+      "taskId": "qa-verify",
+      "attemptId": "56865af0-93a6-43db-83b3-fc474ecb72d5",
+      "requestId": "0efdab00-56f3-492f-93f5-9ea9790677b1",
+      "durationMs": 2126,
+      "inputTokens": 9081,
+      "outputTokens": 172,
+      "cost": 0.0029306999999999996,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:55:57.676Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "8ecdba40-1e8c-4588-bae6-919d8deab98d",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "2b65bad1-5c33-401f-aa75-73e4886e89b9",
+      "taskId": "qa-verify",
+      "attemptId": "56865af0-93a6-43db-83b3-fc474ecb72d5",
+      "requestId": "33672d5a-10cd-4cd6-aee2-2a7f86af9c65",
+      "durationMs": 2111,
+      "inputTokens": 8211,
+      "outputTokens": 97,
+      "cost": 0.0025797,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:55:55.375Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "223b5b3f-c8d4-43ad-a94b-7efc525541bf",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "f2ef72c4-eb48-484f-a431-f2250843fe33",
+      "taskId": "write-docx",
+      "attemptId": "e6210ab3-2508-48fc-b022-ec45c1f8e9f1",
+      "requestId": "7c352af3-f4c5-4efb-aa48-05eb35019dd9",
+      "durationMs": 7165,
+      "inputTokens": 9491,
+      "outputTokens": 1401,
+      "cost": 0.0045285,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:55:53.081Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "6fdd483e-43d7-4d46-ae13-436dc79a1648",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "f2ef72c4-eb48-484f-a431-f2250843fe33",
+      "taskId": "write-docx",
+      "attemptId": "e6210ab3-2508-48fc-b022-ec45c1f8e9f1",
+      "requestId": "8c50235c-2304-4716-b219-d0528a585920",
+      "durationMs": 1641,
+      "inputTokens": 9179,
+      "outputTokens": 52,
+      "cost": 0.0028160999999999998,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:55:43.225Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "0ab2b484-f0af-42c3-a155-93d724765fc3",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "f2ef72c4-eb48-484f-a431-f2250843fe33",
+      "taskId": "write-docx",
+      "attemptId": "e6210ab3-2508-48fc-b022-ec45c1f8e9f1",
+      "requestId": "fa20e84d-52af-4ba7-b1d3-0a76be724e2e",
+      "durationMs": 2964,
+      "inputTokens": 8623,
+      "outputTokens": 353,
+      "cost": 0.0030105,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:55:38.769Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "05381c06-4bf0-4d34-9537-a7388a79b20b",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "c6516254-6ab0-44c3-88f8-f9e86ac81592",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "f2ef72c4-eb48-484f-a431-f2250843fe33",
+      "taskId": "write-docx",
+      "attemptId": "e6210ab3-2508-48fc-b022-ec45c1f8e9f1",
+      "requestId": "0e405e88-bb40-48e0-a94a-9248675b9885",
+      "durationMs": 2329,
+      "inputTokens": 7690,
+      "outputTokens": 95,
+      "cost": 0.002421,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:55:35.666Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "a07b7619-8a6d-4355-9ced-8d22625f56a0",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "ede9a1d8-75af-495b-9931-88aec362e0a9",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "7423d07f-1c12-45aa-9043-92934175ea8c",
+      "taskId": "write-docx",
+      "attemptId": "4afc8b88-da92-4199-83f4-8d4cbe227d05",
+      "requestId": "210efc93-e48c-4c7d-a256-f5247ca75858",
+      "durationMs": 7404,
+      "inputTokens": 9743,
+      "outputTokens": 921,
+      "cost": 0.004028100000000001,
+      "purpose": "正式交接",
+      "createdAt": "2026-10-18T05:46:40.423Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "785b598b-306c-49e6-a843-ac195add7b68",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "ede9a1d8-75af-495b-9931-88aec362e0a9",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "7423d07f-1c12-45aa-9043-92934175ea8c",
+      "taskId": "write-docx",
+      "attemptId": "4afc8b88-da92-4199-83f4-8d4cbe227d05",
+      "requestId": "e0305653-af51-4224-8866-d13ba855c854",
+      "durationMs": 1755,
+      "inputTokens": 10531,
+      "outputTokens": 57,
+      "cost": 0.0032277,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:46:29.474Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "fca96cb4-4a70-4b63-9ca1-f12fc6293514",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "ede9a1d8-75af-495b-9931-88aec362e0a9",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "7423d07f-1c12-45aa-9043-92934175ea8c",
+      "taskId": "write-docx",
+      "attemptId": "4afc8b88-da92-4199-83f4-8d4cbe227d05",
+      "requestId": "6f184bfd-c324-4f50-acac-600b066c426c",
+      "durationMs": 2286,
+      "inputTokens": 10003,
+      "outputTokens": 323,
+      "cost": 0.0033885,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:46:25.033Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "40af8d88-4336-4a0c-a704-56902faf5200",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "ede9a1d8-75af-495b-9931-88aec362e0a9",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "7423d07f-1c12-45aa-9043-92934175ea8c",
+      "taskId": "write-docx",
+      "attemptId": "4afc8b88-da92-4199-83f4-8d4cbe227d05",
+      "requestId": "1d4d1cef-da1b-44bc-8181-2702050c2e44",
+      "durationMs": 2534,
+      "inputTokens": 9074,
+      "outputTokens": 94,
+      "cost": 0.002835,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:46:22.62Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "e69a481c-95c3-4496-ba6c-cfab296c5737",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "d447098f-2281-4642-8d5e-9437c1c860be",
+      "taskId": "write-docx",
+      "attemptId": "d7c194c0-d8d5-4e52-b246-ebe86a1c8f2e",
+      "requestId": "5334844c-1103-44d9-978c-1243f614aa40",
+      "durationMs": 2256,
+      "inputTokens": 9393,
+      "outputTokens": 121,
+      "cost": 0.0029630999999999998,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:29:23.828Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "3991fa47-ad72-409c-b19e-7b7054ec2371",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "d447098f-2281-4642-8d5e-9437c1c860be",
+      "taskId": "write-docx",
+      "attemptId": "d7c194c0-d8d5-4e52-b246-ebe86a1c8f2e",
+      "requestId": "3b15a951-3213-4751-863a-cba548e06d3d",
+      "durationMs": 3747,
+      "inputTokens": 9097,
+      "outputTokens": 263,
+      "cost": 0.0030447,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:29:21.407Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "db337e20-000c-4366-a632-886740e7787c",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "d447098f-2281-4642-8d5e-9437c1c860be",
+      "taskId": "write-docx",
+      "attemptId": "d7c194c0-d8d5-4e52-b246-ebe86a1c8f2e",
+      "requestId": "b9d821f3-0930-4d3c-a784-be95b8007c75",
+      "durationMs": 2390,
+      "inputTokens": 8798,
+      "outputTokens": 263,
+      "cost": 0.002955,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:29:17.476Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "8fbacafc-ae74-44ca-a2fc-df54d342e249",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "d447098f-2281-4642-8d5e-9437c1c860be",
+      "taskId": "write-docx",
+      "attemptId": "d7c194c0-d8d5-4e52-b246-ebe86a1c8f2e",
+      "requestId": "04667465-ff92-480a-baa7-758ec1cbcc9b",
+      "durationMs": 1934,
+      "inputTokens": 8648,
+      "outputTokens": 123,
+      "cost": 0.002742,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:29:14.968Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "a6650c94-973a-4f32-b04c-40486b800067",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "d447098f-2281-4642-8d5e-9437c1c860be",
+      "taskId": "write-docx",
+      "attemptId": "d7c194c0-d8d5-4e52-b246-ebe86a1c8f2e",
+      "requestId": "f4776c20-de70-4584-9d59-754b23277394",
+      "durationMs": 2549,
+      "inputTokens": 7711,
+      "outputTokens": 95,
+      "cost": 0.0024273,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-18T05:29:12.945Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "f64ed4e9-e6ae-4e1c-8c07-0622487b7dde",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": null,
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 7709,
+      "outputTokens": 2411,
+      "cost": 0.005205899999999999,
+      "purpose": "组织规划",
+      "createdAt": "2026-10-18T05:16:27.078Z",
+      "agentName": null
+    }
+  ],
+  "totals": {
+    "calls": 25,
+    "inputTokens": 258735,
+    "outputTokens": 14436,
+    "cost": 0.09494369999999999
+  },
+  "capAccounting": {
+    "sourceRunId": "ede9a1d8-75af-495b-9931-88aec362e0a9",
+    "oldCalls": 9,
+    "nextRunCap": 23,
+    "overallExecutionCap": 32,
+    "writerOldCalls": 9,
+    "writerNextCap": 7,
+    "writerOverallCap": 16,
+    "completedTaskIds": [],
+    "operatorDeliveryWrites": 0,
+    "reason": "Original same-project UI plan edit and approval; original expense and runs retained. No completed task exists. Partial unsealed DOCX remains in old run; new writer must produce and hand off its own report."
+  },
+  "docxText": "测试资料报告（虚构）\n\n本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。\n说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。\n检查结果\n检查项\n结果\n首页\n通过\n登录\n通过\n备份\n失败\n统计\n总计 3 项，2 项通过，1 项失败。",
+  "docxTables": [
+    [
+      "检查项",
+      "结果"
+    ],
+    [
+      "首页",
+      "通过"
+    ],
+    [
+      "登录",
+      "通过"
+    ],
+    [
+      "备份",
+      "失败"
+    ]
+  ],
+  "qa": {
+    "verdict": "pass",
+    "documentRead": {
+      "path": "report.docx",
+      "readTool": "plugin__office__docx_read",
+      "readOk": true,
+      "reportedSha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795",
+      "size": 10162
+    },
+    "checks": [
+      {
+        "name": "虚构测试资料标注",
+        "expected": "文档明确标注为虚构测试资料，且未声称访问网站或做真实巡检",
+        "observed": "标题“测试资料报告（虚构）”；正文“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”",
+        "result": "pass",
+        "consistent": true,
+        "evidenceQuote": "本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。"
+      },
+      {
+        "name": "检查项 首页",
+        "expected": "通过",
+        "observed": "表格行“首页 / 通过”",
+        "result": "pass",
+        "consistent": true,
+        "evidenceQuote": "首页 通过"
+      },
+      {
+        "name": "检查项 登录",
+        "expected": "通过",
+        "observed": "表格行“登录 / 通过”",
+        "result": "pass",
+        "consistent": true,
+        "evidenceQuote": "登录 通过"
+      },
+      {
+        "name": "检查项 备份",
+        "expected": "失败",
+        "observed": "表格行“备份 / 失败”",
+        "result": "pass",
+        "consistent": true,
+        "evidenceQuote": "备份 失败"
+      },
+      {
+        "name": "统计（总计/通过/失败）",
+        "expected": "总计 3 项，2 项通过，1 项失败",
+        "observed": "“总计 3 项，2 项通过，1 项失败。”与三条检查结果算术一致（2 通过 + 1 失败 = 3 项）",
+        "result": "pass",
+        "consistent": true,
+        "evidenceQuote": "总计 3 项，2 项通过，1 项失败。"
+      }
+    ],
+    "findings": [
+      {
+        "type": "consistent",
+        "item": "虚构测试资料标注",
+        "detail": "DOCX 独立回读文本首个标题即为“测试资料报告（虚构）”，并含免责声明与说明段；全文未出现任何声称访问网站、执行真实巡检或存在真实实测结果的表述。与预期一致。"
+      },
+      {
+        "type": "consistent",
+        "item": "三条检查结果",
+        "detail": "回读表格按 检查项/结果 顺序输出：首页→通过、登录→通过、备份→失败，与指定原始事实逐条一致。"
+      },
+      {
+        "type": "consistent",
+        "item": "统计",
+        "detail": "回读含“总计 3 项，2 项通过，1 项失败。”，条目数与结果分布自洽。"
+      },
+      {
+        "type": "inconsistency",
+        "item": "不符点",
+        "detail": "未发现不符点。DOCX 未被修改（本员工仅执行只读 docx_read 与 qa.json 写入，report.docx 属 outOfScope）。"
+      },
+      {
+        "type": "limitation",
+        "item": "核验方式说明",
+        "detail": "本结论仅基于对 report.docx 的直接 docx_read 文本回读（工具返回 sha256 819c06a9…3795，size 10162），未采信 writer 的交接总结作为证据；未做像素级版式校验，因任务仅要求内容事实核对。"
+      }
+    ]
+  },
+  "acceptance": {
+    "verdict": "pass",
+    "findings": [
+      {
+        "type": "consistent",
+        "item": "虚构测试资料标注",
+        "detail": "经理以 docx_read 独立回读 report.docx（sha256 819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795，size 10162），首行为标题“测试资料报告（虚构）”，并含“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”全文无任何声称访问网站、执行真实巡检或存在真实实测结果的表述。"
+      },
+      {
+        "type": "consistent",
+        "item": "检查项 首页",
+        "detail": "回读表格按 检查项/结果 输出“首页 / 通过”，与原始事实（首页通过）一致。"
+      },
+      {
+        "type": "consistent",
+        "item": "检查项 登录",
+        "detail": "回读表格输出“登录 / 通过”，与原始事实（登录通过）一致。"
+      },
+      {
+        "type": "consistent",
+        "item": "检查项 备份",
+        "detail": "回读表格输出“备份 / 失败”，与原始事实（备份失败）一致。"
+      },
+      {
+        "type": "consistent",
+        "item": "统计",
+        "detail": "回读含“总计 3 项，2 项通过，1 项失败。”，与三条检查结果算术自洽（2 通过 + 1 失败 = 3 项）。"
+      },
+      {
+        "type": "qa-consistency",
+        "item": "QA 结论一致性",
+        "detail": "以 filesystem 读取 qa.json（sha256 a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630，size 3233）：verdict=pass；checks 5 项（虚构标注、首页、登录、备份、统计）result 均为 pass、consistent 均为 true；findings 含三条 consistent、一条 inconsistency“未发现不符点”和一条 limitation。QA 记录的 DOCX sha256/size 与经理独立回读所得一致，结论与 DOCX 事实无矛盾。"
+      },
+      {
+        "type": "inconsistency",
+        "item": "不符点或矛盾",
+        "detail": "未发现任何不符点或矛盾。"
+      },
+      {
+        "type": "limitation",
+        "item": "验收方式说明",
+        "detail": "本验收仅基于对 report.docx 的直接 docx_read 文本回读与对 qa.json 的直接读取，未采信 writer/QA 的交接总结作为证据；未做像素级版式校验，因任务仅要求内容事实核对。经理全程只读：未修改或重写 report.docx 与 qa.json（均属 outOfScope），仅写入 acceptance.json，未创建其他文件。"
+      }
+    ],
+    "summary": "验收通过（verdict=pass）。经理以 docx_read 独立回读 report.docx、以 filesystem 读取 qa.json，逐项核对一致：文档明确标注为虚构测试资料且未访问网站/未做真实巡检；检查三项为首页=通过、登录=通过、备份=失败；统计为总计 3 项、2 项通过、1 项失败（算术自洽）。QA verdict=pass 且 checks/findings 与 DOCX 事实一致，无不符点或矛盾。未修改 report.docx 与 qa.json，仅产出 acceptance.json。"
+  },
+  "independentChecks": {
+    "filesMatchHostSha256": true,
+    "docxZipIntact": true,
+    "documentXmlParsed": true,
+    "originalFactsAndTotalsMatch": true,
+    "threeFormalHandoffs": true,
+    "threeEmployeesIndependentlyReadDocx": true,
+    "operatorAuthoredDeliverables": 0
+  }
+}

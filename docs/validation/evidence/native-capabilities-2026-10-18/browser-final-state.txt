@@ -1,0 +1,77 @@
+Browser tab: 1, Title: "为伍 · 一个想法，一支团队", URL: "http://127.0.0.1:4312/#run/c6516254-6ab0-44c3-88f8-f9e86ac81592".
+0 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#run/c6516254-6ab0-44c3-88f8-f9e86ac81592
+	1 container root
+		2 container
+			3 link Description: 为伍 一个想法，一支团队, Value: 127.0.0.1:4312/#dashboard
+			4 button 新建项目 ↗
+				5 image
+				6 text 新建项目
+				7 text ↗
+			8 text 工作空间
+			9 button 部门工作台
+				10 image
+				11 text 部门工作台
+			12 button 需求组建
+				13 image
+				14 text 需求组建
+			15 button 部门与员工
+				16 image
+				17 text 部门与员工
+			18 button 项目与方案
+				19 image
+				20 text 项目与方案
+			21 button 执行记录
+				22 image
+				23 text 执行记录
+			24 button 浏览器与 MCP
+				25 image
+				26 text 浏览器与 MCP
+			27 button 文件与项目导入
+				28 image
+				29 text 文件与项目导入
+			30 button 自动化与改进
+				31 image
+				32 text 自动化与改进
+			33 button 知识库
+				34 image
+				35 text 知识库
+			36 button 模型目录
+				37 image
+				38 text 模型目录
+			39 button 用量与费用
+				40 image
+				41 text 用量与费用
+			42 button 系统设置
+				43 image
+				44 text 系统设置
+			45 text 本机工作空间 数据保存在后端所在电脑 L 本地用户 个人工作空间
+			46 image
+		47 container
+			48 text 工作空间
+			49 image
+			50 text 执行记录
+			51 container 最近确认连接：2026/10/18 14:07:20
+				52 text 后端服务已连接
+			53 container 本机已登记费用，不含未结算预留；待核对金额见用量与费用
+				54 text 已记录  $0.00
+			55 button 查看系统状态
+				56 image
+		57 container
+			58 text 读取请求超时，请刷新；后台执行和已保存记录仍然保留。
+			59 button 关闭错误
+				60 image
+			61 text 本机运行 · 可接入真实 API · 模型调用由你配置的服务计费 · 命令逐次审批 EXECUTION HISTORY
+			62 heading 执行记录, Value: 1
+				63 text 执行记录
+			64 text 查看当时的职责、任务指令和实际操作。历史快照独立保留。
+			65 button 运行追溯验证
+				66 image
+				67 text 运行追溯验证
+			68 image
+			69 text 工具执行受岗位授权约束；文件与终端按批准的执行位置操作，终端需要逐次审批。追溯验证使用测试模型，不会调用真实 API。 读取请求超时，请刷新；后台执行和已保存记录仍然保留。
+			70 button 返回运行列表
+				71 image
+				72 text 返回运行列表
+			73 text 正在读取运行记录… ▦  为伍  /  团队工作台 · v0.2 一个想法，一支团队
+
+The focused UI element is 0 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#run/c6516254-6ab0-44c3-88f8-f9e86ac81592

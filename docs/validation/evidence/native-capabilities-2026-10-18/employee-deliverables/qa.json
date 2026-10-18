@@ -1,0 +1,79 @@
+{
+  "verdict": "pass",
+  "documentRead": {
+    "path": "report.docx",
+    "readTool": "plugin__office__docx_read",
+    "readOk": true,
+    "reportedSha256": "819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795",
+    "size": 10162
+  },
+  "checks": [
+    {
+      "name": "虚构测试资料标注",
+      "expected": "文档明确标注为虚构测试资料，且未声称访问网站或做真实巡检",
+      "observed": "标题“测试资料报告（虚构）”；正文“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”；“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”",
+      "result": "pass",
+      "consistent": true,
+      "evidenceQuote": "本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。"
+    },
+    {
+      "name": "检查项 首页",
+      "expected": "通过",
+      "observed": "表格行“首页 / 通过”",
+      "result": "pass",
+      "consistent": true,
+      "evidenceQuote": "首页 通过"
+    },
+    {
+      "name": "检查项 登录",
+      "expected": "通过",
+      "observed": "表格行“登录 / 通过”",
+      "result": "pass",
+      "consistent": true,
+      "evidenceQuote": "登录 通过"
+    },
+    {
+      "name": "检查项 备份",
+      "expected": "失败",
+      "observed": "表格行“备份 / 失败”",
+      "result": "pass",
+      "consistent": true,
+      "evidenceQuote": "备份 失败"
+    },
+    {
+      "name": "统计（总计/通过/失败）",
+      "expected": "总计 3 项，2 项通过，1 项失败",
+      "observed": "“总计 3 项，2 项通过，1 项失败。”与三条检查结果算术一致（2 通过 + 1 失败 = 3 项）",
+      "result": "pass",
+      "consistent": true,
+      "evidenceQuote": "总计 3 项，2 项通过，1 项失败。"
+    }
+  ],
+  "findings": [
+    {
+      "type": "consistent",
+      "item": "虚构测试资料标注",
+      "detail": "DOCX 独立回读文本首个标题即为“测试资料报告（虚构）”，并含免责声明与说明段；全文未出现任何声称访问网站、执行真实巡检或存在真实实测结果的表述。与预期一致。"
+    },
+    {
+      "type": "consistent",
+      "item": "三条检查结果",
+      "detail": "回读表格按 检查项/结果 顺序输出：首页→通过、登录→通过、备份→失败，与指定原始事实逐条一致。"
+    },
+    {
+      "type": "consistent",
+      "item": "统计",
+      "detail": "回读含“总计 3 项，2 项通过，1 项失败。”，条目数与结果分布自洽。"
+    },
+    {
+      "type": "inconsistency",
+      "item": "不符点",
+      "detail": "未发现不符点。DOCX 未被修改（本员工仅执行只读 docx_read 与 qa.json 写入，report.docx 属 outOfScope）。"
+    },
+    {
+      "type": "limitation",
+      "item": "核验方式说明",
+      "detail": "本结论仅基于对 report.docx 的直接 docx_read 文本回读（工具返回 sha256 819c06a9…3795，size 10162），未采信 writer 的交接总结作为证据；未做像素级版式校验，因任务仅要求内容事实核对。"
+    }
+  ]
+}

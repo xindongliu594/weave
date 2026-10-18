@@ -1,0 +1,46 @@
+{
+  "verdict": "pass",
+  "findings": [
+    {
+      "type": "consistent",
+      "item": "虚构测试资料标注",
+      "detail": "经理以 docx_read 独立回读 report.docx（sha256 819c06a9c23771b9e274db9f89ea16c8fdbddb0652156b785cf0221980de3795，size 10162），首行为标题“测试资料报告（虚构）”，并含“本报告仅为虚构测试资料，未访问任何网站，未做真实巡检。”及“说明：以下检查结果均为用户提供的虚构测试数据，用于插件功能测试，不代表任何真实系统状态。”全文无任何声称访问网站、执行真实巡检或存在真实实测结果的表述。"
+    },
+    {
+      "type": "consistent",
+      "item": "检查项 首页",
+      "detail": "回读表格按 检查项/结果 输出“首页 / 通过”，与原始事实（首页通过）一致。"
+    },
+    {
+      "type": "consistent",
+      "item": "检查项 登录",
+      "detail": "回读表格输出“登录 / 通过”，与原始事实（登录通过）一致。"
+    },
+    {
+      "type": "consistent",
+      "item": "检查项 备份",
+      "detail": "回读表格输出“备份 / 失败”，与原始事实（备份失败）一致。"
+    },
+    {
+      "type": "consistent",
+      "item": "统计",
+      "detail": "回读含“总计 3 项，2 项通过，1 项失败。”，与三条检查结果算术自洽（2 通过 + 1 失败 = 3 项）。"
+    },
+    {
+      "type": "qa-consistency",
+      "item": "QA 结论一致性",
+      "detail": "以 filesystem 读取 qa.json（sha256 a620cfb6a388f2632f69a9ce87e1526185d140c3ecd7cf867cd0524d8ca2a630，size 3233）：verdict=pass；checks 5 项（虚构标注、首页、登录、备份、统计）result 均为 pass、consistent 均为 true；findings 含三条 consistent、一条 inconsistency“未发现不符点”和一条 limitation。QA 记录的 DOCX sha256/size 与经理独立回读所得一致，结论与 DOCX 事实无矛盾。"
+    },
+    {
+      "type": "inconsistency",
+      "item": "不符点或矛盾",
+      "detail": "未发现任何不符点或矛盾。"
+    },
+    {
+      "type": "limitation",
+      "item": "验收方式说明",
+      "detail": "本验收仅基于对 report.docx 的直接 docx_read 文本回读与对 qa.json 的直接读取，未采信 writer/QA 的交接总结作为证据；未做像素级版式校验，因任务仅要求内容事实核对。经理全程只读：未修改或重写 report.docx 与 qa.json（均属 outOfScope），仅写入 acceptance.json，未创建其他文件。"
+    }
+  ],
+  "summary": "验收通过（verdict=pass）。经理以 docx_read 独立回读 report.docx、以 filesystem 读取 qa.json，逐项核对一致：文档明确标注为虚构测试资料且未访问网站/未做真实巡检；检查三项为首页=通过、登录=通过、备份=失败；统计为总计 3 项、2 项通过、1 项失败（算术自洽）。QA verdict=pass 且 checks/findings 与 DOCX 事实一致，无不符点或矛盾。未修改 report.docx 与 qa.json，仅产出 acceptance.json。"
+}
