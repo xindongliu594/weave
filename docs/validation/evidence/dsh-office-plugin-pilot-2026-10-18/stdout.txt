@@ -1,0 +1,1 @@
+{"probeCompleted":true,"acceptancePassed":false,"checks":9,"unmetRequirements":[{"id":"xlsx-recalc-persisted-value","expected":0.2,"actual":"No cached value in saved C2","toolReported":"status: success\ntotal_formulas: 1\ntotal_errors: 0"}],"modelCalls":0}

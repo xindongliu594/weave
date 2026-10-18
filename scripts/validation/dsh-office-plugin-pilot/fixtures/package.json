@@ -1,0 +1,8 @@
+{
+  "name": "weiwu-office-plugin-pilot",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@huiliyi37/dsh-office": "file:./huiliyi37-dsh-office-0.2.4.tgz"
+  }
+}

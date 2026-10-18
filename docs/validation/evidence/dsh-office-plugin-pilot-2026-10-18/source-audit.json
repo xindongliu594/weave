@@ -1,0 +1,192 @@
+{
+  "package": "@huiliyi37/dsh-office",
+  "version": "0.2.4",
+  "matchedFiles": 46,
+  "allBytesEqual": true,
+  "files": [
+    {
+      "path": "package/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "package/lib/docx.js",
+      "sha256": "1d2d9d3f42202e625968fec262a0541822d57f3b90d5ff82c18776615af95adc"
+    },
+    {
+      "path": "package/lib/excel-audit.js",
+      "sha256": "be5d2c37656771665a7e430c5e037f599670aeab1c9665b3d55497786cf63928"
+    },
+    {
+      "path": "package/lib/excel.js",
+      "sha256": "1bada98f4d496a9120d65c35b6ec5fcab843ddad34edf7f02c882830dc2e50c8"
+    },
+    {
+      "path": "package/lib/fonts.js",
+      "sha256": "7ff47ffe73de85af28649f3c413d4e24d7d3d736d8a6a7f20d06b3ccfbf2cebd"
+    },
+    {
+      "path": "package/lib/index.js",
+      "sha256": "b2760156f93027f22cf6df37741df2fdcc229e2ba780ba33d081ecf6097a39cb"
+    },
+    {
+      "path": "package/lib/pdf-ops.js",
+      "sha256": "99227d19df7411bb4885a3d0bd1c846ff8e65ef1e6dcfa2268d70d944cab5243"
+    },
+    {
+      "path": "package/lib/pdf.js",
+      "sha256": "0b47508d554ac2eab35a4557c913a28f8590b48bbb7f38836bc7914beff2e6e2"
+    },
+    {
+      "path": "package/lib/ppt.js",
+      "sha256": "4a66ba53683b2a9b75a774bd702b6f410da3bda33087748aebbeb687bc4fc275"
+    },
+    {
+      "path": "package/lib/text-output.js",
+      "sha256": "91b75135fe24ca233e2abc9ffdfb214824f4f97e0a266379fc40fda2bfcb7ee6"
+    },
+    {
+      "path": "package/lib/write.js",
+      "sha256": "d5cf563688110b72fb756a22d93fc8988ad28ce992bb2c1fc7e2c48e0bae3b68"
+    },
+    {
+      "path": "package/package.json",
+      "sha256": "484c41f9204f67a120ccce5f088bc21827863157c8137ccdd0a34dbb2de933f1"
+    },
+    {
+      "path": "package/lib/docx.d.ts.map",
+      "sha256": "4eb9e7510b29e43a3d7098c738c44b97af1a8e55d7107b9680dc8012d51c02bb"
+    },
+    {
+      "path": "package/lib/docx.js.map",
+      "sha256": "c00de5184facf61b902f834224f2eee01f633440b90a61d3217250c097e3a4da"
+    },
+    {
+      "path": "package/lib/excel-audit.d.ts.map",
+      "sha256": "9fa21ebf8ea14ed00db0e91c07f2d50c3cddae85aafd8f2b50a6a7afb56057eb"
+    },
+    {
+      "path": "package/lib/excel-audit.js.map",
+      "sha256": "2565189cce33ab8b9f7da3416f1f9df4c7ce82e6ad5369496b8e73da8b498e0e"
+    },
+    {
+      "path": "package/lib/excel.d.ts.map",
+      "sha256": "6d5cafec504d60c244310d476701525d83d60c7e1acd7caf6580b3ce5192d306"
+    },
+    {
+      "path": "package/lib/excel.js.map",
+      "sha256": "143e79124a8454d2f52278720d091f962c3b0b741c78a1645b83ba5e76a3dcf1"
+    },
+    {
+      "path": "package/lib/fonts.d.ts.map",
+      "sha256": "2794c5691ecdb4f96f544eeb9e5afe0b6996c0e8a947c776631c12ca296e2e1e"
+    },
+    {
+      "path": "package/lib/fonts.js.map",
+      "sha256": "d8d4bd058686c50a155e3153081a2f41c08c6c4617bb1bedef347d488776c0b6"
+    },
+    {
+      "path": "package/lib/index.d.ts.map",
+      "sha256": "4993ab9c7dc9d9c031f9a52332f27a6c77e332574f59eb3c12fb96684707b44d"
+    },
+    {
+      "path": "package/lib/index.js.map",
+      "sha256": "980762449e88b91f8bdcf967882250b68a59a7ddd0b72004a2ef85e44c23dbf7"
+    },
+    {
+      "path": "package/lib/pdf-ops.d.ts.map",
+      "sha256": "4bfbf88f332e1a58384633760b2f5c9ef4d52d2faea7d10e92d0f8d228b7f11c"
+    },
+    {
+      "path": "package/lib/pdf-ops.js.map",
+      "sha256": "4a7421d166e150a0f74744910c3b4c7230b9ba294d99264237d2c36e3794cb0f"
+    },
+    {
+      "path": "package/lib/pdf.d.ts.map",
+      "sha256": "a4f544e27b927c77c7bcb31532ae938ba322816c617115ef10d96e63606b81c2"
+    },
+    {
+      "path": "package/lib/pdf.js.map",
+      "sha256": "6a7cf1cc67fc2c94573a97fe26125cc3a9f736fc01eb8b36f3ff6f9753101d71"
+    },
+    {
+      "path": "package/lib/ppt.d.ts.map",
+      "sha256": "2214e6bcfc2d78731abf752844420103c92b714a5d82ab83ba67775e64fffbef"
+    },
+    {
+      "path": "package/lib/ppt.js.map",
+      "sha256": "5bbbe326b7a1c94e9022cea041f8e043e5f3f722018bddc5437a839b4c9ce043"
+    },
+    {
+      "path": "package/lib/text-output.d.ts.map",
+      "sha256": "949dd1db9ff34610fa83c376e88bacc21a04debfd8d6dbe1f97f6be4a87cb93b"
+    },
+    {
+      "path": "package/lib/text-output.js.map",
+      "sha256": "892ab378d5fa3246834be63fe42a1859c3cd02abc48f002e0776f9aab4f32c6c"
+    },
+    {
+      "path": "package/lib/write.d.ts.map",
+      "sha256": "7bee942958b5641bd0e944887d7b91724b005f3b6376a99af50a714c20de31fa"
+    },
+    {
+      "path": "package/lib/write.js.map",
+      "sha256": "43320f91a55adf102fe589fe013e26e1bf2c041530972eab104458f443094159"
+    },
+    {
+      "path": "package/README.md",
+      "sha256": "bcf14ad2c8f3f63d2011b432e81e392fddc4be5a3dd7871e86dd455b16a182ed"
+    },
+    {
+      "path": "package/README.zh.md",
+      "sha256": "63818a78be67e4a96bb17d2896cc4fa427ffb8b9325081a0ff2e024e4c3a789d"
+    },
+    {
+      "path": "package/skills/dsh-office/SKILL.md",
+      "sha256": "822d2164d45d7aa7e5264620d990d789f270e17dbfe418e18d40003371f0dca1"
+    },
+    {
+      "path": "package/lib/docx.d.ts",
+      "sha256": "3797f15b8010ae55b0a5545694cf73694039768348b5dbad5193299b1cca640e"
+    },
+    {
+      "path": "package/lib/excel-audit.d.ts",
+      "sha256": "64548f2a74ab0d59061d9943f174f96e9298a2ea934d25749e57554781577c7b"
+    },
+    {
+      "path": "package/lib/excel.d.ts",
+      "sha256": "fc5f05513e64765aa40d3aed30cdbbd25a2f0a7d4322c9cea1ae8d95f5524376"
+    },
+    {
+      "path": "package/lib/fonts.d.ts",
+      "sha256": "625776e716bffae7c1358a1956dc4955f600d5381abac0a86ec3f9ff91c5909b"
+    },
+    {
+      "path": "package/lib/index.d.ts",
+      "sha256": "1476ec384c3421f554d51a99e9999278bac1c7214acabb5bead5bea5caa415e2"
+    },
+    {
+      "path": "package/lib/pdf-ops.d.ts",
+      "sha256": "1f95f3a9d792dc21129ba9922e1ae6f3504eb0be1845bef9219081daa9993109"
+    },
+    {
+      "path": "package/lib/pdf.d.ts",
+      "sha256": "f63f732d232c7c2325c2f574761f7a76c36a9924ea086f7f452a5fd48ddf487c"
+    },
+    {
+      "path": "package/lib/ppt.d.ts",
+      "sha256": "9abe5a879950710ac1f4082c3aa113943618083ca87243f0720704bf013999d5"
+    },
+    {
+      "path": "package/lib/text-output.d.ts",
+      "sha256": "e813334346fc76055ec15058d697a22fc9fb7fb0266b57ce06373283ac5df2b1"
+    },
+    {
+      "path": "package/lib/write.d.ts",
+      "sha256": "f5d3cd3cda355527d998d5c69b01540dff989cd5f4883301a4e925da27ce96f3"
+    },
+    {
+      "path": "package/cordis.patch.yml",
+      "sha256": "115471360d311e061637f3a532e298571d122152b9d4b70a57e1dd10984a4c40"
+    }
+  ]
+}

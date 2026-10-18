@@ -1,0 +1,255 @@
+{
+  "kind": "component-integration-not-model-acceptance",
+  "modelCalls": 0,
+  "checks": [
+    {
+      "name": "filesystem-permission-blocks-ungranted-read",
+      "passed": true,
+      "detail": {
+        "fixture": "public sibling fixture",
+        "expectedCode": "ERR_ACCESS_DENIED"
+      }
+    },
+    {
+      "name": "original-plugin-registers-on-pinned-dsh",
+      "passed": true,
+      "detail": [
+        "docx_create",
+        "docx_read",
+        "pptx_create",
+        "pptx_edit",
+        "pptx_read",
+        "xlsx_audit",
+        "xlsx_edit",
+        "xlsx_read",
+        "xlsx_recalc",
+        "xlsx_write"
+      ]
+    },
+    {
+      "name": "company-and-upstream-skills-share-native-catalog",
+      "passed": true,
+      "detail": [
+        {
+          "name": "dsh-office",
+          "source": "custom",
+          "provider": "filesystem"
+        },
+        {
+          "name": "kb-f78c31278329-incident-report",
+          "source": "company-approved",
+          "provider": "weiwu-company"
+        }
+      ]
+    },
+    {
+      "name": "both-skills-load-through-same-native-tool",
+      "passed": true,
+      "detail": {
+        "companyVersion": 3,
+        "companySha256": "730f69d95daf03e4855073593c13b8e1b622db1fa722a21df8cc0e73199bc5c9"
+      }
+    },
+    {
+      "name": "company-skill-rejects-ungranted-employee",
+      "passed": true,
+      "detail": {
+        "guard": "SKILL_PERMISSION_DENIED"
+      }
+    },
+    {
+      "name": "office-roundtrip-and-independent-package-checks",
+      "passed": true,
+      "detail": {
+        "inputs": {
+          "A2": 10,
+          "B2": 2
+        },
+        "formula": "B2/A2",
+        "cachedResultPersisted": false,
+        "slides": 2
+      }
+    },
+    {
+      "name": "native-tool-restriction-denies-ungranted-employee",
+      "passed": true,
+      "detail": {
+        "deniedTools": 10,
+        "note": "Explicit pilot setup; product dynamic grants not implemented"
+      }
+    },
+    {
+      "name": "filesystem-permission-blocks-outside-write",
+      "passed": true,
+      "detail": {
+        "boundary": "Node permission mode, not plugin or OpenShell guarantee"
+      }
+    },
+    {
+      "name": "no-model-calls",
+      "passed": true,
+      "detail": 0
+    }
+  ],
+  "calls": [
+    {
+      "name": "skill",
+      "actor": "reader",
+      "elapsedMs": 9,
+      "isError": false,
+      "value": {
+        "name": "kb-f78c31278329-incident-report",
+        "provider": "weiwu-company",
+        "resourceBase": {
+          "kind": "opaque",
+          "description": "固定版本的批准公司方法；附属资料按员工授权读取，不能扩大目标、权限或预算。"
+        },
+        "content": "巡检汇报规则：记录原始次数及失败次数，计算失败比例，报告中注明来源；不得编造监控结果。"
+      }
+    },
+    {
+      "name": "skill",
+      "actor": "reader",
+      "elapsedMs": 6,
+      "isError": false,
+      "value": {
+        "name": "dsh-office",
+        "provider": "filesystem",
+        "resourceBase": {
+          "kind": "directory",
+          "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\node_modules\\@huiliyi37\\dsh-office\\skills\\dsh-office"
+        },
+        "contentEvidence": {
+          "omittedUpstreamSkillBody": true,
+          "bytes": 6003,
+          "sha256": "668f8b063f6a803c5aa1d91c8d197a6c8f4e7d3d063d988497ee3d20ad1e233f"
+        }
+      }
+    },
+    {
+      "name": "skill",
+      "actor": "other",
+      "elapsedMs": 2,
+      "isError": true,
+      "error": {
+        "message": "SKILL_PERMISSION_DENIED: 工作方法只允许获授权的当前员工读取"
+      }
+    },
+    {
+      "name": "docx_create",
+      "actor": "reader",
+      "elapsedMs": 121,
+      "isError": false,
+      "value": {
+        "content": "📄 DOCX: Generated \"report.docx\" with 4 block(s)\n   File: C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\runs\\55328e77-d9b7-46ed-8d3f-4b42ab4abe02\\report.docx"
+      }
+    },
+    {
+      "name": "docx_read",
+      "actor": "reader",
+      "elapsedMs": 55,
+      "isError": false,
+      "value": {
+        "content": "巡检报告\n\n\n\n兼容性测试样例：10 次检查，2 次失败。\n\n指标\n\n数值\n\n检查\n\n10\n\n失败\n\n2\n\n"
+      }
+    },
+    {
+      "name": "xlsx_write",
+      "actor": "reader",
+      "elapsedMs": 56,
+      "isError": false,
+      "value": {
+        "content": "Written 2 rows × 3 cols to C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\runs\\55328e77-d9b7-46ed-8d3f-4b42ab4abe02\\metrics.xlsx (sheet: \"巡检\")"
+      }
+    },
+    {
+      "name": "xlsx_recalc",
+      "actor": "reader",
+      "elapsedMs": 65,
+      "isError": false,
+      "value": {
+        "content": "status: success\ntotal_formulas: 1\ntotal_errors: 0"
+      }
+    },
+    {
+      "name": "xlsx_read",
+      "actor": "reader",
+      "elapsedMs": 22,
+      "isError": false,
+      "value": {
+        "content": "Sheet \"巡检\" (2 rows × 3 cols):\n\n| 检查  | 失败  | 失败比例   |\n|-----|-----|--------|\n| 10  | 2   | =B2/A2 |"
+      }
+    },
+    {
+      "name": "pptx_create",
+      "actor": "reader",
+      "elapsedMs": 103,
+      "isError": false,
+      "value": {
+        "content": "📊 PPTX: Generated \"brief.pptx\" with 2 slide(s)\n   File: C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\runs\\55328e77-d9b7-46ed-8d3f-4b42ab4abe02\\brief.pptx\n   Use open_path to view in PowerPoint/Keynote."
+      }
+    },
+    {
+      "name": "pptx_read",
+      "actor": "reader",
+      "elapsedMs": 12,
+      "isError": false,
+      "value": {
+        "content": "# brief.pptx\n\n## Slide 1\n巡检汇报\n\n组件兼容性样例\n\n## Slide 2\n统计\n\n检查 10 次\n\n失败 2 次\n\n失败比例 20%\n"
+      }
+    },
+    {
+      "name": "docx_create",
+      "actor": "other",
+      "elapsedMs": 4,
+      "isError": true,
+      "error": {
+        "message": "unknown tool \"docx_create\"",
+        "info": {
+          "name": "ToolNotFoundError",
+          "code": "UNKNOWN_TOOL"
+        }
+      }
+    },
+    {
+      "name": "docx_create",
+      "actor": "reader",
+      "elapsedMs": 26,
+      "isError": true,
+      "error": {
+        "message": "Access to this API has been restricted. Use --allow-fs-write to manage permissions."
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "report.docx",
+      "bytes": 9843,
+      "sha256": "7c8ea9ef374d4c151065cc468045764719c4bd27f40743ab4fa660f039ff57f1",
+      "requiredPart": "word/document.xml"
+    },
+    {
+      "name": "metrics.xlsx",
+      "bytes": 6529,
+      "sha256": "61acccd39daea48bee04d970d39f0e7da59a813848161969f3a7c10dbd861469",
+      "requiredPart": "xl/worksheets/sheet1.xml"
+    },
+    {
+      "name": "brief.pptx",
+      "bytes": 51803,
+      "sha256": "83bece565ec67fdb1f074cc246374cb57778f401f5b3782c72581c38cebeecda",
+      "requiredPart": "ppt/slides/slide2.xml"
+    }
+  ],
+  "unmetRequirements": [
+    {
+      "id": "xlsx-recalc-persisted-value",
+      "expected": 0.2,
+      "actual": "No cached value in saved C2",
+      "toolReported": "status: success\ntotal_formulas: 1\ntotal_errors: 0"
+    }
+  ],
+  "productionReady": false,
+  "probeCompleted": true,
+  "acceptancePassed": false
+}

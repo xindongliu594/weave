@@ -1,0 +1,30 @@
+{
+  "package": "@huiliyi37/dsh-office",
+  "version": "0.2.4",
+  "integrity": "sha512-cTLnwzv9MdIXGO4vfK+1QHkOziZndFF4K/T8B98Im8h3gmQn1sAUpQ1z5PliEQHJsX4j4jCbFBBPBx37XFsZGw==",
+  "node": "v24.15.0",
+  "dsh": "0.1.5-rc.1",
+  "lockSha256": "c4636d48d13853cb49c60a9c6d37d8e67f3d2816c2f8d94da91fdb3bc4a68451",
+  "entrySha256": "b2760156f93027f22cf6df37741df2fdcc229e2ba780ba33d081ecf6097a39cb",
+  "elapsedMs": 3725,
+  "exitCode": 2,
+  "signal": null,
+  "output": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\runs\\55328e77-d9b7-46ed-8d3f-4b42ab4abe02",
+  "modelCallsAuthorized": 0,
+  "productionChanged": false,
+  "boundary": "Node filesystem permission experiment; not OpenShell or network isolation verification",
+  "readAllowlist": [
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\validation\\dsh-office-plugin-pilot\\worker.mjs",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\approved-skills.mjs",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\package.json",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\package.json",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\node_modules",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\node_modules",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\node_modules",
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\runs\\55328e77-d9b7-46ed-8d3f-4b42ab4abe02"
+  ],
+  "writeAllowlist": [
+    "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\runs\\55328e77-d9b7-46ed-8d3f-4b42ab4abe02"
+  ],
+  "outsideWriteAbsent": true
+}
