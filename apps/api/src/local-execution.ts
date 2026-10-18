@@ -92,7 +92,7 @@ export class LocalOperationService {
    else if(name==='native_plugin'){
     if(target.backend?.kind!=='openshell')throw new AppError(422,'原生插件需要 OpenShell 隔离','NATIVE_BACKEND_REQUIRED');
     const binding=nativeToolBinding(run.snapshot,args.toolName),tool=binding.manifest.tools.find((item:any)=>item.name===args.toolName);
-    const access=nativeFileAccess(tool,args.arguments),task=run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&item.assigneeId===employee.id);
+    const access=nativeFileAccess(tool,args.arguments),task=run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&(item.assignee??item.assigneeId)===employee.id);
     if(!task||!Array.isArray(task.inputs)||!Array.isArray(task.outputs))throw new AppError(422,'原生插件必须固定当前任务的输入和输出合同','NATIVE_TASK_REQUIRED');
     const readPaths=[...new Set<string>([...task.inputs,...task.outputs].map((item:any)=>item.path))],writePaths=task.outputs.map((item:any)=>item.path);
     if(access.read.some(path=>!readPaths.includes(path))||access.write.some(path=>!writePaths.includes(path)))throw new AppError(422,'原生插件参数超出当前任务文件合同','NATIVE_PATH_DENIED');

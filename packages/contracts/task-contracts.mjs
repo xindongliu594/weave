@@ -57,6 +57,8 @@ export function taskContractErrors(tasks, agents = [], checkpoints = [], { allow
     }
     for (const output of task.outputs ?? []) {
       if (output.format !== undefined && !['text', 'json'].includes(output.format)) errors.push(`${task.id}: 未知文件格式`);
+      if (output.format !== undefined && /\.(docx|xlsx|pptx)$/i.test(output.path))
+        errors.push(`${task.id}: ${output.path} 是 Office 二进制文件，请省略 format；使用原生读取工具和独立 QA 核对内容，宿主仍校验文件与 SHA256`);
       if ((output.requiredKeys?.length || Object.keys(output.expectedValues ?? {}).length) && output.format !== 'json') errors.push(`${task.id}: 字段检查仅用于 JSON 输出`);
       if (task.inScope?.length && !withinScope(output.path, task.inScope)) errors.push(`${task.id}: 输出 ${output.path} 不在允许修改的文件或目录范围内`);
       if (task.outOfScope?.length && withinScope(output.path, task.outOfScope)) errors.push(`${task.id}: 输出 ${output.path} 位于禁止修改的文件或目录范围内`);

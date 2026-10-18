@@ -11,6 +11,18 @@ const base:Plan={rationale:'文件交接',agents:[{id:'manager',name:'经理',ro
 test('approved file contracts survive parsing and valid producer/consumer plans pass',()=>{
   const parsed=planSchema.parse(base);assert.equal(parsed.tasks[0].outputs?.[0].expectedValues?.count,2);assert.equal(validatePlan(parsed,policy,[model]).valid,true);
 });
+test('Office binary files cannot be approved with text or JSON output checks',()=>{
+  for(const path of ['report.docx','metrics.XLSX','brief.pptx']) {
+    const plan=structuredClone(base);
+    plan.tasks[0].outputs=[{path,format:'text'}];plan.tasks[1].inputs=[{path,producerTaskId:'produce'}];
+    for(const format of ['text','json'] as const) {
+      plan.tasks[0].outputs[0].format=format;
+      assert.match(validatePlan(plan,policy,[model]).errors.join(';'),/二进制.*省略 format/);
+    }
+    delete plan.tasks[0].outputs[0].format;
+    assert.equal(validatePlan(plan,policy,[model]).valid,true,'generic binary output retains host file/hash checks');
+  }
+});
 test('missing source edges, unknown output and unordered writers/readers fail product validation',()=>{
   const cases:Plan[]=[];
   const noEdge=structuredClone(base);noEdge.tasks[1].dependencies=[];cases.push(noEdge);

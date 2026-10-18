@@ -1,0 +1,83 @@
+{
+  "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+  "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+  "status": "failed",
+  "error": "REPEATED_ERROR: 同类工具错误连续出现 3 次",
+  "eventCount": 199,
+  "tasks": [
+    {
+      "id": "t1",
+      "assignee": "employee-2",
+      "status": "failed"
+    },
+    {
+      "id": "t2",
+      "assignee": "employee-3",
+      "status": "pending"
+    },
+    {
+      "id": "t3",
+      "assignee": "employee-1",
+      "status": "pending"
+    }
+  ],
+  "budget": {
+    "version": 1,
+    "runId": "7da3a959-aee5-4b3c-8650-138e4adc6ec3",
+    "projectId": "5b0f9606-859f-4c63-96b3-4e7e0d7412ec",
+    "projectVersion": 2,
+    "capturedAt": "2026-10-18T05:29:24.029Z",
+    "point": "runtime-checkpoint",
+    "basis": "host-execution-budget",
+    "currency": "USD",
+    "project": {
+      "limit": 0.4,
+      "occupied": 0.019337999999999987,
+      "activeReserved": 0,
+      "available": 0.38066200000000006,
+      "callsUsed": 5,
+      "callLimit": 32,
+      "callsBasis": "host-reserved-model-attempts"
+    },
+    "inherited": {
+      "basis": "run-admission-snapshot",
+      "recordedCost": 0.005205899999999999,
+      "retainedUnknownReservation": 0,
+      "availableBudget": 0.39479410000000004,
+      "callsUsed": null,
+      "callsBasis": "archived-model-wire-request-count",
+      "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+    },
+    "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+  },
+  "recovery": {
+    "unknownOperations": [],
+    "costReadiness": {
+      "recordedCost": 0.019337999999999998,
+      "reserved": 0,
+      "availableBudget": 0.380662,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    }
+  },
+  "rejection": [
+    {
+      "type": "runtime/operation-finished",
+      "data": {
+        "name": "plugin__office__docx_create",
+        "notExecuted": true
+      }
+    },
+    {
+      "type": "runtime/operation-failed",
+      "data": {
+        "name": "plugin__office__docx_create",
+        "code": "NATIVE_TASK_REQUIRED",
+        "message": "原生插件必须固定当前任务的输入和输出合同"
+      }
+    }
+  ],
+  "operatorDeliverables": 0,
+  "rootCause": "Approved task keeps assigneeId=writer and assignee=employee-2; native enqueue incorrectly compared original assigneeId with runtime employee id."
+}

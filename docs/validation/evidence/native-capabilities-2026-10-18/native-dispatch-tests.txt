@@ -1,0 +1,15 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ native plugin dispatch binds the runtime employee alias to its approved file contract (2572.0963ms)
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (7010.2961ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20858.1334ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (4063.9378ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (442.1936ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35723.2668

@@ -5,10 +5,10 @@ rendering chunks...
 computing gzip size...
 ../../dist/web/index.html                   0.56 kB │ gzip:   0.43 kB
 ../../dist/web/assets/index-CzCbk_YO.css   52.49 kB │ gzip:  11.11 kB
-../../dist/web/assets/index-nz0bGBso.js   614.11 kB │ gzip: 190.17 kB
-✓ built in 17.58s
+../../dist/web/assets/index-BOXKgkgZ.js   614.42 kB │ gzip: 190.29 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 11.41s

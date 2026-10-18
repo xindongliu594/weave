@@ -67,7 +67,7 @@ export const artifactInputSchema = z.object({
   sha256: z.string().regex(/^[a-f0-9]{64}$/).optional().describe('仅用于用户选定的外部固定资料的真实 SHA256；此类输入不填写 producerTaskId。本次任务产物使用 producerTaskId，由宿主绑定本次验收版本。'),
 }).refine(v => !!v.producerTaskId || !!v.sha256, '输入必须绑定来源任务或固定 SHA256');
 export const artifactOutputSchema = z.object({
-  path: artifactPathSchema, format: z.enum(['text', 'json']).optional(),
+  path: artifactPathSchema, format: z.enum(['text', 'json']).optional().describe('仅用于真实纯文本或 JSON 内容检查；DOCX/XLSX/PPTX 等二进制文件必须省略 format，由宿主检查文件/SHA256，员工使用原生读取工具及独立 QA 核对内容。'),
   requiredKeys: z.array(z.string().min(1).max(100)).max(30).optional(),
   expectedValues: z.record(z.string().min(1).max(100), z.union([z.string().max(2000), z.number().finite(), z.boolean(), z.null()])).refine(v => Object.keys(v).length <= 30).optional(),
 }).refine(v => (!v.requiredKeys?.length && !Object.keys(v.expectedValues ?? {}).length) || v.format === 'json', '字段检查需要 JSON 格式');

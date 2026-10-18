@@ -1,11 +1,13 @@
 import { before, after, beforeEach, afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdtemp, mkdir, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, relative, isAbsolute } from 'node:path';
-import { randomUUID, randomBytes } from 'node:crypto';
+import { randomUUID, randomBytes, createHash } from 'node:crypto';
+import { gzipSync } from 'node:zlib';
+import { nativeManifestId } from '../services/agent-runtime/native-capabilities.mjs';
 import { createRequire } from 'node:module';
 import http from 'node:http';
 import express from 'express';
@@ -121,6 +123,35 @@ async function writeJob(f: Fixture) {
   const job = await claim(f, id); return { id, job, body: await execute(f, job) };
 }
 
+test('native plugin dispatch binds the runtime employee alias to its approved file contract', { skip: !isolated, timeout: 30000 }, async () => {
+  const f=await fixture(), toolName='plugin__office__write';
+  const hash=(data:string|Buffer)=>createHash('sha256').update(data).digest('hex');
+  const code=Buffer.from('unused isolated fixture'), compressed=gzipSync(code), metadata=Buffer.from('{}');
+  const manifest={format:'dsh-native-tools-v1',namespace:'office',package:'@company/office',version:'1.0.0',source:{kind:'company',reference:'isolated fixture'},dshVersion:'0.1.5-rc.1',config:{},lockSha256:hash('lock'),
+    bundle:{sha256:hash(compressed),codeSha256:hash(code),metadataSha256:hash(metadata),bytes:compressed.length},
+    tools:[{name:toolName,originalName:'write',description:'Fixture only',parameters:{type:'object'},files:{read:[],write:['path']}}]};
+  const id=nativeManifestId(manifest), root=join(directory,'native-plugins',id);await mkdir(root,{recursive:true});
+  await writeFile(join(root,'bundle.gz'),compressed);await writeFile(join(root,'package.json'),metadata);await writeFile(join(root,'manifest.json'),JSON.stringify(manifest));
+  const {setNativeCapability}=await import('../apps/api/src/native-capabilities.ts');await setNativeCapability(id,true,pool);
+  const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[f.runId])).rows[0].snapshot;
+  const backend={kind:'openshell',version:'0.1.2',gateway:'fixture',image:'node@sha256:'+hash('image'),policySha256:hash('policy'),fingerprint:hash('backend')};
+  snapshot.agents[0]={...snapshot.agents[0],id:'employee-2',employeeId:employee.id,sourceAgentId:employee.id,sourceDepartmentId:departmentId,tools:[toolName]};
+  snapshot.tasks=[{...snapshot.tasks[0],assignee:'employee-2',assigneeId:employee.id,inputs:[],outputs:[{path:'report.docx'}]}];
+  snapshot.nativeCapabilities=[{id,manifest}];snapshot.policy.executionTarget.backend=backend;snapshot.executionTarget.backend=backend;
+  await pool.query('UPDATE departments SET data=$1 WHERE id=$2',[{name:'隔离心跳测试',agents:[{...employee,tools:[toolName]}]},departmentId]);
+  try {
+    await pool.query('UPDATE local_devices SET backend=$1 WHERE id=$2',[backend,f.device.id]);
+    await pool.query('UPDATE project_runs SET snapshot=$1 WHERE id=$2',[snapshot,f.runId]);
+    const context={agentId:'employee-2',employeeId:employee.id,taskId:'review',callId:randomUUID(),sessionId:randomUUID()};
+    const args={toolName,arguments:{path:'report.docx'}};
+    const op=await f.service.enqueue(f.runId,'native_plugin',args,context);
+    assert.deepEqual((await row(op)).payload.arguments.writePaths,['report.docx']);
+    assert.equal((await row(op)).payload.arguments.pluginId,id);
+    await assert.rejects(f.service.enqueue(f.runId,'native_plugin',{...args,arguments:{path:'other.docx'}},context),{code:'NATIVE_PATH_DENIED',notExecuted:true});
+    snapshot.tasks[0].assignee='employee-3';await pool.query('UPDATE project_runs SET snapshot=$1 WHERE id=$2',[snapshot,f.runId]);
+    await assert.rejects(f.service.enqueue(f.runId,'native_plugin',args,context),{code:'NATIVE_TASK_REQUIRED',notExecuted:true});
+  } finally {await pool.query('UPDATE departments SET data=$1 WHERE id=$2',[{name:'隔离心跳测试',agents:[employee]},departmentId]);}
+});
 test('started native command retains its waiting result after the heartbeat exceeds 15 seconds', { skip: !isolated, timeout: 30000 }, async () => {
   const f = await fixture(), { id } = await commandJob(f), job = await claim(f, id); await start(f, job);
   const controller = new AbortController();

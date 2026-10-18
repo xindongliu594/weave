@@ -1,0 +1,28 @@
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (35.823ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (18.7683ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (45.0226ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (44.3225ms)
+✔ restored outputs are not current-attempt changes and mismatches report the exact observed paths (48.3147ms)
+✔ host file checks reject linked directories before reading their contents (9.837ms)
+✔ host file checks reject binary content declared as text (8.4111ms)
+✔ optimistic writes reject a second editor using the same observed hash (26.3397ms)
+✔ native catalog binds package, config, tool schemas and file permissions in content identity (4.0169ms)
+✔ approval checks registered file effects, not merely native tool name syntax (1.7595ms)
+✔ native binding denies absent grants, mismatched identity and duplicate tool names (0.9223ms)
+✔ native file declaration resolves fallback outputs and rejects escapes before execution (1.29ms)
+✔ approved file contracts survive parsing and valid producer/consumer plans pass (13.1118ms)
+✔ Office binary files cannot be approved with text or JSON output checks (3.6946ms)
+✔ missing source edges, unknown output and unordered writers/readers fail product validation (2.8329ms)
+✔ downstream cannot name an older writer after an upstream replacement (1.3703ms)
+✔ schema rejects unsafe paths, unpinned external files and incompatible JSON checks (6.7355ms)
+✔ quality tasks require command grants, scope, valid references and an independent reviewer (0.7638ms)
+✔ declared outputs must fit host file scopes before any employee executes (0.6859ms)
+✔ automatic rework is explicit, bounded, read-only in review and gates all consumers (3.5806ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 888.9652
