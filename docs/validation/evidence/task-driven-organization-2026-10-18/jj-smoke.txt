@@ -1,0 +1,21 @@
+✔ independent content review is explicitly labelled as employee evidence and survives receipt reload (7.611717ms)
+✔ missing, stale or fabricated statements cannot satisfy delivery (2.380961ms)
+✔ a replacement repair output needs a matching new review; legacy runs get no invented evidence (0.616291ms)
+✔ a later writer or changed final file invalidates historical review evidence (0.987351ms)
+✔ delivery producers must be final declared writers of their files (5.954588ms)
+✔ legacy plans stay unchanged and new organization fields survive serialization (0.906876ms)
+✔ delivery checks require an evidence channel and the declared producer files (0.470115ms)
+✔ V2 requires a target and delivery criteria, preserving the existing identity selection (2.00452ms)
+✔ manager waits for delivery checks and AI revision cannot drop confirmed requirements (0.765233ms)
+✔ delivery checks reject missing, duplicate, cyclic, unordered or self-reviewed references (1.318333ms)
+✔ catalog exposes only allowed identity and capability summaries, not private instructions or knowledge (1.578236ms)
+✔ resolved team keeps source identities, limits grants, and does not modify the department (5.343133ms)
+✔ subsets preserve legacy calls and cannot drop the manager or smuggle employee identity (2.223178ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1220.847442

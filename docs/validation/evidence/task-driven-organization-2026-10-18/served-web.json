@@ -1,0 +1,8 @@
+{
+  "asset": "/assets/index-7PjxUnI3.js",
+  "sha256": "8b23cee71874cb9b6e0477ef7056f6acc95aa861f13822141d25a0f09de2f395",
+  "matchesValidatedBuild": true,
+  "verification": "JJ loopback HTTP compared with deployed file; same hash as Windows validated build",
+  "windowsTunnelDownload": "connection closed during large asset transfer; direct tunnel hash verification not completed",
+  "modelCalls": 0
+}
