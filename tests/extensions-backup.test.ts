@@ -59,8 +59,11 @@ before(async () => {
 after(async () => { if (server) await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await pool?.end(); await admin.query(`DROP SCHEMA ${schema} CASCADE`); await admin.end(); if (directory) await rm(directory, { recursive: true, force: true }); });
 
 test('extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action', async () => {
+  await pool.query("INSERT INTO organization_conversations(id,turn_id,preview_id) VALUES('conversation','latest-turn','latest-preview')");
   const exported = await call('export', { password }); assert.equal(exported.status, 200, JSON.stringify(exported.data)); backup = exported.data;
   const plain = await backupModule.decryptBackup(backup, password);
+  assert.equal(plain.tables.organization_conversations[0].turn_id,'latest-turn');
+  await pool.query("UPDATE organization_conversations SET turn_id='changed',preview_id=NULL");
   assert.equal(Buffer.from(plain.files[archivedRunId + '/artifacts/result.txt'], 'base64').toString(), 'Windows 嵌套档案也必须完整保留。');
   assert.ok(Object.keys(plain.vaultFiles).length > 0); assert.ok(Object.keys(plain.vaultFiles).every(key => !key.includes('\\')), 'vault paths are portable relative paths');
   for (const table of extensionTables) assert.ok(plain.tables[table].length > 0, `${table} is included`);
@@ -68,6 +71,7 @@ test('extension tables survive encrypted backup while scheduled dispatch and pen
   assert.equal(plain.tables.storage_cleanups[0].result.bytes,42);
   await pool.query("UPDATE automation_schedules SET name='Changed',status='cancelled'"); await pool.query("UPDATE work_file_snapshots SET name='Changed'");
   const restored = await call('restore', { password, backup, confirmation: 'RESTORE' }); assert.equal(restored.status, 200, JSON.stringify(restored.data));
+  assert.deepEqual((await pool.query('SELECT turn_id,preview_id FROM organization_conversations')).rows,[{turn_id:'latest-turn',preview_id:'latest-preview'}]);
   assert.equal((await pool.query("SELECT name,status FROM automation_schedules WHERE id='schedule'")).rows[0].status, 'paused');
   assert.equal((await pool.query("SELECT name FROM automation_schedules WHERE id='schedule'")).rows[0].name, '每日检查');
   const messages = (await pool.query('SELECT id,status,reply,error FROM manager_messages')).rows;

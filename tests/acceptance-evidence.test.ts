@@ -30,6 +30,17 @@ test('legacy reports remain unverified instead of inventing new mappings',()=>{
  const source=run();delete (source.snapshot.tasks[0] as any).acceptanceChecks;
  const row=runAcceptanceEvidence(source,lineage as any).rows[0];assert.equal(row.status,'unverified');assert.match(row.reason,/未定义/);
 });
+test('delivery projection requires committed producers and the exact check attempt',()=>{
+ const source:any=run();source.snapshot.tasks[0].assigneeId='qa';source.snapshot.tasks.push({id:'write',assigneeId:'writer',acceptanceCriteria:[],outputs:[]});
+ source.snapshot.deliveryCriteria=[{id:'r1',description:'程序可启动',producerTaskIds:['write'],checkTaskId:'qa',checkCriteriaIndexes:[0],independent:true}];
+ source.events[0].data.tasks.push({task_id:'native-write',seed_id:'write'});source.events[1].data.tasks.push({id:'native-write',status:'completed',attemptId:'w'});
+ source.events.push({type:'handoff/accepted',data:{taskId:'write',attemptId:'w',runId:'run',outputs:[]}});
+ assert.equal(runAcceptanceEvidence(source,lineage as any).deliveryCriteria?.[0].status,'passed');
+ source.snapshot.tasks[1].outputs=[{path:'result.txt'}];source.events.at(-1).data.outputs=[{path:'result.txt',sha256:'old'}];source.events[2].data.inputs=[{path:'result.txt',producerTaskId:'write',sha256:'old'}];
+ source.events.push({type:'delivery/checked',data:{files:[{path:'result.txt',sha256:'changed'}]}});
+ assert.equal(runAcceptanceEvidence(source,lineage as any).deliveryCriteria?.[0].status,'unverified','final artifact manifest defeats matching old receipt pairs');
+ source.events[1].data.tasks[1].status='in_progress';assert.equal(runAcceptanceEvidence(source,lineage as any).deliveryCriteria?.[0].status,'unverified');
+});
 test('check schema rejects invalid exit codes and zero tests',()=>{
  const plan={...task,subject:'QA',objective:'检查交付',assigneeId:'qa',estimatedInputTokens:1,estimatedOutputTokens:1};
  assert.equal(taskSchema.safeParse(plan).success,true);

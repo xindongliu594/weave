@@ -30,6 +30,7 @@ async function qualityScenario(mode) {
     snapshot.agents.push({id:'auditor',employeeId:'auditor',role:'member',tools:[]});
     snapshot.tasks.push({id:'accept',subject:'[quality:accept]',assignee:'auditor',assigneeId:'original-auditor',kind:'work',objective:'Read QA handoff',dependencies:['review'],acceptanceCriteria:['QA reviewed'],outputs:[]});
     for(const task of snapshot.tasks)task.handoff={sections:[{key:'usage',requirement:'说明核验结论'}]};
+    snapshot.deliveryCriteria=[{id:'qa-report',description:'独立复核结论传递到最终验收',producerTaskIds:['review'],checkTaskId:'accept',checkCriteriaIndexes:[0],independent:true}];
   }
   for(const employee of snapshot.agents) employee.modelId=employee.role==='manager'?'captain':'same-model';
   const archive=createRunArchive(root,snapshot),steps=new Map(),results=[],requests=[],hash=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -113,6 +114,7 @@ async function qualityScenario(mode) {
     }
     assert.ok(status);assert.equal(status.tasks.length,mode==='manager-contract-chain'?3:2,'no unapproved repair/review task may appear');
     const events=readRun(root,archive.id).events,seals=events.filter(e=>e.type==='handoff/accepted');
+    if(mode==='manager-contract-chain')assert.equal(events.find(e=>e.type==='delivery/verified')?.data.criteria[0].status,'passed');
     if(mode==='forged-command'||mode==='failed-acceptance'){
       // Observe the final native failure after rejection, rather than a stale pre-tool status poll.
       assert.equal(status.tasks[0].status,'failed');assert.equal(status.tasks[1].status,'pending');assert.equal(status.deliverable,false);assert.equal(seals.length,0);assert.ok(!requests.includes('review'));

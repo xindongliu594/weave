@@ -13,6 +13,7 @@ const base = process.env.DATABASE_URL ?? 'postgres://agent_department:local-deve
 const schema = 'organization_chat_' + Date.now(), admin = new pg.Pool({ connectionString: base });
 let pool: pg.Pool, app: any, server: http.Server, gateway: http.Server, url: string, directory: string, modelId: string, otherModelId: string;
 let response: unknown, wire: any, requests = 0;
+let heldResponses:(()=>void)[]|undefined;
 let timeoutMode: 'normal' | 'headers' | 'body' = 'normal';
 const policy = { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 300 };
 const firstMessage = { role: 'user', content: '我想做一个适合团队使用的工具。' };
@@ -36,7 +37,8 @@ before(async () => {
   gateway = http.createServer(async (req, res) => { assert.equal(req.url, '/v1/chat/completions'); let raw = ''; for await (const chunk of req) raw += chunk; wire = JSON.parse(raw); requests++; assert.ok(['fixture-model', 'fixture-team-astra', 'gpt-4.1-mini'].includes(wire.model)); assert.equal(wire.tools, undefined); res.setHeader('content-type', 'application/json');
     if (timeoutMode === 'headers') return;
     if (timeoutMode === 'body') { res.writeHead(200); res.flushHeaders(); res.write('{"choices":'); return; }
-    res.end(JSON.stringify({ choices: [{ message: { content: typeof response === 'string' ? response : JSON.stringify(response) } }], usage: { prompt_tokens: 40, completion_tokens: 15 } })); });
+    const body=JSON.stringify({ choices: [{ message: { content: typeof response === 'string' ? response : JSON.stringify(response) } }], usage: { prompt_tokens: 40, completion_tokens: 15 } });
+    if(heldResponses){heldResponses.push(()=>res.end(body));return;}res.end(body); });
   gateway.listen(0, '127.0.0.1'); await once(gateway, 'listening');
   const saved = await call('/gateways', { name: '组织对话固定服务', baseUrl: 'http://127.0.0.1:' + (gateway.address() as AddressInfo).port + '/v1' });
   for (const name of ['selected', 'other']) { const added = await call('/models', { name, model: name === 'selected' ? 'fixture-model' : 'fixture-other', gatewayId: saved.data.id, inputRate: .1, outputRate: .2 }); assert.equal(added.status, 201, JSON.stringify(added.data)); if (name === 'selected') modelId = added.data.id; else otherModelId = added.data.id; }
@@ -50,6 +52,39 @@ test('executable candidate without host mappings is rejected without save or hid
   const result=await call('/organizations/chat',input({policy:{...policy,allowedTools:['filesystem','artifact_write','terminal_test']}}));
   assert.equal(result.data.draftIssue.code,'ORGANIZATION_CHAT_PLAN_INVALID');assert.match(result.data.draftIssue.message,/逐项/);
   assert.equal(result.data.preview,undefined);assert.deepEqual(await counts(),before);assert.equal(requests,calls+1);
+});
+
+test('V2 conversation recommends existing employees without changing their department and expires old drafts',async()=>{
+ const dept=await call('/departments',{name:'现有研发部',description:'保留人员',agents:implementationCandidate().department.agents});
+ const source=implementationCandidate(),before=await counts();
+ const v2={schemaVersion:2,target:{kind:'existing',departmentId:dept.data.id,departmentVersion:1,primaryAgentIds:source.department.agents.map(a=>a.id),collaboratingAgents:[]},rationale:source.rationale,tasks:source.tasks,orchestration:{pattern:'pipeline',rationale:'开发后独立验收'},deliveryCriteria:[{id:'todo',description:'Todo API 可用',producerTaskIds:['implement'],checkTaskId:'review',checkCriteriaIndexes:[0],independent:true}]};
+ response={reply:'建议使用已有员工。',candidate:v2};
+ const args=input({organizationRouting:true,policy:{...policy,allowedDepartmentIds:[dept.data.id],allowedTools:['filesystem','artifact_write','terminal_test']}});
+ const result=await call('/organizations/chat',args);assert.equal(result.status,200,JSON.stringify(result.data));
+ assert.equal(result.data.preview?.kind,'organization-v2',JSON.stringify(result.data));
+ assert.equal(result.data.preview.plan.agents[0].sourceDepartmentId,dept.data.id);
+ assert.equal((await counts()).departments,before.departments);assert.equal((await counts()).projects,before.projects);
+ assert.ok(wire.messages[0].content.includes('schemaVersion:2'));
+ response={reply:'继续补充需求。'};
+ await call('/organizations/chat',{...args,previousPreviewId:result.data.preview.previewId,messages:[firstMessage,{role:'user',content:'这个项目还要增加一个新的要求。'}]});
+ assert.ok((await pool.query('SELECT data FROM organization_previews WHERE id=$1',[result.data.preview.previewId])).rows[0].data.supersededBy);
+});
+
+test('out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later',async()=>{
+ const source=implementationCandidate(),dept=await call('/departments',source.department);
+ response={reply:'请确认最新需求方案',candidate:{schemaVersion:2,target:{kind:'existing',departmentId:dept.data.id,departmentVersion:1,primaryAgentIds:source.department.agents.map(a=>a.id),collaboratingAgents:[]},rationale:source.rationale,tasks:source.tasks,orchestration:{pattern:'pipeline',rationale:'开发后独立检查'},deliveryCriteria:[{id:'todo',description:'接口可用',producerTaskIds:['implement'],checkTaskId:'review',checkCriteriaIndexes:[0],independent:true}]}};
+ const args=input({organizationRouting:true,conversationId:randomUUID(),policy:{...policy,allowedDepartmentIds:[dept.data.id],allowedTools:['filesystem','artifact_write','terminal_test']}});
+ heldResponses=[];
+ const waitFor=async(n:number)=>{for(let i=0;i<200&&heldResponses!.length<n;i++)await new Promise(r=>setTimeout(r,10));assert.equal(heldResponses!.length,n);};
+ try{
+  const a=call('/organizations/chat',args);await waitFor(1);
+  const b=call('/organizations/chat',{...args,messages:[firstMessage,{role:'user',content:'还要支持优先级字段'}]});await waitFor(2);
+  heldResponses[1]();const latest=await b;assert.ok(latest.data.preview,JSON.stringify(latest));
+  heldResponses[0]();const stale=await a;assert.equal(stale.status,409);assert.equal(stale.data.code,'ORGANIZATION_PREVIEW_STALE');
+  heldResponses=undefined;response={reply:'继续明确需求'};
+  await call('/organizations/chat',{...args,messages:[firstMessage,{role:'user',content:'新的要求仍需讨论'}]});
+  const confirmed=await call('/organizations/previews/'+latest.data.preview.previewId+'/confirm',{previewVersion:1});assert.equal(confirmed.status,409);
+ }finally{for(const finish of heldResponses??[])finish();heldResponses=undefined;}
 });
 
 test('clarification replies retain global billed usage and do not create departments, previews or runs', async () => {

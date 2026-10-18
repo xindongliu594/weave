@@ -1,0 +1,45 @@
+✔ independent content review is explicitly labelled as employee evidence and survives receipt reload (7.7903ms)
+✔ missing, stale or fabricated statements cannot satisfy delivery (5.5031ms)
+✔ a replacement repair output needs a matching new review; legacy runs get no invented evidence (0.6149ms)
+✔ a later writer or changed final file invalidates historical review evidence (1.1592ms)
+✔ admission uses an independent seal and retains first pause reason without log flooding (3.6615ms)
+✔ node evidence and restored context always retain original acceptance during authorized rework (2.4273ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (38.3658ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (18.5941ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (42.795ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (40.5569ms)
+✔ restored outputs are not current-attempt changes and mismatches report the exact observed paths (32.3453ms)
+✔ host file checks reject linked directories before reading their contents (5.9823ms)
+✔ host file checks reject binary content declared as text (5.1642ms)
+✔ optimistic writes reject a second editor using the same observed hash (19.5661ms)
+✔ manager contract rejects missing, oversized or incomplete reports and failed acceptance (38.737ms)
+✔ sealed report is separate from host evidence; only direct completed predecessors enter recipient context (17.4389ms)
+✔ report never replaces real file validation and legacy contracts remain compatible (8.4229ms)
+✔ identical criterion text is matched by contract order rather than becoming impossible to submit (9.5595ms)
+✔ native quality contracts receive actual file and command evidence before independent review (1986.3892ms)
+✔ native resumed implementation can seal existing outputs with observed empty changes and a fresh check (1566.9629ms)
+✔ native DSH tool accepts contracted employee report and passes its seal to independent reviewer (1766.9065ms)
+✔ native three-stage handoff does not inject indirect reports through assignment messages (2448.6881ms)
+✔ model claims of a passed command cannot unlock native quality work (1290.0171ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (1418.1063ms)
+✔ review revision cannot create an unapproved automatic repair graph (1770.3308ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (1865.4262ms)
+✔ a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate (1917.2264ms)
+✔ accepted task completion at the call boundary ends the native turn without charging a redundant report or stopping downstream review (2004.2013ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (4921.0145ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (6024.1446ms)
+✔ out-of-scope finding cannot create a repair task (2021.975ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (2406.9255ms)
+✔ explicit reject stops the loop even with spare rework allowance (2170.3769ms)
+✔ repair model calls share the original task allowance (2791.2198ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (2751.0175ms)
+✔ repair cannot overwrite a changed file with a stale hash (1897.9044ms)
+✔ duplicate finding IDs cannot authorize a repair graph (1490.0918ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27229.414

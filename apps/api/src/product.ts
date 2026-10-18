@@ -11,6 +11,7 @@ import { organizationCandidateSchema, templatePlan } from '../../../packages/con
 import { completeBudgeted,lockCostPolicy,checkDailyBudget,shareCostMaintenance,requireProjectCostReady } from './cost-control.ts';
 import { departmentTemplates, roleTemplates } from '../../../packages/contracts/templates.ts';
 import { organizationChatRouter } from './organization-chat.ts';
+import {confirmOrganizationDraft} from './organization-confirmation.ts';
 export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0),knowledgeSearchMode:z.enum(['keyword','hybrid']).optional(),reuseMinSuccessfulWorks:z.number().int().min(2).max(100).optional()});
 export async function settings(client:pg.Pool|pg.PoolClient=pool){return (await client.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];}
 // Role versions are server-managed metadata, not a different user-approved proposal.
@@ -18,6 +19,10 @@ function withoutRoleVersions<T extends {agents:any[]}>(value:T){return {...value
 export function productRouter(){
   const router=Router();
   router.use(organizationChatRouter());
+  router.post('/organizations/previews/:id/confirm',async(req,res)=>{
+    const {previewVersion}=z.object({previewVersion:z.number().int().positive()}).strict().parse(req.body);
+    const client=await pool.connect();try{const result=await confirmOrganizationDraft(client,z.uuid().parse(req.params.id),previewVersion);res.status(result.existing?200:201).json(result);}finally{client.release();}
+  });
   router.get('/settings',async(_req,res)=>res.json(await settings()));
   router.put('/settings',async(req,res)=>{const data=settingsSchema.parse(req.body.data);const r=await pool.query('UPDATE product_settings SET data=$1,version=version+1 WHERE id=1 AND version=$2',[data,z.number().int().positive().parse(req.body.version)]);if(!r.rowCount)throw new AppError(409,'设置已修改，请刷新');res.json({ok:true});});
   router.get('/templates',async(_req,res)=>{const saved=(await pool.query('SELECT * FROM templates WHERE deleted_at IS NULL ORDER BY name')).rows;res.json({departments:[...departmentTemplates.map(t=>({...t,builtin:true})),...saved.filter(t=>t.kind==='department')],roles:[...roleTemplates.map(t=>({...t,builtin:true})),...saved.filter(t=>t.kind==='role').map(t=>({...t,...t.data}))]});});
@@ -62,6 +67,7 @@ export function productRouter(){
       const preview=input.previewId?(await client.query('SELECT * FROM organization_previews WHERE id=$1 FOR UPDATE',[input.previewId])).rows[0]:null;
       if(input.previewId&&!preview)throw new AppError(404,'组织预览不存在');
       if(preview?.data.kind==='project-plan')throw new AppError(409,'这是项目方案候选，请在原项目中确认','PLANNING_PREVIEW_MISMATCH');
+      if(preview?.data.kind==='organization-v2')throw new AppError(409,'请在任务组队方案中确认，不能通过部门编辑入口保存','PLANNING_PREVIEW_MISMATCH');
       dId=preview?.department_id??dId;
       input.policy=bindPolicy(input.policy,input.department.agents,dId);assertPolicy(plan.agents,input.policy);
       if(preview?.project_id){

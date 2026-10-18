@@ -1,0 +1,149 @@
+{
+  "environment": "isolated-fixed-response-fixture",
+  "paidModelCalls": 0,
+  "counts": {
+    "runs": 0,
+    "departments": 1,
+    "fixtureModelRequests": 2,
+    "projects": 1
+  },
+  "project": {
+    "id": "46949ee0-6a9b-4323-a6ea-0718da1a3a5e",
+    "departmentId": "00000000-0000-4000-8000-000000000001",
+    "departmentVersion": 1,
+    "version": 1,
+    "requirement": "请整理三条虚构网站巡检结果，每条说明时间和结论，安排独立检查。\n\n补充：最后由经理核对三条结论是否齐全，请更新方案。",
+    "status": "DRAFT",
+    "plan": {
+      "tasks": [
+        {
+          "id": "write",
+          "handoff": {
+            "sections": [
+              {
+                "key": "evidence",
+                "requirement": "逐项说明依据与缺项"
+              }
+            ]
+          },
+          "subject": "整理巡检记录",
+          "objective": "分析三条虚构巡检结果",
+          "assigneeId": "writer",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "每条结果具备时间和结论"
+          ],
+          "estimatedInputTokens": 300,
+          "estimatedOutputTokens": 200
+        },
+        {
+          "id": "check",
+          "handoff": {
+            "sections": [
+              {
+                "key": "evidence",
+                "requirement": "逐项说明依据与缺项"
+              }
+            ]
+          },
+          "subject": "独立复核记录",
+          "objective": "分析三条虚构巡检结果",
+          "assigneeId": "qa",
+          "dependencies": [
+            "write"
+          ],
+          "acceptanceCriteria": [
+            "每条结果具备时间和结论"
+          ],
+          "estimatedInputTokens": 300,
+          "estimatedOutputTokens": 200
+        },
+        {
+          "id": "deliver",
+          "handoff": {
+            "sections": [
+              {
+                "key": "evidence",
+                "requirement": "逐项说明依据与缺项"
+              }
+            ]
+          },
+          "subject": "经理核对交付",
+          "objective": "分析三条虚构巡检结果",
+          "assigneeId": "manager",
+          "dependencies": [
+            "check"
+          ],
+          "acceptanceCriteria": [
+            "每条结果具备时间和结论"
+          ],
+          "estimatedInputTokens": 300,
+          "estimatedOutputTokens": 200
+        }
+      ],
+      "agents": [
+        {
+          "id": "manager",
+          "name": "经理",
+          "role": "manager",
+          "title": "经理",
+          "tools": [],
+          "modelId": "fixture-model",
+          "instructions": "整理并核对虚构资料。",
+          "sourceAgentId": "manager",
+          "browserOrigins": [],
+          "mcpConnections": [],
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "00000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "writer",
+          "name": "资料员工",
+          "role": "member",
+          "title": "资料员工",
+          "tools": [],
+          "modelId": "fixture-model",
+          "instructions": "整理并核对虚构资料。",
+          "sourceAgentId": "writer",
+          "browserOrigins": [],
+          "mcpConnections": [],
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "00000000-0000-4000-8000-000000000001"
+        },
+        {
+          "id": "qa",
+          "name": "检查员工",
+          "role": "member",
+          "title": "检查员工",
+          "tools": [],
+          "modelId": "fixture-model",
+          "instructions": "整理并核对虚构资料。",
+          "sourceAgentId": "qa",
+          "browserOrigins": [],
+          "mcpConnections": [],
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "00000000-0000-4000-8000-000000000001"
+        }
+      ],
+      "rationale": "先整理再独立检查，最后经理验收。",
+      "orchestration": {
+        "pattern": "pipeline",
+        "rationale": "三条记录使用顺序交接，独立员工检查完整性。"
+      },
+      "deliveryCriteria": [
+        {
+          "id": "inspection",
+          "checkTaskId": "check",
+          "description": "三条巡检记录均含时间和结论",
+          "independent": true,
+          "producerTaskIds": [
+            "write"
+          ],
+          "checkCriteriaIndexes": [
+            0
+          ]
+        }
+      ]
+    }
+  }
+}

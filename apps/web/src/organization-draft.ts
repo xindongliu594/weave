@@ -1,13 +1,17 @@
 import { policySchema, type DepartmentInput, type Plan, type Policy } from '../../../packages/contracts/index.ts';
 import {ApiError} from './api.ts';
+import type {OrganizationCandidateV2} from '../../../packages/contracts/organization.ts';
 
 export type Message = { role: 'user' | 'assistant'; content: string };
-export type Preview = { previewId: string; department: DepartmentInput; plan: Plan; policy: Policy; requirement: string; source: string; costAccounting?: 'conversation'; validation: { valid: boolean; errors: string[]; warnings?: string[] } };
-export type ChatRequest = { key: string; settings: string; body: { messages: Message[]; modelId: string; policy: Policy; templateId: string; maxPlanningCost?: number; previousPreviewId?: string; conversationId?: string; previousDraftIssue?: DraftIssue & { truncated?: boolean } } };
+export type Preview = { kind?:'organization-v2'; previewVersion?:number; candidate?:OrganizationCandidateV2; previewId: string; department: DepartmentInput; plan: Plan; policy: Policy; requirement: string; source: string; costAccounting?: 'conversation'; validation: { valid: boolean; errors: string[]; warnings?: string[] } };
+export type ChatRequest = { key: string; settings: string; body: { organizationRouting?:boolean; messages: Message[]; modelId: string; policy: Policy; templateId: string; maxPlanningCost?: number; previousPreviewId?: string; conversationId?: string; previousDraftIssue?: DraftIssue & { truncated?: boolean } } };
 export type SavedTeam = { departmentId: string; projectId: string; departmentVersion: number; projectVersion: number; previewId: string };
 export type DraftIssue = { code: string; message: string };
 export type Draft = { messages: Message[]; modelId: string; policy: Policy; maxPlanningCost?: number; input: string; conversationId?: string; preview?: Preview; previewSettings?: string; projectId?: string; saved?: SavedTeam; draftIssue?: DraftIssue; previousPreviewId?: string; pendingRequest?: ChatRequest; awaitingPlan?: boolean };
 export type ChatReply = { reply: string; preview?: Preview; draftIssue?: DraftIssue };
+export function organizationConfirmationRequest(preview:Preview,target?:Omit<SavedTeam,'previewId'>){
+ return preview.kind==='organization-v2'?{path:'/organizations/previews/'+preview.previewId+'/confirm',body:{previewVersion:preview.previewVersion}}:{path:'/organizations',body:{...preview,...(target?{target}:{})}};
+}
 /** The old per-reply cost remains legacy metadata, never a new setting. */
 export function organizationSettingsFingerprint(value: Pick<Draft, 'modelId' | 'policy'>): string {
   const policy = policySchema.safeParse(value.policy);
@@ -46,7 +50,7 @@ export function createOrganizationChatRequest(draft: Draft, content: string, set
   const current = ensureOrganizationConversation(draft);
   return { key: crypto.randomUUID(), settings, body: {
     messages: [...draft.messages, { role: 'user', content }], modelId: draft.modelId, policy: draft.policy,
-    templateId: 'software',
+    templateId: 'software', organizationRouting:!(draft.saved||draft.projectId)||draft.preview?.kind==='organization-v2',
     previousPreviewId: draft.preview?.previewId ?? draft.previousPreviewId, conversationId: current.conversationId,
     ...(draft.draftIssue ? { previousDraftIssue: { code: draft.draftIssue.code.slice(0, 100), message: draft.draftIssue.message.slice(0, 4000), ...(draft.draftIssue.message.length > 4000 ? { truncated: true } : {}) } } : {}),
   } };

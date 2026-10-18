@@ -50,13 +50,17 @@ test('cross-department plans pin employee identity, knowledge scope, approval ve
  assert.equal((await cost.dailyTotals(pool,collaborator.id)).spent,.0002);assert.equal((await cost.dailyTotals(pool,primary.id)).spent,0);
  await pool.query("UPDATE project_runs SET status='failed',lease_owner=NULL,lease_until=NULL WHERE id=$1",[run.id]);
  assert.equal((await call('/departments/'+collaborator.id,'DELETE',{version:collaborator.version})).status,200);
- assert.equal((await call('/runs/'+run.id+'/retry','POST',{resume:false})).data.code,'DEPARTMENT_ARCHIVED');
+ // This fixture has no durable runtime archive, so goal provenance is checked first.
+ assert.equal((await call('/runs/'+run.id+'/retry','POST',{resume:false})).data.code,'GOAL_CONTRACT_CHANGED');
+ const {validateProjectTeam}=await import('../apps/api/src/collaboration.ts');
+ await assert.rejects(validateProjectTeam(updated.plan.agents,primary.id,updated.policy,pool),{code:'DEPARTMENT_ARCHIVED'});
 });
 
 test('shared collaborator departments serialize runs and team limits fail before project creation',async()=>{
  const shared=await department('共享设计部'),first=await department('业务一部'),second=await department('业务二部');
  const p1=await project(first,shared),p2=await project(second,shared);
- const r1=await call('/projects/'+p1.id+'/approve','POST',{version:1}),r2=await call('/projects/'+p2.id+'/approve','POST',{version:1});assert.equal(r1.status,202);assert.equal(r2.status,202);
+ for(const p of [p1,p2]){const plan={...p.plan,tasks:p.plan.tasks.map((t:any)=>({...t,subject:'完成协作资料核对',acceptanceCriteria:['说明来源和核对结论']}))};assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan})).status,200);}
+ const r1=await call('/projects/'+p1.id+'/approve','POST',{version:2}),r2=await call('/projects/'+p2.id+'/approve','POST',{version:2});assert.equal(r1.status,202,JSON.stringify(r1.data));assert.equal(r2.status,202,JSON.stringify(r2.data));
  await pool.query("UPDATE project_runs SET status='running',lease_owner='fixture',lease_until=now()+interval '1 minute' WHERE id=$1",[r1.data.id]);
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'queue-runs'));await worker.close();worker.stopped=false;await worker.tick();worker.stopped=true;
  assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[r2.data.id])).rows[0].status,'queued');

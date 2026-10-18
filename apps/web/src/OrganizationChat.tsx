@@ -5,6 +5,8 @@ import { departmentSchema, planSchema, policySchema, type Model, type Policy } f
 import { api, ApiError } from './api.ts';
 import { createOrganizationChatRequest, ensureOrganizationConversation, finishOrganizationReply, organizationReplyFailure,hasUnconfirmedOrganizationChanges, isOrganizationConversationId, normalizeOrganizationSettings, organizationSettingsFingerprint, type ChatReply, type ChatRequest, type Draft, type Message, type SavedTeam } from './organization-draft.ts';
 import './OrganizationChat.css';
+import {OrganizationRecommendation,OrganizationDepartmentScope} from './OrganizationRecommendation.tsx';
+import {organizationConfirmationRequest} from './organization-draft.ts';
 
 const storageKey = 'agent-department:organization-chat:v1';
 export const organizationPendingHistoryStorageKey = 'agent-department:organization-chat:pending-history:v1';
@@ -109,6 +111,8 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
   const nativeToolCatalog=useToolOptions();
   const availableToolNames={...toolNames,...Object.fromEntries(nativeToolCatalog.options.filter(tool=>tool.id.startsWith('plugin__')).map(tool=>[tool.id,tool.name]))};
   const [draft, setDraft] = useState<Draft>(initialDraft), [busy, setBusy] = useState<'chat' | 'save' | null>(null), [error, setError] = useState(''), [pending, setPending] = useState('');
+  const [departments,setDepartments]=useState<{id:string;name:string}[]>([]),[departmentError,setDepartmentError]=useState('');
+  useEffect(()=>{if(demo)return;let active=true;api<{id:string;name:string}[]>('/departments').then(rows=>{if(active)setDepartments(rows);}).catch(cause=>{if(active)setDepartmentError((cause as Error).message);});return()=>{active=false;};},[demo]);
   const [requestHistory, setRequestHistory] = useState<OrganizationPendingRequestHistory[]>(() => { try { return readOrganizationPendingHistory(sessionStorage); } catch { return []; } });
   const end = useRef<HTMLDivElement>(null), inputRef = useRef<HTMLTextAreaElement>(null), inFlight = useRef(false);
   const available = models.filter(m => m.status === 'available');
@@ -159,13 +163,14 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
     try {
       let target = draft.saved && { departmentId: draft.saved.departmentId, projectId: draft.saved.projectId, departmentVersion: draft.saved.departmentVersion, projectVersion: draft.saved.projectVersion };
       // Resolve a draft saved by an earlier UI version before allowing another confirmation.
-      if (!target && draft.projectId) {
+      if (!target && draft.projectId && draft.preview.kind!=='organization-v2') {
         const [projects, departments] = await Promise.all([api<any[]>('/projects'), api<any[]>('/departments')]);
         const project = projects.find(item => item.id === draft.projectId), department = departments.find(item => item.id === project?.departmentId);
         if (!project || !department) throw Error('原团队或项目不存在，请查看部门与员工，或开始新需求。');
         target = { departmentId: department.id, projectId: project.id, departmentVersion: department.version, projectVersion: project.version };
       }
-      const result = await api<Omit<SavedTeam, 'previewId'>>('/organizations', 'POST', { ...draft.preview, ...(target ? { target } : {}) });
+      const confirmation=organizationConfirmationRequest(draft.preview,target);
+      const result = await api<Omit<SavedTeam, 'previewId'>>(confirmation.path, 'POST', confirmation.body);
       const next = { ...draft, projectId: result.projectId, saved: { ...result, previewId: draft.preview.previewId } };
       setDraft(next);
       try { sessionStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* Saved team remains recoverable from the department list. */ }
@@ -184,7 +189,7 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
           <div ref={end}/>
         </div>
         {error && <p className="banner error" role="alert">{error}</p>}
-        {draft.projectId && <div className="organization-saved" role="status"><CheckCircle2 size={19}/><div><strong>团队已保存到部门与员工</strong><p>可以继续对话调整，确认新方案后更新同一团队。</p><div className="organization-saved-actions"><button onClick={onDepartments}>查看部门与员工 <ArrowRight size={14}/></button><button onClick={() => onProject(draft.projectId!)}>查看执行方案</button></div></div></div>}
+        {draft.projectId && <div className="organization-saved" role="status"><CheckCircle2 size={19}/><div><strong>{draft.preview?.kind==='organization-v2'?'项目已创建':'团队已保存到部门与员工'}</strong><p>{draft.preview?.kind==='organization-v2'?'请在执行方案中继续配置并批准任务。要发起其他任务，请点击“新需求”。':'可以继续对话调整，确认新方案后更新同一团队。'}</p><div className="organization-saved-actions"><button onClick={onDepartments}>查看部门与员工 <ArrowRight size={14}/></button><button onClick={() => onProject(draft.projectId!)}>查看执行方案</button></div></div></div>}
         {draft.draftIssue && <p className="organization-draft-issue" role="status"><strong>本轮方案未生成成功</strong><br/>{draft.draftIssue.message}</p>}
         {!draft.preview && !draft.draftIssue && !!draft.messages.length && !busy && <p className="organization-plan-status" role="status">尚未生成团队方案。继续说明需求，整理出方案后再确认组建。</p>}
         <>
@@ -205,6 +210,8 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
               </div>
               <p className="organization-fee">项目预算用于确认保存后的执行。新需求对话由中转站计费，实际用量另行记录，不做预算预留，也不按项目或每日预算拦截。</p>
               <OrganizationAllowedModels policy={draft.policy} planningModelId={draft.modelId} models={models} disabled={!!busy || !!draft.pendingRequest} onChange={policy => setDraft(value => ({ ...value, policy }))}/>
+              {!!departments.length&&<OrganizationDepartmentScope departments={departments} allowed={draft.policy.allowedDepartmentIds??[]} onChange={ids=>changePolicy({allowedDepartmentIds:ids.length?ids:undefined})}/>}
+              {departmentError&&<p className="validation-error">部门目录暂不可用：{departmentError}</p>}
               <p className="subcopy">可为员工建议的工作能力</p><div className="organization-tool-options">{Object.entries(availableToolNames).map(([tool, label]) => <label key={tool}><input type="checkbox" checked={draft.policy.allowedTools?.includes(tool as any) ?? false} onChange={event => changePolicy({ allowedTools: event.target.checked ? [...(draft.policy.allowedTools ?? []), tool as any] : draft.policy.allowedTools?.filter(item => item !== tool) })}/>{label}</label>)}</div>
               <small>创建后还需批准项目才会执行；运行测试命令需逐次确认。</small>
             </fieldset>
@@ -215,10 +222,11 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
         {draft.preview.costAccounting === 'conversation' ? <p className="organization-fee">这份方案的需求对话费用单独记录，确认保存不会计入项目执行预算。</p> : draft.preview.source === 'model' && <p className="organization-fee">这份旧方案按原收费规则保存，相关规划费用仍按原规则计入项目预算；不会清除已有费用或预留。</p>}
         <div className="organization-roles">{draft.preview.department.agents.map(agent => <article key={agent.id}><div className="organization-role-title"><span className="organization-role-icon">{agent.role === 'manager' ? <ShieldCheck size={18}/> : <Users size={18}/>}</span><div><strong>{agent.name}</strong><small>{agent.role === 'manager' ? '部门经理' : agent.title}</small></div></div><p>{agent.instructions}</p><div className="organization-role-tools">{agent.tools.length ? agent.tools.map(tool => <span key={tool}>{toolNames[tool] ?? tool}</span>) : <span>分析与协作</span>}</div></article>)}</div>
         <details className="organization-task-details"><summary>查看任务与验收标准</summary><ol>{draft.preview.plan.tasks.map(task => <li key={task.id}><strong>{task.subject}</strong><small>{draft.preview!.department.agents.find(agent => agent.id === task.assigneeId)?.name}{task.dependencies.length ? ' · 前置任务：' + task.dependencies.map(id => draft.preview!.plan.tasks.find(item => item.id === id)?.subject ?? id).join('、') : ' · 可先开始'}</small><p>{task.objective}</p><ul>{task.acceptanceCriteria.map((criterion, index) => <li key={index}>{criterion}</li>)}</ul></li>)}</ol></details>
+        <OrganizationRecommendation plan={draft.preview.plan} existing={draft.preview.kind==='organization-v2'?draft.preview.candidate?.target.kind==='existing':undefined}/>
         <p className="organization-rationale">{draft.preview.plan.rationale}</p>
         {!draft.preview.validation.valid && <p className="banner error">{draft.preview.validation.errors.join('；')}</p>}
         {stale && <p className="organization-stale">{draft.awaitingPlan ? '上一份方案已保留，本轮讨论尚未形成新方案。继续补充需求，或点击发送整理更新后的方案，再确认。' : '需求或设置有调整。请发送补充，更新方案后再确认。'}</p>}
-        <button className="primary organization-confirm" disabled={!!busy || stale || !draft.preview.validation.valid || savedCurrent} onClick={() => void save()}>{busy === 'save' ? <LoaderCircle className="spin" size={16}/> : <CheckCircle2 size={16}/>} {savedCurrent ? '团队已保存' : draft.projectId ? '确认更新团队' : '确认组建团队'}</button><small>确认后保存到部门与员工。任务执行需在项目方案中批准。</small>
+        <button className="primary organization-confirm" disabled={!!busy || stale || !draft.preview.validation.valid || savedCurrent} onClick={() => void save()}>{busy === 'save' ? <LoaderCircle className="spin" size={16}/> : <CheckCircle2 size={16}/>} {savedCurrent ? draft.preview.kind==='organization-v2'?'项目已创建':'团队已保存' : draft.preview.kind==='organization-v2'?'确认方案并创建项目':draft.projectId ? '确认更新团队' : '确认组建团队'}</button><small>{draft.preview.candidate?.target.kind==='existing'?'仅保存项目团队，原部门与员工保持。':'确认后保存部门与项目。'}任务执行需在项目方案中批准。</small>
       </aside>}
     </div></>}
   </section>;

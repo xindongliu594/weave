@@ -10,6 +10,7 @@ import { installProductTools, employeeFor } from './product-tools.mjs';
 import { installNativePluginTools } from './native-plugin-tools.mjs';
 import { assignedTask } from './task-attribution.mjs';
 import { HandoffGate } from './handoff.mjs';
+import {listArtifacts} from './sandbox.mjs';
 import { ReworkGate } from './rework.mjs';
 import { EmployeeHostFactory } from './employee-hosts.mjs';
 import { recoveryContext } from './checkpoint-context.mjs';
@@ -17,6 +18,7 @@ import { restoreStagedCheckpoints } from './checkpoint-team.mjs';
 import { executionBudgetContext } from './budget-context.mjs';
 import { readOnlyEvidenceSignature, completedWriteEvidenceSignature } from './request-context.mjs';
 import { captureBudgetEvidence, taskRunEvidence } from './run-evidence.mjs';
+import {assertDeliveryCriteria} from './delivery-criteria.mjs';
 import { handoffReportGuidance } from '../../packages/contracts/handoff-report.mjs';
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
@@ -393,6 +395,12 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
             const task = state.tasks.findLast(t => taskIds.get(t.id) === contract.id);
             if (task?.status !== 'completed' || handoff.accepted.get(contract.id)?.attemptId !== task.attemptId)
               throw Error('HANDOFF_NOT_COMMITTED: ' + contract.id);
+          }
+          if(product.snapshot.deliveryCriteria?.length){
+            const files=listArtifacts(product.sandbox.root);
+            archive.append('delivery/checked',{files});
+            const criteria=assertDeliveryCriteria(product.snapshot,handoff.committed,[...handoff.tasks.values()],files);
+            archive.append('delivery/verified',{criteria,files});
           }
         });
       },

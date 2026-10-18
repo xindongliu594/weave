@@ -4,6 +4,12 @@ import { createOrganizationChatRequest, finishOrganizationReply, hasUnconfirmedO
 
 const policy = { maxBudget: 1, maxAgents: 3, maxConcurrentAgents: 2, deadlineSeconds: 300 };
 const initial = (): Draft => ({ messages: [], modelId: 'model', policy, maxPlanningCost: .1, input: '' });
+
+test('saved legacy conversations preserve update routing, while new conversations opt into task organization',()=>{
+ const legacy:Draft={...initial(),projectId:'p',saved:{departmentId:'d',projectId:'p',departmentVersion:1,projectVersion:1,previewId:'old'}};
+ assert.notEqual(createOrganizationChatRequest(legacy,'调整原团队','settings').body.organizationRouting,true);
+ assert.equal(createOrganizationChatRequest(initial(),'新任务','settings').body.organizationRouting,true);
+});
 const preview = (id: string): Preview => ({
   previewId: id, source: 'model', requirement: '开发 Todo API', policy,
   department: { name: 'Todo 团队', description: '开发及验收', agents: [{ id: 'manager', role: 'manager', name: '经理', title: '项目经理', instructions: '记录验收结果', modelId: 'model', tools: [] }] },

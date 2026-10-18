@@ -4,6 +4,7 @@ import type { CostReadiness } from './CostCarryoverChoice.tsx';
 import type { PlanningExecutionContext } from '../../api/src/planning-execution-context.ts';
 import { api, ApiError } from './api.ts';
 import { PlanTaskBudgetSummary } from './PlanTaskBudget.tsx';
+import {OrganizationRecommendation} from './OrganizationRecommendation.tsx';
 import { notifyCostsChanged } from './usage-sync.ts';
 
 export type PlanningParameters = { projectId: string; version: number; modelId: string; maxPlanningCost: number; maxOutputTokens: number; retainUncertainCosts?: boolean; revisionRequest?: string };
@@ -180,7 +181,7 @@ export function GeneratedPlanView({ candidate, currentVersion, models, busy, dis
   const stale = candidate.baseVersion !== currentVersion;
   return <section className="panel padded lower" role="region" aria-label="AI 方案候选">
     <div className="section-title"><h3>AI 方案候选 · 尚未保存</h3><span className="tag">基于 v{candidate.baseVersion}</span></div>
-    <p>{candidate.plan.rationale}</p>
+    <p>{candidate.plan.rationale}</p><OrganizationRecommendation plan={candidate.plan}/>
     {candidate.conversation&&<p className="subcopy">候选已绑定当前需求对话。新增或修改对话后需重新规划，确认不会覆盖新要求。</p>}
     <p className="subcopy">确认保存仅生成方案新版本，不启动执行、不清零已登记费用或未知预留。原运行与交付保留；新版本需重新批准，不会自动继承原运行检查点。</p>
     {stale && <p className="validation-error" role="status">当前方案已是 v{currentVersion}，此候选不能覆盖新版本。请丢弃后重新检查。</p>}

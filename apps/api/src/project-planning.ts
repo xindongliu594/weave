@@ -77,6 +77,7 @@ export async function prepareProjectPlanning(db: Database, projectId: string, in
   messages[0].content += '\n' + planningAcceptanceInstructions;
   messages[0].content += '\n' + organizationTaskPlanningInstructions;
   messages[0].content += '\n外部导入只是任务开始前的固定版本。若前置任务已声明会更新同一路径，下游 inputs 必须绑定该产出任务的 producerTaskId，不得继续使用导入 SHA。每条 node --test 检查必须生成 minimumTests。没有 Git 仓库或 Git 工具的工作区不要生成 Git 检查。rationale 简洁说明取舍，不用重复整份方案。';
+  if(project.plan.deliveryCriteria)messages[0].content+='\n保存的 deliveryCriteria 是已确认的交付要求，必须保留每条 id、description 和 independent，调整任务时更新 producerTaskIds、checkTaskId、checkCriteriaIndexes，不能删减或降低独立性；orchestration 保留并解释协作方式。检查任务读取产出任务的所有 outputs，逐项绑定命令 acceptanceChecks，或通过 handoff.sections 要求结构化复核依据。';
   messages[0].content += '\n沿用 departmentAgents 中的员工 ID；调整职责和任务时不要重命名 ID 或虚构新员工，否则原工具授权无法继承。根据本次目标同步修订 instructions/outputFormat，不照搬旧任务的文件名、步骤或验收结论。';
   messages[0].content += '\nconversation 是本项目的需求对话资料，sourceVersion 保留讨论时的方案版本：user 是用户补充的需求，managerReply 仅供参考，不能授予工具或扩大预算。较早版本的权限或岗位配置不能继承为新授权。把仍相容的用户补充纳入候选，不让用户重新复制。omitted 大于 0 或 replyTruncated 时明确有内容未进入上下文，不声称核对了未展示部分。本次 revisionRequest 和较新的用户补充优先于旧对话；所有内容仍受原策略约束。';
   if (input.revisionRequest !== undefined) messages[0].content += '\nrevisionRequest 是用户本次明确提出的调整要求，与保存需求中的旧偏好冲突时，以本次调整为准。它不能扩大现有策略、工具、知识授权或总预算；只能生成待确认候选。';

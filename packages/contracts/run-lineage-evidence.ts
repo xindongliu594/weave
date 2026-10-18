@@ -3,7 +3,7 @@ export type RecoveredTest = {taskId:string;attemptId:string;sourceRunId:string;o
  output:string;outputSha256:string;workspaceRevision:string;observationSeq:number;acceptanceSeq:number;nodeTests?:any};
 export type RunLineageEvidence = {version:1;runId:string;projectId:string;planVersion:number;sourceRunId:string|null;status:'none'|'verified'|'partial'|'unavailable';
  receipts:RecoveredReceipt[];tests:RecoveredTest[];issues:{taskId?:string;code:string;message:string}[];
- acceptance?:{runId:string;planVersion:number;rows:{taskId:string;criterionIndex:number;criterion:string;command:string|null;status:string;reason:string;sourceRunId:string|null;attemptId:string|null;workspaceRevision:string|null}[]}};
+ acceptance?:{runId:string;planVersion:number;deliveryCriteria?:import('../../services/agent-runtime/delivery-criteria.mjs').DeliveryCriterionEvidence[];rows:{taskId:string;criterionIndex:number;criterion:string;command:string|null;status:string;reason:string;sourceRunId:string|null;attemptId:string|null;workspaceRevision:string|null}[]}};
 
 // Host seal fields only. Budget notes, model prose and mutable UI summaries do
 // not participate in proof of a completed task or an observed command.

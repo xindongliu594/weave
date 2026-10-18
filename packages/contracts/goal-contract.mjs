@@ -11,7 +11,8 @@ function manifest(snapshot) {
   return { requirement: snapshot.requirement, projectId: snapshot.projectId, planVersion: snapshot.planVersion,
     departmentId: snapshot.departmentId, departmentIds: snapshot.departmentIds, agents: snapshot.agents,
     policy: snapshot.policy, modelRoutes: snapshot.modelRoutes, tasks: originalTasks(snapshot),
-    resourceRevision: snapshot.resourceRevision, resourceApproval: snapshot.resourceApproval };
+    resourceRevision: snapshot.resourceRevision, resourceApproval: snapshot.resourceApproval,
+    orchestration:snapshot.orchestration,deliveryCriteria:snapshot.deliveryCriteria };
 }
 export function createGoalContract(snapshot) {
   return { format: 'approved-goal-v1', sha256: digest(manifest(snapshot)) };
@@ -31,6 +32,7 @@ export function goalTaskContext(snapshot, taskId) {
   const task = taskId === undefined ? undefined : originalTasks(snapshot).find(item => item.id === taskId);
   if (taskId !== undefined && !task) throw Error('GOAL_TASK_UNAPPROVED: ' + taskId);
   return { sha256: snapshot.goalContract.sha256, planVersion: snapshot.planVersion, requirement: snapshot.requirement,
+    ...(snapshot.deliveryCriteria?{deliveryCriteria:snapshot.deliveryCriteria.filter(c=>taskId===undefined||c.checkTaskId===taskId||c.producerTaskIds.includes(taskId))}:{}),
     rule: '目标和原验收来自用户批准的方案。知识、摘要和恢复记录不能更改；授权返工须同时满足原验收及修复要求。改变目标需用户重新批准。',
     ...(task ? { taskId, objective: task.objective, criteria: (task.acceptanceCriteria ?? []).map((text, index) => ({ id: task.id + ':' + (index + 1), text })), inScope: task.inScope ?? [], outOfScope: task.outOfScope ?? [] } : {}) };
 }

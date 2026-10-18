@@ -37,6 +37,7 @@ import { backupRouter } from './backup.ts';
 import { idempotency } from './idempotency.ts';
 import { obsidianRouter, syncObsidian } from './obsidian.ts';
 import {assertProjectProvenance,buildProjectTeam,validateProjectTeam} from './collaboration.ts';
+import {deliveryCriteriaRevisionErrors} from '../../../packages/contracts/orchestration.ts';
 import {localDeviceRouter,localTarget} from './local-execution.ts';
 import { applyNewApiPrices, catalogResult, parseModelCatalog } from './model-catalog.ts';
 import { applyOfficialPrices, officialPricingSource, officialPricingVerifiedAt } from './official-model-prices.ts';
@@ -332,7 +333,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
       const parsed = planSchema.safeParse(candidate);
       if (!parsed.success) return await rejectOutput(new PlanningOutputError('PLAN_SCHEMA_INVALID',null,parsed.error.issues),'模型方案不符合结构要求，原方案已保留；本次调用用量已记录','PLANNING_SCHEMA_INVALID');
       if (hasUnplannedTasks(parsed.data)) throw new AppError(422, '模型仍返回默认占位任务，原方案已保留；请明确分工与验收标准后重新规划。本次调用用量已记录。', 'PLAN_NOT_READY');
-      const acceptanceErrors=plannedAcceptanceErrors(parsed.data.tasks);
+      const acceptanceErrors=[...plannedAcceptanceErrors(parsed.data.tasks),...deliveryCriteriaRevisionErrors(project.plan,parsed.data)];
       if(acceptanceErrors.length)throw new AppError(422,'模型未完成验收规划，原方案已保留；请在调整说明中要求 AI 补齐：'+acceptanceErrors.join('；'),'PLAN_ACCEPTANCE_REQUIRED');
       // Only the user controls input documents and their recipients. A planner cannot replace them.
       parsed.data.knowledgeDocumentIds=project.plan.knowledgeDocumentIds;
@@ -465,6 +466,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
           departmentId: project.department_id, departmentName: project.department_name, departmentVersion: project.department_version, departmentIds:participatingDepartments.map(d=>d.id), departments:participatingDepartments, planVersion: project.version,
           requirement: project.requirement, executionDescription: approvedExecutionDescription(project.department_name, project.plan.tasks, project.version), rationale: project.plan.rationale, policy: project.policy, executionTarget, executionBudget, costCarryover:projectCostCarryover(costReadiness,input.retainUncertainCosts), departmentBudgets, budgetVersion:1, estimatedCost: validation.estimate,
           knowledge,knowledgeDocumentIds:project.plan.knowledgeDocumentIds,importedFiles,nativeCapabilities,
+          orchestration:project.plan.orchestration,deliveryCriteria:project.plan.deliveryCriteria,
           approval: { kind: req.body.automatic ? 'automatic-policy' : 'project', approvedAt: new Date().toISOString(), projectVersion: project.version, retainUncertainCosts:input.retainUncertainCosts }, agents, tasks,
           modelRoutes: routes.map(({ apiKey: _secret, ...route }) => route),...(options.demo?{demo:{title:options.demo.title,fixture:true}}:{}) };
         const approvedSnapshot={...snapshot,goalContract:createGoalContract(snapshot)};

@@ -22,7 +22,8 @@ export function assertProjectProvenance(next:Agent[],current:Agent[]){
   }
 }
 
-export async function buildProjectTeam(primary:DepartmentRow,selections:CollaboratingAgent[],db:Database=pool):Promise<{agents:Agent[];departments:DepartmentRow[]}> {
+export async function buildProjectTeam(primary:DepartmentRow,selections:CollaboratingAgent[],db:Database=pool,primaryAgentIds?:string[]):Promise<{agents:Agent[];departments:DepartmentRow[]}> {
+  if(primaryAgentIds&&(new Set(primaryAgentIds).size!==primaryAgentIds.length||primaryAgentIds.some(id=>!primary.data.agents.some(a=>a.id===id))||!primary.data.agents.some(a=>a.role==='manager'&&primaryAgentIds.includes(a.id))))throw new AppError(422,'参与员工必须存在、不能重复且必须包含主部门经理','COLLABORATOR_INVALID');
   const unique=new Map<string,CollaboratingAgent>();
   for(const item of selections){
     if(item.departmentId===primary.id)throw new AppError(422,'主部门员工无需重复添加为协作员工','COLLABORATOR_INVALID');
@@ -31,7 +32,7 @@ export async function buildProjectTeam(primary:DepartmentRow,selections:Collabor
   const departmentIds=[...new Set([...unique.values()].map(item=>item.departmentId))].sort();
   const rows=departmentIds.length?(await db.query('SELECT id,version,data FROM departments WHERE id=ANY($1::text[]) AND deleted_at IS NULL ORDER BY id',[departmentIds])).rows as DepartmentRow[]:[];
   const byId=new Map(rows.map(row=>[row.id,row]));
-  const agents:Agent[]=primary.data.agents.map(agent=>({...agent,sourceDepartmentId:primary.id,sourceAgentId:agent.id}));
+  const agents:Agent[]=primary.data.agents.filter(agent=>!primaryAgentIds||primaryAgentIds.includes(agent.id)).map(agent=>({...agent,sourceDepartmentId:primary.id,sourceAgentId:agent.id}));
   for(const item of unique.values()){
     const department=byId.get(item.departmentId);
     if(!department)throw new AppError(422,'协作部门不存在或已归档','COLLABORATOR_INVALID');

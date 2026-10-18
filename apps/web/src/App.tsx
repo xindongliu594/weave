@@ -4,6 +4,7 @@ import { PlanTaskBudgetFields, PlanTaskBudgetSummary } from './PlanTaskBudget.ts
 import { ProjectRequirement } from './ProjectRequirement.tsx';
 import { ProjectStatusTag } from './ProjectStatusTag.tsx';
 import { ProjectPlanning } from './ProjectPlanning.tsx';
+import {OrganizationRecommendation} from './OrganizationRecommendation.tsx';
 import {ProjectPolicy} from './ProjectPolicy.tsx';
 import {bindPolicy,type Policy} from '../../../packages/contracts/index.ts';
 import { ModelCapabilities } from './ModelCapabilities.tsx';
@@ -153,6 +154,7 @@ function App() {
         <p className="subcopy" role="status">{projectState.error || (projectState.refreshing?'正在读取最新项目状态…':projectState.updatedAt?`项目状态更新于 ${fmt(projectState.updatedAt)}${projectActive?'；运行中会短时自动更新，也可手动刷新。':''}`:'尚未读取项目状态。')}{current&&` · 当前${({DRAFT:'方案草稿',QUEUED:'等待执行',RUNNING:'执行中',COMPLETED:'已完成',FAILED:'执行失败',CANCELLED:'已取消',INTERRUPTED:'执行中断'} as Record<string,string>)[current.status]??current.status}`}</p>
         {current ? <>
         <button className="text-button muted back" onClick={() => setSelected(null)}>← 返回项目列表</button><div className="plan-layout"><div><section className="panel padded"><div className="row"><Tag>{current.source === 'model' ? 'AI 生成方案' : '手动草案'}</Tag><Tag>v{current.version}</Tag></div><ProjectRequirement requirement={current.requirement}/><p>{current.plan.rationale}</p>
+          <OrganizationRecommendation plan={current.plan}/>
           <ProjectPlanning key={current.id} project={current} models={models} allowedModelIds={allowedPlanningModels} disabled={!!busy || projectActive} onChanged={refresh} onBusyChange={active=>setBusy(value=>active?'planning':value==='planning'?'':value)} onCosts={()=>setPage('usage')}/>
           {current.validation.checks.some(check => check.label === '任务已规划' && !check.pass) && <p className="planning-required" role="status">还需完善执行方案：请先选择模型生成方案，或在「编辑方案」中明确分工与验收标准。</p>}
           <div className="planning-model-scope" id="planning-model-scope">

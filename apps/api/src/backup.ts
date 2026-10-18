@@ -17,7 +17,7 @@ import { workFileTables } from './work-files.ts';
 import { automationTables } from './automation-learning.ts';
 import {storageTables} from './storage-governance.ts';
 const scrypt=promisify(scryptCallback);
-const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','model_reservations','knowledge_embeddings','model_capability_tests',...managerChatTables,...browserMcpTables,...workFileTables,...automationTables,...storageTables,...nativeCapabilityTables];
+const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','organization_conversations','model_reservations','knowledge_embeddings','model_capability_tests',...managerChatTables,...browserMcpTables,...workFileTables,...automationTables,...storageTables,...nativeCapabilityTables];
 const password=z.string().min(12).max(200);
 // The complete decrypted JSON, including base64 files, is the authoritative limit.
 // The file walk/staging checks use the same ceiling as an early bounded guard.
@@ -31,6 +31,7 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
   const input=z.object({password,backup:z.record(z.string(),z.unknown()),confirmation:z.literal('RESTORE')}).parse(req.body);const value=await decryptBackup(input.backup,input.password);
   if(value.tables)for(const table of [...managerChatTables,...browserMcpTables,...workFileTables,...automationTables,...storageTables,...nativeCapabilityTables])value.tables[table]??=[];
   if(value.tables&&!value.tables.organization_previews)value.tables.organization_previews=[];
+  if(value.tables&&!value.tables.organization_conversations)value.tables.organization_conversations=[];
   if(value.tables&&!value.tables.model_capability_tests)value.tables.model_capability_tests=[];
   if(Array.isArray(value.tables?.models))for(const model of value.tables.models)if(model&&typeof model==='object')model.capabilities??={};
   if(value.tables&&!value.tables.knowledge_embeddings)value.tables.knowledge_embeddings=[];

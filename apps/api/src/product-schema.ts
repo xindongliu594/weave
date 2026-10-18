@@ -41,6 +41,7 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS run_id text;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS department_id text;
     CREATE TABLE IF NOT EXISTS organization_previews(id text PRIMARY KEY,data jsonb NOT NULL,project_id text,department_id text,created_at timestamptz NOT NULL DEFAULT now());
+    CREATE TABLE IF NOT EXISTS organization_conversations(id text PRIMARY KEY,turn_id text NOT NULL,preview_id text,updated_at timestamptz NOT NULL DEFAULT now());
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS planning_preview_id text;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS agent_id text;
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS employee_id text;
