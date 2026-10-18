@@ -2,6 +2,8 @@
 
 日期：2026-10-18。结论：**原版办公插件可在为伍固定 DSH 上注册并调用，公司方法可共用原生 Skill 入口；还未达到生产办公交付验收。** 本轮只改本地探针和文档，未部署 JJ、未改产品依赖或数据库、未请求付费模型。
 
+**后续实际打开验证已通过，修正初次判定：** 插件生成的原 XLSX 可以由本机 WPS 正常计算，修改输入后会重算，保存后含正确缓存。初次把“未保存公式缓存”扩大为“Excel 不可用”的判断过严；它只限制不具备重算能力的读取/预览路径，不应阻断所有办公插件接入。原始证据保留，新增实测见文末。
+
 ## 实际复用内容
 
 选择 [omdsh-dev/dsh-office](https://github.com/omdsh-dev/dsh-office) 对应的 [npm @huiliyi37/dsh-office](https://www.npmjs.com/package/@huiliyi37/dsh-office)。GitHub main manifest 为 0.2.5，但 npm 查询该版本返回 404，实际固定可下载版 **0.2.4**（Apache-2.0）。已核对 tarball SHA512；安装包 46 个文件与原 tarball 逐字节一致。独立依赖锁文件随探针保存，安装禁用生命周期脚本。没有自行实现 Word、Excel、PPT 引擎，也没有修改上游业务代码。
@@ -15,7 +17,7 @@
 | 原版插件注册 | 注册 10 个 DOCX/XLSX/PPTX 工具 | PDF 已关闭；没有完整调用所有 10 个工具 |
 | 公司与上游 Skill | 原生同一目录列出 `weiwu-company` 和 `filesystem` 来源，两者经 `skill` 按需加载 | 公司内容是明确的试验 fixture，固定 v3/hash；不是员工新提炼的业务经验 |
 | Word | 创建/回读中文报告；独立解析 OOXML，核对标题、真实表格及 10/2 数值 | 未验证桌面 Office 排版或渲染 |
-| Excel | 创建/回读工作表；独立核对 A2=10、B2=2、C2=`B2/A2` | **未满足**：重算之后 C2 没有保存缓存值 0.2 |
+| Excel | 创建/回读工作表；独立核对 A2=10、B2=2、C2=`B2/A2`；后续 WPS 实际打开、改值和保存验证通过 | 插件自己不保存公式缓存；WPS 可计算并保存。服务端无重算预览仍需处理 |
 | PPT | 创建/回读中文汇报；独立解析实际两页和目标正文 | 未验证排版、图片、编辑及真实 Office 打开 |
 | 原生工具权限 | 未授权上下文隐藏全部 10 个办公工具，DOCX 调用返回 `UNKNOWN_TOOL` | 仅为探针显式配置的 native restrict，产品动态授权尚未接通 |
 | 公司方法权限 | 未授权员工没有 skill 工具；伪用另一员工上下文被 `SKILL_PERMISSION_DENIED` 拒绝 | 不代表任意插件已纳入现有产品权限模型 |
@@ -23,6 +25,8 @@
 | 原有 Skill 回归 | 2/2 通过，覆盖固定正文、员工隔离、审计及冷恢复 | 既有本地 fixture 测试，不是新增办公插件的持久化验收 |
 
 最终 `probeCompleted=true`，9 项正向检查通过；`acceptancePassed=false`，`productionReady=false`，退出码 2。保持这个结果，不补写 Excel 缓存冒充插件能力。原版 `lib/excel.js` 的 `xlsxRecalc` 只读取、求值并返回检查状态，没有保存工作簿；其返回成功与“缓存未持久化”并不矛盾。这是交付需求上的能力缺口，不能仅凭该状态宣称表格结果已保存。
+
+上段的 `acceptancePassed=false` 是初次探针对额外“缓存必须已保存”要求的结果，**不代表 XLSX 格式/公式错误，也不代表 WPS 无法使用**。缓存是上次计算结果，公式本身另存于 `<f>`；参见 [Microsoft Open XML 公式说明](https://learn.microsoft.com/en-us/office/open-xml/spreadsheet/working-with-formulas)。插件自带 Skill 将 `xlsx_recalc` 定义为公式重算门禁，没有声明持久化缓存。后续原生消费端测试单独记录，不覆盖旧结果。
 
 ## 产物与复现
 
@@ -51,3 +55,19 @@
 5. 先验证一个员工获授权调用原版办公插件、独立检查文件，并覆盖拒绝访问及恢复固定版本。Excel 持久重算优先评估现有引擎或上游支持；视觉渲染与真实员工选择另行实际验证。
 
 本轮没有接入后台监控服务、原生 DSH 网页插件，也没有实现自动发布可执行经验工具。不能从这个样例推断所有插件都可无适配使用。既有金额、次数、权限和未知费用保持原状。
+
+## 后续 WPS 原生计算验证
+
+用户要求实际再试。直接复用本机已安装的 WPS 表格，通过它提供的 Excel COM 兼容接口，仅打开原样例的独立副本。接口自报 `Microsoft Excel 12.0`，但程序路径位于 `Kingsoft/WPSOFF~1/.../office6`，因此证据明确归属 **WPS，不能声称 Microsoft Excel 实测通过**。Windows 默认托管沙箱拒绝 COM；在正常用户权限下完成测试，无管理员修改、无新软件安装。
+
+运行 ID：`a5680cc6-fc6a-4d02-997f-39f03f380387`。5 项检查通过，付费模型调用 0：
+
+1. 原样例 C2 保持公式 `=B2/A2`，A2=10、B2=2 时得到 **0.2**。
+2. 将副本 B2 改为 5，计算结果更新为 **0.5**，不是预填静态结果。
+3. 将副本 A2 改为 0，显示 **#DIV/0!**，错误未被掩盖。
+4. 恢复 10/2 并保存副本，原样例哈希保持不变。
+5. 独立打开保存副本的 ZIP/XML，C2 同时保留公式 `B2/A2` 和缓存数值 **0.2**。副本 SHA256：`2740c6d9cf4510e6bd92ba3a1d5a3ba756cc57b1d8426edeca39589e4224f866`。
+
+脚本：[check-native-recalculation.ps1](../../scripts/validation/dsh-office-plugin-pilot/check-native-recalculation.ps1)。原插件生成的 6529 B 样例随脚本保留，SHA256 `61acccd39daea48bee04d970d39f0e7da59a813848161969f3a7c10dbd861469`，与首次工具产物一致。结果：[native-consumer-result.json](evidence/dsh-office-plugin-pilot-2026-10-18/native-consumer-result.json)。首次消费端试运行 `b2dd2de1-2724-4fcc-a37b-fc05353f0d74` 同样通过，原始记录保留在本地忽略目录。
+
+**修正后的接入结论：继续复用原版插件；不需要为这个例子重写 Excel 或修改上游。** 本机 WPS 是独立测试消费者，未纳入 JJ 生产环境。网页服务端预览若只读缓存，需要另接已有重算能力或明确提示；本轮未验证该路径，也没有验证 WPS 视觉排版、复杂函数或任意第三方工作簿。接下来的主工作仍是统一插件授权与执行连接。

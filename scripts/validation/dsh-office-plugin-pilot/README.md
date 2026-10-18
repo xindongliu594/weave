@@ -22,6 +22,8 @@ python scripts/validation/dsh-office-plugin-pilot/audit-source.py
 
 输出位于 `.data/plugin-pilot-20261018/runs/<UUID>/`：`result.json`、`receipt.json`、stdout/stderr 和三个样例。退出码 0 表示探针断言及全部能力要求满足；1 表示探针或边界异常；2 表示探针完成但仍有未满足能力。当前原版 0.2.4 预期返回 **2**，原因是 `xlsx_recalc` 不持久化公式缓存。不要把返回码改成 0 或手填结果来制造通过。
 
+这个返回码包含额外的“保存缓存”要求，不能据此判断原文件在表格软件中不可用。后续 WPS 实测已通过：原公式计算、修改输入、除零错误、保存并独立读取缓存均正确。Windows 已安装可用 Excel 兼容 COM 引擎时，运行 `./scripts/validation/dsh-office-plugin-pilot/check-native-recalculation.ps1` 可重现；它只操作所附原插件样例的独立副本，结果保存到 `consumer-runs/<UUID>`。本机接口由 WPS 提供，不等于 Microsoft Excel 或 JJ 服务端验收。
+
 公司 Skill 回归：
 
 ```powershell

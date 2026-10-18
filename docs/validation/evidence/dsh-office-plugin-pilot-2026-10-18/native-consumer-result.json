@@ -1,0 +1,45 @@
+{
+  "kind": "native-consumer-test-not-employee-acceptance",
+  "source": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\validation\\dsh-office-plugin-pilot\\fixtures\\metrics-plugin-generated.xlsx",
+  "sourceSha256": "61ACCCD39DAEA48BEE04D970D39F0E7DA59A813848161969F3A7C10DBD861469",
+  "output": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\plugin-pilot-20261018\\consumer-runs\\a5680cc6-fc6a-4d02-997f-39f03f380387\\metrics-native-recalculated.xlsx",
+  "passed": true,
+  "checks": [
+    {
+      "name": "original-formula-computes",
+      "formula": "=B2/A2",
+      "value": 0.2,
+      "text": "0.2"
+    },
+    {
+      "B2": 5,
+      "name": "changed-input-recalculates",
+      "value": 0.5
+    },
+    {
+      "name": "zero-denominator-reported",
+      "A2": 0,
+      "text": "#DIV/0!"
+    },
+    {
+      "expectedC2": 0.2,
+      "name": "consumer-saved-recalculated-copy",
+      "restoredA2": 10,
+      "restoredB2": 2
+    },
+    {
+      "name": "independent-zip-formula-and-cache",
+      "formula": "B2/A2",
+      "value": 0.2
+    }
+  ],
+  "modelCalls": 0,
+  "engine": {
+    "reportedName": "Microsoft Excel",
+    "path": "C:\\Users\\JJ\\AppData\\Local\\Kingsoft\\WPSOFF~1\\1210~1.291\\office6",
+    "note": "Identify the real vendor by executable path; Excel COM may be implemented by WPS.",
+    "version": "12.0"
+  },
+  "outputSha256": "2740C6D9CF4510E6BD92BA3A1D5A3BA756CC57B1D8426EDECA39589E4224F866",
+  "sourceUnchanged": true
+}
