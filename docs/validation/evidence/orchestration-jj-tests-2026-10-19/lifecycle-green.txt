@@ -1,0 +1,12 @@
+✔ timeout or signal exit must not be reported as success (8.636ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (10.8749ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (8.0477ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (4.1116ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 219.4954

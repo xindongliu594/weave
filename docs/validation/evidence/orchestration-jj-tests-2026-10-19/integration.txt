@@ -1,0 +1,23 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (1992.930138ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (38.828619ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (35.517602ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (82.542389ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (70.652064ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (70.000353ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (62.681616ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (60.462019ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (66.887902ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (69.638426ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (91.564308ms)
+✔ legacy candidate without a template remains confirmable (37.055212ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (9.676431ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3206.953363

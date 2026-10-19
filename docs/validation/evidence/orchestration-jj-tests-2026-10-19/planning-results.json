@@ -1,0 +1,65 @@
+[
+  {
+    "id": "sequential-report",
+    "httpStatus": 200,
+    "milliseconds": 98,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  },
+  {
+    "id": "independent-statistics",
+    "httpStatus": 200,
+    "milliseconds": 34,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  },
+  {
+    "id": "domain-routing",
+    "httpStatus": 200,
+    "milliseconds": 42,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  },
+  {
+    "id": "goal-decomposition",
+    "httpStatus": 200,
+    "milliseconds": 33,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  },
+  {
+    "id": "bounded-code-review",
+    "httpStatus": 200,
+    "milliseconds": 35,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  },
+  {
+    "id": "fixed-shards",
+    "httpStatus": 200,
+    "milliseconds": 29,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  },
+  {
+    "id": "two-proposals",
+    "httpStatus": 200,
+    "milliseconds": 36,
+    "validPreview": false,
+    "selected": null,
+    "issue": null,
+    "previewId": null
+  }
+]

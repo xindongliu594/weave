@@ -1,0 +1,10 @@
+AgentTeams 0.1.20 public Config/create/stage/approve: pass; seed inputs/outputs absent; create_task description preserves host contract; inference 0; sandbox/tools/network 0. Scheduling suppressed by public agent/pre-step guard; no execution acceptance claimed.
+✔ public profiles stage and approve offline; public create_task bridge retains host file contract (203.235012ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 397.55392

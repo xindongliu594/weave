@@ -1,0 +1,86 @@
+[
+  {
+    "id": "sequential-report",
+    "httpStatus": 200,
+    "milliseconds": 12638,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "final_acceptance: 检查任务 acceptance 必须在产出任务 acceptance 之后；final_acceptance: 检查任务 acceptance 必须读取 acceptance 的当前产物 acceptance.md；final_acceptance: 检查任务 acceptance 必须在产出任务 acceptance 之后；final_acceptance: 检查任务 acceptance 必须读取 acceptance 的当前产物 acceptance.md；pipeline: 必须声明独立交付检查与经理验收；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null
+  },
+  {
+    "id": "independent-statistics",
+    "httpStatus": 200,
+    "milliseconds": 24854,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "parallel: 必须声明独立交付检查与经理验收；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null
+  },
+  {
+    "id": "domain-routing",
+    "httpStatus": 200,
+    "milliseconds": 13496,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_INVALID",
+      "message": "本轮方案资料不完整，未更新方案。可以继续讨论或请为伍重新整理。"
+    },
+    "previewId": null
+  },
+  {
+    "id": "goal-decomposition",
+    "httpStatus": 200,
+    "milliseconds": 14872,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_SCOPE_DENIED",
+      "message": "新部门方案不能额外设置来源、知识、浏览器、MCP 或每日预算；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null
+  },
+  {
+    "id": "bounded-code-review",
+    "httpStatus": 200,
+    "milliseconds": 14585,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "本轮团队方案尚不完整，暂不能保存。待修正字段：orchestration.template.reviewTaskId：Invalid input: expected string, received undefined；orchestration.template：Unrecognized key: \"taskIds\"；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null
+  },
+  {
+    "id": "fixed-shards",
+    "httpStatus": 200,
+    "milliseconds": 13461,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_INVALID",
+      "message": "本轮方案资料不完整，未更新方案。可以继续讨论或请为伍重新整理。"
+    },
+    "previewId": null
+  },
+  {
+    "id": "two-proposals",
+    "httpStatus": 200,
+    "milliseconds": 17887,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_INVALID",
+      "message": "本轮方案资料不完整，未更新方案。可以继续讨论或请为伍重新整理。"
+    },
+    "previewId": null
+  }
+]

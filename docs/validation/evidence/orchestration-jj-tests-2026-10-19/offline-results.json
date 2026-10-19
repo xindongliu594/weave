@@ -1,0 +1,25 @@
+{
+  "sourceCommit": "580aafb",
+  "modelCalls": 0,
+  "productionChanges": 0,
+  "results": [
+    {
+      "name": "contracts",
+      "exitCode": 0,
+      "seconds": 1.67,
+      "log": "/home/jj/.local/share/weiwu/validation/orchestration-20261019-580aafb/contracts.log"
+    },
+    {
+      "name": "integration",
+      "exitCode": 0,
+      "seconds": 6.18,
+      "log": "/home/jj/.local/share/weiwu/validation/orchestration-20261019-580aafb/integration.log"
+    },
+    {
+      "name": "native",
+      "exitCode": 0,
+      "seconds": 0.46,
+      "log": "/home/jj/.local/share/weiwu/validation/orchestration-20261019-580aafb/native.log"
+    }
+  ]
+}

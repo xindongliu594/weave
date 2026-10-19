@@ -1,0 +1,21 @@
+{
+  "mode": "dry-run",
+  "sourceCommit": "580aafb",
+  "limits": {
+    "maxCalls": 7,
+    "maxCallCost": 0.02,
+    "maxTrialCost": 0.14,
+    "maxCumulative": 3.41,
+    "maxTokens": 8192
+  },
+  "startedAt": "2026-10-19T06:34:31.701Z",
+  "finishedAt": "2026-10-19T06:34:36.200Z",
+  "exit": {
+    "code": 0,
+    "signal": null
+  },
+  "requests": 7,
+  "realModelCalls": 0,
+  "projectWrites": 0,
+  "departmentWrites": 0
+}

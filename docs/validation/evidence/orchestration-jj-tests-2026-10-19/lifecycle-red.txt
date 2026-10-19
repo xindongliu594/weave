@@ -1,0 +1,78 @@
+✖ timeout or signal exit must not be reported as success (8.7493ms)
+✖ worker exit must await outstanding provider and receipt work before pool.end (11.144ms)
+✖ a new unknown receipt in the final snapshot must fail the trial (6.9868ms)
+✖ a paid failure retains the settled usage id and actual fee for its case (3.6482ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 173.753
+
+✖ failing tests:
+
+test at .superpowers\sdd\orchestration-test-2026-10-19\pilot-review-repro.mjs:54:1
+✖ timeout or signal exit must not be reported as success (8.7493ms)
+  AssertionError [ERR_ASSERTION]: timeout=true, exit.code=null currently becomes exitCode=0
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.superpowers/sdd/orchestration-test-2026-10-19/pilot-review-repro.mjs:56:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at .superpowers\sdd\orchestration-test-2026-10-19\pilot-review-repro.mjs:59:1
+✖ worker exit must await outstanding provider and receipt work before pool.end (11.144ms)
+  AssertionError [ERR_ASSERTION]: ["dispatch","pool.end","provider.return"]
+
+  true !== false
+
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.superpowers/sdd/orchestration-test-2026-10-19/pilot-review-repro.mjs:63:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at .superpowers\sdd\orchestration-test-2026-10-19\pilot-review-repro.mjs:67:1
+✖ a new unknown receipt in the final snapshot must fail the trial (6.9868ms)
+  AssertionError [ERR_ASSERTION]: final after.holds is recorded but never checked
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.superpowers/sdd/orchestration-test-2026-10-19/pilot-review-repro.mjs:71:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at .superpowers\sdd\orchestration-test-2026-10-19\pilot-review-repro.mjs:74:1
+✖ a paid failure retains the settled usage id and actual fee for its case (3.6482ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - 'receipt-1'
+
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/.superpowers/sdd/orchestration-test-2026-10-19/pilot-review-repro.mjs:78:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'receipt-1',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
