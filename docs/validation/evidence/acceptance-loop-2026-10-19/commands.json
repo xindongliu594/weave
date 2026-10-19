@@ -1,0 +1,140 @@
+[
+  {
+    "sessionId": "0ba22b92-ac29-4011-a003-f597972821b9",
+    "callId": "call_00_Y5KNVXduW6jkmbzcN8pp2393",
+    "taskId": "verify",
+    "attemptId": "e6e511c5-9456-49c1-b3f0-d8d064a5d55e",
+    "seq": 351,
+    "at": "2026-10-19T13:35:41.538Z",
+    "type": "handoff/command-observed",
+    "data": {
+      "taskId": "verify",
+      "attemptId": "e6e511c5-9456-49c1-b3f0-d8d064a5d55e",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "3476f1f01e3d932618e503283e8102d6d96de34e85fc063a89f41b085e915793",
+      "evidence": {
+        "version": 1,
+        "runId": "3657d6bc-24bc-42f3-b261-c8b893618a30",
+        "observedAt": "2026-10-19T13:35:41.519Z",
+        "tool": "terminal_test",
+        "sessionId": "0ba22b92-ac29-4011-a003-f597972821b9",
+        "callId": "call_00_Y5KNVXduW6jkmbzcN8pp2393",
+        "approval": {
+          "status": "available",
+          "approvalId": "6807ed5f-b91b-4638-af1f-b346c4f414a4"
+        },
+        "operation": {
+          "status": "available",
+          "operationId": "58ae3850-d98c-462e-93b9-6aaf52d0459d",
+          "queuedSeq": 341,
+          "finishedSeq": 349
+        },
+        "hashBasis": "executor-result-before-archive-redaction",
+        "output": {
+          "status": "available",
+          "sha256": "958dbecc3d3ebb03c8c83dc4fe735544f3c794b847ac99c77cffaae970990a53",
+          "bytes": 1132,
+          "complete": true,
+          "layout": "combined"
+        },
+        "stdout": {
+          "status": "unknown",
+          "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+        },
+        "stderr": {
+          "status": "unknown",
+          "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+        },
+        "nodeTests": {
+          "status": "available",
+          "format": "spec",
+          "tests": 13,
+          "suites": 0,
+          "pass": 13,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      },
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "4914ece8cce4edd17ed64cf4beab60c7f570ce1fe8eb843cc42d00084c6580f6",
+          "status": "passed",
+          "reason": ""
+        }
+      ]
+    }
+  },
+  {
+    "sessionId": "0ba22b92-ac29-4011-a003-f597972821b9",
+    "callId": "call_00_XDtFfsdFxGl99oMletc90764",
+    "taskId": "verify",
+    "attemptId": "e6e511c5-9456-49c1-b3f0-d8d064a5d55e",
+    "seq": 1137,
+    "at": "2026-10-19T13:38:47.900Z",
+    "type": "handoff/command-observed",
+    "data": {
+      "taskId": "verify",
+      "attemptId": "e6e511c5-9456-49c1-b3f0-d8d064a5d55e",
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "workspaceRevision": "3476f1f01e3d932618e503283e8102d6d96de34e85fc063a89f41b085e915793",
+      "evidence": {
+        "version": 1,
+        "runId": "3657d6bc-24bc-42f3-b261-c8b893618a30",
+        "observedAt": "2026-10-19T13:38:47.843Z",
+        "tool": "terminal_test",
+        "sessionId": "0ba22b92-ac29-4011-a003-f597972821b9",
+        "callId": "call_00_XDtFfsdFxGl99oMletc90764",
+        "approval": {
+          "status": "available",
+          "approvalId": "d0bf4eb5-1361-40e8-a2bc-ff6f44c4ff64"
+        },
+        "operation": {
+          "status": "available",
+          "operationId": "1770200d-0d51-4dff-ad8f-30167fc058bb",
+          "queuedSeq": 1127,
+          "finishedSeq": 1135
+        },
+        "hashBasis": "executor-result-before-archive-redaction",
+        "output": {
+          "status": "available",
+          "sha256": "c0f125cfffd67b196f081e22c07d847ea1135a23be6228805e6fa45b66f37cb3",
+          "bytes": 1132,
+          "complete": true,
+          "layout": "combined"
+        },
+        "stdout": {
+          "status": "unknown",
+          "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+        },
+        "stderr": {
+          "status": "unknown",
+          "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+        },
+        "nodeTests": {
+          "status": "available",
+          "format": "spec",
+          "tests": 13,
+          "suites": 0,
+          "pass": 13,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      },
+      "acceptanceChecks": [
+        {
+          "criterionIndex": 0,
+          "ruleSha256": "4914ece8cce4edd17ed64cf4beab60c7f570ce1fe8eb843cc42d00084c6580f6",
+          "status": "passed",
+          "reason": ""
+        }
+      ]
+    }
+  }
+]

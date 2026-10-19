@@ -1,0 +1,31 @@
+[
+  {
+    "sessionId": "0ba22b92-ac29-4011-a003-f597972821b9",
+    "callId": "call_00_dZXtLt88xXIpyaktiv6f3641",
+    "taskId": "t2",
+    "attemptId": "e6e511c5-9456-49c1-b3f0-d8d064a5d55e",
+    "seq": 391,
+    "at": "2026-10-19T13:35:47.779Z",
+    "type": "tool/result",
+    "data": {
+      "name": "agent_teams_update_task",
+      "result": {
+        "isError": true,
+        "error": {
+          "message": "HANDOFF_REPORT_FIELDS: report.risks: invalid_type。summary 为1至1000字符，sections 各项为1至2000字符，risks 为最多10项字符串数组；不增加字段。只纠正报告，不重跑已有文件或测试。",
+          "info": {
+            "name": "HarnessError",
+            "code": "INVALID_ARGS"
+          }
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Error: HANDOFF_REPORT_FIELDS: report.risks: invalid_type。summary 为1至1000字符，sections 各项为1至2000字符，risks 为最多10项字符串数组；不增加字段。只纠正报告，不重跑已有文件或测试。"
+          }
+        ]
+      },
+      "boundary": "employee"
+    }
+  }
+]

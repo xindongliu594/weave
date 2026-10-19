@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "projectId": "6d1b5010-2da9-4d35-afb8-a0619540e12d",
+  "sourceRunId": "5784a24a-aa74-4e82-b826-fd219de5100a",
+  "completedRunId": "3657d6bc-24bc-42f3-b261-c8b893618a30",
+  "previewId": "7566b53b-c677-4d6f-b4b0-de983c59571d",
+  "status": "completed",
+  "counts": {
+    "accept": 3,
+    "verify": 10,
+    "develop": 5,
+    "planning": 2
+  },
+  "costs": {
+    "accept": 0.0148974,
+    "verify": 0.0598749,
+    "develop": 0.0201015,
+    "planning": 0.010257299999999999
+  },
+  "phaseSpent": 0.1051311,
+  "cumulativeOccupied": 3.2204609,
+  "oldUnknownCount": 7,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 2228,
+      "sha256": "f9a1ee1e80bda94798a16e07c181121f2639399c5d3d80c9cc4467f274dd91e9"
+    },
+    {
+      "path": "cli.mjs",
+      "size": 1312,
+      "sha256": "c47eeb31330e9788ff92ace55c506c02f4fe496bc37dd81a4dd34dca0789f953"
+    },
+    {
+      "path": "cli.test.mjs",
+      "size": 7095,
+      "sha256": "3eb774daeb9c614e26b35fcbc4fd47e0e74a39516a1de0c0734e98f6e87a84ca"
+    }
+  ],
+  "recovery": {
+    "sourceRunId": "5784a24a-aa74-4e82-b826-fd219de5100a",
+    "completed": [
+      "develop"
+    ],
+    "files": [
+      {
+        "path": "README.md",
+        "size": 2228,
+        "state": "accepted",
+        "sha256": "f9a1ee1e80bda94798a16e07c181121f2639399c5d3d80c9cc4467f274dd91e9",
+        "producerTaskId": "develop"
+      },
+      {
+        "path": "cli.mjs",
+        "size": 1312,
+        "state": "accepted",
+        "sha256": "c47eeb31330e9788ff92ace55c506c02f4fe496bc37dd81a4dd34dca0789f953",
+        "producerTaskId": "develop"
+      }
+    ]
+  },
+  "costCarryover": {
+    "receipts": [],
+    "reserved": 0,
+    "retained": false,
+    "recordedCost": 0.0201015,
+    "availableBudget": 0.2298985
+  },
+  "sourceRestoration": {
+    "scripts/local-api.ts": {
+      "restored": true,
+      "sha256": "9e123f668795dc34a98334e628e4aa0e459f09b958a2b48faa90a6e9e4968bb4"
+    },
+    "apps/api/src/cost-control.ts": {
+      "restored": true,
+      "sha256": "323cd96ed0a6d48bf23b407c555494f7bc92ccb1dde798214e3fea96f0acd1c4"
+    }
+  },
+  "limits": {
+    "phase": 0.28,
+    "planning": 0.03,
+    "project": 0.25,
+    "cumulative": 3.41
+  },
+  "limitations": [
+    "First plan lacked formal independent review; second model turn corrected it.",
+    "QA submitted invalid report.risks, then reread/researched and repeated unchanged tests before successful correction.",
+    "Controlled interruption occurred before an external request, not during an unknown in-flight operation.",
+    "No new-template execution, knowledge or backup test in this narrow acceptance."
+  ]
+}

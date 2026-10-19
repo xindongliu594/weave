@@ -1,0 +1,190 @@
+[
+  {
+    "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "modelName": "Go · DeepSeek V4.1 Flash",
+    "projectId": "4ae5cce4-73c1-420a-987f-83db54d196f2",
+    "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+    "runId": "4fac3246-e4fe-462e-aca0-7e571b99924a",
+    "purpose": "项目执行",
+    "amount": 0.0192111,
+    "accountingMode": "budgeted",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-08T13:22:21.661Z",
+        "note": "CALL_INTERRUPTED",
+        "source": "runtime",
+        "dispatched": true
+      }
+    ],
+    "providerReconciliation": null,
+    "createdAt": "2026-10-08T13:20:51.636Z"
+  },
+  {
+    "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "modelName": "Go · DeepSeek V4.1 Flash",
+    "projectId": "1d432498-6e6a-4da5-9833-4e946283f29b",
+    "departmentId": "3c0cb5ee-0b24-4ef5-9957-8a048c7dae0a",
+    "runId": "8b8dff91-7a2f-4ba7-a079-792d2f06ff7c",
+    "purpose": "项目执行",
+    "amount": 0.03529379999999999,
+    "accountingMode": "budgeted",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-10T14:27:16.830Z",
+        "note": "CALL_INTERRUPTED",
+        "source": "runtime",
+        "dispatched": true
+      },
+      {
+        "at": "2026-10-10T14:33:40.355Z",
+        "code": "GATEWAY_REJECTED",
+        "note": "账单查询失败：中转站返回 HTTP 404：New API 查询接口不存在，请检查站点版本及代理是否转发 /api 路径；自动查询已暂停，可在网页明确重新查询。",
+        "source": "billing-query",
+        "status": "failed",
+        "failureReason": "endpoint-unsupported",
+        "upstreamStatus": 404
+      }
+    ],
+    "providerReconciliation": {
+      "code": "GATEWAY_REJECTED",
+      "status": "failed",
+      "message": "账单查询失败：中转站返回 HTTP 404：New API 查询接口不存在，请检查站点版本及代理是否转发 /api 路径；自动查询已暂停，可在网页明确重新查询。",
+      "attempts": 1,
+      "checkedAt": "2026-10-10T14:33:40.355Z",
+      "failureReason": "endpoint-unsupported",
+      "upstreamStatus": 404,
+      "automaticPaused": true
+    },
+    "createdAt": "2026-10-10T14:27:15.770Z"
+  },
+  {
+    "id": "f865392a-f575-4f5b-9041-59954d407986",
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "modelName": "Go · DeepSeek V4.1 Flash",
+    "projectId": null,
+    "departmentId": null,
+    "runId": null,
+    "purpose": "连接测试",
+    "amount": 0.00037109999999999997,
+    "accountingMode": "budgeted",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-10T14:37:11.382Z",
+        "note": "GATEWAY_CONNECTION_FAILED",
+        "source": "runtime",
+        "dispatched": true
+      }
+    ],
+    "providerReconciliation": null,
+    "createdAt": "2026-10-10T14:37:10.323Z"
+  },
+  {
+    "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "modelName": "Go · DeepSeek V4.1 Flash",
+    "projectId": "cf082432-c6e7-42d2-8068-0ef9bbdd7dee",
+    "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+    "runId": null,
+    "purpose": "组织规划",
+    "amount": 0.014085,
+    "accountingMode": "budgeted",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-11T12:04:15.443Z",
+        "note": "GATEWAY_CONNECTION_FAILED",
+        "source": "runtime",
+        "dispatched": true
+      }
+    ],
+    "providerReconciliation": null,
+    "createdAt": "2026-10-11T12:04:14.646Z"
+  },
+  {
+    "id": "26e850af-4ed9-4a5e-abd8-6bf84ec76599",
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "modelName": "Go · DeepSeek V4.1 Flash",
+    "projectId": "acc5411f-e128-4dc4-98ef-6a43a110b228",
+    "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+    "runId": null,
+    "purpose": "预算补充规划",
+    "amount": 0.0022239,
+    "accountingMode": "budgeted",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-11T12:54:18.712Z",
+        "note": "GATEWAY_CONNECTION_FAILED",
+        "source": "runtime",
+        "dispatched": true
+      }
+    ],
+    "providerReconciliation": null,
+    "createdAt": "2026-10-11T12:54:17.904Z"
+  },
+  {
+    "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+    "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "modelName": "Go · DeepSeek V4.1 Flash",
+    "projectId": "02428911-26c3-47cc-84c2-7db1ee7c2b5d",
+    "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+    "runId": null,
+    "purpose": "预算补充规划",
+    "amount": 0.0025932,
+    "accountingMode": "budgeted",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-13T01:54:37.799Z",
+        "note": "GATEWAY_REJECTED",
+        "source": "runtime",
+        "dispatched": true
+      }
+    ],
+    "providerReconciliation": null,
+    "createdAt": "2026-10-13T01:54:36.780Z",
+    "providerStatus": 429
+  },
+  {
+    "id": "d8af5bf7-377a-4589-a4ec-f3e8ef2df10f",
+    "modelId": "70bf9d7d-6cc0-4ea0-a7d1-d969cab6b65c",
+    "modelName": "Go · GLM-5.3-Flash（规划对照）",
+    "projectId": null,
+    "departmentId": null,
+    "runId": null,
+    "purpose": "规划模型与阶段提示对照",
+    "amount": 0.008632099999999998,
+    "accountingMode": "budgeted",
+    "inputRate": 0.15,
+    "outputRate": 0.5,
+    "status": "uncertain",
+    "history": [
+      {
+        "at": "2026-10-19T12:17:29.767Z",
+        "note": "GATEWAY_REJECTED",
+        "source": "runtime",
+        "dispatched": true
+      }
+    ],
+    "providerReconciliation": null,
+    "createdAt": "2026-10-19T12:17:29.141Z",
+    "providerStatus": 400
+  }
+]

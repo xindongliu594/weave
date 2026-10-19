@@ -1,0 +1,14 @@
+{
+  "reply": "已按你的要求整理为最小可执行方案：复用目录中的协调经理、开发工程师、质量审查员三人，走普通 pipeline 顺序布局，不引用七种新模板。开发先完成 cli.mjs 与 README.md 并只做 node --check 语法自检；独立 QA 再读取这两份文件、自行编写 cli.test.mjs 并实际运行 node --test；经理最后只读全部产物与 QA 证据，给出简短结构化结论，不写新文件。业务交付标准绑定 QA 的独立验收条目，经理结论不当作需再次验收的新产物。方案尚未保存或执行，你确认后才会进入认领与执行；执行中的工具审批和真实测试回执会单独核验。",
+  "draftIssue": {
+    "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+    "message": "生成草案校验失败：develop: 代码实现必须有另一位员工的独立审查任务；已有方案未改变，可以继续讨论修改。"
+  },
+  "outputDiagnostic": {
+    "finishReason": "stop",
+    "originalOutputSHA": "39d6910d4ed818475e9e128c8a8ed3e3983967a90401838a40b6e33607fd7e3e",
+    "outputBytes": 6051,
+    "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+    "position": null
+  }
+}

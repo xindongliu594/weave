@@ -1,0 +1,21 @@
+✔ 0 摄氏度 -> 32 华氏度（stdout JSON 数值） (98.7528ms)
+✔ 100 摄氏度 -> 212 华氏度（stdout JSON 数值） (104.5096ms)
+✔ -40 摄氏度 -> -40 华氏度（负数为合法输入） (93.6406ms)
+✔ 小数输入 36.6 摄氏度 -> 97.88 华氏度（stdout JSON 数值） (95.9838ms)
+✔ 小数输入 -0.5 摄氏度 -> 31.1 华氏度（负小数） (94.2982ms)
+✔ 25 摄氏度 -> 77 华氏度（README 示例） (98.4882ms)
+✔ 缺失参数：非零退出码 + stderr 提示 + stdout 无 JSON (96.4778ms)
+✔ 非数字参数 abc：非零退出码 + stderr 提示 + stdout 无 JSON (99.2042ms)
+✔ 非数字参数 (空字符串)：非零退出码 + stderr 提示 (96.9766ms)
+✔ 非数字参数 NaN：非零退出码 + stderr 提示 (96.9692ms)
+✔ 非数字参数 Infinity：非零退出码 + stderr 提示 (102.7318ms)
+✔ 多个参数 1 2：非零退出码 + stderr 提示 + stdout 无 JSON (95.0138ms)
+✔ 多个参数 0 100：非零退出码 + stderr 提示 (96.4642ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1413.0267

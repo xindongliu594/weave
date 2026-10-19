@@ -1,0 +1,655 @@
+{
+  "reply": "已按校验意见修正：保留同一需求、复用现有部门三人、普通 pipeline 顺序布局且不引用新模板。开发任务只做 cli.mjs 与 README.md 并仅执行 node --check 语法自检；QA 为独立 verification，读取开发两份文件、自行编写 cli.test.mjs 并实际执行 node --test；经理节点改为 kind=review、reviewedTaskId 指向 develop、依赖 develop 与 verify、maxReworkRounds=0，只读审查开发产物与 QA 测试文件，给出简短结构化结论，不创建任何文件、不做自验循环。方案尚未保存或执行，你确认后才会进入认领与运行，真实工具审批与测试回执会单独核验。",
+  "preview": {
+    "kind": "organization-v2",
+    "candidate": {
+      "schemaVersion": 2,
+      "target": {
+        "kind": "existing",
+        "departmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+        "departmentVersion": 2,
+        "primaryAgentIds": [
+          "mgr-1",
+          "dev-1",
+          "qa-1"
+        ],
+        "collaboratingAgents": []
+      },
+      "rationale": "需求明确、范围很小，复用目录中现有部门的协调经理、开发工程师和质量审查员即可，不新增部门。采用普通 pipeline 顺序布局：开发先交付实现与说明，QA 再独立编写并运行测试，经理最后只读审查。开发仅做语法自检，功能正确性完全交由独立 QA 的真实测试证明；经理审查不产生新文件，避免自验循环。",
+      "tasks": [
+        {
+          "id": "develop",
+          "subject": "实现 Node 温度换算 CLI 与使用说明",
+          "objective": "在工作区编写 cli.mjs 与 README.md。cli.mjs 为无第三方依赖的 Node 命令行：接受唯一数字位置参数，允许负数与小数，将摄氏度换算为华氏度（F=C*9/5+32），并以 stdout 输出 JSON {\"celsius\":<输入>,\"fahrenheit\":<结果>}；当缺失参数、参数非数字或传入多个参数时，向 stderr 输出提示并以非零退出码结束。README.md 说明运行方式、参数规则、输出格式、错误行为与已知限制。本任务只执行 node --check cli.mjs 语法自检，不编写、不调用任何测试文件，也不把语法自检当作功能验收证据。",
+          "assigneeId": "dev-1",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "cli.mjs 与 README.md 已按目标交付，且 node --check cli.mjs 通过；功能正确性由后续独立 QA 验证"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "deliverables",
+                "requirement": "列出本任务实际创建的文件路径，并说明各自用途。"
+              },
+              {
+                "key": "usage",
+                "requirement": "说明 cli.mjs 的运行命令、输入规则、stdout JSON 结构与错误时的 stderr 提示及退出码行为。"
+              },
+              {
+                "key": "limitations",
+                "requirement": "列出已知限制与未验证事项，明确功能正确性尚未由本任务证明。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 45000,
+          "estimatedOutputTokens": 4500,
+          "maxOutputTokens": 8192,
+          "maxModelCalls": 10,
+          "kind": "implementation",
+          "inputs": [],
+          "outputs": [
+            {
+              "path": "cli.mjs",
+              "format": "text"
+            },
+            {
+              "path": "README.md",
+              "format": "text"
+            }
+          ],
+          "inScope": [
+            "cli.mjs",
+            "README.md"
+          ],
+          "outOfScope": [
+            "cli.test.mjs"
+          ],
+          "verify": [
+            "node --check cli.mjs"
+          ]
+        },
+        {
+          "id": "verify",
+          "subject": "独立测试温度换算 CLI",
+          "objective": "读取开发交付的 cli.mjs 与 README.md，自行编写 cli.test.mjs，使用 Node 内置 node:test 与 assert 覆盖：0、100、-40、小数输入、缺失参数、非数字参数、多个参数；对正常输入检查 stdout JSON 的 celsius 与 fahrenheit 数值，对错误输入检查退出码非零与 stderr 提示。随后实际执行 node --test cli.test.mjs 并如实报告结果。不得修改 cli.mjs 或 README.md。",
+          "assigneeId": "qa-1",
+          "dependencies": [
+            "develop"
+          ],
+          "acceptanceCriteria": [
+            "独立测试覆盖 0、100、-40、小数、缺失、非数字、多参数等情形，其中正常输入核对 stdout JSON 数值、错误输入核对非零退出与 stderr 提示；node --test cli.test.mjs 实际执行且全部用例通过，无失败、跳过或待办"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "coverage",
+                "requirement": "逐项列出覆盖的用例（0、100、-40、小数、缺失、非数字、多参数）及各自断言内容。"
+              },
+              {
+                "key": "evidence",
+                "requirement": "给出实际执行 node --test cli.test.mjs 的真实回执要点，包括通过数、失败数与退出码。"
+              },
+              {
+                "key": "failures",
+                "requirement": "如实说明任何失败、跳过或尚未覆盖的边界；没有则明确写无。"
+              }
+            ]
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "command": "node --test cli.test.mjs",
+              "expectedExitCode": 0,
+              "minimumTests": 7
+            }
+          ],
+          "estimatedInputTokens": 50000,
+          "estimatedOutputTokens": 5000,
+          "maxOutputTokens": 8192,
+          "maxModelCalls": 12,
+          "kind": "verification",
+          "inputs": [
+            {
+              "path": "cli.mjs",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "README.md",
+              "producerTaskId": "develop"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "cli.test.mjs",
+              "format": "text"
+            }
+          ],
+          "inScope": [
+            "cli.test.mjs"
+          ],
+          "outOfScope": [
+            "cli.mjs",
+            "README.md"
+          ],
+          "verify": [
+            "node --test cli.test.mjs"
+          ]
+        },
+        {
+          "id": "accept",
+          "subject": "经理只读审查与最终判定",
+          "objective": "只读审查开发交付的 cli.mjs、README.md 与 QA 产出的 cli.test.mjs，核对功能实现、说明与 QA 实测证据是否一致，判断业务交付标准是否达成。不创建或修改任何文件，不自行编写或复跑测试，不引用未展示的结果。以任务完成回复提交简短结构化结论。",
+          "assigneeId": "mgr-1",
+          "dependencies": [
+            "develop",
+            "verify"
+          ],
+          "acceptanceCriteria": [
+            "逐项核对被测文件当前版本、QA 测试覆盖与真实执行证据，给出通过项与缺口，并明确最终判定；结论仅基于只读审查，不含自编测试结果"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "verdict",
+                "requirement": "给出最终判定：通过或不通过，并列出对应的验收标准与依据。"
+              },
+              {
+                "key": "evidence",
+                "requirement": "列出所读文件路径、QA 测试命令回执要点（通过/失败数与退出码）等实际证据。"
+              },
+              {
+                "key": "gaps",
+                "requirement": "列出未验证事项、缺口或风险；没有则明确写无。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 30000,
+          "estimatedOutputTokens": 3000,
+          "maxOutputTokens": 8192,
+          "maxModelCalls": 8,
+          "kind": "review",
+          "inputs": [
+            {
+              "path": "cli.mjs",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "README.md",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "cli.test.mjs",
+              "producerTaskId": "verify"
+            }
+          ],
+          "outputs": [],
+          "reviewedTaskId": "develop",
+          "maxReworkRounds": 0
+        }
+      ],
+      "orchestration": {
+        "pattern": "pipeline",
+        "rationale": "三节点存在明确先后依赖：开发交付实现与说明后，QA 才能独立编写并运行测试；经理必须等待前两者完成才能进行只读审查。顺序执行符合普通 pipeline 布局，且不引用七种预览模板。"
+      },
+      "deliveryCriteria": [
+        {
+          "id": "cli_function",
+          "description": "独立 QA 用真实测试核对 CLI 的换算正确性、stdout JSON 数值与错误退出行为",
+          "producerTaskIds": [
+            "develop"
+          ],
+          "checkTaskId": "verify",
+          "checkCriteriaIndexes": [
+            0
+          ],
+          "independent": true
+        }
+      ]
+    },
+    "department": {
+      "name": "能力选用验收样本",
+      "description": "独立验证，原部门与旧运行保持。",
+      "agents": [
+        {
+          "id": "mgr-1",
+          "name": "协调经理",
+          "role": "manager",
+          "title": "协调经理",
+          "tools": [
+            "filesystem",
+            "terminal_test"
+          ],
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "roleVersion": 1,
+          "instructions": "审查 T1 与 T2 的真实证据，执行只读复审，判定验收结论并说明依据与未完成项；不得修改任何文件，不得扩大授权或预算，不得代写开发或测试结论。",
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+          "sourceAgentId": "mgr-1",
+          "browserOrigins": [],
+          "mcpConnections": []
+        },
+        {
+          "id": "dev-1",
+          "name": "开发工程师",
+          "role": "member",
+          "title": "开发工程师",
+          "tools": [
+            "filesystem",
+            "artifact_write",
+            "terminal_test"
+          ],
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "roleVersion": 1,
+          "instructions": "只生成 cli.mjs 与 README.md。cli.mjs 接受唯一位置参数（数字，允许负数与小数），输出 JSON {celsius, fahrenheit}，公式 F=C*9/5+32；缺失、非数字或多参数时向 stderr 说明并非零退出。仅可申请一次 node --check cli.mjs 语法检查，不运行功能测试，不代写 QA 测试或结论。",
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+          "sourceAgentId": "dev-1",
+          "browserOrigins": [],
+          "mcpConnections": []
+        },
+        {
+          "id": "qa-1",
+          "name": "质量审查员",
+          "role": "member",
+          "title": "质量审查员",
+          "tools": [
+            "filesystem",
+            "artifact_write",
+            "terminal_test"
+          ],
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "roleVersion": 1,
+          "instructions": "独立编写 cli.test.mjs，使用 Node 内置 test 模块，不引用开发结论。实际执行 node --test cli.test.mjs 并如实报告通过或失败及证据，不修改 cli.mjs 与 README.md。",
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+          "sourceAgentId": "qa-1",
+          "browserOrigins": [],
+          "mcpConnections": []
+        }
+      ]
+    },
+    "plan": {
+      "agents": [
+        {
+          "id": "mgr-1",
+          "name": "协调经理",
+          "role": "manager",
+          "title": "协调经理",
+          "tools": [
+            "filesystem",
+            "terminal_test"
+          ],
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "roleVersion": 1,
+          "instructions": "审查 T1 与 T2 的真实证据，执行只读复审，判定验收结论并说明依据与未完成项；不得修改任何文件，不得扩大授权或预算，不得代写开发或测试结论。",
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+          "sourceAgentId": "mgr-1",
+          "browserOrigins": [],
+          "mcpConnections": []
+        },
+        {
+          "id": "dev-1",
+          "name": "开发工程师",
+          "role": "member",
+          "title": "开发工程师",
+          "tools": [
+            "filesystem",
+            "artifact_write",
+            "terminal_test"
+          ],
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "roleVersion": 1,
+          "instructions": "只生成 cli.mjs 与 README.md。cli.mjs 接受唯一位置参数（数字，允许负数与小数），输出 JSON {celsius, fahrenheit}，公式 F=C*9/5+32；缺失、非数字或多参数时向 stderr 说明并非零退出。仅可申请一次 node --check cli.mjs 语法检查，不运行功能测试，不代写 QA 测试或结论。",
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+          "sourceAgentId": "dev-1",
+          "browserOrigins": [],
+          "mcpConnections": []
+        },
+        {
+          "id": "qa-1",
+          "name": "质量审查员",
+          "role": "member",
+          "title": "质量审查员",
+          "tools": [
+            "filesystem",
+            "artifact_write",
+            "terminal_test"
+          ],
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "roleVersion": 1,
+          "instructions": "独立编写 cli.test.mjs，使用 Node 内置 test 模块，不引用开发结论。实际执行 node --test cli.test.mjs 并如实报告通过或失败及证据，不修改 cli.mjs 与 README.md。",
+          "knowledgeSpaceIds": [],
+          "sourceDepartmentId": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+          "sourceAgentId": "qa-1",
+          "browserOrigins": [],
+          "mcpConnections": []
+        }
+      ],
+      "rationale": "需求明确、范围很小，复用目录中现有部门的协调经理、开发工程师和质量审查员即可，不新增部门。采用普通 pipeline 顺序布局：开发先交付实现与说明，QA 再独立编写并运行测试，经理最后只读审查。开发仅做语法自检，功能正确性完全交由独立 QA 的真实测试证明；经理审查不产生新文件，避免自验循环。",
+      "tasks": [
+        {
+          "id": "develop",
+          "subject": "实现 Node 温度换算 CLI 与使用说明",
+          "objective": "在工作区编写 cli.mjs 与 README.md。cli.mjs 为无第三方依赖的 Node 命令行：接受唯一数字位置参数，允许负数与小数，将摄氏度换算为华氏度（F=C*9/5+32），并以 stdout 输出 JSON {\"celsius\":<输入>,\"fahrenheit\":<结果>}；当缺失参数、参数非数字或传入多个参数时，向 stderr 输出提示并以非零退出码结束。README.md 说明运行方式、参数规则、输出格式、错误行为与已知限制。本任务只执行 node --check cli.mjs 语法自检，不编写、不调用任何测试文件，也不把语法自检当作功能验收证据。",
+          "assigneeId": "dev-1",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "cli.mjs 与 README.md 已按目标交付，且 node --check cli.mjs 通过；功能正确性由后续独立 QA 验证"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "deliverables",
+                "requirement": "列出本任务实际创建的文件路径，并说明各自用途。"
+              },
+              {
+                "key": "usage",
+                "requirement": "说明 cli.mjs 的运行命令、输入规则、stdout JSON 结构与错误时的 stderr 提示及退出码行为。"
+              },
+              {
+                "key": "limitations",
+                "requirement": "列出已知限制与未验证事项，明确功能正确性尚未由本任务证明。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 45000,
+          "estimatedOutputTokens": 4500,
+          "maxOutputTokens": 8192,
+          "maxModelCalls": 10,
+          "kind": "implementation",
+          "inputs": [],
+          "outputs": [
+            {
+              "path": "cli.mjs",
+              "format": "text"
+            },
+            {
+              "path": "README.md",
+              "format": "text"
+            }
+          ],
+          "inScope": [
+            "cli.mjs",
+            "README.md"
+          ],
+          "outOfScope": [
+            "cli.test.mjs"
+          ],
+          "verify": [
+            "node --check cli.mjs"
+          ]
+        },
+        {
+          "id": "verify",
+          "subject": "独立测试温度换算 CLI",
+          "objective": "读取开发交付的 cli.mjs 与 README.md，自行编写 cli.test.mjs，使用 Node 内置 node:test 与 assert 覆盖：0、100、-40、小数输入、缺失参数、非数字参数、多个参数；对正常输入检查 stdout JSON 的 celsius 与 fahrenheit 数值，对错误输入检查退出码非零与 stderr 提示。随后实际执行 node --test cli.test.mjs 并如实报告结果。不得修改 cli.mjs 或 README.md。",
+          "assigneeId": "qa-1",
+          "dependencies": [
+            "develop"
+          ],
+          "acceptanceCriteria": [
+            "独立测试覆盖 0、100、-40、小数、缺失、非数字、多参数等情形，其中正常输入核对 stdout JSON 数值、错误输入核对非零退出与 stderr 提示；node --test cli.test.mjs 实际执行且全部用例通过，无失败、跳过或待办"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "coverage",
+                "requirement": "逐项列出覆盖的用例（0、100、-40、小数、缺失、非数字、多参数）及各自断言内容。"
+              },
+              {
+                "key": "evidence",
+                "requirement": "给出实际执行 node --test cli.test.mjs 的真实回执要点，包括通过数、失败数与退出码。"
+              },
+              {
+                "key": "failures",
+                "requirement": "如实说明任何失败、跳过或尚未覆盖的边界；没有则明确写无。"
+              }
+            ]
+          },
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "command": "node --test cli.test.mjs",
+              "expectedExitCode": 0,
+              "minimumTests": 7
+            }
+          ],
+          "estimatedInputTokens": 50000,
+          "estimatedOutputTokens": 5000,
+          "maxOutputTokens": 8192,
+          "maxModelCalls": 12,
+          "kind": "verification",
+          "inputs": [
+            {
+              "path": "cli.mjs",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "README.md",
+              "producerTaskId": "develop"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "cli.test.mjs",
+              "format": "text"
+            }
+          ],
+          "inScope": [
+            "cli.test.mjs"
+          ],
+          "outOfScope": [
+            "cli.mjs",
+            "README.md"
+          ],
+          "verify": [
+            "node --test cli.test.mjs"
+          ]
+        },
+        {
+          "id": "accept",
+          "subject": "经理只读审查与最终判定",
+          "objective": "只读审查开发交付的 cli.mjs、README.md 与 QA 产出的 cli.test.mjs，核对功能实现、说明与 QA 实测证据是否一致，判断业务交付标准是否达成。不创建或修改任何文件，不自行编写或复跑测试，不引用未展示的结果。以任务完成回复提交简短结构化结论。",
+          "assigneeId": "mgr-1",
+          "dependencies": [
+            "develop",
+            "verify"
+          ],
+          "acceptanceCriteria": [
+            "逐项核对被测文件当前版本、QA 测试覆盖与真实执行证据，给出通过项与缺口，并明确最终判定；结论仅基于只读审查，不含自编测试结果"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "verdict",
+                "requirement": "给出最终判定：通过或不通过，并列出对应的验收标准与依据。"
+              },
+              {
+                "key": "evidence",
+                "requirement": "列出所读文件路径、QA 测试命令回执要点（通过/失败数与退出码）等实际证据。"
+              },
+              {
+                "key": "gaps",
+                "requirement": "列出未验证事项、缺口或风险；没有则明确写无。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 30000,
+          "estimatedOutputTokens": 3000,
+          "maxOutputTokens": 8192,
+          "maxModelCalls": 8,
+          "kind": "review",
+          "inputs": [
+            {
+              "path": "cli.mjs",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "README.md",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "cli.test.mjs",
+              "producerTaskId": "verify"
+            }
+          ],
+          "outputs": [],
+          "reviewedTaskId": "develop",
+          "maxReworkRounds": 0
+        }
+      ],
+      "orchestration": {
+        "pattern": "pipeline",
+        "rationale": "三节点存在明确先后依赖：开发交付实现与说明后，QA 才能独立编写并运行测试；经理必须等待前两者完成才能进行只读审查。顺序执行符合普通 pipeline 布局，且不引用七种预览模板。"
+      },
+      "deliveryCriteria": [
+        {
+          "id": "cli_function",
+          "description": "独立 QA 用真实测试核对 CLI 的换算正确性、stdout JSON 数值与错误退出行为",
+          "producerTaskIds": [
+            "develop"
+          ],
+          "checkTaskId": "verify",
+          "checkCriteriaIndexes": [
+            0
+          ],
+          "independent": true
+        }
+      ]
+    },
+    "sourceDepartmentVersions": [
+      {
+        "id": "62558bb0-cc2e-4356-ae7f-d53f919fec93",
+        "version": 2
+      }
+    ],
+    "conversationId": "befdecdf-d82c-4f24-be61-ba14231372a9",
+    "turnId": "7c8cac87-4b23-4786-bce1-ddedffa28b0d",
+    "previewVersion": 1,
+    "requirement": "请生成可确认并实际执行的最小温度换算项目方案：复用目录中现有部门的开发、QA、经理三人，不新增部门。采用现有普通 pipeline 顺序布局，省略 orchestration.template（七种新模板目前仅预览）。开发生成 cli.mjs 和 README.md：Node 无第三方依赖命令行，接受唯一数字位置参数，允许负数、小数，stdout 输出 JSON {celsius,fahrenheit}，F=C*9/5+32；缺失、非数字或多个参数时 stderr 提示并非零退出。开发只执行 node --check cli.mjs 语法自检，不生成或调用 QA 文件，不把语法自检绑定功能验收。独立 QA 读取开发两份文件后自行生成 cli.test.mjs，用 Node 内置 node:test 和 assert 编写并实际执行 node --test cli.test.mjs；至少核对0、100、-40、小数、缺失、非数字、多参数，检查 stdout JSON 数值及错误退出/stderr。经理最后读取所有文件和 QA 真实测试证据，作简短结构化交接结论，不写新文件、不自编测试结果。业务交付标准绑定独立 QA 的对应验收条目；经理结论不再作为需后续自验的新产物。文件引用按 producerTaskId 正确连接，QA 验收命令只使用本节点产出的测试文件及已完成开发输入。三任务顺序执行，maxReworkRounds为0；经理要的交接字段简短、列事实与证据，避免长篇重复。真实模型资源由你在项目0.25美元内安排，总32次/单节点16次，上下文96000字节、输出最多8192Token；留出认领、读写、工具审批、测试回读、正式交接与恢复所需轮数。每个节点输出上限8192，不把整个任务估算误当单次输出。仅授权文件与隔离终端，不访问知识库、网络或安装依赖。直接返回完整精炼候选。\n\n上一轮没有通过结构校验：生成草案校验失败：develop: 代码实现必须有另一位员工的独立审查任务；已有方案未改变，可以继续讨论修改。 请保留同一需求、三人三节点与预算。经理最终节点明确使用 kind=review，reviewedTaskId 指开发任务 ID，读取开发两份文件和 QA 测试文件，依赖开发与 QA，maxReworkRounds=0；QA 用 kind=verification。经理的 acceptanceCriteria 和 handoff 仅要求只读审查、QA 实测证据与最终判定，不创建文件、不做自验循环。返回完整修正版候选。",
+    "policy": {
+      "maxBudget": 0.25,
+      "maxAgents": 3,
+      "maxConcurrentAgents": 1,
+      "deadlineSeconds": 1800,
+      "maxModelCalls": 32,
+      "maxTaskModelCalls": 16,
+      "contextBytes": 96000,
+      "contextManagement": "prune",
+      "executionTarget": {
+        "kind": "local",
+        "deviceId": "14b3b6f9-a109-4396-a8cc-8691fa33458a",
+        "grantId": "d75b2a15-c862-4de4-a363-5afd3e3428ea",
+        "backend": {
+          "kind": "openshell",
+          "version": "0.1.2",
+          "gateway": "weiwu-openshell-v012",
+          "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+          "policySha256": "997f69aba4386ad9f67410ba9221626d507851f0524258d22bfd28f9ffba9bee",
+          "fingerprint": "a2ec8791201283dc2aa31ba1306e6b7235bd50dcb01104b2c428c3a393dbc104"
+        }
+      },
+      "allowedModelIds": [
+        "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051"
+      ],
+      "allowedTools": [
+        "filesystem",
+        "artifact_write",
+        "terminal_test"
+      ],
+      "allowedKnowledgeSpaceIds": [],
+      "allowedDepartmentIds": [
+        "62558bb0-cc2e-4356-ae7f-d53f919fec93"
+      ]
+    },
+    "source": "model",
+    "costAccounting": "conversation",
+    "previewId": "7566b53b-c677-4d6f-b4b0-de983c59571d",
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "estimate": 0.063,
+      "checks": [
+        {
+          "label": "任务已规划",
+          "pass": true
+        },
+        {
+          "label": "策略允许的模型",
+          "pass": true
+        },
+        {
+          "label": "策略允许的工具",
+          "pass": true
+        },
+        {
+          "label": "策略允许的知识空间",
+          "pass": true
+        },
+        {
+          "label": "策略允许的参与部门",
+          "pass": true
+        },
+        {
+          "label": "组织与人数",
+          "pass": true
+        },
+        {
+          "label": "并发上限",
+          "pass": true
+        },
+        {
+          "label": "模型可用性",
+          "pass": true
+        },
+        {
+          "label": "备用模型可用性",
+          "pass": true
+        },
+        {
+          "label": "员工推理强度兼容性",
+          "pass": true
+        },
+        {
+          "label": "本次资料授权",
+          "pass": true
+        },
+        {
+          "label": "工作方法授权",
+          "pass": true
+        },
+        {
+          "label": "导入资料授权",
+          "pass": true
+        },
+        {
+          "label": "任务负责人和引用",
+          "pass": true
+        },
+        {
+          "label": "任务依赖无环",
+          "pass": true
+        },
+        {
+          "label": "文件交接与质量合同",
+          "pass": true
+        },
+        {
+          "label": "任务费用上限",
+          "pass": true
+        },
+        {
+          "label": "员工每任务调用上限",
+          "pass": true
+        },
+        {
+          "label": "预估执行费用",
+          "pass": true
+        }
+      ]
+    }
+  }
+}

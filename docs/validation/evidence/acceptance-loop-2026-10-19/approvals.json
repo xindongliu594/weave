@@ -1,0 +1,38 @@
+[
+  {
+    "id": "7268684d-8058-4658-9ff1-ab36802b3063",
+    "runId": "5784a24a-aa74-4e82-b826-fd219de5100a",
+    "agentId": "employee-2",
+    "tool": "terminal_test",
+    "arguments": {
+      "command": "node --check cli.mjs",
+      "expectedWorkspaceRevision": "f6dc017ff0848190503d05ac5500d126248876b684c261135165c2e4acfc7420"
+    },
+    "status": "approved",
+    "createdAt": "2026-10-19T13:32:05.794Z"
+  },
+  {
+    "id": "d0bf4eb5-1361-40e8-a2bc-ff6f44c4ff64",
+    "runId": "3657d6bc-24bc-42f3-b261-c8b893618a30",
+    "agentId": "employee-3",
+    "tool": "terminal_test",
+    "arguments": {
+      "command": "node --test cli.test.mjs",
+      "expectedWorkspaceRevision": "3476f1f01e3d932618e503283e8102d6d96de34e85fc063a89f41b085e915793"
+    },
+    "status": "approved",
+    "createdAt": "2026-10-19T13:35:58.542Z"
+  },
+  {
+    "id": "6807ed5f-b91b-4638-af1f-b346c4f414a4",
+    "runId": "3657d6bc-24bc-42f3-b261-c8b893618a30",
+    "agentId": "employee-3",
+    "tool": "terminal_test",
+    "arguments": {
+      "command": "node --test cli.test.mjs",
+      "expectedWorkspaceRevision": "3476f1f01e3d932618e503283e8102d6d96de34e85fc063a89f41b085e915793"
+    },
+    "status": "approved",
+    "createdAt": "2026-10-19T13:35:04.561Z"
+  }
+]

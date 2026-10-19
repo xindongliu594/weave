@@ -1,0 +1,77 @@
+{
+  "runId": "5784a24a-aa74-4e82-b826-fd219de5100a",
+  "projectId": "6d1b5010-2da9-4d35-afb8-a0619540e12d",
+  "planVersion": 1,
+  "checkedAt": "2026-10-19T13:34:40.518Z",
+  "originalBudget": 0.25,
+  "costReadiness": {
+    "recordedCost": 0.0201015,
+    "reserved": 0,
+    "availableBudget": 0.2298985,
+    "pendingCount": 0,
+    "uncertainCount": 0,
+    "receipts": []
+  },
+  "choices": {
+    "retainUncertainCosts": false,
+    "acknowledgeUnknownOperations": false
+  },
+  "nativeRequestChecked": false,
+  "unknownOperationCount": 0,
+  "unknownOperationIds": [],
+  "calls": {
+    "used": 5,
+    "limit": 32,
+    "remaining": 27
+  },
+  "tasks": [
+    {
+      "id": "develop",
+      "subject": "实现 Node 温度换算 CLI 与使用说明",
+      "recordedCost": 0.0201015,
+      "reserved": 0,
+      "budgetLimit": 0.25,
+      "availableBudget": 0.2298985,
+      "calls": 5,
+      "callLimit": 10,
+      "remainingCalls": 5,
+      "completed": true
+    },
+    {
+      "id": "verify",
+      "subject": "独立测试温度换算 CLI",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.25,
+      "availableBudget": 0.25,
+      "calls": 0,
+      "callLimit": 12,
+      "remainingCalls": 12,
+      "completed": false
+    },
+    {
+      "id": "accept",
+      "subject": "经理只读审查与最终判定",
+      "recordedCost": 0,
+      "reserved": 0,
+      "budgetLimit": 0.25,
+      "availableBudget": 0.25,
+      "calls": 0,
+      "callLimit": 8,
+      "remainingCalls": 8,
+      "completed": false
+    }
+  ],
+  "resume": {
+    "allowed": true,
+    "reasons": [],
+    "completedTaskIds": [
+      "develop"
+    ]
+  },
+  "retry": {
+    "allowed": true,
+    "reasons": [],
+    "completedTaskIds": []
+  }
+}
