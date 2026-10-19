@@ -251,7 +251,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   const contracts = taskContractErrors(plan.tasks, requireToolSupport ? plan.agents : []);
   contracts.push(...deliveryCriteriaErrors(plan));
   contracts.push(...orchestrationPatternErrors(plan));
-  check('文件交接与质量合同', contracts.length === 0, contracts.join('；'));
+  check('文件交接与质量合同', contracts.length === 0, [...new Set(contracts)].join('；'));
   let estimate = 0;
   let taskBudgetsOK = true;
   const taskBudgetErrors: string[] = [];

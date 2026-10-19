@@ -97,6 +97,30 @@ test('real malformed handoff reports independent contract errors without correct
  assert.equal(requests,calls+2,'only explicit conversation turns call the local fixture');
 });
 
+test('real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview',async()=>{
+ const evidence=JSON.parse(readFileSync(new URL('../docs/validation/evidence/orchestration-feedback-pilot-2026-10-19/real/broker-result.json',import.meta.url),'utf8'));
+ const raw=evidence.requests[0].content;
+ await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available') ON CONFLICT(id) DO NOTHING",[evidence.model.id,{...evidence.model,gatewayId:'g'}]);
+ const counts=async()=>{const result:any={};for(const table of ['organization_previews','departments','projects','project_runs'])result[table]=(await pool.query('SELECT count(*)::int n FROM '+table)).rows[0].n;return result;};
+ const before=await counts(),calls=requests,args={organizationRouting:true,modelId:evidence.model.id,policy:JSON.parse(evidence.requests[0].request.messages[1].content).policy,messages:[{role:'user',content:'本地夹具回归，仅验证开发、QA、经理交付关系；不执行。'}]};
+ response=raw;const failed=await call('/organizations/chat',args);
+ assert.equal(failed.data.preview,undefined);assert.match(failed.data.draftIssue.message,/verify.*producerTaskIds.*checkTaskId/);
+ const parts=failed.data.draftIssue.message.split('；');assert.equal(parts.length,new Set(parts).size);
+ assert.equal(failed.data.outputDiagnostic.originalOutputSHA,createHash('sha256').update(raw).digest('hex'));
+ assert.deepEqual(await counts(),before);assert.equal(requests,calls+1);
+ // Counterfactual loopback fixture, not a repaired real model response or employee result.
+ const local=JSON.parse(raw);local.candidate.deliveryCriteria=[
+  {id:'function',description:'QA验证功能',producerTaskIds:['develop'],checkTaskId:'verify',checkCriteriaIndexes:[0],independent:true},
+  {id:'package',description:'经理核对交付及测试证据',producerTaskIds:['develop','verify'],checkTaskId:'accept',checkCriteriaIndexes:[0],independent:true},
+ ];response=local;
+ const valid=await call('/organizations/chat',{...args,previousDraftIssue:failed.data.draftIssue});assert.ok(valid.data.preview,JSON.stringify(valid));
+ assert.deepEqual(valid.data.preview.plan.deliveryCriteria,local.candidate.deliveryCriteria);assert.equal(valid.data.preview.plan.agents.length,4);
+ const feedback=wire.messages.find((m:any)=>m.role==='user'&&m.content.startsWith('{"kind":"previous_organization_draft_validation"'));
+ assert.equal(JSON.parse(feedback.content).message,failed.data.draftIssue.message);
+ const after=await counts();assert.equal(after.organization_previews,before.organization_previews+1);
+ for(const table of ['departments','projects','project_runs'])assert.equal(after[table],before[table]);assert.equal(requests,calls+2);
+});
+
 test('handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract',async()=>{
  const before=(await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n,calls=requests;
  const invalid:any=candidate('pipeline');invalid.tasks[0].handoff.extra=1;

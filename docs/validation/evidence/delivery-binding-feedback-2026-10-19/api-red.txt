@@ -1,0 +1,49 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (2738.3843ms)
+✔ legacy conversation uses the same restricted generation fields while retaining its old envelope (51.7647ms)
+✔ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (453.9208ms)
+✔ real malformed handoff reports independent contract errors without correcting or saving the candidate (101.7722ms)
+✖ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (68.0669ms)
+✔ handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract (136.3478ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (53.9232ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (52.3454ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (34.6602ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (115.6864ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (118.0857ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (98.7117ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (107.6979ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (91.0673ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (95.1896ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (95.3812ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (129.5745ms)
+✔ legacy candidate without a template remains confirmable (71.1565ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (79.3186ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5507.5615
+
+✖ failing tests:
+
+test at tests\orchestration-pattern-integration.test.ts:1:10223
+✖ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (68.0669ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /verify.*producerTaskIds.*checkTaskId/. Input:
+
+  'function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；已有方案未改变，可以继续讨论修改。'
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:107:53)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；已有方案未改变，可以继续讨论修改。',
+    expected: /verify.*producerTaskIds.*checkTaskId/,
+    operator: 'match',
+    diff: 'simple'
+  }

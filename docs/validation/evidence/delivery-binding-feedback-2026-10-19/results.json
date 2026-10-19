@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "0f55e13",
+  "modelCalls": 0,
+  "productionWrites": 0,
+  "checks": {
+    "unit": 0,
+    "api": 0
+  },
+  "sha256": {
+    "packages/contracts/orchestration.ts": "7682b1ec8a9af07049a662f48a75dfd9b9ef679318a321293857f83dcc70fb88",
+    "packages/contracts/index.ts": "c8e748e31d0690f1a9e6f78c715f208d135f470f3a5f650fd864eaee12d7c3c2",
+    "apps/api/src/organization-routing.ts": "0d284f668b64e811030a198e446a25457183361d7631088b37e89e3668cd218a",
+    "apps/api/src/organization-task-planning.ts": "738c97edfcd1484f7abc327bb30688e1ebde2574abe8cd7fb97a2f50af44c3d4",
+    "tests/delivery-binding-feedback.test.ts": "65ad69ffb6ebfddc6401ca096795488efead51a43c90ef8ef980c26351f93639",
+    "tests/orchestration-pattern-integration.test.ts": "81ff6136f01258aa91d5762fede932ea66ec6f844e2d251cf7c3af1f4a3e7634"
+  }
+}

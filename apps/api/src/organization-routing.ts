@@ -38,7 +38,7 @@ export async function resolveOrganizationCandidate(raw:OrganizationCandidateV2,p
  if(department.agents.length>policy.maxAgents)throw new AppError(422,'团队人数超过本次人数上限','COLLABORATOR_LIMIT');
  if(permissionChecks(department.agents,policy).some(c=>!c.pass))throw new AppError(422,'员工模型或能力超出本次授权范围','ORGANIZATION_SCOPE_DENIED');
  const plan:Plan={agents:department.agents,rationale:candidate.rationale,tasks:candidate.tasks,orchestration:candidate.orchestration,deliveryCriteria:candidate.deliveryCriteria};
- const errors=[...deliveryCriteriaErrors(plan),...orchestrationPatternErrors(plan)];if(errors.length)throw new AppError(422,errors.join('；'),'ORGANIZATION_CHAT_PLAN_INVALID');
+ const errors=[...new Set([...deliveryCriteriaErrors(plan),...orchestrationPatternErrors(plan)])];if(errors.length)throw new AppError(422,errors.join('；'),'ORGANIZATION_CHAT_PLAN_INVALID');
  return {kind:'organization-v2' as const,candidate,department,plan,sourceDepartmentVersions};
 }
 

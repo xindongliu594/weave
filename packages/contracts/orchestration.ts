@@ -27,9 +27,12 @@ export function deliveryCriteriaErrors(plan:Pick<Plan,'tasks'|'agents'|'delivery
    const producer=byId.get(id);
    if(!producer)fail(`产出任务 ${id} 不存在`);
    else{
-    if(!upstream.has(id)||id===check.id)fail(`检查任务 ${check.id} 必须在产出任务 ${id} 之后`);
-    if(criterion.independent&&producer.assigneeId===check.assigneeId)fail(`检查任务 ${check.id} 必须由不同于 ${id} 作者的员工承担`);
-    for(const output of producer.outputs??[])if(!check.inputs?.some(input=>input.path===output.path&&input.producerTaskId===id))fail(`检查任务 ${check.id} 必须读取 ${id} 的当前产物 ${output.path}`);
+    if(id===check.id)fail(`检查任务 ${check.id} 同时出现在 producerTaskIds 与 checkTaskId，形成自我验收。producerTaskIds 只列本项被检查的产出，checkTaskId 应绑定其后的检查任务。请按产出责任拆分交付项，不能将检查者自己的产出绑定给自己验收`);
+    else{
+     if(!upstream.has(id))fail(`检查任务 ${check.id} 必须在产出任务 ${id} 之后`);
+     if(criterion.independent&&producer.assigneeId===check.assigneeId)fail(`检查任务 ${check.id} 必须由不同于 ${id} 作者的员工承担`);
+     for(const output of producer.outputs??[])if(!check.inputs?.some(input=>input.path===output.path&&input.producerTaskId===id))fail(`检查任务 ${check.id} 必须读取 ${id} 的当前产物 ${output.path}`);
+    }
     for(const output of producer.outputs??[])if(conflictingDeliveryWriters(plan.tasks,id,output.path).length)fail(`交付产物 ${output.path} 仍有后续或无序写入；必须绑定最后产出者及其后检查`);
    }
   }

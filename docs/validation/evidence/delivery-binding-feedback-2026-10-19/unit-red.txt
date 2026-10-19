@@ -1,0 +1,73 @@
+✖ self-bound delivery reports one actionable binding error and leaves the original response unchanged (13.8159ms)
+✖ both composed validation boundaries report each delivery error once (5.9705ms)
+✔ QA may author and run tests while manager independently checks the final package (3.4944ms)
+✔ different node with same author, missing inputs, wrong order and later writes still fail (3.1768ms)
+✖ the actual planning prompt contains delivery examples that validate with its own task examples (0.5921ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 2
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2740.5282
+
+✖ failing tests:
+
+test at tests\delivery-binding-feedback.test.ts:1:1757
+✖ self-bound delivery reports one actionable binding error and leaves the original response unchanged (13.8159ms)
+  AssertionError [ERR_ASSERTION]: ["function_delivery: 检查任务 verify 必须在产出任务 verify 之后","function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担","function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js"]
+
+  3 !== 1
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\delivery-binding-feedback.test.ts:24:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\delivery-binding-feedback.test.ts:1:2227
+✖ both composed validation boundaries report each delivery error once (5.9705ms)
+  AssertionError [ERR_ASSERTION]: ["function_delivery: 检查任务 verify 必须在产出任务 verify 之后","function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担","function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js","function_delivery: 检查任务 verify 必须在产出任务 verify 之后","function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担","function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js"]
+
+  6 !== 3
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\delivery-binding-feedback.test.ts:31:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 6,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\delivery-binding-feedback.test.ts:1:4312
+✖ the actual planning prompt contains delivery examples that validate with its own task examples (0.5921ms)
+  AssertionError [ERR_ASSERTION]: task examples need matching delivery bindings
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\delivery-binding-feedback.test.ts:58:73)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

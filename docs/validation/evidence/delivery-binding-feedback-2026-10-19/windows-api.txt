@@ -1,0 +1,71 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (2778.5296ms)
+✔ legacy conversation uses the same restricted generation fields while retaining its old envelope (53.7898ms)
+✔ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (460.6278ms)
+✔ real malformed handoff reports independent contract errors without correcting or saving the candidate (104.7601ms)
+✔ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (117.8901ms)
+✔ handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract (135.6721ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (55.9952ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (55.8344ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (37.4814ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (119.3334ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (123.3076ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (98.1783ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (98.3488ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (94.9521ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (96.9295ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (102.5315ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (128.0929ms)
+✔ legacy candidate without a template remains confirmable (73.3576ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (76.8374ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5601.7002
+✔ executable candidate without host mappings is rejected without save or hidden model repair (2849.3576ms)
+✔ V2 conversation recommends existing employees without changing their department and expires old drafts (154.1973ms)
+✔ out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later (227.7332ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (41.7056ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (100.0526ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (41.3812ms)
+✔ documented JSON mode preserves receipts and never retries: gpt-4.1-mini (75.0205ms)
+✔ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (76.7497ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (92.9772ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (38.5626ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (101.3221ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (77.0738ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (43.637ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (332.8497ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (149.0032ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (134.2153ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (120.1054ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (163.5565ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (358.7105ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (78.4173ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (60.3598ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (277.1784ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (297.1636ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6453.1368
+✔ confirmation creates a project only, freezes selected sources, and duplicate requests are idempotent (2920.8337ms)
+✔ superseded, edited or archived source drafts cannot create a project (93.0432ms)
+✔ new team uses the same explicit confirmation and V2 cannot enter the legacy department-update endpoint (58.3469ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3603.8436
