@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "5055aab",
+  "modelCalls": 0,
+  "productionWrites": 0,
+  "checks": {
+    "tests": 0,
+    "dry-run": 0
+  },
+  "sha256": {
+    "cases.mjs": "4e1a26e0a2302518a023e451df4607247ccc85c0f49a748183993e1658016124",
+    "worker.mjs": "a3bdc0ac4f72a1e090e909d1be0ff2bee78e955049cf3837e1a765f84e80f812",
+    "broker.mjs": "16c0960bc477a3cf2fe4b1922d6e0589dade01f8ff8bae4812a694f961a1a9b4",
+    "launch-approved.py": "b7fcce159cdddc7a26b0f27f12327e0f46b781b5ed3b046aa17b2912fd79b563",
+    "feedback.test.mjs": "02854740e427d1881c5f0978aafb0be60049088955762f330ae60d95e8845182"
+  },
+  "baseline": {
+    "checkedAt": "2026-10-19T08:12:56.081111+00:00",
+    "spent": 2.9861397,
+    "reserved": 0.07377809999999999,
+    "activeRuns": 0
+  },
+  "oldUnknowns": 6,
+  "quote": {
+    "reservation": 0.0177336,
+    "maxOutputTokens": 4000,
+    "requestBytes": 42057,
+    "messages": 6,
+    "model": "deepseek-v4.1-flash",
+    "inputRate": 0.3,
+    "outputRate": 1.2
+  }
+}

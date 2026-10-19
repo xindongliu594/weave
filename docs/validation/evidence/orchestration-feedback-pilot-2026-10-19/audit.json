@@ -1,0 +1,89 @@
+{
+  "sourceCommit": "5055aab",
+  "realCalls": 1,
+  "localReplays": 1,
+  "validPreviews": 0,
+  "selectedTemplate": "review_repair",
+  "requestId": "bd54c7dc-58a6-413b-93ea-888c02d81cc6",
+  "receiptId": "0c20d583-842c-4ed4-80e2-1cd4e0578bbc",
+  "finishReason": "stop",
+  "cost": 0.0057051,
+  "reserved": 0.0177375,
+  "inputTokens": 9685,
+  "outputTokens": 2333,
+  "occupied": 3.065622900000002,
+  "unchangedUnknowns": 6,
+  "strictSchemaValid": true,
+  "independentTaskContractErrors": [],
+  "deliveryErrors": [
+    "function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js"
+  ],
+  "outputSHA256": "60de83d7d1d006743a5325a50fbf429eb8b957f3d0f77b520b56cce8d33f984e",
+  "projectWrites": 0,
+  "departmentWrites": 0,
+  "criterion": {
+    "id": "function_delivery",
+    "description": "实现摄氏转华氏函数并通过独立 QA 测试：0→32、100→212、非法输入抛错。",
+    "producerTaskIds": [
+      "develop",
+      "verify"
+    ],
+    "checkTaskId": "verify",
+    "checkCriteriaIndexes": [
+      0
+    ],
+    "independent": true
+  },
+  "dag": [
+    {
+      "id": "clarify",
+      "assignee": "analyst",
+      "dependencies": [],
+      "outputs": []
+    },
+    {
+      "id": "develop",
+      "assignee": "developer",
+      "dependencies": [
+        "clarify"
+      ],
+      "outputs": [
+        {
+          "path": "src/temperature.js",
+          "format": "text"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "assignee": "qa",
+      "dependencies": [
+        "develop"
+      ],
+      "outputs": []
+    },
+    {
+      "id": "verify",
+      "assignee": "qa",
+      "dependencies": [
+        "review"
+      ],
+      "outputs": [
+        {
+          "path": "test/temperature.test.js",
+          "format": "text"
+        }
+      ]
+    },
+    {
+      "id": "accept",
+      "assignee": "manager",
+      "dependencies": [
+        "review",
+        "verify"
+      ],
+      "outputs": []
+    }
+  ],
+  "note": "One real correction failed independent delivery acceptance; no employee execution, deployment, or automatic retry."
+}

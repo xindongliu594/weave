@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-10-19T08:12:56.081111+00:00",
+  "spent": 2.9861397,
+  "reserved": 0.07377809999999999,
+  "holds": [
+    {
+      "id": "26e850af-4ed9-4a5e-abd8-6bf84ec76599",
+      "status": "uncertain",
+      "amount": 0.0022239
+    },
+    {
+      "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+      "status": "uncertain",
+      "amount": 0.03529379999999999
+    },
+    {
+      "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+      "status": "uncertain",
+      "amount": 0.0025932
+    },
+    {
+      "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+      "status": "uncertain",
+      "amount": 0.0192111
+    },
+    {
+      "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+      "status": "uncertain",
+      "amount": 0.014085
+    },
+    {
+      "id": "f865392a-f575-4f5b-9041-59954d407986",
+      "status": "uncertain",
+      "amount": 0.00037109999999999997
+    }
+  ],
+  "model": {
+    "id": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+    "name": "Go \u00b7 DeepSeek V4.1 Flash",
+    "model": "deepseek-v4.1-flash",
+    "inputRate": 0.3,
+    "outputRate": 1.2,
+    "protocol": "chat-completions",
+    "thinkingMode": "disabled",
+    "capabilities": {
+      "tools": {
+        "status": "supported",
+        "testId": "5d473912-c1b6-4d78-ad46-608ad47bf9f3",
+        "checkedAt": "2026-10-08T08:54:32.757Z",
+        "probeVersion": "chat-tools-roundtrip-v1"
+      }
+    }
+  },
+  "activeRuns": 0
+}

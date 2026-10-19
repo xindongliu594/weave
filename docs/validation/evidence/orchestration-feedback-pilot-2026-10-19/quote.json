@@ -1,0 +1,9 @@
+{
+  "reservation": 0.0177336,
+  "maxOutputTokens": 4000,
+  "requestBytes": 42057,
+  "messages": 6,
+  "model": "deepseek-v4.1-flash",
+  "inputRate": 0.3,
+  "outputRate": 1.2
+}

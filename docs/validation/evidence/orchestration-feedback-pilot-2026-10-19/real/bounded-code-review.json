@@ -1,0 +1,14 @@
+{
+  "reply": "按上一轮校验反馈一次修正：把交接内容只放进 handoff.sections；开发任务补齐逐项验收映射；Node 测试映射补上 minimumTests；需求分析师改为只用文字澄清，不写文件，避免无写入权限还声明输出。方案仍只是待确认预览，不保存部门或项目，不执行命令；所有员工使用策略唯一允许的模型，并省略 reasoningEffort（沿用模型默认）。文件合同不变：实现放 src/temperature.js，QA 测试放 test/temperature.test.js，真实验证命令为 node --test test/temperature.test.js。编排采用 review_repair 的离线预览：开发→独立审查（最多 1 轮有范围修复并复审）→独立 QA 写并运行测试→经理只读验收；审查与 QA 由同一位独立质量审查员分两个节点承担，不为节点额外加人。",
+  "draftIssue": {
+    "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+    "message": "function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；已有方案未改变，可以继续讨论修改。"
+  },
+  "outputDiagnostic": {
+    "finishReason": "stop",
+    "originalOutputSHA": "60de83d7d1d006743a5325a50fbf429eb8b957f3d0f77b520b56cce8d33f984e",
+    "outputBytes": 9505,
+    "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+    "position": null
+  }
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "id": "bounded-code-review",
+    "httpStatus": 200,
+    "milliseconds": 13950,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；function_delivery: 检查任务 verify 必须在产出任务 verify 之后；function_delivery: 检查任务 verify 必须由不同于 verify 作者的员工承担；function_delivery: 检查任务 verify 必须读取 verify 的当前产物 test/temperature.test.js；已有方案未改变，可以继续讨论修改。"
+    },
+    "outputDiagnostic": {
+      "finishReason": "stop",
+      "originalOutputSHA": "60de83d7d1d006743a5325a50fbf429eb8b957f3d0f77b520b56cce8d33f984e",
+      "outputBytes": 9505,
+      "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "position": null
+    },
+    "previewId": null
+  }
+]

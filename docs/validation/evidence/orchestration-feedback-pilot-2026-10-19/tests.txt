@@ -1,0 +1,20 @@
+✔ feedback correction refuses a second dispatch and a quote above its two-cent allocation (1.603491ms)
+✔ actual isolated worker replays original failure then sends one correction with the product feedback (4005.282414ms)
+✔ timeout or signal exit must not be reported as success (5.090314ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (6.426844ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (5.23638ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (2.962816ms)
+✔ repair smoke can stop after one invalid preview without claiming acceptance (4.599607ms)
+✔ repair smoke reports acceptance only after both selected cases pass (3.736252ms)
+✔ trial refuses excess calls, per-call/phase/cumulative spend and uncertain receipts before dispatch (1.06109ms)
+✔ seven small distinct scenarios carry only synthetic content and immutable shard references (0.310653ms)
+✔ repair smoke selects only two fixed cases and rejects a third request or more than four cents (0.848461ms)
+✔ repair smoke stops after an invalid real preview but dry-run still assembles both requests (0.168328ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4072.631403

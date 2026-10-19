@@ -1,9 +1,9 @@
 """After explicit approval, keep only two live configuration values inside JJ."""
 import os,pathlib,subprocess,sys
-assert sys.argv[1:] in [['--approved-real'],['--approved-real','repair-smoke']]
+assert sys.argv[1:] in [['--approved-real'],['--approved-real','repair-smoke'],['--approved-real','feedback-correction']]
 profile=sys.argv[2] if len(sys.argv)==3 else 'original'
 root=pathlib.Path('/home/jj/.local/share/weiwu')
-base=root/'validation'/({'original':'orchestration-20261019-580aafb','repair-smoke':'orchestration-smoke-20261019-4283f2b'}[profile]);repo=base/'source'
+base=root/'validation'/({'original':'orchestration-20261019-580aafb','repair-smoke':'orchestration-smoke-20261019-4283f2b','feedback-correction':'orchestration-correction-20261019-5055aab'}[profile]);repo=base/'source'
 live=pathlib.Path(subprocess.check_output(['systemctl','--user','show','weiwu-jj.service','--property=WorkingDirectory','--value'],text=True).strip())
 assert live==root/'releases/weiwu-task-organization-20261018';assert not (base/'real').exists()
 matches=[]
