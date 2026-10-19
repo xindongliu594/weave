@@ -15,6 +15,7 @@ export function getTrial(profile='original'){
  if(profile==='original')return {cases,limits:trialLimits,sourceCommit:'580aafb',stopOnInvalid:false};
  if(profile==='repair-smoke')return {cases:[cases[0],cases[4]],limits:{...trialLimits,maxCalls:2,maxTrialCost:.04,maxTokens:4000},sourceCommit:'4283f2b',stopOnInvalid:true};
  if(profile==='feedback-correction')return {cases:[cases[4]],limits:{...trialLimits,maxCalls:1,maxTrialCost:.02,maxTokens:4000},sourceCommit:'5055aab',stopOnInvalid:true};
+ if(profile==='delivery-binding')return {cases:[cases[4]],limits:{...trialLimits,maxCalls:1,maxTrialCost:.02,maxTokens:4000},sourceCommit:'a05f034',stopOnInvalid:true};
  throw Error('Unknown fixed trial profile');
 }
 export function stopAfterResult(trial,mode,result){return mode==='approved-real'&&trial.stopOnInvalid&&!result.preview;}

@@ -8,12 +8,13 @@ import {pathToFileURL} from 'node:url';
 import {randomUUID} from 'node:crypto';
 import {getTrial,checkQuote} from './cases.mjs';
 const [mode,repo,outArg,profile='original']=process.argv.slice(2),out=resolve(outArg),trial=getTrial(profile),{cases,limits:trialLimits}=trial;
+const correction=['feedback-correction','delivery-binding'].includes(profile);
 assert.ok(['dry-run','approved-real'].includes(mode));process.umask(0o077);mkdirSync(out); // An existing trial cannot be replayed.
 const report={mode,profile,sourceCommit:trial.sourceCommit,limits:trialLimits,requests:[],startedAt:new Date().toISOString()},save=()=>writeFileSync(join(out,'broker-result.json'),JSON.stringify(report,null,2));
 const api=async route=>{const r=await fetch('http://127.0.0.1:4310/api/'+route);assert.ok(r.ok);return r.json();};
 const totals=async()=>{const usage=await api('usage'),costs=await api('costs');const holds=costs.calls.map(c=>({id:c.id,status:c.status,amount:c.amount})).sort((a,b)=>a.id.localeCompare(b.id));return {spent:usage.reduce((s,u)=>s+u.cost,0),reserved:holds.reduce((s,c)=>s+c.amount,0),holds};};
 let model={id:'isolated-model',name:'Dry-run only',model:'deepseek-v4.1-flash',inputRate:.3,outputRate:1.2,status:'available'},pool,completeBudgeted,budgetedRequestEstimate;
-if(profile==='feedback-correction')model.id='c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051';
+if(correction)model.id='c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051';
 if(mode==='approved-real'){
  assert.ok(process.env.DATABASE_URL&&process.env.DATA_DIR,'Operator-approved broker config required');
  const models=(await api('models')).filter(m=>m.id==='c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051'&&m.status==='available');assert.equal(models.length,1);model=models[0];
@@ -36,7 +37,7 @@ async function handleRequest(line){
   request=JSON.parse(line.slice('ORCHESTRATION_REQUEST '.length));assert.equal(accepting,true);assert.equal(stopped,false);assert.equal(busy,false);busy=true;
   assert.equal(request.id,cases[report.requests.length]?.id,'Each case can dispatch only once in order');
   const body=request.body;assert.equal(body.model,model.model);assert.ok(Array.isArray(body.messages));
-  if(profile==='feedback-correction')assert.deepEqual(body.messages.map(m=>m.role),['system','system','user','user','assistant','user']);
+  if(correction)assert.deepEqual(body.messages.map(m=>m.role),['system','system','user','user','assistant','user']);
   else {assert.ok(body.messages.length<=5);assert.ok(body.messages.every(m=>['system','user'].includes(m.role)));}
   assert.ok(body.messages.every(m=>typeof m.content==='string'));assert.ok(Buffer.byteLength(JSON.stringify(body))<300000);assert.ok(Number.isSafeInteger(body.max_tokens)&&body.max_tokens>0&&body.max_tokens<=trialLimits.maxTokens);assert.ok(!body.tools&&!body.stream);
   const options=body.response_format?{response_format:body.response_format}:{};
@@ -45,7 +46,7 @@ async function handleRequest(line){
   const now=mode==='approved-real'?await totals():{spent:0,reserved:0,holds:[]};
   checkQuote({used,calls:report.requests.length,quote,occupied:now.spent+now.reserved,unknownChanged:mode==='approved-real'&&JSON.stringify(now.holds)!==JSON.stringify(report.before.holds)},trialLimits);
   entry={id:request.id,requestId:randomUUID(),reserved:quote,request:body,attemptStartedAt:new Date().toISOString()};report.requests.push(entry);save();
-  const result=mode==='approved-real'?await completeBudgeted(model,body.messages,body.max_tokens,{purpose:profile==='feedback-correction'?'编排草案反馈一次纠正':profile==='repair-smoke'?'编排修复两例复测':'七类编排隔离规划测试',maxCost:Math.min(trialLimits.maxCallCost,trialLimits.maxTrialCost-used),timeoutMs:180000,context:{experiment:'orchestration-planning-20261019'+(profile==='original'?'':':'+profile),caseId:request.id,requestId:entry.requestId,sessionId:'orchestration-test:'+(profile==='original'?'':profile+':')+request.id}},options):{choices:[{message:{content:JSON.stringify({reply:'DRY RUN：仅验证接口连通，不提供真实模型方案。'})}}],usage:{prompt_tokens:1,completion_tokens:1}};
+  const result=mode==='approved-real'?await completeBudgeted(model,body.messages,body.max_tokens,{purpose:profile==='delivery-binding'?'交付映射修复单次验证':profile==='feedback-correction'?'编排草案反馈一次纠正':profile==='repair-smoke'?'编排修复两例复测':'七类编排隔离规划测试',maxCost:Math.min(trialLimits.maxCallCost,trialLimits.maxTrialCost-used),timeoutMs:180000,context:{experiment:'orchestration-planning-20261019'+(profile==='original'?'':':'+profile),caseId:request.id,requestId:entry.requestId,sessionId:'orchestration-test:'+(profile==='original'?'':profile+':')+request.id}},options):{choices:[{message:{content:JSON.stringify({reply:'DRY RUN：仅验证接口连通，不提供真实模型方案。'})}}],usage:{prompt_tokens:1,completion_tokens:1}};
   entry.returnedAt=new Date().toISOString();entry.usageId=result.usageId;entry.usage=result.usage;entry.content=result.choices[0].message.content;entry.finishReason=result.choices[0].finish_reason;
   if(mode==='approved-real'){const usage=(await api('usage')).find(u=>u.id===result.usageId);assert.ok(usage);entry.cost=usage.cost;assert.ok(entry.cost<=entry.reserved+1e-9);}else entry.cost=0;
   responseReply={result};

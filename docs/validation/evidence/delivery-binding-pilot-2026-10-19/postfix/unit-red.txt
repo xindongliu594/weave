@@ -1,0 +1,56 @@
+✔ new AI candidate cannot pin an external old hash after an upstream writer (2.5799ms)
+✔ new AI candidate requires a real minimum count for each Node test mapping (0.3969ms)
+✔ fixed source files remain valid when no earlier task writes them (0.2741ms)
+✔ Node flags cannot bypass the supported test-count parser in a new candidate (0.309ms)
+✖ untouched real preview cannot require the developer to run a future QA output (5.8558ms)
+✖ known Node command files must be own outputs or declared inputs from completed predecessors (0.6322ms)
+✔ narrow literal Node path checks do not pretend to parse flags, shell scripts or unknown files (0.4698ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2111.7072
+
+✖ failing tests:
+
+test at tests\planning-acceptance.test.ts:1:2751
+✖ untouched real preview cannot require the developer to run a future QA output (5.8558ms)
+  AssertionError [ERR_ASSERTION]: []
+
+  0 !== 1
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-acceptance.test.ts:45:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\planning-acceptance.test.ts:1:3443
+✖ known Node command files must be own outputs or declared inputs from completed predecessors (0.6322ms)
+  AssertionError [ERR_ASSERTION]: node --test "tests/cli test.mjs"
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-acceptance.test.ts:54:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

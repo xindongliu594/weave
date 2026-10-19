@@ -4,9 +4,20 @@ export const planningBudgetInstructions = '任务 estimatedInputTokens 与 estim
 
 const managerHandoffInstructions = '你作为派工经理，在每个新任务的 handoff.sections 中定义 1 至 8 项交接必答内容，每项包含唯一英文 key 与中文 requirement。例如开发交代使用方法与已知限制，QA 交代覆盖、失败与证据位置，经理交代逐项结论和交付入口。结合实际任务编写，不复制整份日志或知识原文；员工通过原生任务更新 output 提交简短 JSON，验收结果和真实文件/命令回执仍单独核验。不要要求员工或用户填写另一份配置文件。';
 
-export const planningAcceptanceInstructions = managerHandoffInstructions + '有 verify 的任务必须由你生成 acceptanceChecks，不能让用户手填内部合同：每条 acceptanceCriteria 恰好对应一个 criterionIndex（从 0 开始），command 必须逐字来自该任务 verify，默认 expectedExitCode=0。最低测试数 minimumTests 只用于单条 node --test，按需求实际需覆盖的用例数量规划，不能为通过门禁随意填 1；失败、跳过或待办均不通过。语法检查只证明语法可运行，不能把功能正确当作语法检查的结论；功能标准交给独立 QA 的真实测试。简单确定输出可用 expectedOutput 精确比较（包含真实换行），不要写不确定的耗时或路径。经理审查应核对当前版本与实际 QA 回执；有终端权限时可安排独立复测。没有执行工具的文字任务不编造命令或通过结果。';
+export const planningAcceptanceInstructions = managerHandoffInstructions + '每个节点的验证命令只能依赖当前可得文件：自己的输出或合法前置输入，不能依赖后续 QA 才创建的测试文件。开发自检与后续独立功能验收分别规划。有 verify 的任务必须由你生成 acceptanceChecks，不能让用户手填内部合同：每条 acceptanceCriteria 恰好对应一个 criterionIndex（从 0 开始），command 必须逐字来自该任务 verify，默认 expectedExitCode=0。最低测试数 minimumTests 只用于单条 node --test，按需求实际需覆盖的用例数量规划，不能为通过门禁随意填 1；失败、跳过或待办均不通过。语法检查只证明语法可运行，不能把功能正确当作语法检查的结论；功能标准交给独立 QA 的真实测试。简单确定输出可用 expectedOutput 精确比较（包含真实换行），不要写不确定的耗时或路径。经理审查应核对当前版本与实际 QA 回执；有终端权限时可安排独立复测。没有执行工具的文字任务不编造命令或通过结果。';
 
 /** New model plans need explicit checks; legacy saved plans remain valid. */
+// Deliberately narrow: literal paths in the simple Node forms we already teach.
+// Flags, shell expressions and other runners need their own execution evidence.
+function literalNodeFiles(command:string){
+  const match=/^node(?:\.exe)?\s+--(?:test|check)\s+(.+)$/i.exec(command);
+  if(!match||/[;&|<>\r\n`$*?{}\[\]\\]/.test(match[1]))return [];
+  const tokens=match[1].match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s"']+/g)??[];
+  if(tokens.join(' ').replace(/\s+/g,' ')!==match[1].trim().replace(/\s+/g,' '))return [];
+  const paths=tokens.map(token=>token.replace(/^(["'])(.*)\1$/,'$2').replace(/^\.\//,''));
+  return paths.some(path=>path.startsWith('-'))?[]:paths;
+}
+
 export function plannedAcceptanceErrors(tasks: Plan['tasks']) {
   const errors: string[] = [], byId = new Map(tasks.map(task => [task.id, task]));
   for (const task of tasks) {
@@ -21,10 +32,17 @@ export function plannedAcceptanceErrors(tasks: Plan['tasks']) {
     const upstream = new Set<string>();
     const walk = (id: string) => { for (const dep of byId.get(id)?.dependencies ?? []) if (!upstream.has(dep)) { upstream.add(dep); walk(dep); } };
     walk(task.id);
+    for(const command of new Set(task.verify??[]))for(const path of literalNodeFiles(command)){
+      if(task.outputs?.some(output=>output.path===path)||task.inputs?.some(input=>input.path===path))continue;
+      const writers=tasks.filter(source=>source.id!==task.id&&source.outputs?.some(output=>output.path===path));
+      if(!writers.length)continue; // Existing files without a planned writer cannot be inferred here.
+      if(writers.some(source=>upstream.has(source.id)))errors.push(`${task.id}: 命令文件 ${path} 必须在 inputs 中绑定前置产出任务，不能隐式读取`);
+      else errors.push(`${task.id}: 验证命令 ${command} 使用了后续或并行任务 ${writers.map(source=>source.id).join(',')} 才产出的文件 ${path}；当前节点必须使用自己的输出或合法前置输入，功能测试留给产物可用后的 QA`);
+    }
     for (const input of task.inputs ?? []) if (!input.producerTaskId && tasks.some(source => upstream.has(source.id) && source.outputs?.some(output => output.path === input.path)))
       errors.push(`${task.id}: 输入 ${input.path} 已由前置任务更新，必须绑定来源任务 producerTaskId，不能固定修改前的 SHA256`);
   }
-  return errors;
+  return [...new Set(errors)];
 }
 
 // Planning history remains in the archive; it is background data after approval.

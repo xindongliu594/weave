@@ -1,0 +1,870 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (14211.6982ms)
+✔ legacy conversation uses the same restricted generation fields while retaining its old envelope (50.9932ms)
+✔ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (449.9921ms)
+✔ real malformed handoff reports independent contract errors without correcting or saving the candidate (96.2701ms)
+✔ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (113.6456ms)
+✔ handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract (126.0771ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (52.2658ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (51.191ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (34.2077ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (109.5268ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (93.6379ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (90.693ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (94.343ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (112.4271ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (99.3768ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (99.4927ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (131.0483ms)
+✔ legacy candidate without a template remains confirmable (69.3544ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (78.0736ms)
+✖ a real preview with a future QA test command is rejected before saving and without hidden repair (88.9722ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 19
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20771.8487
+
+✖ failing tests:
+
+test at tests\orchestration-pattern-integration.test.ts:1:21982
+✖ a real preview with a future QA test command is rejected before saving and without hidden repair (88.9722ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + {
+  +   candidate: {
+  +     deliveryCriteria: [
+  +       {
+  +         checkCriteriaIndexes: [
+  +           0,
+  +           1
+  +         ],
+  +         checkTaskId: 'verify',
+  +         description: '开发实现的功能由独立 QA 编写并实际运行测试验证',
+  +         id: 'function',
+  +         independent: true,
+  +         producerTaskIds: [
+  +           'develop'
+  +         ]
+  +       },
+  +       {
+  +         checkCriteriaIndexes: [
+  +           0
+  +         ],
+  +         checkTaskId: 'accept',
+  +         description: '经理核对包含实现、说明与测试文件的完整交付',
+  +         id: 'package',
+  +         independent: true,
+  +         producerTaskIds: [
+  +           'develop',
+  +           'verify'
+  +         ]
+  +       }
+  +     ],
+  +     orchestration: {
+  +       pattern: 'pipeline',
+  +       rationale: '存在明确前后依赖：实现→独立审查→独立测试→经理验收。审查与 QA 由同一独立员工分两节点承担，节点数不等于员工数，不额外增加员工。采用 pipeline 旧布局，不绑定预览模板，不宣称已验收。',
+  +       template: {
+  +         definitionHash: '0cd1d11b121853e58ee87462e1f3e27cacdf0dba1cd71d58a6a5423dc7bc67ec',
+  +         id: 'pipeline',
+  +         schemaVersion: 1,
+  +         taskIds: [
+  +           'develop',
+  +           'review',
+  +           'verify',
+  +           'accept'
+  +         ],
+  +         version: 1
+  +       }
+  +     },
+  +     rationale: '三人分工：开发负责实现与说明，QA 负责只读审查与独立测试，经理负责派工与最终验收。审查人（qa）与实现人（developer）不同，满足独立性；测试文件由 QA 自己编写并运行，不把测试任务列为开发者产出的检查者，避免上一轮的自我验收问题。文件合同限定在 src/temperature.js、README.md 与 test/temperature.test.js，验证命令为 node --test test/temperature.test.js。本轮不实际调用终端，所有结果以保存后真实运行为准。',
+  +     schemaVersion: 2,
+  +     target: {
+  +       department: {
+  +         agents: [
+  +           {
+  +             id: 'manager',
+  +             instructions: '拆解并派发任务，核对每位成员按合同提交的产物与证据，最后只读验收；不自行扩大授权或预算，不代替 QA 编写测试，不在无执行工具时声称命令已运行。',
+  +             modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +             name: '协调经理',
+  +             role: 'manager',
+  +             title: '协调经理',
+  +             tools: [
+  +               'filesystem'
+  +             ]
+  +           },
+  +           {
+  +             id: 'developer',
+  +             instructions: '在工作区实现 src/temperature.js，导出摄氏转华氏函数，0→32、100→212，非法输入抛出错误；同步编写简短使用说明 README.md。先检查现有文件，最小必要修改，不修改测试与验收文件。',
+  +             modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +             name: '开发工程师',
+  +             role: 'member',
+  +             title: '开发工程师',
+  +             tools: [
+  +               'filesystem',
+  +               'artifact_write',
+  +               'terminal'
+  +             ]
+  +           },
+  +           {
+  +             id: 'qa',
+  +             instructions: '独立审查开发实现，记录具体问题与结论；随后独立编写 test/temperature.test.js 并实际运行 node --test，不得修改开发实现文件，如实报告失败与覆盖缺口。',
+  +             modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +             name: '质量审查员',
+  +             role: 'member',
+  +             title: '质量审查员',
+  +             tools: [
+  +               'filesystem',
+  +               'artifact_write',
+  +               'terminal'
+  +             ]
+  +           }
+  +         ],
+  +         description: '实现并验证极小的 Node.js 摄氏转华氏函数，含独立测试与经理验收。仅预览，不保存不执行。',
+  +         name: '温度转换小分队'
+  +       },
+  +       kind: 'new'
+  +     },
+  +     tasks: [
+  +       {
+  +         acceptanceChecks: [
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 0,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 1,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 2,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 3,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           }
+  +         ],
+  +         acceptanceCriteria: [
+  +           'src/temperature.js 导出可调用的摄氏转华氏函数，0 对应 32、100 对应 212',
+  +           '非法输入抛出错误，不被静默转换',
+  +           'README.md 说明用法、输入边界与已知限制',
+  +           '开发产物不包含测试文件，测试由独立 QA 另行编写'
+  +         ],
+  +         assigneeId: 'developer',
+  +         dependencies: [],
+  +         estimatedInputTokens: 40000,
+  +         estimatedOutputTokens: 5000,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'usage',
+  +               requirement: '说明函数导出位置、调用方式与返回类型'
+  +             },
+  +             {
+  +               key: 'boundaries',
+  +               requirement: '说明非法输入的判定范围与错误抛出方式'
+  +             },
+  +             {
+  +               key: 'limitations',
+  +               requirement: '列出已知限制与未覆盖的场景'
+  +             }
+  +           ]
+  +         },
+  +         id: 'develop',
+  +         inScope: [
+  +           'src/temperature.js',
+  +           'README.md'
+  +         ],
+  +         inputs: [],
+  +         kind: 'implementation',
+  +         maxOutputTokens: 4096,
+  +         objective: '在工作区实现 src/temperature.js，导出 Celsius 转 Fahrenheit 的函数，满足 0→32、100→212；非法输入（非数字、NaN、Infinity、null、字符串等）抛出错误。同时编写 README.md 说明用法、边界与已知限制。先检查现有文件，最小必要修改，不创建或修改测试文件。',
+  +         outOfScope: [
+  +           'test/temperature.test.js',
+  +           'package.json'
+  +         ],
+  +         outputs: [
+  +           {
+  +             format: 'text',
+  +             path: 'src/temperature.js'
+  +           },
+  +           {
+  +             format: 'text',
+  +             path: 'README.md'
+  +           }
+  +         ],
+  +         subject: '实现摄氏转华氏函数与使用说明',
+  +         verify: [
+  +           'node --test test/temperature.test.js'
+  +         ]
+  +       },
+  +       {
+  +         acceptanceCriteria: [
+  +           '按需求逐项核对实现与说明，列出依据、具体问题与审查结论',
+  +           '不得把尚未运行的测试写成已通过'
+  +         ],
+  +         assigneeId: 'qa',
+  +         dependencies: [
+  +           'develop'
+  +         ],
+  +         estimatedInputTokens: 20000,
+  +         estimatedOutputTokens: 1500,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'findings',
+  +               requirement: '逐项提供需求、当前实现版本、核对依据、真实问题与审查结论；明确区分已验证与推测'
+  +             }
+  +           ]
+  +         },
+  +         id: 'review',
+  +         inputs: [
+  +           {
+  +             path: 'src/temperature.js',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'README.md',
+  +             producerTaskId: 'develop'
+  +           }
+  +         ],
+  +         kind: 'review',
+  +         maxOutputTokens: 4096,
+  +         maxReworkRounds: 1,
+  +         objective: '只读审查 src/temperature.js 与 README.md，对照需求记录具体问题、依据与结论；如存在真实问题，最多允许一轮有范围的修复与复审。审查人不得修改开发实现文件；后续 QA 等待审查完成后再读取产物。',
+  +         outputs: [],
+  +         reviewedTaskId: 'develop',
+  +         subject: '独立审查实现并按问题限定返工'
+  +       },
+  +       {
+  +         acceptanceChecks: [
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 0,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 1,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 2,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           }
+  +         ],
+  +         acceptanceCriteria: [
+  +           '测试覆盖 0→32、100→212、普通值转换与非法输入抛错，至少 4 项真实测试',
+  +           '实际运行 node --test test/temperature.test.js 且全部通过',
+  +           '测试文件由 QA 自己编写，未修改开发实现文件'
+  +         ],
+  +         assigneeId: 'qa',
+  +         dependencies: [
+  +           'develop',
+  +           'review'
+  +         ],
+  +         estimatedInputTokens: 40000,
+  +         estimatedOutputTokens: 4000,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'coverage',
+  +               requirement: '说明测试覆盖的功能点与边界'
+  +             },
+  +             {
+  +               key: 'failures',
+  +               requirement: '如实记录失败、跳过或未覆盖项'
+  +             },
+  +             {
+  +               key: 'evidence',
+  +               requirement: '给出实际运行命令与结果摘要位置'
+  +             }
+  +           ]
+  +         },
+  +         id: 'verify',
+  +         inScope: [
+  +           'test/temperature.test.js'
+  +         ],
+  +         inputs: [
+  +           {
+  +             path: 'src/temperature.js',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'README.md',
+  +             producerTaskId: 'develop'
+  +           }
+  +         ],
+  +         kind: 'verification',
+  +         maxOutputTokens: 4096,
+  +         objective: '读取开发实现，独立编写 test/temperature.test.js，覆盖 0→32、100→212、普通值转换与非法输入抛错，并实际运行 node --test；不得修改开发实现文件。',
+  +         outOfScope: [
+  +           'src/temperature.js',
+  +           'README.md'
+  +         ],
+  +         outputs: [
+  +           {
+  +             format: 'text',
+  +             path: 'test/temperature.test.js'
+  +           }
+  +         ],
+  +         subject: '独立编写并运行测试',
+  +         verify: [
+  +           'node --test test/temperature.test.js'
+  +         ]
+  +       },
+  +       {
+  +         acceptanceCriteria: [
+  +           '逐项核对需求、当前文件版本、审查结论与真实测试证据，说明通过项与缺口',
+  +           '结论明确，未验证项单独列出'
+  +         ],
+  +         assigneeId: 'manager',
+  +         dependencies: [
+  +           'verify'
+  +         ],
+  +         estimatedInputTokens: 15000,
+  +         estimatedOutputTokens: 1500,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'verdict',
+  +               requirement: '按验收要求给出结论、文件版本与实际测试证据；未验证的明确列出'
+  +             }
+  +           ]
+  +         },
+  +         id: 'accept',
+  +         inputs: [
+  +           {
+  +             path: 'src/temperature.js',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'README.md',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'test/temperature.test.js',
+  +             producerTaskId: 'verify'
+  +           }
+  +         ],
+  +         kind: 'work',
+  +         maxOutputTokens: 4096,
+  +         objective: '等待审查与 QA 完成，读取当前实现、说明、测试文件及真实 QA 证据，按需求给出通过项、缺口与结论；不执行任务，不声称命令已运行。',
+  +         outputs: [],
+  +         subject: '经理只读验收'
+  +       }
+  +     ]
+  +   },
+  +   conversationId: '3fdf1e4f-5970-4b4a-9e96-62a9ac112f00',
+  +   costAccounting: 'conversation',
+  +   department: {
+  +     agents: [
+  +       {
+  +         id: 'manager',
+  +         instructions: '拆解并派发任务，核对每位成员按合同提交的产物与证据，最后只读验收；不自行扩大授权或预算，不代替 QA 编写测试，不在无执行工具时声称命令已运行。',
+  +         modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +         name: '协调经理',
+  +         role: 'manager',
+  +         title: '协调经理',
+  +         tools: [
+  +           'filesystem'
+  +         ]
+  +       },
+  +       {
+  +         id: 'developer',
+  +         instructions: '在工作区实现 src/temperature.js，导出摄氏转华氏函数，0→32、100→212，非法输入抛出错误；同步编写简短使用说明 README.md。先检查现有文件，最小必要修改，不修改测试与验收文件。',
+  +         modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +         name: '开发工程师',
+  +         role: 'member',
+  +         title: '开发工程师',
+  +         tools: [
+  +           'filesystem',
+  +           'artifact_write',
+  +           'terminal'
+  +         ]
+  +       },
+  +       {
+  +         id: 'qa',
+  +         instructions: '独立审查开发实现，记录具体问题与结论；随后独立编写 test/temperature.test.js 并实际运行 node --test，不得修改开发实现文件，如实报告失败与覆盖缺口。',
+  +         modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +         name: '质量审查员',
+  +         role: 'member',
+  +         title: '质量审查员',
+  +         tools: [
+  +           'filesystem',
+  +           'artifact_write',
+  +           'terminal'
+  +         ]
+  +       }
+  +     ],
+  +     description: '实现并验证极小的 Node.js 摄氏转华氏函数，含独立测试与经理验收。仅预览，不保存不执行。',
+  +     name: '温度转换小分队'
+  +   },
+  +   kind: 'organization-v2',
+  +   plan: {
+  +     agents: [
+  +       {
+  +         id: 'manager',
+  +         instructions: '拆解并派发任务，核对每位成员按合同提交的产物与证据，最后只读验收；不自行扩大授权或预算，不代替 QA 编写测试，不在无执行工具时声称命令已运行。',
+  +         modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +         name: '协调经理',
+  +         role: 'manager',
+  +         title: '协调经理',
+  +         tools: [
+  +           'filesystem'
+  +         ]
+  +       },
+  +       {
+  +         id: 'developer',
+  +         instructions: '在工作区实现 src/temperature.js，导出摄氏转华氏函数，0→32、100→212，非法输入抛出错误；同步编写简短使用说明 README.md。先检查现有文件，最小必要修改，不修改测试与验收文件。',
+  +         modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +         name: '开发工程师',
+  +         role: 'member',
+  +         title: '开发工程师',
+  +         tools: [
+  +           'filesystem',
+  +           'artifact_write',
+  +           'terminal'
+  +         ]
+  +       },
+  +       {
+  +         id: 'qa',
+  +         instructions: '独立审查开发实现，记录具体问题与结论；随后独立编写 test/temperature.test.js 并实际运行 node --test，不得修改开发实现文件，如实报告失败与覆盖缺口。',
+  +         modelId: 'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051',
+  +         name: '质量审查员',
+  +         role: 'member',
+  +         title: '质量审查员',
+  +         tools: [
+  +           'filesystem',
+  +           'artifact_write',
+  +           'terminal'
+  +         ]
+  +       }
+  +     ],
+  +     deliveryCriteria: [
+  +       {
+  +         checkCriteriaIndexes: [
+  +           0,
+  +           1
+  +         ],
+  +         checkTaskId: 'verify',
+  +         description: '开发实现的功能由独立 QA 编写并实际运行测试验证',
+  +         id: 'function',
+  +         independent: true,
+  +         producerTaskIds: [
+  +           'develop'
+  +         ]
+  +       },
+  +       {
+  +         checkCriteriaIndexes: [
+  +           0
+  +         ],
+  +         checkTaskId: 'accept',
+  +         description: '经理核对包含实现、说明与测试文件的完整交付',
+  +         id: 'package',
+  +         independent: true,
+  +         producerTaskIds: [
+  +           'develop',
+  +           'verify'
+  +         ]
+  +       }
+  +     ],
+  +     orchestration: {
+  +       pattern: 'pipeline',
+  +       rationale: '存在明确前后依赖：实现→独立审查→独立测试→经理验收。审查与 QA 由同一独立员工分两节点承担，节点数不等于员工数，不额外增加员工。采用 pipeline 旧布局，不绑定预览模板，不宣称已验收。',
+  +       template: {
+  +         definitionHash: '0cd1d11b121853e58ee87462e1f3e27cacdf0dba1cd71d58a6a5423dc7bc67ec',
+  +         id: 'pipeline',
+  +         schemaVersion: 1,
+  +         taskIds: [
+  +           'develop',
+  +           'review',
+  +           'verify',
+  +           'accept'
+  +         ],
+  +         version: 1
+  +       }
+  +     },
+  +     rationale: '三人分工：开发负责实现与说明，QA 负责只读审查与独立测试，经理负责派工与最终验收。审查人（qa）与实现人（developer）不同，满足独立性；测试文件由 QA 自己编写并运行，不把测试任务列为开发者产出的检查者，避免上一轮的自我验收问题。文件合同限定在 src/temperature.js、README.md 与 test/temperature.test.js，验证命令为 node --test test/temperature.test.js。本轮不实际调用终端，所有结果以保存后真实运行为准。',
+  +     tasks: [
+  +       {
+  +         acceptanceChecks: [
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 0,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 1,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 2,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 3,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           }
+  +         ],
+  +         acceptanceCriteria: [
+  +           'src/temperature.js 导出可调用的摄氏转华氏函数，0 对应 32、100 对应 212',
+  +           '非法输入抛出错误，不被静默转换',
+  +           'README.md 说明用法、输入边界与已知限制',
+  +           '开发产物不包含测试文件，测试由独立 QA 另行编写'
+  +         ],
+  +         assigneeId: 'developer',
+  +         dependencies: [],
+  +         estimatedInputTokens: 40000,
+  +         estimatedOutputTokens: 5000,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'usage',
+  +               requirement: '说明函数导出位置、调用方式与返回类型'
+  +             },
+  +             {
+  +               key: 'boundaries',
+  +               requirement: '说明非法输入的判定范围与错误抛出方式'
+  +             },
+  +             {
+  +               key: 'limitations',
+  +               requirement: '列出已知限制与未覆盖的场景'
+  +             }
+  +           ]
+  +         },
+  +         id: 'develop',
+  +         inScope: [
+  +           'src/temperature.js',
+  +           'README.md'
+  +         ],
+  +         inputs: [],
+  +         kind: 'implementation',
+  +         maxOutputTokens: 4096,
+  +         objective: '在工作区实现 src/temperature.js，导出 Celsius 转 Fahrenheit 的函数，满足 0→32、100→212；非法输入（非数字、NaN、Infinity、null、字符串等）抛出错误。同时编写 README.md 说明用法、边界与已知限制。先检查现有文件，最小必要修改，不创建或修改测试文件。',
+  +         outOfScope: [
+  +           'test/temperature.test.js',
+  +           'package.json'
+  +         ],
+  +         outputs: [
+  +           {
+  +             format: 'text',
+  +             path: 'src/temperature.js'
+  +           },
+  +           {
+  +             format: 'text',
+  +             path: 'README.md'
+  +           }
+  +         ],
+  +         subject: '实现摄氏转华氏函数与使用说明',
+  +         verify: [
+  +           'node --test test/temperature.test.js'
+  +         ]
+  +       },
+  +       {
+  +         acceptanceCriteria: [
+  +           '按需求逐项核对实现与说明，列出依据、具体问题与审查结论',
+  +           '不得把尚未运行的测试写成已通过'
+  +         ],
+  +         assigneeId: 'qa',
+  +         dependencies: [
+  +           'develop'
+  +         ],
+  +         estimatedInputTokens: 20000,
+  +         estimatedOutputTokens: 1500,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'findings',
+  +               requirement: '逐项提供需求、当前实现版本、核对依据、真实问题与审查结论；明确区分已验证与推测'
+  +             }
+  +           ]
+  +         },
+  +         id: 'review',
+  +         inputs: [
+  +           {
+  +             path: 'src/temperature.js',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'README.md',
+  +             producerTaskId: 'develop'
+  +           }
+  +         ],
+  +         kind: 'review',
+  +         maxOutputTokens: 4096,
+  +         maxReworkRounds: 1,
+  +         objective: '只读审查 src/temperature.js 与 README.md，对照需求记录具体问题、依据与结论；如存在真实问题，最多允许一轮有范围的修复与复审。审查人不得修改开发实现文件；后续 QA 等待审查完成后再读取产物。',
+  +         outputs: [],
+  +         reviewedTaskId: 'develop',
+  +         subject: '独立审查实现并按问题限定返工'
+  +       },
+  +       {
+  +         acceptanceChecks: [
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 0,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 1,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           },
+  +           {
+  +             command: 'node --test test/temperature.test.js',
+  +             criterionIndex: 2,
+  +             expectedExitCode: 0,
+  +             minimumTests: 4
+  +           }
+  +         ],
+  +         acceptanceCriteria: [
+  +           '测试覆盖 0→32、100→212、普通值转换与非法输入抛错，至少 4 项真实测试',
+  +           '实际运行 node --test test/temperature.test.js 且全部通过',
+  +           '测试文件由 QA 自己编写，未修改开发实现文件'
+  +         ],
+  +         assigneeId: 'qa',
+  +         dependencies: [
+  +           'develop',
+  +           'review'
+  +         ],
+  +         estimatedInputTokens: 40000,
+  +         estimatedOutputTokens: 4000,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'coverage',
+  +               requirement: '说明测试覆盖的功能点与边界'
+  +             },
+  +             {
+  +               key: 'failures',
+  +               requirement: '如实记录失败、跳过或未覆盖项'
+  +             },
+  +             {
+  +               key: 'evidence',
+  +               requirement: '给出实际运行命令与结果摘要位置'
+  +             }
+  +           ]
+  +         },
+  +         id: 'verify',
+  +         inScope: [
+  +           'test/temperature.test.js'
+  +         ],
+  +         inputs: [
+  +           {
+  +             path: 'src/temperature.js',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'README.md',
+  +             producerTaskId: 'develop'
+  +           }
+  +         ],
+  +         kind: 'verification',
+  +         maxOutputTokens: 4096,
+  +         objective: '读取开发实现，独立编写 test/temperature.test.js，覆盖 0→32、100→212、普通值转换与非法输入抛错，并实际运行 node --test；不得修改开发实现文件。',
+  +         outOfScope: [
+  +           'src/temperature.js',
+  +           'README.md'
+  +         ],
+  +         outputs: [
+  +           {
+  +             format: 'text',
+  +             path: 'test/temperature.test.js'
+  +           }
+  +         ],
+  +         subject: '独立编写并运行测试',
+  +         verify: [
+  +           'node --test test/temperature.test.js'
+  +         ]
+  +       },
+  +       {
+  +         acceptanceCriteria: [
+  +           '逐项核对需求、当前文件版本、审查结论与真实测试证据，说明通过项与缺口',
+  +           '结论明确，未验证项单独列出'
+  +         ],
+  +         assigneeId: 'manager',
+  +         dependencies: [
+  +           'verify'
+  +         ],
+  +         estimatedInputTokens: 15000,
+  +         estimatedOutputTokens: 1500,
+  +         handoff: {
+  +           sections: [
+  +             {
+  +               key: 'verdict',
+  +               requirement: '按验收要求给出结论、文件版本与实际测试证据；未验证的明确列出'
+  +             }
+  +           ]
+  +         },
+  +         id: 'accept',
+  +         inputs: [
+  +           {
+  +             path: 'src/temperature.js',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'README.md',
+  +             producerTaskId: 'develop'
+  +           },
+  +           {
+  +             path: 'test/temperature.test.js',
+  +             producerTaskId: 'verify'
+  +           }
+  +         ],
+  +         kind: 'work',
+  +         maxOutputTokens: 4096,
+  +         objective: '等待审查与 QA 完成，读取当前实现、说明、测试文件及真实 QA 证据，按需求给出通过项、缺口与结论；不执行任务，不声称命令已运行。',
+  +         outputs: [],
+  +         subject: '经理只读验收'
+  +       }
+  +     ]
+  +   },
+  +   policy: {
+  +     allowedKnowledgeSpaceIds: [],
+  +     allowedModelIds: [
+  +       'c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051'
+  +     ],
+  +     allowedTools: [
+  +       'filesystem',
+  +       'artifact_write',
+  +       'terminal'
+  +     ],
+  +     contextBytes: 96000,
+  +     deadlineSeconds: 600,
+  +     maxAgents: 6,
+  +     maxBudget: 0.25,
+  +     maxConcurrentAgents: 3,
+  +     maxModelCalls: 48,
+  +     maxTaskModelCalls: 16
+  +   },
+  +   previewId: 'e725028d-f78d-4951-9c9f-78178528aaee',
+  +   previewVersion: 1,
+  +   requirement: '回放未经改动的真实规划响应，不执行任务。',
+  +   source: 'model',
+  +   sourceDepartmentVersions: [],
+  +   turnId: '7a0ddb0f-51e0-4078-a6d9-eed59b927e16',
+  +   validation: {
+  +     checks: [
+  +       {
+  +         label: '任务已规划',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '策略允许的模型',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '策略允许的工具',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '策略允许的知识空间',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '策略允许的参与部门',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '组织与人数',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '并发上限',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '模型可用性',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '备用模型可用性',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '员工推理强度兼容性',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '本次资料授权',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '工作方法授权',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '导入资料授权',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '任务负责人和引用',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '任务依赖无环',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '文件交接与质量合同',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '任务费用上限',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '员工每任务调用上限',
+  +         pass: true
+  +       },
+  +       {
+  +         label: '预估执行费用',
+  +         pass: true
+  +       }
+  +     ],
+  +     errors: [],
+  +     estimate: 0.05868,
+  +     valid: true
+  +   }
+  + }
+  - undefined
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:213:41)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { kind: 'organization-v2', candidate: { schemaVersion: 2, target: [Object], rationale: '三人分工：开发负责实现与说明，QA 负责只读审查与独立测试，经理负责派工与最终验收。审查人（qa）与实现人（developer）不同，满足独立性；测试文件由 QA 自己编写并运行，不把测试任务列为开发者产出的检查者，避免上一轮的自我验收问题。文件合同限定在 src/temperature.js、README.md 与 test/temperature.test.js，验证命令为 node --test test/temperature.test.js。本轮不实际调用终端，所有结果以保存后真实运行为准。', tasks: [Array], orchestration: [Object], deliveryCriteria: [Array] }, department: { name: '温度转换小分队', description: '实现并验证极小的 Node.js 摄氏转华氏函数，含独立测试与经理验收。仅预览，不保存不执行。', agents: [Array] }, plan: { agents: [Array], rationale: '三人分工：开发负责实现与说明，QA 负责只读审查与独立测试，经理负责派工与最终验收。审查人（qa）与实现人（developer）不同，满足独立性；测试文件由 QA 自己编写并运行，不把测试任务列为开发者产出的检查者，避免上一轮的自我验收问题。文件合同限定在 src/temperature.js、README.md 与 test/temperature.test.js，验证命令为 node --test test/temperature.test.js。本轮不实际调用终端，所有结果以保存后真实运行为准。', tasks: [Array], orchestration: [Object], deliveryCriteria: [Array] }, sourceDepartmentVersions: [], conversationId: '3fdf1e4f-5970-4b4a-9e96-62a9ac112f00', turnId: '7a0ddb0f-51e0-4078-a6d9-eed59b927e16', previewVersion: 1, requirement: '回放未经改动的真实规划响应，不执行任务。', policy: { maxBudget: 0.25, maxAgents: 6, maxConcurrentAgents: 3, deadlineSeconds: 600, maxModelCalls: 48, maxTaskModelCalls: 16, contextBytes: 96000, allowedModelIds: [Array], allowedTools: [Array], allowedKnowledgeSpaceIds: [] }, source: 'model', costAccounting: 'conversation', previewId: 'e725028d-f78d-4951-9c9f-78178528aaee', validation: { valid: true, errors: [], estimate: 0.05868, checks: [Array] } },
+    expected: undefined,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

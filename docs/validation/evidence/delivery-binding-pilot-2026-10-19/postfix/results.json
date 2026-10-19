@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "a05f034",
+  "modelCalls": 0,
+  "productionWrites": 0,
+  "checks": {
+    "unit": 0,
+    "api": 0
+  },
+  "sha256": {
+    "apps/api/src/execution-prompt.ts": "0b179739170f62feb550ed8dbbd7880e345059f1ba9c7061f553a3665baf3ee8",
+    "apps/api/src/organization-task-planning.ts": "094fbb9c612444e44a17df8f42aeb6f86e9a2adc128b92fbc919a97fb4317689",
+    "tests/planning-acceptance.test.ts": "e8f56d22747e479d8e6956bbb6f29c74a92353371e7516658feaaa1a20dfc07d",
+    "tests/orchestration-pattern-integration.test.ts": "3ea023b90b70235e90e2ab916f7e2e11535c1ec9973dad3aef899af1634e7541"
+  }
+}

@@ -202,3 +202,15 @@ test('archive reads and resource recovery retain frozen orchestration without se
  const resumed=createRunArchive(root,{...recovered,recovery:{sourceRunId:archive.id,completed:[{taskId:'a'},{taskId:'check'}]}});
  assert.deepEqual(readRun(root,resumed.id).snapshot.orchestration,original.orchestration);
 });
+
+test('a real preview with a future QA test command is rejected before saving and without hidden repair',async()=>{
+ const evidence=JSON.parse(readFileSync(new URL('../docs/validation/evidence/delivery-binding-pilot-2026-10-19/real/broker-result.json',import.meta.url),'utf8'));
+ await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available') ON CONFLICT(id) DO NOTHING",[evidence.model.id,{...evidence.model,gatewayId:'g'}]);
+ const counts=async()=>{const result:any={};for(const table of ['organization_previews','departments','projects','project_runs'])result[table]=(await pool.query('SELECT count(*)::int n FROM '+table)).rows[0].n;return result;};
+ const before=await counts(),calls=requests;response=evidence.requests[0].content;
+ const policy=JSON.parse(evidence.requests[0].request.messages[1].content).policy;
+ const result=await call('/organizations/chat',{organizationRouting:true,modelId:evidence.model.id,policy,messages:[{role:'user',content:'回放未经改动的真实规划响应，不执行任务。'}]});
+ assert.equal(result.status,200);assert.equal(result.data.preview,undefined);assert.match(result.data.draftIssue.message,/develop.*后续或并行任务.*verify/);
+ assert.equal(result.data.outputDiagnostic.originalOutputSHA,'47ad11d484ba8e59100c3ab194b81a2926a76815c9e3c3db79ad5bd52baf74f5');
+ assert.deepEqual(await counts(),before);assert.equal(requests,calls+1);
+});

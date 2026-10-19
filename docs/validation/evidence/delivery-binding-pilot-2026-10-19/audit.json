@@ -1,0 +1,194 @@
+{
+  "sourceCommit": "a05f034",
+  "realCalls": 1,
+  "localReplays": 1,
+  "validPreviews": 1,
+  "selectedTemplate": "pipeline",
+  "requestId": "c6b2ea69-c955-4a09-990c-85eadcb85a69",
+  "receiptId": "f20719e1-d7ab-451a-b386-0af92126a4f3",
+  "previewId": "4d26ec1b-aa28-4625-b424-91bab491cff3",
+  "finishReason": "stop",
+  "cost": 0.0056067,
+  "reserved": 0.017864400000000002,
+  "inputTokens": 9757,
+  "outputTokens": 2233,
+  "occupied": 3.0712296000000023,
+  "unchangedUnknowns": 6,
+  "strictSchemaValid": true,
+  "trialPreviewPassed": true,
+  "currentContractPassed": false,
+  "taskContractErrors": [
+    "develop: 验证命令 node --test test/temperature.test.js 使用了后续或并行任务 verify 才产出的文件 test/temperature.test.js；当前节点必须使用自己的输出或合法前置输入，功能测试留给产物可用后的 QA"
+  ],
+  "planErrors": [],
+  "outputSHA256": "47ad11d484ba8e59100c3ab194b81a2926a76815c9e3c3db79ad5bd52baf74f5",
+  "projectWrites": 0,
+  "departmentWrites": 0,
+  "deliveryCriteria": [
+    {
+      "id": "function",
+      "description": "开发实现的功能由独立 QA 编写并实际运行测试验证",
+      "producerTaskIds": [
+        "develop"
+      ],
+      "checkTaskId": "verify",
+      "checkCriteriaIndexes": [
+        0,
+        1
+      ],
+      "independent": true
+    },
+    {
+      "id": "package",
+      "description": "经理核对包含实现、说明与测试文件的完整交付",
+      "producerTaskIds": [
+        "develop",
+        "verify"
+      ],
+      "checkTaskId": "accept",
+      "checkCriteriaIndexes": [
+        0
+      ],
+      "independent": true
+    }
+  ],
+  "dag": [
+    {
+      "id": "develop",
+      "assignee": "developer",
+      "dependencies": [],
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "src/temperature.js",
+          "format": "text"
+        },
+        {
+          "path": "README.md",
+          "format": "text"
+        }
+      ],
+      "verify": [
+        "node --test test/temperature.test.js"
+      ],
+      "handoff": {
+        "sections": [
+          {
+            "key": "usage",
+            "requirement": "说明函数导出位置、调用方式与返回类型"
+          },
+          {
+            "key": "boundaries",
+            "requirement": "说明非法输入的判定范围与错误抛出方式"
+          },
+          {
+            "key": "limitations",
+            "requirement": "列出已知限制与未覆盖的场景"
+          }
+        ]
+      }
+    },
+    {
+      "id": "review",
+      "assignee": "qa",
+      "dependencies": [
+        "develop"
+      ],
+      "inputs": [
+        {
+          "path": "src/temperature.js",
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "develop"
+        }
+      ],
+      "outputs": [],
+      "verify": [],
+      "handoff": {
+        "sections": [
+          {
+            "key": "findings",
+            "requirement": "逐项提供需求、当前实现版本、核对依据、真实问题与审查结论；明确区分已验证与推测"
+          }
+        ]
+      }
+    },
+    {
+      "id": "verify",
+      "assignee": "qa",
+      "dependencies": [
+        "develop",
+        "review"
+      ],
+      "inputs": [
+        {
+          "path": "src/temperature.js",
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "develop"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "test/temperature.test.js",
+          "format": "text"
+        }
+      ],
+      "verify": [
+        "node --test test/temperature.test.js"
+      ],
+      "handoff": {
+        "sections": [
+          {
+            "key": "coverage",
+            "requirement": "说明测试覆盖的功能点与边界"
+          },
+          {
+            "key": "failures",
+            "requirement": "如实记录失败、跳过或未覆盖项"
+          },
+          {
+            "key": "evidence",
+            "requirement": "给出实际运行命令与结果摘要位置"
+          }
+        ]
+      }
+    },
+    {
+      "id": "accept",
+      "assignee": "manager",
+      "dependencies": [
+        "verify"
+      ],
+      "inputs": [
+        {
+          "path": "src/temperature.js",
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "test/temperature.test.js",
+          "producerTaskId": "verify"
+        }
+      ],
+      "outputs": [],
+      "verify": [],
+      "handoff": {
+        "sections": [
+          {
+            "key": "verdict",
+            "requirement": "按验收要求给出结论、文件版本与实际测试证据；未验证的明确列出"
+          }
+        ]
+      }
+    }
+  ],
+  "note": "Original trial preview is preserved. Current checks separately detect the future QA file dependency; do not treat preview success as overall planning quality. No employee execution, production deployment, or automatic retry."
+}

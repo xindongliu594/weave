@@ -1,0 +1,22 @@
+✔ delivery binding pilot is one request capped at two cents with unchanged cumulative limit (1.743888ms)
+✔ delivery pilot replays untouched latest real response and forwards one deduplicated self-review correction (5021.406038ms)
+✔ feedback correction refuses a second dispatch and a quote above its two-cent allocation (1.61231ms)
+✔ actual isolated worker replays original failure then sends one correction with the product feedback (5039.867598ms)
+✔ timeout or signal exit must not be reported as success (9.762187ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (10.150124ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (5.920852ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (2.259033ms)
+✔ repair smoke can stop after one invalid preview without claiming acceptance (2.918486ms)
+✔ repair smoke reports acceptance only after both selected cases pass (2.168863ms)
+✔ trial refuses excess calls, per-call/phase/cumulative spend and uncertain receipts before dispatch (1.233999ms)
+✔ seven small distinct scenarios carry only synthetic content and immutable shard references (0.321634ms)
+✔ repair smoke selects only two fixed cases and rejects a third request or more than four cents (0.841129ms)
+✔ repair smoke stops after an invalid real preview but dry-run still assembles both requests (0.169063ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5113.856341
