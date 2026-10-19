@@ -1,0 +1,44 @@
+Task 2 focused verification — 2026-10-19
+This is a compact result record, not a full console transcript.
+All databases/workspaces were isolated test fixtures. Real provider calls: 0.
+
+RED (before implementation):
+node --import tsx --test tests/organization-recommendation-ui.test.ts
+3 pass, 1 fail: template display missing 分片汇总.
+node scripts/test-integration.mjs tests/orchestration-pattern-integration.test.ts
+2 pass, 7 fail: orchestrationCatalog absent; review_repair rejected by legacy automatic rework restriction.
+
+GREEN:
+node --import tsx --test tests/organization-recommendation-ui.test.ts
+4/4 pass, exit 0.
+
+node scripts/test-integration.mjs tests/orchestration-pattern-integration.test.ts tests/organization-routing-confirmation.test.ts tests/organization-chat.test.ts
+orchestration-pattern-integration: 10/10 pass (duration 6333.8938 ms).
+organization-routing-confirmation: 3/3 pass (duration 4291.1376 ms).
+organization-chat: 23/23 pass (duration 6582.4549 ms).
+Total 36/36 pass, exit 0. PGlite per-file isolation; loopback HTTP response fixtures only.
+Each of seven templates: preview/confirm/plan_versions pin preserved; normal, automatic and forged client flags rejected; project stays DRAFT, project_runs 0; approval does not add usage or provider requests.
+Archive/resource regression also preserves an unknown historical definitionHash without registry reselection.
+
+node --test services/agent-runtime/orchestration-profile-probe.test.mjs
+1/1 pass, exit 0 (duration 2270.4258 ms).
+AgentTeams 0.1.20 public Config/create/stage/approve.
+Seed extra contract rejected: profiles.unsupported.tasks[0].inputs is unknown.
+Legal seed carries no structured inputs/outputs.
+Public create_task description preserves host file-contract input SHA256 and output path; deliverables preserved.
+Inference 0; sandbox/business tools/external network 0.
+Public agent/pre-step guard suppresses scheduled execution. This is API compatibility evidence only.
+
+node --test services/agent-runtime/smoke.test.mjs services/agent-runtime/handoff.test.mjs services/agent-runtime/trace.test.mjs
+13/13 pass, exit 0 (duration 2328.9811 ms).
+Initial sandbox attempt: 7 passed, 3 failed (symlink EPERM and MoveFileExW EACCES); explicit tool-approved outside-sandbox rerun above passed.
+
+node --import tsx --test tests/handoff-checkpoints.test.ts tests/recovery-resource-plan.test.ts
+38/38 pass, exit 0 (duration 3156.8851 ms).
+
+npm run build
+tsc --noEmit and Vite build: exit 0.
+1713 modules transformed; build 11.47 s.
+JS chunk 624.72 kB (gzip 194.04 kB); existing >500 kB advisory remains.
+
+Task 1 results are recorded separately in contracts-tests.txt (57/57), contracts-typecheck.txt and contracts-review.md; not rerun for Task 2 because contracts were unchanged.

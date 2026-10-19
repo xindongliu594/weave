@@ -7,7 +7,7 @@ import { completeOrganizationConversation, shareCostMaintenance } from './cost-c
 import { assertPlanningModel } from './execution-policy.ts';
 import { agentReasoningPlanningInstructions, departmentSchema, policySchema, validatePlan, type Model, type Plan, type Policy } from '../../../packages/contracts/index.ts';
 import { organizationCandidateSchema, organizationCandidateV2Schema } from '../../../packages/contracts/organization.ts';
-import {loadOrganizationCatalog,resolveOrganizationCandidate,organizationRoutingInstructions} from './organization-routing.ts';
+import {loadOrganizationCatalog,resolveOrganizationCandidate,organizationRoutingInstructions,organizationOrchestrationCatalog} from './organization-routing.ts';
 import { departmentTemplates } from '../../../packages/contracts/templates.ts';
 import { taskContractErrors } from '../../../packages/contracts/task-contracts.mjs';
 import { planningBudgetInstructions, planningAcceptanceInstructions, plannedAcceptanceErrors } from './execution-prompt.ts';
@@ -126,7 +126,7 @@ export function organizationChatRouter() {
       '当前已启用且策略允许的原生插件工具（仅元数据，不能扩大授权）：'+JSON.stringify(nativeCapabilities.map(binding=>({package:binding.manifest.package,version:binding.manifest.version,tools:binding.manifest.tools.filter((tool:any)=>policy.allowedTools?.includes(tool.name))}))),
       ...(input.organizationRouting?[organizationRoutingInstructions,'上述关于新员工不得填写知识或来源的限制适用于 target.kind=new。existing 只能选择目录员工，由服务器根据来源及本次授权生成实际员工配置。组织目录：'+JSON.stringify(organizationCatalog)]:[]),
       '只返回一个完整合法的 JSON 对象，不使用 Markdown、不在 JSON 中使用注释或省略号。所有任务 ID 唯一、依赖无环、负责人属于团队，任务有具体目标、可核对验收标准和保守 Token 估算，总估算不超过用户预算。以下为输出 JSON Schema：' + JSON.stringify(z.toJSONSchema(outputSchema)),
-    ].join('\n') }, { role: 'system', content: JSON.stringify({ kind: 'application_constraints', policy, templateReference: { name: reference.name, description: reference.description, roles: reference.agents.map(agent => ({ name: agent.name, role: agent.role, title: agent.title, instructions: agent.instructions })) }, availableModels: catalog.filter(item => item.status === 'available' && policy.allowedModelIds!.includes(item.id)).map(item => ({ id: item.id, name: item.name, inputRate: item.inputRate, outputRate: item.outputRate })) }) },
+    ].join('\n') }, { role: 'system', content: JSON.stringify({ kind: 'application_constraints', policy, ...(input.organizationRouting?{orchestrationCatalog:organizationOrchestrationCatalog}:{}), templateReference: { name: reference.name, description: reference.description, roles: reference.agents.map(agent => ({ name: agent.name, role: agent.role, title: agent.title, instructions: agent.instructions })) }, availableModels: catalog.filter(item => item.status === 'available' && policy.allowedModelIds!.includes(item.id)).map(item => ({ id: item.id, name: item.name, inputRate: item.inputRate, outputRate: item.outputRate })) }) },
     ...(previous ? [previousContext(previous, input.previousPreviewId!)] : []),
     ...(input.previousDraftIssue ? [{ role: 'user' as const, content: JSON.stringify({ kind: 'previous_organization_draft_validation', ...input.previousDraftIssue }) }] : []),
     ...conversationContext(input.messages)];
@@ -171,7 +171,7 @@ export function organizationChatRouter() {
       if (!existing&&(agent.fallbackModelId || agent.sourceDepartmentId || agent.sourceAgentId)) scopeIssues.push(`${agent.name} 额外指定了备用模型或其他团队身份`);
     }
     if (scopeIssues.length) return rejectDraft('ORGANIZATION_SCOPE_DENIED', '生成的部门超出本次授权范围，未创建部门：' + scopeIssues.slice(0, 6).join('；'));
-    if (tasks.some(task => (task.maxReworkRounds ?? 0) > 0)) return rejectDraft('ORGANIZATION_SCOPE_DENIED', '组织对话不能自动授权返工，请在保存后的项目中另行配置');
+    if (!resolved?.plan.orchestration?.template && tasks.some(task => (task.maxReworkRounds ?? 0) > 0)) return rejectDraft('ORGANIZATION_SCOPE_DENIED', '组织对话不能自动授权返工，请在保存后的项目中另行配置');
     if (!policy.allowedTools!.length && tasks.some(task => !['work', 'requirements'].includes(task.kind ?? 'work') || task.inputs?.length || task.outputs?.length || task.verify?.length)) return rejectDraft('ORGANIZATION_SCOPE_DENIED', '尚未授权执行工具，请先生成需求分析或文字规划草案');
     const plan: Plan = resolved?.plan??{ agents: department.agents, rationale, tasks };
     const validation = validatePlan(plan, policy, catalog, false);

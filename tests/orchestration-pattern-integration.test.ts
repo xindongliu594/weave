@@ -1,0 +1,71 @@
+import {before,after,test} from 'node:test';
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import {once} from 'node:events';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import pg from 'pg';
+import {orchestrationFixture,orchestrationPatternIds,orchestrationPolicy} from './fixtures/orchestration-patterns.ts';
+const base=process.env.DATABASE_URL!,admin=new pg.Pool({connectionString:base}),schema='orchestration_'+Date.now();
+let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,response:any,wire:any,requests=0;
+async function call(path:string,body:any){const r=await fetch(url+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return {status:r.status,data:await r.json() as any};}
+function candidate(id:string){
+ const plan=orchestrationFixture(id);
+ // New model plans have explicit host acceptance mappings for their test command.
+ for(const t of plan.tasks)if(t.verify?.length)t.acceptanceChecks=[{criterionIndex:0,command:t.verify[0],minimumTests:1}];
+ return {schemaVersion:2,target:{kind:'new',department:{name:'离线编排验证部',description:'仅测试草案',agents:plan.agents}},rationale:plan.rationale,tasks:plan.tasks,orchestration:plan.orchestration,deliveryCriteria:plan.deliveryCriteria};
+}
+before(async()=>{
+ await admin.query('CREATE SCHEMA '+schema);const connection=new URL(base);connection.searchParams.set('options','-c search_path='+schema);process.env.DATABASE_URL=connection.toString();
+ dir=await mkdtemp(join(tmpdir(),'orchestration-'));process.env.DATA_DIR=dir;process.env.TRACE_ROOT=join(dir,'runs');process.env.OBSIDIAN_VAULT=join(dir,'vault');
+ const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
+ gateway=http.createServer(async(req:any,res:any)=>{let raw='';for await(const chunk of req)raw+=chunk;wire=JSON.parse(raw);requests++;res.setHeader('content-type','application/json');res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(response)}}],usage:{prompt_tokens:10,completion_tokens:10}}));});
+ gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
+ await pool.query("INSERT INTO gateways(id,data) VALUES('g',$1)",[{name:'Loopback fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);
+ await pool.query("INSERT INTO models(id,data,status) VALUES('m',$1,'available')",[{name:'fixture',model:'fixture',gatewayId:'g',inputRate:1,outputRate:1}]);
+ app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
+});
+after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s){s.closeAllConnections();await new Promise<void>(r=>s.close(()=>r()));}await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
+async function chat(value:any){response={reply:'请查看离线草案。',candidate:value};return call('/organizations/chat',{organizationRouting:true,modelId:'m',policy:orchestrationPolicy,messages:[{role:'user',content:'仅整理可供确认的团队协作草案并独立核对结果。'}]});}
+for(const id of orchestrationPatternIds)test(id+' previews and confirms frozen references, but all approval routes are blocked before effects',async()=>{
+ const value=candidate(id),calls=requests,result=await chat(value);
+ assert.equal(result.status,200,JSON.stringify(result));assert.ok(result.data.preview,JSON.stringify(result));assert.equal(requests,calls+1,'one loopback planning response, no hidden repair');
+ const preview=result.data.preview;assert.deepEqual(preview.plan.orchestration,value.orchestration);
+ const constraints=wire.messages.map((m:any)=>{try{return JSON.parse(m.content);}catch{return undefined;}}).find((m:any)=>m?.orchestrationCatalog);
+ assert.equal(constraints.orchestrationCatalog.length,7);assert.ok(constraints.orchestrationCatalog.every((p:any)=>p.templateExample&&p.previewOnly===true));
+ const confirmed=await call('/organizations/previews/'+preview.previewId+'/confirm',{previewVersion:1});assert.equal(confirmed.status,201,JSON.stringify(confirmed));
+ const projectId=confirmed.data.projectId;
+ for(const sql of ['SELECT plan FROM projects WHERE id=$1','SELECT plan FROM plan_versions WHERE project_id=$1'])assert.deepEqual((await pool.query(sql,[projectId])).rows[0].plan.orchestration,value.orchestration);
+ const before=requests,usage=(await pool.query('SELECT count(*)::int n FROM usage')).rows[0].n;
+ for(const flags of [{},{automatic:true},{automatic:true,executionVerified:true,status:'verified',acceptanceEvidence:['client']}]){
+  const denied=await call('/projects/'+projectId+'/approve',{version:1,...flags});assert.equal(denied.status,422,JSON.stringify(denied));assert.equal(denied.data.code,'ORCHESTRATION_PREVIEW_ONLY');assert.match(denied.data.message,/待真实验收/);assert.match(denied.data.message,/旧协作方案|真实.*验收/);
+ }
+ assert.equal(requests,before);assert.equal((await pool.query('SELECT count(*)::int n FROM usage')).rows[0].n,usage);assert.equal((await pool.query('SELECT count(*)::int n FROM project_runs')).rows[0].n,0);
+ assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[projectId])).rows[0].status,'DRAFT');
+});
+test('bad template id, hash and binding yield explicit draft issues without saving a preview',async()=>{
+ for(const mutate of [(t:any)=>t.id='unknown',(t:any)=>t.definitionHash='0'.repeat(64),(t:any)=>t.taskIds=['missing']]){
+  const value=candidate('pipeline');mutate(value.orchestration!.template);const before=(await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n;
+  const result=await chat(value);assert.equal(result.data.preview,undefined);assert.equal(result.data.draftIssue.code,'ORGANIZATION_CHAT_PLAN_INVALID');assert.match(result.data.draftIssue.message,/template|模板|绑定|missing/);assert.equal((await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n,before);
+ }
+});
+test('legacy candidate without a template remains confirmable',async()=>{
+ const value=candidate('pipeline');delete value.orchestration!.template;const result=await chat(value);assert.ok(result.data.preview,JSON.stringify(result));
+ const confirmed=await call('/organizations/previews/'+result.data.preview.previewId+'/confirm',{previewVersion:1});assert.equal(confirmed.status,201,JSON.stringify(confirmed));
+ assert.equal((await pool.query('SELECT plan FROM projects WHERE id=$1',[confirmed.data.projectId])).rows[0].plan.orchestration.template,undefined);
+});
+test('archive reads and resource recovery retain frozen orchestration without selecting a current definition',async()=>{
+ const {createRunArchive,readRun}=await import(new URL('../services/agent-runtime/trace-store.mjs',import.meta.url).href);
+ const {createGoalContract}=await import('../packages/contracts/goal-contract.mjs');
+ const {applyRecoveryResources}=await import('../apps/api/src/recovery-resource-plan.ts');
+ const plan=orchestrationFixture('router'),snapshot:any={...plan,projectId:'offline-history',planVersion:1,policy:{...orchestrationPolicy,maxTaskModelCalls:10,maxModelCalls:100}};
+ // A historical unknown definition must be readable verbatim, never upgraded.
+ snapshot.orchestration.template.definitionHash='f'.repeat(64);snapshot.goalContract=createGoalContract(snapshot);
+ const original=structuredClone(snapshot),root=join(dir,'metadata-regression'),archive=createRunArchive(root,snapshot),read=readRun(root,archive.id);
+ assert.equal(read.integrity,'ok');assert.deepEqual(read.snapshot.orchestration,original.orchestration);
+ const recovered=applyRecoveryResources(read.snapshot,{maxBudget:10,taskCallLimits:{manager:10},rationale:'保留原节点，仅确认已有额度'}, {newRevision:1,completedTaskIds:['a','check'],history:{calls:2,tasks:{}},ceiling:10});
+ assert.deepEqual(recovered.orchestration,original.orchestration);assert.deepEqual(snapshot,original);assert.deepEqual(recovered.tasks.slice(0,2),original.tasks.slice(0,2));
+ const resumed=createRunArchive(root,{...recovered,recovery:{sourceRunId:archive.id,completed:[{taskId:'a'},{taskId:'check'}]}});
+ assert.deepEqual(readRun(root,resumed.id).snapshot.orchestration,original.orchestration);
+});

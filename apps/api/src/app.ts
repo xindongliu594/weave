@@ -38,6 +38,7 @@ import { idempotency } from './idempotency.ts';
 import { obsidianRouter, syncObsidian } from './obsidian.ts';
 import {assertProjectProvenance,buildProjectTeam,validateProjectTeam} from './collaboration.ts';
 import {deliveryCriteriaRevisionErrors} from '../../../packages/contracts/orchestration.ts';
+import {orchestrationExecutionErrors} from '../../../packages/contracts/index.ts';
 import {localDeviceRouter,localTarget} from './local-execution.ts';
 import { applyNewApiPrices, catalogResult, parseModelCatalog } from './model-catalog.ts';
 import { applyOfficialPrices, officialPricingSource, officialPricingVerifiedAt } from './official-model-prices.ts';
@@ -396,6 +397,8 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
       await client.query('BEGIN');await shareCostMaintenance(client);
       const project = requireRow((await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE', [req.params.id])).rows[0]);
       if (project.version !== input.version) throw new AppError(409, '方案版本已变化，请刷新后重新批准', 'VERSION_CONFLICT');
+      const orchestrationErrors=orchestrationExecutionErrors(project.plan);
+      if(orchestrationErrors.length)throw new AppError(422,orchestrationErrors.join('；')+'；请使用无新模板引用的旧协作方案，或等待该模板完成真实小任务与恢复验收后由服务端开放。','ORCHESTRATION_PREVIEW_ONLY');
       if (hasUnplannedTasks(project.plan)) throw new AppError(422, planningRequiredMessage, 'PLAN_NOT_READY');
       existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
       if (existing) { await client.query('COMMIT'); }

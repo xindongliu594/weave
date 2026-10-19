@@ -1,5 +1,5 @@
 import type pg from 'pg';
-import {departmentSchema,permissionChecks,type Agent,type Plan,type Policy} from '../../../packages/contracts/index.ts';
+import {departmentSchema,permissionChecks,orchestrationPatterns,orchestrationPatternErrors,type Agent,type Plan,type Policy} from '../../../packages/contracts/index.ts';
 import {organizationCandidateV2Schema,type OrganizationCandidateV2} from '../../../packages/contracts/organization.ts';
 import {deliveryCriteriaErrors} from '../../../packages/contracts/orchestration.ts';
 import {buildProjectTeam} from './collaboration.ts';
@@ -38,8 +38,20 @@ export async function resolveOrganizationCandidate(raw:OrganizationCandidateV2,p
  if(department.agents.length>policy.maxAgents)throw new AppError(422,'团队人数超过本次人数上限','COLLABORATOR_LIMIT');
  if(permissionChecks(department.agents,policy).some(c=>!c.pass))throw new AppError(422,'员工模型或能力超出本次授权范围','ORGANIZATION_SCOPE_DENIED');
  const plan:Plan={agents:department.agents,rationale:candidate.rationale,tasks:candidate.tasks,orchestration:candidate.orchestration,deliveryCriteria:candidate.deliveryCriteria};
- const errors=deliveryCriteriaErrors(plan);if(errors.length)throw new AppError(422,errors.join('；'),'ORGANIZATION_CHAT_PLAN_INVALID');
+ const errors=[...deliveryCriteriaErrors(plan),...orchestrationPatternErrors(plan)];if(errors.length)throw new AppError(422,errors.join('；'),'ORGANIZATION_CHAT_PLAN_INVALID');
  return {kind:'organization-v2' as const,candidate,department,plan,sourceDepartmentVersions};
 }
 
-export const organizationRoutingInstructions='当启用任务组队时，candidate 必须为 schemaVersion:2；从 organizationCatalog 推荐适合的已有部门及员工，目录没有合适对象时提出 target.kind=new 的待确认部门。existing 只填目录 ID 和版本，主部门经理必须参加；借用员工任务负责人 ID 使用 departmentId::agentId，不复制或编造员工权限。协作模式 single/pipeline/parallel 只是建议，任务 DAG 按实际依赖生成。每条用户交付要求列入 deliveryCriteria，绑定产出任务、其后的检查任务和验收条目索引；需要独立核对时 independent=true，作者不能自验。经理等待必要检查再交付；没有合适能力要解释缺口。orchestration.rationale 解释选人和协作依据，不能声称命中了尚不存在的历史模板。';
+// Examples describe bindings only. Definitions, versions and hashes come from the
+// contract registry; this planning catalog grants no execution or tool permission.
+const bindingExamples={
+ pipeline:{taskIds:['write','check','deliver']},
+ parallel:{branchTaskIds:['a','b'],joinTaskId:'join'},
+ router:{routeKey:'research',selectedTaskIds:['write','check','deliver']},
+ orchestrator_workers:{workItems:[{id:'part_a',taskId:'a',objective:'与任务 a 的 objective 完全一致'},{id:'part_b',taskId:'b',objective:'与任务 b 的 objective 完全一致'}],joinTaskId:'join'},
+ review_repair:{reviewTaskId:'review'},
+ map_reduce:{manifest:[{id:'part_a',taskId:'a',input:{path:'input_a.txt',sha256:'a'.repeat(64)}},{id:'part_b',taskId:'b',input:{path:'input_b.txt',sha256:'b'.repeat(64)}}],reduceTaskId:'join'},
+ proposal_review:{proposals:[{proposalTaskId:'a',critiqueTaskId:'critique_a'},{proposalTaskId:'b',critiqueTaskId:'critique_b'}],decisionTaskId:'decision'},
+};
+export const organizationOrchestrationCatalog=orchestrationPatterns.map(p=>({id:p.id,name:p.name,description:p.description,applicability:p.applicability,limits:p.limits,binding:p.binding,previewOnly:true,acceptance:'离线校验，待真实验收',templateExample:{schemaVersion:p.schemaVersion,id:p.id,version:p.version,definitionHash:p.definitionHash,...bindingExamples[p.id]}}));
+export const organizationRoutingInstructions='当启用任务组队时，candidate 必须为 schemaVersion:2；从 organizationCatalog 推荐适合的已有部门及员工，目录没有合适对象时提出 target.kind=new 的待确认部门。existing 只填目录 ID 和版本，主部门经理必须参加；借用员工任务负责人 ID 使用 departmentId::agentId，不复制或编造员工权限。旧协作布局 single/pipeline/parallel 保持可用；可省略 orchestration.template 沿用旧路径。orchestrationCatalog 七种新模板本轮仅离线预览、待真实验收，保存和确认不授予执行权，普通批准或自动批准也不能执行。根据真实需要选模式或解释能力缺口，不能为凑模板增加工具或人数。选择模板时把 templateExample 中的引用版本和 definitionHash 原样填入 orchestration.template，按实际任务 ID 替换绑定例子，批准前冻结路由、拆分、分片和提案轮次；不运行时派生或条件跳过。基础任务数加每个独立合法返工入口批准轮数的两倍之和最多 50，每任务输入最多 40。review_repair 可预览 1..2 轮返工，仍不能执行。每条用户交付要求列入 deliveryCriteria，绑定产出任务、其后的检查任务和验收条目索引；需要独立核对时 independent=true，作者不能自验。经理等待必要检查再交付。orchestration.rationale 解释选人和协作依据，不能声称已经真实验收。';

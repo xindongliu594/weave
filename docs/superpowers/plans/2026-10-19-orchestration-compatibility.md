@@ -53,10 +53,17 @@
 
 **Interfaces:** Consume Task 1 exports and optional `plan.orchestration.template`. Preserve existing schemaVersion:2 organization response and project snapshot orchestration field. Do not expose a new user-enabled execution bypass.
 
-- [ ] 先补失败测试：组织候选可生成/确认七类有效预览，错误模板/hash/绑定形成明确 draftIssue，普通方案仍走旧路径；模板方案批准被拒绝且无运行记录/模型调用；直接 API 与 automatic 参数也拒绝。隔离数据库只用测试 fixture，不连接生产。
-- [ ] 在原有规划请求给模型有界目录及每种绑定的例子/说明，清楚标出本轮新模式只能预览、旧模式仍可用；模型选择合适模式或说明能力缺口，不能为凑模板扩大工具/人数。不增加第二次模型请求，不每个任务注入七类全文。
-- [ ] resolveOrganizationCandidate 校验新引用；preview/confirm/plan_versions 原样保留冻结引用。批准在副作用之前调用 orchestrationExecutionErrors；保存/显示预览不等于运行批准。批准快照沿用原 orchestration 字段，历史读取/恢复不得基于当前目录重新改写。
-- [ ] 网页显示模式名称、版本、选择依据及“离线校验，待真实验收”；旧三标签保持原显示。模板未验证的执行错误包含下一步而不是无信息失败。覆盖 React 静态渲染；不为纯标签改动启动繁重 computer use。
-- [ ] 用已装 AgentTeams 公共 profiles Config 在临时目录做无模型 create/stage/approve 探针；记录是否保留完整文件合同。若种子字段不足，使用既有公开 create_task bridge，明确不导入私有实现。探针不修改产品 Host，不开沙箱/网络/模型。
-- [ ] Run Task 1 tests + UI tests；Run `node scripts/test-integration.mjs tests/orchestration-pattern-integration.test.ts tests/organization-routing-confirmation.test.ts tests/organization-chat.test.ts`；Run profile probe and related portable runtime tests as supported；Run `npm run build`。日志保存小型证据，不重复全量 suite。
+- [x] 先补失败测试：组织候选可生成/确认七类有效预览，错误模板/hash/绑定形成明确 draftIssue，普通方案仍走旧路径；模板方案批准被拒绝且无运行记录/模型调用；直接 API 与 automatic 参数也拒绝。隔离数据库只用测试 fixture，不连接生产。
+- [x] 在原有规划请求给模型有界目录及每种绑定的例子/说明，清楚标出本轮新模式只能预览、旧模式仍可用；模型选择合适模式或说明能力缺口，不能为凑模板扩大工具/人数。不增加第二次模型请求，不每个任务注入七类全文。
+- [x] resolveOrganizationCandidate 校验新引用；preview/confirm/plan_versions 原样保留冻结引用。批准在副作用之前调用 orchestrationExecutionErrors；保存/显示预览不等于运行批准。批准快照沿用原 orchestration 字段，历史读取/恢复不得基于当前目录重新改写。
+- [x] 网页显示模式名称、版本、选择依据及“离线校验，待真实验收”；旧三标签保持原显示。模板未验证的执行错误包含下一步而不是无信息失败。覆盖 React 静态渲染；不为纯标签改动启动繁重 computer use。
+- [x] 用已装 AgentTeams 公共 profiles Config 在临时目录做无模型 create/stage/approve 探针；记录是否保留完整文件合同。若种子字段不足，使用既有公开 create_task bridge，明确不导入私有实现。探针不修改产品 Host，不开沙箱/网络/模型。
+- [x] Run Task 1 tests + UI tests；Run `node scripts/test-integration.mjs tests/orchestration-pattern-integration.test.ts tests/organization-routing-confirmation.test.ts tests/organization-chat.test.ts`；Run profile probe and related portable runtime tests as supported；Run `npm run build`。日志保存小型证据，不重复全量 suite。
 - [ ] 独立评审本轮完整差异，修复重要问题；更新报告和进度、精确提交并沿用既有授权推送当前分支。报告分别列本地已验证、真实未验证、未部署。后续真实小任务/恢复逐类验收及公司模板发布生命周期另起具体计划，不在此阶段伪称完成。
+
+
+## 本地验证记录（2026-10-19）
+
+Task 2 实现与目标检查通过，独立评审和提交待控制器完成。Task 1 合同证据 57/57；本轮集成 36/36、UI 4/4、公共 Profile 探针 1/1、相关运行时 13/13、恢复回归 38/38，构建通过（保留主 chunk >500 kB 提示）。七类仍只离线预览、待真实验收。真实模型调用、生产数据库修改、JJ 部署均为 0。
+
+用户可读报告：[验证结果](../../validation/orchestration-compatibility-2026-10-19.md)。小型日志见 docs/validation/evidence/orchestration-compatibility-2026-10-19/integration-ui-native-build.txt。
