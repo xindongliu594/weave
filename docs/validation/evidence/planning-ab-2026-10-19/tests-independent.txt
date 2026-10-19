@@ -1,0 +1,28 @@
+✔ unaltered real failure is schema-valid but not contract-valid (15.457443ms)
+✔ invalid JSON is not counted as a valid plan or future-file success (0.211898ms)
+✔ transport rejection is unavailable, not a model planning error (0.209781ms)
+✔ baseline request mutation fails even when historical response stays unchanged (6.488738ms)
+✔ independent continuation only selects five unattempted DeepSeek cells and retains previous hold (22.596554ms)
+✔ fixed balanced matrix and budget boundaries (0.572003ms)
+✔ only prompt clarification and backend model differ; prior fixture untouched (1.673287ms)
+✔ paid output failure keeps its receipt and stops without retry (3.204648ms)
+✔ unresolved receipt stops even when text arrived (1.255092ms)
+✔ invalid plan texts are preserved and do not change next fixed prompt (8.556962ms)
+✔ timeout or signal exit must not be reported as success (7.042632ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (11.977967ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (8.555922ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (3.922388ms)
+✔ repair smoke can stop after one invalid preview without claiming acceptance (3.378927ms)
+✔ repair smoke reports acceptance only after both selected cases pass (3.610276ms)
+✔ trial refuses excess calls, per-call/phase/cumulative spend and uncertain receipts before dispatch (1.238036ms)
+✔ seven small distinct scenarios carry only synthetic content and immutable shard references (0.33488ms)
+✔ repair smoke selects only two fixed cases and rejects a third request or more than four cents (0.861419ms)
+✔ repair smoke stops after an invalid real preview but dry-run still assembles both requests (0.200076ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1114.410092

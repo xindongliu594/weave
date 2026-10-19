@@ -1,0 +1,21 @@
+{
+  "method": "Human-readable offline review of untouched model response; no employee execution or generated deliverables",
+  "id": "r1-deepseek-v4.1-flash-original",
+  "checks": {
+    "developmentDoesNotDependOnFutureQAFile": true,
+    "developmentChecksOwnSourceOnly": true,
+    "qaDifferentAuthorAndOwnTestFile": true,
+    "qaCoverageZeroHundredInvalidInputsAndNegative": true,
+    "managerWaitsForReviewAndQA": true,
+    "singleReworkReviewGatesQA": true,
+    "templateAndStructuredTaskDependenciesConsistent": true,
+    "allEmployeeCommandsActuallyExecuted": false,
+    "narrativeMatchesStructuredDeliveryMapping": false,
+    "narrativeBudgetArithmeticCorrect": false
+  },
+  "findings": [
+    "Reply says the QA test file binds to QA's own verification task; actual package delivery criterion binds develop+verify to manager accept.",
+    "Reply/rationale says estimated cost about $0.24. Fixed rates and returned token estimates total $0.0495, or $0.0594 including 20%; task maxBudget sum is $0.17. None support $0.24."
+  ],
+  "conclusion": "Target future-file error did not recur in this one identical-input sample. Static contract passed; narrative reliability and actual execution are separate. No prompt/model comparison conclusion is supported."
+}

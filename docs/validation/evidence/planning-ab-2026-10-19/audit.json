@@ -1,0 +1,162 @@
+{
+  "notice": "Only static contract checks; semantic audit and execution are separate.",
+  "results": [
+    {
+      "id": "r1-deepseek-v4.1-flash-original",
+      "responseStatus": "received",
+      "schemaValid": true,
+      "contractValid": true,
+      "futureFileErrors": [],
+      "errors": [],
+      "template": "review_repair",
+      "tasks": [
+        {
+          "id": "clarify",
+          "assigneeId": "analyst",
+          "kind": "requirements",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "逐条列出换算公式、必测示例、非法输入范围与抛错类型，并标注任何假设或待确认项",
+            "明确开发与 QA 的文件边界，确认需求分析师本身不产出文件"
+          ]
+        },
+        {
+          "id": "develop",
+          "assigneeId": "developer",
+          "kind": "implementation",
+          "dependencies": [
+            "clarify"
+          ],
+          "outputs": [
+            {
+              "path": "src/temperature.js",
+              "format": "text"
+            }
+          ],
+          "inputs": [],
+          "verify": [
+            "node --check src/temperature.js",
+            "node --input-type=module -e \"import('./src/temperature.js').then(m=>{const f=m.celsiusToFahrenheit;if(f(0)!==32)throw new Error('0');if(f(100)!==212)throw new Error('100');let ok=0;for(const v of [NaN,Infinity,'1',null,undefined]){try{f(v)}catch(e){if(e instanceof TypeError)ok++}}if(ok!==5)throw new Error('invalid')})\""
+          ],
+          "acceptanceCriteria": [
+            "node --check src/temperature.js 语法检查通过",
+            "自检命令确认 0→32、100→212，以及非法输入抛出 TypeError"
+          ],
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "command": "node --check src/temperature.js",
+              "expectedExitCode": 0
+            },
+            {
+              "criterionIndex": 1,
+              "command": "node --input-type=module -e \"import('./src/temperature.js').then(m=>{const f=m.celsiusToFahrenheit;if(f(0)!==32)throw new Error('0');if(f(100)!==212)throw new Error('100');let ok=0;for(const v of [NaN,Infinity,'1',null,undefined]){try{f(v)}catch(e){if(e instanceof TypeError)ok++}}if(ok!==5)throw new Error('invalid')})\"",
+              "expectedExitCode": 0
+            }
+          ]
+        },
+        {
+          "id": "review",
+          "assigneeId": "qa",
+          "kind": "review",
+          "dependencies": [
+            "develop",
+            "clarify"
+          ],
+          "outputs": [],
+          "inputs": [
+            {
+              "path": "src/temperature.js",
+              "producerTaskId": "develop"
+            }
+          ],
+          "acceptanceCriteria": [
+            "逐项给出需求、当前实现版本、核对依据与审查结论",
+            "若有问题，给出具体问题清单与返工范围，并完成一次复审结论"
+          ],
+          "maxReworkRounds": 1
+        },
+        {
+          "id": "verify",
+          "assigneeId": "qa",
+          "kind": "verification",
+          "dependencies": [
+            "review",
+            "clarify"
+          ],
+          "outputs": [
+            {
+              "path": "test/temperature.test.js",
+              "format": "text"
+            }
+          ],
+          "inputs": [
+            {
+              "path": "src/temperature.js",
+              "producerTaskId": "develop"
+            }
+          ],
+          "verify": [
+            "node --test test/temperature.test.js"
+          ],
+          "acceptanceCriteria": [
+            "node --test test/temperature.test.js 通过，且至少 4 项真实测试，无失败、跳过或待办"
+          ],
+          "acceptanceChecks": [
+            {
+              "criterionIndex": 0,
+              "command": "node --test test/temperature.test.js",
+              "expectedExitCode": 0,
+              "minimumTests": 4
+            }
+          ]
+        },
+        {
+          "id": "accept",
+          "assigneeId": "manager",
+          "kind": "work",
+          "dependencies": [
+            "review",
+            "verify"
+          ],
+          "outputs": [],
+          "inputs": [
+            {
+              "path": "src/temperature.js",
+              "producerTaskId": "develop"
+            },
+            {
+              "path": "test/temperature.test.js",
+              "producerTaskId": "verify"
+            }
+          ],
+          "acceptanceCriteria": [
+            "逐项核对需求、当前文件版本、审查结论和真实测试回执，说明通过项与缺口",
+            "给出明确的验收结论或需返工项"
+          ]
+        }
+      ],
+      "model": "deepseek-v4.1-flash",
+      "variant": "original",
+      "usage": {
+        "prompt_tokens": 9757,
+        "completion_tokens": 3091
+      },
+      "cost": 0.0066362999999999995,
+      "milliseconds": 31624
+    },
+    {
+      "id": "r1-glm-5.3-flash-clarified",
+      "responseStatus": "unavailable",
+      "schemaValid": null,
+      "contractValid": null,
+      "futureFileErrors": null,
+      "errors": [
+        "中转站返回 HTTP 400：请求被拒绝，请检查连接配置"
+      ],
+      "model": "glm-5.3-flash",
+      "variant": "clarified",
+      "milliseconds": 627
+    }
+  ]
+}

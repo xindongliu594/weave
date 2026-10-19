@@ -1,0 +1,23 @@
+✔ fixed balanced matrix and budget boundaries (1.036029ms)
+✔ only prompt clarification and backend model differ; prior fixture untouched (6.625073ms)
+✔ paid output failure keeps its receipt and stops without retry (2.250304ms)
+✔ unresolved receipt stops even when text arrived (1.275739ms)
+✔ invalid plan texts are preserved and do not change next fixed prompt (6.343372ms)
+✔ timeout or signal exit must not be reported as success (5.585984ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (6.743956ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (5.600895ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (2.211848ms)
+✔ repair smoke can stop after one invalid preview without claiming acceptance (3.567218ms)
+✔ repair smoke reports acceptance only after both selected cases pass (2.13429ms)
+✔ trial refuses excess calls, per-call/phase/cumulative spend and uncertain receipts before dispatch (1.080082ms)
+✔ seven small distinct scenarios carry only synthetic content and immutable shard references (0.302414ms)
+✔ repair smoke selects only two fixed cases and rejects a third request or more than four cents (0.841304ms)
+✔ repair smoke stops after an invalid real preview but dry-run still assembles both requests (0.169006ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 92.143932

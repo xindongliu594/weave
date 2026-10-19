@@ -1,11 +1,12 @@
 """After explicit approval, keep only two live configuration values inside JJ."""
 import os,pathlib,subprocess,sys
-assert sys.argv[1:] in [['--approved-real'],['--approved-real','repair-smoke'],['--approved-real','feedback-correction'],['--approved-real','delivery-binding']]
+assert sys.argv[1:] in [['--approved-real'],['--approved-real','repair-smoke'],['--approved-real','feedback-correction'],['--approved-real','delivery-binding'],['--approved-real','planning-ab'],['--approved-real','planning-ab-independent']]
 profile=sys.argv[2] if len(sys.argv)==3 else 'original'
 root=pathlib.Path('/home/jj/.local/share/weiwu')
-base=root/'validation'/({'original':'orchestration-20261019-580aafb','repair-smoke':'orchestration-smoke-20261019-4283f2b','feedback-correction':'orchestration-correction-20261019-5055aab','delivery-binding':'delivery-binding-pilot-20261019-a05f034'}[profile]);repo=base/'source'
+base=root/'validation'/({'original':'orchestration-20261019-580aafb','repair-smoke':'orchestration-smoke-20261019-4283f2b','feedback-correction':'orchestration-correction-20261019-5055aab','delivery-binding':'delivery-binding-pilot-20261019-a05f034','planning-ab':'planning-ab-20261019-db8153d','planning-ab-independent':'planning-ab-20261019-db8153d'}[profile]);repo=base/'source'
+output=base/('deepseek-only' if profile=='planning-ab-independent' else 'real')
 live=pathlib.Path(subprocess.check_output(['systemctl','--user','show','weiwu-jj.service','--property=WorkingDirectory','--value'],text=True).strip())
-assert live==root/'releases/weiwu-task-organization-20261018';assert not (base/'real').exists()
+assert live==root/'releases/weiwu-task-organization-20261018';assert not output.exists()
 matches=[]
 for p in pathlib.Path('/proc').iterdir():
  if not p.name.isdigit():continue
@@ -22,5 +23,6 @@ del raw
 assert env.get('DATA_DIR')==str(root/'data/pilot/credentials')
 assert env.get('DATABASE_URL','').startswith('postgresql://postgres:postgres@127.0.0.1:')
 os.umask(0o077)
-result=subprocess.run([str(node),'--import',str(repo/'node_modules/tsx/dist/loader.mjs'),str(repo/'scripts/validation/orchestration-planning-pilot/broker.mjs'),'approved-real',str(repo),str(base/'real'),profile],cwd=repo,env=env)
+driver='ab-broker.mjs' if profile.startswith('planning-ab') else 'broker.mjs'
+result=subprocess.run([str(node),'--import',str(repo/'node_modules/tsx/dist/loader.mjs'),str(repo/'scripts/validation/orchestration-planning-pilot'/driver),'approved-real',str(repo),str(output),profile],cwd=repo,env=env)
 sys.exit(result.returncode)

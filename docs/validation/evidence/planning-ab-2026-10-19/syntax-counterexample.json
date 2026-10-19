@@ -1,0 +1,7 @@
+{
+  "source": "LOCAL_COUNTEREXAMPLE_ONLY_NOT_EMPLOYEE_DELIVERY",
+  "fixture": "export function celsiusToFahrenheit(value) { return 0; }",
+  "syntaxExit": 0,
+  "behaviorExit": 1,
+  "conclusion": "Syntax success does not prove required function behavior"
+}

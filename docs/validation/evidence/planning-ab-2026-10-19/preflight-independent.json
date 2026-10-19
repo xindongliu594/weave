@@ -1,0 +1,188 @@
+{
+  "mode": "preflight",
+  "phase": "planning-ab-independent",
+  "sourceCommit": "db8153d",
+  "baselineRequestSha256": "65a41fcc51316503786482ad0c811da26bab0d94b5edd774511306b7339d3ff3",
+  "limits": {
+    "maxCalls": 12,
+    "maxCallCost": 0.02,
+    "maxTrialCost": 0.24,
+    "maxCumulative": 3.41,
+    "maxTokens": 4000
+  },
+  "carryCost": 0.015268399999999998,
+  "carryCalls": 2,
+  "requests": [],
+  "startedAt": "2026-10-19T12:24:21.939Z",
+  "departmentWrites": 0,
+  "projectWrites": 0,
+  "models": {
+    "deepseek-v4.1-flash": {
+      "name": "Go · DeepSeek V4.1 Flash",
+      "model": "deepseek-v4.1-flash",
+      "protocol": "chat-completions",
+      "gatewayId": "a951fdd7-4eae-4ff3-9d6b-cfa26a6d8d95",
+      "inputRate": 0.3,
+      "outputRate": 1.2,
+      "thinkingMode": "disabled",
+      "contextWindowTokens": 131072,
+      "id": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "version": 7,
+      "status": "available",
+      "checkedAt": "2026-10-10T15:54:33.241Z",
+      "capabilities": {
+        "tools": {
+          "status": "supported",
+          "testId": "5d473912-c1b6-4d78-ad46-608ad47bf9f3",
+          "checkedAt": "2026-10-08T08:54:32.757Z",
+          "probeVersion": "chat-tools-roundtrip-v1"
+        }
+      }
+    },
+    "glm-5.3-flash": {
+      "name": "Go · GLM-5.3-Flash（规划对照）",
+      "model": "glm-5.3-flash",
+      "protocol": "chat-completions",
+      "gatewayId": "a951fdd7-4eae-4ff3-9d6b-cfa26a6d8d95",
+      "inputRate": 0.15,
+      "outputRate": 0.5,
+      "thinkingMode": "disabled",
+      "id": "70bf9d7d-6cc0-4ea0-a7d1-d969cab6b65c",
+      "version": 1,
+      "status": "untested",
+      "checkedAt": null,
+      "capabilities": {}
+    }
+  },
+  "before": {
+    "spent": 3.0040878000000015,
+    "reserved": 0.08241019999999999,
+    "holds": [
+      {
+        "id": "26e850af-4ed9-4a5e-abd8-6bf84ec76599",
+        "status": "uncertain",
+        "amount": 0.0022239
+      },
+      {
+        "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+        "status": "uncertain",
+        "amount": 0.03529379999999999
+      },
+      {
+        "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+        "status": "uncertain",
+        "amount": 0.0025932
+      },
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "status": "uncertain",
+        "amount": 0.0192111
+      },
+      {
+        "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+        "status": "uncertain",
+        "amount": 0.014085
+      },
+      {
+        "id": "d8af5bf7-377a-4589-a4ec-f3e8ef2df10f",
+        "status": "uncertain",
+        "amount": 0.008632099999999998
+      },
+      {
+        "id": "f865392a-f575-4f5b-9041-59954d407986",
+        "status": "uncertain",
+        "amount": 0.00037109999999999997
+      }
+    ]
+  },
+  "quotes": [
+    {
+      "id": "r1-deepseek-v4.1-flash-clarified",
+      "round": 1,
+      "model": "deepseek-v4.1-flash",
+      "variant": "clarified",
+      "inputBytes": 44220,
+      "reservation": 0.018066,
+      "requestSha256": "c679e07e8174f009db1392f95d121565427fa17c4c9ffeb4e8eeb1b373136482"
+    },
+    {
+      "id": "r2-deepseek-v4.1-flash-clarified",
+      "round": 2,
+      "model": "deepseek-v4.1-flash",
+      "variant": "clarified",
+      "inputBytes": 44220,
+      "reservation": 0.018066,
+      "requestSha256": "c679e07e8174f009db1392f95d121565427fa17c4c9ffeb4e8eeb1b373136482"
+    },
+    {
+      "id": "r2-deepseek-v4.1-flash-original",
+      "round": 2,
+      "model": "deepseek-v4.1-flash",
+      "variant": "original",
+      "inputBytes": 43548,
+      "reservation": 0.017864400000000002,
+      "requestSha256": "65a41fcc51316503786482ad0c811da26bab0d94b5edd774511306b7339d3ff3"
+    },
+    {
+      "id": "r3-deepseek-v4.1-flash-original",
+      "round": 3,
+      "model": "deepseek-v4.1-flash",
+      "variant": "original",
+      "inputBytes": 43548,
+      "reservation": 0.017864400000000002,
+      "requestSha256": "65a41fcc51316503786482ad0c811da26bab0d94b5edd774511306b7339d3ff3"
+    },
+    {
+      "id": "r3-deepseek-v4.1-flash-clarified",
+      "round": 3,
+      "model": "deepseek-v4.1-flash",
+      "variant": "clarified",
+      "inputBytes": 44220,
+      "reservation": 0.018066,
+      "requestSha256": "c679e07e8174f009db1392f95d121565427fa17c4c9ffeb4e8eeb1b373136482"
+    }
+  ],
+  "completed": false,
+  "after": {
+    "spent": 3.0040878000000015,
+    "reserved": 0.08241019999999999,
+    "holds": [
+      {
+        "id": "26e850af-4ed9-4a5e-abd8-6bf84ec76599",
+        "status": "uncertain",
+        "amount": 0.0022239
+      },
+      {
+        "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+        "status": "uncertain",
+        "amount": 0.03529379999999999
+      },
+      {
+        "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+        "status": "uncertain",
+        "amount": 0.0025932
+      },
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "status": "uncertain",
+        "amount": 0.0192111
+      },
+      {
+        "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+        "status": "uncertain",
+        "amount": 0.014085
+      },
+      {
+        "id": "d8af5bf7-377a-4589-a4ec-f3e8ef2df10f",
+        "status": "uncertain",
+        "amount": 0.008632099999999998
+      },
+      {
+        "id": "f865392a-f575-4f5b-9041-59954d407986",
+        "status": "uncertain",
+        "amount": 0.00037109999999999997
+      }
+    ]
+  },
+  "finishedAt": "2026-10-19T12:24:22.950Z"
+}

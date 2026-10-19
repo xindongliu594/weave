@@ -1,0 +1,36 @@
+{
+  "method": "Offline inspection of all five untouched follow-on responses. No generated code or commands were executed.",
+  "results": [
+    {
+      "id": "r1-deepseek-v4.1-flash-clarified",
+      "futureQAFileDependency": false,
+      "semanticEvidenceValid": false,
+      "finding": "develop.acceptanceCriteria[1] requires an exported function and invalid-input throws, but acceptanceChecks[1] uses only node --check src/temperature.js. Subsequent QA is planned but cannot turn syntax into functional evidence."
+    },
+    {
+      "id": "r2-deepseek-v4.1-flash-clarified",
+      "futureQAFileDependency": false,
+      "semanticEvidenceValid": false,
+      "finding": "develop.acceptanceCriteria[0] requires exported celsiusToFahrenheit, but its command only checks syntax. Reply and rationale claim review_repair while the actual template id/hash is pipeline; actual review.maxReworkRounds is 1."
+    },
+    {
+      "id": "r2-deepseek-v4.1-flash-original",
+      "futureQAFileDependency": false,
+      "semanticEvidenceValid": false,
+      "finding": "Developer has no terminal tool and implementation has no verify command. Reply recognizes that a future QA file cannot be a developer gate, then removes the mandatory developer self-check rather than producing a valid contract. Product static validation correctly rejects it."
+    },
+    {
+      "id": "r3-deepseek-v4.1-flash-original",
+      "futureQAFileDependency": false,
+      "semanticEvidenceValid": false,
+      "finding": "Developer has two acceptance criteria but only maps index 0. Product static validation correctly rejects missing coverage; index 1 mentions exported function and future QA."
+    },
+    {
+      "id": "r3-deepseek-v4.1-flash-clarified",
+      "futureQAFileDependency": false,
+      "semanticEvidenceValid": false,
+      "finding": "Developer maps all three criteria (syntax, exported name, invalid input behavior) to node --check src/temperature.js. Static count and command membership pass, but syntax does not prove exports or throwing."
+    }
+  ],
+  "limits": "Each prompt has only three DeepSeek samples; the GLM comparison is unavailable. Correct file scheduling is distinct from correct evidence semantics, and none of these plans have executed."
+}

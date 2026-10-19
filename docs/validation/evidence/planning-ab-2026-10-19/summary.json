@@ -1,0 +1,65 @@
+{
+  "attempted": 7,
+  "returned": 6,
+  "groups": {
+    "original": {
+      "calls": 3,
+      "inputTokens": 29271,
+      "outputTokens": 7753,
+      "cost": 0.018084899999999998,
+      "meanMilliseconds": 18900
+    },
+    "clarified": {
+      "calls": 3,
+      "inputTokens": 29700,
+      "outputTokens": 7061,
+      "cost": 0.0173832,
+      "meanMilliseconds": 13255.333333333334
+    }
+  },
+  "actualCost": 0.0354681,
+  "newUnknown": 0.0086321,
+  "occupied": 3.1153298000000023,
+  "oldHoldsUnchanged": true,
+  "after": {
+    "spent": 3.0329196000000023,
+    "reserved": 0.08241019999999999,
+    "holds": [
+      {
+        "id": "26e850af-4ed9-4a5e-abd8-6bf84ec76599",
+        "status": "uncertain",
+        "amount": 0.0022239
+      },
+      {
+        "id": "730e094b-e047-4b11-a159-8dffa4a83d40",
+        "status": "uncertain",
+        "amount": 0.03529379999999999
+      },
+      {
+        "id": "7a4e1c47-1ae1-4460-ad17-43d93331567d",
+        "status": "uncertain",
+        "amount": 0.0025932
+      },
+      {
+        "id": "9827dc97-cec7-4e69-bccf-7260922c9ac6",
+        "status": "uncertain",
+        "amount": 0.0192111
+      },
+      {
+        "id": "d1146ef1-8400-4fe3-a34c-0f4fe8287801",
+        "status": "uncertain",
+        "amount": 0.014085
+      },
+      {
+        "id": "d8af5bf7-377a-4589-a4ec-f3e8ef2df10f",
+        "status": "uncertain",
+        "amount": 0.008632099999999998
+      },
+      {
+        "id": "f865392a-f575-4f5b-9041-59954d407986",
+        "status": "uncertain",
+        "amount": 0.00037109999999999997
+      }
+    ]
+  }
+}

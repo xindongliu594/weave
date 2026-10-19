@@ -1,0 +1,14 @@
+{
+  "name": "Go · GLM-5.3-Flash（规划对照）",
+  "model": "glm-5.3-flash",
+  "protocol": "chat-completions",
+  "gatewayId": "a951fdd7-4eae-4ff3-9d6b-cfa26a6d8d95",
+  "inputRate": 0.15,
+  "outputRate": 0.5,
+  "thinkingMode": "disabled",
+  "id": "70bf9d7d-6cc0-4ea0-a7d1-d969cab6b65c",
+  "version": 1,
+  "status": "untested",
+  "checkedAt": null,
+  "capabilities": {}
+}
