@@ -1,0 +1,15 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ actual router uses production TEXT identifiers to read the bound operation and immutable source evidence (5689.3584ms)
+✔ cross-run database operation cannot be substituted by a matching ID (30.6764ms)
+✔ formal row identity, unknown IDs and strict query validation stay enforced (31.006ms)
+✔ missing or different database workspace revision cannot produce a verified QA card (46.2377ms)
+✔ tampered ancestor snapshot and oversized archive return explicit unavailable evidence (52.5684ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11632.8572

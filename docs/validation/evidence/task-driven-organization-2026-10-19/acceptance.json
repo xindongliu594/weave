@@ -1,0 +1,69 @@
+{
+  "verdict": "pass",
+  "summary": "经理独立以 plugin__office__docx_read 读取 report.docx（sha256=03a17d1e4390a03231995e4c403196bf9589c8e71ce5448e8d96b2908b81d13d，size=10400）、以 filesystem 读取 qa.json（sha256=10a3a5765e26c2fc42aeeec68ccf23dab02cf3f8fadcbff265725b4786430489），逐项核对：虚构测试资料标注与未访问网站/未做真实巡检声明齐备；检查表三行为首页=通过、登录=通过、备份=失败；统计为总计3项、2项通过、1项失败。qa.json 的 verdict=pass 及 5 条 checks 与经理实际读取的 DOCX 文本完全一致，无矛盾，故最终验收为通过。",
+  "findings": [
+    {
+      "id": "A1",
+      "item": "虚构测试资料标注与未真实巡检声明",
+      "expected": "明确标注为虚构测试资料，且写明未访问网站、未做真实巡检",
+      "observed": "标题为“虚构测试资料报告（Fictional Test Data Report）”；声明段写“本报告为虚构测试资料……编写过程未访问任何网站、未连接任何外部服务，也未做任何真实巡检或实测”；结尾说明重申“均为虚构测试资料中的样例事实，并非真实巡检结果”",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    },
+    {
+      "id": "A2",
+      "item": "首页检查结果",
+      "expected": "首页=通过",
+      "observed": "检查表中“首页”一行结果为“通过”",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    },
+    {
+      "id": "A3",
+      "item": "登录检查结果",
+      "expected": "登录=通过",
+      "observed": "检查表中“登录”一行结果为“通过”",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    },
+    {
+      "id": "A4",
+      "item": "备份检查结果",
+      "expected": "备份=失败",
+      "observed": "检查表中“备份”一行结果为“失败”",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    },
+    {
+      "id": "A5",
+      "item": "统计结果",
+      "expected": "总计3项、2项通过、1项失败",
+      "observed": "统计段为“总计：3项”“通过：2项”“失败：1项”，与三条明细（通过2、失败1）自洽",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    },
+    {
+      "id": "A6",
+      "item": "QA 结论一致性",
+      "expected": "qa.json verdict 与经理实际读取一致",
+      "observed": "qa.json verdict=\"pass\"，checks 5 项均 status=\"pass\"，id 覆盖 fictional-notice/check-homepage/check-login/check-backup/statistics，findings 3 条均为 info 级一致性/边界说明；与经理独立读取的 DOCX 文本逐条吻合，未发现矛盾",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    },
+    {
+      "id": "A7",
+      "item": "边界限制",
+      "expected": "不声称真实巡检",
+      "observed": "文档内三行结果均为用户提供的虚构样例数据；本次验收仅核对标注与条目一致性与 QA 结论匹配，不代表任何真实系统状态。经理仅执行 docx_read(report.docx) 与 filesystem(qa.json) 只读操作，仅用 artifact_write 写出本文件，未修改 report.docx 与 qa.json，未创建其他文件，未使用终端，未访问网络。",
+      "qaConsistent": true,
+      "severity": "info",
+      "resolved": true
+    }
+  ]
+}

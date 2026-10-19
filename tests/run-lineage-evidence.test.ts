@@ -7,6 +7,7 @@ import {collectRunLineageEvidence} from '../apps/api/src/run-lineage-evidence.ts
 import {RunInheritedEvidence} from '../apps/web/src/RunInheritedEvidence.tsx';
 import {createGoalContract} from '../packages/contracts/goal-contract.mjs';
 import {applyRecoveryResources} from '../apps/api/src/recovery-resource-plan.ts';
+import {createHandoffReport,handoffContractDigest} from '../packages/contracts/handoff-report.mjs';
 
 // Isolated regression fixtures. No model, production DB or employee artifact
 // is generated here. Real acceptance is documented separately.
@@ -156,4 +157,30 @@ test('web evidence visibly names original run/attempt/observation and does not p
  assert.doesNotMatch(wrong,/恢复沿用的真实测试结果|输出 SHA256/);
  const absent=renderToStaticMarkup(createElement(RunInheritedEvidence,{...props,evidence:undefined,error:'原档案缺失'}));
  assert.match(absent,/原档案缺失/);assert.doesNotMatch(absent,/测试通过/);
+});
+
+test('recovery-derived repair report binding preserves the original accepted report',async()=>{
+ const make=()=>{
+  const f=fixture();
+  const approved={...contracts[0],acceptanceCriteria:['原要求'],handoff:{sections:[{key:'evidence',requirement:'核对依据'}]}};
+  const effective={...approved,acceptanceCriteria:['修复后核对要求'],reworkRound:1};
+  const report=createHandoffReport(effective,{output:JSON.stringify({summary:'独立核对通过',sections:{evidence:'修复后的实际文件'},risks:[]}),acceptanceResults:[{criterion:'修复后核对要求',status:'passed',evidence:'真实文件'}]});
+  const original={...f.t1,employeeReport:report};
+  const restored={...original,reportContract:{task:effective,approvedSha256:handoffContractDigest(approved)}};
+  for(const r of [f.parent,f.child,f.current]){
+   r.snapshot=structuredClone(r.snapshot);r.snapshot.tasks[0]=approved;
+   if(r.snapshot.approvedTasks)r.snapshot.approvedTasks[0]=approved;
+   if(r.snapshot.handoffCheckpoints)r.snapshot.handoffCheckpoints[0]=structuredClone(restored);
+  }
+  f.parent.events[1].data=original;
+  return f;
+ };
+ const f=make(),result=await collectRunLineageEvidence(f.current,f.load);
+ assert.equal(result.status,'verified');
+ assert.deepEqual(result.receipts[0].receipt.reportContract,f.current.snapshot.handoffCheckpoints[0].reportContract);
+ for(const mutate of [(r:any)=>r.reportContract.approvedSha256='bad',(r:any)=>r.reportContract.task.acceptanceCriteria=['篡改要求'],(r:any)=>r.employeeReport.summary='篡改报告']){
+  const changed=make();mutate(changed.current.snapshot.handoffCheckpoints[0]);
+  const evidence=await collectRunLineageEvidence(changed.current,changed.load);
+  assert.equal(evidence.receipts.some(r=>r.taskId==='T1'),false);
+ }
 });

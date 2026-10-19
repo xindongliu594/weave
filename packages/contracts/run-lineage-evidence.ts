@@ -5,10 +5,12 @@ export type RunLineageEvidence = {version:1;runId:string;projectId:string;planVe
  receipts:RecoveredReceipt[];tests:RecoveredTest[];issues:{taskId?:string;code:string;message:string}[];
  acceptance?:{runId:string;planVersion:number;deliveryCriteria?:import('../../services/agent-runtime/delivery-criteria.mjs').DeliveryCriterionEvidence[];rows:{taskId:string;criterionIndex:number;criterion:string;command:string|null;status:string;reason:string;sourceRunId:string|null;attemptId:string|null;workspaceRevision:string|null}[]}};
 
-// Host seal fields only. Budget notes, model prose and mutable UI summaries do
-// not participate in proof of a completed task or an observed command.
+// Preserve the host-accepted structured report. reportContract is derived on
+// recovery, so ancestry validates and carries that binding separately.
+// Free-form model prose and mutable UI summaries remain outside the seal;
+// a structured report is employee review evidence, not a command receipt.
 export function handoffSealValue(record:any) {
- return Object.fromEntries(['runId','taskId','attemptId','workspaceRevision','inputs','outputs','commands','acceptanceChecks','acceptedAt']
+ return Object.fromEntries(['runId','taskId','attemptId','workspaceRevision','inputs','outputs','commands','acceptanceChecks','employeeReport','acceptedAt']
   .filter(key=>record?.[key]!==undefined).map(key=>[key,record[key]]));
 }
 export function canonicalEvidence(value:any):string {
@@ -26,5 +28,6 @@ export function verifiedRecoveredReceipt(evidence:RunLineageEvidence|undefined,r
  const verified=evidence.receipts?.filter(entry=>entry.taskId===taskId&&entry.attemptId===attemptId)??[];
  if(completed.length!==1||sealed.length!==1||verified.length!==1)return;
  const entry=verified[0];
- if(entry.sourceRunId===sealed[0].runId&&entry.sourceRunId===entry.receipt?.runId&&Number.isSafeInteger(entry.acceptanceSeq)&&entry.acceptanceSeq>0&&sameHandoffSeal(entry.receipt,sealed[0]))return entry;
+ if(entry.sourceRunId===sealed[0].runId&&entry.sourceRunId===entry.receipt?.runId&&Number.isSafeInteger(entry.acceptanceSeq)&&entry.acceptanceSeq>0&&sameHandoffSeal(entry.receipt,sealed[0])&&
+  canonicalEvidence(entry.receipt.reportContract)===canonicalEvidence(sealed[0].reportContract))return entry;
 }

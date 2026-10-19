@@ -34,7 +34,7 @@ before(async () => {
   await admin.query('CREATE SCHEMA ' + schema); const connection = new URL(base); connection.searchParams.set('options', '-c search_path=' + schema); process.env.DATABASE_URL = connection.toString();
   directory = await mkdtemp(join(tmpdir(), 'organization-chat-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs'); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown(); server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as AddressInfo).port + '/api';
-  gateway = http.createServer(async (req, res) => { assert.equal(req.url, '/v1/chat/completions'); let raw = ''; for await (const chunk of req) raw += chunk; wire = JSON.parse(raw); requests++; assert.ok(['fixture-model', 'fixture-team-astra', 'gpt-4.1-mini'].includes(wire.model)); assert.equal(wire.tools, undefined); res.setHeader('content-type', 'application/json');
+  gateway = http.createServer(async (req, res) => { assert.equal(req.url, '/v1/chat/completions'); let raw = ''; for await (const chunk of req) raw += chunk; wire = JSON.parse(raw); requests++; assert.ok(['fixture-model', 'fixture-team-astra', 'gpt-4.1-mini', 'deepseek-v4.1-flash'].includes(wire.model)); assert.equal(wire.tools, undefined); res.setHeader('content-type', 'application/json');
     if (timeoutMode === 'headers') return;
     if (timeoutMode === 'body') { res.writeHead(200); res.flushHeaders(); res.write('{"choices":'); return; }
     const body=JSON.stringify({ choices: [{ message: { content: typeof response === 'string' ? response : JSON.stringify(response) } }], usage: { prompt_tokens: 40, completion_tokens: 15 } });
@@ -127,11 +127,11 @@ test('client-provided validation feedback cannot grant tools and oversized feedb
   assert.equal(oversized.status, 422); assert.equal(requests, beforeRequests + 1);
 });
 
-test('documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output', async () => {
+for (const wireModel of ['gpt-4.1-mini','deepseek-v4.1-flash']) test('documented JSON mode preserves receipts and never retries: '+wireModel, async () => {
   const original = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
   const before = await counts(), beforeCalls = requests;
   try {
-    await pool.query('UPDATE models SET data=$1 WHERE id=$2', [{ ...original, model: 'gpt-4.1-mini' }, modelId]);
+    await pool.query('UPDATE models SET data=$1 WHERE id=$2', [{ ...original, model: wireModel }, modelId]);
     response = '{"reply":"待继续整理","candidate":';
     const result = await call('/organizations/chat', input({ maxPlanningCost: .1 }));
     assert.equal(result.status, 200); assert.equal(result.data.preview, undefined);

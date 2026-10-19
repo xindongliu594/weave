@@ -1,0 +1,15 @@
+{
+  "completed": true,
+  "criteriaPassed": 2,
+  "downloadLinks": [
+    "http://127.0.0.1:4312/api/runs/b7de5334-38a5-4e76-bcd4-0e743bcbafde/artifact?path=acceptance.json",
+    "http://127.0.0.1:4312/api/runs/b7de5334-38a5-4e76-bcd4-0e743bcbafde/artifact?path=qa.json",
+    "http://127.0.0.1:4312/api/runs/b7de5334-38a5-4e76-bcd4-0e743bcbafde/artifact?path=report.docx"
+  ],
+  "qaSourcePreserved": true,
+  "scripts": [
+    "http://127.0.0.1:4312/assets/index-CtIdbdPG.js"
+  ],
+  "unverified": false,
+  "url": "http://127.0.0.1:4312/#run/b7de5334-38a5-4e76-bcd4-0e743bcbafde"
+}

@@ -1,0 +1,69 @@
+{
+  "health": {
+    "database": "connected",
+    "runtime": {
+      "ready": true,
+      "reason": "DSH + AgentTeams：员工独立宿主、受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。"
+    },
+    "version": "0.2.0",
+    "workspace": {
+      "kind": "local",
+      "database": "pglite",
+      "workspacesPath": "/home/jj/.local/share/weiwu/data/pilot/workspaces",
+      "executionTarget": {
+        "kind": "local",
+        "deviceId": "5b34cfd1-eee6-45fd-9be7-9000c4daf9d8",
+        "grantId": "7ffb9e55-18e1-4a9c-aeed-befddb39a6b3"
+      }
+    }
+  },
+  "lineageStatus": "verified",
+  "criteria": [
+    {
+      "criterionId": "dc-facts",
+      "description": "report.docx 含用户提供的虚构测试事实：首页通过、登录通过、备份失败，统计总计3项、2项通过、1项失败，并明确标注虚构测试资料、未访问网站或真实巡检。",
+      "status": "passed",
+      "reason": "已收到指定员工的结构化复核；内容判断由检查者承担",
+      "evidenceRefs": [
+        {
+          "taskId": "qa-verify",
+          "criterionIndex": 1,
+          "sourceRunId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+          "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+          "kind": "employee_review"
+        },
+        {
+          "taskId": "qa-verify",
+          "criterionIndex": 2,
+          "sourceRunId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+          "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+          "kind": "employee_review"
+        }
+      ]
+    },
+    {
+      "criterionId": "dc-independent-qa",
+      "description": "QA 独立读取当前 report.docx 后输出 qa.json，逐项核对上述事实并与实际内容一致，不符时给 fail。",
+      "status": "passed",
+      "reason": "已收到指定员工的结构化复核；内容判断由检查者承担",
+      "evidenceRefs": [
+        {
+          "taskId": "manager-accept",
+          "criterionIndex": 1,
+          "sourceRunId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+          "attemptId": "413f9aae-a05b-40aa-9619-e5fadfdeaafc",
+          "kind": "employee_review"
+        },
+        {
+          "taskId": "manager-accept",
+          "criterionIndex": 2,
+          "sourceRunId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+          "attemptId": "413f9aae-a05b-40aa-9619-e5fadfdeaafc",
+          "kind": "employee_review"
+        }
+      ]
+    }
+  ],
+  "usageCount": 664,
+  "activeRuns": []
+}

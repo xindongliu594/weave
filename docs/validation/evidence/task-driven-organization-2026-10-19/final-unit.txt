@@ -1,0 +1,35 @@
+✔ control passes ordinary requests through and holds only the selected accepted project before dispatch (2.1544ms)
+✔ remaining real planning request is bounded before reserve or dispatch (2.286ms)
+✔ only matching completed attempt and host seal expose passing evidence (21.3293ms)
+✔ new requirement or truncated/changed receipt cannot inherit old success; seals include acceptance (0.7382ms)
+✔ legacy reports remain unverified instead of inventing new mappings (0.5277ms)
+✔ delivery projection requires committed producers and the exact check attempt (1.4564ms)
+✔ check schema rejects invalid exit codes and zero tests (6.6381ms)
+✔ cold recovery retains checks without rerunning commands and rejects altered proof (2.7055ms)
+✔ recovered structured reviews retain their sealed report and reject report tampering (5.053ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (31.1877ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (14.8495ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (19.5512ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (16.5014ms)
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (16.3982ms)
+✔ new executable plans require mappings while text tasks and saved legacy contracts stay compatible (0.5753ms)
+✔ office-only planning does not teach the model to label document acceptance as code review (0.4258ms)
+✔ explicit resource approval preserves exact inherited QA evidence across ordinary later recovery (29.1796ms)
+✔ a resource boundary cannot authorize changed goal, completed contract or counterfeit parent (7.9819ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (2.7737ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (3.3344ms)
+✔ ancestry has an explicit maximum depth (1.9536ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (7.2151ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (12.2877ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (0.8068ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (13.6027ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (3.5438ms)
+✔ recovery-derived repair report binding preserves the original accepted report (7.6375ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3156.3016

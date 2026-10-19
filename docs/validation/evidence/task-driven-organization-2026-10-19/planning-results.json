@@ -1,0 +1,297 @@
+[
+  {
+    "label": "plan-word",
+    "status": "returned",
+    "reply": "已按你的要求把方案收束为目录中现有部门的三名成员（经理、文档作者、独立 QA），不新增员工、不使用终端。三个任务按顺序执行：作者用已授权的原版 docx_create 生成一页 report.docx 并 docx_read 回读；QA 读取当前 DOCX，逐项核对首页结论、登录结论、备份结论、统计总计3项/2通过/1失败，并输出含 verdict 与证据的 qa.json；经理读取 DOCX 与 QA 结果，输出 acceptance.json，不符即 fail。两份 JSON 都会要求列出具体事实、结论、依据与限制，并统一标注“虚构测试资料，未访问网站或真实巡检”。\n\n协作方式建议 pipeline：只有作者产出后才可独立核对，经理验收再依赖作者与 QA。预算按 0.28 美元与 48 次总调用规划，单节点上限 24 次，单次输出上限 8192 Token，并预留恢复余量。所有任务 kind=work，不承诺任何真实网站巡检或超出这三个文件的产物。",
+    "draftIssue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "manager-acceptance: 检查任务 manager-accept 必须在产出任务 manager-accept 之后；manager-acceptance: 检查任务 manager-accept 必须读取 manager-accept 的当前产物 acceptance.json；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null,
+    "candidate": null
+  },
+  {
+    "label": "correct-word",
+    "status": "returned",
+    "reply": "已按你指出的校验问题修正：删除“检查任务检查自身产物”的链条，deliveryCriteria 只对应用户报告事实与独立核对要求；依赖改为 author-report → qa-verify → manager-acceptance。经理任务读取作者 DOCX 与 QA 的当前 qa.json，输出 acceptance.json，作为最终检查结论，不再被任何交付标准反向检查。预算上限 0.26 美元（项目 0.28 内预留 0.02 恢复余量），总调用 48 次、单节点 24 次、单次输出 8192 Token，不执行、不新增员工与权限。",
+    "draftIssue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "生成草案校验失败：qa-verify: 来源未声明输出 report.docx；manager-acceptance: 来源未声明输出 report.docx；qa-verify: 来源未声明输出 report.docx；manager-acceptance: 来源未声明输出 report.docx；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null,
+    "candidate": null
+  },
+  {
+    "label": "plan-summary",
+    "status": "returned",
+    "reply": "可以，这里给出一个**待确认、不会自动执行**的团队方案：使用现有“原生办公插件验收”部门做三元分工——经理负责派工与最终确认，文档员工负责生成 summary.json，独立 QA 负责核对计算与来源。由于当前授权没有终端命令能力，QA 只能用 docx_read / filesystem / artifact_write 做只读核对和独立记录，不能执行 node --test 之类命令；因此本方案不安排执行型测试节点，改为人工独立核对。保存后需要在项目中确认工具与实现合同。",
+    "draftIssue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "生成草案校验失败：manager_confirm: 需要另一位员工审查实现或修复任务；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null,
+    "candidate": null
+  },
+  {
+    "label": "correct-word-2",
+    "status": "returned",
+    "reply": "已按你指出的校验问题修正：qa-verify 只把 write-docx 声明输出的 report.docx 作为输入，manager-accept 只把 write-docx 的 report.docx 与 qa-verify 的 qa.json 作为输入，不再检查未声明产物。deliveryCriteria 仅绑定用户报告的事实与“独立QA核对”要求，检查任务为 qa-verify；经理 acceptance.json 是最终检查结论，不再另造需要被检查的交付标准，也不形成无限自检链。三人三节点均为 work，有序执行，不执行、不新增权限。预算按项目原0.28预留0.02，实执行上限0.26。",
+    "draftIssue": {
+      "code": "ORGANIZATION_CHAT_INVALID",
+      "message": "本轮方案资料不完整，未更新方案。可以继续讨论或请为伍重新整理。"
+    },
+    "previewId": null,
+    "candidate": null
+  },
+  {
+    "label": "correct-word-3",
+    "status": "returned",
+    "reply": "已按你上轮校验意见整理：沿用目录中的“原生办公插件验收”部门，不新增员工；writer 制作并回读 report.docx，独立 QA 读取当前 DOCX 逐项核对后写出 qa.json，经理只读 DOCX 与 QA 后输出 acceptance.json。三个节点均为 work、有序执行，只产出这三个文件，不使用终端、不访问网络，也不声称真实巡检。deliveryCriteria 只列用户报告的事实与独立核对要求：作者产物由 QA 检查，QA 结果由经理复核；经理验收单是最终检查结论，不另造需要被检查的交付标准，不形成无限自检链。人员与依赖：writer→qa→manager，QA 输入绑定 write-docx 的 report.docx，经理输入绑定 write-docx 的 report.docx 与 qa-verify 的 qa.json。预算从项目原 0.28 美元内预留 0.02 作为恢复余量，实际执行上限 0.26 美元；总模型调用最多 48 次、单节点最多 24 次、单次输出 8192 Token，各节点按认领、工具加载、读写与正式交接留足轮数。本方案仅返回候选，尚未保存或执行。",
+    "draftIssue": null,
+    "previewId": "e968b261-c250-43d1-a210-54e617acb051",
+    "candidate": {
+      "schemaVersion": 2,
+      "target": {
+        "kind": "existing",
+        "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+        "departmentVersion": 1,
+        "primaryAgentIds": [
+          "manager",
+          "writer",
+          "qa"
+        ],
+        "collaboratingAgents": []
+      },
+      "rationale": "任务是一次性的虚构测试资料 DOCX 制作、独立核对与经理验收，目录中该部门恰好提供文档制作、独立 QA 与交付经理三类角色，且工具授权覆盖 docx_create、docx_read、filesystem 与 artifact_write，无需新增员工或扩大权限。采用单线串行：writer 先产出 report.docx；QA 读取作者当前产物独立核对并写 qa.json；经理等 QA 结束后读取 DOCX 与 qa.json 作最终结论并写 acceptance.json。三个节点均标 work，不使用 terminal，不把办公核对标成代码 review。",
+      "tasks": [
+        {
+          "id": "write-docx",
+          "subject": "制作并回读 report.docx 虚构测试资料报告",
+          "objective": "仅依据用户提供的虚构测试资料，使用已授权的原版 plugin__office__docx_create 在工作区根目录创建一页 report.docx：含标题；明确标注为虚构测试资料、未访问网站、未做真实巡检；检查表三行——首页=通过、登录=通过、备份=失败；统计为总计3项、2项通过、1项失败。创建后立即用 plugin__office__docx_read 回读核验上述要点齐全，不符则修正并重新回读。只产出 report.docx，不创建其他文件，不访问网络，不声称真实巡检。",
+          "assigneeId": "writer",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "report.docx 存在且可被 docx_read 成功读出文本",
+            "文档明确标注为虚构测试资料，未声称访问网站或真实巡检",
+            "含三行检查结果：首页=通过、登录=通过、备份=失败",
+            "统计为总计3项、2项通过、1项失败",
+            "除 report.docx 外未创建其他交付文件"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "artifact",
+                "requirement": "给出 report.docx 的最终路径与所用工具（须为 plugin__office__docx_create）"
+              },
+              {
+                "key": "readback",
+                "requirement": "说明 docx_read 回读是否成功及回读到的事实要点"
+              },
+              {
+                "key": "notice",
+                "requirement": "确认文档已标注虚构测试资料且未声称真实巡检"
+              },
+              {
+                "key": "limits",
+                "requirement": "说明已知偏差或未完成点，无则明确写无"
+              }
+            ]
+          },
+          "estimatedInputTokens": 9000,
+          "estimatedOutputTokens": 3500,
+          "maxOutputTokens": 8192,
+          "maxBudget": 0.1,
+          "maxModelCalls": 12,
+          "kind": "work",
+          "inputs": [],
+          "outputs": [
+            {
+              "path": "report.docx"
+            }
+          ],
+          "inScope": [
+            "report.docx"
+          ],
+          "outOfScope": [
+            "qa.json",
+            "acceptance.json"
+          ]
+        },
+        {
+          "id": "qa-verify",
+          "subject": "独立核对 report.docx 并输出 qa.json",
+          "objective": "作为独立 QA，使用 plugin__office__docx_read 读取本次 writer 产出的 report.docx，独立核对：虚构测试资料标注与未真实巡检声明；三条检查结果首页=通过、登录=通过、备份=失败；统计总计3项、2通过、1失败。不得修改 DOCX。仅用 artifact_write 写出 qa.json（含 verdict、checks、findings）。事实不符或读取失败时 verdict 必须为 fail 并如实记录 findings。不创建其他文件，不使用终端。",
+          "assigneeId": "qa",
+          "dependencies": [
+            "write-docx"
+          ],
+          "acceptanceCriteria": [
+            "qa.json 存在且含 verdict、checks、findings 三个字段",
+            "checks 覆盖虚构资料标注、首页、登录、备份四条结果与总计统计",
+            "结论与实际 DOCX 内容一致；不符时 verdict 为 fail 并记录 findings",
+            "未修改 report.docx，未创建额外文件"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "verdict",
+                "requirement": "给出明确 pass/fail 及一句话依据"
+              },
+              {
+                "key": "evidence",
+                "requirement": "给出 qa.json 路径与逐项核对到的 DOCX 事实"
+              },
+              {
+                "key": "findings",
+                "requirement": "列出不符点或一致确认，不得只复述作者总结"
+              }
+            ]
+          },
+          "estimatedInputTokens": 9000,
+          "estimatedOutputTokens": 3000,
+          "maxOutputTokens": 8192,
+          "maxBudget": 0.08,
+          "maxModelCalls": 11,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "report.docx",
+              "producerTaskId": "write-docx"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "qa.json",
+              "format": "json",
+              "requiredKeys": [
+                "verdict",
+                "checks",
+                "findings"
+              ]
+            }
+          ],
+          "inScope": [
+            "qa.json"
+          ],
+          "outOfScope": [
+            "report.docx",
+            "acceptance.json"
+          ]
+        },
+        {
+          "id": "manager-accept",
+          "subject": "只读验收 DOCX 与 QA 并输出 acceptance.json",
+          "objective": "经理以 plugin__office__docx_read 读取 report.docx、以 filesystem 读取 qa.json，逐项核对虚构测试资料标注、三条检查结果（首页通过、登录通过、备份失败）、统计2通过1失败，以及 QA 结论与本经理实际读取是否一致，然后仅用 artifact_write 写出 acceptance.json（含 verdict、findings、summary）。不得修改或重写 report.docx 与 qa.json，不得创建其他文件；任一事实不符或矛盾时如实给出 fail 并记录。",
+          "assigneeId": "manager",
+          "dependencies": [
+            "write-docx",
+            "qa-verify"
+          ],
+          "acceptanceCriteria": [
+            "acceptance.json 存在且含 verdict、findings、summary 三个字段",
+            "结论与 DOCX 事实及 qa.json 一致，逐条覆盖三条结果与统计",
+            "不一致时 verdict 为 fail 并在 findings 说明",
+            "未修改 report.docx 与 qa.json，未创建额外文件"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "conclusion",
+                "requirement": "给出最终验收 verdict 与简短理由"
+              },
+              {
+                "key": "facts",
+                "requirement": "列出实际从 DOCX 与 QA 核对到的三条结果与统计事实"
+              },
+              {
+                "key": "evidence",
+                "requirement": "给出 report.docx、qa.json、acceptance.json 路径"
+              },
+              {
+                "key": "mismatches",
+                "requirement": "列出任何不符或矛盾，无则明确写无"
+              }
+            ]
+          },
+          "estimatedInputTokens": 10000,
+          "estimatedOutputTokens": 3000,
+          "maxOutputTokens": 8192,
+          "maxBudget": 0.08,
+          "maxModelCalls": 12,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "report.docx",
+              "producerTaskId": "write-docx"
+            },
+            {
+              "path": "qa.json",
+              "producerTaskId": "qa-verify"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "acceptance.json",
+              "format": "json",
+              "requiredKeys": [
+                "verdict",
+                "findings",
+                "summary"
+              ]
+            }
+          ],
+          "inScope": [
+            "acceptance.json"
+          ],
+          "outOfScope": [
+            "report.docx",
+            "qa.json"
+          ]
+        }
+      ],
+      "orchestration": {
+        "pattern": "pipeline",
+        "rationale": "文档制作依赖单次创建与回读，随后必须由独立 QA 读取作者当前产物核对，最后由经理读取 DOCX 与 qa.json 形成结论，存在严格先后与产物绑定关系，故采用串行流水线而非并行。"
+      },
+      "deliveryCriteria": [
+        {
+          "id": "dc-facts",
+          "description": "report.docx 含用户提供的虚构测试事实：首页通过、登录通过、备份失败，统计总计3项、2项通过、1项失败，并明确标注虚构测试资料、未访问网站或真实巡检。",
+          "producerTaskIds": [
+            "write-docx"
+          ],
+          "checkTaskId": "qa-verify",
+          "checkCriteriaIndexes": [
+            1,
+            2
+          ],
+          "independent": true
+        },
+        {
+          "id": "dc-independent-qa",
+          "description": "QA 独立读取当前 report.docx 后输出 qa.json，逐项核对上述事实并与实际内容一致，不符时给 fail。",
+          "producerTaskIds": [
+            "qa-verify"
+          ],
+          "checkTaskId": "manager-accept",
+          "checkCriteriaIndexes": [
+            1,
+            2
+          ],
+          "independent": true
+        }
+      ]
+    }
+  },
+  {
+    "label": "plan-temperature",
+    "status": "returned",
+    "reply": "可以确认：按当前授权（只有办公文档工具、无终端/运行权限），本部门无法编写或运行脚本，也无法执行任何测试。因此本轮只能产出文字版需求与验收/测试说明（DOCX），并做独立文本核对；代码实现与 `node`/`npm test` 类运行验收必须留待获得执行授权后进行。\n\n能力缺口：①无终端/执行工具，不能创建 .js 文件或运行 happy path 与非法输入用例；②无测试运行器，0→32、100→212、非法输入三类断言只能写成“待运行”的用例描述；③目录中仅有“原生办公插件验收”部门（经理/文档员工/独立办公QA），与代码开发岗位不匹配。\n\n组织建议：可选用目录中该部门做“需求与验收标准文档”这一小任务（文档员工产出 DOCX，QA 只做文字二级核对）；开发职责与真实运行验证应放入一个待确认的新部门（如含开发工程师+可执行测试的独立QA），在你确认执行权限和工具后再建。\n\n交付物：1 份《摄氏转华氏需求与验收测试说明》DOCX，包含：功能定义与边界（0↔32、100↔212，公式 F=C×9/5+32）、非法输入提示行为、逐条测试用例与预期结果（标注“未运行”）、以及明确的风险声明。所附候选方案只是待你确认的草案，我不会自动保存或执行。确认后需要你在项目中先补齐终端与测试工具授权，才能规划真实实现与独立复测。",
+    "draftIssue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "d-spec: 检查任务 check 的验收条目索引无效或重复；已有方案未改变，可以继续讨论修改。"
+    },
+    "previewId": null,
+    "candidate": null
+  }
+]

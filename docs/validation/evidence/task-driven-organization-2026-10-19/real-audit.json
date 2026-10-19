@@ -1,0 +1,689 @@
+{
+  "passed": true,
+  "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+  "parentRunId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+  "restartRunId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+  "resumedRunId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+  "checks": [
+    {
+      "name": "original and both recovered archives intact",
+      "passed": true
+    },
+    {
+      "name": "restart preserved all settled usage and six unknown reservations",
+      "passed": true
+    },
+    {
+      "name": "original approved DAG and requirements preserved",
+      "passed": true
+    },
+    {
+      "name": "policy unchanged across restart",
+      "passed": true
+    },
+    {
+      "name": "agents unchanged across restart",
+      "passed": true
+    },
+    {
+      "name": "orchestration unchanged across restart",
+      "passed": true
+    },
+    {
+      "name": "deliveryCriteria unchanged across restart",
+      "passed": true
+    },
+    {
+      "name": "goalContract unchanged across restart",
+      "passed": true
+    },
+    {
+      "name": "author completed checkpoint restored",
+      "passed": true
+    },
+    {
+      "name": "author never redispatched or reaccepted",
+      "passed": true
+    },
+    {
+      "name": "all prior model calls and spend carried",
+      "passed": true
+    },
+    {
+      "name": "recovery happened before any new model request",
+      "passed": true
+    },
+    {
+      "name": "exactly three official independent handoffs",
+      "passed": true
+    },
+    {
+      "name": "original DOCX version restored",
+      "passed": true
+    },
+    {
+      "name": "both completed nodes restored in final continuation",
+      "passed": true
+    },
+    {
+      "name": "final continuation never redispatches completed nodes",
+      "passed": true
+    },
+    {
+      "name": "requirement preserved after resource-only revision",
+      "passed": true
+    },
+    {
+      "name": "agents preserved after resource-only revision",
+      "passed": true
+    },
+    {
+      "name": "orchestration preserved after resource-only revision",
+      "passed": true
+    },
+    {
+      "name": "deliveryCriteria preserved after resource-only revision",
+      "passed": true
+    },
+    {
+      "name": "resource-only continuation remains within original authorization",
+      "passed": true
+    },
+    {
+      "name": "final restored input versions match accepted files",
+      "passed": true
+    },
+    {
+      "name": "every delivery requirement has matching host evidence",
+      "passed": true
+    },
+    {
+      "name": "no unknown or pending operation at interruption or completion",
+      "passed": true
+    },
+    {
+      "name": "only approved delivery files",
+      "passed": true
+    },
+    {
+      "name": "download SHA matches acceptance.json",
+      "passed": true
+    },
+    {
+      "name": "download SHA matches qa.json",
+      "passed": true
+    },
+    {
+      "name": "download SHA matches report.docx",
+      "passed": true
+    },
+    {
+      "name": "final DOCX is the original accepted bytes",
+      "passed": true
+    },
+    {
+      "name": "DOCX ZIP complete",
+      "passed": true
+    },
+    {
+      "name": "three original facts in actual Word table",
+      "passed": true
+    },
+    {
+      "name": "fictional-data and no-real-inspection disclosure",
+      "passed": true
+    },
+    {
+      "name": "correct 3/2/1 totals",
+      "passed": true
+    },
+    {
+      "name": "qa.json employee verdict pass",
+      "passed": true
+    },
+    {
+      "name": "acceptance.json employee verdict pass",
+      "passed": true
+    },
+    {
+      "name": "no added unknown fees",
+      "passed": true
+    },
+    {
+      "name": "execution within .26 and 48 requests",
+      "passed": true
+    },
+    {
+      "name": "source department employees unchanged",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "path": "acceptance.json",
+      "size": 3450,
+      "sha256": "0c3c9ef649b8606fd672217b4bd6bfe61309732f56512af5f645ecf92ef8f5e2"
+    },
+    {
+      "path": "qa.json",
+      "size": 2570,
+      "sha256": "10a3a5765e26c2fc42aeeec68ccf23dab02cf3f8fadcbff265725b4786430489"
+    },
+    {
+      "path": "report.docx",
+      "size": 10400,
+      "sha256": "03a17d1e4390a03231995e4c403196bf9589c8e71ce5448e8d96b2908b81d13d"
+    }
+  ],
+  "wordTableRows": [
+    [
+      "检查项",
+      "结果"
+    ],
+    [
+      "首页",
+      "通过"
+    ],
+    [
+      "登录",
+      "通过"
+    ],
+    [
+      "备份",
+      "失败"
+    ]
+  ],
+  "wordText": "虚构测试资料报告（Fictional Test Data Report）\n\n重要声明：本报告为虚构测试资料，仅用于演示与流程验证，不代表任何真实系统状态。编写过程未访问任何网站、未连接任何外部服务，也未做任何真实巡检或实测；下列全部结论均为用户提供的虚构样例数据，不可用于真实生产判断。\n检查表\n检查项\n结果\n首页\n通过\n登录\n通过\n备份\n失败\n统计\n总计：3项\n通过：2项\n失败：1项\n说明：以上“首页=通过、登录=通过、备份=失败”及“总计3项、2项通过、1项失败”均为虚构测试资料中的样例事实，并非真实巡检结果。",
+  "newUsage": [
+    {
+      "id": "7538758c-663c-44a6-8f95-a0e8ceb6e6e0",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "767e3f77-a74a-426e-a00f-5ac74b92ee05",
+      "taskId": "manager-accept",
+      "attemptId": "413f9aae-a05b-40aa-9619-e5fadfdeaafc",
+      "requestId": "e0b44b35-7c64-4489-b091-cf23d9d783c8",
+      "durationMs": 10510,
+      "inputTokens": 18434,
+      "outputTokens": 1496,
+      "cost": 0.007325399999999999,
+      "purpose": "正式交接",
+      "createdAt": "2026-10-19T02:43:49.706Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "cb464864-f91c-403c-b5f5-1ef3e0efbc27",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "767e3f77-a74a-426e-a00f-5ac74b92ee05",
+      "taskId": "manager-accept",
+      "attemptId": "413f9aae-a05b-40aa-9619-e5fadfdeaafc",
+      "requestId": "1d82d035-f0ce-4d29-9227-23c51e8108fb",
+      "durationMs": 8042,
+      "inputTokens": 16968,
+      "outputTokens": 115,
+      "cost": 0.005228399999999999,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:43:34.596Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "b0eb48f4-cb9d-467c-86e0-c07682c745af",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "767e3f77-a74a-426e-a00f-5ac74b92ee05",
+      "taskId": "manager-accept",
+      "attemptId": "413f9aae-a05b-40aa-9619-e5fadfdeaafc",
+      "requestId": "af43a63e-1581-4ecd-889b-184fb208c9bc",
+      "durationMs": 2349,
+      "inputTokens": 14844,
+      "outputTokens": 178,
+      "cost": 0.0046668000000000005,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:43:21.645Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "e05dfc3b-50d2-4a48-a12e-ac9ead050403",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "767e3f77-a74a-426e-a00f-5ac74b92ee05",
+      "taskId": "manager-accept",
+      "attemptId": "413f9aae-a05b-40aa-9619-e5fadfdeaafc",
+      "requestId": "9b4122ec-91d6-4124-8112-b245aec6e7bd",
+      "durationMs": 2935,
+      "inputTokens": 13906,
+      "outputTokens": 98,
+      "cost": 0.0042894000000000005,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:43:19.133Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "c5139df8-8526-46e3-9f4c-28c3ce7283c6",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": null,
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 2783,
+      "outputTokens": 109,
+      "cost": 0.0009656999999999999,
+      "purpose": "预算补充规划",
+      "createdAt": "2026-10-19T02:42:32.188Z",
+      "agentName": null
+    },
+    {
+      "id": "f5837447-7620-4a48-ac70-d17b2d5fd96f",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "2c00b1ad-5be0-4ee9-8941-a081bbfa68c1",
+      "taskId": "manager-accept",
+      "attemptId": "2d2120eb-a292-4569-8d53-c75796d89ba9",
+      "requestId": "2b424121-4623-4fd2-8d14-5e66ed540998",
+      "durationMs": 6264,
+      "inputTokens": 15911,
+      "outputTokens": 1008,
+      "cost": 0.005982899999999999,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:31:48.664Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "7c98795a-5731-4ad3-80c8-c5ea2cc4e335",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "2c00b1ad-5be0-4ee9-8941-a081bbfa68c1",
+      "taskId": "manager-accept",
+      "attemptId": "2d2120eb-a292-4569-8d53-c75796d89ba9",
+      "requestId": "89986bc5-6098-4d3a-8487-48e2e3c66c49",
+      "durationMs": 2421,
+      "inputTokens": 13926,
+      "outputTokens": 162,
+      "cost": 0.0043722,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:31:36.579Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "bfedfed5-d7ad-4d33-b68a-b61e9566e2d9",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-1",
+      "employeeId": "manager",
+      "sessionId": "2c00b1ad-5be0-4ee9-8941-a081bbfa68c1",
+      "taskId": "manager-accept",
+      "attemptId": "2d2120eb-a292-4569-8d53-c75796d89ba9",
+      "requestId": "15ee2743-3319-4398-b4d6-12a347a0af25",
+      "durationMs": 2521,
+      "inputTokens": 13064,
+      "outputTokens": 100,
+      "cost": 0.0040392,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:31:34.047Z",
+      "agentName": "办公验收经理"
+    },
+    {
+      "id": "18a564f2-c816-4081-a431-b8df40f58f10",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+      "taskId": "qa-verify",
+      "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+      "requestId": "419cf6a9-3fce-4dfa-850f-0a17e6d0b952",
+      "durationMs": 9458,
+      "inputTokens": 15233,
+      "outputTokens": 1581,
+      "cost": 0.006467099999999999,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:31:31.309Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "b2a8e2bb-e8b1-461d-b6a5-687a4f3bf24c",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+      "taskId": "qa-verify",
+      "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+      "requestId": "9b3a15e6-5cf5-4d56-bd28-ce39485705f4",
+      "durationMs": 2345,
+      "inputTokens": 13570,
+      "outputTokens": 81,
+      "cost": 0.0041681999999999995,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:31:20.124Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "4843cab6-03ad-4ad1-99bc-6dd80cf07e28",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+      "taskId": "qa-verify",
+      "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+      "requestId": "5a987511-2023-4a0d-ab74-75cc9fe8507f",
+      "durationMs": 13180,
+      "inputTokens": 19567,
+      "outputTokens": 2212,
+      "cost": 0.0085245,
+      "purpose": "上下文摘要",
+      "createdAt": "2026-10-19T02:31:17.687Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "6de2dcca-9fc5-442d-adcb-0d9960140f1f",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+      "taskId": "qa-verify",
+      "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+      "requestId": "da361ba8-df19-4a8b-af3a-5931dfabd3a2",
+      "durationMs": 5239,
+      "inputTokens": 12806,
+      "outputTokens": 732,
+      "cost": 0.0047202,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:31:02.740Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "f0101264-a1fe-48e0-9a05-9f08867a1ab8",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+      "taskId": "qa-verify",
+      "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+      "requestId": "85c44331-2138-46b0-a3f5-bb951a1b6612",
+      "durationMs": 15421,
+      "inputTokens": 12301,
+      "outputTokens": 153,
+      "cost": 0.0038738999999999996,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:30:54.603Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "355c2811-5ee8-4c67-8816-89b87be5d6b8",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+      "agentId": "employee-3",
+      "employeeId": "qa",
+      "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+      "taskId": "qa-verify",
+      "attemptId": "37e86e7f-4a07-4ab2-9480-580b9ee56edf",
+      "requestId": "9d0e23d2-2f42-4abd-ac14-a06100464a24",
+      "durationMs": 11909,
+      "inputTokens": 11391,
+      "outputTokens": 97,
+      "cost": 0.0035337,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:30:39.030Z",
+      "agentName": "独立办公QA"
+    },
+    {
+      "id": "3010c45f-240c-45ea-828e-f17d1c8b5e65",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+      "taskId": "write-docx",
+      "attemptId": "41c2215f-1a94-4373-b645-926a06a1ebdb",
+      "requestId": "eb7549d2-5c8a-41ca-866a-67e2e7e3c9dc",
+      "durationMs": 13362,
+      "inputTokens": 11194,
+      "outputTokens": 1521,
+      "cost": 0.0051833999999999995,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:28:57.808Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "86a5ec7c-f6a6-4f92-82e0-fd0473688304",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+      "taskId": "write-docx",
+      "attemptId": "41c2215f-1a94-4373-b645-926a06a1ebdb",
+      "requestId": "5b94d202-fe46-4fd2-8d04-0003574e0794",
+      "durationMs": 2501,
+      "inputTokens": 10810,
+      "outputTokens": 55,
+      "cost": 0.003309,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:28:41.272Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "91ed8455-10ff-4bf1-8638-a9c5b965f595",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+      "taskId": "write-docx",
+      "attemptId": "41c2215f-1a94-4373-b645-926a06a1ebdb",
+      "requestId": "17320d0d-b591-4aca-a149-1027462d17fc",
+      "durationMs": 6607,
+      "inputTokens": 10328,
+      "outputTokens": 311,
+      "cost": 0.0034716,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:28:35.597Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "260e4c5c-3047-426b-9345-cfda5f948da4",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+      "taskId": "write-docx",
+      "attemptId": "41c2215f-1a94-4373-b645-926a06a1ebdb",
+      "requestId": "a5fc8843-3a8f-4b17-9942-c880686ebdde",
+      "durationMs": 1890,
+      "inputTokens": 10183,
+      "outputTokens": 117,
+      "cost": 0.0031953000000000003,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:28:28.921Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "be9d67e6-22d6-491f-9cc0-76b38ec404f7",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": "38e2213f-4530-45ba-9308-87742b61b01a",
+      "departmentId": "830c5454-a0d8-477c-912c-2273dfd2b7de",
+      "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+      "agentId": "employee-2",
+      "employeeId": "writer",
+      "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+      "taskId": "write-docx",
+      "attemptId": "41c2215f-1a94-4373-b645-926a06a1ebdb",
+      "requestId": "c9959f75-6264-4261-a685-30d9c3170c55",
+      "durationMs": 16796,
+      "inputTokens": 9216,
+      "outputTokens": 105,
+      "cost": 0.0028908,
+      "purpose": "项目执行",
+      "createdAt": "2026-10-19T02:28:26.894Z",
+      "agentName": "文档员工"
+    },
+    {
+      "id": "b17c7fd3-874b-4168-8244-e56fe777715d",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": "organization:61500670-2dbb-49ab-9477-fbd1150b306e",
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 8044,
+      "outputTokens": 1976,
+      "cost": 0.004784399999999999,
+      "purpose": "组织需求对话",
+      "createdAt": "2026-10-19T02:24:54.155Z",
+      "agentName": null
+    },
+    {
+      "id": "1bc47f09-38f9-47ae-8e51-ca0daed82f65",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": "organization:61500670-2dbb-49ab-9477-fbd1150b306e",
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 8719,
+      "outputTokens": 1753,
+      "cost": 0.004719299999999999,
+      "purpose": "组织需求对话",
+      "createdAt": "2026-10-19T02:18:49.607Z",
+      "agentName": null
+    },
+    {
+      "id": "67dfefac-5820-43ca-883f-0a53b4564661",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": "organization:9312616a-fbaa-4b99-84e9-9157b3527255",
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 6843,
+      "outputTokens": 1976,
+      "cost": 0.0044241,
+      "purpose": "组织需求对话",
+      "createdAt": "2026-10-19T02:17:47.193Z",
+      "agentName": null
+    },
+    {
+      "id": "d4924576-a5fa-49b9-a813-5f6ddd00440c",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": "organization:61500670-2dbb-49ab-9477-fbd1150b306e",
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 7474,
+      "outputTokens": 1807,
+      "cost": 0.004410600000000001,
+      "purpose": "组织需求对话",
+      "createdAt": "2026-10-19T02:16:33.629Z",
+      "agentName": null
+    },
+    {
+      "id": "6f599120-1d03-4d23-a88d-74fc3367c7a4",
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "projectId": null,
+      "departmentId": null,
+      "runId": null,
+      "agentId": null,
+      "employeeId": null,
+      "sessionId": "organization:61500670-2dbb-49ab-9477-fbd1150b306e",
+      "taskId": null,
+      "attemptId": null,
+      "requestId": null,
+      "durationMs": null,
+      "inputTokens": 6994,
+      "outputTokens": 2279,
+      "cost": 0.004833,
+      "purpose": "组织需求对话",
+      "createdAt": "2026-10-19T02:15:13.488Z",
+      "agentName": null
+    }
+  ],
+  "phaseCost": 0.10937909999999999,
+  "projectCost": 0.0862077,
+  "projectCalls": 19,
+  "inputTokens": 246435,
+  "outputTokens": 10231,
+  "cumulativeOccupied": 3.0042906,
+  "unknownCount": 6,
+  "originalDepartmentVersion": 1,
+  "employeeDeliverablesEditedByCodex": false,
+  "limitation": "Content/OOXML/hash and genuine employee checks verified; exact desktop Word pagination not verified. Controlled pre-dispatch pause, then graceful service shutdown, not arbitrary mid-request crash."
+}

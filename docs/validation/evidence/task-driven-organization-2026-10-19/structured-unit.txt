@@ -1,0 +1,11 @@
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (13.2896ms)
+✔ new executable plans require mappings while text tasks and saved legacy contracts stay compatible (0.5334ms)
+✔ office-only planning does not teach the model to label document acceptance as code review (0.4487ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 980.0664

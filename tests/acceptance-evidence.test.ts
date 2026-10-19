@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {observeAcceptanceChecks,collectAcceptanceChecks} from '../services/agent-runtime/acceptance-checks.mjs';
 import {runAcceptanceEvidence} from '../apps/api/src/run-acceptance-evidence.ts';
-import {sameHandoffSeal} from '../packages/contracts/run-lineage-evidence.ts';
+import {sameHandoffSeal,handoffSealValue} from '../packages/contracts/run-lineage-evidence.ts';
+import {createHandoffReport} from '../packages/contracts/handoff-report.mjs';
 import {taskSchema} from '../packages/contracts/index.ts';
 import {resumeHandoff} from '../apps/api/src/handoff-checkpoints.ts';
 
@@ -55,4 +56,22 @@ test('cold recovery retains checks without rerunning commands and rejects altere
  inherited.handoffCheckpoints[0].acceptanceChecks[0].status='unverified';
  assert.throws(()=>resumeHandoff(inherited,[],completed,process.cwd()),/逐项验收/);
  assert.equal(record.commands.length,1);
+});
+
+test('recovered structured reviews retain their sealed report and reject report tampering',()=>{
+ const source:any=run();
+ const writer={id:'write',assigneeId:'writer',dependencies:[],acceptanceCriteria:[],outputs:[]};
+ const qa={id:'qa',assigneeId:'qa',dependencies:['write'],acceptanceCriteria:['内容与来源一致'],outputs:[],handoff:{sections:[{key:'evidence',requirement:'核对依据'}]}};
+ const report=createHandoffReport(qa,{output:JSON.stringify({summary:'已独立核对',sections:{evidence:'当前报告与来源一致'},risks:[]}),acceptanceResults:[{criterion:'内容与来源一致',status:'passed',evidence:'当前报告已读取'}]});
+ const records=[{taskId:'write',runId:'prior',attemptId:'w',outputs:[]},{taskId:'qa',runId:'prior',attemptId:'a',outputs:[],employeeReport:report}];
+ source.snapshot={...source.snapshot,tasks:[writer,qa],handoffCheckpoints:records,recovery:{sourceRunId:'prior',completed:[{taskId:'write',attemptId:'w'},{taskId:'qa',attemptId:'a'}]},deliveryCriteria:[{id:'r1',description:'报告可用',producerTaskIds:['write'],checkTaskId:'qa',checkCriteriaIndexes:[0],independent:true}]};
+ source.events=[{type:'run/task-mapping',data:{tasks:[{task_id:'native-w',seed_id:'write'},{task_id:'native-q',seed_id:'qa'}]}},{type:'team/checkpoint',data:{tasks:[{id:'native-w',status:'completed',attemptId:'w'},{id:'native-q',status:'completed',attemptId:'a'}]}}];
+ const inherited:any={...lineage,status:'verified',sourceRunId:'prior',receipts:records.map((r,i)=>({taskId:r.taskId,attemptId:r.attemptId,sourceRunId:'prior',acceptanceSeq:i+1,receipt:handoffSealValue(r)}))};
+ assert.equal(runAcceptanceEvidence(source,inherited).deliveryCriteria?.[0].status,'passed');
+ const tampered=structuredClone(records[1]);tampered.employeeReport.summary='冒充旧结论';
+ assert.equal(sameHandoffSeal(records[1],tampered),false);
+ source.snapshot.handoffCheckpoints[1]={...records[1],reportContract:{approvedSha256:'unapproved'}};
+ assert.equal(runAcceptanceEvidence(source,inherited).deliveryCriteria?.[0].status,'unverified');
+ source.snapshot.handoffCheckpoints[1]=tampered;
+ assert.equal(runAcceptanceEvidence(source,inherited).deliveryCriteria?.[0].status,'unverified');
 });

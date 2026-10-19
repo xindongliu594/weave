@@ -23,3 +23,15 @@ export const organizationTaskPlanningInstructions = [
   '未授权执行工具时仅用 requirements/work 做文字讨论，不输出执行合同。以下三节点仅示范合同结构，不是固定方案、预算建议或已生成交付物；任务、路径、验收标准、估算与员工 ID 应按用户需求及当前目录重新规划。不能照抄示例 Token 估算来规避费用校验：',
   JSON.stringify(organizationPlanningTaskExample),
 ].join('\n');
+
+/** Code-review examples are misleading when the granted tools only produce documents. */
+export function organizationTaskInstructionsFor(tools:readonly string[]){
+ if(tools.some(tool=>['terminal','terminal_test'].includes(tool)))return organizationTaskPlanningInstructions;
+ return [
+  '当前没有终端授权。文字分析、文档制作、独立内容核对及经理验收都使用 kind=work；不要将普通办公验收标成 review（review 专指对 implementation/repair 的代码审查），不要编造 verify 命令。没有文件工具时仅规划文字内容，不承诺写文件。',
+  '按每位员工各自授权选择工作：有文档创建工具不代表可以写 JSON；没有 artifact_write 的员工不能负责 JSON 文件。能力不足可以选择其他获授权员工或清楚说明缺口，不能凭部门总工具清单扩大个人权限。',
+  '实际文件任务必须显式声明 outputs:[{path:"相对路径"}]。每个 inputs 的 path 必须与来源任务 outputs 的 path 完全一致，producerTaskId 必须是声明该输出的前置任务 ID；不能写来源员工ID或不存在任务。DOCX 等二进制产物省略 format；JSON 写 format:"json"。',
+  '独立核对者读取作者当前产物，填写可核验 acceptanceCriteria，并用 handoff.sections 要求事实、结论和证据。deliveryCriteria 绑定作者任务与其后的检查任务，禁止自检或循环依赖；最终经理结论是检查结果，不额外生成需要检查自身的标准。经理应等必要检查结束，读取所需原产物与QA证据。',
+  '例如来源任务 id=produce 的 outputs:[{path:"result.json",format:"json"}]，下游输入必须是 inputs:[{path:"result.json",producerTaskId:"produce"}]、dependencies:["produce"]。例子只说明字段关系，不能照抄为本次方案或已生成交付物。',
+ ].join('\n');
+}

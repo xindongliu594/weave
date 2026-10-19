@@ -1,0 +1,57 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executable candidate without host mappings is rejected without save or hidden model repair (16470.2478ms)
+✔ V2 conversation recommends existing employees without changing their department and expires old drafts (301.9173ms)
+✔ out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later (387.7926ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (69.0292ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (180.1255ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (96.146ms)
+✔ documented JSON mode preserves receipts and never retries: gpt-4.1-mini (141.064ms)
+✖ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (81.1968ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (191.6255ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (60.2242ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (168.0796ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (137.5322ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (88.8149ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (409.4441ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (234.485ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (194.3095ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (183.8652ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (340.0994ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (617.2302ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (79.387ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (52.2832ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (339.8949ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (291.5997ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 22
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23054.391
+
+✖ failing tests:
+
+test at tests\organization-chat.test.ts:1:16474
+✖ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (81.1968ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + undefined
+  - {
+  -   type: 'json_object'
+  - }
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-chat.test.ts:138:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { type: 'json_object' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,50 @@
+[
+  {
+    "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+    "seq": 212,
+    "agentId": null,
+    "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+    "tool": "plugin__office__docx_create",
+    "isError": false
+  },
+  {
+    "runId": "afc518f1-e2d3-4b0e-a8a0-c81155ac01de",
+    "seq": 255,
+    "agentId": null,
+    "sessionId": "af49b51f-a454-4fb8-9e1e-afd1592ad16d",
+    "tool": "plugin__office__docx_read",
+    "isError": false
+  },
+  {
+    "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+    "seq": 207,
+    "agentId": null,
+    "sessionId": "87a95dec-0559-4901-a4b9-4fee0f4814ce",
+    "tool": "plugin__office__docx_read",
+    "isError": false
+  },
+  {
+    "runId": "279bcb8e-9bf3-4059-8287-c84c7c013d97",
+    "seq": 511,
+    "agentId": null,
+    "sessionId": "2c00b1ad-5be0-4ee9-8941-a081bbfa68c1",
+    "tool": "plugin__office__docx_read",
+    "isError": false
+  },
+  {
+    "runId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+    "seq": 127,
+    "agentId": null,
+    "sessionId": "767e3f77-a74a-426e-a00f-5ac74b92ee05",
+    "tool": "plugin__office__docx_read",
+    "isError": false
+  },
+  {
+    "runId": "b7de5334-38a5-4e76-bcd4-0e743bcbafde",
+    "seq": 206,
+    "agentId": null,
+    "sessionId": "767e3f77-a74a-426e-a00f-5ac74b92ee05",
+    "tool": "plugin__office__docx_read",
+    "isError": false
+  }
+]

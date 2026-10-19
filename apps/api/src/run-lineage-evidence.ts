@@ -10,6 +10,7 @@ import {nodeTestCounts} from '../../../services/agent-runtime/run-evidence.mjs';
 import {canonicalEvidence,handoffSealValue,sameHandoffSeal,type RunLineageEvidence,type RecoveredReceipt} from '../../../packages/contracts/run-lineage-evidence.ts';
 import {runAcceptanceEvidence} from './run-acceptance-evidence.ts';
 import {verifiedResourceEdge} from './recovery-resource-plan.ts';
+import {assertHandoffReport,reportTaskFor} from '../../../packages/contracts/handoff-report.mjs';
 
 type Database={query:(sql:string,args?:any[])=>Promise<{rows:any[]}>};
 type Loaders={run:(id:string)=>any;operations:(runId:string,ids:string[])=>Promise<any[]>};
@@ -56,20 +57,26 @@ export async function collectRunLineageEvidence(current:any,load:Loaders):Promis
    for(const inherited of runs.slice(0,sourceIndex)){
     const carried=inherited.snapshot.recovery?.completed?.filter((task:any)=>task.taskId===id&&attempt(task)===attempt(done))??[];
     const records=inherited.snapshot.handoffCheckpoints?.filter((entry:any)=>entry.taskId===id&&entry.attemptId===attempt(done))??[];
-    assert(carried.length===1&&records.length===1&&sameHandoffSeal(records[0],seal),'SEAL_INVALID');
+    assert(carried.length===1&&records.length===1&&sameHandoffSeal(records[0],seal)&&
+      canonicalEvidence(records[0].reportContract)===canonicalEvidence(seal.reportContract),'SEAL_INVALID');
     assert(Array.isArray(seal.outputs)&&seal.outputs.every((output:any)=>inherited.snapshot.recovery.files?.some((file:any)=>file.state==='accepted'&&file.producerTaskId===id&&file.path===output.path&&file.sha256===output.sha256&&file.size===output.size)),'SEAL_INVALID');
    }
    const state=completedTasks(source.events,source.snapshot).get(id);
    assert(state&&attempt(state)===attempt(done),'SEAL_INVALID');
    const original=source.events.filter((event:any)=>event.type==='handoff/accepted'&&event.data.runId===source.id&&event.data.taskId===id&&event.data.attemptId===attempt(done));
    assert(original.length===1&&sameHandoffSeal(original[0].data,seal),'SEAL_INVALID');
+   if(seal.reportContract!==undefined){
+    assert(contract.handoff!==undefined,'SEAL_INVALID');
+    assertHandoffReport(reportTaskFor(contract,seal),original[0].data.employeeReport);
+   }
    const arrays=['inputs','outputs'];
    for(const key of arrays){
     const declared=contract[key]??[],observed=seal[key];
     assert(Array.isArray(observed)&&observed.length===declared.length&&new Set(observed.map((file:any)=>file.path)).size===observed.length&&
      declared.every((file:any)=>observed.some((actual:any)=>actual.path===file.path&&/^[a-f0-9]{64}$/i.test(actual.sha256??'')&&Number.isSafeInteger(actual.size)&&actual.size>=0&&(!file.sha256||file.sha256===actual.sha256))),'SEAL_INVALID');
    }
-   proof={taskId:id,attemptId:attempt(done),sourceRunId:source.id,acceptanceSeq:original[0].seq,receipt:handoffSealValue(original[0].data)};
+   proof={taskId:id,attemptId:attempt(done),sourceRunId:source.id,acceptanceSeq:original[0].seq,receipt:{...handoffSealValue(original[0].data),
+     ...(seal.reportContract===undefined?{}:{reportContract:seal.reportContract})}};
    response.receipts.push(proof);
   }catch{response.issues.push({taskId:done.taskId,code:'SEAL_INVALID',message:messages.SEAL_INVALID});continue;}
   // Only accepted attempt observations enter the inherited test list. Unknown,

@@ -1,0 +1,63 @@
+{
+  "verdict": "pass",
+  "checks": [
+    {
+      "id": "fictional-notice",
+      "item": "虚构测试资料标注与未真实巡检声明",
+      "expected": "文档明确标注为虚构测试资料，且声明未访问网站、未做真实巡检",
+      "observed": "标题为“虚构测试资料报告（Fictional Test Data Report）”；声明段写明“本报告为虚构测试资料，仅用于演示与流程验证，不代表任何真实系统状态”“编写过程未访问任何网站、未连接任何外部服务，也未做任何真实巡检或实测”；结尾说明重申“均为虚构测试资料中的样例事实，并非真实巡检结果”",
+      "status": "pass"
+    },
+    {
+      "id": "check-homepage",
+      "item": "首页检查结果",
+      "expected": "首页=通过",
+      "observed": "检查表中“首页”一行结果为“通过”",
+      "status": "pass"
+    },
+    {
+      "id": "check-login",
+      "item": "登录检查结果",
+      "expected": "登录=通过",
+      "observed": "检查表中“登录”一行结果为“通过”",
+      "status": "pass"
+    },
+    {
+      "id": "check-backup",
+      "item": "备份检查结果",
+      "expected": "备份=失败",
+      "observed": "检查表中“备份”一行结果为“失败”",
+      "status": "pass"
+    },
+    {
+      "id": "statistics",
+      "item": "统计结果",
+      "expected": "总计3项、2项通过、1项失败",
+      "observed": "统计段落为“总计：3项”“通过：2项”“失败：1项”，与三条检查结果自洽（通过2条、失败1条）",
+      "status": "pass"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "info",
+      "type": "consistency",
+      "detail": "独立读取 report.docx 全文（10 个内容块）逐项核对：五项要点全部与预期一致，未发现事实不符、缺失或与作者总结矛盾之处。",
+      "resolved": true
+    },
+    {
+      "id": "F2",
+      "severity": "info",
+      "type": "limitation",
+      "detail": "核对范围仅限文档文本内容与内文自洽性：三行结果（首页/登录/备份）均来自用户提供的虚构样例数据，本次核对不代表任何真实系统状态或真实巡检结论。",
+      "resolved": true
+    },
+    {
+      "id": "F3",
+      "severity": "info",
+      "type": "scope",
+      "detail": "QA 仅执行 plugin__office__docx_read 读取与 artifact_write 写 qa.json；未修改 report.docx，未创建其他文件，未使用终端，未访问网络。",
+      "resolved": true
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+✔ only matching completed attempt and host seal expose passing evidence (20.8995ms)
+✔ new requirement or truncated/changed receipt cannot inherit old success; seals include acceptance (0.7645ms)
+✔ legacy reports remain unverified instead of inventing new mappings (0.5266ms)
+✔ delivery projection requires committed producers and the exact check attempt (1.5257ms)
+✔ check schema rejects invalid exit codes and zero tests (5.3498ms)
+✔ cold recovery retains checks without rerunning commands and rejects altered proof (3.3938ms)
+✔ recovered structured reviews retain their sealed report and reject report tampering (3.5404ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (23.6385ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (11.3681ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (16.1593ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (16.7005ms)
+✔ explicit resource approval preserves exact inherited QA evidence across ordinary later recovery (29.6512ms)
+✔ a resource boundary cannot authorize changed goal, completed contract or counterfeit parent (8.4109ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (10.3802ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (3.0996ms)
+✔ ancestry has an explicit maximum depth (1.7492ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (5.9035ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (10.2899ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (0.7043ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (13.5797ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (3.4816ms)
+✔ recovery-derived repair report binding preserves the original accepted report (7.7007ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2897.6264

@@ -1,0 +1,40 @@
+✔ explicit resource approval preserves exact inherited QA evidence across ordinary later recovery (39.4062ms)
+✔ a resource boundary cannot authorize changed goal, completed contract or counterfeit parent (8.1984ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (2.9808ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (5.7266ms)
+✔ ancestry has an explicit maximum depth (1.8676ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (11.5156ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (21.8501ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (2.0531ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (26.6879ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (5.2039ms)
+✖ recovery-derived repair report binding preserves the original accepted report (10.2655ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3186.5223
+
+✖ failing tests:
+
+test at tests\run-lineage-evidence.test.ts:1:13503
+✖ recovery-derived repair report binding preserves the original accepted report (10.2655ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'partial'
+  - 'verified'
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-lineage-evidence.test.ts:179:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'partial',
+    expected: 'verified',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

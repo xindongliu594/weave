@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { organizationCandidateSchema } from '../packages/contracts/organization.ts';
 import { policySchema, validatePlan, type Model } from '../packages/contracts/index.ts';
 import { taskContractErrors } from '../packages/contracts/task-contracts.mjs';
-import { organizationPlanningTaskExample } from '../apps/api/src/organization-task-planning.ts';
+import { organizationPlanningTaskExample, organizationTaskInstructionsFor } from '../apps/api/src/organization-task-planning.ts';
 import { plannedAcceptanceErrors } from '../apps/api/src/execution-prompt.ts';
 
 test('the planning example is a legal three-person develop, independent verification, existing-manager review DAG', () => {
@@ -29,4 +29,13 @@ test('new executable plans require mappings while text tasks and saved legacy co
   assert.equal(plannedAcceptanceErrors(tasks).length,2);
   assert.deepEqual(taskContractErrors(tasks),[],'this check must not invalidate historical handoffs');
   assert.deepEqual(plannedAcceptanceErrors([tasks[2]]),[],'read-only semantic review does not invent a command');
+});
+
+test('office-only planning does not teach the model to label document acceptance as code review',()=>{
+  const prompt=organizationTaskInstructionsFor(['artifact_write','filesystem','plugin__office__docx_read']);
+  assert.ok(!prompt.includes('node --test'));
+  assert.match(prompt,/kind=work/);
+  assert.match(prompt,/producerTaskId/);
+  assert.match(prompt,/最终经理结论/);
+  assert.ok(organizationTaskInstructionsFor(['terminal_test']).includes('node --test'));
 });

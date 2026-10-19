@@ -1,0 +1,44 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executable candidate without host mappings is rejected without save or hidden model repair (6550.6063ms)
+✔ V2 conversation recommends existing employees without changing their department and expires old drafts (183.1908ms)
+✔ out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later (245.1801ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (53.8931ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (129.2566ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (59.4021ms)
+✔ documented JSON mode preserves receipts and never retries: gpt-4.1-mini (88.5302ms)
+✔ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (84.4574ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (98.3519ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (38.3932ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (153.2765ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (84.4505ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (40.6206ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (329.7666ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (144.908ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (132.5035ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (136.5916ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (165.8424ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (355.8021ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (62.424ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (58.0782ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (305.5666ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (291.0429ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10508.7751
+✔ confirmation creates a project only, freezes selected sources, and duplicate requests are idempotent (2938.8871ms)
+✔ superseded, edited or archived source drafts cannot create a project (109.2147ms)
+✔ new team uses the same explicit confirmation and V2 cannot enter the legacy department-update endpoint (45.0146ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3581.6954
