@@ -1,0 +1,803 @@
+{
+  "reply": "先说明：这只是一个待讨论的方案草案，不会保存，也不会执行；假设的 0.25 美元预算只用于检查估算是否合理，并不是执行授权，也没有任何工具调用被批准。你描述的三步链（事实表→短总结→独立核对）和最后的经理验收，在结构上正好是严格顺序的 pipeline：后一步必须读取前一步的产物，且每一步都有唯一的作者，没有可以并行或按运行时条件跳过的地方，因此我不使用并行、路由或分片汇总模板。由于这是目录为空时的隔离测试，我会提出一个待确认的新部门，其中设协调经理、记录整理员、摘要撰写员、质量核对员四个岗位；下游只读取上游的文件输入来传递内容，每份文件只有一位作者，独立核对者不承担事实表的制作。请注意，当前没有终端授权；核对岗位只能做文字层面的独立复核，不能承诺真实运行命令，也不能声称已通过测试。方案尚未创建或执行。",
+  "preview": {
+    "kind": "organization-v2",
+    "candidate": {
+      "schemaVersion": 2,
+      "target": {
+        "kind": "new",
+        "department": {
+          "name": "记录核验小组（待确认）",
+          "description": "隔离测试用的小型组织：整理三条虚构记录的事实表，撰写短总结，独立核对事实与3/2/1统计，最后由经理验收。仅用于讨论，不执行。",
+          "agents": [
+            {
+              "id": "manager",
+              "name": "验收经理",
+              "role": "manager",
+              "title": "协调经理",
+              "instructions": "负责把要求拆成有验收标准的任务，按顺序派工；等待事实表、短总结和独立核对回执全部完成后，逐项核对当前版本再给出验收结论。不得自行扩大授权、预算或声称文件已写入。",
+              "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+              "tools": [
+                "filesystem",
+                "artifact_write"
+              ]
+            },
+            {
+              "id": "fact_keeper",
+              "name": "记录整理员",
+              "role": "member",
+              "title": "原始事实整理员",
+              "instructions": "根据用户提供的三条虚构记录（首页通过、登录通过、备份失败）整理原始事实表，逐条保留状态和可核验描述，不擅自补充未给出的统计数据；只负责事实表这一份文件。",
+              "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+              "tools": [
+                "artifact_write"
+              ]
+            },
+            {
+              "id": "summarizer",
+              "name": "摘要撰写员",
+              "role": "member",
+              "title": "短总结撰写员",
+              "instructions": "只读取上游事实表，撰写简短总结；明确写出3条记录中通过2条、失败1条，以及首页和登录通过、备份失败的事实，不添加事实表中没有的信息。",
+              "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+              "tools": [
+                "filesystem",
+                "artifact_write"
+              ]
+            },
+            {
+              "id": "checker",
+              "name": "质量核对员",
+              "role": "member",
+              "title": "独立核对员",
+              "instructions": "独立读取事实表和短总结，逐项核对三条记录的名称与状态、3条总数、2条通过、1条失败，以及首页和登录通过、备份失败；只做文字层面的比对，不声称执行过命令或测试，发现不一致时如实列出。",
+              "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+              "tools": [
+                "filesystem",
+                "artifact_write"
+              ]
+            }
+          ]
+        }
+      },
+      "rationale": "选择 pipeline：用户明确要求后续步骤依赖前一步，且每份文件各有唯一作者。facts 由记录整理员产出；summary 读取 facts 的 facts.json；check 读取 facts 与 summary，最后 manager 验收。质量核对员与各产出作者不同，保证独立核对。所有员工都只使用已授权的 filesystem/artifact_write，不编造终端命令；经理与核对员的结论是文字验收结果，不代替实际执行证据。由于没有终端授权，方案不声明任何命令执行或用例通过。",
+      "tasks": [
+        {
+          "id": "facts",
+          "subject": "整理三条虚构记录的原始事实表",
+          "objective": "依据用户提供的三条虚构记录创建原始事实表：homepage=通过，login=通过，backup=失败。使用 JSON 记录每条记录的名称、状态和简要说明，并给出总数3、通过数2、失败数1的统计；不得添加未提供的事实。输出到 facts.json。",
+          "assigneeId": "fact_keeper",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "facts.json 是合法 JSON，包含3条记录：homepage 通过、login 通过、backup 失败。",
+            "facts.json 明确给出 total=3、passed=2、failed=1，且统计与记录逐一对应。",
+            "文件内容没有加入用户未提供的记录或虚构细节。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "records_table",
+                "requirement": "逐条列出三条记录的名称、状态与说明，并说明事实来源仅为用户描述。"
+              },
+              {
+                "key": "stats_basis",
+                "requirement": "说明 total/passed/failed 如何由三条记录计算得出。"
+              },
+              {
+                "key": "output_path",
+                "requirement": "说明 facts.json 的相对路径及其内容结构。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 2200,
+          "estimatedOutputTokens": 700,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.02,
+          "maxModelCalls": 4,
+          "kind": "work",
+          "outputs": [
+            {
+              "path": "facts.json",
+              "format": "json"
+            }
+          ]
+        },
+        {
+          "id": "summary",
+          "subject": "依据事实表撰写短总结",
+          "objective": "读取 facts.json，撰写一段简短总结，说明三条记录中首页通过、登录通过、备份失败，总数为3、通过2、失败1。不得添加事实表之外的信息，输出到 summary.md。",
+          "assigneeId": "summarizer",
+          "dependencies": [
+            "facts"
+          ],
+          "acceptanceCriteria": [
+            "summary.md 明确写出首页通过和登录通过。",
+            "summary.md 明确写出备份失败。",
+            "summary.md 给出总数3、通过2、失败1，且与 facts.json 一致，不出现额外事实。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "summary_text",
+                "requirement": "给出短总结全文，标明事实来源为 facts.json。"
+              },
+              {
+                "key": "stats_mapping",
+                "requirement": "说明总结中3/2/1统计分别对应哪些记录。"
+              },
+              {
+                "key": "limitations",
+                "requirement": "说明总结没有新增事实表之外的信息，以及未使用终端或实际测试。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 3200,
+          "estimatedOutputTokens": 600,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.02,
+          "maxModelCalls": 4,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "facts.json",
+              "producerTaskId": "facts"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "summary.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "subject": "独立核对事实表与短总结",
+          "objective": "独立读取 facts.json 和 summary.md，逐项核对三条记录的名称与状态、总数3、通过2、失败1，以及首页和登录通过、备份失败是否在两个文件中一致。输出文字核对报告 check_report.md，列出每一项的结论、依据和发现的不一致；不做终端测试，不声称已执行命令。",
+          "assigneeId": "checker",
+          "dependencies": [
+            "facts",
+            "summary"
+          ],
+          "acceptanceCriteria": [
+            "check_report.md 逐项核对三条记录：homepage 通过、login 通过、backup 失败，并给出与 facts.json 和 summary.md 的对应依据。",
+            "check_report.md 核对 total=3、passed=2、failed=1 在两个文件中是否一致。",
+            "报告如实说明核对为文字比对、未执行终端命令；如有不一致须列出具体位置。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "coverage",
+                "requirement": "列出核对覆盖的记录条目和统计项，以及未覆盖的部分。"
+              },
+              {
+                "key": "findings",
+                "requirement": "逐项给出结论、依据文件位置和任何不一致。"
+              },
+              {
+                "key": "evidence_note",
+                "requirement": "说明核对方式为文字读取比对，未运行命令或测试。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 3800,
+          "estimatedOutputTokens": 900,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.03,
+          "maxModelCalls": 5,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "facts.json",
+              "producerTaskId": "facts"
+            },
+            {
+              "path": "summary.md",
+              "producerTaskId": "summary"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "check_report.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "accept",
+          "subject": "经理验收三条记录链",
+          "objective": "读取 facts.json、summary.md、check_report.md，对照用户要求逐项给出验收结论：三条记录事实是否正确、短总结是否与事实表一致、独立核对是否覆盖3/2/1统计及关键状态。输出 accept_report.md，写明通过项、未通过项和交付入口；不代替实际执行测试。",
+          "assigneeId": "manager",
+          "dependencies": [
+            "facts",
+            "summary",
+            "check"
+          ],
+          "acceptanceCriteria": [
+            "accept_report.md 逐项引用 facts.json、summary.md、check_report.md 的当前内容并给出通过或未通过结论。",
+            "验收结论覆盖三条记录状态、3/2/1统计和独立核对的覆盖情况。",
+            "明确说明未使用终端执行测试，结论仅基于文字核对，并列出交付文件路径。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "item_decisions",
+                "requirement": "逐项列出验收项、结论和依据。"
+              },
+              {
+                "key": "delivery_entry",
+                "requirement": "列出 facts.json、summary.md、check_report.md 的路径。"
+              },
+              {
+                "key": "open_issues",
+                "requirement": "列出未通过或待确认项，并说明无终端执行授权。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 4000,
+          "estimatedOutputTokens": 800,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.03,
+          "maxModelCalls": 5,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "facts.json",
+              "producerTaskId": "facts"
+            },
+            {
+              "path": "summary.md",
+              "producerTaskId": "summary"
+            },
+            {
+              "path": "check_report.md",
+              "producerTaskId": "check"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "accept_report.md",
+              "format": "text"
+            }
+          ]
+        }
+      ],
+      "orchestration": {
+        "pattern": "pipeline",
+        "rationale": "用户要求后续步骤依赖前一步、文件各有唯一作者，适合按 facts→summary→check→accept 严格顺序推进；核对者和经理不写事实表，保持独立入口。",
+        "template": {
+          "schemaVersion": 1,
+          "version": 1,
+          "definitionHash": "0cd1d11b121853e58ee87462e1f3e27cacdf0dba1cd71d58a6a5423dc7bc67ec",
+          "id": "pipeline",
+          "taskIds": [
+            "facts",
+            "summary",
+            "check",
+            "accept"
+          ]
+        }
+      },
+      "deliveryCriteria": [
+        {
+          "id": "facts_verified",
+          "description": "原始事实表准确记录首页通过、登录通过、备份失败，且统计为3/2/1。",
+          "producerTaskIds": [
+            "facts"
+          ],
+          "checkTaskId": "check",
+          "checkCriteriaIndexes": [
+            0,
+            1
+          ],
+          "independent": true
+        },
+        {
+          "id": "summary_matches_facts",
+          "description": "短总结与事实表一致，仅包含已给出的三条记录和3/2/1统计。",
+          "producerTaskIds": [
+            "summary"
+          ],
+          "checkTaskId": "check",
+          "checkCriteriaIndexes": [
+            0,
+            1,
+            2
+          ],
+          "independent": true
+        },
+        {
+          "id": "manager_acceptance",
+          "description": "经理基于事实表、短总结和独立核对报告给出逐项验收结论与交付入口。",
+          "producerTaskIds": [
+            "facts",
+            "summary",
+            "check"
+          ],
+          "checkTaskId": "accept",
+          "checkCriteriaIndexes": [
+            0,
+            1,
+            2
+          ],
+          "independent": true
+        }
+      ]
+    },
+    "department": {
+      "name": "记录核验小组（待确认）",
+      "description": "隔离测试用的小型组织：整理三条虚构记录的事实表，撰写短总结，独立核对事实与3/2/1统计，最后由经理验收。仅用于讨论，不执行。",
+      "agents": [
+        {
+          "id": "manager",
+          "name": "验收经理",
+          "role": "manager",
+          "title": "协调经理",
+          "instructions": "负责把要求拆成有验收标准的任务，按顺序派工；等待事实表、短总结和独立核对回执全部完成后，逐项核对当前版本再给出验收结论。不得自行扩大授权、预算或声称文件已写入。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "filesystem",
+            "artifact_write"
+          ]
+        },
+        {
+          "id": "fact_keeper",
+          "name": "记录整理员",
+          "role": "member",
+          "title": "原始事实整理员",
+          "instructions": "根据用户提供的三条虚构记录（首页通过、登录通过、备份失败）整理原始事实表，逐条保留状态和可核验描述，不擅自补充未给出的统计数据；只负责事实表这一份文件。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "artifact_write"
+          ]
+        },
+        {
+          "id": "summarizer",
+          "name": "摘要撰写员",
+          "role": "member",
+          "title": "短总结撰写员",
+          "instructions": "只读取上游事实表，撰写简短总结；明确写出3条记录中通过2条、失败1条，以及首页和登录通过、备份失败的事实，不添加事实表中没有的信息。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "filesystem",
+            "artifact_write"
+          ]
+        },
+        {
+          "id": "checker",
+          "name": "质量核对员",
+          "role": "member",
+          "title": "独立核对员",
+          "instructions": "独立读取事实表和短总结，逐项核对三条记录的名称与状态、3条总数、2条通过、1条失败，以及首页和登录通过、备份失败；只做文字层面的比对，不声称执行过命令或测试，发现不一致时如实列出。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "filesystem",
+            "artifact_write"
+          ]
+        }
+      ]
+    },
+    "plan": {
+      "agents": [
+        {
+          "id": "manager",
+          "name": "验收经理",
+          "role": "manager",
+          "title": "协调经理",
+          "instructions": "负责把要求拆成有验收标准的任务，按顺序派工；等待事实表、短总结和独立核对回执全部完成后，逐项核对当前版本再给出验收结论。不得自行扩大授权、预算或声称文件已写入。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "filesystem",
+            "artifact_write"
+          ]
+        },
+        {
+          "id": "fact_keeper",
+          "name": "记录整理员",
+          "role": "member",
+          "title": "原始事实整理员",
+          "instructions": "根据用户提供的三条虚构记录（首页通过、登录通过、备份失败）整理原始事实表，逐条保留状态和可核验描述，不擅自补充未给出的统计数据；只负责事实表这一份文件。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "artifact_write"
+          ]
+        },
+        {
+          "id": "summarizer",
+          "name": "摘要撰写员",
+          "role": "member",
+          "title": "短总结撰写员",
+          "instructions": "只读取上游事实表，撰写简短总结；明确写出3条记录中通过2条、失败1条，以及首页和登录通过、备份失败的事实，不添加事实表中没有的信息。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "filesystem",
+            "artifact_write"
+          ]
+        },
+        {
+          "id": "checker",
+          "name": "质量核对员",
+          "role": "member",
+          "title": "独立核对员",
+          "instructions": "独立读取事实表和短总结，逐项核对三条记录的名称与状态、3条总数、2条通过、1条失败，以及首页和登录通过、备份失败；只做文字层面的比对，不声称执行过命令或测试，发现不一致时如实列出。",
+          "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+          "tools": [
+            "filesystem",
+            "artifact_write"
+          ]
+        }
+      ],
+      "rationale": "选择 pipeline：用户明确要求后续步骤依赖前一步，且每份文件各有唯一作者。facts 由记录整理员产出；summary 读取 facts 的 facts.json；check 读取 facts 与 summary，最后 manager 验收。质量核对员与各产出作者不同，保证独立核对。所有员工都只使用已授权的 filesystem/artifact_write，不编造终端命令；经理与核对员的结论是文字验收结果，不代替实际执行证据。由于没有终端授权，方案不声明任何命令执行或用例通过。",
+      "tasks": [
+        {
+          "id": "facts",
+          "subject": "整理三条虚构记录的原始事实表",
+          "objective": "依据用户提供的三条虚构记录创建原始事实表：homepage=通过，login=通过，backup=失败。使用 JSON 记录每条记录的名称、状态和简要说明，并给出总数3、通过数2、失败数1的统计；不得添加未提供的事实。输出到 facts.json。",
+          "assigneeId": "fact_keeper",
+          "dependencies": [],
+          "acceptanceCriteria": [
+            "facts.json 是合法 JSON，包含3条记录：homepage 通过、login 通过、backup 失败。",
+            "facts.json 明确给出 total=3、passed=2、failed=1，且统计与记录逐一对应。",
+            "文件内容没有加入用户未提供的记录或虚构细节。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "records_table",
+                "requirement": "逐条列出三条记录的名称、状态与说明，并说明事实来源仅为用户描述。"
+              },
+              {
+                "key": "stats_basis",
+                "requirement": "说明 total/passed/failed 如何由三条记录计算得出。"
+              },
+              {
+                "key": "output_path",
+                "requirement": "说明 facts.json 的相对路径及其内容结构。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 2200,
+          "estimatedOutputTokens": 700,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.02,
+          "maxModelCalls": 4,
+          "kind": "work",
+          "outputs": [
+            {
+              "path": "facts.json",
+              "format": "json"
+            }
+          ]
+        },
+        {
+          "id": "summary",
+          "subject": "依据事实表撰写短总结",
+          "objective": "读取 facts.json，撰写一段简短总结，说明三条记录中首页通过、登录通过、备份失败，总数为3、通过2、失败1。不得添加事实表之外的信息，输出到 summary.md。",
+          "assigneeId": "summarizer",
+          "dependencies": [
+            "facts"
+          ],
+          "acceptanceCriteria": [
+            "summary.md 明确写出首页通过和登录通过。",
+            "summary.md 明确写出备份失败。",
+            "summary.md 给出总数3、通过2、失败1，且与 facts.json 一致，不出现额外事实。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "summary_text",
+                "requirement": "给出短总结全文，标明事实来源为 facts.json。"
+              },
+              {
+                "key": "stats_mapping",
+                "requirement": "说明总结中3/2/1统计分别对应哪些记录。"
+              },
+              {
+                "key": "limitations",
+                "requirement": "说明总结没有新增事实表之外的信息，以及未使用终端或实际测试。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 3200,
+          "estimatedOutputTokens": 600,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.02,
+          "maxModelCalls": 4,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "facts.json",
+              "producerTaskId": "facts"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "summary.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "subject": "独立核对事实表与短总结",
+          "objective": "独立读取 facts.json 和 summary.md，逐项核对三条记录的名称与状态、总数3、通过2、失败1，以及首页和登录通过、备份失败是否在两个文件中一致。输出文字核对报告 check_report.md，列出每一项的结论、依据和发现的不一致；不做终端测试，不声称已执行命令。",
+          "assigneeId": "checker",
+          "dependencies": [
+            "facts",
+            "summary"
+          ],
+          "acceptanceCriteria": [
+            "check_report.md 逐项核对三条记录：homepage 通过、login 通过、backup 失败，并给出与 facts.json 和 summary.md 的对应依据。",
+            "check_report.md 核对 total=3、passed=2、failed=1 在两个文件中是否一致。",
+            "报告如实说明核对为文字比对、未执行终端命令；如有不一致须列出具体位置。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "coverage",
+                "requirement": "列出核对覆盖的记录条目和统计项，以及未覆盖的部分。"
+              },
+              {
+                "key": "findings",
+                "requirement": "逐项给出结论、依据文件位置和任何不一致。"
+              },
+              {
+                "key": "evidence_note",
+                "requirement": "说明核对方式为文字读取比对，未运行命令或测试。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 3800,
+          "estimatedOutputTokens": 900,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.03,
+          "maxModelCalls": 5,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "facts.json",
+              "producerTaskId": "facts"
+            },
+            {
+              "path": "summary.md",
+              "producerTaskId": "summary"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "check_report.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "accept",
+          "subject": "经理验收三条记录链",
+          "objective": "读取 facts.json、summary.md、check_report.md，对照用户要求逐项给出验收结论：三条记录事实是否正确、短总结是否与事实表一致、独立核对是否覆盖3/2/1统计及关键状态。输出 accept_report.md，写明通过项、未通过项和交付入口；不代替实际执行测试。",
+          "assigneeId": "manager",
+          "dependencies": [
+            "facts",
+            "summary",
+            "check"
+          ],
+          "acceptanceCriteria": [
+            "accept_report.md 逐项引用 facts.json、summary.md、check_report.md 的当前内容并给出通过或未通过结论。",
+            "验收结论覆盖三条记录状态、3/2/1统计和独立核对的覆盖情况。",
+            "明确说明未使用终端执行测试，结论仅基于文字核对，并列出交付文件路径。"
+          ],
+          "handoff": {
+            "sections": [
+              {
+                "key": "item_decisions",
+                "requirement": "逐项列出验收项、结论和依据。"
+              },
+              {
+                "key": "delivery_entry",
+                "requirement": "列出 facts.json、summary.md、check_report.md 的路径。"
+              },
+              {
+                "key": "open_issues",
+                "requirement": "列出未通过或待确认项，并说明无终端执行授权。"
+              }
+            ]
+          },
+          "estimatedInputTokens": 4000,
+          "estimatedOutputTokens": 800,
+          "maxOutputTokens": 2400,
+          "maxBudget": 0.03,
+          "maxModelCalls": 5,
+          "kind": "work",
+          "inputs": [
+            {
+              "path": "facts.json",
+              "producerTaskId": "facts"
+            },
+            {
+              "path": "summary.md",
+              "producerTaskId": "summary"
+            },
+            {
+              "path": "check_report.md",
+              "producerTaskId": "check"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "accept_report.md",
+              "format": "text"
+            }
+          ]
+        }
+      ],
+      "orchestration": {
+        "pattern": "pipeline",
+        "rationale": "用户要求后续步骤依赖前一步、文件各有唯一作者，适合按 facts→summary→check→accept 严格顺序推进；核对者和经理不写事实表，保持独立入口。",
+        "template": {
+          "schemaVersion": 1,
+          "version": 1,
+          "definitionHash": "0cd1d11b121853e58ee87462e1f3e27cacdf0dba1cd71d58a6a5423dc7bc67ec",
+          "id": "pipeline",
+          "taskIds": [
+            "facts",
+            "summary",
+            "check",
+            "accept"
+          ]
+        }
+      },
+      "deliveryCriteria": [
+        {
+          "id": "facts_verified",
+          "description": "原始事实表准确记录首页通过、登录通过、备份失败，且统计为3/2/1。",
+          "producerTaskIds": [
+            "facts"
+          ],
+          "checkTaskId": "check",
+          "checkCriteriaIndexes": [
+            0,
+            1
+          ],
+          "independent": true
+        },
+        {
+          "id": "summary_matches_facts",
+          "description": "短总结与事实表一致，仅包含已给出的三条记录和3/2/1统计。",
+          "producerTaskIds": [
+            "summary"
+          ],
+          "checkTaskId": "check",
+          "checkCriteriaIndexes": [
+            0,
+            1,
+            2
+          ],
+          "independent": true
+        },
+        {
+          "id": "manager_acceptance",
+          "description": "经理基于事实表、短总结和独立核对报告给出逐项验收结论与交付入口。",
+          "producerTaskIds": [
+            "facts",
+            "summary",
+            "check"
+          ],
+          "checkTaskId": "accept",
+          "checkCriteriaIndexes": [
+            0,
+            1,
+            2
+          ],
+          "independent": true
+        }
+      ]
+    },
+    "sourceDepartmentVersions": [],
+    "conversationId": "214eb548-dd42-4a08-91eb-186bab5f6f06",
+    "turnId": "910687a4-7216-4109-9a06-07e5e8916471",
+    "previewVersion": 1,
+    "requirement": "只生成可供讨论的组织方案，不执行。这是隔离测试，目录为空时提出待确认部门，不保存。请依据需求选择合适的编排模板并解释理由；全部资料均为虚构。假设执行预算最多0.25美元仅用于检验方案估算，不是执行授权。整理三条虚构记录（首页通过、登录通过、备份失败）：作者先形成原始事实表，下一位依据该表编写短总结，独立核对者检查事实和3/2/1统计，经理最后验收。后续步骤依赖前一步，文件各有唯一作者。",
+    "policy": {
+      "maxBudget": 0.25,
+      "maxAgents": 6,
+      "maxConcurrentAgents": 3,
+      "deadlineSeconds": 600,
+      "maxModelCalls": 48,
+      "maxTaskModelCalls": 16,
+      "contextBytes": 96000,
+      "allowedModelIds": [
+        "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051"
+      ],
+      "allowedTools": [
+        "filesystem",
+        "artifact_write"
+      ],
+      "allowedKnowledgeSpaceIds": []
+    },
+    "source": "model",
+    "costAccounting": "conversation",
+    "previewId": "16d95d65-8092-453f-8e46-f83e88c765ca",
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "estimate": 0.009072,
+      "checks": [
+        {
+          "label": "任务已规划",
+          "pass": true
+        },
+        {
+          "label": "策略允许的模型",
+          "pass": true
+        },
+        {
+          "label": "策略允许的工具",
+          "pass": true
+        },
+        {
+          "label": "策略允许的知识空间",
+          "pass": true
+        },
+        {
+          "label": "策略允许的参与部门",
+          "pass": true
+        },
+        {
+          "label": "组织与人数",
+          "pass": true
+        },
+        {
+          "label": "并发上限",
+          "pass": true
+        },
+        {
+          "label": "模型可用性",
+          "pass": true
+        },
+        {
+          "label": "备用模型可用性",
+          "pass": true
+        },
+        {
+          "label": "员工推理强度兼容性",
+          "pass": true
+        },
+        {
+          "label": "本次资料授权",
+          "pass": true
+        },
+        {
+          "label": "工作方法授权",
+          "pass": true
+        },
+        {
+          "label": "导入资料授权",
+          "pass": true
+        },
+        {
+          "label": "任务负责人和引用",
+          "pass": true
+        },
+        {
+          "label": "任务依赖无环",
+          "pass": true
+        },
+        {
+          "label": "文件交接与质量合同",
+          "pass": true
+        },
+        {
+          "label": "任务费用上限",
+          "pass": true
+        },
+        {
+          "label": "员工每任务调用上限",
+          "pass": true
+        },
+        {
+          "label": "预估执行费用",
+          "pass": true
+        }
+      ]
+    }
+  }
+}

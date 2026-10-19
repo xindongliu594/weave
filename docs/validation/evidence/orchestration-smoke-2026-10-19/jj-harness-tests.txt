@@ -1,0 +1,24 @@
+Captured SSH output, 2026-10-19 15:26 Beijing.
+Command: node --test scripts/validation/orchestration-planning-pilot/limits.test.mjs scripts/validation/orchestration-planning-pilot/lifecycle.test.mjs
+Runtime: /home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node
+Source: /home/jj/.local/share/weiwu/validation/orchestration-smoke-20261019-4283f2b/source
+
+✔ timeout or signal exit must not be reported as success (11.501185ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (9.289109ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (6.475812ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (2.516159ms)
+✔ repair smoke can stop after one invalid preview without claiming acceptance (4.023238ms)
+✔ repair smoke reports acceptance only after both selected cases pass (3.065075ms)
+✔ trial refuses excess calls, per-call/phase/cumulative spend and uncertain receipts before dispatch (1.392358ms)
+✔ seven small distinct scenarios carry only synthetic content and immutable shard references (0.399951ms)
+✔ repair smoke selects only two fixed cases and rejects a third request or more than four cents (0.83929ms)
+✔ repair smoke stops after an invalid real preview but dry-run still assembles both requests (0.175761ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 100.515168
+Exit code: 0

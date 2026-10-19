@@ -1,0 +1,179 @@
+{
+  "sourceCommit": "4283f2b",
+  "cases": [
+    {
+      "id": "sequential-report",
+      "requestId": "bcb29125-979b-4c3b-a8c9-369dcd5e06ff",
+      "receiptId": "9b5269dd-d166-4e1b-81a1-ce65d931fe80",
+      "selectedTemplate": "pipeline",
+      "validPreview": true,
+      "finishReason": "stop",
+      "cost": 0.0053406,
+      "prompt_tokens": 8002,
+      "completion_tokens": 2450,
+      "plannedBudget": 0.1,
+      "assumedBudget": 0.25,
+      "handoffUnexpectedKeys": [],
+      "outputTasksWithoutWriter": [],
+      "dag": [
+        {
+          "id": "facts",
+          "assignee": "fact_keeper",
+          "dependencies": [],
+          "outputs": [
+            {
+              "path": "facts.json",
+              "format": "json"
+            }
+          ]
+        },
+        {
+          "id": "summary",
+          "assignee": "summarizer",
+          "dependencies": [
+            "facts"
+          ],
+          "outputs": [
+            {
+              "path": "summary.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "assignee": "checker",
+          "dependencies": [
+            "facts",
+            "summary"
+          ],
+          "outputs": [
+            {
+              "path": "check_report.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "accept",
+          "assignee": "manager",
+          "dependencies": [
+            "facts",
+            "summary",
+            "check"
+          ],
+          "outputs": [
+            {
+              "path": "accept_report.md",
+              "format": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bounded-code-review",
+      "requestId": "97558677-aa65-442d-826f-5f43c11be820",
+      "receiptId": "f67dc440-239f-4d54-92f6-bcf1dd64c7d1",
+      "selectedTemplate": "review_repair",
+      "validPreview": false,
+      "finishReason": "stop",
+      "cost": 0.0061449,
+      "prompt_tokens": 8975,
+      "completion_tokens": 2877,
+      "plannedBudget": 0.37,
+      "assumedBudget": 0.25,
+      "handoffUnexpectedKeys": [
+        {
+          "taskId": "develop",
+          "key": "estimatedInputTokens"
+        },
+        {
+          "taskId": "develop",
+          "key": "estimatedOutputTokens"
+        },
+        {
+          "taskId": "develop",
+          "key": "maxOutputTokens"
+        },
+        {
+          "taskId": "develop",
+          "key": "maxBudget"
+        }
+      ],
+      "outputTasksWithoutWriter": [
+        "clarify"
+      ],
+      "dag": [
+        {
+          "id": "clarify",
+          "assignee": "analyst",
+          "dependencies": [],
+          "outputs": [
+            {
+              "path": "docs/temperature-requirements.md",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "develop",
+          "assignee": "developer",
+          "dependencies": [
+            "clarify"
+          ],
+          "outputs": [
+            {
+              "path": "src/temperature.js",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "review",
+          "assignee": "qa",
+          "dependencies": [
+            "develop"
+          ],
+          "outputs": []
+        },
+        {
+          "id": "verify",
+          "assignee": "qa",
+          "dependencies": [
+            "develop",
+            "review"
+          ],
+          "outputs": [
+            {
+              "path": "test/temperature.test.js",
+              "format": "text"
+            }
+          ]
+        },
+        {
+          "id": "accept",
+          "assignee": "manager",
+          "dependencies": [
+            "clarify",
+            "review",
+            "verify"
+          ],
+          "outputs": []
+        }
+      ]
+    }
+  ],
+  "cost": 0.0114855,
+  "inputTokens": 16977,
+  "outputTokens": 5327,
+  "occupied": 3.059917800000002,
+  "unchangedUnknowns": 6,
+  "verifiedFiles": 8,
+  "validPreviews": 1,
+  "realCalls": 2,
+  "extraCalls": 0,
+  "projectWrites": 0,
+  "departmentWrites": 0,
+  "note": "Recorded preview contract checks plus read-only inspection; no employee execution or delivery acceptance."
+}

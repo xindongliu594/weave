@@ -11,8 +11,14 @@ export const cases=[
  {id:'two-proposals',prompt:'为虚构内部周会提出两个不同方案：两位作者先各自独立提出，互不读取对方初始上下文；两份都完成后互相阅读并各做一次对方方案的质疑，保留依据和分歧；经理读取两个方案及两份质疑，独立检查事实后裁定或声明不足以决策。只一轮，不无限讨论。'},
 ];
 export const trialLimits=Object.freeze({maxCalls:7,maxCallCost:.02,maxTrialCost:.14,maxCumulative:3.41,maxTokens:8192});
-export function checkQuote({used,calls,quote,occupied,unknownChanged=false}){
+export function getTrial(profile='original'){
+ if(profile==='original')return {cases,limits:trialLimits,sourceCommit:'580aafb',stopOnInvalid:false};
+ if(profile==='repair-smoke')return {cases:[cases[0],cases[4]],limits:{...trialLimits,maxCalls:2,maxTrialCost:.04,maxTokens:4000},sourceCommit:'4283f2b',stopOnInvalid:true};
+ throw Error('Unknown fixed trial profile');
+}
+export function stopAfterResult(trial,mode,result){return mode==='approved-real'&&trial.stopOnInvalid&&!result.preview;}
+export function checkQuote({used,calls,quote,occupied,unknownChanged=false},limits=trialLimits){
  if(unknownChanged)throw Error('New or changed unknown receipt; stop without replay');
  if(![used,calls,quote,occupied].every(Number.isFinite)||!Number.isSafeInteger(calls)||calls<0||used<0||quote<=0||occupied<0)throw Error('Invalid quote');
- if(calls>=trialLimits.maxCalls||quote>trialLimits.maxCallCost+1e-10||used+quote>trialLimits.maxTrialCost+1e-10||occupied+quote>trialLimits.maxCumulative+1e-10)throw Error('Trial budget/call boundary: no dispatch');
+ if(calls>=limits.maxCalls||quote>limits.maxCallCost+1e-10||used+quote>limits.maxTrialCost+1e-10||occupied+quote>limits.maxCumulative+1e-10)throw Error('Trial budget/call boundary: no dispatch');
 }

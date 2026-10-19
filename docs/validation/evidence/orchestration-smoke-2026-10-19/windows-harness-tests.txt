@@ -1,0 +1,18 @@
+✔ timeout or signal exit must not be reported as success (8.6533ms)
+✔ worker exit must await outstanding provider and receipt work before pool.end (11.1291ms)
+✔ a new unknown receipt in the final snapshot must fail the trial (8.9236ms)
+✔ a paid failure retains the settled usage id and actual fee for its case (3.3157ms)
+✔ repair smoke can stop after one invalid preview without claiming acceptance (4.4978ms)
+✔ repair smoke reports acceptance only after both selected cases pass (3.6424ms)
+✔ trial refuses excess calls, per-call/phase/cumulative spend and uncertain receipts before dispatch (1.6031ms)
+✔ seven small distinct scenarios carry only synthetic content and immutable shard references (0.4839ms)
+✔ repair smoke selects only two fixed cases and rejects a third request or more than four cents (1.3364ms)
+✔ repair smoke stops after an invalid real preview but dry-run still assembles both requests (0.2526ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 185.8741

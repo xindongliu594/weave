@@ -1,0 +1,31 @@
+[
+  {
+    "id": "sequential-report",
+    "httpStatus": 200,
+    "milliseconds": 13117,
+    "validPreview": true,
+    "selected": "pipeline",
+    "issue": null,
+    "outputDiagnostic": null,
+    "previewId": "16d95d65-8092-453f-8e46-f83e88c765ca"
+  },
+  {
+    "id": "bounded-code-review",
+    "httpStatus": 200,
+    "milliseconds": 13411,
+    "validPreview": false,
+    "selected": null,
+    "issue": {
+      "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "message": "本轮团队方案尚不完整，暂不能保存。待修正字段：tasks.2.handoff：Unrecognized keys: \"estimatedInputTokens\", \"estimatedOutputTokens\", \"maxOutputTokens\", \"maxBudget\"；已有方案未改变，可以继续讨论修改。"
+    },
+    "outputDiagnostic": {
+      "finishReason": "stop",
+      "originalOutputSHA": "492a6d51d11205e81b4bc0cd7ef9dce3ac1dfd015cf60e4f87fb6f132516fbbb",
+      "outputBytes": 11470,
+      "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+      "position": null
+    },
+    "previewId": null
+  }
+]
