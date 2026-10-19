@@ -42,7 +42,7 @@
 
 - [ ] 先写失败测试并运行，覆盖七类至少四个代表例（28）和以下边界（至少12）：缺权限、缺输入、重复/歧义绑定、未知模式、人数上限、任务上限、并行文件冲突、环、漏独立检查、错误版本/hash、模板不能伪称可执行、旧模板缺省兼容。与既有 validatePlan 的联合测试才可覆盖权限和预算。
 - [ ] 采用最少的显式绑定：pipeline 有顺序 taskIds；parallel 有独立 branchTaskIds、joinTaskId；router 有固定 routeKey 和完整 selectedTaskIds；orchestrator_workers 有 frozen workItems（id、taskId、objective）和 joinTaskId；review_repair 有 reviewTaskId（必须是合法实现审查入口、maxReworkRounds 1..2）；map_reduce 有固定 manifest（id、taskId、input path/SHA256）和 reduceTaskId；proposal_review 有恰好两组 proposalTaskId/critiqueTaskId 和 decisionTaskId。绑定均检查 ID 唯一、任务存在；所有数组有 50 上限、文本有现有风格长度限制。
-- [ ] 对 pipeline 检查完整任务顺序；parallel/workers/map_reduce 检查分支互不依赖、join 等待全部分支并读取其全部输出；map_reduce 每个分片恰好一个独立任务且其 inputs 绑定该不可变输入。proposal_review 两位不同提案者、初始提案互不依赖，各有他人批评，经理等全部批评，读取提案/批评输出；不声称提示词能证明语义独立。review_repair 复用 taskContractErrors，不造返工引擎。所有新模板要求 deliveryCriteria 覆盖产出、独立检查与经理；同时仍运行旧 DAG/文件/权限校验。
+- [ ] 对 pipeline 检查完整任务顺序；parallel/workers/map_reduce 检查分支互不依赖、join 等待全部分支并读取其全部输出；map_reduce 每个分片恰好一个独立任务且其 inputs 绑定该不可变输入。proposal_review 两位不同提案者、初始提案互不依赖，各有他人批评，经理等全部批评，读取提案/批评输出；不声称提示词能证明语义独立。review_repair 复用 taskContractErrors，不造返工引擎。所有新模板要求 deliveryCriteria 绑定用户交付要求、独立检查与经理；QA/经理为记录核对过程写出的证据报告不因此递归要求新增检查任务（加一例回归）。是否完整表达了用户需求仍需语义验收，不能用“所有文件都再独立验收”冒充该保证。同时仍运行旧 DAG/文件/权限校验。
 - [ ] 将新校验接入 validatePlan，不改变其已有参数含义，不将 requireToolSupport 当作放行新模式的开关。新模板的布局 pattern 仍为原三种；检验 pipeline→pipeline、parallel/map_reduce/proposal_review→parallel、其余可采用 pipeline 或 parallel（不能 single）。
 - [ ] 检查返工展开最坏节点数边界 46+2×2=50 通过、48+2×2=52 拒绝；老无模板方案不新加此约束。
 - [ ] Run `node --import tsx --test tests/orchestration-patterns.test.ts tests/task-contracts.test.ts tests/organization-routing.test.ts`，再 `npx tsc --noEmit`，保存输出；仅提交本任务精确路径（审批受阻时保留工作树交审）。

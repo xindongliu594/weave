@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { isArtifactPath, taskContractErrors } from './task-contracts.mjs';
 import {orchestrationSchema,deliveryCriterionSchema,deliveryCriteriaErrors} from './orchestration.ts';
+import {orchestrationPatternErrors} from './orchestration-patterns.ts';
+export {orchestrationTemplateSchema,orchestrationPatterns,orchestrationPatternErrors,orchestrationExecutionErrors,orchestrationPatternSummary,type OrchestrationTemplate} from './orchestration-patterns.ts';
 import { BUILTIN_TOOL_NAMES, isNativeToolName } from './native-tool-ids.mjs';
 
 export const toolNameSchema = z.string().max(64).refine(value => BUILTIN_TOOL_NAMES.includes(value) || isNativeToolName(value), '工具名称必须来自已授权目录');
@@ -248,6 +250,7 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   check('任务依赖无环', referencesOK && plan.tasks.every(t => visit(t.id)), '任务依赖必须组成无环图');
   const contracts = taskContractErrors(plan.tasks, requireToolSupport ? plan.agents : []);
   contracts.push(...deliveryCriteriaErrors(plan));
+  contracts.push(...orchestrationPatternErrors(plan));
   check('文件交接与质量合同', contracts.length === 0, contracts.join('；'));
   let estimate = 0;
   let taskBudgetsOK = true;

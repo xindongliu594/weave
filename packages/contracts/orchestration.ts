@@ -1,8 +1,9 @@
 import {z} from 'zod';
 import type {Plan} from './index.ts';
 import {conflictingDeliveryWriters} from './delivery-files.mjs';
+import {orchestrationTemplateSchema} from './orchestration-patterns.ts';
 
-export const orchestrationSchema=z.object({pattern:z.enum(['single','pipeline','parallel']),rationale:z.string().trim().min(1).max(2000)}).strict();
+export const orchestrationSchema=z.object({pattern:z.enum(['single','pipeline','parallel']),rationale:z.string().trim().min(1).max(2000),template:z.lazy(()=>orchestrationTemplateSchema).optional()}).strict();
 export const deliveryCriterionSchema=z.object({
  id:z.string().trim().min(1).max(80),description:z.string().trim().min(1).max(2000),
  producerTaskIds:z.array(z.string().min(1).max(80)).min(1).max(50),
@@ -45,5 +46,6 @@ export function deliveryCriteriaErrors(plan:Pick<Plan,'tasks'|'agents'|'delivery
 export function deliveryCriteriaRevisionErrors(previous:Plan,next:Plan):string[]{
  const errors=(previous.deliveryCriteria??[]).filter(c=>!next.deliveryCriteria?.some(n=>n.id===c.id&&n.description===c.description&&(!c.independent||n.independent))).map(c=>`${c.id}: AI 方案不能删减已确认交付要求或降低独立检查`);
  if(previous.orchestration&&!next.orchestration)errors.push('AI 方案缺少协作方式');
+ if(previous.orchestration?.template&&!next.orchestration?.template)errors.push('AI 方案不能删除已确认编排模板引用');
  return errors;
 }
