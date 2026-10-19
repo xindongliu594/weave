@@ -1,0 +1,28 @@
+{
+  "sourceFiles": 15,
+  "webFiles": 3,
+  "backup": "/home/jj/.local/share/weiwu/validation/acceptance-separation-20261019-3ea081e/production-backup",
+  "modelCalls": 0,
+  "passed": true,
+  "hashes": {
+    "apps/api/src/organization-draft-diagnostics.ts": "17dec3cd9bbada3d0dd86ed10e110ad4324001715ac3f10a72e68b9375e6f846",
+    "packages/contracts/orchestration-patterns.ts": "8de140f5e3423c5c2ad723fda58a232de7995b00ed2843a920ad0c7c0d0038e6",
+    "packages/contracts/index.ts": "c8e748e31d0690f1a9e6f78c715f208d135f470f3a5f650fd864eaee12d7c3c2",
+    "apps/api/src/execution-prompt.ts": "88b0567d14d899d0b415e49fdaceffd9ea01427ab124650994b7ec03487f12cb",
+    "apps/web/src/AcceptanceCheckEditor.tsx": "f7a26366ee59514e5b33366e912857d88bbf5e87aec7d07a80cbd0cf4d922f3b",
+    "apps/api/src/organization-routing.ts": "0d284f668b64e811030a198e446a25457183361d7631088b37e89e3668cd218a",
+    "apps/web/src/OrganizationCenter.tsx": "25f94156aecc296acefa941c9b45daf852e8c2a8fd92bdfdc66e7c6317dfc2ca",
+    "apps/web/src/OrganizationRecommendation.tsx": "7e57c0f5e3a6538a70641ba332824d84177c1654d4c13efbff947331e2489f79",
+    "apps/api/src/organization-chat.ts": "92bea1e5e3cbcfc598a5025a1e8fe7fc1fe70c3a67f0bb2b5046d07217e0f090",
+    "apps/web/src/RunAcceptanceChecks.tsx": "813dddc2b8ab8f7fb6d22ccb7f5a7f39c19ad7dad09c3f1199d1ab1d1fb49779",
+    "packages/contracts/orchestration.ts": "7682b1ec8a9af07049a662f48a75dfd9b9ef679318a321293857f83dcc70fb88",
+    "apps/api/src/organization-task-planning.ts": "4cde3ffc817f4955473355a29e1208c795c2e8cc0ade2f21a70420b7c38f2ca9",
+    "apps/api/src/product.ts": "774731c17d31695c061d74941c059834903bd463784b35004f7a8313ff676d49",
+    "packages/contracts/acceptance-commands.ts": "1bb2c7e6d0998bc4c5fa30f819f1ffa166e4a8f72a5551d4a30b3775a66cce1d",
+    "apps/api/src/app.ts": "0af08a41e30cab5a43a0d3edde4126df1ae716aeb269310209b85a1ab480a319",
+    "dist/web/assets/index-Bj0f_jh5.js": "36039440a08452e27646711537f5a4359884eefb6940b946090a4d3f807e4b23",
+    "dist/web/assets/index-CzCbk_YO.css": "51932f4c987a372505465411953b8b09e84760345140c32699bbc477d5d4e2d5",
+    "dist/web/index.html": "f8cf591cf282a7671c80211eeb559a4da9a8e2e568ebc37a916cca3ff2b46eee"
+  },
+  "activeRuns": []
+}

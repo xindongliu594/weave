@@ -5,7 +5,7 @@ import type { Plan } from '../packages/contracts/index.ts';
 import {readFileSync} from 'node:fs';
 
 const tasks: Plan['tasks'] = [
- {id:'dev',subject:'更新代码',objective:'增量修改',assigneeId:'developer',dependencies:[],acceptanceCriteria:['语法'],estimatedInputTokens:100,estimatedOutputTokens:100,outputs:[{path:'cli.mjs'}],verify:['node --check cli.mjs'],acceptanceChecks:[{criterionIndex:0,command:'node --check cli.mjs'}]},
+ {id:'dev',subject:'更新代码',objective:'增量修改',assigneeId:'developer',dependencies:[],acceptanceCriteria:['自测'],estimatedInputTokens:100,estimatedOutputTokens:100,outputs:[{path:'cli.mjs'}],verify:['node --test smoke.test.mjs'],acceptanceChecks:[{criterionIndex:0,command:'node --test smoke.test.mjs',minimumTests:1}]},
  {id:'qa',subject:'独立测试',objective:'测试更新后的代码',assigneeId:'qa',dependencies:['dev'],acceptanceCriteria:['原17项通过'],estimatedInputTokens:100,estimatedOutputTokens:100,inputs:[{path:'cli.mjs',sha256:'a'.repeat(64)}],verify:['node --test cli.test.mjs'],acceptanceChecks:[{criterionIndex:0,command:'node --test cli.test.mjs',minimumTests:17}]},
 ];
 
@@ -53,11 +53,11 @@ test('known Node command files must be own outputs or declared inputs from compl
   const p=make();p[0].verify=[command];p[0].acceptanceChecks=[{criterionIndex:0,command,...(command.includes('--test')?{minimumTests:1}:{})}];
   assert.ok(plannedAcceptanceErrors(p).some(e=>e.includes('后续或并行任务')),command);
   p[0].inputs=[{path:'tests/cli test.mjs',sha256:'a'.repeat(64)}];
-  assert.deepEqual(plannedAcceptanceErrors(p),[],'a fixed initial file can exist before a later overwrite');
+  assert.ok(!plannedAcceptanceErrors(p).some(e=>e.includes('后续或并行任务')||e.includes('命令文件')),'a fixed initial file can exist before a later overwrite; syntax mappings are checked separately');
  }
  const p=make();p[1].verify=['node --check cli.mjs'];p[1].acceptanceChecks=[{criterionIndex:0,command:p[1].verify[0]}];p[1].inputs=[];
  assert.ok(plannedAcceptanceErrors(p).some(e=>e.includes('inputs')&&e.includes('cli.mjs')));
- p[1].inputs=[{path:'cli.mjs',producerTaskId:'dev'}];assert.deepEqual(plannedAcceptanceErrors(p),[]);
+ p[1].inputs=[{path:'cli.mjs',producerTaskId:'dev'}];assert.ok(!plannedAcceptanceErrors(p).some(e=>e.includes('inputs')));
  p[1].verify=['node --test "tests/cli test.mjs"'];p[1].acceptanceChecks=[{criterionIndex:0,command:p[1].verify[0],minimumTests:1}];assert.deepEqual(plannedAcceptanceErrors(p),[],'QA may run its own tests');
 });
 

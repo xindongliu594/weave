@@ -1,0 +1,48 @@
+✔ real syntax self-check allows handoff but independent behavior failure cannot pass QA (492.8364ms)
+✔ three untouched real stage-clarified replies cannot use syntax as acceptance proof (11.4761ms)
+✔ implementation syntax self-check stays executable with independent downstream QA (4.6602ms)
+✔ self-check exemption cannot omit independent QA, current outputs or real QA mappings (2.1168ms)
+✔ direct Node value-taking options and quoted flags cannot hide syntax-only checks (1.6219ms)
+✔ only matching completed attempt and host seal expose passing evidence (18.8094ms)
+✔ new requirement or truncated/changed receipt cannot inherit old success; seals include acceptance (1.0827ms)
+✔ legacy reports remain unverified instead of inventing new mappings (0.724ms)
+✔ delivery projection requires committed producers and the exact check attempt (1.4502ms)
+✔ check schema rejects invalid exit codes and zero tests (5.9418ms)
+✔ cold recovery retains checks without rerunning commands and rejects altered proof (2.8739ms)
+✔ recovered structured reviews retain their sealed report and reject report tampering (3.634ms)
+✔ UI distinguishes legacy, unverified and bound evidence, and escapes requirement content (20.3849ms)
+✔ editor exposes approved commands, exact output and useful test count (3.4513ms)
+✔ editor never preselects a command for every criterion and excludes syntax proof (3.5635ms)
+✔ historical passed syntax evidence is labelled as syntax, not functional acceptance (0.7653ms)
+✔ historical delivery headline does not promote syntax receipts to functional success (1.3357ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (23.6753ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (17.5262ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (18.38ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (12.9144ms)
+✔ real draft diagnostics reuse independent checks without mutation or acceptance (21.5394ms)
+✔ malformed task, team or target data never enters typed task validation (7.1162ms)
+✔ existing-team failure cannot resolve or invent employees for diagnostics (3.0035ms)
+✔ legacy drafts use the same independent contract checks (2.2607ms)
+✔ multiple file-contract findings are returned individually once (2.023ms)
+✔ valid real sequential preview has no additional diagnostics (1.5885ms)
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (16.8364ms)
+✔ new executable plans require mappings while text tasks and saved legacy contracts stay compatible (0.6507ms)
+✔ office-only planning does not teach the model to label document acceptance as code review (0.5678ms)
+✔ terminal planning covers writers for every task kind and keeps resource fields out of handoff (0.2865ms)
+✔ terminal template previews use contextual rework instructions while existing callers keep zero rework (0.4455ms)
+✔ routing rework example lets QA consume only the independently reviewed implementation and ends with manager acceptance (3.9093ms)
+✔ new AI candidate cannot pin an external old hash after an upstream writer (6.6325ms)
+✔ new AI candidate requires a real minimum count for each Node test mapping (0.8406ms)
+✔ fixed source files remain valid when no earlier task writes them (0.5092ms)
+✔ Node flags cannot bypass the supported test-count parser in a new candidate (0.6115ms)
+✔ untouched real preview cannot require the developer to run a future QA output (4.9332ms)
+✔ known Node command files must be own outputs or declared inputs from completed predecessors (1.2361ms)
+✔ narrow literal Node path checks do not pretend to parse flags, shell scripts or unknown files (2.2592ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1537.8865

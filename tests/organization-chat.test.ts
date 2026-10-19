@@ -54,6 +54,27 @@ test('executable candidate without host mappings is rejected without save or hid
   assert.equal(result.data.preview,undefined);assert.deepEqual(await counts(),before);assert.equal(requests,calls+1);
 });
 
+test('syntax-only acceptance is rejected at chat and confirmation while independent QA plans remain confirmable',async()=>{
+  const {organizationPlanningTaskExample}=await import('../apps/api/src/organization-task-planning.ts');
+  const draft:any={department:{name:'证据分离回归',description:'隔离测试，不执行项目',agents:[agent('manager','manager',['filesystem']),agent('developer','member',['filesystem','artifact_write','terminal_test']),agent('qa','member',['filesystem','artifact_write','terminal_test'])]},rationale:'开发自检，独立QA功能测试，经理核对',tasks:structuredClone(organizationPlanningTaskExample)};
+  const args=input({policy:{...policy,allowedTools:['filesystem','artifact_write','terminal_test']}});
+  draft.tasks[0].acceptanceChecks=[{criterionIndex:0,command:'node --check cli.mjs'}];
+  response={reply:'错误映射测试',candidate:draft};const before=await counts(),calls=requests;
+  const invalid=await call('/organizations/chat',args);
+  assert.equal(invalid.data.preview,undefined);assert.match(invalid.data.draftIssue.message,/语法检查/);
+  assert.deepEqual(await counts(),before);assert.equal(requests,calls+1);
+  delete draft.tasks[0].acceptanceChecks;response={reply:'开发语法自检与独立功能验收分开',candidate:draft};
+  const valid=await call('/organizations/chat',args);assert.ok(valid.data.preview,JSON.stringify(valid.data));
+  const preview=valid.data.preview;
+  // This legacy editor allows changing a preview before confirmation.
+  preview.plan.tasks[0].acceptanceChecks=[{criterionIndex:0,command:'node --check cli.mjs'}];
+  const rejected=await call('/organizations',preview);assert.equal(rejected.status,422,JSON.stringify(rejected.data));
+  assert.match(JSON.stringify(rejected.data),/语法检查/);assert.equal((await counts()).projects,before.projects);
+  delete preview.plan.tasks[0].acceptanceChecks;
+  const confirmed=await call('/organizations',preview);assert.equal(confirmed.status,201,JSON.stringify(confirmed.data));
+  assert.equal((await counts()).runs,before.runs,'confirming a plan does not execute employees');
+});
+
 test('V2 conversation recommends existing employees without changing their department and expires old drafts',async()=>{
  const dept=await call('/departments',{name:'现有研发部',description:'保留人员',agents:implementationCandidate().department.agents});
  const source=implementationCandidate(),before=await counts();

@@ -112,7 +112,10 @@ test('real self-acceptance stays rejected once while a clearly marked local mapp
  const local=JSON.parse(raw);local.candidate.deliveryCriteria=[
   {id:'function',description:'QA验证功能',producerTaskIds:['develop'],checkTaskId:'verify',checkCriteriaIndexes:[0],independent:true},
   {id:'package',description:'经理核对交付及测试证据',producerTaskIds:['develop','verify'],checkTaskId:'accept',checkCriteriaIndexes:[0],independent:true},
- ];response=local;
+ ];
+ delete local.candidate.tasks.find((task:any)=>task.id==='develop').acceptanceChecks;
+ local.reply='本地合同夹具：开发只做语法自检，QA提供独立功能测试；并非真实模型生成结果。';
+ response=local;
  const valid=await call('/organizations/chat',{...args,previousDraftIssue:failed.data.draftIssue});assert.ok(valid.data.preview,JSON.stringify(valid));
  assert.deepEqual(valid.data.preview.plan.deliveryCriteria,local.candidate.deliveryCriteria);assert.equal(valid.data.preview.plan.agents.length,4);
  const feedback=wire.messages.find((m:any)=>m.role==='user'&&m.content.startsWith('{"kind":"previous_organization_draft_validation"'));

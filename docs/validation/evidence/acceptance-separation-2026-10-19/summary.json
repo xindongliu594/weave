@@ -1,0 +1,23 @@
+{
+  "windows": {
+    "relatedTests": 40,
+    "isolatedApiTests": 31,
+    "typecheckExit": 0,
+    "buildExit": 0
+  },
+  "jj": {
+    "relatedTests": 40,
+    "additionalUnitTests": 60,
+    "isolatedApiTests": 31,
+    "additionalApiTests": 23,
+    "deploymentPassed": true,
+    "activeRunsAfterDeploy": 0
+  },
+  "browser": {
+    "checked": true,
+    "changedProjectOrSaved": false
+  },
+  "paidModelCalls": 0,
+  "freshModelAcceptance": "not run",
+  "legacyContractPolicy": "preserved; no retroactive receipt or hash changes"
+}

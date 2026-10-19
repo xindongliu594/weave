@@ -12,6 +12,7 @@ import { completeBudgeted,lockCostPolicy,checkDailyBudget,shareCostMaintenance,r
 import { departmentTemplates, roleTemplates } from '../../../packages/contracts/templates.ts';
 import { organizationChatRouter } from './organization-chat.ts';
 import {confirmOrganizationDraft} from './organization-confirmation.ts';
+import {plannedAcceptanceErrors} from './execution-prompt.ts';
 export const settingsSchema=z.object({autoBudgetLimit:z.number().min(0).max(100),dailyBudgetLimit:z.number().positive().max(100000),maxActiveRuns:z.number().int().min(1).max(8),retentionDays:z.literal(0),knowledgeSearchMode:z.enum(['keyword','hybrid']).optional(),reuseMinSuccessfulWorks:z.number().int().min(2).max(100).optional()});
 export async function settings(client:pg.Pool|pg.PoolClient=pool){return (await client.query('SELECT version,data FROM product_settings WHERE id=1')).rows[0];}
 // Role versions are server-managed metadata, not a different user-approved proposal.
@@ -75,6 +76,10 @@ export function productRouter(){
         if(!saved||!isDeepStrictEqual(withoutRoleVersions(saved.plan),withoutRoleVersions(plan))||!isDeepStrictEqual(saved.policy,input.policy)||saved.requirement!==input.requirement||!isDeepStrictEqual(withoutRoleVersions(saved.data),withoutRoleVersions(input.department)))throw new AppError(409,'此预览已保存且之后发生了变更，请查看现有团队后再修改');
         if(input.target&&(input.target.departmentId!==preview.department_id||input.target.projectId!==preview.project_id))throw new AppError(409,'此预览已保存到其他团队');
         await client.query('COMMIT');return res.json({departmentId:preview.department_id,projectId:preview.project_id,departmentVersion:saved.department_version,projectVersion:saved.project_version,existing:true});
+      }
+      if(preview?.data.source==='model'){
+        const errors=plannedAcceptanceErrors(plan.tasks);
+        if(errors.length)throw new AppError(422,'方案暂不能保存：'+errors.join('；'),'ORGANIZATION_CHAT_PLAN_INVALID');
       }
       let currentProject:any,currentDepartment:any,costConfig:any;
       if(input.target){

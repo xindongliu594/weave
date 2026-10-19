@@ -1,0 +1,10 @@
+{
+  "baseUrl": "http://127.0.0.1:4312",
+  "checked": [
+    "Existing completed Word run still shows sealed employee QA and manager evidence",
+    "Existing CLI project editor shows syntax-only mapping warning and no selectable syntax command",
+    "Editing cancelled without saving; returned to requirement conversation"
+  ],
+  "screenshot": "browser-editor.png",
+  "paidModelCalls": 0
+}

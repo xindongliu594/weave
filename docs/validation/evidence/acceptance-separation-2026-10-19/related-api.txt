@@ -1,0 +1,58 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ confirmation creates a project only, freezes selected sources, and duplicate requests are idempotent (1480.119413ms)
+✔ superseded, edited or archived source drafts cannot create a project (46.310748ms)
+✔ new team uses the same explicit confirmation and V2 cannot enter the legacy department-update endpoint (22.728533ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1805.96002
+✔ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (1340.473835ms)
+✔ legacy conversation uses the same restricted generation fields while retaining its old envelope (23.322513ms)
+✔ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (248.937892ms)
+✔ real malformed handoff reports independent contract errors without correcting or saving the candidate (58.238072ms)
+✖ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (74.183002ms)
+✔ handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract (72.111127ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (23.808052ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (22.311319ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (15.899484ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (61.607539ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (45.184836ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (47.047408ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (55.435086ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (44.951948ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (49.18729ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (51.045174ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (62.154669ms)
+✔ legacy candidate without a template remains confirmable (30.782946ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (11.729104ms)
+✔ a real preview with a future QA test command is rejected before saving and without hidden repair (28.543017ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 19
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2778.055877
+
+✖ failing tests:
+
+test at tests/orchestration-pattern-integration.test.ts:1:10223
+✖ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (74.183002ms)
+  AssertionError [ERR_ASSERTION]: {"status":200,"data":{"reply":"按上一轮校验反馈一次修正：把交接内容只放进 handoff.sections；开发任务补齐逐项验收映射；Node 测试映射补上 minimumTests；需求分析师改为只用文字澄清，不写文件，避免无写入权限还声明输出。方案仍只是待确认预览，不保存部门或项目，不执行命令；所有员工使用策略唯一允许的模型，并省略 reasoningEffort（沿用模型默认）。文件合同不变：实现放 src/temperature.js，QA 测试放 test/temperature.test.js，真实验证命令为 node --test test/temperature.test.js。编排采用 review_repair 的离线预览：开发→独立审查（最多 1 轮有范围修复并复审）→独立 QA 写并运行测试→经理只读验收；审查与 QA 由同一位独立质量审查员分两个节点承担，不为节点额外加人。","draftIssue":{"code":"ORGANIZATION_CHAT_PLAN_INVALID","message":"生成草案校验失败：develop: 语法检查 node --check src/temperature.js 只放在 verify 自检中，不得作为 acceptanceChecks 的功能验收证据；由后续独立 QA 提供实际测试；已有方案未改变，可以继续讨论修改。"},"outputDiagnostic":{"finishReason":"stop","originalOutputSHA":"285790b4a63fd53d82b193d3c2e4bdcfb270ff6c873f17f4d8fa4b45da709197","outputBytes":9579,"reason":"ORGANIZATION_CHAT_PLAN_INVALID","position":null}}}
+      at TestContext.<anonymous> (/home/jj/.local/share/weiwu/validation/acceptance-separation-20261019-3ea081e/source/tests/orchestration-pattern-integration.test.ts:116:107)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

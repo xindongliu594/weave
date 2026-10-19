@@ -3,7 +3,7 @@ import type { Plan } from '../../../packages/contracts/index.ts';
 /** A contract example, never a generated candidate or employee deliverable. */
 export const organizationPlanningTaskExample: Plan['tasks'] = [
   { id: 'develop', subject: '实现 CLI 与使用说明', objective: '实现用户要求的小型 CLI，并说明使用方法。', assigneeId: 'developer', dependencies: [],
-    acceptanceCriteria: ['CLI 语法检查通过；功能由后续独立 QA 验证'], acceptanceChecks: [{criterionIndex:0,command:'node --check cli.mjs'}], estimatedInputTokens: 60000, estimatedOutputTokens: 6000, maxOutputTokens: 4096,
+    acceptanceCriteria: ['实现和使用说明已交付，语法自检通过；功能由后续独立 QA 验证'], estimatedInputTokens: 60000, estimatedOutputTokens: 6000, maxOutputTokens: 4096,
     kind: 'implementation', inputs: [], outputs: [{ path: 'cli.mjs', format: 'text' }, { path: 'README.md', format: 'text' }], inScope: ['cli.mjs', 'README.md'], verify: ['node --check cli.mjs'] },
   { id: 'verify', subject: '独立测试 CLI', objective: '读取开发交付，另行编写并实际执行独立测试。', assigneeId: 'qa', dependencies: ['develop'],
     acceptanceCriteria: ['独立测试覆盖用户要求及边界，至少 4 项真实测试通过'], acceptanceChecks: [{criterionIndex:0,command:'node --test cli.test.mjs',minimumTests:4}], estimatedInputTokens: 45000, estimatedOutputTokens: 4000, maxOutputTokens: 4096,
@@ -41,7 +41,7 @@ function taskPlanningInstructions(templatePreview=false){return [
   '生成 candidate 前逐项自检任务合同；这些字段由你规划，不要让用户填写内部字段。只使用 application_constraints 允许的模型、工具、人数和预算。',
   outputPermissionInstructions,handoffShapeInstructions,
   'implementation/repair：必须显式给出非空 inScope 和 verify，以及 inputs/outputs（无输入用 []）。inScope/outOfScope 只能是工作区相对路径，inScope 覆盖全部 outputs，outOfScope 不得包含 outputs。verify 是实际可执行的精确 shell 命令，不是“运行测试”等说明；执行人必须有 terminal/terminal_test。',
-  '每个节点的 verify/acceptanceChecks 必须在该节点完成前就能执行，不能引用后续或并行员工才会创建的测试文件。开发可对自己已写的实现运行 node --check，自检标准只写语法等实际可证明的内容；功能正确性放在后续独立 QA 节点，由 QA 写测试再运行。引用其他任务文件必须声明 inputs 和正确的前置依赖，不能为了满足映射把所有标准都指向同一未来测试命令。',
+  '每个节点的 verify/acceptanceChecks 必须在该节点完成前就能执行，不能引用后续或并行员工才会创建的测试文件。开发可对自己已写的实现运行 node --check，仅有语法自检时省略 acceptanceChecks，不能把语法检查填作功能验收证据。此时必须安排另一员工担任后续独立 QA，读取开发全部 outputs 的当前版本，写自己的测试再运行并生成 acceptanceChecks。引用其他任务文件必须声明 inputs 和正确的前置依赖，不能为了满足映射把所有标准都指向同一未来测试命令。',
   'repair 还需绑定已知实现/修复的 sourceTaskId 与真实问题编号 sourceFindingIds，并直接依赖 sourceTaskId；不要为新方案虚构返修问题或来源。',
   'verification：独立 QA 可读取开发产物、写自己的测试文件并执行 verify；不能修改开发文件。写入工具权限覆盖 outputs，filesystem 权限覆盖 inputs。产物输入只填 path 与 producerTaskId，来源任务须声明同一路径输出；不要编造 SHA256。',
   'review：只读验收实现或修复，reviewedTaskId 指向被审查的 implementation/repair，并在 dependencies 中直接列出它。maxReworkRounds=0 且需要先等 QA 时同时直接列出 QA；本次任务产物 inputs 的来源都必须是前置任务。审查人与实现者不同，outputs 必须为 []，不得创建 delivery.md 或其它交付文件，结论通过任务完成回复返回。'+(templatePreview?'无 orchestration.template 的旧方案：maxReworkRounds=0；选择 orchestration.template.id=review_repair 时，绑定的独立审查任务 maxReworkRounds 必须为 1..2，仅预览、不授予执行权。':'maxReworkRounds 固定 0。'),

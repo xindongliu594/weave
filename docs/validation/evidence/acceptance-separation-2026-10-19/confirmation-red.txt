@@ -1,0 +1,31 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ syntax-only acceptance is rejected at chat and confirmation while independent QA plans remain confirmable (3586.6964ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4349.5493
+
+✖ failing tests:
+
+test at tests\organization-chat.test.ts:1:8319
+✖ syntax-only acceptance is rejected at chat and confirmation while independent QA plans remain confirmable (3586.6964ms)
+  AssertionError [ERR_ASSERTION]: {"departmentId":"378d8e38-62ce-4148-b1dc-27555106856e","projectId":"ac900b7b-1177-40fe-9f83-acb61374849e","departmentVersion":1,"projectVersion":1}
+
+  201 !== 422
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-chat.test.ts:71:62)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 422,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

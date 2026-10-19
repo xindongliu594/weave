@@ -1,0 +1,49 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executable candidate without host mappings is rejected without save or hidden model repair (1657.337222ms)
+✔ syntax-only acceptance is rejected at chat and confirmation while independent QA plans remain confirmable (77.794824ms)
+✔ V2 conversation recommends existing employees without changing their department and expires old drafts (59.445286ms)
+✔ out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later (93.549155ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (49.107017ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (61.188194ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (25.909869ms)
+✔ documented JSON mode preserves receipts and never retries: gpt-4.1-mini (67.066971ms)
+✔ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (43.181488ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (49.919039ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (23.719111ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (58.990759ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (39.400864ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (30.296367ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (157.926877ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (118.149006ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (60.841031ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (53.896586ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (74.508952ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (292.741706ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (33.151435ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (25.624432ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (278.151685ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (296.053151ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4042.392218
+✔ confirming a revised proposal updates the same team and draft project, records versions, and never executes (1527.187018ms)
+✔ execution state, archived teams and mismatched project ownership refuse an update without partial writes (69.051984ms)
+✔ all adopted planning charges count toward the updated budget and transfer only after successful confirmation (47.470704ms)
+✔ revisions still require preview identity and explicit tool permissions (24.107168ms)
+✔ pending and uncertain project charges block a revision before any budget or team change (59.270779ms)
+✔ a team participating in another active project cannot be changed through a saved conversation (55.052944ms)
+✔ employee prompt revisions advance role versions while replay and unchanged roles preserve them (52.674326ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2105.572904

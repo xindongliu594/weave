@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (1373.359563ms)
+✔ legacy conversation uses the same restricted generation fields while retaining its old envelope (31.302622ms)
+✔ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (211.367993ms)
+✔ real malformed handoff reports independent contract errors without correcting or saving the candidate (49.650257ms)
+✔ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (55.382757ms)
+✔ handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract (62.514506ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (26.39123ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (23.659478ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (16.903133ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (75.743465ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (46.332175ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (45.612335ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (49.790359ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (43.647777ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (47.252391ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (61.908804ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (74.000406ms)
+✔ legacy candidate without a template remains confirmable (30.136537ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (8.435482ms)
+✔ a real preview with a future QA test command is rejected before saving and without hidden repair (26.823248ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2767.541491
