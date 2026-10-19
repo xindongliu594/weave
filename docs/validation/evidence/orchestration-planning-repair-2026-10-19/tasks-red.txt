@@ -1,0 +1,36 @@
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (14.117ms)
+✔ new executable plans require mappings while text tasks and saved legacy contracts stay compatible (0.5282ms)
+✔ office-only planning does not teach the model to label document acceptance as code review (0.479ms)
+✔ terminal template previews use contextual rework instructions while existing callers keep zero rework (0.3303ms)
+✖ routing rework example lets QA consume only the independently reviewed implementation and ends with manager acceptance (3.3567ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 878.6149
+
+✖ failing tests:
+
+test at tests\organization-task-planning.test.ts:1:4312
+✖ routing rework example lets QA consume only the independently reviewed implementation and ends with manager acceptance (3.3567ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  0 !== 1
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-task-planning.test.ts:60:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

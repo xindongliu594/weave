@@ -5,6 +5,7 @@ import { policySchema, validatePlan, type Model } from '../packages/contracts/in
 import { taskContractErrors } from '../packages/contracts/task-contracts.mjs';
 import { organizationPlanningTaskExample, organizationTaskInstructionsFor, organizationTaskPlanningInstructions } from '../apps/api/src/organization-task-planning.ts';
 import { plannedAcceptanceErrors } from '../apps/api/src/execution-prompt.ts';
+import { orchestrationPatterns } from '../packages/contracts/orchestration-patterns.ts';
 
 test('the planning example is a legal three-person develop, independent verification, existing-manager review DAG', () => {
   const agents = ['manager', 'developer', 'qa'].map(id => ({ id, role: id === 'manager' ? 'manager' as const : 'member' as const,
@@ -51,4 +52,21 @@ test('terminal template previews use contextual rework instructions while existi
     assert.equal(preview.includes('orchestration.template.id=review_repair 时，绑定的独立审查任务 maxReworkRounds 必须为 1..2'),true);
   }
   assert.equal(organizationTaskInstructionsFor(['artifact_write'],true),organizationTaskInstructionsFor(['artifact_write']));
+});
+
+test('routing rework example lets QA consume only the independently reviewed implementation and ends with manager acceptance',()=>{
+  const tasks=JSON.parse(organizationTaskInstructionsFor(['filesystem','artifact_write','terminal_test'],true).split('\n').at(-1)!);
+  const review=tasks.find((t:any)=>t.kind==='review'),qa=tasks.find((t:any)=>t.kind==='verification'),manager=tasks.at(-1);
+  assert.equal(review.maxReworkRounds,1);
+  assert.ok(qa.dependencies.includes(review.id));assert.ok(!review.dependencies.includes(qa.id));
+  assert.equal(manager.assigneeId,'manager');assert.notEqual(review.assigneeId,'manager');
+  const agents=['manager','developer','qa'].map(id=>({id,name:id,title:id,role:id==='manager'?'manager' as const:'member' as const,instructions:'依照合同验证真实结果。',modelId:'m',tools:['filesystem','artifact_write','terminal_test']}));
+  const definition=orchestrationPatterns.find(p=>p.id==='review_repair')!;
+  const plan={agents,tasks,rationale:'仅检查示例合同',orchestration:{pattern:'pipeline' as const,rationale:'审查通过后QA再消费当前产物',template:{schemaVersion:1 as const,id:'review_repair' as const,version:1 as const,definitionHash:definition.definitionHash,reviewTaskId:review.id}},deliveryCriteria:[{id:'cli',description:'实现达到要求',producerTaskIds:['develop'],checkTaskId:review.id,checkCriteriaIndexes:[0],independent:true}]};
+  const policy=policySchema.parse({maxBudget:1,maxAgents:3,maxConcurrentAgents:1,deadlineSeconds:600,allowedModelIds:['m'],allowedTools:['filesystem','artifact_write','terminal_test']});
+  assert.deepEqual(taskContractErrors(tasks,agents),[]);assert.deepEqual(plannedAcceptanceErrors(tasks),[]);
+  const validation=validatePlan(plan,policy,[{id:'m',name:'fixture',gatewayId:'g',model:'m',inputRate:.1,outputRate:.2,status:'available'} as Model],false);
+  assert.equal(validation.valid,true,JSON.stringify(validation.errors));
+  const stale=structuredClone(tasks);stale.find((t:any)=>t.id===qa.id).dependencies=['develop'];
+  assert.ok(taskContractErrors(stale,agents).some((e:string)=>e.includes('必须等待独立审查')),'the consumer gate stays enforced');
 });

@@ -1,0 +1,85 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (2783.6746ms)
+✖ legacy conversation uses the same restricted generation fields while retaining its old envelope (54.4481ms)
+✖ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (90.6307ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (68.5374ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (64.0296ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (38.0839ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (122.6264ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (107.0899ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (103.7444ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (99.0993ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (122.0455ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (147.7543ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (109.7064ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (141.4105ms)
+✔ legacy candidate without a template remains confirmable (83.5274ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (62.6698ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 13
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5038.8844
+
+✖ failing tests:
+
+test at tests\orchestration-pattern-integration.test.ts:1:3679
+✖ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (2783.6746ms)
+  AssertionError [ERR_ASSERTION]: V2 must not be taught the legacy candidate envelope
+
+  true !== false
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:36:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\orchestration-pattern-integration.test.ts:1:4848
+✖ legacy conversation uses the same restricted generation fields while retaining its old envelope (54.4481ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + {
+  +   maximum: 100000,
+  +   minimum: 0,
+  +   type: 'number'
+  + }
+  - undefined
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:51:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { type: 'number', minimum: 0, maximum: 100000 },
+    expected: undefined,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\orchestration-pattern-integration.test.ts:1:5536
+✖ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (90.6307ms)
+  AssertionError [ERR_ASSERTION]: sequential-report
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:64:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

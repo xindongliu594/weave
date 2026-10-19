@@ -2,6 +2,8 @@ import {before,after,test} from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import {once} from 'node:events';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -20,7 +22,7 @@ before(async()=>{
  await admin.query('CREATE SCHEMA '+schema);const connection=new URL(base);connection.searchParams.set('options','-c search_path='+schema);process.env.DATABASE_URL=connection.toString();
  dir=await mkdtemp(join(tmpdir(),'orchestration-'));process.env.DATA_DIR=dir;process.env.TRACE_ROOT=join(dir,'runs');process.env.OBSIDIAN_VAULT=join(dir,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
- gateway=http.createServer(async(req:any,res:any)=>{let raw='';for await(const chunk of req)raw+=chunk;wire=JSON.parse(raw);requests++;res.setHeader('content-type','application/json');res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(response)}}],usage:{prompt_tokens:10,completion_tokens:10}}));});
+ gateway=http.createServer(async(req:any,res:any)=>{let raw='';for await(const chunk of req)raw+=chunk;wire=JSON.parse(raw);requests++;res.setHeader('content-type','application/json');res.end(JSON.stringify({choices:[{message:{content:typeof response==='string'?response:JSON.stringify(response)},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:10}}));});
  gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
  await pool.query("INSERT INTO gateways(id,data) VALUES('g',$1)",[{name:'Loopback fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);
  await pool.query("INSERT INTO models(id,data,status) VALUES('m',$1,'available')",[{name:'fixture',model:'fixture',gatewayId:'g',inputRate:1,outputRate:1}]);
@@ -28,6 +30,49 @@ before(async()=>{
 });
 after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s){s.closeAllConnections();await new Promise<void>(r=>s.close(()=>r()));}await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
 async function chat(value:any){response={reply:'请查看离线草案。',candidate:value};return call('/organizations/chat',{organizationRouting:true,modelId:'m',policy:orchestrationPolicy,messages:[{role:'user',content:'仅整理可供确认的团队协作草案并独立核对结果。'}]});}
+test('assembled generation schema excludes forbidden new-department fields without changing existing-team selection',async()=>{
+ await chat(candidate('pipeline'));
+ const prompt=wire.messages[0].content;
+ assert.equal(prompt.includes('结构为 department、rationale、tasks'),false,'V2 must not be taught the legacy candidate envelope');
+ const schema=JSON.parse(prompt.split('以下为输出 JSON Schema：')[1]),target=schema.properties.candidate.properties.target;
+ const department=target.anyOf.find((o:any)=>o.properties.kind.const==='new').properties.department;
+ assert.equal(department.properties.dailyBudget,undefined);
+ const agent=department.properties.agents.items;
+ for(const field of ['sourceDepartmentId','sourceAgentId','fallbackModelId','knowledgeSpaceIds','browserOrigins','mcpConnections'])assert.equal(agent.properties[field],undefined,field);
+ for(const field of ['id','role','modelId','tools'])assert.ok(agent.required.includes(field),field);
+ assert.equal(department.additionalProperties,false);assert.equal(agent.additionalProperties,false);
+ assert.ok(target.anyOf.find((o:any)=>o.properties.kind.const==='existing').properties.departmentVersion);
+});
+test('legacy conversation uses the same restricted generation fields while retaining its old envelope',async()=>{
+ response={reply:'继续讨论。'};
+ const result=await call('/organizations/chat',{modelId:'m',policy:orchestrationPolicy,messages:[{role:'user',content:'讨论团队。'}]});
+ assert.equal(result.status,200);const schema=JSON.parse(wire.messages[0].content.split('以下为输出 JSON Schema：')[1]);
+ assert.ok(schema.properties.candidate.properties.department);assert.equal(schema.properties.candidate.properties.target,undefined);
+ assert.equal(schema.properties.candidate.properties.department.properties.dailyBudget,undefined);
+});
+test('all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts',async()=>{
+ const evidence=JSON.parse(readFileSync(new URL('../docs/validation/evidence/orchestration-jj-tests-2026-10-19/real-evaluation.json',import.meta.url),'utf8'));
+ await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available')",[evidence.model.id,{...evidence.model,gatewayId:'g'}]);
+ const counts=async()=>{const result:any={};for(const table of ['organization_previews','departments','projects','project_runs'])result[table]=(await pool.query('SELECT count(*)::int n FROM '+table)).rows[0].n;return result;};
+ const before=await counts(),beforeRequests=requests;
+ for(const item of evidence.cases){
+  response=item.rawResponse;
+  const result=await call('/organizations/chat',{organizationRouting:true,modelId:evidence.model.id,policy:{...orchestrationPolicy,maxBudget:.25,allowedModelIds:[evidence.model.id],allowedTools:['filesystem','artifact_write',...(item.caseId==='bounded-code-review'?['terminal']:[])]},messages:[{role:'user',content:'离线回放原始虚构方案，仅检查拒绝与保存边界。'}]});
+  assert.equal(result.status,200,item.caseId);assert.equal(result.data.preview,undefined,item.caseId);
+  assert.equal(result.data.draftIssue.code,item.diagnostic.code,item.caseId);
+  const diagnostic=result.data.outputDiagnostic;
+  assert.ok(diagnostic,item.caseId);assert.equal(diagnostic.finishReason,'stop');
+  assert.equal(diagnostic.originalOutputSHA,createHash('sha256').update(item.rawResponse).digest('hex'));
+  assert.equal(diagnostic.outputBytes,Buffer.byteLength(item.rawResponse));
+  if(item.diagnostic.code==='ORGANIZATION_CHAT_INVALID'){assert.equal(diagnostic.reason,'INVALID_JSON');assert.ok(Number.isInteger(diagnostic.position));}
+  assert.ok(!JSON.stringify(diagnostic).includes('candidate'));
+  assert.deepEqual(await counts(),before,item.caseId);
+ }
+ assert.equal(requests,beforeRequests+7,'local response fixtures, never another provider request');
+ response={reply:'请补充要求。'};
+ const next=await call('/organizations/chat',{organizationRouting:true,modelId:'m',policy:orchestrationPolicy,previousDraftIssue:evidence.cases[0].diagnostic,messages:[{role:'user',content:'继续讨论。'}]});
+ assert.equal(next.status,200);assert.equal(next.data.reply,'请补充要求。');assert.deepEqual(await counts(),before);
+});
 test('assembled terminal routing request distinguishes template preview rework from legacy zero rework',async()=>{
  const calls=requests,result=await chat(candidate('review_repair'));
  assert.ok(result.data.preview,JSON.stringify(result));assert.equal(requests,calls+1);

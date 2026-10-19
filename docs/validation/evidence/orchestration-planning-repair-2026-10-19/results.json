@@ -1,0 +1,29 @@
+{
+  "baseCommit": "784db83",
+  "modelCalls": 0,
+  "productionChanges": 0,
+  "files": {
+    "apps/api/src/organization-chat.ts": "8abe110aae080cdd3d98be6f5454f1b93deaf580eaa19205fa752b62cf7303fb",
+    "apps/api/src/organization-task-planning.ts": "9c9e58e5ee7803a100989cde20b40ea5446d9f90e83459eed10ed6b127120380",
+    "tests/orchestration-pattern-integration.test.ts": "42b299be481ef2103ce0de6896bc0142e1efafb11cc99367c9d86ce51ad4fcc3",
+    "tests/organization-task-planning.test.ts": "ad0f66607db4020db1ce0671c3963ad277edf2a48a74eae2ebea2466cc8ac3e3"
+  },
+  "results": [
+    {
+      "name": "unit",
+      "exitCode": 0,
+      "seconds": 1.52,
+      "tests": 87,
+      "pass": 87,
+      "fail": 0
+    },
+    {
+      "name": "api",
+      "exitCode": 0,
+      "seconds": 13.16,
+      "tests": 42,
+      "pass": 42,
+      "fail": 0
+    }
+  ]
+}
