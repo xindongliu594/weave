@@ -23,7 +23,8 @@ export function installNativePluginTools(ctx, {snapshot,archive,sandbox,gate,cap
        for(const path of access.read)before=handoff.beforeFile(work.taskId,work.attemptId,'filesystem',{path});
        for(const path of access.write)before=handoff.beforeFile(work.taskId,work.attemptId,'artifact_write',{path});
        before??=handoff.beforeFile(work.taskId,work.attemptId,tool.name,args);
-       archive.append('runtime/operation-start',{name:tool.name,arguments:args,pluginId:binding.id},ref);
+       handoff.checkpoint?.(work.taskId,work.attemptId,'before-tool',ref);
+       archive.append('runtime/operation-start',{name:tool.name,arguments:args,pluginId:binding.id},{...ref,taskId:work.taskId,attemptId:work.attemptId});
        dispatched=true;
        const result=await sandbox.execute('native_plugin',{toolName:tool.name,arguments:args,expectedWorkspaceRevision:sandbox.revision()},exec.signal,
         {agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,taskId:work.taskId,attemptId:work.attemptId});

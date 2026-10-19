@@ -97,6 +97,7 @@ export const taskSchema = z.object({
   maxBudget: z.number().finite().positive().max(10000).optional(),
   maxModelCalls: z.number().int().min(1).max(1000).optional(),
   kind: z.enum(['work', 'requirements', 'implementation', 'verification', 'review', 'repair', 'integration']).optional(),
+  verificationReuse: z.enum(['never','same-workspace']).optional().describe('默认重新验证。same-workspace 仅允许继承已核验的固定 OpenShell 环境、本地 Node 测试与完全相同文件版本的成功回执；用于不依赖网络、时间或外部状态的只读 .mjs 测试；启用后使用 Node 权限模式，禁止写入、子进程和工作区外文件读取。恢复仍须独立交接和验收。'),
   inputs: z.array(artifactInputSchema).max(40).optional(),
   outputs: z.array(artifactOutputSchema).max(40).optional(),
   inScope: z.array(artifactPathSchema).max(40).optional().describe('允许修改的工作区相对文件或目录路径，例如 server.mjs 或 src；不能填写自然语言说明。必须覆盖本任务声明的全部 outputs。'),

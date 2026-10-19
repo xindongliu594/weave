@@ -1,0 +1,25 @@
+✔ an unfinished node resumes with inherited evidence and never relabels the original execution (19.861749ms)
+✔ changed files and revoked reuse permission require fresh verification (10.403654ms)
+✔ new environment, changed tool grants, or unknown effects after the checkpoint block reuse (9.170691ms)
+✔ ordinary plans and native host commands do not opt into verification inheritance (8.256709ms)
+✔ a later failed or unconfined result cannot be hidden by an earlier passing receipt (19.044957ms)
+✔ a late unknown operation in the original receipt ancestor blocks another generation of reuse (11.988364ms)
+✔ a parent without a new checkpoint cannot be skipped when it has an unknown operation (6.688153ms)
+✔ native developer → QA → manager sees real command hashes/counts with no private knowledge or extra tools (781.938407ms)
+✔ native resumed QA/manager inherit source budget and exact developer seal without repeating completed developer execution (760.987939ms)
+✔ hard process termination after a real test resumes evidence with one total command execution (193.275261ms)
+ℹ {"sourceRunId":"ffe568b8-cac8-475c-adb2-5c7ad6c23368","resumedRunId":"46c54990-5288-4e70-bc15-b4c96041e009","checkpointId":"f10e9347-0502-4670-9cfd-1dc0c082e266","checkpointMs":4.007982999999996,"resumeMs":4.362430000000018,"archiveBytes":5205,"commandExecutions":1,"modelCalls":0}
+✔ committed checkpoints retain exact file versions and deduplicate unchanged content (12.266761ms)
+✔ partial writes are not checkpoints and corrupt objects fail closed (2.861909ms)
+✔ oversized and excessive workspaces are rejected rather than silently truncated (17.52566ms)
+✔ failed archive commit never publishes a restorable checkpoint (2.206647ms)
+✔ reusable test profile rejects external entrypoints, options and shell syntax (1.242741ms)
+✔ actual Node permission mode reads workspace but rejects external files, writes and child processes (62.260685ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1808.814641

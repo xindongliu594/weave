@@ -1,0 +1,47 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ selected checkpoint preflight validates saved files instead of changed latest files without mutating data (2428.4525ms)
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (183.1239ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (188.7184ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (136.8579ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (195.2964ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (159.3208ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (165.6926ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (139.0804ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (151.2681ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (121.3916ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (97.594ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (268.0902ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (243.1737ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (365.7149ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (550.0093ms)
+✔ explicit continuation grant is previewed, sealed and exhausted across ordinary resume (396.9549ms)
+✔ invalid continuation grants are rejected before any paid planning request (360.7819ms)
+✔ resource planning without an output grant omits output adjustments from its schema and preserves the pinned limits (400.8657ms)
+✔ resource planning without an output grant rejects unsolicited output fields without storing a candidate (365.8941ms)
+✔ context resource planning advertises only the exact authorized limit and applies it to a new snapshot (266.6044ms)
+✔ context resource planning rejects unsupported capacity reductions and insufficient full request money before calling a model (450.9073ms)
+✔ unrequested context fields are absent from the planning schema and cannot produce a candidate (143.1722ms)
+✔ output resource candidate is explicit, persisted and applied only to a new recovery snapshot (274.0646ms)
+✔ detailed output recovery planning fits the approved small planning request without dropping task context (193.2581ms)
+✔ output planning cannot store a candidate funded only for the old output limit (145.5292ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (108.4947ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (186.3588ms)
+✔ shared project money rejects a full correction tranche before planning despite sufficient node money (173.954ms)
+✔ late project expenses prevent confirming a previously valid correction candidate (153.3114ms)
+✔ next-tranche floor also reserves the bounded planning request before paid admission (142.8295ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (187.9078ms)
+✔ DeepSeek resource planning sends JSON mode through the actual budgeted request (180.1021ms)
+✔ missing fields, wrapped plans and schema echoes remain paid failures with no automatic retry (509.7929ms)
+✔ JSON mode rejection makes no paid fallback and preserves unknown cost plus the source run (230.9322ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (202.5949ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (158.3929ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1822.4317ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13363.508

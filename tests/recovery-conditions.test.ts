@@ -2,7 +2,7 @@ import { before, after, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { mkdtemp, rm } from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
@@ -12,6 +12,7 @@ import type pg from 'pg';
 import { createRunArchive, openRunArchive, readRun } from '../services/agent-runtime/trace-store.mjs';
 import { toolEvidence } from './model-fixture.ts';
 import { createGoalContract } from '../packages/contracts/goal-contract.mjs';
+import {commitStepCheckpoint,checkpointContract} from '../services/agent-runtime/step-checkpoints.mjs';
 
 // This test can open only the integration runner's fresh in-memory database.
 // No product data, live service or external model endpoint is contacted.
@@ -71,7 +72,7 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1,detailed=false,wideCalls=false,context?:{bytes:number;route:Record<string,any>}) {
+async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,originalBudget=1,detailed=false,wideCalls=false,context?:{bytes:number;route:Record<string,any>},stepFiles=false) {
   const projectId = randomUUID(), runId = randomUUID(), receiptId = randomUUID();
   const { routeFingerprint } = await import('../apps/api/src/model-capabilities.ts');
   const model = (await pool.query('SELECT data FROM models WHERE id=$1', [modelId])).rows[0].data;
@@ -83,6 +84,7 @@ async function seed(sealGoal=false,declaredReads=false,pricedRoutes=false,origin
     modelRoutes: [{ id: modelId, configurationHash: routeFingerprint(model, 1),...(pricedRoutes?{inputRate:2,outputRate:10,maxOutputTokens:512}:{}) }],
     departmentBudgets: { [departmentId]: .99 }, executionBudget: .99, budgetVersion: 1, budgetHistory: { calls: 0, tasks: {} } };
   if(context){snapshot.policy.contextBytes=context.bytes;Object.assign(snapshot.modelRoutes[0],context.route);}
+  if(stepFiles){snapshot.executionTarget={backend:{kind:'openshell'}};snapshot.agents[0].tools=['filesystem'];snapshot.tasks[1].inputs=[{path:'input.txt',sha256:createHash('sha256').update('saved').digest('hex')}];}
   if(sealGoal)snapshot.goalContract=createGoalContract(snapshot);
   await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
     [projectId, departmentId, '恢复检查隔离部门', snapshot.requirement, { ...policy, maxBudget: 2 }, { rationale: 'Concrete bounded text work', agents: [employee], tasks:planTasks }, 'manual']);
@@ -107,6 +109,20 @@ async function state() {
   const names = ['projects', 'project_runs', 'model_reservations', 'usage', 'request_keys', 'tool_approvals', 'local_operations'];
   return Promise.all(names.map(async name => ({ name, rows: (await pool.query('SELECT row_to_json(t) AS data FROM ' + name + ' t ORDER BY row_to_json(t)::text')).rows })));
 }
+
+test('selected checkpoint preflight validates saved files instead of changed latest files without mutating data', {skip:!isolated},async()=>{
+ const {runId,archive}=await seed(false,false,false,1,false,false,undefined,true);
+ const workspace=join(archive.dir,'artifacts');mkdirSync(workspace);writeFileSync(join(workspace,'input.txt'),'saved');
+ const snapshot=readRun(traceRoot,runId)!.snapshot;
+ const checkpoint=commitStepCheckpoint({archive,workspace,boundary:{taskId:'finish',attemptId:'attempt',sessionId:'session',trigger:'cycle-complete',eventCursor:1,contractHash:checkpointContract(snapshot,snapshot.tasks[1])}});
+ writeFileSync(join(workspace,'input.txt'),'changed');const before=await state();
+ const latest=await check(runId,'?retainUncertainCosts=true');
+ assert.ok(latest.resume.reasons.some((reason:any)=>reason.code==='HANDOFF_CHECKPOINT_INVALID'));
+ const selected=await check(runId,'?retainUncertainCosts=true&checkpointId='+checkpoint.id);
+ assert.ok(!selected.resume.reasons.some((reason:any)=>reason.code==='HANDOFF_CHECKPOINT_INVALID'),JSON.stringify(selected.resume.reasons));
+ assert.equal(selected.costReadiness.availableBudget,latest.costReadiness.availableBudget);
+ assert.deepEqual(await state(),before);assert.equal(providerRequests,0);
+});
 
 test('HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls', { skip: !isolated }, async () => {
   const { runId, archive } = await seed(); const before = await state();

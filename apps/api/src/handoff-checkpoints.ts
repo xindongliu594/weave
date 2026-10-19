@@ -6,7 +6,8 @@ import { canonicalEvidence } from '../../../packages/contracts/run-lineage-evide
 import { assertHandoffReport, handoffContractDigest, reportTaskFor } from '../../../packages/contracts/handoff-report.mjs';
 
 /** Retain only host seals belonging to the exact completed attempt in the archive. */
-export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string) {
+export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string, files?:any[]) {
+  const inspect=(file:any)=>{if(!files)return inspectArtifact(root,file);const found=files.find(row=>row.path===file.path);if(!found)throw Error(`产物 ${file.path} 不在所选检查点中`);return found;};
   const reportContracts = new Map<string,any>();
   // Collapse a rework graph only at an independently accepted boundary. A
   // half-finished repair/review must retain native identities and is not replayed.
@@ -58,7 +59,7 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
       const seal=record.outputs?.find((file:any)=>file.path===output.path);
       if(!seal)throw Error(`产物 ${output.path} 缺少验收版本`);
       const replaced=snapshot.tasks.some((task:any)=>task.id!==id&&completed.has(task.id)&&ancestors(snapshot.tasks,task.id).has(id)&&task.outputs?.some((file:any)=>file.path===output.path));
-      if(!replaced&&inspectArtifact(root,output).sha256!==seal.sha256)throw Error(`产物 ${output.path} 已变化，不能沿用原验收版本`);
+      if(!replaced&&inspect(output).sha256!==seal.sha256)throw Error(`产物 ${output.path} 已变化，不能沿用原验收版本`);
     }
   }
   const remaining = snapshot.tasks.filter((task:any)=>!completed.has(task.id));
@@ -68,7 +69,7 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
         const output = input.producerTaskId ? records.get(input.producerTaskId)?.outputs.find((file:any)=>file.path===input.path) : undefined;
         const expected = output?.sha256??input.sha256;
         if (!expected || (input.sha256&&output&&input.sha256!==output.sha256)) throw Error(`输入 ${input.path} 没有匹配的已验收版本`);
-        if (inspectArtifact(root,input).sha256!==expected) throw Error(`输入 ${input.path} 已变化，不能沿用原验收版本`);
+        if (inspect(input).sha256!==expected) throw Error(`输入 ${input.path} 已变化，不能沿用原验收版本`);
       }
     }
   }

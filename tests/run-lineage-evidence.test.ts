@@ -60,6 +60,20 @@ function resourceFixture(){
  f.current.snapshot.goalContract=createGoalContract(f.current.snapshot);
  return f;
 }
+test('a test reused inside an unfinished attempt retains its original execution through later node recovery',async()=>{
+ const f=fixture(),originalCommand=f.t2.commands[0],originSeal=structuredClone(f.t2);
+ f.child.events=f.child.events.filter((e:any)=>e.type!=='handoff/accepted');f.child.events.at(-1).data.tasks[0].status='failed';
+ const command={...originalCommand,inheritedFrom:{runId:childId,attemptId:'a2',checkpointId:'cp',checkpointRunId:childId,observationSeq:4}};
+ const seal={...originSeal,runId,attemptId:'a3',commands:[command]};
+ f.current.snapshot.handoffCheckpoints=[f.t1];f.current.snapshot.recovery.completed=[{taskId:'T1',attemptId:'a1'}];
+ f.current.events=[event(1,'run/task-mapping',{tasks:[{task_id:'n3',seed_id:'T2'}]}),event(2,'step/evidence-inherited',{taskId:'T2',attemptId:'a3',commands:[command]}),event(3,'handoff/accepted',seal),event(4,'team/checkpoint',{tasks:[{id:'n3',attemptId:'a3',status:'completed'}]})];
+ const later=structuredClone(f.current);later.id='55555555-5555-4555-8555-555555555555';later.events=[];
+ later.snapshot.handoffCheckpoints=[f.t1,seal];later.snapshot.recovery.sourceRunId=runId;later.snapshot.recovery.completed.push({taskId:'T2',attemptId:'a3'});later.snapshot.recovery.nodes.T2={status:'completed',historyRunId:runId};
+ const load={...f.load,run:(id:string)=>id===runId?f.current:f.load.run(id)};
+ let result=await collectRunLineageEvidence(later,load);assert.equal(result.status,'verified',JSON.stringify(result.issues));assert.equal(result.tests[0].sourceRunId,childId);assert.equal(result.tests[0].attemptId,'a2');
+ f.current.events=f.current.events.filter((e:any)=>e.type!=='step/evidence-inherited');
+ result=await collectRunLineageEvidence(later,load);assert.equal(result.tests.length,0);assert.equal(result.status,'partial');
+});
 test('explicit resource approval preserves exact inherited QA evidence across ordinary later recovery',async()=>{
  const f=resourceFixture();
  const result=await collectRunLineageEvidence(f.current,f.load);assert.equal(result.status,'verified');assert.equal(result.tests.length,1);

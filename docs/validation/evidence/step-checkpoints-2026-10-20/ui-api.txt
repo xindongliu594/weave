@@ -1,0 +1,42 @@
+✔ selecting an earlier point preserves accounting and restores files only into a new workspace (155.7762ms)
+✔ unknown and external effects after a selected point cannot be forgotten by rollback (54.6123ms)
+✔ another employee modifying shared files after the point blocks rollback (58.731ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (42.8296ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (10.7633ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (18.4874ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (16.7957ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (35.1891ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (24.2561ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.5573ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (4.11ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.5067ms)
+✔ a test reused inside an unfinished attempt retains its original execution through later node recovery (28.5532ms)
+✔ explicit resource approval preserves exact inherited QA evidence across ordinary later recovery (12.9535ms)
+✔ a resource boundary cannot authorize changed goal, completed contract or counterfeit parent (11.5769ms)
+✔ repeated recovery resolves exact ancestor seals and real QA operation without reading model context into the response (3.2931ms)
+✔ cross-project/version/contract, corrupt, missing and cyclic ancestry fail closed before operation queries (4.0977ms)
+✔ ancestry has an explicit maximum depth (2.5371ms)
+✔ every inherited hop must preserve exact completed attempt, accepted file inventory and original committed seal (8.9308ms)
+✔ QA output requires matching actual operation, approval/call/session/attempt, complete bytes and host observation (15.2183ms)
+✔ source-only summaries and unlinked commands cannot manufacture a test card (1.1727ms)
+✔ QA must have executed the exact workspace revision sealed by the original host (19.1292ms)
+✔ web evidence visibly names original run/attempt/observation and does not pretend inherited QA ran again (4.6363ms)
+✔ recovery-derived repair report binding preserves the original accepted report (10.42ms)
+✔ changing the selected step invalidates its preflight and any open confirmation (2.9277ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (1.0869ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.8739ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.9778ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.372ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.3549ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.4752ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.5036ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (1.6751ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (14.5466ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3585.5684

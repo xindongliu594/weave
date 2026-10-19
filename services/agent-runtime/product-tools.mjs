@@ -69,7 +69,8 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
         let dispatched=false,outcomeKnown=false;
         try {
           const before = handoff?.beforeFile(work.taskId, work.attemptId, name, args);
-          if(name!=='filesystem')archive.append('runtime/operation-start',{name,arguments:args},ref);
+          if(name!=='filesystem'&&handoff)handoff.checkpoint?.(work.taskId,work.attemptId,'before-tool',ref);
+          if(name!=='filesystem')archive.append('runtime/operation-start',{name,arguments:args},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})});
           dispatched=true;
           const result = await retryRead(name,()=>sandbox.execute(name,args,exec.signal,{agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,approvalId,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}),readOptions);
           outcomeKnown=true;

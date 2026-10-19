@@ -16,6 +16,7 @@ import {executionBackendSchema} from '../../../packages/contracts/index.ts';
 import {executionBackend,assertExecutionBackendBinding,assertExecutionBackendReceipt} from './execution-backend.ts';
 import {nativeToolBinding,nativeFileAccess} from '../../../services/agent-runtime/native-capabilities.mjs';
 const {decodeFiles,exportFiles,mirrorFiles,revision}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
+const {checkpointTestInvocation}=createRequire(import.meta.url)('../../desktop/checkpoint-test-profile.cjs');
 const digest=(value:string)=>createHash('sha256').update(value).digest();
 function validateResult(row:any,result:any){
  const files=decodeFiles(result.files),name=row.payload.name,args=row.payload.arguments;
@@ -106,7 +107,12 @@ export class LocalOperationService {
    signal?.throwIfAborted();
    await localTarget(run.snapshot.policy,run.snapshot.agents,db);
    signal?.throwIfAborted();
-   const payload={runId,grantId:target.grantId,name,arguments:args,context,approvalId,...(files?{files}:{}),deviceId:target.deviceId};
+   const task=run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&(item.assignee??item.assigneeId)===employee?.id);
+   let verificationProfile;
+   if(name==='terminal_test'&&target.backend?.kind==='openshell'&&task?.verificationReuse==='same-workspace'&&task.verify?.includes(args.command)){
+    try{verificationProfile=checkpointTestInvocation(args.command,'/sandbox').profile;}catch{/* Other approved commands still run, with fresh verification required. */}
+   }
+   const payload={runId,grantId:target.grantId,name,arguments:args,context,approvalId,...(verificationProfile?{verificationProfile}:{}),...(files?{files}:{}),deviceId:target.deviceId};
    await db.query('INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,approval_id) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,target.deviceId,runId,target.grantId,this.owner,payload,approvalId]);
    signal?.throwIfAborted();
    openRunArchive(this.traceRoot,runId).append('local/operation-queued',{operationId:id,name,deviceId:target.deviceId,...context});committing=true;await db.query('COMMIT');return id;

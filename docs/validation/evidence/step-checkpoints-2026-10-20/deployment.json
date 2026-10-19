@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-step-checkpoints-v2-20261020",
+  "backup": "/home/jj/.local/share/weiwu/backups/step-checkpoints-predeploy-20261020",
+  "packageSha256": "6046d8ed6e0d5fe8f6188747abd4688e7b45ff1ea0fdbb13b7ee5095849c93ed",
+  "modelCalls": 0,
+  "database": "connected",
+  "usageCountUnchanged": true,
+  "unknownReservationsUnchanged": true,
+  "activeRunsBeforeDeployment": 0,
+  "pendingModelCallsBeforeDeployment": 0
+}

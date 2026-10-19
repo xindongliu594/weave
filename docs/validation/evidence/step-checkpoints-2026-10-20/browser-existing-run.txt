@@ -1,0 +1,160 @@
+Browser tab: 4, Title: "为伍 · 一个想法，一支团队", URL: "http://127.0.0.1:4312/#run/3657d6bc-24bc-42f3-b261-c8b893618a30".
+1 AXWebArea 为伍 · 一个想法，一支团队, URL: 127.0.0.1:4312/#run/3657d6bc-24bc-42f3-b261-c8b893618a30
+	2 container root
+		3 container
+			4 link 127.0.0.1:4312/#dashboard
+			5 button 新建项目 ↗
+				6 image
+				7 text 新建项目
+				8 text ↗
+			9 text 工作空间
+			10 button 部门工作台
+				11 image
+				12 text 部门工作台
+			13 button 需求组建
+				14 image
+				15 text 需求组建
+			16 button 部门与员工
+				17 image
+				18 text 部门与员工
+			19 button 项目与方案
+				20 image
+				21 text 项目与方案
+			22 button 执行记录
+				23 image
+				24 text 执行记录
+			25 button 浏览器与 MCP
+				26 image
+				27 text 浏览器与 MCP
+			28 button 文件与项目导入
+				29 image
+				30 text 文件与项目导入
+			31 button 自动化与改进
+				32 image
+				33 text 自动化与改进
+			34 button 知识库
+				35 image
+				36 text 知识库
+			37 button 模型目录
+				38 image
+				39 text 模型目录
+			40 button 用量与费用
+				41 image
+				42 text 用量与费用
+			43 button 系统设置
+				44 image
+				45 text 系统设置
+		46 container
+			47 text 工作空间
+			48 image
+			49 text 执行记录
+			50 button 查看系统状态
+				51 image
+		52 container
+			53 text 本机运行 · 可接入真实 API · 模型调用由你配置的服务计费 · 命令逐次审批 EXECUTION HISTORY
+			54 heading 执行记录, Value: 1
+				55 text 执行记录
+			56 text 查看当时的职责、任务指令和实际操作。历史快照独立保留。
+			57 button 运行追溯验证
+				58 image
+				59 text 运行追溯验证
+			60 image
+			61 text 工具执行受岗位授权约束；文件与终端按批准的执行位置操作，终端需要逐次审批。追溯验证使用测试模型，不会调用真实 API。
+			62 button 返回运行列表
+				63 image
+				64 text 返回运行列表
+			65 heading Value: 2, 请生成可确认并实际执行的最小温度换算项目方案：复用目录中现有部门的开发、QA、经理三人，不新增部门。采用现有普通 pipeline 顺序布局，省略 orchestration.template（七种新模板目前仅预览）。开发生成 cli.mj
+				66 text 请生成可确认并实际执行的最小温度换算项目方案：复用目录中现有部门的开发、QA、经理三人，不新增部门。采用现有普通 pipeline 顺序布局，省略 orchestration.template（七种新模板目前仅预览）。开发生成 cli.mj
+			67 text 正式项目 已完成
+			68 container
+				69 text Run ID： 3657d6bc-24bc-42f3-b261-c8b893618a30
+			70 button (collapsed) 查看完整需求, Secondary Actions: Expand
+				71 text 查看完整需求
+			72 text 方案 v 1  · 模板  department-execution-v1  ·  1364  条事件
+			73 heading 任务、交付物与审批, Value: 2
+				74 text 任务、交付物与审批
+			75 container
+				76 button 刷新审批与交付
+				77 button 导出完整追溯
+			78 container
+				79 text 项目累计费用：$ 0.094874  / 预算 $ 0.250000  · 未结算预留 $0.000000 · 可用 $0.155126
+			80 container
+				81 text 本次运行 $ 0.074772  · 启动前已用 $0.020102（含方案规划及此前执行） 。按配置单价与已记录用量计算，以中转站账单为准；待核对调用可能尚未计入。
+			82 container
+				83 text 方案调用上限  32  次；每员工每任务默认  16  次。备用模型调用也计次，同一方案重试保留已用次数与任务费用。
+			84 container
+				85 text 恢复自
+				86 link Description: 5784a24a-aa74-4e82-b826-fd219de5100a, Value: 127.0.0.1:4312/#run/5784a24a-aa74-4e82-b826-fd219de5100a
+			87 button (collapsed) 断点恢复 · 保留 1 项已完成任务, Secondary Actions: Expand
+				88 text 断点恢复 · 保留
+				89 text 1
+				90 text  项已完成任务
+			91 heading 员工状态 · 本次运行已完成, Value: 3
+				92 text 员工状态 · 本次运行已完成
+			93 text 本次运行已结束，停止前的等待状态不表示员工现在仍在执行。费用和外部操作结果仍须按下方记录核对。
+			94 button (collapsed) 查看停止前原始员工状态（历史记录）, Secondary Actions: Expand
+				95 text 查看停止前原始员工状态（历史记录）
+			96 container 目标与节点检查
+				97 heading 目标与节点检查, Value: 3
+					98 text 目标与节点检查
+				99 container
+					100 text 目标合同已固定  · 方案 v 1
+				101 text 固定目标与权限防止摘要改写。交付是否符合业务目标，还须查看真实测试及独立验收证据。
+				102 button (collapsed) 原目标与节点验收标准（3 个节点）, Secondary Actions: Expand
+					103 text 原目标与节点验收标准（
+					104 text 3
+					105 text  个节点）
+			106 container
+				107 heading 逐项验收证据, Value: 3
+					108 text 逐项验收证据
+				109 text 命令结果由宿主核对；测试内容是否覆盖需求仍需独立 QA 和经理审查。历史方案未启用时不补写通过结论。
+				110 container 用户交付要求
+					111 text 独立 QA 用真实测试核对 CLI 的换算正确性、stdout JSON 数值与错误退出行为
+					112 container
+						113 text 交付检查通过  · 当前产物对应的命令检查通过
+					114 text 实际命令检查  ·  verify  · 来源运行  3657d6bc-24bc-42f3-b261-c8b893618a30  · 尝试  e6e511c5-9456-49c1-b3f0-d8d064a5d55e
+				115 button (collapsed) 实现 Node 温度换算 CLI 与使用说明, Secondary Actions: Expand
+					116 text 实现 Node 温度换算 CLI 与使用说明
+				117 button (collapsed) 独立测试温度换算 CLI, Secondary Actions: Expand
+					118 text 独立测试温度换算 CLI
+				119 button (collapsed) 经理只读审查与最终判定, Secondary Actions: Expand
+					120 text 经理只读审查与最终判定
+			121 container
+				122 heading 员工交接报告, Value: 3
+					123 text 员工交接报告
+				124 text 以下是已封存的员工陈述，经理按派工要求独立核验。历史交接不代表当前项目已通过；文件和真实测试证据请结合下方记录查看。
+				125 button (collapsed) Secondary Actions: Expand, 实现 Node 温度换算 CLI 与使用说明 · 已交付 cli.mjs 与 README.md；唯一授权的 node --check cli.mjs 语法自检通过（exitCode=0）。功能正确性未由本任务验证，交由后续独立 QA。
+					126 text 实现 Node 温度换算 CLI 与使用说明
+					127 text  ·
+					128 text 已交付 cli.mjs 与 README.md；唯一授权的 node --check cli.mjs 语法自检通过（exitCode=0）。功能正确性未由本任务验证，交由后续独立 QA。
+				129 button (collapsed) Secondary Actions: Expand, 独立测试温度换算 CLI · 已独立编写 cli.test.mjs（仅用 node:test/assert/child_process 启动真实 CLI 子进程），覆盖 0、100、-40、小数、缺失、非数字、多参数共 13 个用例；最后写入后实际执行 node --test cli.test.mjs，pass 13 / fail 0 / skipped 0 / todo 0，exitCode=0，全部通过；未修改 cli.mjs 与 README.md。
+					130 text 独立测试温度换算 CLI
+					131 text  ·
+					132 text 已独立编写 cli.test.mjs（仅用 node:test/assert/child_process 启动真实 CLI 子进程），覆盖 0、100、-40、小数、缺失、非数字、多参数共 13 个用例；最后写入后实际执行 node --test cli.test.mjs，pass 13 / fail 0 / skipped 0 / todo 0，exitCode=0，全部通过；未修改 cli.mjs 与 README.md。
+				133 button (collapsed) Secondary Actions: Expand, 经理只读审查与最终判定 · 只读审查通过：cli.mjs 实现、README.md 说明与 cli.test.mjs 覆盖三者一致，QA 实测证据（node --test cli.test.mjs，pass 13 / fail 0，exitCode=0，两次同版本回执）真实且绑定当前文件版本，业务交付标准达成。未创建/修改任何文件，未自写或复跑测试。
+					134 text 经理只读审查与最终判定
+					135 text  ·
+					136 text 只读审查通过：cli.mjs 实现、README.md 说明与 cli.test.mjs 覆盖三者一致，QA 实测证据（node --test cli.test.mjs，pass 13 / fail 0，exitCode=0，两次同版本回执）真实且绑定当前文件版本，业务交付标准达成。未创建/修改任何文件，未自写或复跑测试。
+			137 button (collapsed) 恢复沿用的已核验交接（1）, Secondary Actions: Expand
+				138 text 恢复沿用的已核验交接（
+				139 text 1
+				140 text ）
+			141 heading 恢复沿用的真实测试结果, Value: 3
+				142 text 恢复沿用的真实测试结果
+			143 text 以下是已完成节点原运行的实际操作回执；已核对命令、审批、调用、任务尝试及输出哈希。恢复后未重跑，以对应验收文件版本为准。
+			144 button (collapsed) node --check cli.mjs · 通过 · 退出码 0, Secondary Actions: Expand
+				145 text node --check cli.mjs
+				146 text  ·
+				147 text 通过
+				148 text  · 退出码
+				149 text 0
+			150 heading 真实测试结果, Value: 3
+				151 text 真实测试结果
+			152 text 以下命令与输出来自本机执行回执，包含实际失败和修复后的复测；以当前文件版本的最终复验为准。
+			153 button (collapsed) node --test cli.test.mjs · 通过 · 退出码 0, Secondary Actions: Expand
+				154 text node --test cli.test.mjs
+				155 text  ·
+				156 text 通过
+				157 text  · 退出码
+				158 text 0
+			15

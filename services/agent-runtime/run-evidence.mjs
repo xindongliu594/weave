@@ -53,6 +53,7 @@ export function commandEvidence({ archive, name, taskId, attemptId, args, result
   return {
     version: 1, runId: id(archive?.id), observedAt: new Date().toISOString(), tool: name,
     sessionId: id(context.sessionId), callId: id(context.callId),
+    ...(result.verificationProfile?{verificationProfile:result.verificationProfile}:{}),
     approval: id(context.approvalId) ? { status: 'available', approvalId: context.approvalId } : unknown('APPROVAL_ID_MISSING'),
     operation: localOperationEvidence(archive, { name, taskId, attemptId, ...context }),
     hashBasis: 'executor-result-before-archive-redaction', output, stdout: stream('stdout'), stderr: stream('stderr'),
@@ -120,6 +121,7 @@ function receiptProjection(command, record, sourceRunId) {
     command: redact(command.command), exitCode: Number.isSafeInteger(command.exitCode) ? command.exitCode : null,
     runId: id(evidence?.runId) ?? sourceRunId, observedAt: id(evidence?.observedAt), observationSeq: count(command.observationSeq),
     workspaceRevision: id(command.workspaceRevision), validAtAccepted: id(record.workspaceRevision) ? command.workspaceRevision === record.workspaceRevision : null,
+    ...(command.inheritedFrom?{inheritedFrom:command.inheritedFrom}:{}),
     sessionId: id(evidence?.sessionId), callId: id(evidence?.callId),
     approval: evidence?.approval?.status === 'available' && id(evidence.approval.approvalId) ? { status: 'available', approvalId: evidence.approval.approvalId } : unknown('APPROVAL_ID_MISSING'),
     operation: evidence?.operation?.status === 'available' && id(evidence.operation.operationId) ?

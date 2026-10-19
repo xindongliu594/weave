@@ -133,6 +133,7 @@ test('native developer → QA → manager sees real command hashes/counts with n
   const root = await mkdtemp(join(tmpdir(), 'run-evidence-native-'));
   try {
     const phase = await runPhase(root, initialSnapshot()); assertManagerEvidence(phase);
+    assert.ok(phase.events.some(event=>event.type==='step/checkpoint'&&event.data.boundary.trigger==='cycle-complete'),'native loop commits a step checkpoint');
     assert.equal(phase.events.filter(event=>event.type==='goal/node-checked').length,3);
     for(const request of phase.requests.filter(item=>item.context?.task))assert.equal(request.context.approvedGoal.sha256,phase.events.find(event=>event.type==='goal/anchored').data.sha256);
     assert.equal(phase.events.filter(event => event.type === 'handoff/accepted').length, 3);

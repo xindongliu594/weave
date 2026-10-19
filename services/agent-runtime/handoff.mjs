@@ -1,5 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { dirname } from 'node:path';
+import { readRun } from './trace-store.mjs';
+import { commitStepCheckpoint, checkpointContract, checkpointEnvironment, validateInheritedEvidence } from './step-checkpoints.mjs';
 import { artifactFile, listArtifacts } from './sandbox.mjs';
 import { Semaphore } from './limits.mjs';
 import { commandEvidence } from './run-evidence.mjs';
@@ -46,6 +49,8 @@ export class HandoffGate {
     this.committed = new Map(this.accepted);
     this.bindings = new Map(); this.commands = new Map(); this.writes = new Map(); this.blocked = new Map(); this.scopeViolations = new Map();
     this.mutex = new Semaphore(1);
+    this.stepStatus=new Map();this.stepSessions=new Map();this.inheritanceChecked=new Set();
+    this.environment=archive?.dir?checkpointEnvironment(snapshot,readRun(dirname(archive.dir),archive.id)?.events.findLast(event=>event.type==='local/device-bound')?.data.execution):null;
     // Archived approvals may pin both fields. Keep their exact SHA checks in
     // begin/sameVersion; new approvals reject the ambiguous contract in validatePlan.
     const errors = taskContractErrors(snapshot.tasks ?? [], snapshot.agents, snapshot.handoffCheckpoints, { allowHistoricalPinnedProducerInputs: true });
@@ -64,6 +69,29 @@ export class HandoffGate {
   }
   key(taskId, attemptId) { return taskId + ':' + attemptId; }
   observedChangedPaths(taskId, attemptId) { return [...(this.writes.get(this.key(taskId, attemptId))?.keys() ?? [])].sort(); }
+  inherit(taskId,attemptId) {
+    const key=this.key(taskId,attemptId),task=this.tasks.get(taskId);
+    const previous=this.stepStatus.get(key);
+    if(previous?.reusable&&previous.evidenceRefs.some(entry=>entry.workspaceRevision!==workspaceRevision(this.sandbox.root)))this.stepStatus.set(key,{reusable:false,reasons:['FILES_CHANGED'],evidenceRefs:[]});
+    if(!this.archive?.dir||this.inheritanceChecked.has(key))return;
+    // A later readonly device receipt may attest the sandbox after task claim.
+    if(!this.environment)return;
+    this.inheritanceChecked.add(key);
+    const result=validateInheritedEvidence({root:dirname(this.archive.dir),reference:this.snapshot.recovery?.nodes?.[taskId]?.stepCheckpoint,
+      snapshot:this.snapshot,task,workspace:this.sandbox.root,environment:this.environment});
+    this.stepStatus.set(key,result);
+    if(result.reusable){this.commands.set(key,[...result.evidenceRefs,...(this.commands.get(key)??[])]);this.archive.append('step/evidence-inherited',{taskId,attemptId,commands:result.evidenceRefs},{taskId,attemptId});}
+    else if(this.snapshot.recovery?.nodes?.[taskId]?.stepCheckpoint)this.archive.append('step/evidence-rejected',{taskId,attemptId,reasons:result.reasons},{taskId,attemptId});
+  }
+  checkpoint(taskId,attemptId,trigger,context={}) {
+    if(!this.archive?.dir)return;
+    const sessionId=context.sessionId??this.stepSessions.get(this.key(taskId,attemptId));if(!sessionId)return;
+    const task=this.tasks.get(taskId);if(!task)return;
+    const boundaryEvent=this.archive.append('step/boundary',{taskId,attemptId,trigger},{taskId,attemptId,sessionId});
+    return commitStepCheckpoint({archive:this.archive,workspace:this.sandbox.root,
+      boundary:{taskId,attemptId,sessionId,trigger,eventCursor:boundaryEvent.seq,contractHash:checkpointContract(this.snapshot,task),environment:this.environment,
+        ...(context.sessionCursor===undefined?{}:{sessionCursor:context.sessionCursor})},receipts:this.commands.get(this.key(taskId,attemptId))??[]});
+  }
   begin(taskId, attemptId) {
     const task = this.tasks.get(taskId);
     if (!task) throw Error('UNAPPROVED_TASK: ' + taskId);
@@ -100,6 +128,8 @@ export class HandoffGate {
   }
   observe(taskId, attemptId, name, args, result, before, context = {}) {
     const task = this.tasks.get(taskId), key = this.key(taskId, attemptId);
+    if(context.sessionId)this.stepSessions.set(key,context.sessionId);
+    if(result.execution)this.environment=checkpointEnvironment(this.snapshot,result.execution);
     const previous = new Map(before.map(f => [f.path, f.sha256]));
     const current = new Map(listArtifacts(this.sandbox.root).map(f => [f.path, f.sha256]));
     const changed = [...new Set([...previous.keys(), ...current.keys()])].filter(path => previous.get(path) !== current.get(path));
@@ -124,9 +154,11 @@ export class HandoffGate {
       if (Number.isSafeInteger(event?.seq)) observation.observationSeq = event.seq;
     }
     this.assertInputs(taskId, attemptId);
+    if(name!=='filesystem')this.checkpoint(taskId,attemptId,'tool-result',context);
   }
   prepare(taskId, attemptId, update) {
     const task = this.begin(taskId, attemptId), key = this.key(taskId, attemptId);
+    this.inherit(taskId,attemptId);
     if (this.scopeViolations.has(key)) throw Error(this.scopeViolations.get(key));
     const outputs = (task.outputs ?? []).map(output => inspectArtifact(this.sandbox.root, output));
     const revision = workspaceRevision(this.sandbox.root), observed = this.commands.get(key) ?? [];
@@ -146,11 +178,12 @@ export class HandoffGate {
       ...(task.acceptanceChecks !== undefined ? { acceptanceChecks } : {}), acceptedAt: new Date().toISOString() };
   }
   stage(record) { this.accepted.set(record.taskId, record); }
-  invalidateCommands(taskId, attemptId) { this.commands.delete(this.key(taskId, attemptId)); }
+  invalidateCommands(taskId, attemptId) { const key=this.key(taskId,attemptId);this.commands.delete(key);this.inheritanceChecked.add(key);this.stepStatus.set(key,{reusable:false,reasons:['OPERATION_INVALIDATED'],evidenceRefs:[]}); }
   commit(record) {
     this.accepted.set(record.taskId, record); this.blocked.delete(record.taskId);
     this.archive.append('handoff/accepted', record);
     this.committed.set(record.taskId, record);
+    this.checkpoint(record.taskId,record.attemptId,'node-accepted');
   }
   rollback(record, previous) {
     if (previous) this.accepted.set(record.taskId, previous); else this.accepted.delete(record.taskId);

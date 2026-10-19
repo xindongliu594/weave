@@ -5,6 +5,7 @@ const {spawn}=require('node:child_process');
 const {validPath,canonicalManifest}=require('./local-executor.cjs');
 const {SANDBOX_STORAGE_LIMITS,storageDenied,boundedStorage,checkSandboxStorage}=require('./sandbox-storage.cjs');
 const {runNativeTool}=require('./native-plugin-worker.cjs');
+const {checkpointTestInvocation}=require('./checkpoint-test-profile.cjs');
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const POLICY_TEXT='version: 1\nfilesystem_policy:\n  include_workdir: false\n  read_only: [/bin, /usr, /lib, /lib64, /etc, /proc, /dev/urandom, /var/tmp, /sys/fs/cgroup]\n  read_write: [/sandbox, /tmp, /dev/null]\nlandlock:\n  compatibility: hard_requirement\nprocess:\n  run_as_user: "1000"\n  run_as_group: "1000"\nnetwork_policies: {}\nnetwork_middlewares: {}\n';
@@ -72,22 +73,24 @@ ${storageDenied.toString()}
 ${boundedStorage.toString()}
 ${checkSandboxStorage.toString()}
 ${runNativeTool.toString()}
+${checkpointTestInvocation.toString()}
 function checkedPath(root,value){validPath(value);let at=root;if(!fs.lstatSync(at).isDirectory()||fs.lstatSync(at).isSymbolicLink())throw denied('沙箱工作区目录已被替换');for(const part of value.split('/')){at=path.join(at,part);try{const stat=fs.lstatSync(at);if(stat.isSymbolicLink()||stat.isFile()&&stat.nlink>1)throw denied('沙箱工作区不允许链接');}catch(error){if(error.code!=='ENOENT')throw error;}}return at;}
 function exportFiles(root){const files=[];let total=0,entries=0;function walk(dir){for(const name of fs.readdirSync(dir).sort()){if(++entries>512)throw denied('工作区项目数量超过限制','LOCAL_FILE_LIMIT');const full=path.join(dir,name),stat=fs.lstatSync(full),relative=path.relative(root,full).split(path.sep).join('/');checkedPath(root,relative);if(stat.isDirectory())walk(full);else if(stat.isFile()){if(files.length>=128||stat.size>5*1024*1024||(total+=stat.size)>20*1024*1024)throw denied('工作区文件超过限制','LOCAL_FILE_LIMIT');files.push({path:relative,content:fs.readFileSync(full).toString('base64')});}else throw denied('工作区出现非普通文件');}}walk(root);decodeFiles(files);return files;}
 function manifest(files){return canonicalManifest(decodeFiles(files).map(file=>({path:file.path,size:file.bytes.length,sha256:hash(file.bytes)})));}
 function revision(files){return hash(JSON.stringify(manifest(files)));}
 function writeVersion(root,value,bytes,expected){const file=checkedPath(root,value),current=fs.existsSync(file)?hash(fs.readFileSync(file)):null;if(current!==(expected??null))throw denied('文件已变化，请携带正确 sha256','FILE_VERSION_CONFLICT');let temporary;try{fs.mkdirSync(path.dirname(file),{recursive:true,mode:0o700});checkedPath(root,value);temporary=path.join(path.dirname(file),'.agent-write-'+crypto.randomUUID());const fd=fs.openSync(temporary,'wx',0o600);try{fs.writeFileSync(fd,bytes);fs.fsyncSync(fd);}finally{fs.closeSync(fd);}checkedPath(root,value);if((fs.existsSync(file)?hash(fs.readFileSync(file)):null)!==current)throw denied('写入期间文件已变化','FILE_VERSION_CONFLICT');fs.renameSync(temporary,file);}catch(error){error.notExecuted=false;throw error;}finally{if(temporary&&fs.existsSync(temporary))fs.unlinkSync(temporary);}}
-async function command(command,cwd){
+async function command(command,cwd,profile){
  if(typeof command!=='string'||!command||command.length>5000)throw denied('命令格式不正确');
+ const confined=profile==='node-permission-workspace-v1'?checkpointTestInvocation(command,cwd):null;
  return await new Promise((resolve,reject)=>{
-  const child=spawn('/bin/sh',['-lc',command],{cwd,env:process.env,stdio:['ignore','pipe','pipe'],detached:true});let chunks=[],size=0,overflow=false,timedOut=false,storageError;
+  const child=spawn(confined?process.execPath:'/bin/sh',confined?confined.args:['-lc',command],{cwd,env:confined?confined.env:process.env,stdio:['ignore','pipe','pipe'],detached:true});let chunks=[],size=0,overflow=false,timedOut=false,storageError;
   const kill=()=>{try{process.kill(-child.pid,'SIGKILL');}catch{}};
   const timer=setTimeout(()=>{timedOut=true;kill();},60000),monitor=setInterval(()=>{try{checkSandboxStorage();}catch(error){storageError=error;kill();}},250);
   const clear=()=>{clearTimeout(timer);clearInterval(monitor);};
   const collect=chunk=>{size+=chunk.length;if(size>1024*1024){overflow=true;kill();}else chunks.push(chunk);};child.stdout.on('data',collect);child.stderr.on('data',collect);
   child.once('error',error=>{clear();reject(Object.assign(error,{notExecuted:true}));});
   child.once('close',code=>{clear();kill();if(storageError)return reject(Object.assign(storageError,{notExecuted:false}));
-   if(overflow||timedOut||code===null)return reject(Object.assign(Error(overflow?'命令输出超过限制':timedOut?'命令超过批准的执行时限':'命令退出结果不明确'),{code:overflow?'LOCAL_OUTPUT_LIMIT':'LOCAL_OUTCOME_UNKNOWN',notExecuted:false}));resolve({exitCode:code,output:Buffer.concat(chunks).toString('utf8')});
+   if(overflow||timedOut||code===null)return reject(Object.assign(Error(overflow?'命令输出超过限制':timedOut?'命令超过批准的执行时限':'命令退出结果不明确'),{code:overflow?'LOCAL_OUTPUT_LIMIT':'LOCAL_OUTCOME_UNKNOWN',notExecuted:false}));resolve({exitCode:code,output:Buffer.concat(chunks).toString('utf8'),...(confined?{verificationProfile:confined.profile}: {})});
   });
  });
 }
@@ -101,7 +104,7 @@ process.stdin.on('end',async()=>{let request,changed=false;try{
  if(request.name==='prepare'){const inputs=decodeFiles(request.files??[]);if(files.length)throw denied('沙箱工作区已经存在文件，拒绝重复初始化','LOCAL_WORKSPACE_CONFLICT');for(const file of inputs){changed=true;writeVersion(root,file.path,file.bytes,null);}}
  else if(request.name==='filesystem'){const file=checkedPath(root,args.path),stat=fs.lstatSync(file);if(!stat.isFile()||stat.size>1024*1024)throw denied('读取文件超过限制','LOCAL_FILE_LIMIT');const bytes=fs.readFileSync(file);result={path:args.path,content:bytes.toString('utf8'),sha256:hash(bytes)};}
  else if(request.name==='artifact_write'){if(typeof args.content!=='string'||Buffer.byteLength(args.content)>5*1024*1024)throw denied('写入文件超过限制','LOCAL_FILE_LIMIT');validPath(args.path);decodeFiles([...files.filter(f=>f.path!==args.path),{path:args.path,content:Buffer.from(args.content).toString('base64')}]);writeVersion(root,args.path,Buffer.from(args.content),args.expectedSha256);changed=true;result={path:args.path,bytes:Buffer.byteLength(args.content),sha256:hash(Buffer.from(args.content))};}
- else if(request.name==='terminal'||request.name==='terminal_test'){changed=true;result=await command(args.command,root);}
+ else if(request.name==='terminal'||request.name==='terminal_test'){changed=true;result=await command(args.command,root,request.name==='terminal_test'?request.verificationProfile:undefined);}
  else if(request.name==='native_plugin'){changed=true;const nativeResult=await runNativeTool({root,tempRoot:'/tmp',bundle:request.bundle,originalName:args.originalName,args:args.arguments,callId:request.callId,readPaths:args.readPaths,writePaths:args.writePaths},{checkStorage:checkSandboxStorage});result={nativeResult,pluginId:args.pluginId,toolName:args.toolName};}
  else if(request.name==='storage_inspect'){}
  else throw denied('沙箱工具未开放');
@@ -209,7 +212,7 @@ class OpenShellDeviceExecutor {
    }
    await this.admit(scope,signal);
    const nonce=randomBytes(16).toString('hex');dispatched=true;
-   const response=await this.cli(['sandbox','exec','--name',scope.name,'--workdir','/sandbox','--no-tty','--no-login-shell','--timeout','75','--','node','-e',REMOTE_SCRIPT],signal,{input:JSON.stringify({nonce,name:job.name,arguments:args,...(bundle?{bundle,callId:job.context?.callId}:{}),...(job.name==='prepare'?{files:job.files??[]}:{expectedStoredRevision:scope.workspaceRevision})}),timeoutMs:90000,mutation:true});
+   const response=await this.cli(['sandbox','exec','--name',scope.name,'--workdir','/sandbox','--no-tty','--no-login-shell','--timeout','75','--','node','-e',REMOTE_SCRIPT],signal,{input:JSON.stringify({nonce,name:job.name,arguments:args,...(job.name==='terminal_test'&&job.verificationProfile==='node-permission-workspace-v1'?{verificationProfile:job.verificationProfile}:{}),...(bundle?{bundle,callId:job.context?.callId}:{}),...(job.name==='prepare'?{files:job.files??[]}:{expectedStoredRevision:scope.workspaceRevision})}),timeoutMs:90000,mutation:true});
    let receipt;try{receipt=JSON.parse(response.stdout);}catch{throw unknown('OpenShell 操作回执不完整');}
    if(receipt.nonce!==nonce||typeof receipt.ok!=='boolean')throw unknown('OpenShell 操作回执不匹配');
    if(!receipt.ok)throw Object.assign(Error(receipt.error?.message??'OpenShell 工具失败'),{code:receipt.error?.code??'LOCAL_OPERATION_FAILED',notExecuted:receipt.error?.notExecuted===true,knownRemoteOutcome:true});

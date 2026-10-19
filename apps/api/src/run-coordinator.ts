@@ -2,7 +2,9 @@ import {claimExpiredRun,finishRun,terminalStatus} from './run-state.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
 import { executeBrowserMcpTool } from './work-tools-browser.ts';
 import { randomUUID } from 'node:crypto';
+import {join} from 'node:path';
 import { prepareImportedWorkspace } from './work-files.ts';
+import {restoreStepWorkspace} from './step-checkpoint-recovery.ts';
 import { pool } from './db.ts';
 import { unseal } from './vault.ts';
 import { AppError } from './provider.ts';
@@ -136,7 +138,8 @@ export class RunCoordinator {
         if(!gateway||routeFingerprint(gateway.data,gateway.version)!==route.configurationHash)throw Error('运行快照的模型或中转站配置已变化');routes.push({...route,apiKey:gateway.credential?unseal(gateway.credential):''});
       }
       if(this.stopped)throw new AppError(409,'工作进程已关闭，任务未启动','WORKER_STOPPED');
-      prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind);
+      if(row.snapshot.recovery?.workspaceCheckpoint)restoreStepWorkspace(this.traceRoot,row.snapshot.recovery.workspaceCheckpoint,join(this.traceRoot,row.id,'artifacts'));
+      else prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind);
       const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes});
       const result=await started.completion;
       for(const usage of result.usages)await this.recordUsage(row.id,usage);

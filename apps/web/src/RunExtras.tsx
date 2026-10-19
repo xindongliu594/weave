@@ -14,6 +14,7 @@ import {RunAcceptanceChecks} from './RunAcceptanceChecks.tsx';
 import {RunHandoffReports} from './RunHandoffReports.tsx';
 import {RunGoalChecks} from './RunGoalChecks.tsx';
 import {RunResourceResume} from './RunResourceResume.tsx';
+import {RunStepCheckpoints} from './RunStepCheckpoints.tsx';
 import type {RunLineageEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
 export type RunExtrasErrors = { id: string; operation: string; refresh: string };
 type RunExtrasErrorEvent = { id: string; type: 'reset' | 'operation' | 'refresh-failed' | 'refresh-succeeded'; message?: string };
@@ -73,6 +74,7 @@ export function RunRecoveryConfirmationPanel({intent,submitting,disabled,onCance
    <p>原运行 <span className="trace-id">{intent.runId}</span> · 原方案 v{intent.version}</p>
    <p>原项目费用上限不变，历史费用和调用次数继续计入；{intent.retainUncertainCosts?'未知费用预留继续占用原预算。':'费用仍按原账本核对。'}</p>
    <p>{intent.resume?'保留已核验的完成节点和文件，只继续未完成任务。':'将重新执行全部任务，可能重复之前的操作，并再次产生费用；原完成记录和文件仍保留在原运行档案。'}</p>
+   {intent.checkpointId&&<p>在新运行中恢复所选步骤的文件版本和工作记录。原运行保留；费用不回退。若涉及其他员工成果或外部副作用，恢复会被阻止。检查点：<code>{intent.checkpointId}</code></p>}
    <p>确认后会重新检查费用、方案和未知操作的核对选择；操作审批与预算规则仍然生效。</p>
    {submitting&&<p role="status">正在重新检查并提交，请等待结果，不要重复提交。取消此确认不会撤销已经提交的运行。</p>}
    <button type="button" onClick={onCancel}>取消</button>
@@ -86,6 +88,8 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  const setError=(message:string)=>dispatchError({id,type:'operation',message});
  const [citation,setCitation]=useState<any>(null);
  const [acknowledged,setAcknowledged]=useState(false);
+ const [selectedStep,setSelectedStep]=useState<{runId:string;id:string}>();
+ const checkpointId=selectedStep?.runId===id?selectedStep.id:undefined;
  const [checkedRecovery,setCheckedRecovery]=useState<{key:string;data:RecoveryConditions}>();
  const [checkingRecovery,setCheckingRecovery]=useState(false),[recoveryError,setRecoveryError]=useState('');
  const recoveryInFlight=useRef(false);
@@ -113,7 +117,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
   if(recoveryInFlight.current)return;
   recoveryInFlight.current=true;setCheckingRecovery(true);setRecoveryError('');
   try{
-   const data=await api<RecoveryConditions>('/runs/'+id+'/recovery-check?retainUncertainCosts='+costs.retainUncertainCosts+'&acknowledgeUnknownOperations='+acknowledge);
+   const data=await api<RecoveryConditions>('/runs/'+id+'/recovery-check?retainUncertainCosts='+costs.retainUncertainCosts+'&acknowledgeUnknownOperations='+acknowledge+(checkpointId?'&checkpointId='+encodeURIComponent(checkpointId):''));
    if(currentId.current!==id)return;
    setCheckedRecovery({data,key:recoveryConditionsResultKey(data)});
    return data;
@@ -144,10 +148,11 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  const anomalyNames:Record<string,string>={REPEATED_ACTION:'相同动作反复出现',REPEATED_ERROR:'同类错误连续出现',NO_PROGRESS:'长时间没有有效进展',EMPLOYEE_IDLE:'员工已空闲，任务尚未完成',OUTCOME_UNKNOWN:'操作结果需要核对'};
  const renderApproval=(a:any)=><div className="knowledge-result" key={a.id}><strong>{employeeName(a.agentId)} · {toolNames[a.tool]??a.tool} · {({pending:'等待审批',approved:'已批准',denied:'已拒绝',cancelled:'已取消'}as any)[a.status]}</strong><pre className="product-pre">{JSON.stringify(a.arguments,null,2)}</pre>{a.status==='pending'&&<><button disabled={busy||terminal} className="primary" onClick={()=>void act(async()=>{await api('/approvals/'+a.id,'POST',{decision:'approved'});})}>批准这次操作</button><button disabled={busy||terminal} onClick={()=>void act(async()=>{await api('/approvals/'+a.id,'POST',{decision:'denied'});})}>拒绝</button></>}</div>;
  return <CostContinuation key={id} projectId={snapshot.projectId} identity={id} initial={recovery?.costReadiness} budgetLimit={snapshot.policy?.maxBudget}>{costs=>{
- const checkKey=recoveryConditionsKey(id,snapshot.planVersion,costs.readiness,costs.retainUncertainCosts,acknowledged,unknown.map((operation:any)=>operation.callId));
+ const checkKey=recoveryConditionsKey(id,snapshot.planVersion,costs.readiness,costs.retainUncertainCosts,acknowledged,unknown.map((operation:any)=>operation.callId),checkpointId);
  const recoveryStale=!!checkedRecovery&&checkedRecovery.key!==checkKey;
  return <section className="panel padded lower"><div className="section-title"><h2>任务、交付物与审批</h2><div><button disabled={busy} onClick={()=>void act(async()=>{await onRefreshDetail?.();await refreshLineage();costs.refresh();},true)}>刷新审批与交付</button><button onClick={()=>void act(async()=>downloadJSON(await api('/runs/'+id+'/export'),'run-'+id+'.json'))}>导出完整追溯</button></div></div>{error&&<p className="banner error" role="alert">{error}</p>}<BudgetStatus snapshot={snapshot} events={events} costReadiness={costs.readiness}/>{snapshot.resumedFrom&&<p>恢复自 <a href={'#run/'+snapshot.resumedFrom}>{snapshot.resumedFrom}</a></p>}
  {activeTasks.length>0&&<p role="status"><strong>{executing?'当前执行：':'停止时节点：'}</strong>{activeTasks.map((task:any)=>task.subject+'（'+employeeName(task.assignee)+'）').join('、')}</p>}
+ <RunStepCheckpoints events={events} tasks={snapshot.tasks??[]}/>
  {!terminal&&approvals.some(approval=>approval.status==='pending')&&<p className="notice-box" role="status">有 {approvals.filter(approval=>approval.status==='pending').length} 项操作等待你审批。请查看下方员工申请的具体命令。</p>}
  <TerminalRunChecks status={status} readiness={costs.readiness} unknown={unknown} pendingApprovals={approvals.filter(approval=>approval.status==='pending').length} onRefresh={()=>void act(async()=>{await onRefreshDetail?.();costs.refresh();},true)}/>
  {snapshot.demo?.fixture&&<p className="notice-box">Todo 示例在本机独立演示目录执行，仅运行预置 Node 测试。模型响应固定；下方命令输出和交付物来自实际执行。</p>}
@@ -171,13 +176,14 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  {['failed','interrupted','cancelled'].includes(status)&&!planningBlocked&&<div className="notice-box run-recovery">
   <p>{recovery?.checkpointBlocked??'可以保留已核验的完成任务；返工结果须已通过独立复验。'}重试会创建新的运行档案，沿用原项目剩余预算和任务调用上限。</p>
   <CostCarryoverChoice state={costs} disabled={busy}/>
+  {snapshot.executionTarget?.backend?.kind==='openshell'&&events.some(e=>e.type==='step/checkpoint')&&<label className="field">恢复位置<select disabled={busy||checkingRecovery} value={checkpointId??''} onChange={e=>setSelectedStep(e.target.value?{runId:id,id:e.target.value}:undefined)}><option value="">最新工作现场（推荐）</option>{events.filter(e=>e.type==='step/checkpoint'&&!tasks.some(t=>t.id===e.data.boundary.taskId&&t.status==='completed')).slice(-50).reverse().map(e=><option key={e.data.id} value={e.data.id}>{taskName(e.data.boundary.taskId)} · {e.at} · {e.data.files.length} 个文件</option>)}</select><small>较早的检查点会在新运行中恢复对应文件；仍须通过版本、权限、费用与外部操作核验。</small></label>}
   {recovery?.costBlocked&&!costs.readiness&&<p className="banner error" role="status">{recovery.costBlocked} <a href="#usage">核对调用费用</a></p>}
   {unknown.length>0&&<div><p>以下操作的结果尚未确认，恢复前需要单独检查：</p>{unknown.map(operation=><pre className="product-pre" key={operation.callId}>{operation.name} · {JSON.stringify(operation.arguments)}</pre>)}<label><input type="checkbox" checked={acknowledged} disabled={busy||checkingRecovery} onChange={e=>setAcknowledged(e.target.checked)}/>我已核对这些操作和现有产物，允许未完成部分重新执行。</label></div>}
   <RecoveryConditionsView result={checkedRecovery?.data} stale={recoveryStale} checking={checkingRecovery} error={recoveryError} disabled={busy} staticEstimate={snapshot.estimatedCost} onCheck={()=>void checkRecovery(costs)}/>
-  <RunRecoveryActions key={'recovery-actions:'+id} busy={busy} checking={checkingRecovery} context={{runId:id,version:snapshot.planVersion,key:checkKey,retainUncertainCosts:costs.retainUncertainCosts,acknowledged,
-   allowResume:recoveryConditionsAllow(checkedRecovery?.data,checkedRecovery?.key,checkKey,true)&&!runContinuationBlocked(costs,{busy,legacyCostBlocked:recovery?.costBlocked,checkpointBlocked:recovery?.checkpointBlocked,unknownCount:unknown.length,acknowledged,resume:true}),
+  <RunRecoveryActions key={'recovery-actions:'+id} busy={busy} checking={checkingRecovery} context={{runId:id,version:snapshot.planVersion,key:checkKey,retainUncertainCosts:costs.retainUncertainCosts,acknowledged,checkpointId,
+   allowResume:recoveryConditionsAllow(checkedRecovery?.data,checkedRecovery?.key,checkKey,true)&&!runContinuationBlocked(costs,{busy,legacyCostBlocked:recovery?.costBlocked,checkpointBlocked:checkpointId?undefined:recovery?.checkpointBlocked,unknownCount:unknown.length,acknowledged,resume:true}),
    allowRetry:recoveryConditionsAllow(checkedRecovery?.data,checkedRecovery?.key,checkKey,false)&&!runContinuationBlocked(costs,{busy,legacyCostBlocked:recovery?.costBlocked,unknownCount:unknown.length,acknowledged,resume:false})}}
-   check={intent=>checkRecovery(costs,intent.acknowledged)} submit={intent=>api<{id:string}>('/runs/'+intent.runId+'/retry','POST',{resume:intent.resume,acknowledgeUnknownOperations:intent.acknowledged,retainUncertainCosts:intent.retainUncertainCosts})} onError={setError}/>
+   check={intent=>checkRecovery(costs,intent.acknowledged)} submit={intent=>api<{id:string}>('/runs/'+intent.runId+'/retry','POST',{resume:intent.resume,checkpointId:intent.checkpointId,acknowledgeUnknownOperations:intent.acknowledged,retainUncertainCosts:intent.retainUncertainCosts})} onError={setError}/>
   {snapshot.goalContract&&<RunResourceResume key={'resource-resume:'+id} id={id} snapshot={snapshot} retained={costs.readiness?.reserved??0} retainUncertainCosts={costs.retainUncertainCosts}
     continuationTasks={recoveryStale?undefined:checkedRecovery?.data.tasks.filter(task=>!task.completed).map(task=>({id:task.id,subject:task.subject}))}
     disabled={busy||checkingRecovery||integrity!=='ok'||unknown.length>0||costs.blocked||events.some(event=>event.type==='goal/blocked')}/>}

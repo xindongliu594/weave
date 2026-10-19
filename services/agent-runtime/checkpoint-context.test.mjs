@@ -34,7 +34,7 @@ test('recovery retains host evidence, bounds bootstrap and pages full own histor
   assert.deepEqual(passing.nodeTests,{status:'available',format:'spec',tests:8,suites:0,pass:8,fail:0,cancelled:0,skipped:0,todo:0});
   assert.equal(brief.current.status,'restart');assert.equal(brief.current.lastMessage,long.slice(0,800));
   assert.ok(!JSON.stringify(brief).includes('PRIVATE_COMMAND_BODY_NOT_BOOTSTRAP'));assert.ok(!JSON.stringify(brief).includes('PRIVATE_UPSTREAM_KNOWLEDGE'));
-  assert.match(brief.rule,/旧结果和旧审批不能代替本次 verify/);assert.match(brief.rule,/task_id.*runtimeTaskId/);assert.match(brief.rule,/attempt_id.*attemptId/);
+  assert.match(brief.rule,/旧审批不沿用/);assert.match(brief.rule,/stepEvidence 明确核验为 reusable 时可继承/);assert.match(brief.rule,/task_id.*runtimeTaskId/);assert.match(brief.rule,/attempt_id.*attemptId/);
   assert.match(brief.rule,/无需从头重写/);
   // Even a successful historical receipt and a model's copied declaration do
   // not populate the fresh attempt's host command observations or accept it.

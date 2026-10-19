@@ -64,6 +64,7 @@ async function fixture():Promise<Fixture>{
  createRunArchive(traceRoot,snapshot,{id:runId});return {device,runId,projectId,owner,policy,snapshot,service:new local.LocalOperationService(traceRoot,owner)};
 }
 async function queue(f:Fixture){return f.service.enqueue(f.runId,'prepare',{}, {},[]);}
+
 async function claim(f:Fixture,id:string){const r=await post(f.device,f.device.id+'/poll',{});assert.equal(r.status,200);assert.equal(r.data.job?.id,id);return r.data.job;}
 const operation=(f:Fixture,job:any,action:string,body:any)=>post(f.device,f.device.id+'/operations/'+job.id+'/'+action,{claimToken:job.claimToken,...body});
 const result=(executionProof:any=execution)=>({localWorkspace:'/sandbox',files:[],execution:executionProof});
@@ -154,3 +155,14 @@ test('withdrawn grant preserves late receipt without completing or reactivating 
  const exposed:any[]=await (await fetch(url+'/runs/'+f.runId+'/local-operations')).json();assert.deepEqual(exposed[0].lateResult.execution,execution);
 });
 
+
+test('only an approved task opt-in adds the trusted confinement profile to test operations',opts,async()=>{
+ const f=await fixture(),args={command:'node --test unit.mjs',expectedWorkspaceRevision:'f'.repeat(64)},ctx={...context(),approvalId:randomUUID()};
+ await pool.query("INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments,status) VALUES($1,$2,$3,'terminal_test',$4,'approved')",[ctx.approvalId,f.runId,employee.id,args]);
+ let id=await f.service.enqueue(f.runId,'terminal_test',args,ctx);assert.equal((await row(id)).payload.verificationProfile,undefined);
+ f.snapshot.tasks[0].verificationReuse='same-workspace';f.snapshot.tasks[0].verify=[args.command];
+ await pool.query('UPDATE project_runs SET snapshot=$1 WHERE id=$2',[f.snapshot,f.runId]);
+ ctx.approvalId=randomUUID();await pool.query("INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments,status) VALUES($1,$2,$3,'terminal_test',$4,'approved')",[ctx.approvalId,f.runId,employee.id,args]);
+ id=await f.service.enqueue(f.runId,'terminal_test',args,ctx);assert.equal((await row(id)).payload.verificationProfile,'node-permission-workspace-v1');
+ assert.deepEqual((await row(id)).payload.arguments,args);
+});

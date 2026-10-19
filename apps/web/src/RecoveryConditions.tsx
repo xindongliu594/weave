@@ -5,8 +5,8 @@ export type { RecoveryConditions } from '../../api/src/recovery-conditions.ts';
 const dollars = (value: number) => '$' + value.toFixed(6);
 
 export function recoveryConditionsKey(runId: string, version: number, readiness: CostReadiness | undefined,
-  retainUncertainCosts: boolean, acknowledgeUnknownOperations: boolean, unknownOperationIds: string[] = []) {
-  return JSON.stringify([runId, version, retainUncertainCosts, acknowledgeUnknownOperations, [...unknownOperationIds].sort(), readiness && [
+  retainUncertainCosts: boolean, acknowledgeUnknownOperations: boolean, unknownOperationIds: string[] = [],checkpointId?:string) {
+  return JSON.stringify([runId, version, retainUncertainCosts, acknowledgeUnknownOperations, [...unknownOperationIds].sort(),checkpointId??null, readiness && [
     readiness.recordedCost, readiness.reserved, readiness.availableBudget, readiness.pendingCount, readiness.uncertainCount,
     readiness.receipts.map(receipt => [receipt.id, receipt.amount, receipt.status]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
   ]]);
@@ -14,7 +14,7 @@ export function recoveryConditionsKey(runId: string, version: number, readiness:
 
 export function recoveryConditionsResultKey(result: RecoveryConditions) {
   return recoveryConditionsKey(result.runId, result.planVersion, result.costReadiness,
-    result.choices.retainUncertainCosts, result.choices.acknowledgeUnknownOperations, result.unknownOperationIds);
+    result.choices.retainUncertainCosts, result.choices.acknowledgeUnknownOperations, result.unknownOperationIds,result.choices.checkpointId);
 }
 
 /** A check is informational until both its choices and its current ledger still match. */

@@ -89,25 +89,31 @@ export async function collectRunLineageEvidence(current:any,load:Loaders):Promis
    try{
     assert(++commandCount<=MAX_COMMANDS,'COMMAND_UNAVAILABLE');
     const e=command.evidence,op=e.operation,approval=e.approval;
-    assert(typeof command.command==='string'&&e.version===1&&e.runId===source.id&&op?.status==='available'&&approval?.status==='available'&&z.uuid().safeParse(op.operationId).success&&
-     typeof e.callId==='string'&&typeof e.sessionId==='string'&&Number.isSafeInteger(command.observationSeq)&&command.observationSeq<proof.acceptanceSeq&&
+    let executionSource=source,executionAttempt=proof.attemptId;
+    if(command.inheritedFrom){
+     executionSource=runs.find((run:any,index:number)=>index>runs.indexOf(source)&&run.id===command.inheritedFrom.runId);
+     executionAttempt=command.inheritedFrom.attemptId;
+     assert(executionSource&&source.events.some((event:any)=>event.type==='step/evidence-inherited'&&event.seq<proof.acceptanceSeq&&event.data.taskId===proof.taskId&&event.data.attemptId===proof.attemptId&&event.data.commands?.some((entry:any)=>canonicalEvidence(entry)===canonicalEvidence(command))),'COMMAND_UNAVAILABLE');
+    }
+    assert(typeof command.command==='string'&&e.version===1&&e.runId===executionSource.id&&op?.status==='available'&&approval?.status==='available'&&z.uuid().safeParse(op.operationId).success&&
+     typeof e.callId==='string'&&typeof e.sessionId==='string'&&Number.isSafeInteger(command.observationSeq)&&(command.inheritedFrom||command.observationSeq<proof.acceptanceSeq)&&
      /^[a-f0-9]{64}$/i.test(command.workspaceRevision??'')&&command.workspaceRevision===proof.receipt.workspaceRevision,'COMMAND_UNAVAILABLE');
-    const observed=source.events.find((event:any)=>event.seq===command.observationSeq);
-    const assignee=contracts(source).find((task:any)=>task.id===proof.taskId)?.assignee;
-    const sameLinks=(event:any)=>event?.data?.operationId===op.operationId&&event.data.name==='terminal_test'&&event.data.taskId===proof.taskId&&event.data.attemptId===proof.attemptId&&event.data.callId===e.callId&&event.data.sessionId===e.sessionId&&event.data.approvalId===approval.approvalId&&event.data.agentId===assignee;
-    const queued=source.events.filter((event:any)=>event.type==='local/operation-queued'&&sameLinks(event)),finished=source.events.filter((event:any)=>event.type==='local/operation-finished'&&sameLinks(event));
-    assert(observed?.type==='handoff/command-observed'&&observed.data.taskId===proof.taskId&&observed.data.attemptId===proof.attemptId&&
-     canonicalEvidence({...observed.data,taskId:undefined,attemptId:undefined})===canonicalEvidence({...command,observationSeq:undefined})&&
+    const observed=executionSource.events.find((event:any)=>event.seq===command.observationSeq);
+    const assignee=contracts(executionSource).find((task:any)=>task.id===proof.taskId)?.assignee;
+    const sameLinks=(event:any)=>event?.data?.operationId===op.operationId&&event.data.name==='terminal_test'&&event.data.taskId===proof.taskId&&event.data.attemptId===executionAttempt&&event.data.callId===e.callId&&event.data.sessionId===e.sessionId&&event.data.approvalId===approval.approvalId&&event.data.agentId===assignee;
+    const queued=executionSource.events.filter((event:any)=>event.type==='local/operation-queued'&&sameLinks(event)),finished=executionSource.events.filter((event:any)=>event.type==='local/operation-finished'&&sameLinks(event));
+    assert(observed?.type==='handoff/command-observed'&&observed.data.taskId===proof.taskId&&observed.data.attemptId===executionAttempt&&
+     canonicalEvidence({...observed.data,taskId:undefined,attemptId:undefined})===canonicalEvidence({...command,observationSeq:undefined,inheritedFrom:undefined})&&
      queued.length===1&&finished.length===1&&queued[0].seq===op.queuedSeq&&finished[0].seq===op.finishedSeq&&op.queuedSeq<op.finishedSeq&&op.finishedSeq<command.observationSeq,'COMMAND_UNAVAILABLE');
-    const rows=await load.operations(source.id,[op.operationId]);assert(rows.length===1,'COMMAND_UNAVAILABLE');
+    const rows=await load.operations(executionSource.id,[op.operationId]);assert(rows.length===1,'COMMAND_UNAVAILABLE');
     const row=rows[0],context=row.payload?.context,result=row.result?.result??row.result;
-    assert(row.id===op.operationId&&row.runId===source.id&&row.status==='completed'&&row.started===true&&row.payload.name==='terminal_test'&&
-     row.payload.arguments?.command===command.command&&row.payload.arguments.expectedWorkspaceRevision===command.workspaceRevision&&context?.taskId===proof.taskId&&context?.attemptId===proof.attemptId&&
+    assert(row.id===op.operationId&&row.runId===executionSource.id&&row.status==='completed'&&row.started===true&&row.payload.name==='terminal_test'&&
+     row.payload.arguments?.command===command.command&&row.payload.arguments.expectedWorkspaceRevision===command.workspaceRevision&&context?.taskId===proof.taskId&&context?.attemptId===executionAttempt&&
      context?.callId===e.callId&&context?.sessionId===e.sessionId&&context?.approvalId===approval.approvalId&&context?.agentId===assignee&&row.result?.ok===true&&
      result.exitCode===command.exitCode&&typeof result.output==='string'&&e.output?.status==='available'&&e.output.complete===true&&
      result.outputTruncated!==true&&result.truncated!==true&&Buffer.byteLength(result.output)<=MAX_OUTPUT_BYTES&&
      Buffer.byteLength(result.output)===e.output.bytes&&hash(result.output)===e.output.sha256,'COMMAND_UNAVAILABLE');
-    response.tests.push({taskId:proof.taskId,attemptId:proof.attemptId,sourceRunId:source.id,operationId:row.id,command:String(redact(command.command)),exitCode:result.exitCode,
+    response.tests.push({taskId:proof.taskId,attemptId:executionAttempt,sourceRunId:executionSource.id,operationId:row.id,command:String(redact(command.command)),exitCode:result.exitCode,
      output:String(redact(result.output)),outputSha256:e.output.sha256,workspaceRevision:command.workspaceRevision,observationSeq:command.observationSeq,acceptanceSeq:proof.acceptanceSeq,
      nodeTests:nodeTestCounts(command.command,result.output,true)});
    }catch{response.issues.push({taskId:proof.taskId,code:'COMMAND_UNAVAILABLE',message:messages.COMMAND_UNAVAILABLE});}

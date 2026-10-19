@@ -184,7 +184,10 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     if (!contract) throw Error('UNAPPROVED_TASK: 无法固定当前任务合同');
     const budget = budgetContext(contract.id, state);
     const goal = product.goal?.context(contract.id);
+    handoff.inherit(contract.id,current.attemptId);
+    const stepEvidence=handoff.stepStatus.get(handoff.key(contract.id,current.attemptId));
     return JSON.stringify({ ...base, budget, task: { ...contract, taskPrompt: undefined }, recovery: recoveryContext(product.snapshot,contract.id),
+      ...(stepEvidence?{stepEvidence:{reusable:stepEvidence.reusable,reasons:stepEvidence.reasons,commands:stepEvidence.evidenceRefs.slice(-16).map(entry=>({command:entry.command,inheritedFrom:entry.inheritedFrom,nodeTests:entry.evidence.nodeTests})),rule:'这些是宿主核对的节点内部证据。reusable=true 的命令可沿用，不必重跑；保留 inheritedFrom 来源，不能称为本次重新执行。文件变化后失效；其他命令仍须实际验证。独立分析结果并按当前合同交接。'}}:{}),
       ...(goal ? { approvedGoal: { ...goal, requirement: undefined } } : {}),
       completionGuidance: reviewCompletionGuidance(contract, budget?.task?.configuredOutputLimit ?? contract.maxOutputTokens),
       runEvidence: taskRunEvidence({ snapshot: product.snapshot, taskId: contract.id, state, taskIds, handoff, budget: adapter.budget, runId: archive.id }),
@@ -361,7 +364,16 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         return concluded;
       } : undefined,
       protectedContext: product ? protectedContext : undefined,
-      waitForProtectedContext: handoff ? (agent, signal) => agent.id === captainId ? undefined : handoff.exclusive(signal, () => {}) : undefined,
+      waitForProtectedContext: handoff ? async (agent, signal) => {
+        if(agent.id===captainId)return;
+        await agent.ctx.sessions.flush(agent.session);
+        await handoff.exclusive(signal,()=>{
+          product?.supervisor?.check();
+          let work;try{work=activeWork(agent);}catch(error){if(error.message.startsWith('TASK_NOT_ACTIVE:'))return;throw error;}
+          const events=agent.session.snapshotEvents();
+          if(events.some(event=>event.type==='assistant/message'))handoff.checkpoint(work.taskId,work.attemptId,'cycle-complete',{sessionId:agent.id,sessionCursor:events.at(-1)?.seq});
+        });
+      } : undefined,
       identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,
       loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
     removeFactory = ctx.agents.setFactory(employees);

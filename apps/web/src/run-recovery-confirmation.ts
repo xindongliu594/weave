@@ -3,15 +3,17 @@ import { recoveryConditionsAllow, recoveryConditionsResultKey, type RecoveryCond
 export type RunRecoveryContext = {
  runId: string; version: number; key: string; retainUncertainCosts: boolean; acknowledged: boolean;
  allowResume: boolean; allowRetry: boolean;
+ checkpointId?: string;
 };
-export type RunRecoveryIntent = Pick<RunRecoveryContext, 'runId' | 'version' | 'key' | 'retainUncertainCosts' | 'acknowledged'> & { resume: boolean };
+export type RunRecoveryIntent = Pick<RunRecoveryContext, 'runId' | 'version' | 'key' | 'retainUncertainCosts' | 'acknowledged' | 'checkpointId'> & { resume: boolean };
 
 /** An intent is local consent, never a retry ticket. Each confirmation rechecks the backend. */
 export function createRunRecoveryConfirmation() {
  let intent: RunRecoveryIntent | undefined, inFlight = false;
  const sameConsent = (value: RunRecoveryIntent, current: RunRecoveryContext) => value.runId === current.runId
   && value.version === current.version && value.key === current.key
-  && value.retainUncertainCosts === current.retainUncertainCosts && value.acknowledged === current.acknowledged;
+  && value.retainUncertainCosts === current.retainUncertainCosts && value.acknowledged === current.acknowledged
+  && value.checkpointId === (value.resume ? current.checkpointId : undefined);
  const matches = (value: RunRecoveryIntent, current: RunRecoveryContext) => sameConsent(value,current)
   && (value.resume ? current.allowResume : current.allowRetry);
  return {
@@ -22,7 +24,7 @@ export function createRunRecoveryConfirmation() {
   sync(current: RunRecoveryContext) { if(intent && !sameConsent(intent, current)) intent = undefined; },
   open(current: RunRecoveryContext, resume: boolean) {
    if(inFlight || !(resume ? current.allowResume : current.allowRetry)) return false;
-   intent = { runId: current.runId, version: current.version, key: current.key, retainUncertainCosts: current.retainUncertainCosts, acknowledged: current.acknowledged, resume };
+   intent = { runId: current.runId, version: current.version, key: current.key, retainUncertainCosts: current.retainUncertainCosts, acknowledged: current.acknowledged, resume, ...(resume&&current.checkpointId?{checkpointId:current.checkpointId}:{}) };
    return true;
   },
   cancel() { intent = undefined; },

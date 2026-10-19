@@ -19,6 +19,13 @@ function fixture() {
  const callbacks = { current: () => current, check: async () => { gets++; return result; }, dispatch: async (intent: RunRecoveryIntent) => { posts.push(structuredClone(intent)); return { id: 'only-child' }; }, navigate: (id: string) => { navigations.push(id); } };
  return { controller, result, callbacks, posts, navigations, get gets() { return gets; }, get current() { return current; }, set current(value) { current = value; controller.sync(current); } };
 }
+test('changing the selected step invalidates its preflight and any open confirmation',async()=>{
+ const f=fixture(),originalKey=f.current.key;
+ f.result.choices.checkpointId='point-a';f.current={...context(f.result),checkpointId:'point-a'};
+ assert.notEqual(f.current.key,originalKey);assert.equal(f.controller.open(f.current,true),true);assert.equal(f.controller.intent?.checkpointId,'point-a');
+ f.current={...f.current,checkpointId:'point-b'};assert.equal(f.controller.intent,undefined);
+ assert.equal(await f.controller.confirm(f.callbacks),false);assert.equal(f.posts.length,0);
+});
 
 test('opening and cancelling either confirmation is local and never dispatches a check or retry', () => {
  const f = fixture();

@@ -1,0 +1,11 @@
+The input did not match the regular expression /# pass 1/. Input:
+
+'✔ confined verification (2.136908ms)\n' +
+  'ℹ tests 1\n' +
+  'ℹ suites 0\n' +
+  'ℹ pass 1\n' +
+  'ℹ fail 0\n' +
+  'ℹ cancelled 0\n' +
+  'ℹ skipped 0\n' +
+  'ℹ todo 0\n' +
+  'ℹ duration_ms 14.8153\n'

@@ -1,0 +1,18 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ legacy registration gets native default; OpenShell registration requires Linux and hides credentials (1542.8569ms)
+✔ existing device cannot change backend fingerprint, grant or platform or re-enable itself (160.841ms)
+✔ unbound or changed approved backend cannot enqueue; valid approved identity can (131.8564ms)
+✔ employee permissions and exact per-command approvals still apply to OpenShell (121.7571ms)
+✔ invalid sandbox receipt leaves started operation unresolved; valid receipt is durable and idempotent (359.1684ms)
+✔ lost unstarted claim is re-offered; started unknown outcome is never replayed (244.4736ms)
+✔ withdrawn grant preserves late receipt without completing or reactivating the device (161.0319ms)
+✔ only an approved task opt-in adds the trusted confinement profile to test operations (101.1865ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3562.4979

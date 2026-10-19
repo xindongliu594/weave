@@ -1,6 +1,6 @@
 # 节点内部检查点：复用调研与接入边界
 
-日期：2026-10-19。状态：设计建议，未实施；没有新付费调用、生产重启或额度变更。
+日期：2026-10-19。本文保留设计时的调研结论；2026-10-20 实施状态见 [验收记录](../validation/step-checkpoints-2026-10-20.md)。未新增付费调用或调整额度。
 
 ## 用户目标
 
@@ -57,6 +57,8 @@ DSH 插件市场本轮打开的公开目录页没有出现 checkpoint 匹配项�
 - 尚未验证新的节点内部恢复、结果继承和分支文件回退；不能将已有测试计为这些新增能力通过。
 
 ## 来源
+
+2026-10-20 实施补充：复用 Node 自带权限模式约束可复用测试，使用 `--permission --allow-fs-read=<workspace> --test-isolation=none --test`。可信执行器以独立参数启动，清空员工环境变量，禁止文件写入、子进程、Worker 和原生插件权限。OpenShell 仍承担外层隔离。Node 权限模式本身不证明时间/随机数/网络无依赖，这些测试仍不得选择证据复用。依据：[Node CLI](https://nodejs.org/api/cli.html)、[Node 权限说明](https://github.com/nodejs/node/blob/main/doc/api/permissions.md)。不新增第三方测试运行引擎。
 
 - [DSH 官方检查点策略](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/session/session-checkpoint-policy/README.md)
 - [DSH JSONL 持久化](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/session/session-persistence-jsonl/README.md)

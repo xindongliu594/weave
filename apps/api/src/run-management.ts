@@ -19,6 +19,8 @@ import { inspectRecoveryConditions, recoveryProjectBudgetIssues, recoveryHistory
 import { assertGoalRecovery } from './goal-recovery.ts';
 import { approvedRecoveryResources, recoveryMinimumProjectBudget, recoveryCallRequirementVersion } from './recovery-resource-plan.ts';
 import { recoveryResourceRouter } from './recovery-resource-router.ts';
+import {selectStepCheckpoint,stepCheckpointError} from './step-checkpoint-recovery.ts';
+import {sourceBudgetEvidence} from '../../../services/agent-runtime/run-evidence.mjs';
 export function runManagementRouter(traceRoot:string){
  const router=Router();
  router.use(recoveryResourceRouter(traceRoot));
@@ -42,7 +44,7 @@ export function runManagementRouter(traceRoot:string){
  });
  router.get('/runs/:id/recovery-check',async(req,res)=>{
   const id=z.uuid().parse(req.params.id),booleanQuery=z.enum(['true','false']).default('false').transform(value=>value==='true');
-  const choices={retainUncertainCosts:booleanQuery.parse(req.query.retainUncertainCosts),acknowledgeUnknownOperations:booleanQuery.parse(req.query.acknowledgeUnknownOperations)};
+  const choices={retainUncertainCosts:booleanQuery.parse(req.query.retainUncertainCosts),acknowledgeUnknownOperations:booleanQuery.parse(req.query.acknowledgeUnknownOperations),...(req.query.checkpointId?{checkpointId:z.uuid().parse(req.query.checkpointId)}:{})};
   const client=await pool.connect();
   try{await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
    const result=await inspectRecoveryConditions(client,traceRoot,id,choices);
@@ -51,7 +53,8 @@ export function runManagementRouter(traceRoot:string){
  });
  router.post('/runs/:id/retry',async(req,res)=>{
   const id=z.uuid().parse(req.params.id),input=z.object({resume:z.boolean().default(true),acknowledgeUnknownOperations:z.boolean().default(false),retainUncertainCosts:z.boolean().default(false),
-    budgetPreviewId:z.uuid().optional(),confirmation:z.literal('APPROVE_RESOURCES_AND_RESUME').optional()}).parse(req.body);
+    checkpointId:z.uuid().optional(),budgetPreviewId:z.uuid().optional(),confirmation:z.literal('APPROVE_RESOURCES_AND_RESUME').optional()}).parse(req.body);
+  if(input.checkpointId&&(!input.resume||input.budgetPreviewId))throw new AppError(409,'步骤恢复须沿用原方案与资源；请先核对预算，再选择恢复点','CHECKPOINT_RESUME_ONLY');
   if(input.budgetPreviewId&&input.confirmation!=='APPROVE_RESOURCES_AND_RESUME')throw new AppError(400,'请明确确认资源额度与续跑','RESOURCE_CONFIRMATION_REQUIRED');
   if(input.budgetPreviewId&&!input.resume)throw new AppError(409,'资源补充只允许续跑未完成节点','RESOURCE_RESUME_ONLY');
   const client=await pool.connect();
@@ -65,6 +68,7 @@ export function runManagementRouter(traceRoot:string){
    // child is active. The project lock still fences creation of a new child.
    const already=(await client.query('SELECT id,snapshot FROM project_runs WHERE parent_run_id=$1',[id])).rows[0];
    if(already){
+    if((already.snapshot.recovery?.workspaceCheckpoint?.id??undefined)!==input.checkpointId)throw new AppError(409,'此运行已有不同恢复点的续跑，请打开已有运行','CHECKPOINT_CHILD_EXISTS');
     if(input.budgetPreviewId&&(already.snapshot.approval?.kind!=='resume-resources'||already.snapshot.resourceApproval?.previewId!==input.budgetPreviewId||
        already.snapshot.resourceApproval?.sourceRunId!==id||already.snapshot.resourceRevision!==(old.snapshot.resourceRevision??0)+1))
       throw new AppError(409,'此运行已有其他续跑记录，请打开已有运行后重新核对资源方案','RESOURCE_PREVIEW_STALE');
@@ -82,9 +86,13 @@ export function runManagementRouter(traceRoot:string){
    if(input.resume&&run){
     done=completedTasks(run.events,snapshot);
     snapshot.tasks=structuredClone(snapshot.approvedTasks);
-    try { snapshot.handoffCheckpoints=resumeHandoff(snapshot,run.events,done,join(traceRoot,id,'artifacts')); }
+    let selected:ReturnType<typeof selectStepCheckpoint>|undefined;
+    try {if(input.checkpointId)selected=selectStepCheckpoint(traceRoot,run,input.checkpointId);}
+    catch(error){throw new AppError(409,stepCheckpointError(error),'CHECKPOINT_RESTORE_BLOCKED');}
+    try { snapshot.handoffCheckpoints=resumeHandoff(snapshot,run.events,done,join(traceRoot,id,'artifacts'),selected?.checkpoint.files); }
     catch(error) { throw new AppError(409,(error as Error).message,'HANDOFF_CHECKPOINT_INVALID'); }
-    snapshot.recovery=buildCheckpointContext(snapshot,run.events,checkpointTasks(run.events,snapshot),done,join(traceRoot,id,'artifacts'),id);
+    snapshot.recovery=buildCheckpointContext(snapshot,selected?.events??run.events,checkpointTasks(selected?.events??run.events,snapshot),done,join(traceRoot,id,'artifacts'),id,selected?.checkpoint.files);
+    if(selected){snapshot.recovery.workspaceCheckpoint=selected.reference;snapshot.recovery.budgetEvidence=sourceBudgetEvidence(snapshot,run.events,id);}
    }
    if(input.resume&&!run)throw new AppError(409,'运行档案缺失，无法恢复上下文和核对调用上限；请先恢复备份','BUDGET_HISTORY_MISSING');
    const history=await budgetHistory(client,traceRoot,old.project_id,old.project_version);

@@ -1,5 +1,6 @@
 import type pg from 'pg';
 import { join } from 'node:path';
+import {selectStepCheckpoint,stepCheckpointError} from './step-checkpoint-recovery.ts';
 import { AppError } from './provider.ts';
 import { projectCostReadiness, checkDailyBudget, type ProjectCostReadiness } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
@@ -23,7 +24,7 @@ export type RecoveryConditions = {
     availableBudget: number; calls: number; callLimit: number; remainingCalls: number; completed: boolean }[];
   resume: { allowed: boolean; reasons: RecoveryIssue[]; completedTaskIds: string[] };
   retry: { allowed: boolean; reasons: RecoveryIssue[]; completedTaskIds: string[] };
-  choices: { retainUncertainCosts: boolean; acknowledgeUnknownOperations: boolean };
+  choices: { retainUncertainCosts: boolean; acknowledgeUnknownOperations: boolean; checkpointId?:string };
   unknownOperationCount: number; unknownOperationIds: string[]; nativeRequestChecked: false; existingRunId?: string;
 };
 const issue = (status: number, code: string, message: string, taskId?: string): RecoveryIssue =>
@@ -109,8 +110,8 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
   if(snapshot.resourceRevision)retryReasons.push(issue(409,'RESOURCE_RESUME_ONLY','资源补充只批准未完成节点，完整重试需要另外批准方案'));
   if (!run) resumeReasons.push(issue(409, 'BUDGET_HISTORY_MISSING', '运行档案缺失，无法恢复上下文和核对调用上限；请先恢复备份'));
   if (run && run.integrity === 'ok') {
-    try { resumeHandoff(snapshot, run.events, done, join(traceRoot, runId, 'artifacts')); }
-    catch (error) { resumeReasons.push(issue(409, 'HANDOFF_CHECKPOINT_INVALID', (error as Error).message)); }
+    try {const selected=choices.checkpointId?selectStepCheckpoint(traceRoot,run,choices.checkpointId):undefined;resumeHandoff(snapshot, run.events, done, join(traceRoot, runId, 'artifacts'),selected?.checkpoint.files); }
+    catch (error) { resumeReasons.push(issue(409, 'HANDOFF_CHECKPOINT_INVALID', stepCheckpointError(error))); }
   }
   if (!snapshot.tasks.some((task: any) => !done.has(task.id))) resumeReasons.push(issue(409, 'RUN_ALREADY_COMPLETE', '所有任务已有完成记录，请查看交付结果，无需重跑'));
   if (history) {
