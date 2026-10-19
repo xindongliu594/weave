@@ -1,0 +1,205 @@
+Console output below preserves test content; trailing whitespace and final blank lines normalized for Git.
+Final review fix verification — 2026-10-19; base 8ea78ae. Exact command output; isolated local fixtures only.
+
+RED / exit 1 / node --import tsx --test tests/organization-task-planning.test.ts
+
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (13.567ms)
+✔ new executable plans require mappings while text tasks and saved legacy contracts stay compatible (0.5426ms)
+✔ office-only planning does not teach the model to label document acceptance as code review (0.4075ms)
+✖ terminal template previews use contextual rework instructions while existing callers keep zero rework (2.875ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 882.7412
+
+✖ failing tests:
+
+test at tests\organization-task-planning.test.ts:1:3287
+✖ terminal template previews use contextual rework instructions while existing callers keep zero rework (2.875ms)
+  AssertionError [ERR_ASSERTION]: template previews must not receive unconditional zero-only rework
+
+  true !== false
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-task-planning.test.ts:49:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+RED / exit 1 / node scripts/test-integration.mjs --test-name-pattern=assembled tests/orchestration-pattern-integration.test.ts
+
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ assembled terminal routing request distinguishes template preview rework from legacy zero rework (2528.4437ms)
+✖ assembled terminal routing request requires independent criteria for every referenced template (86.6401ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (51.5296ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 1
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3434.8164
+
+✖ failing tests:
+
+test at tests\orchestration-pattern-integration.test.ts:1:3552
+✖ assembled terminal routing request distinguishes template preview rework from legacy zero rework (2528.4437ms)
+  AssertionError [ERR_ASSERTION]: no unconditional zero-only review instruction may survive request assembly
+
+  true !== false
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:35:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\orchestration-pattern-integration.test.ts:1:4476
+✖ assembled terminal routing request requires independent criteria for every referenced template (86.6401ms)
+  AssertionError [ERR_ASSERTION]: all referenced-template criteria require independent=true and different authors/checkers
+
+  false !== true
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:44:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+GREEN / exit 0 / node --import tsx --test tests/organization-task-planning.test.ts tests/organization-routing.test.ts
+
+✔ catalog exposes only allowed identity and capability summaries, not private instructions or knowledge (2.5691ms)
+✔ resolved team keeps source identities, limits grants, and does not modify the department (8.8234ms)
+✔ subsets preserve legacy calls and cannot drop the manager or smuggle employee identity (11.5127ms)
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (13.7912ms)
+✔ new executable plans require mappings while text tasks and saved legacy contracts stay compatible (0.5819ms)
+✔ office-only planning does not teach the model to label document acceptance as code review (0.4689ms)
+✔ terminal template previews use contextual rework instructions while existing callers keep zero rework (0.3159ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3063.5281
+
+
+GREEN / exit 0 / node scripts/test-integration.mjs tests/orchestration-pattern-integration.test.ts tests/organization-routing-confirmation.test.ts tests/organization-chat.test.ts
+
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (2727.0323ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (77.0707ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (72.9032ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (145.9692ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (109.9793ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (106.9691ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (110.7613ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (131.8344ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (124.5938ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (127.2407ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (129.4006ms)
+✔ legacy candidate without a template remains confirmable (78.6875ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (76.1443ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4772.9999
+✔ confirmation creates a project only, freezes selected sources, and duplicate requests are idempotent (3135.8861ms)
+✔ superseded, edited or archived source drafts cannot create a project (188.2425ms)
+✔ new team uses the same explicit confirmation and V2 cannot enter the legacy department-update endpoint (90.1747ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4033.9394
+✔ executable candidate without host mappings is rejected without save or hidden model repair (3255.5662ms)
+✔ V2 conversation recommends existing employees without changing their department and expires old drafts (143.3291ms)
+✔ out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later (217.415ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (43.4882ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (98.4621ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (39.8088ms)
+✔ documented JSON mode preserves receipts and never retries: gpt-4.1-mini (71.5967ms)
+✔ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (73.8331ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (84.707ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (38.693ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (97.524ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (76.63ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (40.7879ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (320.8694ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (153.058ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (133.6226ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (119.2739ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (165.8396ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (359.279ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (66.5178ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (45.6602ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (281.6106ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (287.5759ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6830.8843
+
+
+GREEN / exit 0 / npm run build (tsc --noEmit && vite build)
+
+
+> agent-department@0.2.0 build
+> tsc --noEmit && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1713 modules transformed.
+rendering chunks...
+computing gzip size...
+../../dist/web/index.html                   0.56 kB │ gzip:   0.43 kB
+../../dist/web/assets/index-CzCbk_YO.css   52.49 kB │ gzip:  11.11 kB
+../../dist/web/assets/index-G7JloLnO.js   624.72 kB │ gzip: 194.04 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 8.35s

@@ -13,20 +13,21 @@ export const organizationPlanningTaskExample: Plan['tasks'] = [
     kind: 'review', reviewedTaskId: 'develop', inputs: [{ path: 'cli.mjs', producerTaskId: 'develop' }, { path: 'README.md', producerTaskId: 'develop' }, { path: 'cli.test.mjs', producerTaskId: 'verify' }], outputs: [], maxReworkRounds: 0 },
 ];
 
-export const organizationTaskPlanningInstructions = [
+function taskPlanningInstructions(templatePreview=false){return [
   '生成 candidate 前逐项自检任务合同；这些字段由你规划，不要让用户填写内部字段。只使用 application_constraints 允许的模型、工具、人数和预算。',
   'implementation/repair：必须显式给出非空 inScope 和 verify，以及 inputs/outputs（无输入用 []）。inScope/outOfScope 只能是工作区相对路径，inScope 覆盖全部 outputs，outOfScope 不得包含 outputs。verify 是实际可执行的精确 shell 命令，不是“运行测试”等说明；执行人必须有 terminal/terminal_test。',
   'repair 还需绑定已知实现/修复的 sourceTaskId 与真实问题编号 sourceFindingIds，并直接依赖 sourceTaskId；不要为新方案虚构返修问题或来源。',
   'verification：独立 QA 可读取开发产物、写自己的测试文件并执行 verify；不能修改开发文件。写入工具权限覆盖 outputs，filesystem 权限覆盖 inputs。产物输入只填 path 与 producerTaskId，来源任务须声明同一路径输出；不要编造 SHA256。',
-  'review：只读验收实现或修复，reviewedTaskId 指向被审查的 implementation/repair，并在 dependencies 中直接列出它。还需等待 QA 时同时直接列出 QA；本次任务产物 inputs 的来源都必须是前置任务。审查人与实现者不同，outputs 必须为 []，不得创建 delivery.md 或其它交付文件，结论通过任务完成回复返回。maxReworkRounds 固定 0。',
+  'review：只读验收实现或修复，reviewedTaskId 指向被审查的 implementation/repair，并在 dependencies 中直接列出它。还需等待 QA 时同时直接列出 QA；本次任务产物 inputs 的来源都必须是前置任务。审查人与实现者不同，outputs 必须为 []，不得创建 delivery.md 或其它交付文件，结论通过任务完成回复返回。'+(templatePreview?'无 orchestration.template 的旧方案：maxReworkRounds=0；选择 orchestration.template.id=review_repair 时，绑定的独立审查任务 maxReworkRounds 必须为 1..2，仅预览、不授予执行权。':'maxReworkRounds 固定 0。'),
   '独立审查可以由团队中已有的经理或 QA 承担，不是额外增加一位员工。例如三人团队就是开发、QA、经理；经理可在开发和 QA 完成后承担只读验收。同一 QA 也可负责 verification 与 review 两个节点，节点数不等于员工数。若需要经理编写文件，应另设符合写入权限的 work/integration 任务，不能把写文件放入 review。',
   '未授权执行工具时仅用 requirements/work 做文字讨论，不输出执行合同。以下三节点仅示范合同结构，不是固定方案、预算建议或已生成交付物；任务、路径、验收标准、估算与员工 ID 应按用户需求及当前目录重新规划。不能照抄示例 Token 估算来规避费用校验：',
   JSON.stringify(organizationPlanningTaskExample),
-].join('\n');
+].join('\n');}
+export const organizationTaskPlanningInstructions = taskPlanningInstructions();
 
 /** Code-review examples are misleading when the granted tools only produce documents. */
-export function organizationTaskInstructionsFor(tools:readonly string[]){
- if(tools.some(tool=>['terminal','terminal_test'].includes(tool)))return organizationTaskPlanningInstructions;
+export function organizationTaskInstructionsFor(tools:readonly string[],templatePreview=false){
+ if(tools.some(tool=>['terminal','terminal_test'].includes(tool)))return taskPlanningInstructions(templatePreview);
  return [
   '当前没有终端授权。文字分析、文档制作、独立内容核对及经理验收都使用 kind=work；不要将普通办公验收标成 review（review 专指对 implementation/repair 的代码审查），不要编造 verify 命令。没有文件工具时仅规划文字内容，不承诺写文件。',
   '按每位员工各自授权选择工作：有文档创建工具不代表可以写 JSON；没有 artifact_write 的员工不能负责 JSON 文件。能力不足可以选择其他获授权员工或清楚说明缺口，不能凭部门总工具清单扩大个人权限。',

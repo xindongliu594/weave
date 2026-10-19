@@ -28,6 +28,30 @@ before(async()=>{
 });
 after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s){s.closeAllConnections();await new Promise<void>(r=>s.close(()=>r()));}await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
 async function chat(value:any){response={reply:'请查看离线草案。',candidate:value};return call('/organizations/chat',{organizationRouting:true,modelId:'m',policy:orchestrationPolicy,messages:[{role:'user',content:'仅整理可供确认的团队协作草案并独立核对结果。'}]});}
+test('assembled terminal routing request distinguishes template preview rework from legacy zero rework',async()=>{
+ const calls=requests,result=await chat(candidate('review_repair'));
+ assert.ok(result.data.preview,JSON.stringify(result));assert.equal(requests,calls+1);
+ const prompt=wire.messages.filter((m:any)=>m.role==='system').map((m:any)=>m.content).join('\n');
+ assert.equal(prompt.includes('maxReworkRounds 固定 0'),false,'no unconditional zero-only review instruction may survive request assembly');
+ assert.equal(prompt.includes('无 orchestration.template 的旧方案：maxReworkRounds=0'),true);
+ assert.equal(prompt.includes('orchestration.template.id=review_repair 时，绑定的独立审查任务 maxReworkRounds 必须为 1..2'),true);
+ assert.equal(prompt.includes('普通批准或自动批准也不能执行'),true);
+});
+test('assembled terminal routing request requires independent criteria for every referenced template',async()=>{
+ const calls=requests,result=await chat(candidate('pipeline'));
+ assert.ok(result.data.preview,JSON.stringify(result));assert.equal(requests,calls+1);
+ const prompt=wire.messages.filter((m:any)=>m.role==='system').map((m:any)=>m.content).join('\n');
+ assert.equal(prompt.includes('存在 orchestration.template 时，每条 deliveryCriteria 都必须 independent=true，检查者与所有产出作者不同'),true,'all referenced-template criteria require independent=true and different authors/checkers');
+ assert.equal(prompt.includes('无模板引用时沿用旧规则：需要独立核对时 independent=true'),true);
+});
+test('assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog',async()=>{
+ response={reply:'请继续明确需求。'};const calls=requests;
+ const result=await call('/organizations/chat',{modelId:'m',policy:orchestrationPolicy,messages:[{role:'user',content:'先讨论团队。'}]});
+ assert.equal(result.status,200,JSON.stringify(result));assert.equal(requests,calls+1);
+ const prompt=wire.messages.filter((m:any)=>m.role==='system').map((m:any)=>m.content).join('\n');
+ assert.match(prompt,/maxReworkRounds 固定 0/);assert.doesNotMatch(prompt,/review_repair/);
+ assert.equal(JSON.parse(wire.messages[1].content).orchestrationCatalog,undefined);
+});
 for(const id of orchestrationPatternIds)test(id+' previews and confirms frozen references, but all approval routes are blocked before effects',async()=>{
  const value=candidate(id),calls=requests,result=await chat(value);
  assert.equal(result.status,200,JSON.stringify(result));assert.ok(result.data.preview,JSON.stringify(result));assert.equal(requests,calls+1,'one loopback planning response, no hidden repair');
@@ -51,9 +75,10 @@ test('bad template id, hash and binding yield explicit draft issues without savi
  }
 });
 test('legacy candidate without a template remains confirmable',async()=>{
- const value=candidate('pipeline');delete value.orchestration!.template;const result=await chat(value);assert.ok(result.data.preview,JSON.stringify(result));
+ const value=candidate('pipeline');delete value.orchestration!.template;value.deliveryCriteria![0].independent=false;const result=await chat(value);assert.ok(result.data.preview,JSON.stringify(result));
  const confirmed=await call('/organizations/previews/'+result.data.preview.previewId+'/confirm',{previewVersion:1});assert.equal(confirmed.status,201,JSON.stringify(confirmed));
  assert.equal((await pool.query('SELECT plan FROM projects WHERE id=$1',[confirmed.data.projectId])).rows[0].plan.orchestration.template,undefined);
+ assert.equal(result.data.preview.plan.deliveryCriteria[0].independent,false,'legacy criteria are not upgraded to template requirements');
 });
 test('archive reads and resource recovery retain frozen orchestration without selecting a current definition',async()=>{
  const {createRunArchive,readRun}=await import(new URL('../services/agent-runtime/trace-store.mjs',import.meta.url).href);

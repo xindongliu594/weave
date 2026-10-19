@@ -1,6 +1,6 @@
 # 编排模板与现有 DAG 兼容接入 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 将七种编排保存为可检查、有版本的规划模板，接入现有方案预览和批准门禁，证明它们不会另起执行器或破坏旧项目。
 
@@ -40,12 +40,12 @@
 - `orchestrationExecutionErrors(plan: Pick<Plan,'orchestration'>): string[]`：旧方案返回空，全部当前新引用返回待真实验收原因；无用户参数可绕过。离线验证状态和实测证据不进入可变模型输入。
 - `orchestrationPatternSummary(template): {name:string; version:number; status:string}`：UI 只读标签，未知引用显示不可执行。
 
-- [ ] 先写失败测试并运行，覆盖七类至少四个代表例（28）和以下边界（至少12）：缺权限、缺输入、重复/歧义绑定、未知模式、人数上限、任务上限、并行文件冲突、环、漏独立检查、错误版本/hash、模板不能伪称可执行、旧模板缺省兼容。与既有 validatePlan 的联合测试才可覆盖权限和预算。
-- [ ] 采用最少的显式绑定：pipeline 有顺序 taskIds；parallel 有独立 branchTaskIds、joinTaskId；router 有固定 routeKey 和完整 selectedTaskIds；orchestrator_workers 有 frozen workItems（id、taskId、objective）和 joinTaskId；review_repair 有 reviewTaskId（必须是合法实现审查入口、maxReworkRounds 1..2）；map_reduce 有固定 manifest（id、taskId、input path/SHA256）和 reduceTaskId；proposal_review 有恰好两组 proposalTaskId/critiqueTaskId 和 decisionTaskId。绑定均检查 ID 唯一、任务存在；所有数组有 50 上限、文本有现有风格长度限制。
-- [ ] 对 pipeline 检查完整任务顺序；parallel/workers/map_reduce 检查分支互不依赖、join 等待全部分支并读取其全部输出；map_reduce 每个分片恰好一个独立任务且其 inputs 绑定该不可变输入。proposal_review 两位不同提案者、初始提案互不依赖，各有他人批评，经理等全部批评，读取提案/批评输出；不声称提示词能证明语义独立。review_repair 复用 taskContractErrors，不造返工引擎。所有新模板要求 deliveryCriteria 绑定用户交付要求、独立检查与经理；QA/经理为记录核对过程写出的证据报告不因此递归要求新增检查任务（加一例回归）。是否完整表达了用户需求仍需语义验收，不能用“所有文件都再独立验收”冒充该保证。同时仍运行旧 DAG/文件/权限校验。
-- [ ] 将新校验接入 validatePlan，不改变其已有参数含义，不将 requireToolSupport 当作放行新模式的开关。新模板的布局 pattern 仍为原三种；检验 pipeline→pipeline、parallel/map_reduce/proposal_review→parallel、其余可采用 pipeline 或 parallel（不能 single）。
-- [ ] 检查返工展开最坏节点数边界 46+2×2=50 通过、48+2×2=52 拒绝；老无模板方案不新加此约束。
-- [ ] Run `node --import tsx --test tests/orchestration-patterns.test.ts tests/task-contracts.test.ts tests/organization-routing.test.ts`，再 `npx tsc --noEmit`，保存输出；仅提交本任务精确路径（审批受阻时保留工作树交审）。
+- [x] 先写失败测试并运行，覆盖七类至少四个代表例（28）和以下边界（至少12）：缺权限、缺输入、重复/歧义绑定、未知模式、人数上限、任务上限、并行文件冲突、环、漏独立检查、错误版本/hash、模板不能伪称可执行、旧模板缺省兼容。与既有 validatePlan 的联合测试才可覆盖权限和预算。
+- [x] 采用最少的显式绑定：pipeline 有顺序 taskIds；parallel 有独立 branchTaskIds、joinTaskId；router 有固定 routeKey 和完整 selectedTaskIds；orchestrator_workers 有 frozen workItems（id、taskId、objective）和 joinTaskId；review_repair 有 reviewTaskId（必须是合法实现审查入口、maxReworkRounds 1..2）；map_reduce 有固定 manifest（id、taskId、input path/SHA256）和 reduceTaskId；proposal_review 有恰好两组 proposalTaskId/critiqueTaskId 和 decisionTaskId。绑定均检查 ID 唯一、任务存在；所有数组有 50 上限、文本有现有风格长度限制。
+- [x] 对 pipeline 检查完整任务顺序；parallel/workers/map_reduce 检查分支互不依赖、join 等待全部分支并读取其全部输出；map_reduce 每个分片恰好一个独立任务且其 inputs 绑定该不可变输入。proposal_review 两位不同提案者、初始提案互不依赖，各有他人批评，经理等全部批评，读取提案/批评输出；不声称提示词能证明语义独立。review_repair 复用 taskContractErrors，不造返工引擎。所有新模板要求 deliveryCriteria 绑定用户交付要求、独立检查与经理；QA/经理为记录核对过程写出的证据报告不因此递归要求新增检查任务（加一例回归）。是否完整表达了用户需求仍需语义验收，不能用“所有文件都再独立验收”冒充该保证。同时仍运行旧 DAG/文件/权限校验。
+- [x] 将新校验接入 validatePlan，不改变其已有参数含义，不将 requireToolSupport 当作放行新模式的开关。新模板的布局 pattern 仍为原三种；检验 pipeline→pipeline、parallel/map_reduce/proposal_review→parallel、其余可采用 pipeline 或 parallel（不能 single）。
+- [x] 检查返工展开最坏节点数边界 46+2×2=50 通过、48+2×2=52 拒绝；老无模板方案不新加此约束。
+- [x] Run `node --import tsx --test tests/orchestration-patterns.test.ts tests/task-contracts.test.ts tests/organization-routing.test.ts`，再 `npx tsc --noEmit`，保存输出；仅提交本任务精确路径（审批受阻时保留工作树交审）。
 
 ## Task 2: 规划预览、批准门禁与原生接入证据
 
@@ -59,11 +59,13 @@
 - [x] 网页显示模式名称、版本、选择依据及“离线校验，待真实验收”；旧三标签保持原显示。模板未验证的执行错误包含下一步而不是无信息失败。覆盖 React 静态渲染；不为纯标签改动启动繁重 computer use。
 - [x] 用已装 AgentTeams 公共 profiles Config 在临时目录做无模型 create/stage/approve 探针；记录是否保留完整文件合同。若种子字段不足，使用既有公开 create_task bridge，明确不导入私有实现。探针不修改产品 Host，不开沙箱/网络/模型。
 - [x] Run Task 1 tests + UI tests；Run `node scripts/test-integration.mjs tests/orchestration-pattern-integration.test.ts tests/organization-routing-confirmation.test.ts tests/organization-chat.test.ts`；Run profile probe and related portable runtime tests as supported；Run `npm run build`。日志保存小型证据，不重复全量 suite。
-- [ ] 独立评审本轮完整差异，修复重要问题；更新报告和进度、精确提交并沿用既有授权推送当前分支。报告分别列本地已验证、真实未验证、未部署。后续真实小任务/恢复逐类验收及公司模板发布生命周期另起具体计划，不在此阶段伪称完成。
+- [x] 独立评审本轮完整差异，修复重要问题；更新报告和进度、精确提交并沿用既有授权推送当前分支。报告分别列本地已验证、真实未验证、未部署。后续真实小任务/恢复逐类验收及公司模板发布生命周期另起具体计划，不在此阶段伪称完成。
 
 
 ## 本地验证记录（2026-10-19）
 
-Task 2 实现与目标检查通过，独立评审和提交待控制器完成。Task 1 合同证据 57/57；本轮集成 36/36、UI 4/4、公共 Profile 探针 1/1、相关运行时 13/13、恢复回归 38/38，构建通过（保留主 chunk >500 kB 提示）。七类仍只离线预览、待真实验收。真实模型调用、生产数据库修改、JJ 部署均为 0。
+两项实现与目标检查、独立评审及最终修复复审均通过。提交及远端状态以 Git 记录为准。Task 1 合同证据 57/57；本轮集成 36/36、UI 4/4、公共 Profile 探针 1/1、相关运行时 13/13、恢复回归 38/38，构建通过（保留主 chunk >500 kB 提示）。七类仍只离线预览、待真实验收。真实模型调用、生产数据库修改、JJ 部署均为 0。
 
 用户可读报告：[验证结果](../../validation/orchestration-compatibility-2026-10-19.md)。小型日志见 docs/validation/evidence/orchestration-compatibility-2026-10-19/integration-ui-native-build.txt。
+
+最终修复新增验证：规划单元 7/7、组织 API 集成 39/39、类型检查与构建通过；两项完整请求指令冲突均已 RED→GREEN，最终复审 PASS。未重跑无关套件，先前证据继续保留。

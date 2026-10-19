@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { organizationCandidateSchema } from '../packages/contracts/organization.ts';
 import { policySchema, validatePlan, type Model } from '../packages/contracts/index.ts';
 import { taskContractErrors } from '../packages/contracts/task-contracts.mjs';
-import { organizationPlanningTaskExample, organizationTaskInstructionsFor } from '../apps/api/src/organization-task-planning.ts';
+import { organizationPlanningTaskExample, organizationTaskInstructionsFor, organizationTaskPlanningInstructions } from '../apps/api/src/organization-task-planning.ts';
 import { plannedAcceptanceErrors } from '../apps/api/src/execution-prompt.ts';
 
 test('the planning example is a legal three-person develop, independent verification, existing-manager review DAG', () => {
@@ -38,4 +38,17 @@ test('office-only planning does not teach the model to label document acceptance
   assert.match(prompt,/producerTaskId/);
   assert.match(prompt,/最终经理结论/);
   assert.ok(organizationTaskInstructionsFor(['terminal_test']).includes('node --test'));
+});
+
+test('terminal template previews use contextual rework instructions while existing callers keep zero rework',()=>{
+  for(const tool of ['terminal','terminal_test']){
+    const legacy=organizationTaskInstructionsFor([tool]);
+    assert.equal(legacy,organizationTaskPlanningInstructions);
+    assert.match(legacy,/maxReworkRounds 固定 0/);
+    const preview=organizationTaskInstructionsFor([tool],true);
+    assert.equal(preview.includes('maxReworkRounds 固定 0'),false,'template previews must not receive unconditional zero-only rework');
+    assert.equal(preview.includes('无 orchestration.template 的旧方案：maxReworkRounds=0'),true);
+    assert.equal(preview.includes('orchestration.template.id=review_repair 时，绑定的独立审查任务 maxReworkRounds 必须为 1..2'),true);
+  }
+  assert.equal(organizationTaskInstructionsFor(['artifact_write'],true),organizationTaskInstructionsFor(['artifact_write']));
 });
