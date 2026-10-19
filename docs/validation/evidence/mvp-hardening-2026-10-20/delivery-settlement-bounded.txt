@@ -1,0 +1,10 @@
+✔ successful native delivery settles an already dispatched tail request before disposal and suppresses late tools (5944.8181ms)
+✔ user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee (1103.5773ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7466.0243

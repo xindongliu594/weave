@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "kind": "accelerated synthetic filesystem workload",
+  "platform": "linux",
+  "node": "v24.19.0",
+  "modelCalls": 0,
+  "checkpoints": 600,
+  "fileCount": 20,
+  "fileBytes": 65536,
+  "changedVersions": 59,
+  "uniqueObjects": 79,
+  "objectBytes": 5177344,
+  "archiveBytes": 8156750,
+  "naiveSnapshotBytes": 786432000,
+  "bytesSavedFraction": 0.9896281560262045,
+  "commitMs": 6465.318082,
+  "commitP50Ms": 10.224827000000005,
+  "commitP95Ms": 13.286564999999882,
+  "first50P95Ms": 16.676619999999986,
+  "last50P95Ms": 14.790437000000566,
+  "validateAllMs": 63.39315700000043,
+  "limits": "No employee sessions, sandbox commands, model calls or real elapsed five-hour soak; no performance threshold assertion."
+}

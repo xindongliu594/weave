@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-hardening-runtime-20261020",
+  "backup": "/home/jj/.local/share/weiwu/backups/mvp-hardening-runtime-predeploy-20261020",
+  "packageSha256": "a816f229c3b79faed850a6d38164f2d55e905f94c30eef4f260545765f2f6b78",
+  "modelCalls": 0,
+  "database": "connected",
+  "stoppedAudit": {
+    "activeRuns": 0,
+    "activeMessages": 0,
+    "pendingCalls": 0,
+    "activeCapabilities": 0
+  },
+  "usageCount": 701,
+  "unknownHolds": 7
+}

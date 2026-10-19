@@ -1,0 +1,29 @@
+✔ selecting an earlier point preserves accounting and restores files only into a new workspace (108.4657ms)
+✔ unknown and external effects after a selected point cannot be forgotten by rollback (42.0232ms)
+✔ another employee modifying shared files after the point blocks rollback (47.0481ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (28.9957ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (17.3812ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.5591ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (2.7126ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.4562ms)
+✔ a temporary missing recovered run clears after a successful poll (2.0364ms)
+✔ successful background refresh cannot erase an approval or recovery operation failure (0.2156ms)
+✔ a new run clears old errors and ignores delayed old-run failures or refresh success (0.232ms)
+✔ changing the selected step invalidates its preflight and any open confirmation (5.3331ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (1.09ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.7351ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.7268ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.3413ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.367ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.4667ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.5166ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.8944ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (13.2262ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1322.8537

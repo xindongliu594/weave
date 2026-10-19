@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "kind": "accelerated synthetic filesystem workload",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "modelCalls": 0,
+  "checkpoints": 600,
+  "fileCount": 20,
+  "fileBytes": 65536,
+  "changedVersions": 59,
+  "uniqueObjects": 79,
+  "objectBytes": 5177344,
+  "archiveBytes": 8156750,
+  "naiveSnapshotBytes": 786432000,
+  "bytesSavedFraction": 0.9896281560262045,
+  "commitMs": 63325.767400000004,
+  "commitP50Ms": 104.9670000000001,
+  "commitP95Ms": 115.71669999999722,
+  "first50P95Ms": 108.85820000000001,
+  "last50P95Ms": 117.30010000000038,
+  "validateAllMs": 365.6995999999999,
+  "limits": "No employee sessions, sandbox commands, model calls or real elapsed five-hour soak; no performance threshold assertion."
+}

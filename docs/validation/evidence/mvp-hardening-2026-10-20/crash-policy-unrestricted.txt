@@ -1,0 +1,18 @@
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (196.202ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (121.1526ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (81.6734ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (107.0757ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (70.7748ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (71.3958ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (79.4337ms)
+✔ a lazy sandbox has a durable empty workspace before the first employee tool (56.1499ms)
+✔ hard process termination after a real test resumes evidence with one total command execution (459.1413ms)
+ℹ {"sourceRunId":"f1584c09-a7be-4024-b301-d690cf31ab80","resumedRunId":"77317269-e34a-4dbd-80bb-75bca52f40cd","checkpointId":"606c99f6-9521-4031-b37a-dfb9ef18cca7","checkpointMs":22.492399999999975,"resumeMs":20.44870000000003,"archiveBytes":5205,"commandExecutions":1,"modelCalls":0}
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1229.3644

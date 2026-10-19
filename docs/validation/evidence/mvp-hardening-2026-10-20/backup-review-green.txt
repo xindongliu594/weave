@@ -1,0 +1,14 @@
+✔ restore rejects missing or corrupt child journals even without own checkpoint objects (103.76ms)
+✔ database checkpoint references cannot disappear with missing archived files (53.6753ms)
+✔ empty checkpoints survive the file-only backup format (42.4213ms)
+✔ checkpoint receipts must still match the original journal observation (53.4784ms)
+✔ structurally sound unknown operations remain backup data, not permission to resume (52.8415ms)
+✔ unrelated old forensic logs stay portable without being certified for resume (61.7034ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 897.9441

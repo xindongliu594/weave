@@ -1,0 +1,95 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ selected checkpoint preflight validates saved files instead of changed latest files without mutating data (1792.304ms)
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (129.538ms)
+✔ sealed goal mutation blocks both preflight and actual resume without a child or model call (166.9593ms)
+✔ a recorded goal boundary pause requires reapproval rather than repeating the same invalid run (123.7412ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (179.9248ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (157.5129ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (164.7001ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (134.9773ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (161.1789ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (124.3895ms)
+✔ resource candidate needs explicit approval and cannot silently launch ordinary resume (93.0133ms)
+✔ confirmed resource resume retains completed nodes, old counts and holds, and is idempotent (217.1804ms)
+✔ an ordinary existing child cannot silently satisfy a different resource approval or incur new planning fees (138.9624ms)
+✔ resource approval refuses stale goal, different source and completed-node changes (179.2906ms)
+✔ AI resource planning keeps the original project admission cap and only stores a receipt-backed candidate (255.3014ms)
+✔ explicit continuation grant is previewed, sealed and exhausted across ordinary resume (332.224ms)
+✔ invalid continuation grants are rejected before any paid planning request (177.7126ms)
+✔ resource planning without an output grant omits output adjustments from its schema and preserves the pinned limits (186.5767ms)
+✔ resource planning without an output grant rejects unsolicited output fields without storing a candidate (251.2459ms)
+✔ context resource planning advertises only the exact authorized limit and applies it to a new snapshot (209.1106ms)
+✔ context resource planning rejects unsupported capacity reductions and insufficient full request money before calling a model (408.1446ms)
+✔ unrequested context fields are absent from the planning schema and cannot produce a candidate (134.4066ms)
+✔ output resource candidate is explicit, persisted and applied only to a new recovery snapshot (190.3061ms)
+✔ detailed output recovery planning fits the approved small planning request without dropping task context (158.8848ms)
+✔ output planning cannot store a candidate funded only for the old output limit (174.7818ms)
+✔ one remaining node call is rejected before paid resource planning or any data changes (122.9772ms)
+✔ confirmation rechecks consumed calls and rejects pre-upgrade drafts without creating employees (141.2618ms)
+✔ shared project money rejects a full correction tranche before planning despite sufficient node money (112.685ms)
+✔ late project expenses prevent confirming a previously valid correction candidate (117.3048ms)
+✔ next-tranche floor also reserves the bounded planning request before paid admission (101.7765ms)
+✔ invalid resource proposals expose bounded diagnostics, preserve settled usage and never start employees (137.5639ms)
+✔ DeepSeek resource planning sends JSON mode through the actual budgeted request (152.9419ms)
+✔ missing fields, wrapped plans and schema echoes remain paid failures with no automatic retry (392.0295ms)
+✔ JSON mode rejection makes no paid fallback and preserves unknown cost plus the source run (149.4738ms)
+✔ explicit larger call ceilings travel from planning through confirmation without resetting archived calls (186.4302ms)
+✔ overlapping task lifetime ceilings need only their next bounded tranches inside the shared project ceiling (164.0147ms)
+✔ legacy pre-execution read denials resume only with complete matching host evidence; other goal blocks remain fatal (1115.0321ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9920.7724
+✔ local launcher stores installed plugins in the workspace, independently of its credential directory (1.2754ms)
+✔ registry admits installed bytes, preserves old version across upgrade, denies revoke/tamper and missing grants (2879.6577ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4959.4839
+✔ full corpus retrieval covers late chunks, stays permission scoped and pins compact immutable versions (3489.066ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4042.1056
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (1483.7621ms)
+✔ retention advice is read-only, uses finished age, and cannot bypass preview confirmation (58.6525ms)
+✔ retention protects unknown or damaged original archives even when database says completed (38.1464ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (164.3102ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (101.0063ms)
+✔ post-preview file change refuses the whole batch (83.9033ms)
+✔ expired persisted previews reject confirmation (83.0654ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (135.9387ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (83.599ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (180.9968ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (143.4075ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (161.9443ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (294.3808ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (26.3843ms)
+✔ sandbox storage shows registered identity and explicit inspection never deletes (58.8731ms)
+✔ sandbox retirement requires its own confirmation and preserves official delivery (112.7471ms)
+✔ changed canonical delivery blocks sandbox retirement before external delete (73.4012ms)
+✔ sandbox uncertain deletion records partial and only reconciles without another delete (112.6204ms)
+✔ journal preview seals real completed events and preserves exact trace reads (130.2775ms)
+✔ unresolved sandbox reconciliation can query the same ID again without replaying deletion (130.5416ms)
+✔ journal archive refuses post-preview append and never removes original evidence (67.0741ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4487.7545

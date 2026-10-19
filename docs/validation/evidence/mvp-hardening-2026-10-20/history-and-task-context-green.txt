@@ -1,0 +1,28 @@
+✔ real local HTTP Responses exchange persists the actual path/body and replays complete call/output history without remote conversation (98.2758ms)
+✔ actual Responses envelope expansion is checked before taking calls, reserving or dispatching (7.1787ms)
+✔ context window guards include actual wire bytes, the 1024 guard and unchanged output, at the exact boundary (4.3566ms)
+✔ financial fitting preserves the latest contract, old full SHA file and pinned knowledge groups while removing old discussion (20.9126ms)
+✔ per-task max output cap remains distinct from whole-task estimates and is honored on Responses wire (13.4609ms)
+✔ HTTP failures and missing or invalid usage retain one run/task hold despite a configured fallback, with no retry or tool execution (74.298ms)
+✔ invalid, incomplete, unapproved and nonempty reasoning outputs settle actual usage but yield no executable calls (28.5316ms)
+✔ reasoning policy refusal and malformed native history occur before any durable receipt or HTTP request (2.9163ms)
+✔ legacy Chat route keeps its endpoint and body despite a Responses-named wire model (5.2493ms)
+✔ multiple tool rounds replay every text, parallel call and full file/knowledge result with stable call IDs (13.4155ms)
+✔ unknown dispatched fees stay held even without durable callbacks or when success JSON is malformed (11.0751ms)
+✔ metadata, usage or unknown-fee persistence failures retain the sent hold and never yield executable output (15.5837ms)
+✔ the run/task reservation remains held while known usage persists, then settles before invalid output is rejected (6.7727ms)
+✔ a cancellation before dispatch releases the local hold, while cancellation after headers retains it (8.1195ms)
+✔ Go identity is stable across previews and requires a local session before reservation; unrelated routes receive no Go identity (2.0955ms)
+✔ an internal stop settles only the late original Responses receipt and never executes its tool call or sends another request (5.9774ms)
+✔ compact product mapping changes only duplicated description while generic mapping and immutable contracts retain their complete hashes (1.5274ms)
+✔ compact mapping fails closed without a verified host context instead of producing placeholder contracts (0.7259ms)
+✔ generic native host cannot opt into context-backed descriptions or dispatch before failed assertion (121.9069ms)
+✔ native restored task claim retains canonical file hashes and quality fields without replaying the completed producer or repeating requirement in its receipt (752.2045ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1626.4417

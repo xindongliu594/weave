@@ -2,7 +2,7 @@ import { before, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import express from 'express';
 import { once } from 'node:events';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -16,6 +16,8 @@ const admin = new pg.Pool({ connectionString: originalURL });
 const password = 'test-fixture-password';
 const archivedRunId = randomUUID();
 let archivedEvents:any;
+let stepCheckpoint:any;
+let lineageSourceId:string,lineageChildId:string;
 let pool: pg.Pool, server: http.Server, url: string, directory: string, backupModule: typeof import('../apps/api/src/backup.ts'), backup: any, documentId: string;
 let extensionTables: string[];
 async function call(path: string, body: any) { const result = await fetch(url + '/backup/' + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { status: result.status, data: await result.json() }; }
@@ -23,7 +25,32 @@ before(async () => {
   await admin.query(`CREATE SCHEMA ${schema}`); const dbUrl = new URL(originalURL); dbUrl.searchParams.set('options', `-c search_path=${schema}`); process.env.DATABASE_URL = dbUrl.toString();
   directory = await mkdtemp(join(tmpdir(), 'ad-extensions-backup-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs'); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   await mkdir(join(directory, 'runs', archivedRunId, 'artifacts'), { recursive: true }); await writeFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt'), 'Windows 嵌套档案也必须完整保留。');
-  const trace=await import('../services/agent-runtime/trace-store.mjs'),journals=await import('../services/agent-runtime/journal-archive.mjs');const completed=trace.createRunArchive(join(directory,'runs'),{title:'cold backup fixture'},{id:archivedRunId});completed.append('evidence/test-output',{output:'backup evidence\n'.repeat(2000)});completed.append('run/finished',{status:'completed'});archivedEvents=trace.readRun(join(directory,'runs'),archivedRunId)!.events;journals.archiveJournal(join(directory,'runs'),journals.journalArchiveCandidate(join(directory,'runs'),archivedRunId));
+  const trace=await import('../services/agent-runtime/trace-store.mjs'),journals=await import('../services/agent-runtime/journal-archive.mjs');const completed=trace.createRunArchive(join(directory,'runs'),{title:'cold backup fixture'},{id:archivedRunId});
+  const {commitStepCheckpoint}=await import('../services/agent-runtime/step-checkpoints.mjs');
+  const workspace=join(directory,'runs',archivedRunId,'artifacts');
+  await writeFile(join(workspace,'progress.txt'),'checkpoint version');
+  stepCheckpoint=commitStepCheckpoint({archive:completed,workspace,boundary:{taskId:'qa',attemptId:'qa-first',sessionId:'qa-session',trigger:'tool-result',eventCursor:1,contractHash:'a'.repeat(64)},receipts:[]});
+  await writeFile(join(workspace,'progress.txt'),'later workspace version');
+  completed.append('evidence/test-output',{output:'backup evidence\n'.repeat(2000)});completed.append('run/finished',{status:'completed'});archivedEvents=trace.readRun(join(directory,'runs'),archivedRunId)!.events;journals.archiveJournal(join(directory,'runs'),journals.journalArchiveCandidate(join(directory,'runs'),archivedRunId));
+  // Protocol fixture only: tests archive/backup inheritance, not an employee or sandbox execution.
+  const backend={kind:'openshell',version:'fixture',image:'node@sha256:'+'1'.repeat(64)};
+  const execution={...backend,node:'v24.19.0',uid:1000,gid:1000,effectivePolicyHash:'2'.repeat(64),memory:536870912,cpu:[100000,100000]};
+  const task={id:'qa',assignee:'qa',kind:'verification',dependencies:[],inputs:[],outputs:[{path:'unit.test.mjs'}],verify:['node --test unit.test.mjs'],verificationReuse:'same-workspace'};
+  const savedSnapshot={projectId:'backup-lineage',planVersion:1,agents:[{id:'qa',tools:['filesystem','terminal_test']}],tasks:[task],executionTarget:{kind:'local',backend}};
+  const source=trace.createRunArchive(join(directory,'runs'),savedSnapshot);lineageSourceId=source.id;
+  const sourceFiles=join(source.dir,'artifacts');await mkdir(sourceFiles);await writeFile(join(sourceFiles,'unit.test.mjs'),'// backup fixture; not actually executed\n');
+  const {HandoffGate}=await import('../services/agent-runtime/handoff.mjs');
+  const {listArtifacts}=await import('../services/agent-runtime/sandbox.mjs');
+  const {buildCheckpointContext}=await import('../services/agent-runtime/checkpoint-context.mjs');
+  source.append('local/device-bound',{execution});
+  const context={sessionId:'fixture-qa',callId:'fixture-call',approvalId:'fixture-approval'};
+  for(const type of ['local/operation-queued','local/operation-finished'])source.append(type,{operationId:'fixture-op',name:'terminal_test',taskId:'qa',attemptId:'source-attempt',...context,execution});
+  new HandoffGate({snapshot:savedSnapshot,archive:source,sandbox:{root:sourceFiles}}).observe('qa','source-attempt','terminal_test',{command:task.verify[0]},
+   {exitCode:0,output:'# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n',execution,verificationProfile:'node-permission-workspace-v1'},listArtifacts(sourceFiles),context);
+  source.append('run/finished',{status:'cancelled'});
+  const recovery=buildCheckpointContext(savedSnapshot,trace.readRun(join(directory,'runs'),source.id)!.events,new Map(),new Map(),sourceFiles,source.id);
+  const child=trace.createRunArchive(join(directory,'runs'),{...savedSnapshot,recovery});lineageChildId=child.id;
+  await cp(sourceFiles,join(child.dir,'artifacts'),{recursive:true});child.append('local/device-bound',{execution});child.append('run/finished',{status:'cancelled'});
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); backupModule = await import('../apps/api/src/backup.ts');
   const automation = await import('../apps/api/src/automation-learning.ts'), chat = await import('../apps/api/src/manager-chat.ts'), browser = await import('../apps/api/src/work-tools-browser.ts'), files = await import('../apps/api/src/work-files.ts');
   const storage=await import('../apps/api/src/storage-governance.ts');
@@ -35,6 +62,8 @@ before(async () => {
   await pool.query("INSERT INTO departments(id,data) VALUES('department',$1)", [{ name: 'Fixture', agents: [agent] }]);
   const policy = { maxBudget: 1, maxAgents: 1, maxConcurrentAgents: 1, deadlineSeconds: 300, allowedModelIds: ['model'], allowedTools: [], allowedKnowledgeSpaceIds: [], allowedDepartmentIds: ['department'] }, plan = { agents: [agent], tasks: [] };
   await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES('project','department',1,'Fixture','备份扩展功能测试需求',$1,$2,'manual')", [policy, plan]);
+  await pool.query("INSERT INTO usage(id,model_id,project_id,input_tokens,output_tokens,cost,purpose) VALUES('latest-usage','model','project',12,13,0.12,'backup-fixture')");
+  await pool.query("INSERT INTO model_reservations(id,model_id,project_id,purpose,amount,input_rate,output_rate,status) VALUES('unknown-cost','model','project','backup-fixture',0.13,1,2,'uncertain')");
   await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES('run','project',1,'completed',$1)", [{ approval: { kind: 'project' }, title: 'Fixture completed', agents: [agent], policy }]);
   await pool.query("INSERT INTO knowledge_spaces(id,name,scope,agent_ids) VALUES('space','经验','company','[]')");
   const knowledge = await import('../apps/api/src/knowledge.ts'); documentId = (await knowledge.saveKnowledgeDocument({ spaceId: 'space', title: '经验来源', content: '测试前应确认版本。' })).id;
@@ -86,6 +115,66 @@ test('extension tables survive encrypted backup while scheduled dispatch and pen
   assert.deepEqual((await pool.query('SELECT reuse_evidence FROM automation_knowledge_candidates')).rows[0].reuse_evidence.works,[{runId:'run',workKey:'project:1'}]);
   assert.equal(await readFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt'), 'utf8'), 'Windows 嵌套档案也必须完整保留。');
   const {readRun}=await import('../services/agent-runtime/trace-store.mjs');assert.deepEqual(readRun(join(directory,'runs'),archivedRunId)!.events,archivedEvents);assert.ok((await readFile(join(directory,'runs',archivedRunId,'events.jsonl.gz'))).length>0);
+});
+
+test('encrypted backup preserves checkpoint objects separately from later delivery versions',async()=>{
+ const {readStepCheckpoint}=await import('../services/agent-runtime/step-checkpoints.mjs');
+ const {restoreStepWorkspace}=await import('../apps/api/src/step-checkpoint-recovery.ts');
+ const traceRoot=join(directory,'runs'),reference={id:stepCheckpoint.id,runId:archivedRunId,sha256:stepCheckpoint.sha256};
+ const restored=readStepCheckpoint({root:traceRoot,runId:archivedRunId,checkpointId:reference.id});
+ assert.deepEqual(restored,stepCheckpoint);
+ const plain=await backupModule.decryptBackup(backup,password);
+ for(const file of restored.files)assert.equal(Buffer.from(plain.files[`${archivedRunId}/checkpoint-objects/${file.sha256}`],'base64').length,file.size);
+ const target=join(directory,'checkpoint-restored-workspace');
+ restoreStepWorkspace(traceRoot,reference,target);
+ assert.equal(await readFile(join(target,'progress.txt'),'utf8'),'checkpoint version');
+ assert.equal(await readFile(join(traceRoot,archivedRunId,'artifacts','progress.txt'),'utf8'),'later workspace version');
+ const content=restored.files.find((file:any)=>file.path==='progress.txt');
+ const object=join(traceRoot,archivedRunId,'checkpoint-objects',content.sha256),original=await readFile(object);
+ try {
+  await writeFile(object,'corrupt');
+  assert.throws(()=>readStepCheckpoint({root:traceRoot,runId:archivedRunId,checkpointId:reference.id}),/CHECKPOINT_CONTENT/);
+  await rm(object);
+  assert.throws(()=>restoreStepWorkspace(traceRoot,reference,join(directory,'must-not-restore')),/ENOENT|CHECKPOINT/);
+ } finally {await writeFile(object,original);}
+ assert.deepEqual(readStepCheckpoint({root:traceRoot,runId:archivedRunId,checkpointId:reference.id}),stepCheckpoint);
+});
+
+test('missing or corrupt checkpoint objects reject backup restoration before replacing current data',async()=>{
+ const content=stepCheckpoint.files.find((file:any)=>file.path==='progress.txt');
+ const key=`${archivedRunId}/checkpoint-objects/${content.sha256}`;
+ const journal=join(directory,'runs',archivedRunId,'events.jsonl.gz'),before=await readFile(journal);
+ for(const mode of ['missing','corrupt']){
+  const plain=await backupModule.decryptBackup(backup,password);
+  if(mode==='missing')delete plain.files[key];else plain.files[key]=Buffer.from('corrupt').toString('base64');
+  await pool.query("UPDATE automation_schedules SET name='preserve current data' WHERE id='schedule'");
+  const response=await call('restore',{password,backup:await backupModule.encryptBackup(plain,password),confirmation:'RESTORE'});
+  assert.equal(response.status,422,mode+' checkpoint must be rejected before data replacement');
+  assert.match(response.data.message,/检查点|checkpoint/i);
+  assert.equal((await pool.query("SELECT name FROM automation_schedules WHERE id='schedule'")).rows[0].name,'preserve current data');
+  assert.deepEqual(await readFile(journal),before);
+  assert.deepEqual((await readdir(directory)).filter(name=>name.startsWith('restore-')),[],'failed staging directories are removed');
+ }
+});
+
+test('backup restores both generations and original test receipts while retaining current usage and unknown fees',async()=>{
+ const {readRun,openRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
+ const {HandoffGate}=await import('../services/agent-runtime/handoff.mjs');
+ const root=join(directory,'runs'),child=readRun(root,lineageChildId)!;
+ const report=new HandoffGate({snapshot:child.snapshot,archive:openRunArchive(root,lineageChildId),sandbox:{root:join(root,lineageChildId,'artifacts')}}).prepare('qa','after-backup',{});
+ assert.equal(report.commands.length,1);assert.equal(report.commands[0].evidence.runId,lineageSourceId);
+ assert.equal(report.commands[0].inheritedFrom.attemptId,'source-attempt');
+ assert.equal(Number((await pool.query("SELECT cost FROM usage WHERE id='latest-usage'")).rows[0].cost),0.12);
+ const unknown=(await pool.query("SELECT amount,status FROM model_reservations WHERE id='unknown-cost'")).rows[0];
+ assert.equal(Number(unknown.amount),0.13);assert.equal(unknown.status,'uncertain');
+ const before=await readFile(join(root,lineageChildId,'events.jsonl'));
+ for(const mode of ['source-archive','source-object']){
+  const plain=await backupModule.decryptBackup(backup,password);
+  for(const key of Object.keys(plain.files))if(key.startsWith(`${lineageSourceId}/`)&&(mode==='source-archive'||key.includes('/checkpoint-objects/')))delete plain.files[key];
+  const response=await call('restore',{password,backup:await backupModule.encryptBackup(plain,password),confirmation:'RESTORE'});
+  assert.equal(response.status,422,mode);assert.match(response.data.message,/检查点/);
+  assert.deepEqual(await readFile(join(root,lineageChildId,'events.jsonl')),before);
+ }
 });
 
 test('active paid manager replies block export and restore before any database replacement', async () => {

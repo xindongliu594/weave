@@ -1,0 +1,10 @@
+✔ only a committed successful QA checkpoint holds the next request before dispatch (120.875ms)
+✔ failed test, accepted QA, changed files and unknown effects cannot masquerade as the intended boundary (122.0153ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 589.7384

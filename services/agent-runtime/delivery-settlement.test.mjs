@@ -13,7 +13,17 @@ import { readRun } from './trace-store.mjs';
 // Real installed DSH Hosts, native task transitions and HTTP transport in an
 // isolated directory. Fixture replies verify shutdown ordering, not Todo/model
 // acceptance; no paid API or user's delivery/database is accessed.
-async function nativeDeliveryScenario(cancelDuringSettlement=false) {
+async function bounded(promise,label,signal,timeout=10000) {
+  let timer,onAbort;
+  const interrupted=new Promise((_,reject)=>{
+    timer=setTimeout(()=>reject(Error(`Timed out waiting for ${label}`)),timeout);
+    if(signal){onAbort=()=>reject(signal.reason);if(signal.aborted)onAbort();else signal.addEventListener('abort',onAbort,{once:true});}
+  });
+  try{return await Promise.race([promise,interrupted]);}
+  finally{clearTimeout(timer);if(onAbort)signal.removeEventListener('abort',onAbort);}
+}
+
+async function nativeDeliveryScenario(t,cancelDuringSettlement=false) {
   const root=await mkdtemp(join(tmpdir(),'delivery-settlement-')),requests=[],usages=[],unknown=[],timers=new Set();
   const settlementStarted=Promise.withResolvers();
   let workerStep=0;
@@ -38,7 +48,6 @@ async function nativeDeliveryScenario(cancelDuringSettlement=false) {
       res.end(JSON.stringify({choices:[{message,finish_reason:worker?'tool_calls':'stop'}],usage:{prompt_tokens:tail?37:7,completion_tokens:tail?5:1}}));};
     if(tail){const timer=setTimeout(()=>{timers.delete(timer);send();},5000);timers.add(timer);}else send();
   });
-  server.listen(0,'127.0.0.1');await once(server,'listening');
   const runId=randomUUID(),snapshot={projectId:'isolated-delivery',planVersion:1,requirement:'engineering fixture',executionBudget:1,
     approval:{kind:'project',projectVersion:1},policy:{maxBudget:1,maxConcurrentAgents:2,deadlineSeconds:12,contextManagement:'prune',maxModelCalls:10,maxTaskModelCalls:6,allowedTools:[]},
     agents:[{id:'manager',employeeId:'manager',role:'manager',modelId:'manager-fixture',rolePrompt:'Coordinate.',tools:[]},
@@ -48,11 +57,19 @@ async function nativeDeliveryScenario(cancelDuringSettlement=false) {
     createExecutor:archive=>{const originalAppend=archive.append.bind(archive);archive.append=(type,data,links)=>{
       const event=originalAppend(type,data,links);if(type==='runtime/model-settling'&&data.reason==='delivery-completed')settlementStarted.resolve();return event;
     };const artifacts=join(archive.dir,'artifacts');mkdirSync(artifacts,{recursive:true});return{root:artifacts,prepare:async()=>{},close:async()=>{}};}});
+  let completion;
   try{
+    server.listen(0,'127.0.0.1');await bounded(once(server,'listening'),'fixture HTTP listener',t.signal);
     const started=await runtime.start({runId,approvedSnapshot:snapshot,routes:['manager-fixture','worker-fixture'].map(model=>({id:model,name:model,wireModel:model,
       baseUrl:`http://127.0.0.1:${server.address().port}/v1`,inputRate:1,outputRate:2,maxOutputTokens:512}))});
-    if(cancelDuringSettlement){await settlementStarted.promise;await runtime.cancel(runId);}
-    const result=await started.completion,run=readRun(root,runId),events=run.events;
+    completion=started.completion;
+    if(cancelDuringSettlement){
+      await bounded(Promise.race([settlementStarted.promise,completion.then(result=>{
+        throw Error(`Run ended before delivery settlement: ${result.status}: ${result.message??''}`);
+      })]),'delivery settlement',t.signal);
+      await bounded(runtime.cancel(runId),'runtime cancellation',t.signal);
+    }
+    const result=await bounded(completion,'runtime completion',t.signal),run=readRun(root,runId),events=run.events;
     assert.equal(result.status,cancelDuringSettlement?'cancelled':'completed',result.message);assert.equal(run.integrity,'ok');
     const seal=events.find(event=>event.type==='handoff/accepted');assert.ok(seal);
     const settling=events.find(event=>event.type==='runtime/model-settling'&&event.data.reason==='delivery-completed');assert.ok(settling);
@@ -70,7 +87,16 @@ async function nativeDeliveryScenario(cancelDuringSettlement=false) {
     assert.ok(!events.some(event=>event.type==='tool/start'&&event.data.name==='agent_teams_send_message'&&event.seq>seal.seq));
     assert.ok(!events.some(event=>event.type==='model/wire-request'&&event.seq>settling.seq));
     assert.equal(events.at(-1).type,'run/finished');assert.equal(events.at(-1).data.status,cancelDuringSettlement?'cancelled':'completed');
-  }finally{await runtime.cancel(runId);for(const timer of timers)clearTimeout(timer);server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(root,{recursive:true,force:true});}
+  }finally{
+    // Abort the runtime and close the HTTP sockets before awaiting either one:
+    // a failed assertion or a test timeout must not leave the delayed reply live.
+    const cancellation=runtime.cancel(runId);
+    for(const timer of timers)clearTimeout(timer);
+    const closed=new Promise(resolve=>server.close(resolve));server.closeAllConnections();
+    const cleanup=await bounded(Promise.allSettled([cancellation,completion,closed]),'fixture shutdown',undefined,3000);
+    await rm(root,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+    for(const result of cleanup)if(result.status==='rejected')throw result.reason;
+  }
 }
-test('successful native delivery settles an already dispatched tail request before disposal and suppresses late tools', { timeout: 15000 },()=>nativeDeliveryScenario());
-test('user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee', { timeout: 15000 },()=>nativeDeliveryScenario(true));
+test('successful native delivery settles an already dispatched tail request before disposal and suppresses late tools', { timeout: 15000 },t=>nativeDeliveryScenario(t));
+test('user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee', { timeout: 15000 },t=>nativeDeliveryScenario(t,true));

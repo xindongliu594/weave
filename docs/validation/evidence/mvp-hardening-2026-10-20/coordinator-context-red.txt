@@ -1,0 +1,28 @@
+✖ coordination can refresh its approved context without claiming an employee task (307.6441ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 686.1836
+
+✖ failing tests:
+
+test at services\agent-runtime\coordinator-context.test.mjs:11:1
+✖ coordination can refresh its approved context without claiming an employee task (307.6441ms)
+  AssertionError [ERR_ASSERTION]: [{"kind":"error","error":{"message":"TASK_ATTRIBUTION_MISSING: 团队执行状态未就绪","code":"UNKNOWN"}}]
+
+  0 !== 1
+
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/coordinator-context.test.mjs:23:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

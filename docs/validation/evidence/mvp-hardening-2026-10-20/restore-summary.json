@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "restoredAt": "2026-10-19T18:02:24.857Z",
+  "modelCalls": 0,
+  "servicesStarted": false,
+  "files": 2389,
+  "bytes": 581251400,
+  "credentialContentsReadOrUnsealed": false,
+  "opaqueFiles": 5,
+  "originalBackupUnchanged": true,
+  "allNonSecretFilesMatch": true,
+  "readOnlyReopenedTwice": true,
+  "limitations": [
+    "Full stopped-directory backup, not online encrypted export.",
+    "Employee files restored byte-for-byte; tests not re-executed on the host.",
+    "Unknown costs and old operation records preserved; no historical operation dispatched."
+  ],
+  "businessVerified": {
+    "tableCount": 37,
+    "usageRows": 701,
+    "settledCost": 3.1380507,
+    "unknownReservations": 7,
+    "knowledgeVersions": 8,
+    "employeeArtifactCount": 3
+  },
+  "disposableCopiesRemovedBytes": 819671448,
+  "originalBackupRetained": true
+}

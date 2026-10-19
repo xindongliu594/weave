@@ -1,3 +1,7 @@
+export function RunReply({text,summary,collapsed=false}:{text:string;summary?:string;collapsed?:boolean}) {
+  return <>{summary&&<p>{summary}</p>}{collapsed?<details><summary>查看原始回复</summary><pre className="product-pre">{text}</pre></details>:<pre className="product-pre">{text}</pre>}</>;
+}
+
 /** Reports are historical submissions, not a replacement for live task status
  * or independent acceptance. Only host-accepted records are displayed here. */
 export function RunHandoffReports({snapshot,events}:{snapshot:any;events:any[]}) {

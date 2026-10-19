@@ -373,6 +373,9 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     let configured;
     try { configured = modelCompletionOptions(route); }
     catch (error) { throw new LlmError(error.message, error.code); }
+    // Check the original native history before snapshot normalization reads it.
+    // Malformed history must fail with the protocol error and no reservation.
+    if (route.protocol === 'responses') responsesHistory(options.messages);
     const closure=this.handoffClosure?.(options.sessionId);
     const retainOriginal = options.purpose !== 'compaction' && (Boolean(closure) || this.requireCompleteContext?.(options.sessionId) === true);
     // The last-call gate retains every evidence/history message, but native
@@ -382,7 +385,6 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     options={...options,messages:runtimeSnapshots.messages};
     const fullEnvelope = route.protocol === 'responses' || route.thinkingMode !== undefined;
     if (route.protocol === 'responses') {
-      responsesHistory(options.messages);
       const policyEffort = this.sessionPolicies.get(options.sessionId)?.reasoningEffort;
       const effort = policyEffort === undefined ? options.reasoningEffort : policyEffort;
       if (effort !== undefined && effort !== 'none') throw new LlmError('Responses 兼容层当前仅支持 reasoning none；不会丢弃加密推理状态', 'UNSUPPORTED_REASONING');

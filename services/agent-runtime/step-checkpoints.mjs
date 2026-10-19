@@ -43,6 +43,11 @@ function originalReceipt(runs,entry,taskId,attemptId) {
   if(observed?.data.taskId!==taskId||observed.data.attemptId!==attemptId)return false;
   return ['command','exitCode','workspaceRevision','evidence','acceptanceChecks'].every(key=>checkpointDigest(observed.data[key]??null)===checkpointDigest(entry[key]??null));
 }
+/** Structural backup validation; unknown effects remain preserved for later reconciliation. */
+export function validateCheckpointReceipts(runs,checkpoint) {
+  if(!Array.isArray(checkpoint.receipts))throw Error('CHECKPOINT_RECEIPTS_INVALID');
+  for(const entry of checkpoint.receipts)if(!originalReceipt(runs,entry,checkpoint.boundary.taskId,entry.inheritedFrom?.attemptId??checkpoint.boundary.attemptId))throw Error('CHECKPOINT_RECEIPT_INVALID');
+}
 /** Unlike the download listing, this scan must never silently omit files. */
 export function checkpointFiles(workspace) {
   assertPlain(workspace,'directory');
@@ -95,16 +100,34 @@ export function readStepCheckpoint({root,runId,checkpointId}) {
   const run=readRun(root,runId);if(!run||run.integrity!=='ok')throw Error('CHECKPOINT_ARCHIVE_INVALID');
   const events=run.events.filter(event=>event.type==='step/checkpoint'&&event.data?.id===checkpointId);
   if(events.length!==1)throw Error('CHECKPOINT_NOT_FOUND');
-  const event=events[0],{sha256,...data}=event.data;
+  return validateCheckpointEvent(root,runId,events[0]);
+}
+/** Validate an immutable backup staging archive once, including deduplicated content. */
+export function readStepCheckpoints({root,runId}) {
+  if(!uuid.test(runId??''))throw Error('CHECKPOINT_ID_INVALID');
+  const run=readRun(root,runId);if(!run||run.integrity!=='ok')throw Error('CHECKPOINT_ARCHIVE_INVALID');
+  const results=new Map(),objects=new Set();
+  for(const event of run.events.filter(event=>event.type==='step/checkpoint')) {
+    if(!uuid.test(event.data?.id??'')||results.has(event.data.id))throw Error('CHECKPOINT_MANIFEST_INVALID');
+    results.set(event.data.id,validateCheckpointEvent(root,runId,event,objects));
+  }
+  return results;
+}
+function validateCheckpointEvent(root,runId,event,checkedObjects=new Set()) {
+  const {sha256,...data}=event.data;
   if(data.version!==1||data.runId!==runId||checkpointDigest(data)!==sha256||!Array.isArray(data.files)||data.files.length>128)throw Error('CHECKPOINT_MANIFEST_INVALID');
-  const objects=join(root,runId,'checkpoint-objects');assertPlain(objects,'directory');
+  const objects=join(root,runId,'checkpoint-objects');
+  // The portable backup contains files, not empty directories.
+  if(data.files.length||existsSync(objects))assertPlain(objects,'directory');
   const seen=new Set();let size=0;
   for(const file of data.files) {
     validArtifactPath(file.path);
     if(seen.has(file.path)||!sha.test(file.sha256)||!Number.isSafeInteger(file.size)||file.size<0||file.size>5*1024*1024||(size+=file.size)>20*1024*1024)throw Error('CHECKPOINT_MANIFEST_INVALID');
-    seen.add(file.path);const path=join(objects,file.sha256);
+    seen.add(file.path);const path=join(objects,file.sha256),key=file.sha256+':'+file.size;
+    if(checkedObjects.has(key))continue;
     try {if(assertPlain(path,'file').size!==file.size||hash(readFileSync(path))!==file.sha256)throw Error('mismatch');}
     catch {throw Error('CHECKPOINT_CONTENT_INVALID: '+file.path);}
+    checkedObjects.add(key);
   }
   return {...data,sha256,seq:event.seq,at:event.at};
 }

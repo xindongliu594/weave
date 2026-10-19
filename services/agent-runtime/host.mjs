@@ -344,7 +344,10 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
       context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
       pendingCompletion,handoffClosure:handoff?handoffClosure:undefined,
-      assignmentReports:handoff?agent=>{const work=activeWork(agent);return formatDependencyOutputs(collectCompletedDependencyOutputs(teamState().tasks,work.task.id));}:undefined,
+      assignmentReports:handoff?agent=>{
+        if(agent.id===captainId)return ''; // Coordination has no assigned employee task or native assignment report.
+        const work=activeWork(agent);return formatDependencyOutputs(collectCompletedDependencyOutputs(teamState().tasks,work.task.id));
+      }:undefined,
       onIncompleteCompletion: product?.onHandoffBlocked,
       prepareToolArguments: handoff ? (agent,name,args) => {
         if(!['agent_teams_claim_task','agent_teams_update_task'].includes(name)||nativeTaskId(args.task_id)===args.task_id)return args;

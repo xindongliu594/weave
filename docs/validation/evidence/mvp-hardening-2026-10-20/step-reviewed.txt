@@ -1,0 +1,19 @@
+✔ an unfinished node resumes with inherited evidence and never relabels the original execution (143.0681ms)
+✔ changed files and revoked reuse permission require fresh verification (122.1447ms)
+✔ new environment, changed tool grants, or unknown effects after the checkpoint block reuse (132.208ms)
+✔ ordinary plans and native host commands do not opt into verification inheritance (92.2543ms)
+✔ a later failed or unconfined result cannot be hidden by an earlier passing receipt (267.7032ms)
+✔ a late unknown operation in the original receipt ancestor blocks another generation of reuse (169.9526ms)
+✔ a parent without a new checkpoint cannot be skipped when it has an unknown operation (139.5799ms)
+✔ committed checkpoints retain exact file versions and deduplicate unchanged content (80.8523ms)
+✔ partial writes are not checkpoints and corrupt objects fail closed (34.5518ms)
+✔ oversized and excessive workspaces are rejected rather than silently truncated (211.7184ms)
+✔ failed archive commit never publishes a restorable checkpoint (29.1778ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1440.7223

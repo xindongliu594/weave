@@ -11,10 +11,10 @@ import { runResultView } from './run-result-view.ts';
 import { createRunRecoveryConfirmation, type RunRecoveryContext, type RunRecoveryIntent } from './run-recovery-confirmation.ts';
 import {RunInheritedEvidence} from './RunInheritedEvidence.tsx';
 import {RunAcceptanceChecks} from './RunAcceptanceChecks.tsx';
-import {RunHandoffReports} from './RunHandoffReports.tsx';
+import {RunHandoffReports,RunReply} from './RunHandoffReports.tsx';
 import {RunGoalChecks} from './RunGoalChecks.tsx';
 import {RunResourceResume} from './RunResourceResume.tsx';
-import {RunStepCheckpoints} from './RunStepCheckpoints.tsx';
+import {RunStepCheckpoints,stepCheckpointNames} from './RunStepCheckpoints.tsx';
 import type {RunLineageEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
 export type RunExtrasErrors = { id: string; operation: string; refresh: string };
 type RunExtrasErrorEvent = { id: string; type: 'reset' | 'operation' | 'refresh-failed' | 'refresh-succeeded'; message?: string };
@@ -176,7 +176,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  {['failed','interrupted','cancelled'].includes(status)&&!planningBlocked&&<div className="notice-box run-recovery">
   <p>{recovery?.checkpointBlocked??'可以保留已核验的完成任务；返工结果须已通过独立复验。'}重试会创建新的运行档案，沿用原项目剩余预算和任务调用上限。</p>
   <CostCarryoverChoice state={costs} disabled={busy}/>
-  {snapshot.executionTarget?.backend?.kind==='openshell'&&events.some(e=>e.type==='step/checkpoint')&&<label className="field">恢复位置<select disabled={busy||checkingRecovery} value={checkpointId??''} onChange={e=>setSelectedStep(e.target.value?{runId:id,id:e.target.value}:undefined)}><option value="">最新工作现场（推荐）</option>{events.filter(e=>e.type==='step/checkpoint'&&!tasks.some(t=>t.id===e.data.boundary.taskId&&t.status==='completed')).slice(-50).reverse().map(e=><option key={e.data.id} value={e.data.id}>{taskName(e.data.boundary.taskId)} · {e.at} · {e.data.files.length} 个文件</option>)}</select><small>较早的检查点会在新运行中恢复对应文件；仍须通过版本、权限、费用与外部操作核验。</small></label>}
+  {snapshot.executionTarget?.backend?.kind==='openshell'&&events.some(e=>e.type==='step/checkpoint')&&<label className="field">恢复位置<select disabled={busy||checkingRecovery} value={checkpointId??''} onChange={e=>setSelectedStep(e.target.value?{runId:id,id:e.target.value}:undefined)}><option value="">最新工作现场（推荐）</option>{events.filter(e=>e.type==='step/checkpoint'&&!tasks.some(t=>t.id===e.data.boundary.taskId&&t.status==='completed')).slice(-50).reverse().map(e=><option key={e.data.id} value={e.data.id}>{taskName(e.data.boundary.taskId)} · {stepCheckpointNames[e.data.boundary.trigger]??"进度已保存"} · #{e.seq} · {e.at} · {e.data.files.length} 个文件</option>)}</select><small>较早的检查点会在新运行中恢复对应文件；仍须通过版本、权限、费用与外部操作核验。</small></label>}
   {recovery?.costBlocked&&!costs.readiness&&<p className="banner error" role="status">{recovery.costBlocked} <a href="#usage">核对调用费用</a></p>}
   {unknown.length>0&&<div><p>以下操作的结果尚未确认，恢复前需要单独检查：</p>{unknown.map(operation=><pre className="product-pre" key={operation.callId}>{operation.name} · {JSON.stringify(operation.arguments)}</pre>)}<label><input type="checkbox" checked={acknowledged} disabled={busy||checkingRecovery} onChange={e=>setAcknowledged(e.target.checked)}/>我已核对这些操作和现有产物，允许未完成部分重新执行。</label></div>}
   <RecoveryConditionsView result={checkedRecovery?.data} stale={recoveryStale} checking={checkingRecovery} error={recoveryError} disabled={busy} staticEstimate={snapshot.estimatedCost} onCheck={()=>void checkRecovery(costs)}/>
@@ -196,11 +196,11 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  {events.some(e=>e.type==='billing/unconfirmed')&&<p className="notice-box">本次运行曾有调用未取得完整用量。<a href="#settings">查看当前费用核对状态</a></p>}
  {approvals.filter(a=>a.status==='pending').map(renderApproval)}
  {approvals.some(a=>a.status!=='pending')&&<details className="lower"><summary>已处理审批（{approvals.filter(a=>a.status!=='pending').length}）</summary>{approvals.filter(a=>a.status!=='pending').map(renderApproval)}</details>}
- <div className="task-graph lower">{tasks.map((t:any)=><div className="task-node" key={t.id}><small>{t.id}{t.runtimeTaskId&&`（原生 ${t.runtimeTaskId}）`}{t.unapproved&&' · 未关联批准任务'} · {!executing&&['claimed','in_progress'].includes(t.status)?'停止时'+taskStates[t.status]:taskStates[t.status]??t.status??'待调度'} · {employeeName(t.assignee)}</small><h3>{t.subject}</h3><p>前置：{t.dependencies?.map(taskName).join(' → ')||'无'}</p>{t.output&&<pre className="product-pre">{t.output}</pre>}</div>)}</div>
+ <div className="task-graph lower">{tasks.map((t:any)=><div className="task-node" key={t.id}><small>{t.id}{t.runtimeTaskId&&`（原生 ${t.runtimeTaskId}）`}{t.unapproved&&' · 未关联批准任务'} · {!executing&&['claimed','in_progress'].includes(t.status)?'停止时'+taskStates[t.status]:taskStates[t.status]??t.status??'待调度'} · {employeeName(t.assignee)}</small><h3>{t.subject}</h3><p>前置：{t.dependencies?.map(taskName).join(' → ')||'无'}</p>{t.output&&<RunReply text={t.output} collapsed={t.status==="completed"}/>}</div>)}</div>
  {finished&&<><h3 className="lower">{result.kind==='accepted-manager'?'经理验收结果':'运行原始回复'}</h3>
    {result.reason&&<p className="subcopy">{result.reason}</p>}
-   {result.kind==='accepted-manager'&&<p className="subcopy">{result.taskSubject} · 宿主已核验并接收{result.acceptanceSeq!==undefined&&` · #${result.acceptanceSeq}`}。完整报告见下方交付物。</p>}
-   <pre className="product-pre">{result.text||readableStop}</pre>
+   {result.kind==='accepted-manager'&&<p className="subcopy">{result.taskSubject} · 宿主已核验并接收{result.acceptanceSeq!==undefined&&` · #${result.acceptanceSeq}`}。完整报告见上方员工交接报告，原始回复可在下方展开。</p>}
+   <RunReply text={result.text||readableStop} collapsed={result.kind==='accepted-manager'} summary={result.kind==='accepted-manager'&&result.receipt.employeeReport?.version===1?result.receipt.employeeReport.summary:undefined}/>
    {result.kind==='accepted-manager'&&result.receipt.outputs.map((file:any)=><p className="trace-id" key={file.path}>{file.path} · {file.size} 字节 · SHA256 {file.sha256}</p>)}
    {result.kind==='accepted-manager'&&result.originalSummary&&result.originalSummary!==result.text&&<details><summary>查看原始协调回复</summary><p className="subcopy">这是协调会话最后记录的回复，可能早于任务交付。原文保留供追溯，当前结果以上方宿主核验的经理任务为准。</p><pre className="product-pre">{result.originalSummary}</pre></details>}
  </>}

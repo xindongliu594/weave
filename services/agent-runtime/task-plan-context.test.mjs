@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LlmAdapter } from '@deepseek-ai/dsh-llm';
@@ -68,7 +68,8 @@ test('generic native host cannot opt into context-backed descriptions or dispatc
 
 test('native restored task claim retains canonical file hashes and quality fields without replaying the completed producer or repeating requirement in its receipt', { timeout: 10000 }, async () => {
   const root = await mkdtemp(join(tmpdir(), 'task-context-native-')), sha256 = hash('fixed producer file\n');
-  writeFileSync(join(root, 'server.mjs'), 'fixed producer file\n');
+  const workspace = join(root, 'artifacts'); mkdirSync(workspace);
+  writeFileSync(join(workspace, 'server.mjs'), 'fixed producer file\n');
   const snapshot = { requirement: marker.repeat(300), executionDescription: 'UNCHANGED_APPROVED_EXECUTION_DESCRIPTION', policy: { maxBudget: .5 },
     agents: [{ id: 'manager', employeeId: 'original-manager', role: 'manager', modelId: 'captain', tools: [], rolePrompt: 'UNCHANGED_MANAGER_ROLE' },
       { id: 'dev', employeeId: 'original-dev', role: 'member', modelId: 'fixture', tools: ['artifact_write', 'terminal_test'], rolePrompt: 'UNCHANGED_DEVELOPER_ROLE' },
@@ -105,7 +106,7 @@ test('native restored task claim retains canonical file hashes and quality field
   adapter.budget = new ExecutionBudget({ maxBudget: .4, priorSpend: .1, priorModelCalls: 4, tasks: snapshot.tasks });
   try {
     host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
-      product: { snapshot, sandbox: { root, async execute() { sandboxCalls++; throw Error('no employee file or command operation is needed'); } }, gate: new Semaphore(2) } });
+      product: { snapshot, sandbox: { root: workspace, async execute() { sandboxCalls++; throw Error('no employee file or command operation is needed'); } }, gate: new Semaphore(2) } });
     const captain = await host.captain({ cwd: root, model: 'captain', instructions: snapshot.agents[0].rolePrompt });
     assert.equal(host.assertApprovedTaskContext(snapshot.tasks), true);
     const altered = structuredClone(snapshot.tasks); altered[1].inputs[0].sha256 = 'b'.repeat(64);

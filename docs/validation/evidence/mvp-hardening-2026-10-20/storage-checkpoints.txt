@@ -1,0 +1,23 @@
+✔ archive quota includes nested sessions and artifacts, refuses further admission and never deletes evidence (10.7671ms)
+✔ inventory counts actual regular bytes without following directory links and marks bounded scans incomplete (41.3765ms)
+✔ only completed native workspace copies with verified identical canonical delivery become candidates (63.3392ms)
+✔ incomplete journal and mismatched completion are retained even when database says completed (33.3025ms)
+✔ cleaning copies preserves immutable deliverables, checkpoints and a valid complete journal (67.7792ms)
+✔ changed second candidate rejects the entire preview before the first file is deleted (57.2306ms)
+✔ canonical delivery changes invalidate a preview without deleting its workspace copy (48.1384ms)
+✔ workspace ancestor links and hard-linked files cannot become cleanup candidates (41.8972ms)
+✔ preview paths cannot traverse, name internal files or forge a different run (46.9802ms)
+✔ disk admission uses actual filesystem free space and stops before altering any file (26.358ms)
+✔ inventory refuses a linked ancestor instead of counting files outside the declared directory (28.2186ms)
+✔ a completed journal with an unresolved external mutation still protects its workspace (32.8075ms)
+✔ linked or oversized snapshot metadata cannot authorize cleanup (69.524ms)
+✔ workspace directory enumeration returns only the bounded UUID scope (33.0454ms)
+✔ verified compressed completed logs still authorize identical workspace copy cleanup (89.3732ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 851.9953

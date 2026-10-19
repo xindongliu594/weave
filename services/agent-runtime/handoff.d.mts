@@ -5,5 +5,6 @@ export function workspaceRevision(root: string): string;
 export class HandoffGate {
   constructor(options:any);
   prepare(taskId:string,attemptId:string,update:any):any;
+  observe(taskId:string,attemptId:string,name:string,args:any,result:any,before:any[],context?:any):void;
   commit(record:any):void;
 }

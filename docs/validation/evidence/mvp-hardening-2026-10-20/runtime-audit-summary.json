@@ -1,0 +1,22 @@
+{
+  "initialFileCount": 60,
+  "initialFailures": [
+    "handoff-fixtures.test.mjs",
+    "model-settlement.test.mjs",
+    "product-tools.test.mjs",
+    "responses-compatible.test.mjs",
+    "task-plan-context.test.mjs"
+  ],
+  "note": "Initial per-file audit retained failures; focused post-fix runs are listed separately, not presented as one all-green full run.",
+  "postFixEvidence": [
+    "build-runtime.txt",
+    "coordinator-permissions-green.txt",
+    "coordinator-context-red.txt",
+    "history-and-task-context-green.txt",
+    "delivery-settlement-bounded.txt",
+    "model-settlement-native-fixture.txt",
+    "task-output-fixed.txt",
+    "handoff-fixtures-green.txt",
+    "deploy-runtime-green.txt"
+  ]
+}

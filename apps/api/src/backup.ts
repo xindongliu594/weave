@@ -16,6 +16,7 @@ import { browserMcpTables } from './work-tools-browser.ts';
 import { workFileTables } from './work-files.ts';
 import { automationTables } from './automation-learning.ts';
 import {storageTables} from './storage-governance.ts';
+import {validateBackupCheckpoints} from './backup-checkpoints.ts';
 const scrypt=promisify(scryptCallback);
 const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','organization_conversations','model_reservations','knowledge_embeddings','model_capability_tests',...managerChatTables,...browserMcpTables,...workFileTables,...automationTables,...storageTables,...nativeCapabilityTables];
 const password=z.string().min(12).max(200);
@@ -48,8 +49,12 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
   if(value.tables.model_capability_tests.some((r:any)=>r.status==='running'))throw new AppError(422,'不能恢复包含进行中能力测试的备份');
   if(value.tables.project_runs.some((r:any)=>['queued','running'].includes(r.status)))throw new AppError(422,'不允许恢复包含执行中任务的备份');
   const stage=join(dataRoot,'restore-'+randomUUID()),rollback=join(dataRoot,'before-restore-'+randomUUID());mkdirSync(stage,{recursive:true,mode:0o700});
-  let total=0;for(const [file,data]of Object.entries(value.files)){if(typeof data!=='string')throw new AppError(422,'备份文件格式不正确');const bytes=Buffer.from(data,'base64');if((total+=bytes.length)>ONLINE_BACKUP_LIMIT_BYTES)throw new AppError(422,'备份超出限制');const target=join(stage,file);mkdirSync(dirname(target),{recursive:true,mode:0o700});writeFileSync(target,bytes,{mode:0o600});}
-  if(value.master&&Buffer.from(value.master,'base64').length!==32)throw new AppError(422,'备份主密钥格式不正确');
+  try {
+   let total=0;for(const [file,data]of Object.entries(value.files)){if(typeof data!=='string')throw new AppError(422,'备份文件格式不正确');const bytes=Buffer.from(data,'base64');if((total+=bytes.length)>ONLINE_BACKUP_LIMIT_BYTES)throw new AppError(422,'备份超出限制');const target=join(stage,file);mkdirSync(dirname(target),{recursive:true,mode:0o700});writeFileSync(target,bytes,{mode:0o600});}
+   if(value.master&&Buffer.from(value.master,'base64').length!==32)throw new AppError(422,'备份主密钥格式不正确');
+   try{validateBackupCheckpoints(stage,Object.keys(value.files),value.tables.project_runs);}
+   catch{throw new AppError(422,'备份的步骤检查点、文件内容或恢复来源不完整，未替换当前数据。');}
+  }catch(error){rmSync(stage,{recursive:true,force:true});throw error;}
   const keyPath=join(dataRoot,'credential.key'),oldKey=existsSync(keyPath)?readFileSync(keyPath):null;const client=await pool.connect();let swapped=false;let movedOld=false;let undoVault:(()=>void)|undefined;
   try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918274)');await client.query('SELECT pg_advisory_xact_lock(918275)');await client.query('LOCK TABLE project_runs IN EXCLUSIVE MODE');if((await client.query("SELECT id FROM manager_messages WHERE status='replying' LIMIT 1")).rowCount)throw new AppError(409,'请等待经理回复结束');if((await client.query("SELECT id FROM model_capability_tests WHERE status='running' LIMIT 1")).rowCount)throw new AppError(409,'请等待模型能力测试结束');if((await client.query("SELECT id FROM model_reservations WHERE status='pending' LIMIT 1")).rowCount)throw new AppError(409,'请等待模型调用结束后再恢复');if((await client.query("SELECT id FROM project_runs WHERE status IN ('queued','running')")).rowCount)throw new AppError(409,'请先停止队列和运行任务');
     const previousPaths=(await client.query('SELECT vault_path FROM knowledge_documents WHERE vault_path IS NOT NULL')).rows.map(r=>r.vault_path);

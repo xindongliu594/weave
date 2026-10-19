@@ -1,0 +1,29 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (12172.517ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (8578.6782ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2560.5551ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (4789.0808ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (4808.7133ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (5067.8836ms)
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (9476.4752ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (5267.7497ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (20442.4342ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3650.529ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (2783.9392ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (2058.6597ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (6060.0845ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (5342.8225ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (7225.1949ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (7833.2002ms)
+✔ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (9342.9681ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (12612.8125ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (13326.2169ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 144291.4626

@@ -1,0 +1,27 @@
+✔ web exposes manager requirements and sealed reports with source/version, without treating them as live acceptance (13.7142ms)
+✔ changing the selected step invalidates its preflight and any open confirmation (2.0002ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (1.0989ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.7226ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.7531ms)
+✔ periodic ledger refresh disables submission without dismissing an unchanged confirmation (0.3426ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.3515ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.4925ms)
+✔ a delayed submitted response cannot navigate a different run, changed ledger or cancelled confirmation (0.5298ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.8974ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (12.1267ms)
+✔ completed accepted manager output supersedes stale coordinator reply and exposes its exact receipt without rewriting sources (3.9101ms)
+✔ every approved node needs complete output and input seals, including exact producer SHA and fixed input bindings (2.0314ms)
+✔ inherited seals require server-verified ancestry, completed attempt and accepted file inventory (18.0785ms)
+✔ failed, interrupted, incomplete or unverified status never becomes an accepted delivery result (0.3435ms)
+✔ missing or foreign seals, wrong attempt/version, incomplete DAG and absent output hashes retain the raw reply (1.3115ms)
+✔ current paginated mapping and complete summary seals select the actual manager task (0.3251ms)
+✔ manager delivery identity is determined by approved assignee and terminal DAG, not prose or fixed task IDs (0.3957ms)
+✔ RunExtras renders the accepted manager result first and folds the untouched coordinator reply into traceable history (26.2773ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1329.9336

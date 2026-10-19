@@ -1,0 +1,46 @@
+✔ coordination can refresh its approved context without claiming an employee task (327.993ms)
+✔ last-call handoff skips automatic summary pressure, keeps original evidence and still obeys the hard size limit (901.605ms)
+✔ installed DSH discards a known-fee truncated checkpoint and continues with complete original history without a paid summary retry (247.0702ms)
+✔ a discarded checkpoint suppresses repeated summary fees and restores its confirmed failure gate on a cold Host (484.1525ms)
+✔ raw-history continuation after truncation rejects a 64000-byte overflow before another dispatch and keeps all source fields (254.9478ms)
+✔ raw-history continuation cannot shorten source to spend an existing retained budget hold (254.2172ms)
+✔ missing summary usage, failed fee persistence and an unknown fallback hop never enable truncated-checkpoint degradation (814.8251ms)
+✔ known-fee truncation still requires the official original-request flush before execution dispatch (296.1123ms)
+✔ a complete checkpoint above the soft pressure target continues execution and waits for new history before paying again (621.141ms)
+✔ a cold resumed employee reconstructs its successful checkpoint gate and retains the original source (472.2743ms)
+✔ soft-pressure continuation leaves the original 64000-byte request boundary in force without extra summary fees (391.2016ms)
+✔ installed DSH completes a checkpoint using the existing approved 2048 cap and retains durable original evidence (291.3873ms)
+✔ default context initialization uses the official summary allowance while the adapter clamps it to the approved task cap (257.7277ms)
+✔ a lower approved task cap still rejects the truncated checkpoint while safe original-history execution keeps that cap (334.515ms)
+✔ the larger checkpoint allowance cannot spend a retained task/project reservation or dispatch a budget-blocked summary (261.6612ms)
+✔ default byte policy admits a detailed task with a large fixed prompt and tool schema (132.3488ms)
+✔ automatic employee summaries retain source records, isolate history and survive resume (474.1645ms)
+✔ large structured non-file tool output is reduced without losing hashes or full original evidence (231.1656ms)
+✔ approved Skill instructions stay complete under pruning pressure (0.5229ms)
+✔ structured text below 6000 characters is safely shortened when serialized JSON exceeds the threshold (1.1922ms)
+✔ escaped structured text uses serialized size and retains full metadata without a raw JSON fallback (1.2055ms)
+✔ oversized metadata remains valid and complete and already shortened results do not create repeated replacements (9.748ms)
+✔ mixed structured and plain text preserves JSON, rich block order and explicit omission markers (2.2647ms)
+✔ complete filesystem reads survive the actual employee pruning pipeline and retain original trace evidence (223.0736ms)
+✔ a complete file larger than 192000 context bytes fails before model dispatch and budget reservation (10.5236ms)
+✔ summary admission shares the execution call allowance and rejection preserves source history (148.644ms)
+✔ cancellation during one employee summary leaves sibling state and original history intact (205.2ms)
+✔ a nonshrinking summary is rejected without replacing the source history (144.6344ms)
+✔ unknown model capacity uses pruning without inventing a token window or a summary charge (237.319ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (243.2262ms)
+✔ failed employee setup leaves no published Agent or resident Host (105.0088ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (71.198ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (494.9278ms)
+✔ a queued external tool rechecks a goal pause after capacity is released (188.0773ms)
+✔ execution and summary requests cannot select a model outside the employee approval (98.7829ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (180.4716ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (313.658ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (224.8913ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10361.3473

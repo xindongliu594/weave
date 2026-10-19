@@ -1,0 +1,20 @@
+✔ normal employee state persists each assignment and phase, not unchanged timer ticks (208.447ms)
+✔ approval, model and capacity waits pause progress time without hiding later stalls (3.8399ms)
+✔ coordinator polling and untrusted text do not reset evidence-based progress (0.4708ms)
+✔ identical and alternating read loops stop before another request can be admitted (0.8437ms)
+✔ same error and nonzero command exits are detected, successful changed files reset the window (0.7104ms)
+✔ different handoff format diagnostics share the existing consecutive retry limit (0.6459ms)
+✔ status with no attempt credential does not discard a known assignment; idle is per employee (0.4872ms)
+✔ idle employees wait for an active coordinator response and receive a full idle window afterward (0.5158ms)
+✔ coordinator model waits cannot hide the approved progress timeout or arbitrary polling (0.5124ms)
+✔ a coordinator handling a real tool reply is distinguished from idle polling (0.5281ms)
+✔ transient read retry is bounded and cancellation/mutations never replay (1.4792ms)
+✔ waiting for approval is safe; a started mutation without an outcome requires reconciliation (1.2209ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 367.6921

@@ -1,0 +1,15 @@
+✔ fixture: valid files flow through independent sessions with the same model (4349.9795ms)
+✔ fixture: real output 1798 fails the oracle, preapproved repair produces 4095 (4654.9673ms)
+✔ fixture: failed upstream task keeps all dependents pending (955.9507ms)
+✔ production handoff gate rejects missing output and never dispatches the dependent (930.357ms)
+✔ production input gate stops a changed accepted file before the consumer model request (1381.8995ms)
+✔ fixture oracle rejects a changed input version; this is not a production scheduling gate (19.582ms)
+✔ fixture graph oracle catches cycles, undeclared input edges and concurrent writers (1.2069ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12796.5632

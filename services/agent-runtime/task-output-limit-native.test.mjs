@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
@@ -18,8 +18,10 @@ const route = { id: 'shared', name: 'local-only fixture', wireModel: 'no-network
 
 async function nativeScenario(resume, truncated = false) {
   const root = await mkdtemp(join(tmpdir(), 'task-cap-native-')), originalFetch = globalThis.fetch;
+  // Employee artifacts are separate from Host sessions and the run journal.
+  const workspace=join(root,'artifacts');mkdirSync(workspace);
   const contents = 'local fixed-version reference\n', sha256 = digest(contents);
-  writeFileSync(join(root, 'server.mjs'), contents);
+  writeFileSync(join(workspace, 'server.mjs'), contents);
   const check = { id: 'check', subject: 'Check fixed reference', kind: 'work', assignee: 'qa', assigneeId: 'original-qa',
     dependencies: resume ? ['producer'] : [], objective: 'Read only the approved fixed version', taskPrompt: 'ORIGINAL_TASK_BACKGROUND',
     acceptanceCriteria: ['read the fixed version'], estimatedInputTokens: 6000, estimatedOutputTokens: 9000, maxOutputTokens: 321,
@@ -66,7 +68,7 @@ async function nativeScenario(resume, truncated = false) {
   };
   try {
     host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
-      product: { snapshot, sandbox: { root, async execute() { sandboxCalls++; throw Error('no artifact or command dispatch in this fixture'); } }, gate: new Semaphore(2) } });
+      product: { snapshot, sandbox: { root:workspace, async execute() { sandboxCalls++; throw Error('no artifact or command dispatch in this fixture'); } }, gate: new Semaphore(2) } });
     host.ctx.on('llm/stream', async function* (options, next) {
       const message = options.messages.findLast(item => item.source?.plugin === '@deepseek-ai/dsh-system-prompt' && item.source.form === 'snapshot' &&
         item.source.sections.some(section => section.name === contextName));
@@ -83,7 +85,7 @@ async function nativeScenario(resume, truncated = false) {
     await host.call(captain, 'agent_teams_approve', { confirmation: 'Local isolated output-limit fixture' }); host.lockPlan();
     const deadline = Date.now() + 5000;
     while (Date.now() < deadline && calls < 2) await new Promise(resolve => setTimeout(resolve, 10));
-    assert.equal(calls, 2); assert.equal(receipts.length, 2); assert.equal(wires.length, 2); assert.equal(usage.length, 2);
+    assert.equal(calls, 2,JSON.stringify(readRun(join(root,'runs'),archive.id).events.filter(event=>event.type==='session/turn/end').map(event=>event.data.reason))); assert.equal(receipts.length, 2); assert.equal(wires.length, 2); assert.equal(usage.length, 2);
     assert.deepEqual(wires.map(wire => wire.body.max_tokens), [321, 321]);
     assert.deepEqual(wires.map(wire => wire.taskId), ['check', 'check']);
     for (const current of admitted) {
@@ -118,7 +120,7 @@ async function nativeScenario(resume, truncated = false) {
       assert.equal(adapter.budget.run.reserved, 0, 'historical task holds already occupy global priorSpend and are not deducted twice');
     }
     assert.equal(digest(JSON.stringify(snapshot)), originalHash); assert.equal(sandboxCalls, 0);
-    assert.equal(readFileSync(join(root, 'server.mjs'), 'utf8'), contents);
+    assert.equal(readFileSync(join(workspace, 'server.mjs'), 'utf8'), contents);
     assert.equal(readRun(join(root, 'runs'), archive.id).integrity, 'ok');
   } finally { await host?.close(); globalThis.fetch = originalFetch; await rm(root, { recursive: true, force: true }); }
 }

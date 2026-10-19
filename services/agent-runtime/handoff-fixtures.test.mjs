@@ -36,7 +36,9 @@ async function runScenario(scenario) {
   tasks.find(t => t.id === 'repair').inputs.push({ path: 'lib/money.mjs', producerTaskId: 'library' });
   const snapshot = { mode: 'fixture', title: scenario, tasks, agents: [
     { id: 'manager', role: 'manager', modelId: 'fixture-captain', tools: [] },
-    ...plan.members.map(member => ({ id: member.name, role: 'member', modelId: 'same-fixture-model', tools: ['artifact_write', 'filesystem'] })),
+    ...plan.members.map(member => ({ id: member.name, role: 'member', modelId: 'same-fixture-model', tools: ['artifact_write', 'filesystem',
+      ...(member.name === 'producer' ? ['fixture_private_note'] : member.name === 'checker' ? ['fixture_check_report'] : []),
+    ] })),
   ] };
   const rawArchive = createRunArchive(root, snapshot);
   const archive = { ...rawArchive, append(type, data, links) {
@@ -96,6 +98,10 @@ async function runScenario(scenario) {
         if (match) {
           const [, taskId, task] = match, attemptId = /Attempt id: ([a-f0-9-]+)/.exec(assignment)?.[1];
           assert.ok(attemptId);
+          const granted = task === 'library' || task === 'repair' ? ['fixture_private_note']
+            : task === 'inspect' || task === 'verify' ? ['fixture_check_report'] : [];
+          assert.deepEqual(options.tools.filter(tool => tool.name.startsWith('fixture_')).map(tool => tool.name).sort(), granted,
+            'only this employee\'s approved fixture tools must reach its model request');
           const key = options.sessionId + ':' + attemptId, step = steps.get(key) ?? 0;
           const script = actions(task, taskId, attemptId);
           steps.set(key, step + 1);
@@ -139,8 +145,8 @@ async function runScenario(scenario) {
   try {
     host = await createTeamHost({ adapter: new ScriptedAdapter(), provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
       product: { snapshot, sandbox: files.sandbox, gate: new Semaphore(3) } });
-    captain = await host.captain({ cwd: workspace, model: 'fixture-captain' });
-    // These two tools are mounted only in this test, never in the production runtime.
+    // Register before the first Host freezes the native definitions. These tools
+    // are test-only, with explicit per-employee grants in the approved snapshot.
     host.ctx.tools.register(defineTool({ name: 'fixture_private_note', description: 'Read a session-only fixture marker.', parameters: {},
       output: { schema: { type: 'json' }, render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }] }, async execute(_args, exec) {
       assert.equal(employeeFor(exec.agent, snapshot, captain.id)?.id, 'producer'); return { note: privateNote };
@@ -151,6 +157,7 @@ async function runScenario(scenario) {
       assert.equal(employeeFor(exec.agent, snapshot, captain.id)?.id, 'checker');
       assert.ok(['inspect', 'verify'].includes(args.label)); return files.check(args.label);
     } }));
+    captain = await host.captain({ cwd: workspace, model: 'fixture-captain' });
     host.ctx.on('tools/result', (exec, result) => { toolResults.push({ name: exec.name, args: exec.arguments, sessionId: exec.agent?.id, result }); });
     const created = await stageApprovedTeam(host, captain, { name: 'fixture-' + scenario,
       members: plan.members.map(member => ({ ...member, provider: 'fixture', model: 'same-fixture-model' })),

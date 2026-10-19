@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-hardening-final-20261020",
+  "backup": "/home/jj/.local/share/weiwu/backups/mvp-hardening-final-predeploy-20261020",
+  "modelCalls": 0,
+  "database": "connected",
+  "usageCount": 701,
+  "unknownHolds": 7,
+  "packageSha256": "b37eef34349cbcea68a9c04ca35d561afb0f09ad906fd3427748e0e221c26e68",
+  "overlay": {
+    "scripts/validation/mvp-hardening/verify-stopped-database.mjs": "e7f68a9c32cc5457c72b362047d1ac83fe9fd53bf4fa45a6ed9bb0a3db082580"
+  },
+  "stoppedAudit": {
+    "activeRuns": 0,
+    "activeMessages": 0,
+    "pendingCalls": 0,
+    "activeCapabilities": 0
+  }
+}

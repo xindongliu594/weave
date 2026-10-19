@@ -4,12 +4,15 @@ import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,existsSync,symli
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {createRunArchive,readRun} from './trace-store.mjs';
+import {commitStepCheckpoint,readStepCheckpoint} from './step-checkpoints.mjs';
 const storage=await import('./storage-governance.mjs').catch(error=>{if(error.code==='ERR_MODULE_NOT_FOUND')return {};throw error;});
 function fixture(t){const root=mkdtempSync(join(tmpdir(),'storage-governance-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
  const traceRoot=join(root,'runs'),workspaceRoot=join(root,'workspaces');mkdirSync(workspaceRoot);
  const archive=createRunArchive(traceRoot,{executionTarget:{kind:'local',deviceId:'native'},projectId:'fixture'});
- const work=join(workspaceRoot,archive.id),artifacts=join(archive.dir,'artifacts');mkdirSync(work);mkdirSync(artifacts);writeFileSync(join(work,'code.txt'),'delivered');writeFileSync(join(artifacts,'code.txt'),'delivered');archive.append('run/finished',{status:'completed'});
- return {root,traceRoot,workspaceRoot,archive,work,artifacts,runs:[{id:archive.id,status:'completed',native:true,blocked:false}]};}
+ const work=join(workspaceRoot,archive.id),artifacts=join(archive.dir,'artifacts');mkdirSync(work);mkdirSync(artifacts);writeFileSync(join(work,'code.txt'),'delivered');writeFileSync(join(artifacts,'code.txt'),'delivered');
+ const checkpoint=commitStepCheckpoint({archive,workspace:artifacts,boundary:{taskId:'writer',attemptId:'first',sessionId:'employee',trigger:'cycle-complete',eventCursor:1,contractHash:'a'.repeat(64)}});
+ archive.append('run/finished',{status:'completed'});
+ return {root,traceRoot,workspaceRoot,archive,work,artifacts,checkpoint,runs:[{id:archive.id,status:'completed',native:true,blocked:false}]};}
 test('inventory counts actual regular bytes without following directory links and marks bounded scans incomplete',t=>{
  assert.equal(typeof storage.scanStorage,'function');const f=fixture(t),dir=join(f.root,'inventory');mkdirSync(dir);writeFileSync(join(dir,'a'),'abc');mkdirSync(join(dir,'nested'));writeFileSync(join(dir,'nested','b'),'12345');symlinkSync(f.artifacts,join(dir,'linked'),'junction');
  const result=storage.scanStorage(dir);assert.equal(result.bytes,8);assert.equal(result.files,2);assert.equal(result.links,1);assert.equal(result.complete,true);assert.equal(storage.scanStorage(dir,1).complete,false);
@@ -26,6 +29,7 @@ test('cleaning copies preserves immutable deliverables, checkpoints and a valid 
  assert.equal(typeof storage.removeWorkspaceCopies,'function');const f=fixture(t);const before=readFileSync(join(f.archive.dir,'events.jsonl'));
  const {candidates}=storage.workspaceCopyCandidates(f);const result=storage.removeWorkspaceCopies(f,candidates);assert.equal(result.deleted.length,1);assert.equal(result.bytes,9);assert.equal(existsSync(join(f.work,'code.txt')),false);
  assert.equal(readFileSync(join(f.artifacts,'code.txt'),'utf8'),'delivered');assert.deepEqual(readFileSync(join(f.archive.dir,'events.jsonl')),before);assert.equal(readRun(f.traceRoot,f.archive.id).integrity,'ok');
+ assert.deepEqual(readStepCheckpoint({root:f.traceRoot,runId:f.archive.id,checkpointId:f.checkpoint.id}),f.checkpoint);
  // Prepare/restore can recreate the redundant file from the canonical copy.
  writeFileSync(join(f.work,'code.txt'),readFileSync(join(f.artifacts,'code.txt')));assert.equal(readFileSync(join(f.work,'code.txt'),'utf8'),'delivered');
 });
@@ -65,4 +69,4 @@ test('workspace directory enumeration returns only the bounded UUID scope',t=>{
  assert.equal(typeof storage.workspaceRunIds,'function');const f=fixture(t);for(let n=0;n<6;n++)mkdirSync(join(f.workspaceRoot,`00000000-0000-0000-0000-${String(n).padStart(12,'0')}`));
  const ids=storage.workspaceRunIds(f.workspaceRoot,3);assert.equal(ids.length,3);assert.ok(ids.every(id=>/^[a-f0-9-]{36}$/.test(id)));
 });
-test('verified compressed completed logs still authorize identical workspace copy cleanup',async t=>{const f=fixture(t),journal=await import('./journal-archive.mjs');f.archive.append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});journal.archiveJournal(f.traceRoot,journal.journalArchiveCandidate(f.traceRoot,f.archive.id));assert.equal(storage.workspaceCopyCandidates(f).candidates.length,1);});
+test('verified compressed completed logs still authorize identical workspace copy cleanup',async t=>{const f=fixture(t),journal=await import('./journal-archive.mjs');f.archive.append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});journal.archiveJournal(f.traceRoot,journal.journalArchiveCandidate(f.traceRoot,f.archive.id));assert.equal(storage.workspaceCopyCandidates(f).candidates.length,1);assert.deepEqual(readStepCheckpoint({root:f.traceRoot,runId:f.archive.id,checkpointId:f.checkpoint.id}),f.checkpoint);});

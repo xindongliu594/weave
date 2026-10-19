@@ -122,7 +122,8 @@ export class RuntimeSupervisor {
       rows.push({ ...this.public(item), phase: idle ? coordinatorWorking ? 'waiting_coordinator' : 'idle_unfinished' : item.phase, agentId: task.assignee });
     }
     // Persist transitions rather than flooding the trace with timer ticks.
-    const signature = digest(rows.map(({ lastProgressAt, idleSince, ...row }) => row));
+    // Action-loop normalization erases UUIDs; state transitions must retain assignment identity.
+    const signature = JSON.stringify(rows.map(({ lastProgressAt, idleSince, ...row }) => row));
     if (signature !== this.lastSummary) { this.lastSummary = signature; this.archive?.append('runtime/status', { employees: rows }); }
     this.check(); return rows;
   }

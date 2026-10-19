@@ -43,7 +43,11 @@ export class RunSandbox {
   static async assertReady(signal){
     await command(['image','inspect',SANDBOX_IMAGE],{signal,limit:100000});
   }
-  constructor(id,root){this.name='agent-department-'+id;this.root=root;this.started=false;this.starting=undefined;this.mutex=new Semaphore(1);}
+  constructor(id,root){this.name='agent-department-'+id;this.root=root;this.started=false;this.starting=undefined;this.mutex=new Semaphore(1);
+    // The first before-tool checkpoint precedes lazy container startup. Its
+    // archive mirror is already an empty workspace; no command is run here.
+    mkdirSync(this.root,{recursive:true,mode:0o700});
+  }
   async start(signal){
     if(this.started)return;
     return this.starting??=(async()=>{

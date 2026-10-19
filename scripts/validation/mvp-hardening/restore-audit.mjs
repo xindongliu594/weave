@@ -1,0 +1,24 @@
+// Reuse the already tested full offline restore auditor; no application services.
+import assert from 'node:assert/strict';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
+import {resolve,join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {inventory,content,copyTree,worker,assertClosed} from '../../verify-mvp-full-offline-backup.mjs';
+const release=fileURLToPath(new URL('../../../',import.meta.url));
+const base='/home/jj/.local/share/weiwu',source=base+'/backups/mvp-hardening-predeploy-20261020/data';
+assert.equal(resolve(release),base+'/releases/weiwu-hardening-20261020');
+const restore=join(release,'.data/hardening-isolated-restore'),report=base+'/validation/mvp-hardening-20261020/restore-audit.json';
+assert.ok(!existsSync(restore)&&!existsSync(report),'Never overwrite an earlier restore experiment');
+await mkdir(join(release,'.data'),{recursive:true,mode:0o700});assertClosed(source);
+const original=await inventory(source,true);await copyTree(source,restore);
+assert.deepEqual(content(await inventory(restore,true)),content(original));
+const runId='3657d6bc-24bc-42f3-b261-c8b893618a30';
+const first=await worker(restore,runId),second=await worker(restore,runId);
+assert.deepEqual(second,first,'Business data changed after isolated close/reopen');
+assert.deepEqual(content(await inventory(source,true)),content(original),'Original stopped backup changed');
+const artifacts=await inventory(join(restore,'runs',runId,'artifacts'),true);
+assert.ok(artifacts.rows.some(row=>row.path==='cli.mjs')&&artifacts.rows.some(row=>row.path==='cli.test.mjs'));
+const result={passed:true,restoredAt:new Date().toISOString(),source,restore,modelCalls:0,servicesStarted:false,files:original.rows.length,bytes:original.bytes,credentialContentsReadOrUnsealed:false,opaqueFiles:original.rows.filter(row=>row.opaque).length,originalBackupUnchanged:true,allNonSecretFilesMatch:true,readOnlyReopenedTwice:true,business:first,employeeArtifacts:artifacts.rows.map(({path,bytes,sha256})=>({path,bytes,sha256})),limitations:['Full stopped-directory backup, not online encrypted export.','Employee files restored byte-for-byte; tests not re-executed on the host.','Unknown costs and old operation records preserved; no historical operation dispatched.']};
+await writeFile(report,JSON.stringify(result,null,2),{flag:'wx',mode:0o600});
+console.log(JSON.stringify({passed:true,report,restore,files:result.files,bytes:result.bytes,tables:Object.keys(first.fingerprints).length,usage:first.usage,unknownHolds:first.reservations.length,knowledgeVersions:first.knowledgeVersions.length,employeeFiles:artifacts.rows.length,modelCalls:0}));

@@ -1,0 +1,11 @@
+✔ first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch (671.4375ms)
+✔ cold native restore retains completed attempts, fixed SHA, unknown task holds and the original per-call cap without producer replay (598.9832ms)
+✔ an independently owned employee capped final text records MAX_TOKENS and known fees without a handoff or automatic continuation (443.5624ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2287.9332
