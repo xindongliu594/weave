@@ -1,0 +1,31 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ real malformed handoff reports independent contract errors without correcting or saving the candidate (2642.8991ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3463.5743
+
+✖ failing tests:
+
+test at tests\orchestration-pattern-integration.test.ts:1:8020
+✖ real malformed handoff reports independent contract errors without correcting or saving the candidate (2642.8991ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /clarify: 输出文件需要写入工具权限/. Input:
+
+  '本轮团队方案尚不完整，暂不能保存。待修正字段：tasks.2.handoff：Unrecognized keys: "estimatedInputTokens", "estimatedOutputTokens", "maxOutputTokens", "maxBudget"；已有方案未改变，可以继续讨论修改。'
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\orchestration-pattern-integration.test.ts:86:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '本轮团队方案尚不完整，暂不能保存。待修正字段：tasks.2.handoff：Unrecognized keys: "estimatedInputTokens", "estimatedOutputTokens", "maxOutputTokens", "maxBudget"；已有方案未改变，可以继续讨论修改。',
+    expected: /clarify: 输出文件需要写入工具权限/,
+    operator: 'match',
+    diff: 'simple'
+  }

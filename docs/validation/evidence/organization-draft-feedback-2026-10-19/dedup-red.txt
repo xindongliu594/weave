@@ -1,0 +1,37 @@
+✔ real draft diagnostics reuse independent checks without mutation or acceptance (19.9098ms)
+✔ malformed task, team or target data never enters typed task validation (6.8544ms)
+✔ existing-team failure cannot resolve or invent employees for diagnostics (1.1338ms)
+✔ legacy drafts use the same independent contract checks (2.9805ms)
+✖ multiple file-contract findings are returned individually once (4.3442ms)
+✔ valid real sequential preview has no additional diagnostics (1.3015ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 875.583
+
+✖ failing tests:
+
+test at tests\organization-draft-diagnostics.test.ts:1:3332
+✖ multiple file-contract findings are returned individually once (4.3442ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  2 !== 1
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-draft-diagnostics.test.ts:44:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

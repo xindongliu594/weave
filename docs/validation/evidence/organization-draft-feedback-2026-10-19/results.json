@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "dac13e8",
+  "modelCalls": 0,
+  "productionWrites": 0,
+  "checks": {
+    "unit": 0,
+    "api": 0
+  },
+  "sha256": {
+    "apps/api/src/organization-chat.ts": "92bea1e5e3cbcfc598a5025a1e8fe7fc1fe70c3a67f0bb2b5046d07217e0f090",
+    "apps/api/src/organization-task-planning.ts": "5e92f18806186558ade3866a0b0007c64becfe1d3623918751e24dc7f99213ce",
+    "apps/api/src/organization-draft-diagnostics.ts": "17dec3cd9bbada3d0dd86ed10e110ad4324001715ac3f10a72e68b9375e6f846",
+    "tests/organization-task-planning.test.ts": "1b02b4ea6a8337ce91679e0572c217a061a645f87cfd9d9d48a4e8f79069c8ea",
+    "tests/organization-draft-diagnostics.test.ts": "004e89c16c43bc9457808c6f0c1d9a64ffe15bbf872358bfb6eb5e84d40af314",
+    "tests/orchestration-pattern-integration.test.ts": "e7691f93e4c8da38e8e289c64f53d18cdfa352ec70fbe5177d808b6ea3884c8d"
+  }
+}

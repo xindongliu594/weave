@@ -9,8 +9,8 @@ import { agentReasoningPlanningInstructions, agentSchema, departmentSchema, poli
 import { organizationCandidateSchema, organizationCandidateV2Schema } from '../../../packages/contracts/organization.ts';
 import {loadOrganizationCatalog,resolveOrganizationCandidate,organizationRoutingInstructions,organizationOrchestrationCatalog} from './organization-routing.ts';
 import { departmentTemplates } from '../../../packages/contracts/templates.ts';
-import { taskContractErrors } from '../../../packages/contracts/task-contracts.mjs';
-import { planningBudgetInstructions, planningAcceptanceInstructions, plannedAcceptanceErrors } from './execution-prompt.ts';
+import { planningBudgetInstructions, planningAcceptanceInstructions } from './execution-prompt.ts';
+import {organizationDraftDiagnostics,organizationTaskContractErrors} from './organization-draft-diagnostics.ts';
 import { organizationTaskInstructionsFor } from './organization-task-planning.ts';
 import { snapshotNativeCapabilities } from './native-capabilities.ts';
 import {beginOrganizationTurn,assertOrganizationTurn} from './organization-turns.ts';
@@ -35,7 +35,7 @@ export const organizationChatInputSchema = z.object({
 const responseSchema = z.object({ reply: z.string().trim().min(1).max(6000), candidate: organizationCandidateSchema.optional() });
 type DraftIssue = { code: string; message: string };
 const incompleteReply = '这轮方案还需要进一步整理。你可以继续补充想法，我会接着讨论；当前部门和员工没有发生变更。';
-function issue(code: string, message: string): DraftIssue { return { code, message }; }
+function issue(code: string, message: string): DraftIssue { return { code, message:message.length<=4000?message:message.slice(0,3940)+'；诊断过长，已截断，请先修正上述问题。' }; }
 function userRequirement(messages: { role: string; content: string }[]) {
   const content = messages.filter(item => item.role === 'user').map(item => item.content).join('\n\n');
   return content.length >= 10 ? content : '本次用户需求描述：' + content;
@@ -165,7 +165,8 @@ export function organizationChatRouter() {
         const path = item.path.map(part => typeof part === 'number' ? String(part + 1) : String(part)).join('.');
         return `${path || '方案'}：${item.message}`;
       });
-      return rejectDraft('ORGANIZATION_CHAT_PLAN_INVALID', '本轮团队方案尚不完整，暂不能保存。待修正字段：' + fields.join('；'));
+      const independent=organizationDraftDiagnostics(parsed.candidate,Boolean(input.organizationRouting),policy,catalog);
+      return rejectDraft('ORGANIZATION_CHAT_PLAN_INVALID', '本轮团队方案尚不完整，暂不能保存。待修正字段：' + fields.join('；')+(independent.length?'；交接章节之外还发现：'+independent.join('；'):''));
     }
     let resolved:Awaited<ReturnType<typeof resolveOrganizationCandidate>>|undefined;
     if('schemaVersion' in candidate.data){
@@ -189,11 +190,7 @@ export function organizationChatRouter() {
     if (!policy.allowedTools!.length && tasks.some(task => !['work', 'requirements'].includes(task.kind ?? 'work') || task.inputs?.length || task.outputs?.length || task.verify?.length)) return rejectDraft('ORGANIZATION_SCOPE_DENIED', '尚未授权执行工具，请先生成需求分析或文字规划草案');
     const plan: Plan = resolved?.plan??{ agents: department.agents, rationale, tasks };
     const validation = validatePlan(plan, policy, catalog, false);
-    const contractErrors = [...taskContractErrors(tasks, department.agents), ...plannedAcceptanceErrors(tasks)];
-    for (const task of tasks) {
-      if (task.kind === 'implementation' && !tasks.some(review => review.kind === 'review' && review.reviewedTaskId === task.id && review.assigneeId !== task.assigneeId)) contractErrors.push(`${task.id}: 代码实现必须有另一位员工的独立审查任务`);
-      if (task.kind === 'review' && task.outputs?.length) contractErrors.push(`${task.id}: 独立审查应返回结论，不能在验证后再写文件`);
-    }
+    const contractErrors = organizationTaskContractErrors(tasks, department.agents);
     if (contractErrors.length) { validation.valid = false; validation.errors.push(...contractErrors.filter(error => !validation.errors.includes(error))); validation.checks.push({ label: '员工工具与文件合同', pass: false }); }
     if (!validation.valid) return rejectDraft('ORGANIZATION_CHAT_PLAN_INVALID', '生成草案校验失败：' + validation.errors.join('；'));
     // Only user-authored messages become the project requirement; assistant claims cannot enter it.

@@ -41,6 +41,14 @@ test('office-only planning does not teach the model to label document acceptance
   assert.ok(organizationTaskInstructionsFor(['terminal_test']).includes('node --test'));
 });
 
+test('terminal planning covers writers for every task kind and keeps resource fields out of handoff',()=>{
+ const prompt=organizationTaskInstructionsFor(['filesystem','artifact_write','terminal'],true);
+ assert.match(prompt,/filesystem 仅提供读取能力/);
+ assert.match(prompt,/所有 outputs/);
+ assert.match(prompt,/handoff 只含 sections/);
+ assert.match(prompt,/maxBudget.*任务.*同级/);
+});
+
 test('terminal template previews use contextual rework instructions while existing callers keep zero rework',()=>{
   for(const tool of ['terminal','terminal_test']){
     const legacy=organizationTaskInstructionsFor([tool]);

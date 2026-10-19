@@ -29,8 +29,11 @@ const reviewRepairTaskExample: Plan['tasks'] = [
     handoff:{sections:[{key:'verdict',requirement:'按验收要求给出结论、文件版本和实际测试证据；未验证的明确列出。'}]},estimatedInputTokens:20000,estimatedOutputTokens:1500,maxOutputTokens:4096},
 ];
 
+const outputPermissionInstructions='按每位员工各自授权选择工作：filesystem 仅提供读取能力，不授予写文件权限；所有 outputs（包括 Markdown）都要求该员工有适用写入工具。普通文本/JSON 可使用 artifact_write 或已授权且合同允许写入的 terminal/terminal_test；其他原生工具按已展示元数据所支持的格式工作，不能根据工具名称猜测写入能力。有文档创建工具不代表可以写 JSON。仅预览方案不等于没有工具授权，可以规划 allowedTools 已允许的文件合同，但本轮不执行。能力不足可以选择其他获授权员工或清楚说明缺口，不能凭部门总工具清单扩大个人权限。';
+const handoffShapeInstructions='handoff 只含 sections:[{key,requirement}]；estimatedInputTokens、estimatedOutputTokens、maxOutputTokens、maxBudget、maxModelCalls 都属于任务，与 handoff 同级，不能放入 handoff 内。';
 function taskPlanningInstructions(templatePreview=false){return [
   '生成 candidate 前逐项自检任务合同；这些字段由你规划，不要让用户填写内部字段。只使用 application_constraints 允许的模型、工具、人数和预算。',
+  outputPermissionInstructions,handoffShapeInstructions,
   'implementation/repair：必须显式给出非空 inScope 和 verify，以及 inputs/outputs（无输入用 []）。inScope/outOfScope 只能是工作区相对路径，inScope 覆盖全部 outputs，outOfScope 不得包含 outputs。verify 是实际可执行的精确 shell 命令，不是“运行测试”等说明；执行人必须有 terminal/terminal_test。',
   'repair 还需绑定已知实现/修复的 sourceTaskId 与真实问题编号 sourceFindingIds，并直接依赖 sourceTaskId；不要为新方案虚构返修问题或来源。',
   'verification：独立 QA 可读取开发产物、写自己的测试文件并执行 verify；不能修改开发文件。写入工具权限覆盖 outputs，filesystem 权限覆盖 inputs。产物输入只填 path 与 producerTaskId，来源任务须声明同一路径输出；不要编造 SHA256。',
@@ -47,7 +50,7 @@ export function organizationTaskInstructionsFor(tools:readonly string[],template
  if(tools.some(tool=>['terminal','terminal_test'].includes(tool)))return taskPlanningInstructions(templatePreview);
  return [
   '当前没有终端授权。文字分析、文档制作、独立内容核对及经理验收都使用 kind=work；不要将普通办公验收标成 review（review 专指对 implementation/repair 的代码审查），不要编造 verify 命令。没有文件工具时仅规划文字内容，不承诺写文件。',
-  '按每位员工各自授权选择工作：filesystem 仅提供读取能力，不授予写文件权限；所有 outputs（包括 Markdown）都要求该员工有适用写入工具，普通文本/JSON 使用 artifact_write，文档插件只能按其元数据所支持的格式工作。有文档创建工具不代表可以写 JSON；没有 artifact_write 的员工不能负责 JSON 文件。仅预览方案不等于没有工具授权，可以规划 allowedTools 已允许的文件合同，但本轮不执行。能力不足可以选择其他获授权员工或清楚说明缺口，不能凭部门总工具清单扩大个人权限。',
+  outputPermissionInstructions,handoffShapeInstructions,
   '实际文件任务必须显式声明 outputs:[{path:"相对路径"}]。每个 inputs 的 path 必须与来源任务 outputs 的 path 完全一致，producerTaskId 必须是声明该输出的前置任务 ID；不能写来源员工ID或不存在任务。DOCX 等二进制产物省略 format；JSON 写 format:"json"。',
   '独立核对者读取作者当前产物，填写可核验 acceptanceCriteria，并用 handoff.sections 要求事实、结论和证据。deliveryCriteria 绑定作者任务与其后的检查任务，禁止自检或循环依赖；最终经理结论是检查结果，不额外生成需要检查自身的标准。经理应等必要检查结束，读取所需原产物与QA证据。',
   '例如来源任务 id=produce 的 outputs:[{path:"result.json",format:"json"}]，下游输入必须是 inputs:[{path:"result.json",producerTaskId:"produce"}]、dependencies:["produce"]。例子只说明字段关系，不能照抄为本次方案或已生成交付物。',

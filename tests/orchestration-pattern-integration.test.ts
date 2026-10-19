@@ -73,6 +73,45 @@ test('all seven untouched real failures stay rejected with safe output diagnosti
  const next=await call('/organizations/chat',{organizationRouting:true,modelId:'m',policy:orchestrationPolicy,previousDraftIssue:evidence.cases[0].diagnostic,messages:[{role:'user',content:'继续讨论。'}]});
  assert.equal(next.status,200);assert.equal(next.data.reply,'请补充要求。');assert.deepEqual(await counts(),before);
 });
+test('real malformed handoff reports independent contract errors without correcting or saving the candidate',async()=>{
+ const evidence=JSON.parse(readFileSync(new URL('../docs/validation/evidence/orchestration-smoke-2026-10-19/real/broker-result.json',import.meta.url),'utf8'));
+ const entry=evidence.requests.find((r:any)=>r.id==='bounded-code-review');
+ await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available') ON CONFLICT(id) DO NOTHING",[evidence.model.id,{...evidence.model,gatewayId:'g'}]);
+ const before=(await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n,calls=requests;
+ response=entry.content;
+ const args={organizationRouting:true,modelId:evidence.model.id,policy:{...orchestrationPolicy,maxBudget:.25,maxTaskModelCalls:16,allowedModelIds:[evidence.model.id],allowedTools:['filesystem','artifact_write','terminal']},messages:[{role:'user',content:'离线回放原始失败草案。'}]};
+ const result=await call('/organizations/chat',args);
+ assert.equal(result.status,200);assert.equal(result.data.preview,undefined);
+ assert.match(result.data.draftIssue.message,/handoff/);
+ assert.match(result.data.draftIssue.message,/clarify: 输出文件需要写入工具权限/);
+ assert.match(result.data.draftIssue.message,/develop: 逐项检查必须恰好覆盖每一条验收标准/);
+ assert.match(result.data.draftIssue.message,/verify: Node 测试映射必须填写最低测试数/);
+ assert.ok(!result.data.draftIssue.message.includes('超过剩余预算'),'shared task ceilings are not additive allocations');
+ assert.equal(result.data.outputDiagnostic.originalOutputSHA,createHash('sha256').update(entry.content).digest('hex'));
+ assert.equal((await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n,before);
+ assert.equal(requests,calls+1);
+ response={reply:'请继续讨论。'};
+ await call('/organizations/chat',{...args,previousDraftIssue:result.data.draftIssue});
+ const feedback=wire.messages.find((m:any)=>m.role==='user'&&m.content.startsWith('{"kind":"previous_organization_draft_validation"'));
+ assert.equal(JSON.parse(feedback.content).message,result.data.draftIssue.message);
+ assert.equal(requests,calls+2,'only explicit conversation turns call the local fixture');
+});
+
+test('handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract',async()=>{
+ const before=(await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n,calls=requests;
+ const invalid:any=candidate('pipeline');invalid.tasks[0].handoff.extra=1;
+ let result=await chat(invalid);
+ assert.equal(result.data.preview,undefined);assert.match(result.data.draftIssue.message,/handoff/);
+ assert.ok(!result.data.draftIssue.message.includes('交接章节之外还发现'));
+ for(let i=0;i<20;i++)invalid.tasks[0].handoff['extra_'+i+'x'.repeat(300)]=1;
+ result=await chat(invalid);
+ assert.equal(result.data.preview,undefined);assert.ok(result.data.draftIssue.message.length<=4000);assert.match(result.data.draftIssue.message,/截断/);
+ response={reply:'继续讨论。'};
+ const next=await call('/organizations/chat',{organizationRouting:true,modelId:'m',policy:orchestrationPolicy,previousDraftIssue:result.data.draftIssue,messages:[{role:'user',content:'继续修正。'}]});
+ assert.equal(next.status,200);assert.equal(requests,calls+3);
+ assert.equal((await pool.query('SELECT count(*)::int n FROM organization_previews')).rows[0].n,before);
+});
+
 test('assembled terminal routing request distinguishes template preview rework from legacy zero rework',async()=>{
  const calls=requests,result=await chat(candidate('review_repair'));
  assert.ok(result.data.preview,JSON.stringify(result));assert.equal(requests,calls+1);
