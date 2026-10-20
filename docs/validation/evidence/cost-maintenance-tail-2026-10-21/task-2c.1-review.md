@@ -1,0 +1,38 @@
+# Task 2c.1 independent review
+
+Date: 2026-10-21. Candidate: `def5d27..39a1efa`. Decision: **PASS for the narrow bulk-cost SQL-tail slice**.
+
+Reviewed the supplied diff, task-2c.1 brief, task-2-db-tail-risk addendum, implementation report, source hash manifest, relevant execution logs, and the dedicated native runner/provision metadata in this plan directory. Production/test source inspection was limited to `apps/api/src/cost-control.ts`, `apps/api/src/provider-reconciliation.ts`, `tests/cost.test.ts`, and `tests/cost-maintenance-native.test.ts`. Repository AGENTS.md and the applicable review/minimal-change skill guidance were read. No other plan's private directory was accessed.
+
+## SpecCompliance — PASS
+
+- Public `expireReservations()` no longer accepts an arbitrary query object. `costMaintenanceTransaction` at `cost-control.ts:17` owns one pool client and sequentially awaits BEGIN, shared transaction advisory gate `918275`, the callback's original SQL, and COMMIT. The two original expiry UPDATE statements remain together, with their original predicates and values.
+- Private `expireReservationsInTransaction` at `cost-control.ts:33` is used by `reserveCallAttempt` at line 141 within its existing transaction. That transaction still takes the shared cost gate before project and policy row locks. No additional connection, nested transaction, native-lock acquisition, or alternate unlocked public expiry entry was introduced.
+- `expireProviderQueries` at `provider-reconciliation.ts:157` places the original stale-query UPDATE behind the same owned shared-gate transaction. The service awaits cleanup before its existing selection/lookup loop. Its existing outer error handling remains unchanged; the standalone cleanup/helper propagates failures.
+- The new helper awaits a rollback attempt, rethrows the original error, and discards its owned connection when rollback fails. It neither retries the callback nor infers a database outcome from a local connection error. Connection acquisition failures occur before an owned client exists. Successful completion requires the awaited COMMIT.
+- `receiptTransaction`, shared-before-project ordering, manual cross-receipt billing-scope UPDATE, provider claim-token/CAS logic, query attempts, permissions, budgets, settlement and uncertain-fee handling are unchanged in the candidate. No source-capture authorization, native producer expansion, strict trace/profile/scheduler implementation, new dependency, or model/device action replay was added.
+
+## TaskQuality — PASS
+
+No Critical, Important, or Minor actionable issue was found in the reviewed candidate. The production change is small and reuses the existing database gate without adding a competing lock protocol. The error cleanup is explicit, and the private/public expiry split prevents a caller-supplied query object from impersonating the owned maintenance transaction.
+
+The native test uses separate PostgreSQL control, source and writer connections; its observed blocking relationships are substantive database evidence, rather than SQL-string mocks. Both cleanup paths affect rows from two synthetic projects. The stale-query path is exercised through the real service start/close lifecycle. Trigger placement tests original UPDATE failure and a deferred constraint trigger during actual COMMIT. The max-one pool case reaches `PROBE_EXPIRED` and verifies that both the old probe and reservation writes rolled back, providing a useful check against accidentally opening a second admission connection.
+
+The dedicated runner validates the owned fixture identity and launches with an explicit environment allowlist that excludes ambient DATABASE_URL. The test constructs its URL only after fixture validation and database identity checks. The inspected runtime metadata and logged server identity agree on PostgreSQL 17.10. Private connection credentials were not read for this review.
+
+## Evidence checked
+
+- `task-2c.1-native-green.log`: 9 tests passed, zero failures/skips/cancellations, real EXIT=0. Source PID 43112 is blocked by writer 18220 for expiry and writer 8532 for stale-query. The reverse ordering records writers waiting on shared `918275` with source PID 43112 as blocker before the UPDATEs. Deferred cases identify the original query as COMMIT; error cases identify the original reservation UPDATE. Persisted rows retain amounts and historical evidence.
+- `task-2c.1-native-edge-green.log`: the subsequently strengthened disconnect/reserveCall cases pass 3/3, zero failures/skips/cancellations, EXIT=0. Source PID 9956 waits on writer 22940 or 26992. Expiry preserves `Connection terminated unexpectedly` when rollback also fails and asserts removal of the failed client from the pool. Both disconnect cases resolve to committed persisted rows after SQL barrier acquisition. The service's swallowed error is its unchanged behavior, not evidence that the database rolled back.
+- The disconnected test accepts either committed or rolled-back atomic resolution and reads/logs the resulting rows after the barrier; the retained executions specifically demonstrate committed resolution. No second cleanup/model/device action is issued to discover the outcome. This is deliberately not a claim that socket destruction cancels COMMIT.
+- `task-2c.1-native-red-2.log`: valid native RED, 1 pass and 8 failures, EXIT=1. `task-2c.1-business-red.log`: valid business RED, 1 failed assertion because probe interruption survived the failed reservation UPDATE, EXIT=1.
+- `task-2c.1-native-red.log`: timeout/SIGTERM, EXIT=124, without test evidence; **not RED**. `task-2c.1-native-red-ordinary.log`: fixture jsonb input failure in beforeEach, EXIT=1; **not RED**. Both unsuccessful setup attempts remain preserved separately.
+- `task-2c.1-business-green.log`: cost 12/12 and provider reconciliation 17/17, EXIT=0. PGlite is credited only for business regression, not independent backend concurrency.
+- `task-2c.1-build.log`: tsc --noEmit and Vite completed, EXIT=0; the existing large-chunk advisory is disclosed. The report's whitespace check also has EXIT=0.
+- Independently read live SHA-256 values for all four files; every value matches `task-2c.1-sourceSHA.json`: cost-control `7da3b0aa3777fa742b6c67ef09542dbc770d8fcd54d5f6b013e4e53144728791`; provider-reconciliation `4d02ad64afccf59905f21048c9f64e877926385a947940f70fab9885b39af9b2`; cost test `a42058e5eaaa2784cc823adba08211e516a3eb98bb59c1b4bab87f98c6ddf656`; native test `9f3a80f99e7a644439f735f01e38ac51371328db51c4e2e5af0bcc953b708705`.
+
+## Exclusions and remaining work
+
+This reviewer performed source/evidence inspection and hash checks, not another test or build run. The full native run predates only the documented test-edge strengthening; the affected three cases were then rerun. No need for an additional native probe was identified, and the test slot remains free for the controller's graceful fixture shutdown. No source, Git, dependency, fixture or public-document changes were made by this reviewer; only this private review was written.
+
+This PASS does not complete all of Task 2c or approve source capture. Production source barriers/isolation/revalidation, run/HTTP/device/receipt native lifetime coverage, strict trace registration/synchronous append, later Tasks 3–4, exhaustive process-loss timing, and unrelated coordinator behavior remain outside this review. The native fixture verifies the selected SQL protocol against a minimal synthetic schema; it does not certify the entire application or production state. The existing global advisory gate intentionally makes future exclusive capture wait across projects.

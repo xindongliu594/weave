@@ -1,0 +1,21 @@
+{"fixture":"native-minimal-owned-schema","database":"weiwu_cost_tail_test_6b34551459144b38b25e50dbfe010c99","version":"PostgreSQL 17.10 on x86_64-windows, compiled by msvc-19.44.35226, 64-bit","sourcePid":9956,"schema":"cost_tail_55c2854b0e104906890f47eb72c8bad2"}
+{"case":"source-wait","writerPid":22940,"sourcePid":9956,"locks":[{"pid":9956,"granted":false,"mode":"ExclusiveLock","blockers":[22940]}]}
+{"case":"expiry-disconnect-unknown","writerPid":22940,"sourcePid":9956,"localError":"Connection terminated unexpectedly","resolvedOutcome":"committed","rows":[{"id":"a","project_id":"project-a","status":"uncertain","amount":"0.11","context":{"privateEvidence":"retained","billingQueryClaim":{"token":"old"},"providerReconciliation":{"token":"old","status":"querying","attempts":3,"checkedAt":"2001-01-01T00:00:00.000Z"}},"history":[{"note":"synthetic retained evidence","source":"historical"},{"at":"2026-10-21T04:51:05.698668+08:00","note":"请求租约过期，费用待核对","source":"timeout"}]},{"id":"b","project_id":"project-b","status":"uncertain","amount":"0.23","context":{"privateEvidence":"retained","billingQueryClaim":{"token":"old"},"providerReconciliation":{"token":"old","status":"querying","attempts":3,"checkedAt":"2001-01-01T00:00:00.000Z"}},"history":[{"note":"synthetic retained evidence","source":"historical"},{"at":"2026-10-21T04:51:05.698668+08:00","note":"请求租约过期，费用待核对","source":"timeout"}]}]}
+▶ cost maintenance native PostgreSQL tails
+  ✔ expiry reconciles disconnected COMMIT from persisted state after SQL barrier without replay (163.0156ms)
+{"case":"source-wait","writerPid":26992,"sourcePid":9956,"locks":[{"pid":9956,"granted":false,"mode":"ExclusiveLock","blockers":[26992]}]}
+{"case":"stale-query-disconnect-unknown","writerPid":26992,"sourcePid":9956,"resolvedOutcome":"committed","rows":[{"id":"a","project_id":"project-a","status":"uncertain","amount":"0.11","context":{"privateEvidence":"retained","providerReconciliation":{"token":"old","status":"unresolved","message":"上次账单查询中断；预留仍保留，可在网页重新查询。","attempts":3,"checkedAt":"2026-10-21T04:51:05.811462+08:00"}},"history":[{"note":"synthetic retained evidence","source":"historical"},{"at":"2026-10-21T04:51:05.811462+08:00","note":"中断的账单查询已停止，未释放费用","source":"billing-query","status":"unresolved"}]},{"id":"b","project_id":"project-b","status":"uncertain","amount":"0.23","context":{"privateEvidence":"retained","providerReconciliation":{"token":"old","status":"unresolved","message":"上次账单查询中断；预留仍保留，可在网页重新查询。","attempts":3,"checkedAt":"2026-10-21T04:51:05.811462+08:00"}},"history":[{"note":"synthetic retained evidence","source":"historical"},{"at":"2026-10-21T04:51:05.811462+08:00","note":"中断的账单查询已停止，未释放费用","source":"billing-query","status":"unresolved"}]}]}
+  ✔ stale-query reconciles disconnected COMMIT from persisted state after SQL barrier without replay (104.4748ms)
+  ✔ reserveCall internal expiry remains in its one shared admission transaction and rolls back on rejection (108.0945ms)
+✔ cost maintenance native PostgreSQL tails (2346.6392ms)
+ℹ tests 3
+ℹ suites 1
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2898.7252
+{"nativeTestExit":0,"signal":null,"timedOut":false,"fixtureId":"6b34551459144b38b25e50dbfe010c99","test":"tests/cost-maintenance-native.test.ts","modelCalls":0,"productionAccess":false}
+COMMAND=node .superpowers/sdd/2026-10-21-archive-writer-fence/postgres-runtime/run-cost-tail.mjs --test-name-pattern disconnect|reserveCall
+EXIT=0

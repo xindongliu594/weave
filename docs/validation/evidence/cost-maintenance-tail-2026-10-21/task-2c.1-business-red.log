@@ -1,0 +1,41 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ standalone expiry rolls back probe interruption when its reservation UPDATE fails (3512.3158ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5722.804
+
+✖ failing tests:
+
+test at tests\cost.test.ts:1:21230
+✖ standalone expiry rolls back probe interruption when its reservation UPDATE fails (3512.3158ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   code: 'PROBE_INTERRUPTED',
+  +   finished_at: 2026-10-20T20:48:38.047Z,
+  +   status: 'interrupted'
+  -   code: null,
+  -   finished_at: null,
+  -   status: 'running'
+    }
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost.test.ts:214:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { status: 'interrupted', code: 'PROBE_INTERRUPTED', finished_at: 2026-10-20T20:48:38.047Z },
+    expected: { status: 'running', code: null, finished_at: null },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+COMMAND=node scripts/test-integration.mjs --test-name-pattern=standalone expiry rolls back tests/cost.test.ts
+EXIT=1

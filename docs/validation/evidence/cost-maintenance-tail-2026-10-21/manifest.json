@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-21",
+  "base": "def5d27",
+  "candidate": "39a1efa",
+  "task": "Archive writer Task2c.1: shared SQL gate for bulk cost cleanup",
+  "review": "PASS",
+  "reviewEvidence": "task-2c.1-review.md",
+  "projectModelCalls": 0,
+  "jjProductionChanges": 0,
+  "source": [
+    {
+      "path": "apps/api/src/cost-control.ts",
+      "sha256": "7da3b0aa3777fa742b6c67ef09542dbc770d8fcd54d5f6b013e4e53144728791",
+      "gitLfSha256": "07ba37abfd2afc94ea18255d7167826e10ff41619a23b0e57f70b664f271e250"
+    },
+    {
+      "path": "apps/api/src/provider-reconciliation.ts",
+      "sha256": "4d02ad64afccf59905f21048c9f64e877926385a947940f70fab9885b39af9b2",
+      "gitLfSha256": "4d02ad64afccf59905f21048c9f64e877926385a947940f70fab9885b39af9b2"
+    },
+    {
+      "path": "tests/cost.test.ts",
+      "sha256": "a42058e5eaaa2784cc823adba08211e516a3eb98bb59c1b4bab87f98c6ddf656",
+      "gitLfSha256": "2312110fd3366c15893e54bf8c1b44572e54ef71a9074d1f0a831d87cacb7a56"
+    },
+    {
+      "path": "tests/cost-maintenance-native.test.ts",
+      "sha256": "9f3a80f99e7a644439f735f01e38ac51371328db51c4e2e5af0bcc953b708705",
+      "gitLfSha256": "9f3a80f99e7a644439f735f01e38ac51371328db51c4e2e5af0bcc953b708705"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "native-cleanup-before-stop.json",
+      "bytes": 180,
+      "sha256": "395fff4fe8c473234026a7620f6354ff7331e00db8f3fd54f89e5682fe4b978b"
+    },
+    {
+      "path": "native-cleanup-result.json",
+      "bytes": 295,
+      "sha256": "3c74fe89a815331b20a3fe5ec846151a48a3201518df385a8740f23b8cdb8bf3"
+    },
+    {
+      "path": "native-fixture.mjs",
+      "bytes": 6638,
+      "sha256": "f12d06d03fa1fa5714d46bde1098778c04b24433efa5a3d4da545803e74de9c6"
+    },
+    {
+      "path": "native-initdb.txt",
+      "bytes": 1351,
+      "sha256": "d08546aa182c4ebea66dfedb55ee7f0b836230870ab1a5ff2bb67734857379a8"
+    },
+    {
+      "path": "native-package-lock.json",
+      "bytes": 11385,
+      "sha256": "46cad39813439bb1c8bbf93b8a5de40cfe1934be2cba805730229397ff53141f"
+    },
+    {
+      "path": "native-package.json",
+      "bytes": 245,
+      "sha256": "cb5a1016f6a42dfe9169cb57840df10c7cbbc3c6fa0f9300862a9819c12d50fc"
+    },
+    {
+      "path": "native-provision.json",
+      "bytes": 769,
+      "sha256": "d209e29420e05f70bc9b2c33e6d156ab64d95bef52acb202acc2f052da24a41b"
+    },
+    {
+      "path": "native-ready.json",
+      "bytes": 812,
+      "sha256": "0b0132b72d0358fe6e067a17e473b4b8f56c14a7943b9e057f308b64c025447e"
+    },
+    {
+      "path": "native-run-cost-tail.mjs",
+      "bytes": 2420,
+      "sha256": "a9b697202089065fc7c4effc9959383aec91d74f9d1e72c984f6f4491bacfe76"
+    },
+    {
+      "path": "native-start.txt",
+      "bytes": 62,
+      "sha256": "60b6ae0c95e855376610163e352fa79b29f440af5b024419c3154888e1bdec3f"
+    },
+    {
+      "path": "native-stop.txt",
+      "bytes": 66,
+      "sha256": "de7c5c7ffb762d32556258dbac2d22b5d2087c7ec84bdc57722c31aef91f7bdf"
+    },
+    {
+      "path": "task-2c.1-build.log",
+      "bytes": 824,
+      "sha256": "adca1a02b53b96660d55d56ac3f90ffd6f4bab9b41887485018d810610ac437e"
+    },
+    {
+      "path": "task-2c.1-business-green.log",
+      "bytes": 3974,
+      "sha256": "c7eec14ff9804347f9efb3a7202eabc8e2bdf5fbd4ac45a7b2eaaac6043b8b13"
+    },
+    {
+      "path": "task-2c.1-business-red.log",
+      "bytes": 1687,
+      "sha256": "e323a49e44e0c35833251784d50e4ca7e2c44dc61d8bdfb5837cfefb3fc41d7d"
+    },
+    {
+      "path": "task-2c.1-diffcheck.log",
+      "bytes": 124,
+      "sha256": "f12ed0e63cbd61072cfb5ac03d55930181d89177ec241aad13ff3e0d7b481532"
+    },
+    {
+      "path": "task-2c.1-native-edge-green.log",
+      "bytes": 3711,
+      "sha256": "fc25f1c76dd6bd3b580e14d39c89e11cd9f1f7b171d5136db8320dc4e858bbf4"
+    },
+    {
+      "path": "task-2c.1-native-green.log",
+      "bytes": 9697,
+      "sha256": "fabdaf926b250b856a891c0bc5ae7c81adf2dee137a80ac894bfd1329ad85423"
+    },
+    {
+      "path": "task-2c.1-native-red-2.log",
+      "bytes": 10099,
+      "sha256": "69493e6e8e7514c1e6099872c545dbdf68ddc15a5ac2ed22848b456198197779"
+    },
+    {
+      "path": "task-2c.1-native-red-ordinary.log",
+      "bytes": 14081,
+      "sha256": "28fff8369c7b133664ad800f07b3e47302519e355926a918201bfdf6734606cb"
+    },
+    {
+      "path": "task-2c.1-native-red.log",
+      "bytes": 301,
+      "sha256": "027cda8be099e955eaca011bdcf5cbb31eda1a391ad287404941311b0317d296"
+    },
+    {
+      "path": "task-2c.1-report.md",
+      "bytes": 10065,
+      "sha256": "9f16b49915800966511a03a15906a31fdc8dc768374e085febd2a6a47c8ffb18"
+    },
+    {
+      "path": "task-2c.1-review.md",
+      "bytes": 7629,
+      "sha256": "c78ab87feb492d71e2becd795b176cf3f52d7acf4391bbae30ab9b777bba2577"
+    },
+    {
+      "path": "task-2c.1-sourceSHA.json",
+      "bytes": 567,
+      "sha256": "e0f2a0f1438ad4dc6b6ee38276b43db4f02230204e3a424a8304339b0d6df5fe"
+    }
+  ],
+  "results": {
+    "native": {
+      "pass": 9,
+      "fail": 0,
+      "skip": 0,
+      "exit": 0
+    },
+    "strengthenedNativeSubset": {
+      "pass": 3,
+      "skip": 0,
+      "exit": 0,
+      "note": "Three affected cases from the same nine; not additional unique coverage."
+    },
+    "business": {
+      "cost": 12,
+      "provider": 17,
+      "exit": 0,
+      "kind": "PGlite test doubles"
+    },
+    "validNativeRed": {
+      "pass": 1,
+      "fail": 8,
+      "exit": 1
+    },
+    "businessRed": {
+      "pass": 0,
+      "fail": 1,
+      "exit": 1
+    },
+    "nonRedAttempts": [
+      {
+        "exit": 124,
+        "reason": "restricted runner no-TAP timeout"
+      },
+      {
+        "exit": 1,
+        "reason": "fixture JSON array encoding"
+      }
+    ],
+    "buildExit": 0,
+    "typecheckExit": 0,
+    "diffCheckExit": 0
+  },
+  "fixture": {
+    "id": "6b34551459144b38b25e50dbfe010c99",
+    "postgresVersion": "17.10",
+    "loopbackOnly": true,
+    "installScriptsExecuted": false,
+    "productDependenciesChanged": false,
+    "systemService": false,
+    "remainingTestSchemas": 0,
+    "remainingTestBackends": 0,
+    "remainingTestDirectories": 0,
+    "stopExit": 0,
+    "cleanupExit": 0,
+    "dataRemoved": true,
+    "credentialConfigRemoved": true,
+    "removedDataBytes": 49794239,
+    "binaryCache": "retained only in current plan private runtime"
+  },
+  "exclusions": [
+    "Source-capture and child initialization still closed; this is bulk SQL coverage only.",
+    "No native guard or strict trace enrollment of remaining writers.",
+    "No JJ deployment, real model/device/project acceptance.",
+    "No proof of every possible database/process failure timing.",
+    "The live SQL ledger is not silently added to sourceHistoryDigest.",
+    "Existing Vite >500kB chunk advisory remains."
+  ]
+}

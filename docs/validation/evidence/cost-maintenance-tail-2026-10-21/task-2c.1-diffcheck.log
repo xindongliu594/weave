@@ -1,0 +1,2 @@
+COMMAND=git diff --check -- apps/api/src/cost-control.ts apps/api/src/provider-reconciliation.ts tests/cost.test.ts
+EXIT=0

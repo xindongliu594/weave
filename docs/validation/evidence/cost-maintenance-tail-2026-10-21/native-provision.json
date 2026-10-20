@@ -1,0 +1,22 @@
+{
+  "runtimeVersion": "17.10.0-beta.17",
+  "platformVersion": "17.10.0-beta.17",
+  "platformIntegrity": "sha512-q6xIETTkv67i1QlTWz1LAKb3Z+vG2V3qrp+BjLEWhCQ9jE4hbbsQ/J/3wiOPFLJbuwak7CfHC9EUJG7txAbGKw==",
+  "installScriptsExecuted": false,
+  "symlinkEntries": 0,
+  "binaries": {
+    "postgres": {
+      "version": "postgres (PostgreSQL) 17.10",
+      "sha256": "db14ddb0efc10b72b57dc29dbce5a719e2755dcd0ae54297d0ea4bbfc75f79a0"
+    },
+    "pg_ctl": {
+      "version": "pg_ctl (PostgreSQL) 17.10",
+      "sha256": "9e1c3375f47116eef8d04c1f67cc79f03c7c3cca99172511c4464cb9c6b8116f"
+    },
+    "initdb": {
+      "version": "initdb (PostgreSQL) 17.10",
+      "sha256": "f775e03d6dc6c67f115d7e688c6933573fff7ac7285f6b1f5809354223cfb9e1"
+    }
+  },
+  "clusterStarted": false
+}

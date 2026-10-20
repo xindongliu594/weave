@@ -1,0 +1,10 @@
+{
+  "fixtureId": "6b34551459144b38b25e50dbfe010c99",
+  "gracefulStopConfirmed": true,
+  "dataRemoved": true,
+  "testCredentialConfigRemoved": true,
+  "removedDataBytes": 49794239.0,
+  "evidenceRetained": true,
+  "binaryCacheRetainedForCurrentPlan": true,
+  "productionAccess": false
+}

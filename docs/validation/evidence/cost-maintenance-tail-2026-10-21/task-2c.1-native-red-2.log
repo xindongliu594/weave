@@ -1,0 +1,177 @@
+{"fixture":"native-minimal-owned-schema","database":"weiwu_cost_tail_test_6b34551459144b38b25e50dbfe010c99","version":"PostgreSQL 17.10 on x86_64-windows, compiled by msvc-19.44.35226, 64-bit","sourcePid":5116,"schema":"cost_tail_671c5488c53e4e18945ee4e9eea49ce0"}
+▶ cost maintenance native PostgreSQL tails
+  ✖ expiry cannot mutate across projects while source owns exclusive gate (120.9437ms)
+  ✖ expiry keeps shared gate through original commit across projects (88.0415ms)
+  ✖ expiry keeps shared gate through original rollback across projects (62.738ms)
+  ✖ expiry reconciles disconnected COMMIT from persisted state after SQL barrier without replay (105.9934ms)
+  ✖ stale-query cannot mutate across projects while source owns exclusive gate (44.2435ms)
+  ✖ stale-query keeps shared gate through original commit across projects (47.4295ms)
+  ✖ stale-query keeps shared gate through original rollback across projects (60.2635ms)
+  ✖ stale-query reconciles disconnected COMMIT from persisted state after SQL barrier without replay (110.0248ms)
+  ✔ reserveCall internal expiry remains in its one shared admission transaction and rolls back on rejection (37.8829ms)
+✖ cost maintenance native PostgreSQL tails (2563.819ms)
+ℹ tests 9
+ℹ suites 1
+ℹ pass 1
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3088.6915
+
+✖ failing tests:
+
+test at tests\cost-maintenance-native.test.ts:8:2662
+✖ expiry cannot mutate across projects while source owns exclusive gate (120.9437ms)
+  AssertionError [ERR_ASSERTION]: cleanup must wait for source before the original UPDATE
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:96:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1619:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:3862
+✖ expiry keeps shared gate through original commit across projects (88.0415ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:108:84)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:3862
+✖ expiry keeps shared gate through original rollback across projects (62.738ms)
+  AssertionError [ERR_ASSERTION]: exclusive source gate must wait for the original writer transaction
+  
+  true !== false
+  
+      at assertSourceWaiting (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:35:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:110:6)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:5853
+✖ expiry reconciles disconnected COMMIT from persisted state after SQL barrier without replay (105.9934ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + "UPDATE model_reservations SET status='uncertain',history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','timeout','note','请求租约过期，费用待核对')) WHERE status='pending' AND expires_at<now()"
+  - 'COMMIT'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:134:47)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "UPDATE model_reservations SET status='uncertain',history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','timeout','note','请求租约过期，费用待核对')) WHERE status='pending' AND expires_at<now()",
+    expected: 'COMMIT',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:2662
+✖ stale-query cannot mutate across projects while source owns exclusive gate (44.2435ms)
+  AssertionError [ERR_ASSERTION]: cleanup must wait for source before the original UPDATE
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:96:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:3862
+✖ stale-query keeps shared gate through original commit across projects (47.4295ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:108:84)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:3862
+✖ stale-query keeps shared gate through original rollback across projects (60.2635ms)
+  AssertionError [ERR_ASSERTION]: exclusive source gate must wait for the original writer transaction
+  
+  true !== false
+  
+      at assertSourceWaiting (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:35:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:110:6)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\cost-maintenance-native.test.ts:8:5853
+✖ stale-query reconciles disconnected COMMIT from persisted state after SQL barrier without replay (110.0248ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + "UPDATE model_reservations SET context=jsonb_set(context-'billingQueryClaim','{providerReconciliation}',(context->'providerReconciliation')||jsonb_build_object('status','unresolved','message','上次账单查询中断；预留仍保留，可在网页重新查询。','checkedAt',now())),history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','billing-query','status','unresolved','note','中断的账单查询已停止，未释放费用')) WHERE status='uncertain' AND context->'providerReconciliation'->>'status'='querying' AND (context->'providerReconciliation'->>'checkedAt')::timestamptz<now()-interval '30 seconds'"
+  - 'COMMIT'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-maintenance-native.test.ts:134:47)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "UPDATE model_reservations SET context=jsonb_set(context-'billingQueryClaim','{providerReconciliation}',(context->'providerReconciliation')||jsonb_build_object('status','unresolved','message','上次账单查询中断；预留仍保留，可在网页重新查询。','checkedAt',now())),history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','billing-query','status','unresolved','note','中断的账单查询已停止，未释放费用')) WHERE status='uncertain' AND context->'providerReconciliation'->>'status'='querying' AND (context->'providerReconciliation'->>'checkedAt')::timestamptz<now()-interval '30 seconds'",
+    expected: 'COMMIT',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+{"nativeTestExit":1,"signal":null,"timedOut":false,"fixtureId":"6b34551459144b38b25e50dbfe010c99","test":"tests/cost-maintenance-native.test.ts","modelCalls":0,"productionAccess":false}
+COMMAND=node .superpowers/sdd/2026-10-21-archive-writer-fence/postgres-runtime/run-cost-tail.mjs
+EXIT=1

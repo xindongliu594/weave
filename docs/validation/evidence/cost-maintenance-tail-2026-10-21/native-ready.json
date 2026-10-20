@@ -1,0 +1,16 @@
+{
+  "id": "6b34551459144b38b25e50dbfe010c99",
+  "host": "127.0.0.1",
+  "port": 54268,
+  "database": "weiwu_cost_tail_test_6b34551459144b38b25e50dbfe010c99",
+  "role": "weiwu_cost_tail_test",
+  "dataDir": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.superpowers\\sdd\\2026-10-21-archive-writer-fence\\postgres-runtime\\clusters\\6b34551459144b38b25e50dbfe010c99\\data",
+  "version": "17.10",
+  "data_dir": "C:/Users/JJ/.codex/worktrees/f57c/agent_department/.superpowers/sdd/2026-10-21-archive-writer-fence/postgres-runtime/clusters/6b34551459144b38b25e50dbfe010c99/data",
+  "listen_addresses": "127.0.0.1",
+  "started_at": "2026-10-20T20:41:50.923Z",
+  "fixtureKind": "weiwu-cost-tail-private-fixture-v1",
+  "installScriptsExecuted": false,
+  "systemService": false,
+  "productionAccess": false
+}

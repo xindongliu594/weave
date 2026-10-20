@@ -51,4 +51,6 @@ PGlite 的单后端不能证明独立 PostgreSQL 事务锁和连接断开后的�
 
 检查固定版本代码后发现，其 Windows `stop()` 使用 `taskkill /f /t`。隔离夹具改用该原生包提供的官方 [initdb](https://www.postgresql.org/docs/17/app-initdb.html) 和 [pg_ctl](https://www.postgresql.org/docs/17/app-pg-ctl.html)：明确数据目录、回环地址、随机端口、生成的测试密码，后台子进程隐藏窗口，等待启动与 `fast` 正常关闭完成。无需自行实现服务管理器，也不使用 wrapper 的强制终止及自动递归删除。停止成功并核对专属路径后才清理；失败保留证据，不删除仍可能被进程使用的目录。
 
-本段记录调研和选择，尚未证明原生测试通过。Task 2c.1 仍需实际双 backend 的等待关系、原 UPDATE/COMMIT 尾部和连接断开验证；工具能启动也不等于数据库写入合同已通过。
+随后 Task 2c.1 已完成独立 backend 等待、原 UPDATE/COMMIT 尾部和连接断开验证：原生 9/9、受影响三例加强断言 3/3、独立审查 PASS，详见[数据库尾部验收](../validation/cost-maintenance-tail-2026-10-21.md)。工具安装、版本探测与业务测试分开记录，未把能启动当作合同已通过。集群和测试凭据已清理，仅保留小型证据及本计划的二进制缓存。
+
+接续代码审查进一步缩小了需要自有接线的范围：纯 SQL 费用清扫复用现有 shared/exclusive `918275` 事务门禁即可，不必为每条受影响运行另建 native 锁；来源读取必须持有 SQL 门禁直到发布，初始化重新核对实时费用。跨事务且涉及档案、工具或外部结果的工作仍需原运行作用域。完整条件已补入[接入计划](../superpowers/plans/2026-10-21-archive-writer-fence.md)，这是一项有条件的设计精简，不代表来源签发已经可用。
