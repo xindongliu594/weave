@@ -31,6 +31,10 @@ export function assertPlanningModel(id:string,policy:Policy){
 }
 export async function assertRunAuthorization(row:any,db:Pick<pg.PoolClient,'query'>=pool,{requireLocalOnline=true}:{requireLocalOnline?:boolean}={}){
  assertExecutionProfile(row.snapshot);
+ return assertCurrentRunPermissions(row,db,{requireLocalOnline});
+}
+/** Current permissions only. Launching/executing still requires assertRunAuthorization's profile gate. */
+export async function assertCurrentRunPermissions(row:any,db:Pick<pg.PoolClient,'query'>=pool,{requireLocalOnline=true}:{requireLocalOnline?:boolean}={}){
  const project=(await db.query('SELECT version,department_id FROM projects WHERE id=$1',[row.project_id])).rows[0];
  if(!project||project.version!==row.project_version)throw new AppError(409,'项目已有新方案，请批准当前版本，不能恢复旧版本','RUN_REAPPROVAL_REQUIRED');
  if(!Array.isArray(row.snapshot.agents)||!row.snapshot.agents.length)throw new AppError(422,'运行快照缺少员工授权，请重新批准','RUN_REAPPROVAL_REQUIRED');

@@ -6,10 +6,15 @@ import { validArtifactPath } from './sandbox.mjs';
 import { assertArchiveCapacity, archiveStorageUsage, RUN_ARCHIVE_LIMIT_BYTES } from './archive-storage.mjs';
 import { unresolvedOperations } from './recovery.mjs';
 import { canonicalManifest } from '../../apps/desktop/local-executor.cjs';
+import {assertArchivePlain,storeArchiveObjects,readArchiveObject} from './archive-objects.mjs';
 
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const sha=/^[a-f0-9]{64}$/;
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+function assertPlain(path,kind){
+  try{return assertArchivePlain(path,kind);}
+  catch(error){if(error.code==='ARCHIVE_PATH_UNSAFE')throw Error('CHECKPOINT_PATH_UNSAFE');throw error;}
+}
 export const checkpointDigest=value=>hash(JSON.stringify(value));
 export function checkpointContract(snapshot,task) {
   const {maxBudget,maxModelCalls,maxOutputTokens,estimatedInputTokens,estimatedOutputTokens,...contract}=task;
@@ -21,11 +26,6 @@ export function checkpointEnvironment(snapshot,proof) {
   if(expected?.kind!=='openshell'||!proof||Object.entries(expected).some(([key,value])=>proof[key]!==value)||
       !/@sha256:[a-f0-9]{64}$/.test(proof.image??'')||!proof.node||!proof.effectivePolicyHash||proof.uid!==1000||proof.gid!==1000)return null;
   return checkpointDigest({backend:expected,node:proof.node,policy:proof.effectivePolicyHash,uid:proof.uid,gid:proof.gid,cpu:proof.cpu,memory:proof.memory});
-}
-function assertPlain(path,kind) {
-  const stat=lstatSync(path);
-  if(stat.isSymbolicLink() || (kind==='directory'?!stat.isDirectory():!stat.isFile()) || (stat.isFile()&&stat.nlink>1))throw Error('CHECKPOINT_PATH_UNSAFE');
-  return stat;
 }
 export function checkpointLineage(root,source) {
   const runs=new Map();let run=source;
@@ -67,17 +67,6 @@ export function checkpointFiles(workspace) {
   visit(workspace);return files.sort((a,b)=>a.path.localeCompare(b.path));
 }
 const manifest=files=>files.map(({path,size,sha256})=>({path,size,sha256}));
-function storeObject(dir,file) {
-  const target=join(dir,file.sha256);
-  if(existsSync(target)) {
-    assertPlain(target,'file');
-    if(hash(readFileSync(target))!==file.sha256)throw Error('CHECKPOINT_CONTENT_CORRUPT');
-    return;
-  }
-  const fd=openSync(target,'wx',0o600);
-  try {let offset=0;while(offset<file.content.length)offset+=writeSync(fd,file.content,offset,file.content.length-offset);fsyncSync(fd);}
-  finally{closeSync(fd);}
-}
 /** Caller holds the workspace write fence. The journal commit is published last. */
 export function commitStepCheckpoint({archive,workspace,boundary,receipts=[]}) {
   if(!uuid.test(archive?.id)||!boundary?.taskId||!boundary.attemptId||!boundary.sessionId||!sha.test(boundary.contractHash??'')||
@@ -89,7 +78,12 @@ export function commitStepCheckpoint({archive,workspace,boundary,receipts=[]}) {
   const metadata=redact({id:randomUUID(),version:1,runId:archive.id,boundary,files:manifest(files),receipts});
   const bytes=Buffer.byteLength(JSON.stringify(metadata));
   if(bytes>512*1024||archiveStorageUsage(archive.dir).bytes+fresh.reduce((sum,file)=>sum+file.size,0)+bytes+1024>RUN_ARCHIVE_LIMIT_BYTES)throw Error('CHECKPOINT_STORAGE_LIMIT');
-  for(const file of files)storeObject(objects,file);
+  try{storeArchiveObjects(archive.dir,files);}
+  catch(error){
+    if(error.code==='ARCHIVE_PATH_UNSAFE')throw Error('CHECKPOINT_PATH_UNSAFE');
+    if(error.code==='ARCHIVE_OBJECT_INVALID')throw Error('CHECKPOINT_CONTENT_CORRUPT');
+    throw error;
+  }
   if(checkpointDigest(manifest(checkpointFiles(workspace)))!==checkpointDigest(metadata.files))throw Error('CHECKPOINT_WORKSPACE_CHANGED');
   const record={...metadata,sha256:checkpointDigest(metadata)};
   const event=archive.append('step/checkpoint',record,{taskId:boundary.taskId,attemptId:boundary.attemptId,sessionId:boundary.sessionId});
@@ -125,7 +119,7 @@ function validateCheckpointEvent(root,runId,event,checkedObjects=new Set()) {
     if(seen.has(file.path)||!sha.test(file.sha256)||!Number.isSafeInteger(file.size)||file.size<0||file.size>5*1024*1024||(size+=file.size)>20*1024*1024)throw Error('CHECKPOINT_MANIFEST_INVALID');
     seen.add(file.path);const path=join(objects,file.sha256),key=file.sha256+':'+file.size;
     if(checkedObjects.has(key))continue;
-    try {if(assertPlain(path,'file').size!==file.size||hash(readFileSync(path))!==file.sha256)throw Error('mismatch');}
+    try {readArchiveObject(objects,file);}
     catch {throw Error('CHECKPOINT_CONTENT_INVALID: '+file.path);}
     checkedObjects.add(key);
   }

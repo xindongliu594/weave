@@ -36,6 +36,7 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS parent_run_id text;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS cancel_requested boolean NOT NULL DEFAULT false;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS department_ids text[] NOT NULL DEFAULT '{}';
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS canonical_workspace jsonb;
     UPDATE project_runs SET department_ids=ARRAY[snapshot->>'departmentId'] WHERE department_ids='{}' AND snapshot ? 'departmentId';
     CREATE INDEX IF NOT EXISTS project_runs_departments ON project_runs USING gin(department_ids);
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS run_id text;
@@ -75,6 +76,9 @@ export async function migrateProduct(pool: pg.Pool) {
       created_at timestamptz NOT NULL DEFAULT now(), finished_at timestamptz
     );
     CREATE INDEX IF NOT EXISTS local_operations_device ON local_operations(device_id,status,created_at);
+    ALTER TABLE local_operations ADD COLUMN IF NOT EXISTS merge_state text CHECK(merge_state IN ('pending','committed','rejected','unknown'));
+    ALTER TABLE local_operations ADD COLUMN IF NOT EXISTS merge_record jsonb;
+    ALTER TABLE local_operations ADD COLUMN IF NOT EXISTS merge_rejection jsonb;
     ALTER TABLE local_devices ADD COLUMN IF NOT EXISTS backend jsonb NOT NULL DEFAULT '{"kind":"native"}'::jsonb;
     CREATE TABLE IF NOT EXISTS task_attempt_workspaces (
       run_id text NOT NULL REFERENCES project_runs(id),task_id text NOT NULL,attempt_id text NOT NULL,generation integer NOT NULL CHECK(generation>0),

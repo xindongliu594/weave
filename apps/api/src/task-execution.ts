@@ -118,6 +118,6 @@ export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:Trust
  const workspace=createTaskWorkspace({binding:{projectId:run.project_id,planVersion:run.project_version,runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,assigneeId:assignment.agentId,generation:assignment.generation,contractHash:assignment.contractHash,permissionHash:hashes.permissionHash,backend:{kind:'openshell',version:backend.version,image:backend.image,policyHash:backend.policySha256}},readPaths:[...expected.keys()],writePaths,canonicalFiles:canonical.files,origins:[...origins.values()]});
  if(workspace.baseCanonicalRevision!==canonical.revision)denied('可信工作版本与完整 manifest 不符');
  const scope:TaskExecutionScope={profile:'task-attempt-openshell-v1',key,workspace,workRevision:canonical.revision,capabilityHash:hashes.capabilityHash,inputOrigins:inputs};
- await db.query('UPDATE task_attempt_workspaces SET scope=$1,input_origins=$2,work_revision=$3 WHERE run_id=$4 AND task_id=$5 AND attempt_id=$6 AND generation=$7',[scope,inputs,canonical.revision,run.id,assignment.taskId,assignment.attemptId,assignment.generation]);
+ await db.query('UPDATE task_attempt_workspaces SET scope=$1,input_origins=$2::jsonb,work_revision=$3 WHERE run_id=$4 AND task_id=$5 AND attempt_id=$6 AND generation=$7',[scope,JSON.stringify(inputs),canonical.revision,run.id,assignment.taskId,assignment.attemptId,assignment.generation]);
  return scope;
 }

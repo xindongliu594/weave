@@ -9,7 +9,8 @@ import type pg from 'pg';
 import {pool} from './db.ts';
 import {AppError} from './provider.ts';
 import {shareCostMaintenance} from './cost-control.ts';
-import {assertRunAuthorization,assertExecutionProfile} from './execution-policy.ts';
+import {assertRunAuthorization,assertCurrentRunPermissions,assertExecutionProfile} from './execution-policy.ts';
+import {initializeTaskCanonical,readCommittedCanonical,commitTaskResult,validateTaskOperationResult} from './task-canonical.ts';
 import {bindTrustedAttempt,resolveTaskScope} from './task-execution.ts';
 import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope} from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
@@ -17,7 +18,7 @@ import {openRunArchive,readRun} from '../../../services/agent-runtime/trace-stor
 import {executionBackendSchema} from '../../../packages/contracts/index.ts';
 import {executionBackend,assertExecutionBackendBinding,assertExecutionBackendReceipt} from './execution-backend.ts';
 import {nativeToolBinding,nativeFileAccess} from '../../../services/agent-runtime/native-capabilities.mjs';
-const {decodeFiles,exportFiles,mirrorFiles,revision}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
+const {decodeFiles,exportFiles,mirrorFiles,revision,manifest}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
 const {checkpointTestInvocation}=createRequire(import.meta.url)('../../desktop/checkpoint-test-profile.cjs');
 const digest=(value:string)=>createHash('sha256').update(value).digest();
 function validateResult(row:any,result:any){
@@ -66,12 +67,20 @@ async function operationTransaction<T>(id:string,fn:(db:pg.PoolClient,row:any,ru
   const value=await fn(db,row,run,device);await db.query('COMMIT');return value;
  }catch(error){await db.query('ROLLBACK');throw error;}finally{db.release();}
 }
-async function executable(db:pg.PoolClient,row:any,run:any,device:any){
+async function executable(db:pg.PoolClient,row:any,run:any,device:any,receiptOnly=false){
  if(!device?.enabled||row.grant_id!==device.grant_id||run.status!=='running'||run.cancel_requested||run.lease_owner!==row.lease_owner||!(await db.query('SELECT id FROM project_runs WHERE id=$1 AND lease_until>clock_timestamp()',[run.id])).rowCount||!(await db.query('SELECT id FROM local_operations WHERE id=$1 AND deadline>clock_timestamp()',[row.id])).rowCount)return false;
  // A started operation can return its authenticated receipt while polling is
  // delayed. Heartbeat freshness is admission evidence, not grant withdrawal;
  // the device, run, lease, deadline and full authorization checks still apply.
- await assertRunAuthorization(run,db,{requireLocalOnline:row.started!==true});return true;
+ if(receiptOnly&&run.snapshot.executionProfile==='task-attempt-openshell-v1'){
+  try{await assertCurrentRunPermissions(run,db,{requireLocalOnline:row.started!==true});}
+  catch(error){
+   // An authenticated result is still evidence after authority is withdrawn.
+   // Keep it in late_result; do not turn it into permission to merge or retry.
+   if(error instanceof AppError&&error.status>=400&&error.status<500)return false;
+   throw error;
+  }
+ }else await assertRunAuthorization(run,db,{requireLocalOnline:row.started!==true});return true;
 }
 export class LocalOperationService {
  constructor(public traceRoot:string,public owner:string){}
@@ -126,7 +135,7 @@ export class LocalOperationService {
    while(true){
     signal?.throwIfAborted();
     const state=await operationTransaction(id,async(db,row,run,device)=>{
-     if(row.status==='completed')return await executable(db,row,run,device)?row:{...row,status:'cancelled'};
+     if(row.status==='completed')return await executable(db,row,run,device,true)?row:{...row,status:'cancelled'};
      if(['failed','cancelled'].includes(row.status))return row;
      if(!await executable(db,row,run,device)){
       await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[id]);return {...row,status:'cancelled'};
@@ -171,12 +180,18 @@ export class LocalRunExecutor {
    const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active'",[run.id,context.taskId,context.attemptId,context.generation])).rows[0];
    if(!row)throw new AppError(409,'任务未注册','TASK_SCOPE_DENIED');
    const assignment={...context,runId:run.id,runtimeTaskId:row.runtime_task_id,contractHash:row.contract_hash};
-   return resolveTaskScope(db,run,assignment,{files:exportFiles(this.root),revision:this.revision()},row.scope);
+   // The legacy cache is only available to the closed-profile scope fixtures.
+   // Once initialized, SQL + verified objects are the sole task baseline.
+   const canonical=run.canonical_workspace?readCommittedCanonical(this.service.traceRoot,run):null;
+   return resolveTaskScope(db,run,assignment,canonical?{files:canonical.files,revision:canonical.ref.revision}:{files:exportFiles(this.root),revision:this.revision()},row.scope);
   });
  }
  async prepare(signal:AbortSignal){
   assertExecutionProfile(this.snapshot);
   return this.preparing??=(async()=>{
+   if(this.snapshot.executionProfile==='task-attempt-openshell-v1'){
+    await initializeTaskCanonical(this.service,this.archive.id,signal);return;
+   }
    const callId='local-prepare-'+this.archive.id,ref={callId};
    this.archive.append('runtime/operation-start',{name:'local_workspace',arguments:{deviceId:this.snapshot.executionTarget.deviceId}},ref);
    try{const id=await this.service.enqueue(this.archive.id,'prepare',{}, {},exportFiles(this.root),signal);const result=await this.service.wait(id,signal);mirrorFiles(this.root,result.files);this.archive.append('runtime/operation-finished',{name:'local_workspace'},ref);this.archive.append('local/device-bound',{...this.snapshot.executionTarget,localWorkspace:result.localWorkspace,...(result.execution?{execution:result.execution}:{})});}
@@ -186,8 +201,19 @@ export class LocalRunExecutor {
  async execute(name:string,args:any,signal:AbortSignal,context:any){
   assertExecutionProfile(this.snapshot);
   await this.prepare(signal);const id=await this.service.enqueue(this.archive.id,name,args,context,undefined,signal);const result=await this.service.wait(id,signal);
+  if(this.snapshot.executionProfile==='task-attempt-openshell-v1'){
+   const merge=await commitTaskResult(this.service,id,signal);const visible=await this.taskResultSummary(id);
+   this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace,execution:result.execution,merge},{callId:context.callId});return visible;
+  }
   const metadata=mirrorFiles(this.root,result.files);const {files:_files,...visible}=result;
   this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace,...(result.execution?{execution:result.execution}:{})});return {...visible,...metadata};
+ }
+ /** Public result projection never lists the complete canonical head. */
+ async taskResultSummary(id:string){
+  const row=(await pool.query('SELECT * FROM local_operations WHERE id=$1 AND run_id=$2',[id,this.archive.id])).rows[0];
+  if(row?.merge_state!=='committed'||!row.result?.ok)throw new AppError(409,'任务成果尚未提交','TASK_MERGE_DENIED');
+  const {files:_files,artifacts:_artifacts,...visible}=row.result.result;
+  return {...visible,artifacts:manifest(row.result.result.files),merge:row.merge_record.receipt};
  }
  async close(){await pool.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE run_id=$1 AND lease_owner=$2 AND status IN ('queued','claimed','started')",[this.archive.id,this.service.owner]);}
 }
@@ -243,10 +269,17 @@ export function localDeviceRouter(traceRoot:string){
   else if(!input.error)throw new AppError(422,'缺少操作错误详情');
   await operationTransaction(z.uuid().parse(req.params.operation),async(db,row,run,device)=>{
    if(row.device_id!==id||row.claim_token!==input.claimToken)throw new AppError(403,'操作领取凭证不正确');
-   if(input.ok){validateResult(row,input.result);assertExecutionBackendReceipt(executionBackend(device.backend),input.result);}
+   if(input.ok){
+    validateResult(row,input.result);
+    const taskReceipt=run.snapshot.executionProfile==='task-attempt-openshell-v1';
+    if(taskReceipt)validateTaskOperationResult(row,input.result);
+    // Verify the original approved execution. Current backend/grant permission
+    // is checked separately below; a changed backend may only retain late evidence.
+    assertExecutionBackendReceipt(executionBackend(taskReceipt?run.snapshot.executionTarget.backend:device.backend),input.result);
+   }
    if(row.result){if(!isDeepStrictEqual(row.result,input))throw new AppError(409,'已有不同操作回执');return;}
    if(input.ok&&!row.started)throw new AppError(409,'操作尚未确认开始');
-   if(!['claimed','started'].includes(row.status)||!await executable(db,row,run,device)){
+   if(!['claimed','started'].includes(row.status)||!await executable(db,row,run,device,true)){
     if(row.late_result&&!isDeepStrictEqual(row.late_result,input))throw new AppError(409,'已有不同迟到回执');
     await db.query("UPDATE local_operations SET status='cancelled',late_result=$1,finished_at=now() WHERE id=$2",[input,row.id]);return;
    }

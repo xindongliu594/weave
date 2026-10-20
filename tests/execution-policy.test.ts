@@ -9,6 +9,7 @@ import {randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {toolEvidence} from './model-fixture.ts';
 import {bindPolicy} from '../packages/contracts/index.ts';
+import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
 const base=process.env.DATABASE_URL??'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const admin=new pg.Pool({connectionString:base}),schema='execution_policy_'+Date.now();
 let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,requests=0,candidate:any,lastInput:any;
@@ -75,7 +76,11 @@ test('manual scope expansion requires explicit policy; generated plans and plann
  const versions=(await call('/projects/'+p.id+'/versions')).data;assert.deepEqual(versions[0].policy,expanded);assert.deepEqual(versions[1].policy,p.policy);
  const empty=await call('/projects/'+p.id+'/plan','PUT',{version:2,plan,policy:{...expanded,allowedModelIds:[]}});assert.equal(empty.data.code,'POLICY_PERMISSION_DENIED');
  const selected=await call('/projects/'+p.id+'/approve','POST',{version:2});assert.equal(selected.status,202,JSON.stringify(selected.data));
- assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[selected.data.id])).rows[0].snapshot.policy,expanded);
+ const approvedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[selected.data.id])).rows[0].snapshot;
+ assert.deepEqual(approvedSnapshot.policy,expanded);
+ // The coordinator is disabled in this fixture. Supply its immutable archive
+ // so retry reaches the version gate instead of correctly failing on a missing goal.
+ createRunArchive(join(dir,'runs'),approvedSnapshot,{id:selected.data.id});
  assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:2,plan,policy:expanded})).data.code,'PROJECT_ACTIVE');await call('/runs/'+selected.data.id+'/cancel','POST',{});
  assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:2,plan,policy:expanded})).status,200);
  assert.equal((await call('/runs/'+selected.data.id+'/retry','POST',{resume:false})).data.code,'RUN_REAPPROVAL_REQUIRED');
@@ -87,7 +92,11 @@ test('planner receives the project net budget and generated validation deducts t
  candidate={...p.plan,tasks:p.plan.tasks.map((task:any)=>({...task,estimatedInputTokens:1500000,estimatedOutputTokens:200}))};
  const generated=await call('/projects/'+p.id+'/generate','POST',{version:1,modelId:'model',maxPlanningCost:.1});
  assert.equal(generated.status,200,JSON.stringify(generated.data));assert.equal(requests,before+1,'budget feedback requires no extra provider call');
- const budget=JSON.parse(lastInput.messages[0].content.split('\n').at(-1));
+ const budgets=lastInput.messages[0].content.split('\n').flatMap((line:string)=>{
+  try{const value=JSON.parse(line);return value?.kind==='planning_budget'?[value]:[];}catch{return [];}
+ });
+ assert.equal(budgets.length,1,'there is exactly one structured planning budget, independent of later instructions');
+ const budget=budgets[0];
  assert.equal(budget.kind,'planning_budget');assert.equal(budget.totalLimit,1);assert.equal(budget.recordedCost,.9);
  assert.equal(budget.retainedReservations,0);assert.ok(Math.abs(budget.availableForPlanningAndExecution-.1)<1e-8);
  const actual=Number((await pool.query('SELECT sum(cost) AS cost FROM usage WHERE project_id=$1',[p.id])).rows[0].cost);
