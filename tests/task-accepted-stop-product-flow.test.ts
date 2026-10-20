@@ -20,7 +20,7 @@ import {pool,migrate} from '../apps/api/src/db.ts';
 import {fixtureTaskContext} from './model-fixture.ts';
 const require=createRequire(import.meta.url);
 const {createProductDeviceFixture}=require('./helpers/task-openshell-product-fixture.cjs');
-const {manifest,revision}=require('../apps/desktop/local-executor.cjs');
+const {manifest,revision,exportFiles}=require('../apps/desktop/local-executor.cjs');
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex');
 const file=(path:string,content:string)=>({path,content:Buffer.from(content).toString('base64')});
@@ -48,11 +48,12 @@ async function until<T>(read:()=>T|Promise<T>,accept:(value:T)=>boolean,label:st
  const deadline=Date.now()+timeout;let value:T;do{value=await read();if(accept(value))return value;await pause();}while(Date.now()<deadline);assert.fail(label+': '+JSON.stringify(value!));
 }
 type Mode='baseline'|'green'|'response-loss'|'interleave';
+type SharedDevice={deviceId:string;grantId:string;token:string;device:any};
 const taskFacts=(row:any)=>({key:{runId:row.run_id,taskId:row.task_id,attemptId:row.attempt_id,generation:row.generation},phase:row.phase,principal:row.principal,sessionId:row.session_id,runtimeTaskId:row.runtime_task_id,contract:row.contract,contractHash:row.contract_hash,permissionHash:row.permission_hash,capabilityHash:row.capability_hash,scope:row.scope,inputOrigins:row.input_origins,committedOutputs:row.committed_outputs,sandboxIdentity:row.sandbox_identity});
 const operationFacts=(row:any)=>({id:row.id,deviceId:row.device_id,grantId:row.grant_id,owner:row.lease_owner,status:row.status,started:row.started,claimToken:row.claim_token,payload:row.payload,result:row.result,mergeState:row.merge_state,mergeRecord:row.merge_record});
-async function fixture(mode:Mode){
- const runId=randomUUID(),projectId=randomUUID(),deviceId=randomUUID(),grantId=randomUUID(),owner=randomUUID(),token=randomBytes(32).toString('hex');
- const device=createProductDeviceFixture(join(directory,runId,'device'),grantId),backend=device.executor.backend;
+async function fixture(mode:Mode,shared?:SharedDevice){
+ const runId=randomUUID(),projectId=randomUUID(),owner=randomUUID(),deviceId=shared?.deviceId??randomUUID(),grantId=shared?.grantId??randomUUID(),token=shared?.token??randomBytes(32).toString('hex');
+ const device=shared?.device??createProductDeviceFixture(join(directory,runId,'device'),grantId),backend=device.executor.backend,callStart=device.calls.length,observationStart=device.observations.length;
  const agents=[
   {id:'manager',employeeId:'manager',name:'Manager',role:'manager',modelId:'fixture',rolePrompt:'Run assigned manager acceptance task C.',tools:['artifact_write','filesystem','terminal_test']},
   {id:'developer',employeeId:'developer',name:'Developer',role:'member',modelId:'fixture',rolePrompt:'Run development task A.',tools:['artifact_write','filesystem','terminal_test']},
@@ -67,10 +68,12 @@ async function fixture(mode:Mode){
  ];
  const target={kind:'local',deviceId,grantId,backend},policy={maxBudget:2,maxAgents:3,maxConcurrentAgents:3,maxModelCalls:80,maxTaskModelCalls:25,deadlineSeconds:180,contextManagement:'prune',contextBytes:250000,executionTarget:target};
  let snapshot:any={projectId,planVersion:1,departmentId:'department',title:'Accepted-stop three task engineering fixture',requirement:'Verify three distinct prepared employee tasks with real journal and bounded CLI transport.',executionProfile:'task-attempt-openshell-v1',executionBudget:2,approval:{kind:'project',projectVersion:1},policy,agents,tasks,executionTarget:{...target,platform:'linux',allowCommands:true},importedFiles:[{path:'in.txt',content:'input',snapshotId:'input-snapshot',sha256:hash('input'),agentIds:mode==='interleave'?['developer','qa']:['developer']}]};
- await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'Fixture',agents}]);
+ if(shared)assert.deepEqual((await pool.query('SELECT data FROM departments WHERE id=$1',['department'])).rows[0]?.data,{name:'Fixture',agents},'the next project reuses the department without rewriting it');
+ else await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'Fixture',agents}]);
  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$3,$4,$5,$3)',[projectId,'department','fixture',policy,{agents,tasks}]);
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,lease_owner,lease_until) VALUES($1,$2,1,'running',$3,$4,now()+interval '1 hour')",[runId,projectId,snapshot,owner]);
- await pool.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$3,true,$6)',[deviceId,hash(token),'engineering device','linux',grantId,backend]);
+ if(shared){const original=(await pool.query('SELECT * FROM local_devices WHERE id=$1',[deviceId])).rows[0];assert.ok(original?.enabled);assert.equal(original.grant_id,grantId);assert.equal(original.token_hash,hash(token));assert.deepEqual(original.backend,backend);}
+ else await pool.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$3,true,$6)',[deviceId,hash(token),'engineering device','linux',grantId,backend]);
  snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
  const service=new LocalOperationService(directory,owner),jobs:any[]=[],checks:any[]=[],requests:any[]=[],steps=new Map<string,number>(),timeline:any[]=[];
  const canonical=new Map([['in.txt','input'],['private.txt','private']]);let archive:any,executor:LocalRunExecutor;
@@ -108,13 +111,14 @@ async function fixture(mode:Mode){
   for(const row of (await pool.query('SELECT task_id,accepted_stop FROM task_attempt_workspaces WHERE run_id=$1 AND accepted_stop IS NOT NULL',[runId])).rows){if(row.accepted_stop.state==='prepared'&&!timeline.some(item=>item.kind==='sql-prepared'&&item.key.taskId===row.task_id))timeline.push({kind:'sql-prepared',key:row.accepted_stop.identity.key,identity:row.accepted_stop.identity,digest:row.accepted_stop.digest,preparedAt:row.accepted_stop.preparedAt,call:call.index,eventSeq:events().at(-1)?.seq});}
  };
  device.control.onAcceptedStop=async(journal:any,call:any)=>{
+  assert.equal(journal.key.runId,runId,'a current project never stops a historical project scope');
   const row=(await pool.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2',[runId,journal.key.taskId])).rows[0];
   const run=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0],canonical=readCommittedCanonical(directory,run);
   timeline.push({kind:'stop-dispatch',key:journal.key,call:call.index,journal:structuredClone(journal),sql:row.accepted_stop,sqlFactsSha256:hash(JSON.stringify(taskFacts(row))),currentHead:canonical.ref,eventSeq:events().at(-1)?.seq});
   assert.equal(journal.acceptedStop.stage,'stop_intent');assert.equal(journal.phase,'stopping');assert.equal(row.accepted_stop.state,'dispatching');
  };
  if(mode==='response-loss')device.control.loseAcceptedStop=true;
- return {mode,runId,deviceId,token,backend,snapshot,runtime,provider,jobs,checks,requests,steps,device,canonical,service,events,timeline,maintenance,get archive(){return archive;},get executor(){return executor!;}};
+ return {mode,runId,deviceId,grantId,token,backend,snapshot,runtime,provider,jobs,checks,requests,steps,device,canonical,service,events,timeline,maintenance,callStart,observationStart,get archive(){return archive;},get executor(){return executor!;}};
 }
 type Fixture=Awaited<ReturnType<typeof fixture>>;
 async function protocol(f:Fixture,endpoint:string,body:any){const response=await fetch(url+'/local-devices/'+f.deviceId+endpoint,{method:'POST',headers:{'content-type':'application/json','X-Local-Device-Key':f.token},body:JSON.stringify(body)});const result=await response.json() as any;assert.equal(response.status,200,endpoint+': '+JSON.stringify(result));return result;}
@@ -132,9 +136,9 @@ async function deliver(f:Fixture,job:any){
  f.checks.push({operationId:job.id,key:job.executionScope.key,sandboxId:result.execution.sandboxId,operationFactsSha256:hash(JSON.stringify(operationFacts(row))),scope:row.payload.taskScope,receipt:row.merge_record.receipt,canonical:current.ref,files:result.files});
 }
 function saveEvidence(f:Fixture,label:string,extra:any={}){
- const events=f.events(),journal=(value:any)=>({schema:value.schema,key:value.key,sandboxId:value.sandboxId,name:value.name,phase:value.phase,workspaceRevision:value.workspaceRevision,acceptedStop:value.acceptedStop,workManifestSha256:hash(JSON.stringify(value.workManifest)),storageSha256:hash(JSON.stringify(value.storage)),completedOperations:value.completedOperations});
- const data={label,runId:f.runId,profileClosed:true,paidCalls:0,fixtureBoundary:'CLI transport/UID/cgroup/model selections; real executor/schema2 journal/REMOTE_SCRIPT/files/Node tests/Host/Handoff/HTTP/SQL CAS',jobs:f.jobs.map(job=>({id:job.id,name:job.name,key:job.executionScope.key,error:job.error})),checks:f.checks.map(check=>({operationId:check.operationId,key:check.key,sandboxId:check.sandboxId,operationFactsSha256:check.operationFactsSha256,scopeHash:check.scope.workspace.scopeHash,scopeSha256:hash(JSON.stringify(check.scope)),beforeRevision:check.receipt.beforeRevision,afterRevision:check.receipt.afterRevision,partialRevision:revision(check.files),filesSha256:hash(JSON.stringify(manifest(check.files)))})),finalFiles:manifest([...f.canonical].map(([path,content])=>file(path,content))),timeline:f.timeline.map(item=>({...item,...(item.journal?{journal:journal(item.journal)}:{})})),observations:f.device.observations.map((item:any)=>({...item,...(item.journal?{journal:journal(item.journal)}:{})})),callCounts:Object.fromEntries([...new Set<string>(f.device.calls.map((call:any)=>call.args[3]==='exec'?'exec:'+call.request.name:call.args[2]+':'+call.args[3]))].map(command=>[command,f.device.calls.filter((call:any)=>(call.args[3]==='exec'?'exec:'+call.request.name:call.args[2]+':'+call.args[3])===command).length])),calls:f.device.calls.filter((call:any)=>call.args[2]==='sandbox'&&call.args[3]!=='exec').map((call:any)=>({index:call.index,command:call.args.slice(2,5)})),eventsSha256:hash(JSON.stringify(events)),events:events.filter(event=>event.type==='handoff/accepted'||event.type==='run/finished'||event.type==='step/checkpoint'&&event.data.boundary?.trigger==='node-accepted').map(event=>({seq:event.seq,type:event.type,sha256:hash(JSON.stringify(event)),...(event.type==='handoff/accepted'?{taskId:event.data.taskId,key:event.data.taskExecution.key,workspaceRevision:event.data.workspaceRevision,partialRevision:event.data.sandboxWorkRevision}:event.type==='step/checkpoint'?{id:event.data.id,sha256:event.data.sha256,key:event.data.key,trigger:event.data.boundary?.trigger}:{status:event.data.status,message:event.data.message})})),scopes:f.device.executor.storageScopes(),...extra};
- const path=join(evidenceRoot,'product-stop-'+label+'-summary.json');writeFileSync(path,JSON.stringify(data,null,2));return path;
+ const events=f.events(),calls=f.device.calls.slice(f.callStart),observations=f.device.observations.slice(f.observationStart),scopes=f.device.executor.storageScopes().filter((scope:any)=>scope.key?.runId===f.runId),journal=(value:any)=>({schema:value.schema,key:value.key,sandboxId:value.sandboxId,name:value.name,phase:value.phase,workspaceRevision:value.workspaceRevision,acceptedStop:value.acceptedStop,workManifestSha256:hash(JSON.stringify(value.workManifest)),storageSha256:hash(JSON.stringify(value.storage)),completedOperations:value.completedOperations});
+ const data={label,runId:f.runId,profileClosed:true,paidCalls:0,fixtureBoundary:'CLI transport/UID/cgroup/model selections; real executor/schema2 journal/REMOTE_SCRIPT/files/Node tests/Host/Handoff/HTTP/SQL CAS',jobs:f.jobs.map(job=>({id:job.id,name:job.name,key:job.executionScope.key,error:job.error})),checks:f.checks.map(check=>({operationId:check.operationId,key:check.key,sandboxId:check.sandboxId,operationFactsSha256:check.operationFactsSha256,scopeHash:check.scope.workspace.scopeHash,scopeSha256:hash(JSON.stringify(check.scope)),beforeRevision:check.receipt.beforeRevision,afterRevision:check.receipt.afterRevision,partialRevision:revision(check.files),filesSha256:hash(JSON.stringify(manifest(check.files)))})),finalFiles:manifest([...f.canonical].map(([path,content])=>file(path,content))),timeline:f.timeline.map(item=>({...item,...(item.journal?{journal:journal(item.journal)}:{})})),observations:observations.map((item:any)=>({...item,...(item.journal?{journal:journal(item.journal)}:{})})),callCounts:Object.fromEntries([...new Set<string>(calls.map((call:any)=>call.args[3]==='exec'?'exec:'+call.request.name:call.args[2]+':'+call.args[3]))].map(command=>[command,calls.filter((call:any)=>(call.args[3]==='exec'?'exec:'+call.request.name:call.args[2]+':'+call.args[3])===command).length])),calls:calls.filter((call:any)=>call.args[2]==='sandbox'&&call.args[3]!=='exec').map((call:any)=>({index:call.index,command:call.args.slice(2,5)})),eventsSha256:hash(JSON.stringify(events)),events:events.filter(event=>event.type==='handoff/accepted'||event.type==='run/finished'||event.type==='step/checkpoint'&&event.data.boundary?.trigger==='node-accepted').map(event=>({seq:event.seq,type:event.type,sha256:hash(JSON.stringify(event)),...(event.type==='handoff/accepted'?{taskId:event.data.taskId,key:event.data.taskExecution.key,workspaceRevision:event.data.workspaceRevision,partialRevision:event.data.sandboxWorkRevision}:event.type==='step/checkpoint'?{id:event.data.id,sha256:event.data.sha256,key:event.data.key,trigger:event.data.boundary?.trigger}:{status:event.data.status,message:event.data.message})})),scopes,deviceTotals:{scopes:f.device.executor.storageScopes().length,stoppedScopes:f.device.executor.storageScopes().filter((scope:any)=>scope.phase==='stopped').length},...extra};
+ const path=join(evidenceRoot,'product-terminal-stop-'+label+'-'+f.runId+'-summary.json');writeFileSync(path,JSON.stringify(data,null,2));return path;
 }
 async function runFixture(f:Fixture){
  assert.throws(()=>assertExecutionProfile(f.snapshot),{code:'TASK_EXECUTION_UNAVAILABLE'});
@@ -151,22 +155,62 @@ test('baseline third actual prepare hits unchanged two-running-slot gate',{skip:
 });
 async function assertSuccessful(f:Fixture,result:any){
  saveEvidence(f,f.mode+'-attempt',{status:result.status,message:result.message});assert.equal(result.status,'completed',JSON.stringify({message:result.message,failures:f.events().findLast(event=>event.type==='team/checkpoint')?.data.tasks.filter((task:any)=>task.status==='failed').map((task:any)=>({id:task.id,output:task.output})),steps:[...f.steps]}));
+ assert.deepEqual(result.maintenance,{version:1,state:'stopped'},'terminal maintenance is confirmed before business completion returns');assert.equal(result.recording,'complete');
  assert.deepEqual(f.events().filter(event=>event.type==='handoff/accepted').map(event=>event.data.taskId),['a','b','c']);
  const prepares=f.checks.filter(check=>f.jobs.find(job=>job.id===check.operationId)?.name==='prepare');assert.equal(prepares.length,3);assert.equal(new Set(prepares.map(check=>check.sandboxId)).size,3);assert.equal(new Set(prepares.map(check=>JSON.stringify(check.key))).size,3);assert.equal(new Set(prepares.map(check=>check.key.attemptId)).size,3);
- for(const id of ['a','b']){
+ for(const id of ['a','b','c']){
   const accepted=f.events().find(event=>event.type==='handoff/accepted'&&event.data.taskId===id)!,cpEvent=f.events().find(event=>event.type==='step/checkpoint'&&event.data.boundary.trigger==='node-accepted'&&event.data.boundary.taskId===id)!;
   assert.ok(cpEvent.seq>accepted.seq);const cp=readStepCheckpoint({root:directory,runId:f.runId,checkpointId:cpEvent.data.id});assert.equal(cp.version,2);
   const prepared=f.timeline.find(item=>item.kind==='sql-prepared'&&item.key.taskId===id),stop=f.timeline.find(item=>item.kind==='stop-dispatch'&&item.key.taskId===id);assert.ok(prepared);assert.ok(stop);assert.ok(prepared.eventSeq>=cpEvent.seq);assert.ok(prepared.call<stop.call);assert.deepEqual(prepared.identity,stop.sql.identity);assert.ok(stop.eventSeq>=cpEvent.seq);assert.equal(stop.sql.identity.workspaceRevision,hash(JSON.stringify(cp.workManifest)));assert.notEqual(stop.sql.identity.workspaceRevision,cp.canonical.revision);
-  const next=f.timeline.find(item=>item.kind==='prepare'&&item.key.taskId===(id==='a'&&f.mode!=='interleave'?'b':'c'));assert.ok(next.call>stop.call);
-  const originalGets=f.device.calls.slice(stop.call+1,next.call).filter((call:any)=>call.args[3]==='get');assert.ok(originalGets.some((call:any)=>call.args[4]===stop.sql.identity.sandboxId));
+  const next=id==='c'?undefined:f.timeline.find(item=>item.kind==='prepare'&&item.key.taskId===(id==='a'&&f.mode!=='interleave'?'b':'c'));
+  if(id==='c'){
+   const finalTeam=f.events().findLast(event=>event.type==='team/checkpoint'&&event.seq<=prepared.eventSeq),finished=f.events().findLast(event=>event.type==='run/finished');
+   assert.ok(finalTeam&&finalTeam.seq>cpEvent.seq&&finalTeam.data.tasks.every((task:any)=>task.status==='completed'),'the last durable completed team checkpoint precedes terminal C stop');assert.ok(finished&&finished.seq>stop.eventSeq);
+  }else assert.ok(next&&next.call>stop.call);
+  const originalGets=f.device.calls.slice(stop.call+1,next?.call).filter((call:any)=>call.args[3]==='get');assert.ok(originalGets.some((call:any)=>call.args[4]===stop.sql.identity.sandboxId));
   const row=(await pool.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2',[f.runId,id])).rows[0];assert.equal(row.accepted_stop.state,'stopped');assert.equal(hash(JSON.stringify(taskFacts(row))),stop.sqlFactsSha256,'stopping preserves SQL scope, outputs, binding and sandbox mapping');
   const retained=f.device.executor.read(stop.key);assert.equal(retained.acceptedStop.stage,'stopped_confirmed');assert.deepEqual(retained.workManifest,stop.journal.workManifest);assert.deepEqual(retained.storage,stop.journal.storage);
  }
- assert.equal(f.device.observations.filter((row:any)=>row.kind==='accepted-stop').length,2);assert.ok(f.device.observations.filter((row:any)=>row.kind==='create').every((row:any)=>row.running<=2));
- const scopes=f.device.executor.storageScopes();assert.equal(scopes.length,3);for(const scope of scopes){assert.ok(scope.storage);const remote=[...f.device.sandboxes.values()].find((row:any)=>row.id===scope.sandboxId) as any;assert.ok(remote);for(const item of f.device.executor.read(scope.key).workManifest)assert.equal(hash(readFileSync(join(remote.root,item.path))),item.sha256);}
+ assert.equal(f.device.observations.filter((row:any)=>row.kind==='accepted-stop'&&row.journal.key.runId===f.runId).length,3);assert.ok(f.device.observations.filter((row:any)=>row.kind==='create').every((row:any)=>row.running<=2));
+ const scopes=f.device.executor.storageScopes().filter((scope:any)=>scope.key?.runId===f.runId);assert.equal(scopes.length,3);for(const scope of scopes){assert.equal(scope.phase,'stopped');assert.ok(scope.storage);const remote=[...f.device.sandboxes.values()].find((row:any)=>row.id===scope.sandboxId) as any;assert.ok(remote);assert.deepEqual(manifest(exportFiles(remote.root)),f.device.executor.read(scope.key).workManifest);for(const item of f.device.executor.read(scope.key).workManifest)assert.equal(hash(readFileSync(join(remote.root,item.path))),item.sha256);}
  const operations=(await pool.query('SELECT * FROM local_operations WHERE run_id=$1',[f.runId])).rows;assert.equal(operations.length,f.jobs.length);assert.ok(operations.every(row=>row.started&&row.status==='completed'&&row.merge_state==='committed'));for(const row of operations)assert.equal(hash(JSON.stringify(operationFacts(row))),f.checks.find(check=>check.operationId===row.id).operationFactsSha256,'stopping preserves original SQL operation/claim/result/merge');assert.equal(sharedFallbacks,0);
  assert.equal(await finishRun(f.runId,f.service.owner,'completed'),true);assert.equal((await acceptedWorkEvidence(pool,directory,f.runId)).receipts.length,3);
 }
+async function retainedProjectEvidence(runId:string,device:any){
+ const run=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0];assert.equal(run.status,'completed');
+ const operations=(await pool.query('SELECT * FROM local_operations WHERE run_id=$1 ORDER BY id',[runId])).rows;
+ const scopes=(await pool.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 ORDER BY task_id,attempt_id,generation',[runId])).rows;
+ assert.equal(scopes.length,3);assert.ok(scopes.every(scope=>scope.accepted_stop?.state==='stopped'));assert.ok(operations.every(operation=>operation.started&&operation.claim_token&&operation.result?.claimToken===operation.claim_token&&operation.status==='completed'&&operation.merge_state==='committed'));
+ const current=readCommittedCanonical(directory,run),archive=readRun(directory,runId);assert.equal(archive?.integrity,'ok');
+ const journals=device.executor.storageScopes().filter((scope:any)=>scope.key?.runId===runId).sort((a:any,b:any)=>a.key.taskId.localeCompare(b.key.taskId)).map((scope:any)=>{
+  assert.equal(scope.phase,'stopped');const journal=device.executor.read(scope.key),remote=[...device.sandboxes.values()].find((row:any)=>row.id===scope.sandboxId) as any;assert.ok(remote);assert.equal(remote.phase,'Stopped');assert.equal(journal.acceptedStop.stage,'stopped_confirmed');
+  const files=manifest(exportFiles(remote.root));assert.deepEqual(files,journal.workManifest);
+  return {key:scope.key,sandboxId:scope.sandboxId,workspaceRevision:scope.workspaceRevision,phase:scope.phase,journalSha256:hash(readFileSync(device.executor.taskStateFile(scope.key))),files};
+ });
+ assert.equal(journals.length,3);
+ return {runId,status:run.status,runSqlSha256:hash(JSON.stringify(run)),scopeSqlSha256:hash(JSON.stringify(scopes)),operationsSqlSha256:hash(JSON.stringify(operations)),claimsSha256:hash(JSON.stringify(operations.map(row=>({id:row.id,claimToken:row.claim_token,resultClaimToken:row.result.claimToken})))),operationIds:operations.map(row=>row.id),head:current.ref,files:manifest(current.files),archiveSha256:hash(readFileSync(join(directory,runId,'events.jsonl'))),journals};
+}
+
+test('three sequential complete projects retain nine stopped scopes on one actual executor and journal',{skip:!isolated||process.env.PRODUCT_STOP_BASELINE==='1',timeout:570000},async t=>{
+ let shared:SharedDevice|undefined,originalExecutor:any;const retained:Awaited<ReturnType<typeof retainedProjectEvidence>>[]=[],evidencePaths:string[]=[];
+ for(let round=0;round<3;round++){
+  const f=await fixture('green',shared);
+  if(!shared){shared={deviceId:f.deviceId,grantId:f.grantId,token:f.token,device:f.device};originalExecutor=f.device.executor;}
+  assert.equal(f.device,shared.device);assert.equal(f.device.executor,originalExecutor,'every project uses the same production executor instance and journal');
+  const result=await runFixture(f);await assertSuccessful(f,result);
+  for(const previous of retained)assert.deepEqual(await retainedProjectEvidence(previous.runId,shared.device),previous,'a later complete project preserves every historical SQL claim/head, journal and file SHA');
+  retained.push(await retainedProjectEvidence(f.runId,shared.device));
+  const inventory=shared.device.executor.storageScopes();assert.equal(inventory.length,(round+1)*3);assert.ok(inventory.every((scope:any)=>scope.phase==='stopped'));
+  assert.equal(shared.device.observations.filter((entry:any)=>entry.kind==='accepted-stop').length,(round+1)*3);
+  assert.ok(shared.device.observations.filter((entry:any)=>entry.kind==='create').every((entry:any)=>entry.running<=2),'the original two running slots are never widened');
+  const evidence=saveEvidence(f,'sequential-'+(round+1),{round:round+1,history:retained.at(-1),historicalRunIdsPreserved:retained.slice(0,-1).map(entry=>entry.runId),sharedScopeCount:inventory.length});evidencePaths.push(evidence);t.diagnostic(evidence);
+ }
+ assert.ok(shared);const inventory=shared.device.executor.storageScopes();assert.equal(inventory.length,9);assert.equal(new Set(inventory.map((scope:any)=>scope.sandboxId)).size,9);assert.equal(new Set(inventory.map((scope:any)=>JSON.stringify(scope.key))).size,9);
+ for(const previous of retained)assert.deepEqual(await retainedProjectEvidence(previous.runId,shared.device),previous);
+ const summary={version:1,fixtureBoundary:'Three complete Product/Host/Handoff/HTTP/CAS projects; same actual OpenShellDeviceExecutor/schema2 journal/queue/REMOTE_SCRIPT/files/Node tests. Model/CLI/UID/cgroup/mTLS remain engineering fixtures, not real business acceptance.',profileClosed:true,paidCalls:0,deviceId:shared.deviceId,runIds:retained.map(entry=>entry.runId),runningSlotLimitUnchanged:2,maxRunningObserved:Math.max(...shared.device.observations.filter((entry:any)=>entry.kind==='create').map((entry:any)=>entry.running)),scopeCount:inventory.length,stoppedScopeCount:inventory.filter((scope:any)=>scope.phase==='stopped').length,acceptedStopCount:shared.device.observations.filter((entry:any)=>entry.kind==='accepted-stop').length,history:retained,evidencePaths:evidencePaths.map(path=>path.slice(evidenceRoot.length+1))};
+ const evidence=join(evidenceRoot,'product-terminal-stop-three-projects-'+retained[0].runId+'-summary.json');writeFileSync(evidence,JSON.stringify(summary,null,2));t.diagnostic(evidence);
+});
+
 test('three distinct product tasks stop accepted scopes through maintenance provider',{skip:!isolated||process.env.PRODUCT_STOP_BASELINE==='1',timeout:210000},async t=>{
  const f=await fixture('green'),result=await runFixture(f);await assertSuccessful(f,result);
  t.diagnostic(saveEvidence(f,'green',{sqlStops:(await pool.query('SELECT task_id,accepted_stop FROM task_attempt_workspaces WHERE run_id=$1',[f.runId])).rows}));

@@ -12,6 +12,8 @@ import {retentionAdvice} from '../../../services/agent-runtime/storage-retention
 import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
 import {unresolvedOperations} from '../../../services/agent-runtime/recovery.mjs';
 import {type SandboxMaintenance,maintenanceCandidate,validateMaintenance,applyMaintenance,reconcileMaintenance,maintenanceError,maintenanceConfirmation,boundSandbox} from './storage-lifecycle.ts';
+import {readTaskStopMaintenance} from './task-stop-maintenance.ts';
+import {withTaskStopMaintenance} from './task-stop-storage.ts';
 export const storageTables=['storage_cleanups'];
 export async function migrateStorage(db:Pick<pg.Pool,'query'>){await db.query(`CREATE TABLE IF NOT EXISTS storage_cleanups(id text PRIMARY KEY,status text NOT NULL DEFAULT 'preview',preview jsonb NOT NULL,result jsonb,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());`);}
 type Paths={dataRoot?:string;workspaceRoot?:string;nativeDeviceId?:string;deploymentBase?:string;sandbox?:()=>SandboxMaintenance|undefined};
@@ -42,7 +44,7 @@ export function storageRouter(traceRoot:string,paths:Paths={},db:pg.Pool=pool){
    sandbox:!!adapter&&row.target?.deviceId===adapter.deviceId&&row.target?.grantId===adapter.grantId&&row.target?.backend?.fingerprint===adapter.fingerprint&&scopes.some(s=>s.runId===row.id&&['ready','stopped'].includes(s.phase)&&!!s.storage)
   }))));
  });
- router.get('/storage/sandboxes',async(_req,res)=>{const adapter=paths.sandbox?.();res.json({available:!!adapter,scopes:adapter?.executor.storageScopes()??[],hardQuota:false});});
+ router.get('/storage/sandboxes',async(_req,res)=>{const adapter=paths.sandbox?.(),scopes=await withTaskStopMaintenance(adapter?.executor.storageScopes()??[],runId=>readTaskStopMaintenance({db,traceRoot,runId}));res.json({available:!!adapter,scopes,hardQuota:false});});
  router.post('/storage/sandboxes/:id/inspect',async(req,res)=>{
   const runId=idSchema.parse(req.params.id);z.object({}).strict().parse(req.body);const client=await db.connect();
   try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918276)');await client.query('LOCK TABLE project_runs,local_operations,local_devices IN SHARE MODE');await idle(client);const adapter=await boundSandbox(traceRoot,runId,paths.sandbox,client);const result=await adapter.executor.inspectStorage(runId);await client.query('COMMIT');res.json(result);}

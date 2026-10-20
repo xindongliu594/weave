@@ -1,0 +1,126 @@
+✖ only a validated original pending intent exposes original-ID reconciliation and retained disk status (22.6548ms)
+✖ task storage uses exact scope identity, omits legacy mutation buttons and preserves legacy rows (155.5207ms)
+✖ single pending lock issues one exact POST and refreshes SQL after success without using the response as local fact (7.8184ms)
+✖ a rejected observation still refreshes SQL and never reports success; invalid scopes issue no request (5.243ms)
+✖ unmounted or switched-run actions cannot publish late state or refresh into the replacement run (7.7569ms)
+✖ maintenance timeline events use Chinese labels while business acceptance stays distinct (1096.1357ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2647.4864
+
+✖ failing tests:
+
+test at tests\task-stop-maintenance-ui.test.ts:1:1119
+✖ only a validated original pending intent exposes original-ID reconciliation and retained disk status (22.6548ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:14:35)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-ui.test.ts:1:2501
+✖ task storage uses exact scope identity, omits legacy mutation buttons and preserves legacy rows (155.5207ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /任务 a/. Input:
+  
+  '<details class="lower"><summary>OpenShell 沙箱可写目录</summary><p class="subcopy">应用层容量监管：/sandbox 20 MiB、/tmp 64 MiB；不构成硬磁盘配额。镜像层和 Docker 日志另计。核对停止的沙箱会启动原工作负载，只检查文件，不调用模型。</p><div class="lower"><p><a href="#run/10000000-0000-0000-0000-000000000001">10000000-0000-0000-0000-000000000001</a> · 已停止 · 10000000-0000-0000-0000-000000000002</p><p>目录占用尚未实测</p><button>核对容量与文件版本</button> <button disabled="">预览回收</button></div></details>'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:29:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<details class="lower"><summary>OpenShell 沙箱可写目录</summary><p class="subcopy">应用层容量监管：/sandbox 20 MiB、/tmp 64 MiB；不构成硬磁盘配额。镜像层和 Docker 日志另计。核对停止的沙箱会启动原工作负载，只检查文件，不调用模型。</p><div class="lower"><p><a href="#run/10000000-0000-0000-0000-000000000001">10000000-0000-0000-0000-000000000001</a> · 已停止 · 10000000-0000-0000-0000-000000000002</p><p>目录占用尚未实测</p><button>核对容量与文件版本</button> <button disabled="">预览回收</button></div></details>',
+    expected: /任务 a/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-ui.test.ts:1:4131
+✖ single pending lock issues one exact POST and refreshes SQL after success without using the response as local fact (7.8184ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:39:35)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-ui.test.ts:1:5023
+✖ a rejected observation still refreshes SQL and never reports success; invalid scopes issue no request (5.243ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:48:35)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-ui.test.ts:1:5889
+✖ unmounted or switched-run actions cannot publish late state or refresh into the replacement run (7.7569ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:56:35)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-ui.test.ts:1:6533
+✖ maintenance timeline events use Chinese labels while business acceptance stays distinct (1096.1357ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /任务沙箱维护待核对/. Input:
+  
+  '<details class="trace-event"><summary><span class="trace-dot"></span><span><strong>runtime/maintenance-pending</strong><small>#1 · 08:00:00</small><span class="trace-summary"></span></span></summary></details>'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:66:138)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<details class="trace-event"><summary><span class="trace-dot"></span><span><strong>runtime/maintenance-pending</strong><small>#1 · 08:00:00</small><span class="trace-summary"></span></span></summary></details>',
+    expected: /任务沙箱维护待核对/,
+    operator: 'match',
+    diff: 'simple'
+  }

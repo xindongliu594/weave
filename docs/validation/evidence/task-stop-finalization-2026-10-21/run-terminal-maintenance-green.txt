@@ -1,0 +1,29 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ trusted accepted recording-incomplete completion remains SQL completed without a fabricated terminal trace (3328.4155ms)
+✔ usage replay error after trusted completion cannot rewrite business failure or invent usage (122.8309ms)
+✔ finish bookkeeping error after trusted completion retries completed bookkeeping without failed trace (134.1245ms)
+✔ cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure (213.9273ms)
+✔ trusted acceptance fallback cannot overwrite a replacement owner after replay bookkeeping loses ownership (130.4261ms)
+✔ an ordinary pre-completion runtime rejection retains the existing failed classification (114.9832ms)
+✔ tick leaves a quarantined project queued and unprepared until the same close promise settles (147.8193ms)
+✔ launch readiness check defers an already claimed run before any workspace preparation (96.1368ms)
+✔ check-to-start quarantine race defers the same attempt before input preparation and prepares once after release (178.5421ms)
+✔ quarantine cannot requeue a run with existing local-operation evidence (99.7426ms)
+✔ quarantine cannot requeue a run with existing uncertain-reservation evidence (136.0187ms)
+✔ quarantine cannot requeue a run with existing settled-reservation evidence (119.1888ms)
+✔ quarantine cannot requeue a run with existing usage evidence (115.5523ms)
+✔ cancel racing the quarantine rejection remains cancelled and cannot revive as queued (113.9478ms)
+✔ quarantine defer respects foreign-owner fencing (88.2673ms)
+✔ quarantine defer respects expired-lease fencing (94.9367ms)
+✔ quarantine defer respects project-version fencing (102.2445ms)
+✔ quarantine defer respects attempt fencing (114.3864ms)
+✔ quarantine defer respects successor fencing (97.6366ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6114.2687

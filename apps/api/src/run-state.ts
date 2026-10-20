@@ -23,6 +23,31 @@ export async function claimExpiredRun(id:string,exclude?:(row:any)=>boolean){
   return updated;
  });
 }
+/** Only an unstarted, effect-free claim may return to the existing queue. */
+export async function deferUnstartedRun(id:string,owner:string,expected:{projectId:string;projectVersion:number;attempt:number}){
+ return lockedRun(id,async(client,row)=>{
+  if(!row)return false;
+  const next=(await client.query(`UPDATE project_runs r SET
+    status=CASE WHEN r.cancel_requested THEN 'cancelled' ELSE 'queued' END,
+    finished_at=CASE WHEN r.cancel_requested THEN clock_timestamp() ELSE r.finished_at END,
+    lease_owner=NULL,lease_until=NULL
+    WHERE r.id=$1 AND r.status='running' AND r.lease_owner=$2 AND r.lease_until>clock_timestamp()
+      AND r.project_id=$3 AND r.project_version=$4 AND r.attempt=$5
+      AND EXISTS(SELECT 1 FROM projects p WHERE p.id=r.project_id AND p.version=r.project_version)
+      AND NOT EXISTS(SELECT 1 FROM project_runs newer WHERE newer.project_id=r.project_id AND
+        (newer.project_version>r.project_version OR (newer.project_version=r.project_version AND newer.attempt>r.attempt)))
+      AND NOT EXISTS(SELECT 1 FROM local_operations operation WHERE operation.run_id=r.id)
+      AND NOT EXISTS(SELECT 1 FROM model_reservations reservation WHERE reservation.run_id=r.id)
+      AND NOT EXISTS(SELECT 1 FROM usage receipt WHERE receipt.run_id=r.id)
+    RETURNING r.status`,[id,owner,expected.projectId,expected.projectVersion,expected.attempt])).rows[0];
+  if(!next)return false;
+  if(next.status==='cancelled')await client.query("UPDATE tool_approvals SET status='cancelled',decided_at=clock_timestamp() WHERE run_id=$1 AND status='pending'",[id]);
+  await client.query(`UPDATE projects SET status=$1 WHERE id=$2 AND version=$3 AND NOT EXISTS(
+    SELECT 1 FROM project_runs newer WHERE newer.project_id=$2 AND (newer.project_version>$3 OR (newer.project_version=$3 AND newer.attempt>$4)))`,
+    [next.status==='cancelled'?'CANCELLED':'QUEUED',expected.projectId,expected.projectVersion,expected.attempt]);
+  return true;
+ });
+}
 /** Run and project state become visible together, fenced by owner, lease, version and attempt. */
 export async function finishRun(id:string,owner:string,status:Terminal,message:string|null=null,writeTrace?:(row:any)=>void){
  if(!terminalStatus(status))throw new Error('Invalid terminal run status');

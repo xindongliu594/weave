@@ -1,0 +1,33 @@
+✖ only a validated original pending intent exposes original-ID reconciliation and retained disk status (312.8179ms)
+✔ task storage uses exact scope identity, omits legacy mutation buttons and preserves legacy rows (59.7123ms)
+✔ single pending lock issues one exact POST and refreshes SQL after success without using the response as local fact (4.5206ms)
+✔ a rejected observation still refreshes SQL and never reports success; invalid scopes issue no request (3.397ms)
+✔ unmounted or switched-run actions cannot publish late state or refresh into the replacement run (2.8172ms)
+✔ maintenance timeline events use Chinese labels while business acceptance stays distinct (731.2717ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1929.227
+
+✖ failing tests:
+
+test at tests\task-stop-maintenance-ui.test.ts:1:1119
+✖ only a validated original pending intent exposes original-ID reconciliation and retained disk status (312.8179ms)
+  AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /<button|attempt-a/. Input:
+  
+  '<section class="lower" aria-label="任务沙箱维护"><div class="section-title"><h3>任务沙箱维护</h3><span class="tag amber">维护待核对</span></div><div class="lower"><p><strong>停止结果未知</strong> · 任务 a · 尝试 attempt-a · 代次 1</p><p class="trace-id">沙箱：10000000-0000-0000-0000-000000000002</p><p class="trace-id">部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p><p class="subcopy">原停止结果仍未知（TASK_STOP_UNKNOWN）</p><p class="subcopy">运行占用尚未确认释放，文件与磁盘资料保留。本页不回收磁盘。</p><button disabled="">核对原停止结果</button></div></section>'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-ui.test.ts:21:182)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="lower" aria-label="任务沙箱维护"><div class="section-title"><h3>任务沙箱维护</h3><span class="tag amber">维护待核对</span></div><div class="lower"><p><strong>停止结果未知</strong> · 任务 a · 尝试 attempt-a · 代次 1</p><p class="trace-id">沙箱：10000000-0000-0000-0000-000000000002</p><p class="trace-id">部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p><p class="subcopy">原停止结果仍未知（TASK_STOP_UNKNOWN）</p><p class="subcopy">运行占用尚未确认释放，文件与磁盘资料保留。本页不回收磁盘。</p><button disabled="">核对原停止结果</button></div></section>',
+    expected: /<button|attempt-a/,
+    operator: 'doesNotMatch',
+    diff: 'simple'
+  }

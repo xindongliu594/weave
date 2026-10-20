@@ -1,0 +1,99 @@
+✔ approved deadline is retained as the stop reason when a tool wraps the abort (1100.842ms)
+✖ successful native delivery settles an already dispatched tail request before disposal and suppresses late tools (1077.4136ms)
+✖ user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee (742.8198ms)
+✔ local pre-dispatch failure is not reported as a relay connection failure or charged (9.6473ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (6.5154ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.267ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.9705ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.8808ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.4842ms)
+✖ the actual runtime fences failed work while preserving a late original manager receipt (1078.1971ms)
+✔ task Host private checkpoint barrier success (1274.2938ms)
+✔ task Host private checkpoint barrier cycle-hold (911.4415ms)
+✔ task Host private checkpoint barrier cycle-reject (623.2722ms)
+✔ task Host private checkpoint barrier accepted-hold (1037.1651ms)
+✔ task Host private checkpoint barrier accepted-reject (966.987ms)
+✔ synchronous node-accepted step/boundary failure stops actual dependent Host dispatch (1257.7631ms)
+✔ synchronous node-accepted step/checkpoint failure stops actual dependent Host dispatch (1389.1173ms)
+✖ actual Product marks last native completed node failed when its synchronous checkpoint cannot publish (1091.9898ms)
+✔ task tool preparation uses registered generation and rejects an assignment changed while waiting (3.9211ms)
+✔ task command proof survives another task commit but never its own changed output (263.7413ms)
+✔ task handoff rejects a raw device success without a committed matching merge (28.4976ms)
+✔ a renewed task generation cannot reuse the previous generation command proof (70.8286ms)
+✔ actual product tool body binds prepared generation and exact scope before transport (31.1784ms)
+✔ waiting approval cannot authorize a renewed scope and missing registration dispatches nothing (11.0878ms)
+✔ task runtime refuses shared fallback and initializes committed cache before any cache read (43.8528ms)
+✔ product checkpoint holds tool body before dispatch and exact-operation observation after dispatch (14.736ms)
+✔ rejected before-tool checkpoint prevents transport and rejected result checkpoint prevents observation (8.663ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 23
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20298.8032
+
+✖ failing tests:
+
+test at services\agent-runtime\delivery-settlement.test.mjs:101:1
+✖ successful native delivery settles an already dispatched tail request before disposal and suppresses late tools (1077.4136ms)
+  AssertionError [ERR_ASSERTION]: 无法连接中转站执行模型请求
+  + actual - expected
+  
+  + 'failed'
+  - 'completed'
+  
+      at nativeDeliveryScenario (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/delivery-settlement.test.mjs:73:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\delivery-settlement.test.mjs:102:1
+✖ user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee (742.8198ms)
+  Error: Run ended before delivery settlement: failed: 无法连接中转站执行模型请求
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/delivery-settlement.test.mjs:68:15
+      at async bounded (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/delivery-settlement.test.mjs:22:14)
+      at async nativeDeliveryScenario (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/delivery-settlement.test.mjs:67:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\model-settlement.test.mjs:106:1
+✖ the actual runtime fences failed work while preserving a late original manager receipt (1078.1971ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /NO_PROGRESS/. Input:
+  
+  '无法连接中转站执行模型请求'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:187:51)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '无法连接中转站执行模型请求',
+    expected: /NO_PROGRESS/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\task-readonly-handoff.test.mjs:109:1
+✖ actual Product marks last native completed node failed when its synchronous checkpoint cannot publish (1091.9898ms)
+  AssertionError [ERR_ASSERTION]: 无法连接中转站执行模型请求
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-readonly-handoff.test.mjs:132:72)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

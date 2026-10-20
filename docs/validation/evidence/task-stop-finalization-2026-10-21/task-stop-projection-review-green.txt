@@ -1,0 +1,36 @@
+✔ task acceptance consumes its own sandbox revision and rejects another task binding (62.7951ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (49.4936ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (28.8702ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (37.8102ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (26.7409ms)
+✔ approved file contracts survive parsing and valid producer/consumer plans pass (27.8005ms)
+✔ Office binary files cannot be approved with text or JSON output checks (6.6311ms)
+✔ missing source edges, unknown output and unordered writers/readers fail product validation (2.2577ms)
+✔ downstream cannot name an older writer after an upstream replacement (1.3342ms)
+✔ schema rejects unsafe paths, unpinned external files and incompatible JSON checks (13.2149ms)
+✔ quality tasks require command grants, scope, valid references and an independent reviewer (1.7856ms)
+✔ declared outputs must fit host file scopes before any employee executes (1.9827ms)
+✔ automatic rework is explicit, bounded, read-only in review and gates all consumers (8.7434ms)
+✔ only legacy profile can project not-applicable; empty task evidence remains pending (4966.8901ms)
+✔ NULL original marker is protected no-intent and every existing marker keeps its original ID (50.7091ms)
+✔ marker structure alone cannot confirm mismatched accepted checkpoint or SQL operation metadata (41.9032ms)
+✔ missing archive, sandbox identity or accepted scope never becomes empty stopped output (8.1245ms)
+✔ retired and superseded NULL scopes keep their original no-intent identity without borrowing repair proof (6.8253ms)
+✔ ambiguous and invalid locators collapse to bounded aggregate without effect identity (6.0242ms)
+✔ missing approved row and all truncation signals remain visible and display keys stay stable (21.2258ms)
+✔ DTO refuses unknown private fields, invalid effect identities and duplicate scope keys (6.306ms)
+✔ injected SQL reader selects bounded metadata, re-reads on each call and never emits private reader errors (6.7905ms)
+✔ strict DTO rejects all extra fields and invalid state/reconciliation combinations (6.1905ms)
+✔ partial task revision is compared with original device metadata separately from full canonical revision (3.5972ms)
+✔ historical stopped scope cannot hide a latest repair slot whose SQL row is missing (3.5409ms)
+✔ duplicate native tasks, sessions and mappings cannot select one matching locator as stopped (5.6422ms)
+✔ repeated unchanged mappings and one missing latest accepted locator do not add false ambiguity or duplicate slots (3.543ms)
+✔ no-intent requires complete accepted input/output and verification metadata (4.4949ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6171.3514

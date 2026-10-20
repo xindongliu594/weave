@@ -1,0 +1,20 @@
+Engineering fixtures: models/CLI/UID/cgroup/mTLS; real Product/Host/Handoff/HTTP/CAS/executor/journal/REMOTE_SCRIPT/Node files. Zero paid API.
+TAP version 13
+# Subtest: lost accepted stop response cold API bind only observes original ID and never repeats stop
+ok 1 - lost accepted stop response cold API bind only observes original ID and never repeats stop
+  ---
+  duration_ms: 26454.2948
+  type: 'test'
+  ...
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-response-loss-034697fb-7552-4426-995b-6339bb5e02c8-summary.json
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29537.5753
+
+PROCESS {"code":0,"signal":null,"elapsedMs":32771,"timedOut":false,"sourceStable":true}

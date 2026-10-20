@@ -1,0 +1,8 @@
+{
+  "fixtureOnly": true,
+  "observations": 4,
+  "eachScenarioIssuedOneOriginalRequest": true,
+  "sameRunRefreshAfterSuccess": true,
+  "noOldRunDetailRefreshAfterLateSwitchedResponse": true,
+  "actualModelOrDeviceEffects": 0
+}

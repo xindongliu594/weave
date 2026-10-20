@@ -1,4 +1,4 @@
-import {claimExpiredRun,finishRun,terminalStatus} from './run-state.ts';
+import {claimExpiredRun,deferUnstartedRun,finishRun,terminalStatus} from './run-state.ts';
 import {assertRunAuthorization,assertExecutionProfile,executionMode} from './execution-policy.ts';
 import { executeBrowserMcpTool } from './work-tools-browser.ts';
 import { randomUUID } from 'node:crypto';
@@ -9,7 +9,7 @@ import {restoreStepWorkspace} from './step-checkpoint-recovery.ts';
 import { pool } from './db.ts';
 import { unseal } from './vault.ts';
 import { AppError } from './provider.ts';
-import { ProductDshRuntime } from '../../../services/agent-runtime/product-runtime.mjs';
+import { ProductDshRuntime,type RuntimeCompletion } from '../../../services/agent-runtime/product-runtime.mjs';
 import { readRun, createRunArchive, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
 import { command } from '../../../services/agent-runtime/sandbox.mjs';
 import { queryKnowledge } from './knowledge-store.ts';
@@ -20,6 +20,7 @@ import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compat
 import {LocalOperationService,LocalRunExecutor} from './local-execution.ts';
 import type {SandboxMaintenance} from './storage-lifecycle.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
+const acceptedRecordingPending='业务已完成，终态记录或费用回填尚待核对；请保留原运行记录与未知费用。';
 type Heartbeat={ids:string[];held:string[]};
 async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
   signal?.throwIfAborted();if(!signal)return work;
@@ -109,7 +110,7 @@ export class RunCoordinator {
       const cancel=(await pool.query("SELECT id FROM project_runs WHERE lease_owner=$1 AND cancel_requested=true AND status='running'",[this.owner])).rows;
       for(const row of cancel)await this.runtime.cancel(row.id);
       await this.recover();
-      if(this.stopped)return;
+      if(this.stopped||!(await this.runtime.inspect()).ready)return;
       const client=await pool.connect();let job:any;
       try{
         await client.query('BEGIN');
@@ -133,7 +134,9 @@ export class RunCoordinator {
     }catch(e){if(!this.stopped)console.error('Run worker:',e instanceof Error?e.name:'error');}finally{this.ticking=false;}
   }
   async launch(row:any){
+    let completion:RuntimeCompletion|undefined,runtimeStarted=false;
     try{
+      if(!(await this.runtime.inspect()).ready)throw new AppError(409,'上一运行资源仍在收尾，本次运行尚未启动','RUNTIME_TEARDOWN_PENDING');
       await assertRunAuthorization(row);await assertRunModels(row.snapshot);
       const routes=[];
       for(const route of row.snapshot.modelRoutes){
@@ -141,17 +144,26 @@ export class RunCoordinator {
         if(!gateway||routeFingerprint(gateway.data,gateway.version)!==route.configurationHash)throw Error('运行快照的模型或中转站配置已变化');routes.push({...route,apiKey:gateway.credential?unseal(gateway.credential):''});
       }
       if(this.stopped)throw new AppError(409,'工作进程已关闭，任务未启动','WORKER_STOPPED');
-      if(row.snapshot.recovery?.workspaceCheckpoint)restoreStepWorkspace(this.traceRoot,row.snapshot.recovery.workspaceCheckpoint,join(this.traceRoot,row.id,'artifacts'));
+      let prepareWorkspace:()=>void;
+      if(row.snapshot.recovery?.workspaceCheckpoint)prepareWorkspace=()=>restoreStepWorkspace(this.traceRoot,row.snapshot.recovery.workspaceCheckpoint,join(this.traceRoot,row.id,'artifacts'));
       else {
         const parent=row.parent_run_id&&row.snapshot.approval?.kind!=='retry'?(await pool.query('SELECT * FROM project_runs WHERE id=$1',[row.parent_run_id])).rows[0]:undefined;
         const canonical=parent?await readLiveCanonical(pool,this.traceRoot,parent,readRun(this.traceRoot,parent.id)):undefined;
-        prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind,canonical);
+        prepareWorkspace=()=>prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind,canonical);
       }
-      const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes});
-      const result=await started.completion;
-      for(const usage of result.usages)await this.recordUsage(row.id,usage);
-      await finishRun(row.id,this.owner,result.status,result.message??null);
+      const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes,prepareWorkspace});runtimeStarted=true;
+      completion=await started.completion;
+      for(const usage of completion.usages)await this.recordUsage(row.id,usage);
+      await finishRun(row.id,this.owner,completion.status,completion.recording==='incomplete'?acceptedRecordingPending:completion.message??null);
     }catch(error){
+      if(completion?.status==='completed'){
+        await finishRun(row.id,this.owner,'completed',acceptedRecordingPending);
+        return;
+      }
+      if(!runtimeStarted&&(error as any)?.code==='RUNTIME_TEARDOWN_PENDING'){
+        await deferUnstartedRun(row.id,this.owner,{projectId:row.project_id,projectVersion:row.project_version,attempt:row.attempt});
+        return;
+      }
       const message=error instanceof Error?error.message:'启动失败';
       await finishRun(row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
     }finally{this.active.delete(row.id);}

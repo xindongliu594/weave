@@ -44,7 +44,8 @@ import { obsidianRouter, syncObsidian } from './obsidian.ts';
 import {assertProjectProvenance,buildProjectTeam,validateProjectTeam} from './collaboration.ts';
 import {deliveryCriteriaRevisionErrors} from '../../../packages/contracts/orchestration.ts';
 import {orchestrationExecutionErrors} from '../../../packages/contracts/index.ts';
-import {localDeviceRouter,localTarget} from './local-execution.ts';
+import {localDeviceRouter,localTarget,LocalOperationService} from './local-execution.ts';
+import {taskStopMaintenanceRouter,readTaskStopMaintenance} from './task-stop-maintenance.ts';
 import { applyNewApiPrices, catalogResult, parseModelCatalog } from './model-catalog.ts';
 import { applyOfficialPrices, officialPricingSource, officialPricingVerifiedAt } from './official-model-prices.ts';
 import { checkGatewayService } from './gateway-service.ts';
@@ -162,6 +163,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.use('/api', departmentWorkbenchRouter(pool));
   app.use('/api', openRigRouter(pool));
   app.use('/api', runLineageEvidenceRouter(pool,traceRoot));
+  app.use('/api', taskStopMaintenanceRouter(traceRoot,new LocalOperationService(traceRoot,coordinator.owner),options.sandboxMaintenance));
   app.use('/api', costRouter());
   app.use('/api', runManagementRouter(traceRoot));
   app.use('/api', backupRouter(traceRoot));
@@ -533,12 +535,14 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   app.get('/api/runs/:id', async (req, res) => {
     const id = z.uuid().parse(req.params.id);
-    const run = readRun(traceRoot, id);
+    let run:ReturnType<typeof readRun>=null;
+    try{run=readRun(traceRoot,id);}catch{}
     const row = (await pool.query('SELECT id,project_id,snapshot,status,error,created_at,canonical_workspace FROM project_runs WHERE id=$1',[id])).rows[0];
+    const taskStopMaintenance=await readTaskStopMaintenance({db:pool,traceRoot,runId:id,readArchive:()=>run});
     const costReadiness=row?.snapshot.projectId?await projectCostReadiness(pool,row.snapshot.projectId,row.snapshot.policy?.maxBudget):undefined;
     const costBlocked=row&&['failed','interrupted','cancelled'].includes(row.status)&&costReadiness&&(costReadiness.pendingCount||costReadiness.uncertainCount)
       ? '项目有进行中或待核对的模型费用。请先在系统设置核对供应方账单，再恢复；费用和调用上限继续保留。' : undefined;
-    if (!run) { if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,error:row.error,integrity:'ok',events:[],eventCount:0,nextCursor:0,hasMore:false,recovery:{unknownOperations:[],costBlocked,costReadiness}}); }
+    if (!run) { if (!row) throw new AppError(404,'运行记录不存在'); return res.json({...row.snapshot,id,snapshot:row.snapshot,createdAt:row.created_at,status:row.status,error:row.error,integrity:'incomplete',events:[],summaryEvents:[],eventCount:0,nextCursor:0,hasMore:false,taskStopMaintenance,recovery:{unknownOperations:[],checkpointBlocked:'原运行档案缺失或不完整，保留现场并核对原记录后再恢复。',costBlocked,costReadiness}}); }
     const after = z.coerce.number().int().min(0).default(0).parse(req.query.after);
     const limit = z.coerce.number().int().min(1).max(300).default(300).parse(req.query.limit);
     const sessionId = req.query.sessionId === undefined ? undefined : z.string().parse(req.query.sessionId);
@@ -549,7 +553,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
       const canonical=await readLiveCanonical(pool,traceRoot,row,run);
       resumeHandoff({...run.snapshot,tasks:run.snapshot.approvedTasks??run.snapshot.tasks},run.events,completedTasks(run.events,run.snapshot),resolve(traceRoot,id,'artifacts'),canonical?.ref.manifest);
     }catch(error){recovery.checkpointBlocked=(error as Error).message;}
-    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || e.type.startsWith('goal/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','team/snapshot','team/checkpoint','step/checkpoint','recovery/restored','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
+    res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), taskStopMaintenance, recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || e.type.startsWith('goal/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','runtime/maintenance-pending','runtime/maintenance-completed','team/snapshot','team/checkpoint','step/checkpoint','recovery/restored','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);

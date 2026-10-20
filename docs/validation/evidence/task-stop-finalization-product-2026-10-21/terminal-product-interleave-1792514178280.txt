@@ -1,0 +1,20 @@
+Engineering fixtures: models/CLI/UID/cgroup/mTLS; real Product/Host/Handoff/HTTP/CAS/executor/journal/REMOTE_SCRIPT/Node files. Zero paid API.
+TAP version 13
+# Subtest: A historical partial stop preserves a later B complete canonical head
+ok 1 - A historical partial stop preserves a later B complete canonical head
+  ---
+  duration_ms: 161561.0798
+  type: 'test'
+  ...
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-interleave-5778901e-8d5f-456f-8cb1-58358a6344cb-summary.json
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 164674.1621
+
+PROCESS {"code":0,"signal":null,"elapsedMs":168016,"timedOut":false,"sourceStable":true}

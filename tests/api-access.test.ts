@@ -8,7 +8,7 @@ import {once} from 'node:events';
 import type {AddressInfo} from 'node:net';
 
 test('all mounted business routes have an explicit policy',()=>{
-  assert.equal(routePolicies.length,142);
+  assert.equal(routePolicies.length,143);
   assert.doesNotThrow(()=>assertRouteInventory());
 });
 

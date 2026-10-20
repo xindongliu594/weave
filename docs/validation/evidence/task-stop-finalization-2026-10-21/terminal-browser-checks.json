@@ -1,0 +1,48 @@
+{
+  "kind": "rendered actual React components with fixture API only",
+  "browser": "Codex in-app Chromium",
+  "checks": [
+    {
+      "case": "pending-lock",
+      "passed": true,
+      "text": "任务沙箱维护\n维护待核对\n\n停止结果未知 · 任务 qa · 尝试 qa-attempt-1 · 代次 1\n\n沙箱：10000000-0000-0000-0000-000000000002\n\n部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n原停止结果仍未知（TASK_STOP_UNKNOWN）\n\n运行占用尚未确认释放，文件与磁盘资料保留。本页不回收磁盘。\n\n正在核对原停止结果…"
+    },
+    {
+      "case": "original-observation-success",
+      "passed": true,
+      "text": "任务沙箱维护\n维护已确认停止\n\n已确认停止 · 任务 qa · 尝试 qa-attempt-1 · 代次 1\n\n沙箱：10000000-0000-0000-0000-000000000002\n\n部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n运行槽位已确认停止，文件与磁盘资料仍保留。本页不回收磁盘。"
+    },
+    {
+      "case": "authorization-error-and-refresh",
+      "passed": true,
+      "text": "任务沙箱维护\n维护待核对\n\n停止结果未知 · 任务 qa · 尝试 qa-attempt-1 · 代次 1\n\n沙箱：10000000-0000-0000-0000-000000000002\n\n部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n原停止结果仍未知（TASK_STOP_UNKNOWN）\n\n运行占用尚未确认释放，文件与磁盘资料保留。本页不回收磁盘。\n\n核对原停止结果\n\n原设备授权已变化，请核对原设备和授权。"
+    },
+    {
+      "case": "no-intent-no-action",
+      "passed": true,
+      "text": "任务沙箱维护\n维护待核对\n\n尚未建立停止意向 · 任务 qa · 尝试 qa-attempt-1 · 代次 1\n\n沙箱：10000000-0000-0000-0000-000000000002\n\n部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n没有原停止请求可核对（TASK_STOP_NO_INTENT）\n\n运行占用尚未确认释放，文件与磁盘资料保留。本页不回收磁盘。\n\n尚无原停止请求可核对，现场受保护。"
+    },
+    {
+      "case": "cross-run-projection-rejected",
+      "passed": true,
+      "text": "任务沙箱维护\n维护待核对\n\n维护记录未核对，文件与磁盘现场保留。"
+    },
+    {
+      "case": "late-response-does-not-overwrite-new-run",
+      "passed": true,
+      "text": "任务沙箱维护\n维护待核对\n\n尚未建立停止意向 · 任务 other-task · 尝试 qa-attempt-1 · 代次 1\n\n沙箱：10000000-0000-0000-0000-000000000002\n\n部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n没有原停止请求可核对（TASK_STOP_NO_INTENT）\n\n运行占用尚未确认释放，文件与磁盘资料保留。本页不回收磁盘。\n\n尚无原停止请求可核对，现场受保护。"
+    },
+    {
+      "case": "task-versus-legacy-storage-actions",
+      "passed": true
+    },
+    {
+      "case": "storage-refresh-after-original-observation",
+      "passed": true,
+      "text": "任务沙箱维护\n维护已确认停止\n\n已确认停止 · 任务 qa · 尝试 qa-attempt-1 · 代次 1\n\n沙箱：10000000-0000-0000-0000-000000000002\n\n部分工作版本：aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n运行槽位已确认停止，文件与磁盘资料仍保留。本页不回收磁盘。"
+    }
+  ],
+  "allPassed": true,
+  "paidModelCalls": 0,
+  "productionWrites": 0
+}

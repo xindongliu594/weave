@@ -1,0 +1,22 @@
+[
+  {
+    "path": "apps/api/src/run-coordinator.ts",
+    "sha256": "c2b9086963077c3ddaf245f2942c16ec98ea369c1373f0ec7d81f8e4045b66bf"
+  },
+  {
+    "path": "apps/api/src/run-state.ts",
+    "sha256": "f8630d1a977ed283be99437860ed67e886da05d90c49295f8fed98af04308c88"
+  },
+  {
+    "path": "tests/run-terminal-maintenance.test.ts",
+    "sha256": "335205ec5125db8b4186dae56109391b2e0bb6cac4ae8f6d9c11bcf26bbbccd7"
+  },
+  {
+    "path": "services/agent-runtime/product-runtime.mjs",
+    "sha256": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8"
+  },
+  {
+    "path": "services/agent-runtime/product-runtime.d.mts",
+    "sha256": "fe17910381d1eced939991e0ab3accf94885f846f4a46d8e91fa31f686d3395a"
+  }
+]

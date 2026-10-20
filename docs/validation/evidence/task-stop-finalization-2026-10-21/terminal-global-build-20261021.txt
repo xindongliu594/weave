@@ -1,0 +1,5 @@
+
+> agent-department@0.2.0 build
+> tsc --noEmit && vite build
+
+tests/task-stop-maintenance-http.test.ts(67,40): error TS2322: Type '{ runId: `${string}-${string}-${string}-${string}-${string}`; key: any; sandboxId: any; workspaceRevision: any; phase: string; }' is not assignable to type 'never'.

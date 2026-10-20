@@ -1,0 +1,149 @@
+✖ task runtime requires the source-only finalizer before prepare or model effects (79.6438ms)
+✖ durable native acceptance finalizes once before Host close and run finished (2266.8916ms)
+✔ failure of the final durable checkpoint stays a business failure with zero finalization (2076.1928ms)
+✖ accepted business remains completed with pending maintenance: throws (1522.9407ms)
+✖ accepted business remains completed with pending maintenance: invalid (1812.3413ms)
+✖ accepted business remains completed with pending maintenance: cancel (1663.5852ms)
+✖ business deadline stops at durable acceptance while shared maintenance signal remains active (1843.031ms)
+✖ held native teardown retains the original Host, blocks launches and cannot execute late tools (13838.0827ms)
+✖ sandbox cleanup rejection cannot replace completed business acceptance (1472.5668ms)
+✖ archiving failure after durable acceptance is not recorded as fully persisted completion or business failure (2016.599ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 1
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29813.108
+
+✖ failing tests:
+
+test at services\agent-runtime\terminal-finalization.test.mjs:127:1
+✖ task runtime requires the source-only finalizer before prepare or model effects (79.6438ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:138:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:144:1
+✖ durable native acceptance finalizes once before Host close and run finished (2266.8916ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:148:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:167:53
+✖ accepted business remains completed with pending maintenance: throws (1522.9407ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:175:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:167:53
+✖ accepted business remains completed with pending maintenance: invalid (1812.3413ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:175:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:167:53
+✖ accepted business remains completed with pending maintenance: cancel (1663.5852ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:175:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:185:1
+✖ business deadline stops at durable acceptance while shared maintenance signal remains active (1843.031ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:192:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:198:1
+✖ held native teardown retains the original Host, blocks launches and cannot execute late tools (13838.0827ms)
+  Error: Fixture wait: bounded accepted teardown
+      at Timeout.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:23:106)
+      at listOnTimeout (node:internal/timers:605:17)
+      at process.processTimers (node:internal/timers:541:7)
+
+test at services\agent-runtime\terminal-finalization.test.mjs:223:1
+✖ sandbox cleanup rejection cannot replace completed business acceptance (1472.5668ms)
+  Error: PRIVATE_SANDBOX_CLEANUP_FAILURE
+      at Object.close (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:107:110)
+      at ProductDshRuntime.execute (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-runtime.mjs:204:29)
+
+test at services\agent-runtime\terminal-finalization.test.mjs:232:1
+✖ archiving failure after durable acceptance is not recorded as fully persisted completion or business failure (2016.599ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:234:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /FINAL_ARCHIVE_FSYNC_FAILED/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

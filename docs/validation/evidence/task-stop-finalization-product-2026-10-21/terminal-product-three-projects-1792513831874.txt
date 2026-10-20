@@ -1,0 +1,23 @@
+Engineering fixtures: models/CLI/UID/cgroup/mTLS; real Product/Host/Handoff/HTTP/CAS/executor/journal/REMOTE_SCRIPT/Node files. Zero paid API.
+TAP version 13
+# Subtest: three sequential complete projects retain nine stopped scopes on one actual executor and journal
+ok 1 - three sequential complete projects retain nine stopped scopes on one actual executor and journal
+  ---
+  duration_ms: 263326.509
+  type: 'test'
+  ...
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-sequential-1-700a1662-55ce-46f0-9ef0-bd8ae2dff6e3-summary.json
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-sequential-2-aacad647-9b83-44df-844d-d38ac156f20b-summary.json
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-sequential-3-233e8499-eae2-45f7-afd5-ab235fdcdc59-summary.json
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-three-projects-700a1662-55ce-46f0-9ef0-bd8ae2dff6e3-summary.json
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 266041.6412
+
+PROCESS {"code":0,"signal":null,"elapsedMs":268829,"timedOut":false,"sourceStable":true}

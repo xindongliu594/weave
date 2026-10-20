@@ -1,0 +1,108 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ original-ID reconciliation has one explicit admin policy and a matching literal router mount (465.2576ms)
+✔ exact reconciliation POST bypasses response caching while nearby mutations keep key validation (109.8913ms)
+✔ strict four-field body and path binding reject before selecting a maintenance provider (69.7434ms)
+▶ actual createApp authenticates each original-ID observation and re-reads SQL after uncached 409
+  ✖ a missing snapshot preserves only protected SQL detail (35.0371ms)
+API failure: SyntaxError
+  ✖ malformed snapshot JSON cannot bypass the protected SQL detail (25.8183ms)
+API failure: Error
+  ✖ missing plain and archived journal remains visibly unverified (22.408ms)
+API failure: SyntaxError
+  ✖ invalid archived journal metadata cannot bypass the protected SQL detail (32.5564ms)
+✖ actual createApp authenticates each original-ID observation and re-reads SQL after uncached 409 (6482.2121ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 3
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10155.4608
+
+✖ failing tests:
+
+test at tests\task-stop-maintenance-http.test.ts:1:14591
+✖ a missing snapshot preserves only protected SQL detail (35.0371ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'ok' !== 'incomplete'
+  
+      at protectedDetail (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:100:142)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:109:54)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:107:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'ok',
+    expected: 'incomplete',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-http.test.ts:1:14930
+✖ malformed snapshot JSON cannot bypass the protected SQL detail (25.8183ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at protectedDetail (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:99:101)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:113:107)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:111:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-http.test.ts:1:15270
+✖ missing plain and archived journal remains visibly unverified (22.408ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at protectedDetail (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:99:101)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:117:54)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:115:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance-http.test.ts:1:15582
+✖ invalid archived journal metadata cannot bypass the protected SQL detail (32.5564ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  500 !== 200
+  
+      at protectedDetail (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:99:101)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:122:199)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance-http.test.ts:119:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

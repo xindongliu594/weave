@@ -13,6 +13,14 @@ import { GoalGuard } from './goal-guard.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const maintenancePending = reasonCode => ({ version: 1, state: 'pending', reasonCode });
+function maintenanceResult(value) {
+  if (!value || value.version !== 1 || !['stopped', 'pending'].includes(value.state) ||
+    Object.keys(value).some(key => !['version', 'state', 'reasonCode'].includes(key)) ||
+    (value.reasonCode !== undefined && (typeof value.reasonCode !== 'string' || !/^[A-Z][A-Z0-9_]{0,79}$/.test(value.reasonCode))))
+    return maintenancePending('TASK_STOP_RESULT_UNVERIFIED');
+  return { version: 1, state: value.state, ...(value.reasonCode ? { reasonCode: value.reasonCode } : {}) };
+}
 
 function lastAssistantText(agent) {
   const events = agent.session.snapshotEvents();
@@ -39,34 +47,79 @@ export class ProductDshRuntime {
   }
 
   async inspect() {
+    if ([...this.jobs.values()].some(job => job.teardownPending))
+      return { ready: false, reason: 'RUNTIME_TEARDOWN_PENDING: 已验收项目的宿主清理尚未结束，工具已停止；原清理结束后恢复接收新项目。' };
     return { ready: true, reason: 'DSH + AgentTeams：员工独立宿主、受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。' };
   }
 
-  async start({ runId, approvedSnapshot, routes }) {
+  async start({ runId, approvedSnapshot, routes, prepareWorkspace }) {
+    if ([...this.jobs.values()].some(job => job.teardownPending))
+      throw Object.assign(Error('RUNTIME_TEARDOWN_PENDING: 原宿主清理尚未结束，请稍后重试'), { code: 'RUNTIME_TEARDOWN_PENDING' });
     if (this.jobs.has(runId)) throw new Error('RUN_ALREADY_ACTIVE');
     assertArchiveCapacity(this.traceRoot,ARCHIVE_ROOT_LIMIT_BYTES);
+    // The coordinator supplies this synchronous, source-only preparation.
+    // Admission and preparation share one stack, so a rejected launch cannot
+    // leave imported files that prevent the same queued run from starting.
+    prepareWorkspace?.();
     const archive = createRunArchive(this.traceRoot, approvedSnapshot, { id: runId });
     archive.append('run/queued', { projectId: approvedSnapshot.projectId, projectVersion: approvedSnapshot.planVersion });
-    const job = { controller: new AbortController(), host: undefined, cancelled: false };
+    const job = { runId, controller: new AbortController(), host: undefined, cancelled: false };
     const completion = Promise.resolve().then(() => this.execute(job, archive, approvedSnapshot, routes));
     job.completion = completion;
     this.jobs.set(runId, job);
-    completion.then(() => this.jobs.delete(runId), () => this.jobs.delete(runId));
+    const finished = () => { job.completionSettled = true; this.releaseJob(job); };
+    completion.then(finished, finished);
     return { runtimeRunId: runId, completion };
+  }
+
+  releaseJob(job) {
+    if (!job.completionSettled || job.teardownPending) return;
+    job.host = undefined;
+    job.executor = undefined;
+    if (this.jobs.get(job.runId) === job) this.jobs.delete(job.runId);
+  }
+
+  async closeAcceptedResources(job, host, sandbox) {
+    // Only called after the durable acceptance boundary and synchronous Host
+    // admission fence. This wait never wraps a device stop/dispatch operation.
+    if (!job.teardownPromise) {
+      job.teardownPending = true;
+      job.executor = sandbox;
+      job.hostClosePromise = Promise.resolve().then(() => host.close());
+      job.executorClosePromise = Promise.resolve().then(() => sandbox?.close?.());
+      job.teardownPromise = Promise.allSettled([job.hostClosePromise, job.executorClosePromise]).then(results => {
+        job.teardownPending = false;
+        this.releaseJob(job);
+        return results.some(result => result.status === 'rejected')
+          ? maintenancePending('TASK_HOST_TEARDOWN_FAILED')
+          : { version: 1, state: 'stopped' };
+      });
+    }
+    let timer;
+    try {
+      // The original promises and resource references remain in jobs after a
+      // timeout. Their one eventual settlement, never a second close, releases
+      // readiness and the completed job.
+      return await Promise.race([job.teardownPromise, new Promise(resolve => {
+        timer = setTimeout(() => resolve(maintenancePending('TASK_HOST_TEARDOWN_PENDING')), 10000);
+      })]);
+    } finally { clearTimeout(timer); }
   }
 
   async cancel(runtimeRunId) {
     const job = this.jobs.get(runtimeRunId);
     if (!job) return false;
-    job.cancelled = true;
+    if (!job.businessAccepted) job.cancelled = true;
     job.controller.abort(new Error('Run cancelled'));
+    if (job.businessAccepted) return true;
     await job.host?.close();
     return true;
   }
 
   async execute(job, archive, snapshot, routes) {
     const usages = [];
-    let runtimeFailure;
+    let runtimeFailure, deliveryStop;
+    let deliverySettlementAttempted = false;
     let host, adapter, goal, sandbox, supervisor;
     const taskMode=snapshot.executionProfile==='task-attempt-openshell-v1';
     const gate = new Semaphore(snapshot.policy.maxConcurrentAgents);
@@ -74,7 +127,7 @@ export class ProductDshRuntime {
       job.deadlineExceeded = true;
       archive.append('run/deadline-exceeded', { deadlineSeconds: snapshot.policy.deadlineSeconds });
       job.controller.abort(new Error('Run deadline exceeded'));
-      void job.host?.close();
+      void job.host?.close().catch(() => {});
     }, snapshot.policy.deadlineSeconds * 1000);
     try {
       if(taskMode){
@@ -82,6 +135,7 @@ export class ProductDshRuntime {
         if(snapshot.recovery)throw Error('TASK_RECOVERY_UNAVAILABLE: 任务检查点恢复链路尚未完成');
         sandbox=this.createExecutor(archive,snapshot);
         if(!sandbox||['prepare','prepareTask','prepareCheckpoint','bindAttempt','execute','close'].some(name=>typeof sandbox[name]!=='function'))throw Error('TASK_EXECUTION_REQUIRED: 任务执行器缺少可信接口');
+        if(typeof sandbox.finalizeAccepted!=='function')throw Error('TASK_FINALIZATION_REQUIRED: 任务执行器缺少可信终态停止接口');
         // The root is a compatibility cache, never the publication authority.
         // Rebuild it from the committed head before supervisor/Handoff reads.
         await sandbox.prepare(job.controller.signal);job.controller.signal.throwIfAborted();
@@ -117,7 +171,12 @@ export class ProductDshRuntime {
         onRequest: data => archive.append('model/wire-request', data, {sessionId:data.sessionId,requestId:data.requestId,taskId:data.taskId,attemptId:data.attemptId}),
         onFallback: data => archive.append('model/fallback', data, {sessionId:data.sessionId}),
         onUsage: async usage => { usages.push(usage); archive.append('billing/usage', usage, {sessionId:usage.sessionId,requestId:usage.requestId,taskId:usage.taskId,attemptId:usage.attemptId}); await this.onUsage?.(archive.id, usage); },
-        onError: error => { runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error); },
+        onError: error => {
+          // The adapter settles original usage before throwing this exact
+          // internal stop. Other response/billing failures remain fatal.
+          if (error === deliveryStop) return;
+          runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error);
+        },
       });
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
@@ -167,23 +226,58 @@ export class ProductDshRuntime {
       // let original dispatched requests settle their real usage before closing
       // employee Hosts. Waiting only for the captain can abort a member's tail
       // request and unnecessarily leave its provider fee unknown.
-      adapter.stopAdmission(Object.assign(Error('交付已核验，正在收尾原有模型调用'), { code: 'DELIVERY_FINALIZING' }));
+      if (runtimeFailure) throw runtimeFailure;
+      deliveryStop = Object.assign(Error('交付已核验，正在收尾原有模型调用'), { code: 'DELIVERY_FINALIZING' });
+      adapter.stopAdmission(deliveryStop);
       if (adapter.pendingRequests) {
+        deliverySettlementAttempted = true;
         archive.append('runtime/model-settling', { reason: 'delivery-completed', maxWaitMs: 30000, pendingRequests: adapter.pendingRequests });
         const settlement = await adapter.drain(30000, job.controller.signal);
         archive.append('runtime/model-settled', { reason: 'delivery-completed', ...settlement });
+        job.controller.signal.throwIfAborted();
+        if (settlement.pendingRequests !== 0 || settlement.timedOut || settlement.aborted || adapter.pendingRequests)
+          throw Object.assign(Error('MODEL_SETTLEMENT_UNRESOLVED: 原模型调用尚未完成结算，已保留记录与费用预留，请核对后继续。'), { code: 'MODEL_SETTLEMENT_UNRESOLVED' });
       }
       job.controller.signal.throwIfAborted();
+      if (runtimeFailure) throw runtimeFailure;
       const summary = lastAssistantText(captain);
       archive.append('team/checkpoint',host.checkpointState());
+      if (taskMode) {
+        // The original business timer governs work, settlement and this final
+        // fsynced checkpoint. It cannot undo acceptance during maintenance.
+        job.businessAccepted = true;
+        clearTimeout(timer);
+        host.stopAdmission();
+        let maintenance;
+        try {
+          // The trusted executor starts its shared 120-second budget at entry.
+          // Await actual settlement; no caller timeout can abandon a stop.
+          maintenance = maintenanceResult(await sandbox.finalizeAccepted(job.controller.signal));
+        } catch {
+          maintenance = maintenancePending('TASK_ACCEPTED_STOP_UNRESOLVED');
+        }
+        const teardown = await this.closeAcceptedResources(job, host, sandbox);
+        if (teardown.state === 'pending') maintenance = teardown;
+        archive.append(maintenance.state === 'stopped' ? 'runtime/maintenance-completed' : 'runtime/maintenance-pending', maintenance);
+        archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, maintenance, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
+        return { status: 'completed', usages, summary, maintenance, recording: 'complete' };
+      }
       await host.close();
       host = undefined;
       archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       return { status: 'completed', usages, summary };
     } catch (error) {
+      // The final task checkpoint is already durable. Keep that trusted
+      // business outcome even if later recording fails; do not fabricate a
+      // terminal trace or let the coordinator relabel acceptance as failure.
+      if (job.businessAccepted) return {
+        status: 'completed', usages, recording: 'incomplete',
+        maintenance: maintenancePending('TASK_TERMINAL_RECORDING_INCOMPLETE'),
+        message: '交付已验收，终态记录尚未完整保存，请核对运行记录与维护状态。',
+      };
       supervisor?.stop(error); adapter?.stopAdmission(error);
       try {
-        if (!job.cancelled && !job.deadlineExceeded && !job.controller.signal.aborted && adapter?.pendingRequests) {
+        if (!deliverySettlementAttempted && !job.cancelled && !job.deadlineExceeded && !job.controller.signal.aborted && adapter?.pendingRequests) {
           archive.append('runtime/model-settling', { maxWaitMs: 30000, pendingRequests: adapter.pendingRequests });
           const settlement = await adapter.drain(30000, job.controller.signal);
           archive.append('runtime/model-settled', settlement);
@@ -201,8 +295,8 @@ export class ProductDshRuntime {
       return { status: job.cancelled ? 'cancelled' : 'failed', usages, message };
     } finally {
       clearTimeout(timer);
-      await sandbox?.close?.();
-      job.host = undefined;
+      if (!job.teardownPromise) await sandbox?.close?.();
+      if (!job.teardownPending) job.host = undefined;
     }
   }
 

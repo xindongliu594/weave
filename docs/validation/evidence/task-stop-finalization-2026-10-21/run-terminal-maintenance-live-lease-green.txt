@@ -1,0 +1,19 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (4557.2115ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (138.6126ms)
+✔ dead or foreign expired owners remain recoverable and atomic terminal state still closes pending approvals (217.4557ms)
+✔ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (226.1459ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (481.9246ms)
+✔ the real heartbeat timer renews its own fenced lease even while the scheduler remains busy (1145.2603ms)
+✔ caller abort exits immediately while the shared heartbeat waits for the single pool connection (207.9359ms)
+✔ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (224.3476ms)
+✔ terminal persistence rollback is atomic and a recorded completion is reconciled under a fresh recovery owner (191.7044ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8371.3427

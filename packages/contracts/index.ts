@@ -278,3 +278,4 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
 }
 export type * from './task-execution.ts';
 export type * from './task-workspace.ts';
+export {taskStopMaintenanceSchema,taskStopReconcileInputSchema,type TaskStopMaintenanceV1,type TaskStopMaintenanceScope,type TaskStopMaintenanceReasonCode} from './task-stop-maintenance.ts';

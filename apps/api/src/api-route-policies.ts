@@ -116,6 +116,7 @@ export const routePolicies:readonly RoutePolicy[] = [
   {method:'GET',path:'/api/runs/:id/recovery-check',access:'admin',source:'run-management.ts'},
   {method:'POST',path:'/api/runs/:id/resource-proposal',access:'admin',source:'recovery-resource-router.ts'},
   {method:'POST',path:'/api/runs/:id/retry',access:'admin',source:'run-management.ts'},
+  {method:'POST',path:'/api/runs/:id/task-stops/reconcile',access:'admin',source:'task-stop-maintenance.ts'},
   {method:'POST',path:'/api/runs/verify',access:'admin',source:'app.ts'},
   {method:'POST',path:'/api/sandbox/install',access:'admin',source:'run-management.ts'},
   {method:'GET',path:'/api/settings',access:'admin',source:'product.ts'},
@@ -220,7 +221,7 @@ export function actualRouteRegistrations():string[] {
 
 const mountedRouters=['managerChatRouter','browserMcpRouter','nativeCapabilityRouter','workFilesRouter',
   'automationLearningRouter','localDeviceRouter','obsidianRouter','knowledgeRouter','productRouter',
-  'employeeHistoryRouter','departmentWorkbenchRouter','openRigRouter','runLineageEvidenceRouter',
+  'employeeHistoryRouter','departmentWorkbenchRouter','openRigRouter','runLineageEvidenceRouter','taskStopMaintenanceRouter',
   'costRouter','runManagementRouter','backupRouter','storageRouter'];
 const expectedNestedMounts:Record<string,string[]>={
   'product.ts':['organizationChatRouter'],

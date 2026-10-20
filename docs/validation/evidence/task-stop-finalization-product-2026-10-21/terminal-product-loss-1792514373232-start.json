@@ -1,0 +1,40 @@
+{
+  "label": "loss",
+  "pid": 6564,
+  "parentPid": 42316,
+  "startedAt": "2026-10-20T16:39:33.232Z",
+  "args": [
+    "--import",
+    "tsx",
+    "--import",
+    "./scripts/test-support/pglite-pool.mjs",
+    "--test",
+    "--test-concurrency=1",
+    "--test-reporter=tap",
+    "--test-name-pattern=lost accepted stop",
+    "tests/task-accepted-stop-product-flow.test.ts"
+  ],
+  "startSha": {
+    "tests/task-accepted-stop-product-flow.test.ts": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2",
+    "tests/helpers/task-openshell-product-fixture.cjs": "7270cb220a9f40389ff95eee9c118a5be82b994b123c18e9d8a9cd73bb2ee384",
+    "apps/desktop/openshell-executor.cjs": "6ac776928fc86c89cce0a6687574709d6683b17e0cd647b4f1ae9ed3502af82c",
+    "apps/desktop/sandbox-storage.cjs": "1fff257b260ce31c3586e20ef4aada6c7262fc19231a2f24e2b1d667d44170c7",
+    "apps/api/src/local-execution.ts": "55d0d5343371b5b42f6f442159e5be3e0aa4047902d7580504690d62ce171947",
+    "apps/api/src/task-accepted-stop.ts": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d",
+    "apps/api/src/task-original-commit.ts": "3c1e451672502951a812a8b668342bc19e1248e361593a6ac98ee1d12bd33b75",
+    "apps/api/src/task-checkpoint-state.ts": "33b0ff7c9ada302578825971e18d71fcb5406014d3f00816b26af9c4b593dfb1",
+    "apps/api/src/handoff-checkpoints.ts": "b6a1e436be7091fbb20fc3707bc6fd6851406bb6230631023e855ebc1876295a",
+    "apps/api/src/task-execution.ts": "c2062e9d9fcf41a783ba567d546f1e0147dbd34ebb49cbac6bdfc8032054a7e4",
+    "apps/api/src/storage-lifecycle.ts": "18c2f2e57a0a119a3e1ec4c2a55a005a3fc989b679849710f39f46b5f01aca16",
+    "apps/api/src/task-stop-maintenance.ts": "e930d25fcf99b1858d046f0c4a26becc8b27645fd493a775d2f8883a2d84f732",
+    "apps/api/src/run-management.ts": "55d9cbd6be16bdf0eddba86fefb45392e05ec22724a143c95ac71997ae878b2d",
+    "apps/api/src/app.ts": "c721695ce38801bd2a2c9cb10588475997f5bdefe26ba4e04f41aa65fe9db193",
+    "apps/api/src/task-accepted-stop-state.ts": "51bf01f2ed8eaa06e7c20ae5423c97fdb8173e2791391cd1ac3be60428884a7a",
+    "apps/api/src/live-canonical-reader.ts": "43a6993f6cfaff154b5d8b94b53609fedf0db517f767a870ec78eac7216fb660",
+    "services/agent-runtime/product-runtime.mjs": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8",
+    "services/agent-runtime/host.mjs": "422d2f9130d59e3f51bb750f35d3400964b24ee7c97ad7c43e1623c2377b2899",
+    "services/agent-runtime/task-tool-boundary.mjs": "1fd92ca4a596fb8c4b0d6c8a1be85c5ecc48e14aff800daf9a6f4a7acdeffb95",
+    ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-runner.mjs": "623e2f896d8e857ab63d3d1d06875555f0e22fae7e078e20665f5a19c6a185c9"
+  },
+  "wrapperDeadlineMs": 240000
+}

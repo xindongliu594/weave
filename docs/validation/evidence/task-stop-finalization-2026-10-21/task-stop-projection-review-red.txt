@@ -1,0 +1,61 @@
+✔ only legacy profile can project not-applicable; empty task evidence remains pending (4426.0079ms)
+✔ NULL original marker is protected no-intent and every existing marker keeps its original ID (20.6839ms)
+✔ marker structure alone cannot confirm mismatched accepted checkpoint or SQL operation metadata (17.3295ms)
+✔ missing archive, sandbox identity or accepted scope never becomes empty stopped output (4.8705ms)
+✔ retired and superseded NULL scopes keep their original no-intent identity without borrowing repair proof (4.8183ms)
+✔ ambiguous and invalid locators collapse to bounded aggregate without effect identity (4.7824ms)
+✔ missing approved row and all truncation signals remain visible and display keys stay stable (18.1811ms)
+✔ DTO refuses unknown private fields, invalid effect identities and duplicate scope keys (5.6116ms)
+✔ injected SQL reader selects bounded metadata, re-reads on each call and never emits private reader errors (5.9196ms)
+✔ strict DTO rejects all extra fields and invalid state/reconciliation combinations (5.4733ms)
+✔ partial task revision is compared with original device metadata separately from full canonical revision (3.5227ms)
+✖ historical stopped scope cannot hide a latest repair slot whose SQL row is missing (7.9105ms)
+✖ duplicate native tasks, sessions and mappings cannot select one matching locator as stopped (4.0893ms)
+✔ repeated unchanged mappings and one missing latest accepted locator do not add false ambiguity or duplicate slots (3.9251ms)
+✔ no-intent requires complete accepted input/output and verification metadata (4.9186ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 13
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5583.9425
+
+✖ failing tests:
+
+test at tests\task-stop-maintenance.test.ts:1:17315
+✖ historical stopped scope cannot hide a latest repair slot whose SQL row is missing (7.9105ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance.test.ts:189:89)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-stop-maintenance.test.ts:1:18321
+✖ duplicate native tasks, sessions and mappings cannot select one matching locator as stopped (4.0893ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'stopped'
+  - 'pending'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-stop-maintenance.test.ts:204:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'stopped',
+    expected: 'pending',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -100,7 +100,7 @@ test('task runtime refuses shared fallback and initializes committed cache befor
   let archive=createRunArchive(root,snapshot);let runtime=new ProductDshRuntime({traceRoot:root});
   const absent=await runtime.execute(job(),archive,snapshot,[]);assert.equal(absent.status,'failed');assert.match(absent.message,/TASK_EXECUTION_REQUIRED/);
   let prepared=false,closed=false;archive=createRunArchive(root,snapshot);
-  runtime=new ProductDshRuntime({traceRoot:root,createExecutor:()=>({get root(){assert.equal(prepared,true,'committed cache must be ready before first read');return root;},bindAttempt(){},prepareTask(){},prepareCheckpoint(){},execute(){},prepare:async()=>{prepared=true;throw Error('EXPECTED_PREPARE_STOP');},close:async()=>{closed=true;}})});
+  runtime=new ProductDshRuntime({traceRoot:root,createExecutor:()=>({get root(){assert.equal(prepared,true,'committed cache must be ready before first read');return root;},bindAttempt(){},prepareTask(){},prepareCheckpoint(){},execute(){},finalizeAccepted(){throw Error('FINALIZER_MUST_NOT_RUN_AFTER_FAILED_PREPARE');},prepare:async()=>{prepared=true;throw Error('EXPECTED_PREPARE_STOP');},close:async()=>{closed=true;}})});
   const stopped=await runtime.execute(job(),archive,snapshot,[]);assert.equal(stopped.status,'failed');assert.match(stopped.message,/EXPECTED_PREPARE_STOP/);assert.equal(prepared,true);assert.equal(closed,true);
  }finally{rmSync(root,{recursive:true,force:true});rmSync(root+'-archive',{recursive:true,force:true});}
 });

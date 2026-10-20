@@ -1,0 +1,21 @@
+✔ task runtime requires the source-only finalizer before prepare or model effects (93.2837ms)
+✔ durable native acceptance finalizes once before Host close and run finished (2025.0608ms)
+✔ failure of the final durable checkpoint stays a business failure with zero finalization (2091.7057ms)
+✔ accepted business remains completed with pending maintenance: throws (1847.4597ms)
+✔ accepted business remains completed with pending maintenance: invalid (1784.785ms)
+✔ accepted business remains completed with pending maintenance: cancel (2156.3628ms)
+✔ business deadline stops at durable acceptance while shared maintenance signal remains active (4706.3048ms)
+✔ held native teardown retains the original Host, blocks launches and cannot execute late tools (11763.2928ms)
+✔ sandbox cleanup rejection cannot replace completed business acceptance (1553.2224ms)
+✔ archiving failure after durable acceptance is not recorded as fully persisted completion or business failure (1800.7192ms)
+✔ actual model drain timeout blocks terminal finalization without a second settlement window (1565.4753ms)
+✔ late original model usage settles despite the internal delivery stop (1679.6316ms)
+✔ late original model usage failure blocks acceptance (1754.8582ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35849.2229

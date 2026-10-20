@@ -1,0 +1,35 @@
+✔ approved deadline is retained as the stop reason when a tool wraps the abort (1089.2874ms)
+✔ successful native delivery settles an already dispatched tail request before disposal and suppresses late tools (6318.7399ms)
+✔ user cancellation during successful-delivery settlement remains cancelled and retains an unknown dispatched fee (1264.0659ms)
+✔ local pre-dispatch failure is not reported as a relay connection failure or charged (8.5007ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (6.379ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.3434ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (2.2403ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.9623ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.4838ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (2192.1476ms)
+✔ task Host private checkpoint barrier success (1086.6747ms)
+✔ task Host private checkpoint barrier cycle-hold (1023.0923ms)
+✔ task Host private checkpoint barrier cycle-reject (650.3802ms)
+✔ task Host private checkpoint barrier accepted-hold (716.6259ms)
+✔ task Host private checkpoint barrier accepted-reject (1025.4318ms)
+✔ synchronous node-accepted step/boundary failure stops actual dependent Host dispatch (1184.3548ms)
+✔ synchronous node-accepted step/checkpoint failure stops actual dependent Host dispatch (885.3339ms)
+✔ actual Product marks last native completed node failed when its synchronous checkpoint cannot publish (1744.2255ms)
+✔ task tool preparation uses registered generation and rejects an assignment changed while waiting (4.3548ms)
+✔ task command proof survives another task commit but never its own changed output (135.4795ms)
+✔ task handoff rejects a raw device success without a committed matching merge (17.4308ms)
+✔ a renewed task generation cannot reuse the previous generation command proof (31.8568ms)
+✔ actual product tool body binds prepared generation and exact scope before transport (29.4703ms)
+✔ waiting approval cannot authorize a renewed scope and missing registration dispatches nothing (11.4608ms)
+✔ task runtime refuses shared fallback and initializes committed cache before any cache read (29.0353ms)
+✔ product checkpoint holds tool body before dispatch and exact-operation observation after dispatch (15.5413ms)
+✔ rejected before-tool checkpoint prevents transport and rejected result checkpoint prevents observation (8.7242ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25183.3657

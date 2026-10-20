@@ -1,0 +1,19 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ original-ID reconciliation has one explicit admin policy and a matching literal router mount (385.4024ms)
+✔ exact reconciliation POST bypasses response caching while nearby mutations keep key validation (103.2337ms)
+✔ strict four-field body and path binding reject before selecting a maintenance provider (69.762ms)
+▶ actual createApp authenticates each original-ID observation and re-reads SQL after uncached 409
+  ✔ a missing snapshot preserves only protected SQL detail (63.1476ms)
+  ✔ malformed snapshot JSON cannot bypass the protected SQL detail (81.8819ms)
+  ✔ missing plain and archived journal remains visibly unverified (75.9449ms)
+  ✔ invalid archived journal metadata cannot bypass the protected SQL detail (101.8654ms)
+✔ actual createApp authenticates each original-ID observation and re-reads SQL after uncached 409 (5579.8846ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8959.42

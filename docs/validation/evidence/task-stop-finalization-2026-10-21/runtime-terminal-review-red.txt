@@ -1,0 +1,59 @@
+✖ archiving failure after durable acceptance is not recorded as fully persisted completion or business failure (2364.4839ms)
+✖ actual model drain timeout blocks terminal finalization without a second settlement window (2020.3123ms)
+✔ late original model usage settles despite the internal delivery stop (2313.2082ms)
+✖ late original model usage failure blocks acceptance (2226.8169ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9800.5844
+
+✖ failing tests:
+
+test at services\agent-runtime\terminal-finalization.test.mjs:247:1
+✖ archiving failure after durable acceptance is not recorded as fully persisted completion or business failure (2364.4839ms)
+  Error: FINAL_ARCHIVE_FSYNC_FAILED
+      at archive.append (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:97:76)
+      at Object.append (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-runtime.mjs:140:76)
+      at ProductDshRuntime.execute (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-runtime.mjs:245:17)
+
+test at services\agent-runtime\terminal-finalization.test.mjs:259:1
+✖ actual model drain timeout blocks terminal finalization without a second settlement window (2020.3123ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'completed'
+  - 'failed'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:271:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'completed',
+    expected: 'failed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\terminal-finalization.test.mjs:280:35
+✖ late original model usage failure blocks acceptance (2226.8169ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'completed'
+  - 'failed'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/terminal-finalization.test.mjs:285:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'completed',
+    expected: 'failed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

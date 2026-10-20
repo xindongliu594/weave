@@ -1,0 +1,607 @@
+{
+  "version": 1,
+  "scope": "terminal finalization integration; engineering fixtures and rendered UI only",
+  "localDate": "2026-10-21",
+  "paidModelCalls": 0,
+  "jjDeployments": 0,
+  "profile": "closed",
+  "sources": [
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "bytes": 20944,
+      "sha256": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8",
+      "sha256Lf": "e5e873c64ec1b41f49e44f4a0f92e4b36242d6ee95187afa9fba8834678121da"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.d.mts",
+      "bytes": 1457,
+      "sha256": "fe17910381d1eced939991e0ab3accf94885f846f4a46d8e91fa31f686d3395a",
+      "sha256Lf": "e7690e753100b54a51126af85bd0c8a090f51fe73bbf4739d1c81ac9759c69df"
+    },
+    {
+      "path": "services/agent-runtime/terminal-finalization.test.mjs",
+      "bytes": 18661,
+      "sha256": "9070e65ec5336f6e5987a039bf798ad544406744670e7b47d5cf152032010ec7",
+      "sha256Lf": "9070e65ec5336f6e5987a039bf798ad544406744670e7b47d5cf152032010ec7"
+    },
+    {
+      "path": "services/agent-runtime/task-readonly-handoff.test.mjs",
+      "bytes": 18984,
+      "sha256": "22dd08d7ea56f31e1ffafacfca232c961851f25384c798bda2ccac4aceb21020",
+      "sha256Lf": "ae39158450a09e1cac9474731efc6a337f869bb516e513a8d713ad481b0a9db1"
+    },
+    {
+      "path": "services/agent-runtime/task-sandbox-flow.test.mjs",
+      "bytes": 15146,
+      "sha256": "9991ecbf2a790ab81687d1a83eed554d65a027779407bed0a8e3aab0727e658f",
+      "sha256Lf": "7f8968d86e8e973c309d473795e69bcebf3561249bde8c96443c3f03e73fdd43"
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "bytes": 17242,
+      "sha256": "c2b9086963077c3ddaf245f2942c16ec98ea369c1373f0ec7d81f8e4045b66bf",
+      "sha256Lf": "c85312a467129e380f8208c2b91a75d441f301ea02ab0f07c57c6a47257dcf27"
+    },
+    {
+      "path": "apps/api/src/run-state.ts",
+      "bytes": 4850,
+      "sha256": "f8630d1a977ed283be99437860ed67e886da05d90c49295f8fed98af04308c88",
+      "sha256Lf": "a112634347970b1b4d3fdc047d657d3064f4e8f0b959ed54e1827b57d06453b5"
+    },
+    {
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "bytes": 16668,
+      "sha256": "335205ec5125db8b4186dae56109391b2e0bb6cac4ae8f6d9c11bcf26bbbccd7",
+      "sha256Lf": "335205ec5125db8b4186dae56109391b2e0bb6cac4ae8f6d9c11bcf26bbbccd7"
+    },
+    {
+      "path": "packages/contracts/task-stop-maintenance.ts",
+      "bytes": 3020,
+      "sha256": "30b858f20cd8b07ceca814d76b665884e9ea45ab80357713cdc3d07801fe007f",
+      "sha256Lf": "30b858f20cd8b07ceca814d76b665884e9ea45ab80357713cdc3d07801fe007f"
+    },
+    {
+      "path": "packages/contracts/index.ts",
+      "bytes": 25629,
+      "sha256": "64c74b7ccd25c0b2ee5c03d5b0bc52e8737fd49992f5d41becc06fa7a3580c89",
+      "sha256Lf": "0883e2fa01767bcd32781fdaa3d80de278a0823665392373c587885545d80cbe"
+    },
+    {
+      "path": "apps/api/src/task-stop-maintenance.ts",
+      "bytes": 24750,
+      "sha256": "e930d25fcf99b1858d046f0c4a26becc8b27645fd493a775d2f8883a2d84f732",
+      "sha256Lf": "e930d25fcf99b1858d046f0c4a26becc8b27645fd493a775d2f8883a2d84f732"
+    },
+    {
+      "path": "apps/api/src/task-stop-storage.ts",
+      "bytes": 2899,
+      "sha256": "a850776077611f3be743dbf2a834767be8c7fa5f35cc0f4a164235e6fb07ed01",
+      "sha256Lf": "a850776077611f3be743dbf2a834767be8c7fa5f35cc0f4a164235e6fb07ed01"
+    },
+    {
+      "path": "apps/api/src/storage-governance.ts",
+      "bytes": 16165,
+      "sha256": "e8187b36f2f71d4d57020ff1e840b49f600b504fd272f6085af7af138c84bf04",
+      "sha256Lf": "e8187b36f2f71d4d57020ff1e840b49f600b504fd272f6085af7af138c84bf04"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 62039,
+      "sha256": "0140392e9d1e3f09e0b2986193e1e17dc63687e67c9bb9b6d94df9d8c9c04408",
+      "sha256Lf": "d42371a8d48eb5f75c65641efde14942fa8739d56595a01688802d06143ac890"
+    },
+    {
+      "path": "apps/api/src/api-route-policies.ts",
+      "bytes": 21779,
+      "sha256": "2a8b3db3c461f7586e3ebf66e7d7dd886df4d830cc95ed8d5482a387c221ab37",
+      "sha256Lf": "79231151dce0db70f6e7f8372e6ee6c90180297a81d37868ab0a8e43634c9258"
+    },
+    {
+      "path": "apps/api/src/idempotency.ts",
+      "bytes": 2667,
+      "sha256": "7ee5ea1d88dacc15b79969defd7be548b589f42f7bffded124926b9cdbec4dc4",
+      "sha256Lf": "5c2ab26ec3dc2b6f260a1d4f1bdb247dd7d09e599e31226d0b8052b8eabc3ea5"
+    },
+    {
+      "path": "apps/web/src/TaskStopMaintenance.tsx",
+      "bytes": 6505,
+      "sha256": "98d48683e46e5ea3ad06e7c03c2e30dc5d1355e431579d08afc4a318b634e7c1",
+      "sha256Lf": "98d48683e46e5ea3ad06e7c03c2e30dc5d1355e431579d08afc4a318b634e7c1"
+    },
+    {
+      "path": "apps/web/src/RunCenter.tsx",
+      "bytes": 17020,
+      "sha256": "dffe3a2b418f9ef5e31ee88ae7b43861ea0ac852a4d0895914eba1eab77c12c7",
+      "sha256Lf": "dffe3a2b418f9ef5e31ee88ae7b43861ea0ac852a4d0895914eba1eab77c12c7"
+    },
+    {
+      "path": "apps/web/src/StorageCenter.tsx",
+      "bytes": 13489,
+      "sha256": "78cef7242f85fd3d211e6949134239296e9376235bafc860c7fbf0729004730d",
+      "sha256Lf": "78cef7242f85fd3d211e6949134239296e9376235bafc860c7fbf0729004730d"
+    },
+    {
+      "path": "tests/task-stop-maintenance.test.ts",
+      "bytes": 21495,
+      "sha256": "58538ff2e830a543866010171b30d14274435692f6bf11ce9abf1ecbea93bf89",
+      "sha256Lf": "58538ff2e830a543866010171b30d14274435692f6bf11ce9abf1ecbea93bf89"
+    },
+    {
+      "path": "tests/task-stop-maintenance-http.test.ts",
+      "bytes": 17118,
+      "sha256": "7348596b6d2d465f95e91492127fa6cf4914a6d0cb0dd1bb5ea931994e397cc3",
+      "sha256Lf": "7348596b6d2d465f95e91492127fa6cf4914a6d0cb0dd1bb5ea931994e397cc3"
+    },
+    {
+      "path": "tests/task-stop-maintenance-ui.test.ts",
+      "bytes": 8214,
+      "sha256": "21a783c5499a22f9ca88f82df346065bd12a95b71b9fec45f580d5d32a488cef",
+      "sha256Lf": "21a783c5499a22f9ca88f82df346065bd12a95b71b9fec45f580d5d32a488cef"
+    },
+    {
+      "path": "tests/task-stop-storage.test.ts",
+      "bytes": 4621,
+      "sha256": "6f60887f005f2d23b66ce5a676b1a6c869da9693242095c16614632dde572c9e",
+      "sha256Lf": "6f60887f005f2d23b66ce5a676b1a6c869da9693242095c16614632dde572c9e"
+    },
+    {
+      "path": "tests/api-access.test.ts",
+      "bytes": 6193,
+      "sha256": "5c2394413e58a14c83c0f1a979535eb2059cae24ec50b5514f44e6615d2d8f44",
+      "sha256Lf": "5c2394413e58a14c83c0f1a979535eb2059cae24ec50b5514f44e6615d2d8f44"
+    },
+    {
+      "path": "tests/task-accepted-stop-product-flow.test.ts",
+      "bytes": 38221,
+      "sha256": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2",
+      "sha256Lf": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2"
+    }
+  ],
+  "files": [
+    {
+      "path": "runtime-terminal-red.txt",
+      "bytes": 7162,
+      "sha256": "992df517ee511fe450cb01446d22de9f35af0b9a9bb234313a814ab7850124ad",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-red.exit.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-review-red.txt",
+      "bytes": 2737,
+      "sha256": "843ace62eabf9f5686ce80dd891a95dcd56178bb5209ccdcd552774d7c6bc63e",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-review-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-review-red.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-review-red.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-admission-red.txt",
+      "bytes": 951,
+      "sha256": "0f6f0df66491daa2c4212b94ea521c73761736801115fd2c17233fe014bd77fc",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-admission-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-admission-red.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-admission-red.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-review-green.txt",
+      "bytes": 1401,
+      "sha256": "131c6abaaa74c0f4279d73ebbee974d27825e504b97347861947661f7bba4b9d",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-review-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-review-green.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-review-green.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-related.txt",
+      "bytes": 6147,
+      "sha256": "5096a57029fb7eb3dcde578f34029b7cc70b010b683b079fd3393a2ed91675e9",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-related.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-related.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-related.exit.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-related-loopback.txt",
+      "bytes": 2880,
+      "sha256": "1c4fdef405dba0ac10f2179b8f407a7840be2b33d37057e7e46650d0bcbee72c",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-related-loopback.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-related-loopback.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-related-loopback.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-independent-review.md",
+      "bytes": 10147,
+      "sha256": "c4b2cc1c371eee236435cc1f806c6e8866a704eaefaefeb24c3a4d2a1820af88",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-independent-review.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "runtime-terminal-independent-review-final.md",
+      "bytes": 6342,
+      "sha256": "4993bc171a50300e6ee0e562642315baaf038a216d8f463bb505cff726f3d1a7",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/runtime-terminal-independent-review-final.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-red-fixture-stall.txt",
+      "bytes": 478,
+      "sha256": "6a7ebce3677dcce93d4378c9cb25c623c872b2d28a6f5847c8acc1e70bae0ecc",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-red-fixture-stall.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-red.txt",
+      "bytes": 13585,
+      "sha256": "af85b7ed9d2a7f571e67f1d02f5853705f149429b57f5cd979f9878c131ea312",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-red.exit.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-green.txt",
+      "bytes": 2202,
+      "sha256": "80cddc02ef08b76a7db4124abe68d708a9d1490b77d16ec69577b5c7f0f24d4b",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-green.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-green.exit.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-live-lease-green.txt",
+      "bytes": 1473,
+      "sha256": "94999144f8af0f983b86e5f824a1ae0936ac19ef1e19bfca363bda1de9cdecbd",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-live-lease-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-live-lease-green.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-live-lease-green.exit.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-report.md",
+      "bytes": 6230,
+      "sha256": "d0ff4d10ef1cfc956841bf67aa71d1ba429eba421d9067d3140768493a002004",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-report.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "run-terminal-maintenance-source-sha.json",
+      "bytes": 735,
+      "sha256": "523064334fe4210c5e145fa005118c4b5c90dbfa37eb3a8fc25e2ac461e16dcc",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/run-terminal-maintenance-source-sha.json",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-projection-review-red.txt",
+      "bytes": 3187,
+      "sha256": "214b5181267c01136894d90979274b4b057cbee79df184839a7b105d93f42f6e",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-projection-review-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-projection-review-green.txt",
+      "bytes": 3091,
+      "sha256": "97dcc1ee7dc41015764e182d4e8ac169e66b1db9d85c870731f017399210ac4d",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-projection-review-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-projection-independent-review.md",
+      "bytes": 7293,
+      "sha256": "94aedf93603882589bdf9ec65ca4861fd94d59c7e0245db760fd9b8ecde2593c",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-projection-independent-review.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-projection-independent-review-final.md",
+      "bytes": 3405,
+      "sha256": "f5df9f36cd563a84d12eacd42e935613e4e6905752010ecb3ba36cb835b8eece",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-projection-independent-review-final.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-light-red.txt",
+      "bytes": 3339,
+      "sha256": "6a8e51668f545619e637ecffa203b6ceb5989ea2c9d096ad0da2f39bc17a4408",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-light-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-actual-first.txt",
+      "bytes": 1675,
+      "sha256": "a8f4a019d7376a10809d2ac5f799d1430771e67c0c3e8c14777fa1a899115ff6",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-actual-first.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-actual-second.txt",
+      "bytes": 807,
+      "sha256": "50a264ce25fcf3616e492dd27a79abe845fd742bfb50bf1722b21f8300f7a31f",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-actual-second.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-related.txt",
+      "bytes": 753,
+      "sha256": "b5eeb369291654a6cd32e6f38e504e536367f5a10145cd39edf24394fc87a1ed",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-related.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-archive-red.txt",
+      "bytes": 5734,
+      "sha256": "c34f72b3ff04f85489a90ce66fe626d59daaaa584d907f2ec3f5986e9097def2",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-archive-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-archive-green.txt",
+      "bytes": 1235,
+      "sha256": "21e1b4e74aa300684055bbedaaa366aecd968070a8c82f3949a38727092feb92",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-archive-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-archive-fix-report.md",
+      "bytes": 4020,
+      "sha256": "2e075d30c9850599dbbe3bee1809d50fc39feae6bed424b10e2609d3a568b26d",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-archive-fix-report.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-archive-fix-sha.json",
+      "bytes": 400,
+      "sha256": "25f6792783729c3686061ab7e363d84ee298fe8430717dcb735684498fed9964",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-archive-fix-sha.json",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-web-report.md",
+      "bytes": 7504,
+      "sha256": "4a39b2e6cbe12c33030f0bc7efd091fe0885fe447be7197566129c66ae0df63f",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-web-report.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-http-web-sha.json",
+      "bytes": 2000,
+      "sha256": "b4bed639e97958bff98fe063c0025d77de93fc213ad9305ba9f16573840d276e",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-http-web-sha.json",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-ui-red.txt",
+      "bytes": 6972,
+      "sha256": "5b03b22fd3443691ddac6808910bbc603852e3f5da54281a6c743cef1af79466",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-ui-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-ui-cross-run-red.txt",
+      "bytes": 2984,
+      "sha256": "5561b5d9a1f49f1cfd29c41616bf37b43b1f9bb4fdf2dc61b9ded68b15249632",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-ui-cross-run-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-maintenance-ui-green.txt",
+      "bytes": 4556,
+      "sha256": "1331fbd50659373974a66c6d7fb6412dcef566660698bf7257fb4a6abc9ce408",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-maintenance-ui-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-storage-red.txt",
+      "bytes": 5379,
+      "sha256": "0d2c2e04497dc10c08860149b67192b7f5b7da91c0fef10ef07708b44528ec78",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-storage-red.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-storage-red.exit",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-storage-red.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-storage-green.txt",
+      "bytes": 607,
+      "sha256": "41410430bbe496978d83f93f85720a50b443d5649d8afdd2855bfa3e6be0c6a0",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-storage-green.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "task-stop-storage-green.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/task-stop-storage-green.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-http-web-storage-independent-review.md",
+      "bytes": 7757,
+      "sha256": "be3a633fba2c8c730171a91fb0671001fac7218c4a8ca0aa334c70f55656c861",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-http-web-storage-independent-review.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-http-web-storage-independent-review-final.md",
+      "bytes": 3726,
+      "sha256": "3c2f47b982b9d40272bc08078c72b71fbb026f685796ac4a04b95cce88c218cb",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-http-web-storage-independent-review-final.md",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-global-build-20261021.txt",
+      "bytes": 301,
+      "sha256": "f03395197610a21fa732216d87a9478459962e66707993f6fd57103efb62ca08",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-global-build-20261021.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-global-build-20261021.exit",
+      "bytes": 3,
+      "sha256": "df4e26a04a444901b95afef44e4a96cfae34690fff2ad2c66389c70079cdff2b",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-global-build-20261021.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-global-build-20261021-final.txt",
+      "bytes": 795,
+      "sha256": "bb7f9376f93255bb26ec63d136dc87583ac6031cc2e10e234460cffbbd5b16f9",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-global-build-20261021-final.txt",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-global-build-20261021-final.exit",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-global-build-20261021-final.exit",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-checks.json",
+      "bytes": 3545,
+      "sha256": "47c9cbd3f0150f2fba3e94f3feabd118501bdca2f950c0842c6613dbb4b783cd",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-checks.json",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-console.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-console.json",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-http.jsonl",
+      "bytes": 32586,
+      "sha256": "3b251e90a58e933d6f624c5ea39fb1bb37f8a9b77bc8b4d57aef32f2b8a50751",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-http.jsonl",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-fixture.html",
+      "bytes": 302,
+      "sha256": "0919bf8dd9c1758c28b3cc0a0fb68ec80b12bc4e9cd613079fd55f8076cd9270",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-fixture.html",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-fixture.tsx",
+      "bytes": 1875,
+      "sha256": "2fca0093780e1e2ad1c1f1a9ea0056f7dcac1a7e657bf5dc615ce3473b462dd3",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-fixture.tsx",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-server.mjs",
+      "bytes": 5969,
+      "sha256": "f6d306c6d02adb044c9bad0f57b450d64a35036dc51d2cb7fa68d60eb578d1b0",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-server.mjs",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-pending.png",
+      "bytes": 49353,
+      "sha256": "84303b2af0497ed2ade90f4a7057ebd8f4e024a392ab6ab128ca073a82934556",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-pending.png",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-stopped.png",
+      "bytes": 55828,
+      "sha256": "e8e457d866a3dce43a6345d2848e4c635fcfeef1a9058f059e47c88dcfac9a5f",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-stopped.png",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-denied.png",
+      "bytes": 48851,
+      "sha256": "8cd0dba9347e652ef9e69aaed114e6194302b9238c18f107e6f5d1bb26afcbce",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-denied.png",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-browser-storage.png",
+      "bytes": 55125,
+      "sha256": "05bae4b55078b55b131ad0fd2577e614c93ebd022d439fd78a5802650ee6d717",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-browser-storage.png",
+      "transformation": "byte-for-byte"
+    }
+  ],
+  "generatedFiles": [
+    {
+      "path": "browser-transport-verification.json",
+      "bytes": 226,
+      "sha256": "f61a77eaec63e8336b3c38578f815efc35249e9b74e6b81084c1162d6c7810c2"
+    }
+  ],
+  "browserTransport": {
+    "fixtureOnly": true,
+    "observations": 4,
+    "eachScenarioIssuedOneOriginalRequest": true,
+    "sameRunRefreshAfterSuccess": true,
+    "noOldRunDetailRefreshAfterLateSwitchedResponse": true,
+    "actualModelOrDeviceEffects": 0
+  },
+  "build": {
+    "exitCode": 0,
+    "log": "terminal-global-build-20261021-final.txt"
+  },
+  "exclusions": [
+    "physical JJ/OpenShell and native PostgreSQL concurrency",
+    "paid model acceptance",
+    "task retirement and recovery/carrier gates",
+    "whole enterprise objective"
+  ]
+}

@@ -1,0 +1,13 @@
+✔ storage joins full task attempt identity and reads each run once (6.208ms)
+✔ matching run alone cannot borrow another sandbox, revision or attempt stop (1.0649ms)
+✔ absent, malformed and ambiguous projections are protected without invented stop identity (3.7109ms)
+✔ legacy rows retain existing behavior and invalid task keys cannot enter the SQL reader (0.611ms)
+✔ duplicate device keys and over-limit task inventories cannot expose a reconciliation action (5.2234ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 739.6568

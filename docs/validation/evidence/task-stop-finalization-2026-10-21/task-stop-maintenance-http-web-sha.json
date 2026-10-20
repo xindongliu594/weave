@@ -1,0 +1,42 @@
+[
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\task-stop-maintenance.ts",
+    "Hash": "E930D25FCF99B1858D046F0C4A26BECC8B27645FD493A775D2F8883A2D84F732"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\app.ts",
+    "Hash": "0140392E9D1E3F09E0B2986193E1E17DC63687E67C9BB9B6D94DF9D8C9C04408"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\api-route-policies.ts",
+    "Hash": "2A8B3DB3C461F7586E3EBF66E7D7DD886DF4D830CC95ED8D5482A387C221AB37"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\idempotency.ts",
+    "Hash": "7EE5EA1D88DACC15B79969DEFD7BE548B589F42F7BFFDED124926B9CDBEC4DC4"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\task-stop-maintenance-http.test.ts",
+    "Hash": "7348596B6D2D465F95E91492127FA6CF4914A6D0CB0DD1BB5EA931994E397CC3"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\api-access.test.ts",
+    "Hash": "5C2394413E58A14C83C0F1A979535EB2059CAE24EC50B5514F44E6615D2D8F44"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\TaskStopMaintenance.tsx",
+    "Hash": "98D48683E46E5EA3AD06E7C03C2E30DC5D1355E431579D08AFC4A318B634E7C1"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\RunCenter.tsx",
+    "Hash": "DFFE3A2B418F9EF5E31EE88AE7B43861EA0AC852A4D0895914EBA1EAB77C12C7"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\StorageCenter.tsx",
+    "Hash": "78CEF7242F85FD3D211E6949134239296E9376235BAFC860C7FBF0729004730D"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\task-stop-maintenance-ui.test.ts",
+    "Hash": "21A783C5499A22F9CA88F82DF346065BD12A95B71B9FEC45F580D5D32A488CEF"
+  }
+]

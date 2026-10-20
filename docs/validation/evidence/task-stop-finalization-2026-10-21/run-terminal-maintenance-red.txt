@@ -1,0 +1,305 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ trusted accepted recording-incomplete completion remains SQL completed without a fabricated terminal trace (2790.6947ms)
+✖ usage replay error after trusted completion cannot rewrite business failure or invent usage (129.3127ms)
+✖ finish bookkeeping error after trusted completion retries completed bookkeeping without failed trace (146.0124ms)
+✖ cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure (180.8657ms)
+✔ trusted acceptance fallback cannot overwrite a replacement owner after replay bookkeeping loses ownership (208.6794ms)
+✔ an ordinary pre-completion runtime rejection retains the existing failed classification (161.4026ms)
+✖ tick leaves a quarantined project queued and unprepared until the same close promise settles (199.0461ms)
+✖ launch readiness check defers an already claimed run before any workspace preparation (151.503ms)
+✖ check-to-start quarantine race defers the same attempt before input preparation and prepares once after release (190.3451ms)
+✖ quarantine cannot requeue a run with existing local-operation evidence (194.012ms)
+✖ quarantine cannot requeue a run with existing uncertain-reservation evidence (204.8124ms)
+✖ quarantine cannot requeue a run with existing settled-reservation evidence (167.9296ms)
+✖ quarantine cannot requeue a run with existing usage evidence (157.5146ms)
+✖ cancel racing the quarantine rejection remains cancelled and cannot revive as queued (164.2959ms)
+✔ quarantine defer respects foreign-owner fencing (94.1428ms)
+✔ quarantine defer respects expired-lease fencing (111.9809ms)
+✖ quarantine defer respects project-version fencing (99.928ms)
+✖ quarantine defer respects attempt fencing (108.3623ms)
+✖ quarantine defer respects successor fencing (99.9711ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 5
+ℹ fail 14
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6131.8737
+
+✖ failing tests:
+
+test at tests\run-terminal-maintenance.test.ts:2:2353
+✖ usage replay error after trusted completion cannot rewrite business failure or invent usage (129.3127ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'completed'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:91:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:3310
+✖ finish bookkeeping error after trusted completion retries completed bookkeeping without failed trace (146.0124ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'completed'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:107:63)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:4416
+✖ cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure (180.8657ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'completed'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:116:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:6200
+✖ tick leaves a quarantined project queued and unprepared until the same close promise settles (199.0461ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'failed' !== 'queued'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:137:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'queued',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:7166
+✖ launch readiness check defers an already claimed run before any workspace preparation (151.503ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'failed' !== 'queued'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:145:58)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'queued',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:7686
+✖ check-to-start quarantine race defers the same attempt before input preparation and prepares once after release (190.3451ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'failed' !== 'queued'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:155:63)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'queued',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:8721
+✖ quarantine cannot requeue a run with existing local-operation evidence (194.012ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:169:60)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:8721
+✖ quarantine cannot requeue a run with existing uncertain-reservation evidence (204.8124ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:169:60)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:8721
+✖ quarantine cannot requeue a run with existing settled-reservation evidence (167.9296ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:169:60)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:8721
+✖ quarantine cannot requeue a run with existing usage evidence (157.5146ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:169:60)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:10020
+✖ cancel racing the quarantine rejection remains cancelled and cannot revive as queued (164.2959ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'cancelled'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:175:58)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'cancelled',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:10658
+✖ quarantine defer respects project-version fencing (99.928ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:189:58)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:10658
+✖ quarantine defer respects attempt fencing (108.3623ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:189:58)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:10658
+✖ quarantine defer respects successor fencing (99.9711ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'failed'
+  - 'running'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:189:58)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'running',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "status": "candidate-terminal-product-engineering-PASS",
+  "localDate": "2026-10-21",
+  "utcRunDate": "2026-10-20",
+  "sourceFiles": 20,
+  "scenarioCount": 4,
+  "resultsFile": "terminal-product-final-results.json",
+  "sourceShaFile": "terminal-product-final-source-sha.json",
+  "limits": [
+    "no paid APIs or physical JJ/OpenShell deployment",
+    "loss case intentionally stops at cold observation boundary",
+    "retained scopes and reservations not retired",
+    "prior unknown whole-file failure and stale attempt remain nonpassing historical evidence"
+  ],
+  "files": [
+    {
+      "path": "terminal-product-normal-1792513681309.txt",
+      "bytes": 735,
+      "sha256": "d9f9b5d561b8d2a48be7a2f266fdee412c9593875c7402856d26df9ffaae7054",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-normal-1792513681309.txt",
+      "privateSourceSha256": "783ca4a30077c56ad7365b619b8376648923fc2da4297cc822a3fa2c335690ad",
+      "transformation": "bounded projection or workspace-path redaction"
+    },
+    {
+      "path": "terminal-product-normal-1792513681309-start.json",
+      "bytes": 2726,
+      "sha256": "0eacbf4dbba4b3350d98c31b6bb02c62788e0f260c6988dab19a8e6a3c883df2",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-normal-1792513681309-start.json",
+      "privateSourceSha256": "0eacbf4dbba4b3350d98c31b6bb02c62788e0f260c6988dab19a8e6a3c883df2",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-normal-1792513681309-process.json",
+      "bytes": 5099,
+      "sha256": "254d8b5af9df1546ca7cf9bf90d24193d7aa4656e99ba7108880b8c812df1048",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-normal-1792513681309-process.json",
+      "privateSourceSha256": "254d8b5af9df1546ca7cf9bf90d24193d7aa4656e99ba7108880b8c812df1048",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-three-projects-1792513831874.txt",
+      "bytes": 1268,
+      "sha256": "d237341d95c9b023adfd7dfbde2d0b3d781d05922ea7920ca328053983216654",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-three-projects-1792513831874.txt",
+      "privateSourceSha256": "548053f850e0c98d7b89c03ba801e95d96dac92ca84cffdebd06c4f321730961",
+      "transformation": "bounded projection or workspace-path redaction"
+    },
+    {
+      "path": "terminal-product-three-projects-1792513831874-start.json",
+      "bytes": 2740,
+      "sha256": "b1168449e9c36709aa462ec44648a75eb5ff8b7b66545f27e4bc5d7e0b248294",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-three-projects-1792513831874-start.json",
+      "privateSourceSha256": "b1168449e9c36709aa462ec44648a75eb5ff8b7b66545f27e4bc5d7e0b248294",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-three-projects-1792513831874-process.json",
+      "bytes": 5114,
+      "sha256": "e83d3cdec8ca7718cd59ba5e64d37ab487f91ce61ca957562667d971bb2118f5",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-three-projects-1792513831874-process.json",
+      "privateSourceSha256": "e83d3cdec8ca7718cd59ba5e64d37ab487f91ce61ca957562667d971bb2118f5",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-interleave-1792514178280.txt",
+      "bytes": 725,
+      "sha256": "6409efaed35a73b3c63c5c25ef2299765d02cc741acaf2ad84b42e94f6ca298a",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-interleave-1792514178280.txt",
+      "privateSourceSha256": "349a0b8104c13698ae2723357b8b89b18472a66750e2203e3b0da3d19e65320e",
+      "transformation": "bounded projection or workspace-path redaction"
+    },
+    {
+      "path": "terminal-product-interleave-1792514178280-start.json",
+      "bytes": 2720,
+      "sha256": "dbd42254eb9ba4f7d50a184626aef2ce325e03f6d699b433d82e2524062c7eea",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-interleave-1792514178280-start.json",
+      "privateSourceSha256": "dbd42254eb9ba4f7d50a184626aef2ce325e03f6d699b433d82e2524062c7eea",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-interleave-1792514178280-process.json",
+      "bytes": 5094,
+      "sha256": "eb5f900c2bfa200006cd2660da5546ec8bf54826f446ac0e28c5ba29042690ce",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-interleave-1792514178280-process.json",
+      "privateSourceSha256": "eb5f900c2bfa200006cd2660da5546ec8bf54826f446ac0e28c5ba29042690ce",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-loss-1792514373232.txt",
+      "bytes": 767,
+      "sha256": "f93f146fb195b5da2b8c03e6960e45ef638dca52362604cdf9591bbddc9ad1eb",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-loss-1792514373232.txt",
+      "privateSourceSha256": "2f2f5a2b6ff75fe7e7a3b0d33b615fd267f9095949c9d2f2e5de6488a8b82188",
+      "transformation": "bounded projection or workspace-path redaction"
+    },
+    {
+      "path": "terminal-product-loss-1792514373232-start.json",
+      "bytes": 2713,
+      "sha256": "643c65490c4effeb3570ebc27827316fcecc35a2fd63b2efb23e73aab3e1a723",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-loss-1792514373232-start.json",
+      "privateSourceSha256": "643c65490c4effeb3570ebc27827316fcecc35a2fd63b2efb23e73aab3e1a723",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-loss-1792514373232-process.json",
+      "bytes": 5086,
+      "sha256": "e80001a559beeeba9dad5f026b310262d86f5bbc30b00402067838f36abae521",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-loss-1792514373232-process.json",
+      "privateSourceSha256": "e80001a559beeeba9dad5f026b310262d86f5bbc30b00402067838f36abae521",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "product-terminal-stop-green-254ed4e3-50b7-491e-b438-4cda5c18de3d-compact.json",
+      "bytes": 59579,
+      "sha256": "ad74ae98411f9cecd8db1a99de53f54ee405311e1cfcfd6af25a70998db65002",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-green-254ed4e3-50b7-491e-b438-4cda5c18de3d-summary.json",
+      "privateSourceSha256": "e1cd0f7cdfca0f6dec7b340e75a5e39eda4657b2ddb112326d43fd6ba84f4d9e",
+      "transformation": "bounded ID/key/sequence/phase/SHA projection; full CLI command/event arrays and authority/capability proof omitted; private original preserved"
+    },
+    {
+      "path": "product-terminal-stop-interleave-5778901e-8d5f-456f-8cb1-58358a6344cb-compact.json",
+      "bytes": 66636,
+      "sha256": "533a4034dfb243e9d780b3d32946aba8e6465123818afbe0ff5b9b7254517674",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-interleave-5778901e-8d5f-456f-8cb1-58358a6344cb-summary.json",
+      "privateSourceSha256": "6f4fb4fd5b5d2dd75a72f437d7ecb8c91869cd105c200362623fd32af14b9d63",
+      "transformation": "bounded ID/key/sequence/phase/SHA projection; full CLI command/event arrays and authority/capability proof omitted; private original preserved"
+    },
+    {
+      "path": "product-terminal-stop-response-loss-034697fb-7552-4426-995b-6339bb5e02c8-compact.json",
+      "bytes": 17739,
+      "sha256": "baa141c2819312660afd99f90e791ab4c4a7b56e6c7353e2b7dc9bc96a18f32c",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-response-loss-034697fb-7552-4426-995b-6339bb5e02c8-summary.json",
+      "privateSourceSha256": "d855d417d038c621aa3c68bf2010b6b209c056620661d40a23fcb4c49c8b2203",
+      "transformation": "bounded ID/key/sequence/phase/SHA projection; full CLI command/event arrays and authority/capability proof omitted; private original preserved"
+    },
+    {
+      "path": "product-terminal-stop-sequential-1-700a1662-55ce-46f0-9ef0-bd8ae2dff6e3-compact.json",
+      "bytes": 52931,
+      "sha256": "90cc9129be449807049d65da9fcbb2086dd64d27a2b12bf9dc5e45cbe8400838",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-sequential-1-700a1662-55ce-46f0-9ef0-bd8ae2dff6e3-summary.json",
+      "privateSourceSha256": "0cfd89ebceb65655c41b579eeb123456536fefb116053bfb4e299b53f4c3c643",
+      "transformation": "bounded ID/key/sequence/phase/SHA projection; full CLI command/event arrays and authority/capability proof omitted; private original preserved"
+    },
+    {
+      "path": "product-terminal-stop-sequential-2-aacad647-9b83-44df-844d-d38ac156f20b-compact.json",
+      "bytes": 52937,
+      "sha256": "1f0c9156333cf574d7bda05db4782894809dcf090a3b1cba934e5e78fa3a1e02",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-sequential-2-aacad647-9b83-44df-844d-d38ac156f20b-summary.json",
+      "privateSourceSha256": "353cccaa7d27b8597809ef36b371c0de379248ea92da98101c6a3a1fa9f7a7a9",
+      "transformation": "bounded ID/key/sequence/phase/SHA projection; full CLI command/event arrays and authority/capability proof omitted; private original preserved"
+    },
+    {
+      "path": "product-terminal-stop-sequential-3-233e8499-eae2-45f7-afd5-ab235fdcdc59-compact.json",
+      "bytes": 52937,
+      "sha256": "7c00bc44bb84015c32fd99548e90f17e381f64d2d6a4b4d0b6c29dbe84050048",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-sequential-3-233e8499-eae2-45f7-afd5-ab235fdcdc59-summary.json",
+      "privateSourceSha256": "b7de252b9f8d9e70c4c5836aabcb5bcbe146578b2169365159b6949f78bf0841",
+      "transformation": "bounded ID/key/sequence/phase/SHA projection; full CLI command/event arrays and authority/capability proof omitted; private original preserved"
+    },
+    {
+      "path": "product-terminal-stop-three-projects-700a1662-55ce-46f0-9ef0-bd8ae2dff6e3-summary.json",
+      "bytes": 24636,
+      "sha256": "679f10c4a69f4aadf9951971aa484b2db8b55d7ac3bca32c1b7e261113fb9e0a",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-three-projects-700a1662-55ce-46f0-9ef0-bd8ae2dff6e3-summary.json",
+      "privateSourceSha256": "30a8261bb60fe65e18e3144ece519a10328c79f43f4876c4c868b4237126e27b",
+      "transformation": "bounded projection or workspace-path redaction"
+    },
+    {
+      "path": "terminal-product-final-results.json",
+      "bytes": 1983,
+      "sha256": "8c8da4832144e60f714cacd2e36ad01b7d34bfbd3f80c351ab0de77e1f8444f0",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-final-results.json",
+      "privateSourceSha256": "8c8da4832144e60f714cacd2e36ad01b7d34bfbd3f80c351ab0de77e1f8444f0",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-final-source-sha.json",
+      "bytes": 2273,
+      "sha256": "94858917b372fbd1b4057e693a56f69b8c4eb6bb3e21a806a6e69da694bc4087",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-final-source-sha.json",
+      "privateSourceSha256": "94858917b372fbd1b4057e693a56f69b8c4eb6bb3e21a806a6e69da694bc4087",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "terminal-product-three-projects-independent-review.md",
+      "bytes": 1953,
+      "sha256": "36bdef2421f56a4657def307fda5175bb77e95a875e4b87f1dbfaeab8e74172e",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-product-three-projects-independent-review.md",
+      "privateSourceSha256": "36bdef2421f56a4657def307fda5175bb77e95a875e4b87f1dbfaeab8e74172e",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "product-terminal-stop-runner.mjs",
+      "bytes": 4260,
+      "sha256": "623e2f896d8e857ab63d3d1d06875555f0e22fae7e078e20665f5a19c6a185c9",
+      "privateSource": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-terminal-stop-runner.mjs",
+      "privateSourceSha256": "623e2f896d8e857ab63d3d1d06875555f0e22fae7e078e20665f5a19c6a185c9",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4764,
+      "sha256": "74d260fcc876c4ab8e76282544e659f884a94343197e83435bbb42ac4038c74b",
+      "transformation": "new scope and evidence-index text"
+    },
+    {
+      "path": "post-run-current-source-check.json",
+      "transformation": "new post-run read-only source observation",
+      "bytes": 2726,
+      "sha256": "fe2d08aad068ff3af4d6a092724b09c1f55dd2fceac1582311eb9dd8b50ae939"
+    }
+  ],
+  "publicContentChecks": [
+    "no raw claim-token fields",
+    "no full authority/capability proof or capabilityHash fields",
+    "no private stderr values",
+    "workspace absolute paths redacted from TAP logs"
+  ],
+  "postRunSourceDrift": {
+    "evidence": "post-run-current-source-check.json",
+    "matchingSourceFiles": 19,
+    "changedSourceFiles": 1,
+    "coverage": "four PASS results retain their recorded start/end SHA; later changes require independent source mapping"
+  }
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "label": "normal",
+    "processEvidence": "terminal-product-normal-1792513681309-process.json",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 89802,
+    "timedOut": false,
+    "sourceStable": true,
+    "testSha256": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2",
+    "stopSha256": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d",
+    "runtimeSha256": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8"
+  },
+  {
+    "label": "three-projects",
+    "processEvidence": "terminal-product-three-projects-1792513831874-process.json",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 268829,
+    "timedOut": false,
+    "sourceStable": true,
+    "testSha256": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2",
+    "stopSha256": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d",
+    "runtimeSha256": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8"
+  },
+  {
+    "label": "interleave",
+    "processEvidence": "terminal-product-interleave-1792514178280-process.json",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 168016,
+    "timedOut": false,
+    "sourceStable": true,
+    "testSha256": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2",
+    "stopSha256": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d",
+    "runtimeSha256": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8"
+  },
+  {
+    "label": "loss",
+    "processEvidence": "terminal-product-loss-1792514373232-process.json",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 32771,
+    "timedOut": false,
+    "sourceStable": true,
+    "testSha256": "5875aff4764cd84d03513ea8ae7932ba2c2aa33efdcefcb20a79e9e5d14445a2",
+    "stopSha256": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d",
+    "runtimeSha256": "1dd37089e6e49fa2e328ddff9ec8c23f94bc5a1d3beecc0544de7231c63661a8"
+  }
+]

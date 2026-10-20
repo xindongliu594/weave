@@ -1,0 +1,4 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ trusted accepted recording-incomplete completion remains SQL completed without a fabricated terminal trace (3947.9175ms)
+✖ usage replay error after trusted completion cannot rewrite business failure or invent usage (209.6432ms)
