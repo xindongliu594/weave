@@ -20,9 +20,42 @@ function fixture() {
 const proposal={maxBudget:.18,taskCallLimits:{accept:10},rationale:'Preserve the completed nodes and fund four further manager calls.'};
 const options={newRevision:1,completedTaskIds:['develop','qa'],history:{calls:23,tasks:{accept:{calls:5}}},ceiling:.18};
 
+test('coordination continuation funds all explicit requests using the actual captain envelope and fallback route',()=>{
+ const old=outputFixture();old.agents[0].role='member';old.agents.push({id:'captain',role:'manager',modelId:'captain-route',fallbackModelId:'captain-fallback',tools:[]});
+ old.modelRoutes.push({id:'captain-route',inputRate:2,outputRate:8,maxOutputTokens:4096},
+  {id:'captain-fallback',inputRate:3,outputRate:10,maxOutputTokens:8192});
+ const history:any={calls:40,coordinatorCalls:12,coordinatorRequestOverheadBytes:9000,tasks:{accept:{calls:3}}};
+ const caps={maxModelCalls:50,maxTaskModelCalls:16};
+ const requirement=(resources.recoveryCallRequirements as any)(old,history,['develop','qa'],caps,{accept:7},2);
+ assert.equal(requirement.minimumTotalCalls,49);assert.equal(requirement.coordinator.nextRequestCount,2);
+ const floor=(resources.recoveryMinimumProjectBudget as any)(old,history,['develop','qa'],caps,{recordedCost:.1,reserved:.02},{accept:7},2);
+ const employee=((4000+13+1024)*.3+2048*1.2)/1e6;
+ const captain=((4000+9000+1024)*3+8192*10)/1e6;
+ assert.ok(Math.abs(floor-(.12+7*employee+2*captain))<1e-8);
+ assert.throws(()=>(resources.recoveryCallRequirements as any)(old,history,['develop','qa'],{...caps,maxModelCalls:48},{accept:7},2),
+  (error:any)=>error.code==='RESOURCE_CALLS_INSUFFICIENT');
+});
+
+test('new coordination grants require explicit counts and authentic no-task wire evidence',()=>{
+ assert.equal(typeof (resources as any).recoveryCoordinatorRequirement,'function');
+ const old=outputFixture(),history={calls:5,coordinatorCalls:2,tasks:{},coordinatorRequestOverheadBytes:100};
+ for(const count of [undefined,0,-1,1.5,Infinity,1001])assert.throws(()=>(resources as any).recoveryCoordinatorRequirement(old,history,count));
+ assert.throws(()=>(resources as any).recoveryCoordinatorRequirement(old,{...history,coordinatorRequestOverheadBytes:undefined},2),
+  (error:any)=>error.code==='RESOURCE_COORDINATOR_HISTORY_MISSING');
+});
+
+test('shared-route output changes also reprice coordinator continuation without creating a second money bucket',()=>{
+ const old=outputFixture(),history={calls:23,coordinatorCalls:18,coordinatorRequestOverheadBytes:1000,tasks:{accept:{calls:5}}};
+ const caps={maxModelCalls:45,maxTaskModelCalls:16},costs={recordedCost:.1,reserved:.02},done=['develop','qa'];
+ const before=resources.recoveryMinimumProjectBudget(old,history,done,caps,costs,{accept:2},1);
+ const adjusted=resources.recoveryOutputSnapshot(old,{accept:8192},done,8192);
+ const after=resources.recoveryMinimumProjectBudget(adjusted,history,done,caps,costs,{accept:2},1);
+ assert.ok(Math.abs(after-before-3*(8192-2048)*1.2/1e6)<1e-8);
+});
+
 function outputFixture(){
   const old=fixture();old.policy.maxBudget=1;old.policy.contextBytes=4000;
-  old.agents[0].modelId='m';
+  old.agents[0].modelId='m';old.agents[0].role='manager';
   old.modelRoutes=[{id:'m',configurationHash:'fixed',inputRate:.3,outputRate:1.2,maxOutputTokens:2048,contextWindowTokens:64000}];
   old.tasks.forEach((t:any)=>{t.assignee='e';t.maxOutputTokens=2048;t.maxBudget=1;});
   old.goalContract=createGoalContract(old);return old;
@@ -54,10 +87,10 @@ test('context resources reject missing consent, reductions and routes lacking fu
   assert.throws(()=>applyRecoveryResources(old,{...proposal,maxBudget:1},opts as any),'an approved adjustment must be explicit in the candidate');
 });
 test('context consent is sealed through confirmation and lineage while later unadjusted recovery inherits the new limit',async()=>{
-  const old=contextFixture(),history={calls:23,tasks:{accept:{calls:5}}},previewId='00000000-0000-4000-8000-000000000001',usageId='00000000-0000-4000-8000-000000000002';
+  const old=contextFixture(),history={calls:23,coordinatorCalls:18,coordinatorRequestOverheadBytes:1000,tasks:{accept:{calls:5}}},previewId='00000000-0000-4000-8000-000000000001',usageId='00000000-0000-4000-8000-000000000002';
   const change={...proposal,maxBudget:1,contextBytes:64000,taskBudgetLimits:{accept:.2}};
   const preview:any={kind:'run-resource-proposal',sourceRunId:'parent',projectId:'p',projectVersion:2,sourceResourceRevision:0,
-    sourceGoalContract:old.goalContract,modelId:'m',usageId,proposal:change,ceiling:1,contextBytes:64000,callRequirementVersion:'handoff-correction-v1',taskContinuationLimits:{accept:2}};
+    sourceGoalContract:old.goalContract,modelId:'m',usageId,proposal:change,ceiling:1,contextBytes:64000,callRequirementVersion:resources.recoveryCallRequirementVersion,coordinatorContinuationLimit:1,coordinatorHistory:{calls:18,requestOverheadBytes:1000},taskContinuationLimits:{accept:2}};
   const db={query:async(sql:string)=>({rows:sql.startsWith('SELECT data')?[{data:preview}]:[{id:usageId}]})};
   const next=await resources.approvedRecoveryResources(db,{id:'parent',project_id:'p',project_version:2,snapshot:old},previewId,['develop','qa'],history);
   assert.equal(next.policy.contextBytes,64000);assert.equal(next.resourceApproval.contextBytes,64000);
@@ -261,12 +294,12 @@ const correctionVersion='handoff-correction-v1';
 async function confirmedTranche(extra:Record<string,unknown>={taskContinuationLimits:{qa:4,accept:7}}){
  const old=outputFixture();old.policy.maxModelCalls=72;old.policy.maxTaskModelCalls=45;
  old.tasks[1].maxModelCalls=45;old.tasks[2].maxModelCalls=45;old.goalContract=createGoalContract(old);
- const history={calls:60,tasks:{qa:{calls:44,cost:0},accept:{calls:0,cost:0}}};
+ const history={calls:60,coordinatorCalls:16,coordinatorRequestOverheadBytes:1000,tasks:{qa:{calls:44,cost:0},accept:{calls:0,cost:0}}};
  const change={maxBudget:1,maxModelCalls:72,taskCallLimits:{qa:48,accept:45},taskBudgetLimits:{qa:1,accept:1},rationale:'An explicitly bounded next recovery tranche'};
  const previewId='00000000-0000-4000-8000-000000000001',usageId='00000000-0000-4000-8000-000000000002';
  const preview={kind:'run-resource-proposal',sourceRunId:'parent',projectId:'p',projectVersion:2,
   sourceResourceRevision:0,sourceGoalContract:old.goalContract,modelId:'m',usageId,proposal:change,ceiling:1,
-  callCeilings:{maxModelCalls:72,maxTaskModelCalls:48},callRequirementVersion:correctionVersion,...extra};
+  callCeilings:{maxModelCalls:72,maxTaskModelCalls:48},callRequirementVersion:resources.recoveryCallRequirementVersion,coordinatorContinuationLimit:1,coordinatorHistory:{calls:16,requestOverheadBytes:1000},...extra};
  const db={query:async(sql:string)=>{if(sql.startsWith('SELECT data FROM organization_previews'))return {rows:[{data:preview}]};
   assert.match(sql,/SELECT id FROM usage/);return {rows:[{id:usageId}]};}};
  const before=structuredClone(old),next=await resources.approvedRecoveryResources(db,{id:'parent',project_id:'p',project_version:2,snapshot:old},previewId,['develop'],history);
@@ -274,10 +307,12 @@ async function confirmedTranche(extra:Record<string,unknown>={taskContinuationLi
 }
 test('resource confirmation seals the next absolute call ceilings without lowering original task contracts',async()=>{
  const {old,next}=await confirmedTranche();
+ assert.equal(next.resourceApproval.coordinatorCallCeiling,17);
+ assert.equal(next.resourceApproval.coordinatorCallsAtApproval,16);assert.equal(next.resourceApproval.coordinatorContinuationLimit,1);
  assert.deepEqual(next.resourceApproval.taskCallCeilings,{qa:48,accept:7});
  assert.equal(next.tasks[2].maxModelCalls,45);assert.equal(next.tasks[1].maxModelCalls,48);
  assert.equal(verifiedResourceEdge(next,old,'parent',['develop']),true);
- const before=structuredClone(next),history={calls:70,callsBasis:'durable-admissions-and-archived-wire-requests' as const,
+ const before=structuredClone(next),history={calls:70,coordinatorCalls:16,coordinatorRequestOverheadBytes:1000,callsBasis:'durable-admissions-and-archived-wire-requests' as const,
   tasks:{qa:{calls:48,cost:0},accept:{calls:6,cost:0}}};
  assert.deepEqual(recoveryHistoryBudgetIssues(next,history,new Set(['develop','qa'])),[]);
  history.tasks.accept.calls=7;history.calls=71;
@@ -288,6 +323,19 @@ test('resource confirmation seals the next absolute call ceilings without loweri
  assert.equal(verifiedResourceEdge(legacy,old,'parent',['develop']),true);
  const unbounded=await confirmedTranche({});assert.equal(unbounded.next.resourceApproval.taskCallCeilings,undefined,
   'a minimum planning estimate is not an implicit maximum for every recovery');
+});
+
+test('coordination seals reject malformed edits while already-approved v1 resource lineage remains valid',async()=>{
+ const {old,next}=await confirmedTranche();
+ for(const change of [{coordinatorCallCeiling:18},{coordinatorCallCeiling:0},{coordinatorCallCeiling:1001},
+   {coordinatorCallsAtApproval:undefined},{coordinatorContinuationLimit:undefined},{coordinatorCallCeiling:undefined}]){
+  const forged=structuredClone(next);Object.assign(forged.resourceApproval,change);forged.goalContract=createGoalContract(forged);
+  assert.equal(verifiedResourceEdge(forged,old,'parent',['develop']),false);
+ }
+ const legacy=structuredClone(next);for(const key of ['coordinatorCallCeiling','coordinatorCallsAtApproval','coordinatorContinuationLimit'])delete legacy.resourceApproval[key];
+ legacy.resourceApproval.callRequirementVersion='handoff-correction-v1';legacy.goalContract=createGoalContract(legacy);
+ assert.equal(verifiedResourceEdge(legacy,old,'parent',['develop']),true);
+ assert.equal(verifiedResourceEdge(structuredClone(legacy),legacy,'parent',['develop']),true);
 });
 test('explicit continuation allowance rejects missing tasks, insufficient tranches and excessive cumulative grants',async()=>{
  for(const taskContinuationLimits of [null,[],{}, {qa:4},{qa:4,accept:0},{qa:4,accept:1},{qa:5,accept:7},{qa:4,accept:9},
@@ -313,7 +361,7 @@ test('a new resource confirmation without an explicit continuation grant preserv
  const approval=next.resourceApproval;
  const preview={kind:'run-resource-proposal',sourceRunId:'child',projectId:'p',projectVersion:2,sourceResourceRevision:1,
   sourceGoalContract:next.goalContract,modelId:'m',usageId:approval.usageId,proposal:approval.proposal,ceiling:1,
-  callCeilings:approval.callCeilings,callRequirementVersion:correctionVersion};
+  callCeilings:approval.callCeilings,callRequirementVersion:resources.recoveryCallRequirementVersion,coordinatorHistory:{calls:16,requestOverheadBytes:1000}};
  const db={query:async(sql:string)=>({rows:sql.startsWith('SELECT data')?[{data:preview}]:[{id:approval.usageId}]})};
  const child=await resources.approvedRecoveryResources(db,{id:'child',project_id:'p',project_version:2,snapshot:next},previewId,['develop'],history);
  assert.deepEqual(child.resourceApproval.taskCallCeilings,{qa:48,accept:7});
@@ -323,11 +371,11 @@ test('a new resource confirmation without an explicit continuation grant preserv
 });
 test('a new unfinished-task grant retains completed-task ceilings across later rework',async()=>{
  const {next}=await confirmedTranche(),previewId='00000000-0000-4000-8000-000000000003',approval=next.resourceApproval;
- const history={calls:65,tasks:{qa:{calls:48},accept:{calls:1}}},done=['develop','qa'];
+ const history={calls:65,coordinatorCalls:16,coordinatorRequestOverheadBytes:1000,tasks:{qa:{calls:48},accept:{calls:1}}},done=['develop','qa'];
  const preview={kind:'run-resource-proposal',sourceRunId:'child',projectId:'p',projectVersion:2,sourceResourceRevision:1,
-  sourceGoalContract:next.goalContract,modelId:'m',usageId:approval.usageId,ceiling:1,callCeilings:approval.callCeilings,
-  callRequirementVersion:correctionVersion,taskContinuationLimits:{accept:7},
-  proposal:{...approval.proposal,taskCallLimits:{accept:45},taskBudgetLimits:{accept:1}}};
+  sourceGoalContract:next.goalContract,modelId:'m',usageId:approval.usageId,ceiling:1,callCeilings:{...approval.callCeilings,maxModelCalls:74},
+  callRequirementVersion:resources.recoveryCallRequirementVersion,coordinatorHistory:{calls:16,requestOverheadBytes:1000},taskContinuationLimits:{accept:7},
+  proposal:{...approval.proposal,maxModelCalls:74,taskCallLimits:{accept:45},taskBudgetLimits:{accept:1}}};
  const db={query:async(sql:string)=>({rows:sql.startsWith('SELECT data')?[{data:preview}]:[{id:approval.usageId}]})};
  const before=structuredClone(next),child=await resources.approvedRecoveryResources(db,
   {id:'child',project_id:'p',project_version:2,snapshot:next},previewId,done,history);
@@ -343,12 +391,12 @@ test('a new unfinished-task grant retains completed-task ceilings across later r
 });
 test('planning without a new grant respects the sealed remainder and rejects zero or one available request',async()=>{
  const {next}=await confirmedTranche(),before=structuredClone(next),done=['develop','qa'],ceilings={maxModelCalls:80,maxTaskModelCalls:48};
- const history={calls:69,tasks:{qa:{calls:48},accept:{calls:5}}};
+ const history={calls:69,coordinatorCalls:16,coordinatorRequestOverheadBytes:1000,tasks:{qa:{calls:48},accept:{calls:5}}};
  const requirement=resources.recoveryCallRequirements(next,history,done,ceilings);
  assert.equal(requirement.tasks.accept.nextRequestCount,2);assert.equal(requirement.tasks.accept.workRequests,1);
  for(const calls of [6,7])assert.throws(()=>resources.recoveryCallRequirements(next,
   {...history,tasks:{...history.tasks,accept:{calls}}},done,ceilings),(error:any)=>error.code==='RESOURCE_CALLS_INSUFFICIENT');
- const renewal=resources.recoveryCallRequirements(next,{calls:70,tasks:{qa:{calls:48},accept:{calls:6}}},done,ceilings,{accept:4});
+ const renewal=resources.recoveryCallRequirements(next,{calls:70,coordinatorCalls:16,coordinatorRequestOverheadBytes:1000,tasks:{qa:{calls:48},accept:{calls:6}}},done,ceilings,{accept:4});
  assert.equal(renewal.tasks.accept.nextRequestCount,4,'only an explicit new grant can renew the exhausted tranche');
  assert.deepEqual(next,before);
 });

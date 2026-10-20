@@ -1,0 +1,63 @@
+{
+  "kind": "offline-conservative-estimate-not-approval",
+  "sourceRunId": "58de522b-7015-4d8b-98dd-6e3d7557bfc1",
+  "actualExecutionCalls": 27,
+  "priorCoordinatorCalls": 16,
+  "coordinatorEnvelopeBytes": 18491,
+  "taskContinuation": {
+    "verify": 6,
+    "review": 6
+  },
+  "coordinatorContinuationLimit": 16,
+  "ceilings": {
+    "maxModelCalls": 55,
+    "maxTaskModelCalls": 16
+  },
+  "requirements": {
+    "tasks": {
+      "verify": {
+        "workRequests": 5,
+        "handoffCorrectionRequests": 1,
+        "nextRequestCount": 6,
+        "minimumCallLimit": 12
+      },
+      "review": {
+        "workRequests": 5,
+        "handoffCorrectionRequests": 1,
+        "nextRequestCount": 6,
+        "minimumCallLimit": 8
+      }
+    },
+    "minimumTotalCalls": 55,
+    "coordinator": {
+      "usedCalls": 16,
+      "nextRequestCount": 16,
+      "minimumCallLimit": 32,
+      "requestOverheadBytes": 18491
+    }
+  },
+  "tasks": [
+    {
+      "id": "verify",
+      "priorCalls": 6,
+      "requestEnvelopeBytes": 6973,
+      "envelopeSource": "actual archived task request",
+      "minimumBudget": 0.26849431
+    },
+    {
+      "id": "review",
+      "priorCalls": 0,
+      "requestEnvelopeBytes": 18491,
+      "envelopeSource": "conservative maximum archived envelope; no formal manager request yet",
+      "minimumBudget": 0.26690941
+    }
+  ],
+  "executionFloor": 1.30357621,
+  "resourcePlanning": {
+    "requests": 1,
+    "maxCost": 0.006
+  },
+  "projectFloorIncludingPlanning": 1.30957621,
+  "remainingCurrentProject": 0.05126860000000001,
+  "note": "Finite continuation upper reservation, not predicted spend or guarantee. Existing output, context, task/knowledge permissions unchanged. Actual request gates remain authoritative. No model or external request was made."
+}

@@ -1,0 +1,25 @@
+✔ inspection names coordination usage and sealed remaining calls separately from employee tasks (42.847ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (3.5484ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (1.5273ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.612ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (2.5831ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.3024ms)
+✔ coordination requests require an explicit finite allowance or an existing sealed ceiling (14.2086ms)
+✔ confirmation separates coordination from the manager task and sends only the sealed preview (2.1503ms)
+✔ confirmation displays explicit continuation calls separately from the cumulative task cap (0.9198ms)
+✔ optional continuation input requires all inspected unfinished tasks and preserves omission (3.0744ms)
+✔ output allowance is visible before planning and confirmation shows per-task change (2.0675ms)
+✔ resource confirmation names the unchanged task version, new ceiling and retained checkpoints without claiming acceptance (1.0354ms)
+✔ stale source/version/seal prevents constructing the approval request; unknown operations never get acknowledged (0.2888ms)
+✔ node money confirmation shows cumulative caps under the shared project ceiling (0.993ms)
+✔ confirmation names a larger total call ceiling while preserving shared dollars (1.015ms)
+✔ context resource input is optional, bounded and cannot reduce the original request limit (0.534ms)
+✔ context changes are visible before confirmation while approval still uses the sealed candidate (1.8716ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 656.3224

@@ -11,10 +11,27 @@ export const recoveryResourceProposalSchema=z.object({maxBudget:z.number().finit
   contextBytes:policySchema.shape.contextBytes,
   rationale:z.string().trim().min(5).max(2000)}).strict();
 export type RecoveryResourceProposal=z.infer<typeof recoveryResourceProposalSchema>;
-export const recoveryCallRequirementVersion='handoff-correction-v1' as const;
-type RecoveryHistory={calls:number;tasks:Record<string,{calls:number;cost?:number;reserved?:number;requestOverheadBytes?:number}>};
+export const recoveryCallRequirementVersion='handoff-coordination-v2' as const;
+const legacyCallRequirementVersion='handoff-correction-v1' as const;
+type RecoveryHistory={calls:number;coordinatorCalls?:number;coordinatorRequestOverheadBytes?:number;
+  tasks:Record<string,{calls:number;cost?:number;reserved?:number;requestOverheadBytes?:number}>};
 type CallCeilings={maxModelCalls:number;maxTaskModelCalls:number};
 const taskCallCeilingsSchema=z.record(z.string(),z.number().int().min(1).max(1000));
+const coordinatorLimitSchema=z.number().int().min(1).max(1000);
+export function recoveryCoordinatorRequirement(snapshot:any,history:RecoveryHistory,continuationLimit?:number){
+  const used=history.coordinatorCalls,sealed=snapshot.resourceApproval?.coordinatorCallCeiling;
+  if(typeof used!=='number'||!Number.isSafeInteger(used)||used<0||used>history.calls)
+    throw new AppError(422,'协调调用历史无法核对，不能重新计算可用次数','RESOURCE_COORDINATOR_HISTORY_MISSING');
+  if(sealed!==undefined&&(!coordinatorLimitSchema.safeParse(sealed).success||sealed>(snapshot.policy.maxModelCalls??100)))
+    throw new AppError(422,'已封存的协调调用上限无效','RESOURCE_PROPOSAL_INVALID');
+  const remaining=coordinatorLimitSchema.safeParse(continuationLimit??(sealed===undefined?undefined:sealed-used));
+  if(!remaining.success)
+    throw new AppError(422,'请明确填写本次恢复的协调请求次数；原协调额度不足时需重新分配','RESOURCE_COORDINATOR_LIMIT_REQUIRED');
+  const requestOverheadBytes=history.coordinatorRequestOverheadBytes;
+  if(typeof requestOverheadBytes!=='number'||!Number.isSafeInteger(requestOverheadBytes)||requestOverheadBytes<1)
+    throw new AppError(422,'缺少真实协调请求封套，无法核算恢复预留，请检查原档案','RESOURCE_COORDINATOR_HISTORY_MISSING');
+  return {usedCalls:used,nextRequestCount:remaining.data,minimumCallLimit:used+remaining.data,requestOverheadBytes};
+}
 /** A continuation grant is an absolute cap; ordinary resumes must never add it to new history. */
 export function recoveryTaskCallLimit(snapshot:any,task:any){
   const limits=snapshot.resourceApproval?.taskCallCeilings;
@@ -84,7 +101,7 @@ export function recoveryOutputSnapshot(original:any,limits:Record<string,number>
   return snapshot;
 }
 export function recoveryCallRequirements(snapshot:any,history:RecoveryHistory,completedTaskIds:string[],ceilings:CallCeilings,
-  taskContinuationLimits?:Record<string,number>){
+  taskContinuationLimits?:Record<string,number>,coordinatorContinuationLimit?:number){
   const invalid=()=>new AppError(422,'允许的调用次数不足以覆盖恢复工作与一次正式交接纠正，请重新分配次数','RESOURCE_CALLS_INSUFFICIENT');
   if(![history.calls,ceilings.maxModelCalls,ceilings.maxTaskModelCalls].every(n=>Number.isSafeInteger(n)&&n>=0)||
     ceilings.maxModelCalls<(snapshot.policy.maxModelCalls??100)||ceilings.maxTaskModelCalls<(snapshot.policy.maxTaskModelCalls??40))throw invalid();
@@ -106,10 +123,12 @@ export function recoveryCallRequirements(snapshot:any,history:RecoveryHistory,co
       continuation!==undefined&&used+continuation>ceilings.maxTaskModelCalls)throw invalid();
     tasks[task.id]={workRequests,handoffCorrectionRequests:1,nextRequestCount:workRequests+1,minimumCallLimit};
   }
-  const minimumTotalCalls=Math.max(snapshot.policy.maxModelCalls??100,history.calls+Object.entries(tasks)
+  const coordinator=coordinatorContinuationLimit!==undefined||snapshot.resourceApproval?.coordinatorCallCeiling!==undefined
+    ?recoveryCoordinatorRequirement(snapshot,history,coordinatorContinuationLimit):undefined;
+  const minimumTotalCalls=Math.max(snapshot.policy.maxModelCalls??100,history.calls+(coordinator?.nextRequestCount??0)+Object.entries(tasks)
     .reduce((sum,[id,task])=>sum+(taskContinuationLimits?.[id]??task.nextRequestCount),0));
   if(!Object.keys(tasks).length||minimumTotalCalls>ceilings.maxModelCalls)throw invalid();
-  return {tasks,minimumTotalCalls};
+  return {tasks,minimumTotalCalls,...(coordinator?{coordinator}:{})};
 }
 /** A conservative single-request floor, using the original pinned routes,
  * bounded messages and actual archived wire schemas/configuration.
@@ -126,6 +145,15 @@ function recoveryRequestReservation(snapshot:any,task:any,requestOverheadBytes=1
     reservation=Math.max(reservation,((bytes+Math.max(13,requestOverheadBytes)+1024)*route.inputRate+output*route.outputRate)/1e6);
   }
   return reservation;
+}
+function coordinatorReservation(snapshot:any,requestOverheadBytes:number){
+  const manager=snapshot.agents?.find((agent:any)=>agent.role==='manager');
+  const routes=(snapshot.modelRoutes??[]).filter((route:any)=>manager&&[manager.modelId,manager.fallbackModelId].includes(route.id));
+  if(!manager||!routes.length||[manager.modelId,manager.fallbackModelId].filter(Boolean).some(id=>!routes.some((route:any)=>route.id===id))||
+    routes.some((route:any)=>![route.inputRate,route.outputRate,route.maxOutputTokens,snapshot.policy.contextBytes??64000,route.contextBytes??64000]
+      .every(n=>Number.isFinite(n)&&n>=0)||route.maxOutputTokens<1))
+    throw new AppError(422,'协调经理的固定模型及费用配置不完整，无法核算恢复预留','RESOURCE_COORDINATOR_HISTORY_MISSING');
+  return recoveryRequestReservation(snapshot,{assignee:manager.id},requestOverheadBytes);
 }
 export function recoveryTaskMinimumBudget(snapshot:any,task:any,spent=0,reserved=0,requestOverheadBytes=13,requestCount=1) {
   return Math.max(task.maxBudget??snapshot.policy.maxBudget,Math.ceil((spent+reserved+recoveryRequestReservation(snapshot,task,requestOverheadBytes)*requestCount)*1e8)/1e8);
@@ -146,16 +174,17 @@ export function recoveryTaskOutputBudgets(snapshot:any,task:any,completed:string
   });
 }
 export function recoveryMinimumProjectBudget(snapshot:any,history:RecoveryHistory,completedTaskIds:string[],ceilings:CallCeilings,
-  costs:{recordedCost:number;reserved:number},taskContinuationLimits?:Record<string,number>){
+  costs:{recordedCost:number;reserved:number},taskContinuationLimits?:Record<string,number>,coordinatorContinuationLimit?:number){
   if(![costs.recordedCost,costs.reserved].every(n=>Number.isFinite(n)&&n>=0))throw new AppError(422,'此前项目费用无法核对','RESOURCE_BUDGET_INSUFFICIENT');
-  const requirements=recoveryCallRequirements(snapshot,history,completedTaskIds,ceilings,taskContinuationLimits);
+  const requirements=recoveryCallRequirements(snapshot,history,completedTaskIds,ceilings,taskContinuationLimits,coordinatorContinuationLimit);
   const nextCost=(snapshot.approvedTasks??snapshot.tasks).reduce((sum:number,task:any)=>sum+(requirements.tasks[task.id]?
     recoveryRequestReservation(snapshot,task,history.tasks[task.id]?.requestOverheadBytes)*requirements.tasks[task.id].nextRequestCount:0),0);
-  return Math.ceil((costs.recordedCost+costs.reserved+nextCost)*1e8)/1e8;
+  const coordinationCost=requirements.coordinator?coordinatorReservation(snapshot,requirements.coordinator.requestOverheadBytes)*requirements.coordinator.nextRequestCount:0;
+  return Math.ceil((costs.recordedCost+costs.reserved+nextCost+coordinationCost)*1e8)/1e8;
 }
 export function applyRecoveryResources(original:any,value:unknown,options:{newRevision:number;completedTaskIds:string[];
-  history:RecoveryHistory;ceiling:number;callRequirementVersion?:typeof recoveryCallRequirementVersion;
-  callCeilings?:CallCeilings;maxTaskOutputTokens?:number;taskContinuationLimits?:Record<string,number>;contextBytes?:number}) {
+  history:RecoveryHistory;ceiling:number;callRequirementVersion?:typeof recoveryCallRequirementVersion|typeof legacyCallRequirementVersion;
+  callCeilings?:CallCeilings;maxTaskOutputTokens?:number;taskContinuationLimits?:Record<string,number>;coordinatorContinuationLimit?:number;contextBytes?:number}) {
   if(!assertGoalContract(original))throw new AppError(409,'原运行没有固定目标，需重新批准方案','RESOURCE_GOAL_REQUIRED');
   const proposal=recoveryResourceProposalSchema.parse(value),tasks=original.approvedTasks??original.tasks;
   const denied=(message:string)=>new AppError(422,message,'RESOURCE_PROPOSAL_INVALID');
@@ -174,8 +203,10 @@ export function applyRecoveryResources(original:any,value:unknown,options:{newRe
   const snapshot=recoveryContextSnapshot(recoveryOutputSnapshot(original,proposal.taskOutputLimits,options.completedTaskIds,options.maxTaskOutputTokens),
     proposal.contextBytes,options.contextBytes);
   if(options.callRequirementVersion!==undefined){
-    if(options.callRequirementVersion!==recoveryCallRequirementVersion)throw denied('不支持此恢复资源规则版本');
-    const requirements=recoveryCallRequirements(original,options.history,options.completedTaskIds,ceilings,options.taskContinuationLimits);
+    if(![recoveryCallRequirementVersion,legacyCallRequirementVersion].includes(options.callRequirementVersion))throw denied('不支持此恢复资源规则版本');
+    const coordination=options.callRequirementVersion===recoveryCallRequirementVersion
+      ?recoveryCoordinatorRequirement(original,options.history,options.coordinatorContinuationLimit):undefined;
+    const requirements=recoveryCallRequirements(original,options.history,options.completedTaskIds,ceilings,options.taskContinuationLimits,coordination?.nextRequestCount);
     if(totalCalls<requirements.minimumTotalCalls||Object.keys(proposal.taskCallLimits).length!==Object.keys(requirements.tasks).length)
       throw denied('项目次数不足下一段工作与交接纠正，或缺少未完成节点额度');
     for(const [id,requirement] of Object.entries(requirements.tasks)){
@@ -221,27 +252,32 @@ export function applyRecoveryResources(original:any,value:unknown,options:{newRe
 }
 
 export async function approvedRecoveryResources(db:{query:(sql:string,args?:any[])=>Promise<any>},row:any,previewId:string,
-  completedTaskIds:string[],history:{calls:number;tasks:Record<string,{calls:number}>}) {
+  completedTaskIds:string[],history:RecoveryHistory) {
   const preview=(await db.query('SELECT data FROM organization_previews WHERE id=$1 FOR UPDATE',[previewId])).rows[0]?.data;
   if(!preview||preview.kind!=='run-resource-proposal'||preview.sourceRunId!==row.id||preview.projectId!==row.project_id||
     preview.projectVersion!==row.project_version||preview.sourceResourceRevision!==(row.snapshot.resourceRevision??0)||
     JSON.stringify(preview.sourceGoalContract)!==JSON.stringify(row.snapshot.goalContract))
     throw new AppError(409,'资源候选不属于当前原运行或目标已变化，请重新规划','RESOURCE_PREVIEW_STALE');
   if(preview.callRequirementVersion!==recoveryCallRequirementVersion)
-    throw new AppError(409,'资源候选尚未计入交接纠正余量，请重新规划','RESOURCE_PREVIEW_STALE');
+    throw new AppError(409,'资源候选尚未计入协调和交接纠正余量，请重新规划','RESOURCE_PREVIEW_STALE');
+  if(preview.coordinatorHistory?.calls!==history.coordinatorCalls||
+    preview.coordinatorHistory?.requestOverheadBytes!==history.coordinatorRequestOverheadBytes)
+    throw new AppError(409,'资源候选之后协调调用历史已变化，请重新规划','RESOURCE_PREVIEW_STALE');
+  const coordinator=recoveryCoordinatorRequirement(row.snapshot,history,preview.coordinatorContinuationLimit);
   const receipt=(await db.query("SELECT id FROM usage WHERE id=$1 AND project_id=$2 AND model_id=$3 AND planning_preview_id=$4 AND purpose='预算补充规划'",
     [preview.usageId,row.project_id,preview.modelId,previewId])).rows[0];
   if(!receipt)throw new AppError(409,'资源候选缺少真实规划用量记录','RESOURCE_PREVIEW_UNVERIFIED');
   const snapshot=applyRecoveryResources(row.snapshot,preview.proposal,{newRevision:(row.snapshot.resourceRevision??0)+1,
     completedTaskIds,history,ceiling:preview.ceiling,callCeilings:preview.callCeilings,callRequirementVersion:preview.callRequirementVersion,
-    maxTaskOutputTokens:preview.maxTaskOutputTokens,taskContinuationLimits:preview.taskContinuationLimits,contextBytes:preview.contextBytes});
+    maxTaskOutputTokens:preview.maxTaskOutputTokens,taskContinuationLimits:preview.taskContinuationLimits,
+    coordinatorContinuationLimit:coordinator.nextRequestCount,contextBytes:preview.contextBytes});
   let taskCallCeilings=row.snapshot.resourceApproval?.taskCallCeilings;
   if(preview.taskContinuationLimits!==undefined){
     const limits=taskCallCeilingsSchema.parse(preview.taskContinuationLimits),requirements=recoveryCallRequirements(row.snapshot,history,completedTaskIds,
-      preview.callCeilings??{maxModelCalls:row.snapshot.policy.maxModelCalls??100,maxTaskModelCalls:row.snapshot.policy.maxTaskModelCalls??40},limits);
+      preview.callCeilings??{maxModelCalls:row.snapshot.policy.maxModelCalls??100,maxTaskModelCalls:row.snapshot.policy.maxTaskModelCalls??40},limits,coordinator.nextRequestCount);
     if(Object.keys(limits).length!==Object.keys(requirements.tasks).length||
       Object.entries(requirements.tasks).some(([id,requirement])=>(limits[id]??0)<requirement.nextRequestCount)||
-      history.calls+Object.values(limits).reduce((sum,limit)=>sum+limit,0)>(snapshot.policy.maxModelCalls??100))
+      history.calls+coordinator.nextRequestCount+Object.values(limits).reduce((sum,limit)=>sum+limit,0)>(snapshot.policy.maxModelCalls??100))
       throw new AppError(422,'本段调用授权不足或超过批准的累计上限','RESOURCE_PROPOSAL_INVALID');
     taskCallCeilings={...taskCallCeilings,...Object.fromEntries(Object.entries(limits).map(([id,limit])=>[id,(history.tasks[id]?.calls??0)+limit]))};
   }
@@ -252,6 +288,8 @@ export async function approvedRecoveryResources(db:{query:(sql:string,args?:any[
     ...(preview.maxTaskOutputTokens===undefined?{}:{maxTaskOutputTokens:preview.maxTaskOutputTokens}),
     ...(preview.contextBytes===undefined?{}:{contextBytes:preview.contextBytes}),
     ...(taskCallCeilings===undefined?{}:{taskCallCeilings}),
+    coordinatorCallCeiling:coordinator.minimumCallLimit,coordinatorCallsAtApproval:coordinator.usedCalls,
+    coordinatorContinuationLimit:coordinator.nextRequestCount,
     callRequirementVersion:preview.callRequirementVersion,modelId:preview.modelId,usageId:preview.usageId,approvedAt:new Date().toISOString()};
   snapshot.goalContract=createGoalContract(snapshot);
   return snapshot;
@@ -266,12 +304,19 @@ export function verifiedResourceEdge(child:any,parent:any,parentRunId:string,com
     const taskCallCeilings=child.resourceApproval?.taskCallCeilings;
     if(taskCallCeilings!==undefined&&!validTaskCallCeilings(child,taskCallCeilings))return false;
     if(parent.resourceApproval?.taskCallCeilings!==undefined&&taskCallCeilings===undefined)return false;
+    const coordination=child.resourceApproval;
+    if(coordination?.coordinatorCallCeiling!==undefined){
+      if(!coordinatorLimitSchema.safeParse(coordination.coordinatorCallCeiling).success||coordination.coordinatorCallCeiling>(child.policy.maxModelCalls??100)||
+        coordination.callRequirementVersion!==recoveryCallRequirementVersion||!Number.isSafeInteger(coordination.coordinatorCallsAtApproval)||coordination.coordinatorCallsAtApproval<0||
+        !coordinatorLimitSchema.safeParse(coordination.coordinatorContinuationLimit).success||
+        coordination.coordinatorCallCeiling!==coordination.coordinatorCallsAtApproval+coordination.coordinatorContinuationLimit)return false;
+    }else if(coordination?.callRequirementVersion===recoveryCallRequirementVersion||parent.resourceApproval?.coordinatorCallCeiling!==undefined)return false;
     if(revision===prior)return child.goalContract.sha256===parent.goalContract.sha256;
     const approval=child.resourceApproval;
     if(revision!==prior+1||approval?.format!=='run-resource-approval-v1'||approval.revision!==revision||
       approval.sourceRunId!==parentRunId||approval.sourceGoalContract?.sha256!==parent.goalContract?.sha256||
       !z.uuid().safeParse(approval.previewId).success||!z.uuid().safeParse(approval.usageId).success)return false;
-    if(approval.callRequirementVersion!==undefined&&approval.callRequirementVersion!==recoveryCallRequirementVersion)return false;
+    if(approval.callRequirementVersion!==undefined&&![recoveryCallRequirementVersion,legacyCallRequirementVersion].includes(approval.callRequirementVersion))return false;
     // Edges prove the sealed proposal; live history is checked at confirmation,
     // never reconstructed from fabricated zero-use counters during lineage reads.
     const expected=applyRecoveryResources(parent,approval.proposal,{newRevision:revision,completedTaskIds,

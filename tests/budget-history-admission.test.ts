@@ -108,6 +108,21 @@ test('resource history retains full wire schema overhead without counting messag
   assert.equal(history.tasks.qa_review.requestOverheadBytes,Buffer.byteLength(JSON.stringify({...body,messages:[]}))-2);
   assert.equal(history.tasks.qa_review.cost,0);assert.equal(history.tasks.qa_review.calls,1);
 });
+
+test('coordinator history counts undispatched admissions and authentic envelope without duplicating legacy task attribution', {skip:!isolated},async()=>{
+ const p=await project(),body={model:'coordinator',messages:[{role:'user',content:'not envelope'}],max_tokens:4096,tools:[{name:'team_status'}]};
+ const r=await run(p,{wires:[undefined,'dev'],wireBody:body,inherited:800});
+ await admission(p,r.id,undefined,'settled',.01,r.usageIds[0]);
+ await admission(p,r.id,undefined,'settled',.01,r.usageIds[1]); // Legacy receipt omits the task preserved by its wire.
+ await admission(p,r.id,undefined,'released');
+ const {history}=await both(p);
+ assert.equal(history.calls,3);assert.equal(history.tasks.dev.calls,1);assert.equal(history.coordinatorCalls,2);
+ assert.equal(history.coordinatorRequestOverheadBytes,Buffer.byteLength(JSON.stringify({...body,messages:[]}))-2);
+ const worker=await run(p,{wires:['qa_review'],wireBody:{...body,tools:[{name:'large_worker_only',description:'x'.repeat(6000)}]}});
+ await admission(p,worker.id,'qa_review');
+ const after=await budgetHistory(readonlyDb,traceRoot,p.id,p.version);
+ assert.equal(after.coordinatorCalls,2);assert.equal(after.coordinatorRequestOverheadBytes,history.coordinatorRequestOverheadBytes);
+});
 test('registered undispatched released attempt retains its global and qa_review call with no fee', { skip: !isolated }, async () => {
   const p = await project(), r = await run(p); await admission(p, r.id, 'qa_review');
   const { history, planning } = await both(p);

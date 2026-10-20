@@ -8,6 +8,29 @@ const candidate:any={previewId:'preview',sourceRunId:'source',projectVersion:2,s
   ceiling:.18,proposal:{maxBudget:.18,taskCallLimits:{accept:10},rationale:'Only finish the remaining manager review'},completedTaskIds:['develop','qa']};
 const snapshot:any={planVersion:2,goalContract:candidate.sourceGoalContract,policy:{maxBudget:.13},tasks:[{id:'accept',subject:'经理验收',maxModelCalls:6}]};
 
+test('coordination requests require an explicit finite allowance or an existing sealed ceiling',()=>{
+  const parse=(resourceUi as any).resourceCoordinatorContinuationLimit;
+  assert.equal(typeof parse,'function');
+  assert.equal(parse('6'),6);
+  assert.equal(parse('',20),undefined);
+  for(const value of ['', ' ', '0','-1','1.5','NaN','Infinity','1001'])assert.throws(()=>parse(value));
+  for(const inherited of [0,-1,NaN,Infinity,1.5])assert.throws(()=>parse('',inherited));
+  const form=renderToStaticMarkup(createElement(RunResourceResume,{id:'source',snapshot,retained:0,retainUncertainCosts:true,disabled:false}));
+  assert.ok(form.includes('本段最多新增协调调用次数'));
+  assert.ok(form.includes('协调费用和次数计入项目总额'));
+});
+
+test('confirmation separates coordination from the manager task and sends only the sealed preview',()=>{
+  const value={...candidate,coordinatorContinuationLimit:6};
+  const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot,retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
+  assert.ok(html.includes('经理协调 · 本段最多新增 6 次调用'));
+  assert.ok(html.includes('经理正式验收任务单独计算'));
+  assert.equal(Object.hasOwn(resourceResumeBody(value,'source',snapshot,true),'coordinatorContinuationLimit'),false);
+  const inherited={...snapshot,resourceApproval:{coordinatorCallCeiling:20}};
+  const reuse=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate,snapshot:inherited,retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));
+  assert.ok(reuse.includes('沿用协调累计上限 20 次'));
+});
+
 test('confirmation displays explicit continuation calls separately from the cumulative task cap',()=>{
   const value={...candidate,taskContinuationLimits:{accept:3}};
   const html=renderToStaticMarkup(createElement(ResourceResumeConfirmation,{candidate:value,snapshot,retained:0,disabled:false,onConfirm:()=>{},onCancel:()=>{}}));

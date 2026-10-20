@@ -5,7 +5,9 @@ import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
 export const callsBasis = 'durable-admissions-and-archived-wire-requests' as const;
 
 /** Count each run's own durable attempts, never its inherited snapshot history.
- * Released or undispatched admissions still consumed the approved call quota. */
+ * Released or undispatched admissions still consumed the approved call quota.
+ * A purely in-memory reservation rejected before durable admission and before
+ * any wire request is not a cross-recovery call; do not invent a second ledger. */
 export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoot:string,projectId:string,version:number) {
   const runs=(await db.query('SELECT id,project_id,project_version,status,started_at FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt',[projectId,version])).rows;
   const admissions=(await db.query(`SELECT c.id,c.run_id,c.project_id,c.context->>'taskId' AS task_id
@@ -18,7 +20,8 @@ export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoo
     if(!validId(row.id)||seen.has(row.id)||!runIds.has(row.run_id)||row.project_id!==projectId||row.task_id!==null&&!validId(row.task_id))throw invalid();
     seen.add(row.id);if(!registered.has(row.run_id))registered.set(row.run_id,[]);registered.get(row.run_id)!.push(row);
   }
-  const tasks:Record<string,number>=Object.create(null),requestOverheadBytes:Record<string,number>=Object.create(null);let calls=0;
+  const tasks:Record<string,number>=Object.create(null),requestOverheadBytes:Record<string,number>=Object.create(null);
+  let calls=0,coordinatorCalls=0,coordinatorRequestOverheadBytes:number|undefined;
   for(const run of runs) {
     if(run.project_id!==projectId||run.project_version!==version)throw invalid();
     const receipts=registered.get(run.id)??[];
@@ -41,7 +44,7 @@ export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoo
       if(event.type==='model/request'&&event.sessionId&&event.taskId)sessions.set(event.sessionId,mapping.get(event.taskId)??event.taskId);
       if(event.type!=='model/wire-request')continue;
       wires++;
-      const taskId=event.data.taskId??(event.sessionId?sessions.get(event.sessionId):undefined);
+      const taskId=event.data.taskId??event.taskId??(event.sessionId?sessions.get(event.sessionId):undefined);
       if(taskId!==undefined){
         add(wireTasks,taskId);
         const body=event.data.body;
@@ -52,16 +55,30 @@ export async function durableCallHistory(db:Pick<pg.PoolClient,'query'>,traceRoo
           requestOverheadBytes[id]=Math.max(requestOverheadBytes[id]??0,Buffer.byteLength(JSON.stringify(envelope))-2);
         }
       }
+      else {
+        const body=event.data.body;
+        if(body&&typeof body==='object'&&!Array.isArray(body)&&(Array.isArray(body.messages)||Array.isArray(body.input))){
+          const envelope={...body,...(Array.isArray(body.messages)?{messages:[]}:{input:[]})};
+          coordinatorRequestOverheadBytes=Math.max(coordinatorRequestOverheadBytes??0,Buffer.byteLength(JSON.stringify(envelope))-2);
+        }
+      }
     }
     for(const row of receipts)if(row.task_id!==null)add(admissionTasks,row.task_id);
     const runCalls=Math.max(wires,receipts.length),merged=new Map<string,number>();
     for(const taskId of new Set([...wireTasks.keys(),...admissionTasks.keys()]))merged.set(taskId,Math.max(wireTasks.get(taskId)??0,admissionTasks.get(taskId)??0));
     // Conflicting partial legacy attribution must not create negative
     // unattributed calls or silently manufacture a zero remainder.
-    if([...merged.values()].reduce((sum,value)=>sum+value,0)>runCalls)throw invalid();
+    const attributed=[...merged.values()].reduce((sum,value)=>sum+value,0);
+    if(attributed>runCalls)throw invalid();
+    // Legacy receipts may omit taskId even when their wire has an authoritative
+    // task mapping. Partition only after the existing attribution merge so that
+    // these are not counted twice; genuinely unattributed admissions stay in
+    // the conservative coordinator bucket, including undispatched attempts.
+    coordinatorCalls+=runCalls-attributed;
     calls+=runCalls;for(const [taskId,count] of merged)tasks[taskId]=(tasks[taskId]??0)+count;
   }
-  return {calls,tasks,callsBasis,requestOverheadBytes};
+  return {calls,tasks,callsBasis,requestOverheadBytes,coordinatorCalls,
+    ...(coordinatorRequestOverheadBytes===undefined?{}:{coordinatorRequestOverheadBytes})};
 }
 
 /** A retry uses the same approved task IDs; a new plan version has its own task counters. */
@@ -79,5 +96,6 @@ export async function budgetHistory(db:Pick<pg.PoolClient,'query'>,traceRoot:str
     WHERE r.project_id=$1 AND r.project_version=$2 AND c.context->>'taskId' IS NOT NULL
       AND c.status IN ('pending','uncertain') GROUP BY c.context->>'taskId'`,[projectId,version])).rows;
   for(const row of holds)(tasks[row.task_id]??={cost:0,calls:0}).reserved=Number(row.amount);
-  return {calls:history.calls,tasks,callsBasis:history.callsBasis};
+  return {calls:history.calls,tasks,callsBasis:history.callsBasis,coordinatorCalls:history.coordinatorCalls,
+    ...(history.coordinatorRequestOverheadBytes===undefined?{}:{coordinatorRequestOverheadBytes:history.coordinatorRequestOverheadBytes})};
 }

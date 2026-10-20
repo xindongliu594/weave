@@ -47,6 +47,9 @@ export function RecoveryConditionsView({ result, stale, checking, error, disable
       <p>检查时已记录 {dollars(result.costReadiness.recordedCost)} · 未结算预留 {dollars(result.costReadiness.reserved)} · 净可用 {dollars(result.costReadiness.availableBudget)}</p>
       {result.calls ? <p>原方案已调用 {result.calls.used} / {result.calls.limit} 次 · 剩余 {result.calls.remaining} 次</p>
         : <p className="validation-error">调用历史尚未核验，不能把未知次数当作零次。</p>}
+      {result.coordinatorCalls&&<p>{result.coordinatorCalls.limit===undefined?
+        <>经理协调已调用 {result.coordinatorCalls.used} 次 · 与员工共享项目总上限</>:
+        <>经理协调已调用 {result.coordinatorCalls.used} / {result.coordinatorCalls.limit} 次 · 剩余 {result.coordinatorCalls.remaining} 次</>}</p>}
       {mode('恢复未完成任务', result.resume)}
       {mode('完整重试', result.retry)}
       {result.resume.completedTaskIds.length > 0 && <p className="subcopy">恢复未完成任务将沿用 {result.resume.completedTaskIds.length} 项已核验完成节点；完整重试仍受这些任务的历史费用及次数约束。</p>}

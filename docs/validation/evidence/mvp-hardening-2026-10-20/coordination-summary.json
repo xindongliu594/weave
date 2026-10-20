@@ -1,0 +1,56 @@
+{
+  "kind": "coordination-budget-engineering-verification",
+  "passed": true,
+  "realAcceptancePassed": false,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-hardening-coordination-20261020",
+  "packageSha256": "35641aa7b22b793c3b0d3e04902ffb150f3b203734d0aa4b5a35dd387e73c4f7",
+  "backup": "/home/jj/.local/share/weiwu/backups/mvp-hardening-coordination-predeploy-20261020",
+  "stoppedAudit": {
+    "activeRuns": 0,
+    "activeMessages": 0,
+    "pendingCalls": 0,
+    "activeCapabilities": 0
+  },
+  "usageCountBeforeAndAfter": 732,
+  "unknownHoldsPreserved": 7,
+  "newModelCalls": 0,
+  "tests": {
+    "windowsRuntime": 38,
+    "windowsUnit": 38,
+    "windowsUI": 17,
+    "windowsAPI": 40,
+    "windowsHistory": 14,
+    "windowsProductResource": 1,
+    "jjRuntimeAndPure": 86,
+    "jjAPI": 40,
+    "jjBackup": 6
+  },
+  "typecheckAndBuild": "passed; Vite reports one >500kB bundle warning",
+  "browser": {
+    "runId": "58de522b-7015-4d8b-98dd-6e3d7557bfc1",
+    "historicalCoordinatorCalls": 16,
+    "emptyCoordinationField": "client rejects before API submission",
+    "validPaidProposal": "not attempted"
+  },
+  "cleanup": {
+    "bytes": 119685160,
+    "phaseTotalBytes": 1416794720,
+    "originalBackupRetained": true
+  },
+  "boundary": "Durable registrations and wire requests survive recovery. Pre-registration local refusal with no wire is only an in-process attempted reservation. No new ledger introduced.",
+  "limitations": [
+    "Formal QA handoff and manager acceptance remain incomplete.",
+    "Old run lacks verificationReuse profile; cannot retroactively prove eligible test reuse.",
+    "No five-hour real employee endurance result."
+  ],
+  "postDeploymentReadOnlyVerification": {
+    "filesHashVerified": 606,
+    "service": "active",
+    "database": "connected",
+    "activeRuns": 0,
+    "pendingCalls": 0,
+    "usageCount": 732,
+    "unknownHolds": 7,
+    "coordinatorCalls": 16
+  }
+}

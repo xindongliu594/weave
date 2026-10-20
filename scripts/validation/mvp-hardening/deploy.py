@@ -5,15 +5,15 @@ Run as JJ's user. Do not print or copy runtime credentials outside JJ.
 import hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, time, urllib.request
 os.umask(0o077)
 
-assert sys.argv[1:] in [['--check'],['--apply'],['--final-check'],['--final-apply'],['--runtime-check'],['--runtime-apply'],['--correction-check'],['--correction-apply'],['--correction-resume'],['--admission-check'],['--admission-apply'],['--snapshot-check'],['--snapshot-apply']]
-phase='snapshot' if sys.argv[1].startswith('--snapshot-') else 'admission' if sys.argv[1].startswith('--admission-') else 'correction' if sys.argv[1].startswith('--correction-') else 'runtime' if sys.argv[1].startswith('--runtime-') else 'final' if sys.argv[1].startswith('--final-') else 'initial'
+assert sys.argv[1:] in [['--check'],['--apply'],['--final-check'],['--final-apply'],['--runtime-check'],['--runtime-apply'],['--correction-check'],['--correction-apply'],['--correction-resume'],['--admission-check'],['--admission-apply'],['--snapshot-check'],['--snapshot-apply'],['--coordination-check'],['--coordination-apply']]
+phase='coordination' if sys.argv[1].startswith('--coordination-') else 'snapshot' if sys.argv[1].startswith('--snapshot-') else 'admission' if sys.argv[1].startswith('--admission-') else 'correction' if sys.argv[1].startswith('--correction-') else 'runtime' if sys.argv[1].startswith('--runtime-') else 'final' if sys.argv[1].startswith('--final-') else 'initial'
 resume=sys.argv[1]=='--correction-resume'
 apply=sys.argv[1].endswith('apply') or resume
 ROOT=pathlib.Path('/home/jj/.local/share/weiwu')
-suffix={'initial':'','final':'-final','runtime':'-runtime','correction':'-correction','admission':'-admission','snapshot':'-snapshot'}[phase]
+suffix={'initial':'','final':'-final','runtime':'-runtime','correction':'-correction','admission':'-admission','snapshot':'-snapshot','coordination':'-coordination'}[phase]
 BASE=ROOT/('validation/mvp-hardening'+suffix+'-20261020')
 RELEASE=ROOT/('releases/weiwu-hardening'+suffix+'-20261020')
-OLD=ROOT/('releases/'+{'initial':'weiwu-step-checkpoints-v2-20261020','final':'weiwu-hardening-20261020','runtime':'weiwu-hardening-final-20261020','correction':'weiwu-hardening-runtime-20261020','admission':'weiwu-hardening-correction-20261020','snapshot':'weiwu-hardening-admission-20261020'}[phase])
+OLD=ROOT/('releases/'+{'initial':'weiwu-step-checkpoints-v2-20261020','final':'weiwu-hardening-20261020','runtime':'weiwu-hardening-final-20261020','correction':'weiwu-hardening-runtime-20261020','admission':'weiwu-hardening-correction-20261020','snapshot':'weiwu-hardening-admission-20261020','coordination':'weiwu-hardening-snapshot-20261020'}[phase])
 DATA=ROOT/'data/pilot'
 BACKUP=ROOT/('backups/mvp-hardening'+suffix+'-predeploy-20261020')
 UNIT=pathlib.Path('/home/jj/.config/systemd/user/weiwu-jj.service')
@@ -94,7 +94,7 @@ assert (RELEASE/'apps/api/src/step-checkpoint-recovery.ts').is_file()
 assert (RELEASE/'apps/desktop/checkpoint-test-profile.cjs').is_file()
 node=ROOT/'runtime/node-v24.19.0-linux-x64/bin/node'
 with (BASE/'linux-tests.txt').open('w') as evidence:
-    subprocess.run(([str(node),'--test','services/agent-runtime/model-settlement.test.mjs','services/agent-runtime/responses-compatible.test.mjs'] if phase=='snapshot' else [str(node),'--import','tsx','--test','tests/organization-failed-draft.test.ts','scripts/validation/task-driven-organization/remaining-call-budget.test.mjs'] if phase=='admission' else [str(node),'--test','services/agent-runtime/supervisor.test.mjs',
+    subprocess.run(([str(node),'--import','tsx','--test','--test-concurrency=1','tests/recovery-resource-plan.test.ts','tests/run-resource-resume.test.ts','tests/recovery-conditions-ui.test.ts','services/agent-runtime/budget.test.mjs','services/agent-runtime/coordinator-budget.test.mjs','services/agent-runtime/model-settlement.test.mjs'] if phase=='coordination' else [str(node),'--test','services/agent-runtime/model-settlement.test.mjs','services/agent-runtime/responses-compatible.test.mjs'] if phase=='snapshot' else [str(node),'--import','tsx','--test','tests/organization-failed-draft.test.ts','scripts/validation/task-driven-organization/remaining-call-budget.test.mjs'] if phase=='admission' else [str(node),'--test','services/agent-runtime/supervisor.test.mjs',
         'services/agent-runtime/supervisor-persistence.test.mjs','services/agent-runtime/step-checkpoints.test.mjs',
         'services/agent-runtime/inherited-step-evidence.test.mjs','services/agent-runtime/storage-governance.test.mjs',
         'services/agent-runtime/sandbox-checkpoint.test.mjs','services/agent-runtime/step-checkpoint-crash.test.mjs',
@@ -107,7 +107,7 @@ with (BASE/'linux-tests.txt').open('w') as evidence:
         cwd=RELEASE,stdout=evidence,stderr=subprocess.STDOUT,check=True,timeout=120,
         env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')})
 with (BASE/'linux-backup.txt').open('w') as evidence:
-    subprocess.run([str(node),'scripts/test-integration.mjs','tests/extensions-backup.test.ts',*(['tests/api.test.ts','tests/organization-routing-confirmation.test.ts','tests/openshell-api-admission.test.ts'] if phase=='snapshot' else ['tests/organization-chat.test.ts','tests/orchestration-pattern-integration.test.ts'] if phase in ['correction','admission'] else [])],
+    subprocess.run([str(node),'scripts/test-integration.mjs','tests/extensions-backup.test.ts',*(['tests/recovery-conditions.test.ts'] if phase=='coordination' else ['tests/api.test.ts','tests/organization-routing-confirmation.test.ts','tests/openshell-api-admission.test.ts'] if phase=='snapshot' else ['tests/organization-chat.test.ts','tests/orchestration-pattern-integration.test.ts'] if phase in ['correction','admission'] else [])],
         cwd=RELEASE,stdout=evidence,stderr=subprocess.STDOUT,check=True,timeout=180,
         env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')})
 # This is an announced, idle maintenance window, not a concurrent-deployment API.

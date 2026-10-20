@@ -1,0 +1,46 @@
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (4.483ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.7061ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (1.1371ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.4512ms)
+✔ sealed recovery ceilings retain the absolute counter across another resume and reject malformed grants (2.4234ms)
+✔ restored task holds remain occupied without charging the global carryover twice or releasing an older request (0.615ms)
+✔ recovery admits QA four and manager seven requests but blocks the eighth manager request before dispatch (58.2409ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (3.7766ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.711ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (1.1249ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (1.5202ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.9547ms)
+✔ sealed coordination allowance is absolute, survives release and another reconstruction, and leaves task calls distinct (3.1303ms)
+✔ coordination shares the existing project money and total-call gates rather than receiving a new money bucket (0.4077ms)
+✔ peek checks coordination exhaustion without counters, warnings, reservations or stopped events (1.7927ms)
+✔ unknown tasks cannot disguise coordination, and rejected foreign tasks never consume the coordination allowance (0.5075ms)
+✔ invalid sealed ceilings or historical counts fail closed rather than defaulting history to zero (0.8098ms)
+✔ legacy snapshots without a coordination ceiling keep the existing shared project semantics (0.3484ms)
+✔ adapter passes the sealed coordination ceiling/history through before preview, durable admission or transport (4.6168ms)
+✔ a dispatched unknown request consumes the last coordination call and is never replayed after its reservation is released (2.5536ms)
+✔ concurrent coordination requests cannot share the final sealed call while durable admission is waiting (32.0676ms)
+✔ an authorized fallback cannot create another coordination request after the first consumed its final call (4.2253ms)
+✔ a locally rejected durable admission releases money but never refunds its already reserved coordination call (1.1413ms)
+✔ ProductDshRuntime actually forwards raw sealed ceiling and history into adapter validation before employee hosts exist (6.0661ms)
+✔ repeated preview is read-only even at warning thresholds and cannot expose credentials or mutate schemas (11.1206ms)
+✔ successful stream uses the exact prepared body and amount, while real admission still emits warnings (42.1726ms)
+✔ preview checks owner, task, project/task calls and retained holds without stopped events (3.475ms)
+✔ preview reports the true single-request protected minimum, retaining full file evidence, tools and output (5.0148ms)
+✔ a stale successful preview cannot admit a later request after another employee holds the allowance (1.3272ms)
+✔ retained original history cannot be shortened at dispatch after a concurrent budget hold invalidates its successful preview (5.1113ms)
+✔ fallback and rework previews keep the approved 90% stop gate and never alter warning sets (1.5509ms)
+✔ compaction cannot preview a shortened source, and stopped, unknown and aborted previews fail without dispatch (0.7947ms)
+✔ prepared and dispatched packets keep the newest complete source-attested group and preserve the native transcript (3.8847ms)
+✔ failed, unproven, mixed and altered native tool results never become duplicate evidence (6.5294ms)
+✔ summary source retains all original read groups even when execution can deduplicate them (0.9668ms)
+✔ retained original-history execution preserves every source-attested duplicate group and its wire hash (1.2972ms)
+✔ official DSH user-role tool results qualify without accepting malformed source or failed results (1.0827ms)
+✔ superseded output reads require a complete native CAS pair and positive Host proof; unknown and unpaired writes retain protection (4.6866ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 973.7463

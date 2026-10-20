@@ -12,7 +12,7 @@ import { budgetHistory } from './budget-history.ts';
 import { extractPlanningObject, PlanningOutputError, planningOutputDiagnostic, planningSchemaMessage } from './planning-output.ts';
 import { policySchema } from '../../../packages/contracts/index.ts';
 import { applyRecoveryResources, recoveryResourceProposalSchema, recoveryTaskMinimumBudget, recoveryCallRequirements,
-  recoveryCallRequirementVersion, recoveryMinimumProjectBudget, recoveryTaskOutputLimit, recoveryTaskOutputBudgets, recoveryContextSnapshot } from './recovery-resource-plan.ts';
+  recoveryCallRequirementVersion, recoveryMinimumProjectBudget, recoveryTaskOutputLimit, recoveryTaskOutputBudgets, recoveryContextSnapshot, recoveryCoordinatorRequirement } from './recovery-resource-plan.ts';
 
 export function recoveryResourceRouter(traceRoot:string) {
   const router=Router(),planning=new Set<string>();
@@ -22,6 +22,7 @@ export function recoveryResourceRouter(traceRoot:string) {
       maxModelCalls:z.number().int().min(1).max(1000).optional(),maxTaskModelCalls:z.number().int().min(1).max(1000).optional(),
       maxTaskOutputTokens:z.number().int().min(1).max(32768).optional(),
       contextBytes:policySchema.shape.contextBytes,
+      coordinatorContinuationLimit:z.number().int().min(1).max(1000).optional(),
       taskContinuationLimits:z.record(z.string(),z.number().int().min(1).max(1000)).optional()}).strict().parse(req.body);
     if(planning.has(id))throw new AppError(409,'此运行正在规划资源补充');
     planning.add(id);
@@ -42,6 +43,7 @@ export function recoveryResourceRouter(traceRoot:string) {
       if(!item||item.status!=='available')throw new AppError(422,'请先测试规划模型连接','RESOURCE_MODEL_REQUIRED');
       const model={...item.data,id:item.id,version:item.version,status:item.status,capabilities:item.capabilities};
       const done=[...completedTasks(run!.events,row.snapshot).keys()],history=await budgetHistory(pool,traceRoot,row.project_id,row.project_version);
+      const coordinator=recoveryCoordinatorRequirement(row.snapshot,history,input.coordinatorContinuationLimit);
       const pricedSnapshot=recoveryContextSnapshot(row.snapshot,input.contextBytes,input.contextBytes);
       const tasks=(row.snapshot.approvedTasks??row.snapshot.tasks).map((task:any)=>({id:task.id,subject:task.subject,completed:done.includes(task.id),
         ...(done.includes(task.id)?{}:{kind:task.kind,objective:task.objective,acceptanceCriteria:task.acceptanceCriteria}),
@@ -49,7 +51,7 @@ export function recoveryResourceRouter(traceRoot:string) {
         originalBudget:task.maxBudget??row.snapshot.policy.maxBudget,usedCost:history.tasks[task.id]?.cost??0,
         reserved:history.tasks[task.id]?.reserved??0}));
       const taskMaximum=callCeilings.maxTaskModelCalls;
-      const requirements=recoveryCallRequirements(row.snapshot,history,done,callCeilings,input.taskContinuationLimits);
+      const requirements=recoveryCallRequirements(row.snapshot,history,done,callCeilings,input.taskContinuationLimits,coordinator.nextRequestCount);
       for(const task of tasks){
         Object.assign(task,requirements.tasks[task.id]??{minimumCallLimit:task.originalCallLimit,nextRequestCount:0,workRequests:0,handoffCorrectionRequests:0});
         const original=(row.snapshot.approvedTasks??row.snapshot.tasks).find((item:any)=>item.id===task.id);
@@ -59,7 +61,7 @@ export function recoveryResourceRouter(traceRoot:string) {
       const minimumTotalCalls=requirements.minimumTotalCalls;
       const costs=await projectCostReadiness(pool,row.project_id,row.snapshot.policy.maxBudget);
       const minimumProjectBudget=Math.max(row.snapshot.policy.maxBudget,
-        Math.ceil((recoveryMinimumProjectBudget(pricedSnapshot,history,done,callCeilings,costs,input.taskContinuationLimits)+input.maxPlanningCost)*1e8)/1e8);
+        Math.ceil((recoveryMinimumProjectBudget(pricedSnapshot,history,done,callCeilings,costs,input.taskContinuationLimits,coordinator.nextRequestCount)+input.maxPlanningCost)*1e8)/1e8);
       if(minimumProjectBudget>input.maxBudget)throw new AppError(422,'项目净额不足本次规划与所有未完成节点的工作及交接纠正，请重新分配预算','RESOURCE_BUDGET_INSUFFICIENT');
       const callLimits=z.object(Object.fromEntries(tasks.filter((task:any)=>!task.completed).map((task:any)=>[task.id,z.number().int()
         .min(task.minimumCallLimit).max(taskMaximum)]))).strict();
@@ -81,7 +83,7 @@ export function recoveryResourceRouter(traceRoot:string) {
         taskCallLimits:callLimits,taskBudgetLimits:budgetLimits,...(input.contextBytes===undefined?{}:{contextBytes:z.literal(input.contextBytes)}),
         ...(input.maxTaskOutputTokens===undefined?{}:{taskOutputLimits:outputLimits})});
       const messages=[{role:'system',content:'只规划未完成任务的资源，不改目标、验收、权限或交付。返回JSON实例，顶层为maxBudget、maxModelCalls、taskCallLimits、taskBudgetLimits、taskOutputLimits（未要求则省略）、contextBytes（未要求则省略）、rationale。以下是校验规则，不是回复内容；不能返回type/properties或套proposal外层：'+JSON.stringify(z.toJSONSchema(boundedSchema))+
-        '\n金额与次数均为包含已用和预留的累计上限；节点共享项目总额。minimumBudget覆盖nextRequestCount次工作及交接纠正；outputBudgetOptions为程序计算的新输出预留，选择后同步提高节点预算，所有节点新增预留与规划费必须装入项目净额。rationale一两句；不可行则如实说明，不编造成功。'},
+        '\n金额与次数均为包含已用和预留的累计上限；节点共享项目总额。minimumBudget覆盖nextRequestCount次工作及交接纠正；coordinator为经理协调请求，与经理正式验收任务分开计次、共用项目金额和总次数，不可省略这部分预留。outputBudgetOptions为程序计算的新输出预留，选择后同步提高节点预算，所有节点、协调请求新增预留与规划费必须装入项目净额。rationale一两句；不可行则如实说明，不编造成功。'},
         {role:'user',content:JSON.stringify({requirement:row.snapshot.requirement,ceiling:input.maxBudget,originalBudget:row.snapshot.policy.maxBudget,
           ...(input.contextBytes===undefined?{}:{contextBytes:input.contextBytes,originalContextBytes:row.snapshot.policy.contextBytes??64000}),
           ...(input.maxTaskOutputTokens===undefined?{}:{maxTaskOutputTokens:input.maxTaskOutputTokens,
@@ -91,7 +93,7 @@ export function recoveryResourceRouter(traceRoot:string) {
             availableAtCeiling:input.maxBudget-costs.recordedCost-costs.reserved},
           budgetInstruction:'旧费用和预留不会清零。请核对原净额能否容纳恢复与正式验收；净额很少时应在用户ceiling内提高预算，不能只保留原费用与原调用次数。',
           maxTaskModelCalls:taskMaximum,totalCallLimit:callCeilings.maxModelCalls,minimumProjectBudget,planningCostAllowance:input.maxPlanningCost,
-          originalTotalCallLimit:row.snapshot.policy.maxModelCalls??100,usedTotalCalls:history.calls,tasks})}];
+          originalTotalCallLimit:row.snapshot.policy.maxModelCalls??100,usedTotalCalls:history.calls,coordinator,tasks})}];
       // The small proposal still uses the original project cap. Confirmation,
       // not a planning request, grants the new execution ceiling.
       // Reuse documented JSON mode; unknown gateways keep their existing envelope.
@@ -107,13 +109,15 @@ export function recoveryResourceRouter(traceRoot:string) {
         throw Object.assign(new AppError(422,'AI没有返回有效资源方案，旧运行和额度未改变；本次用量已记录。'+planningSchemaMessage(reason.schema),'RESOURCE_PROPOSAL_INVALID'),
           {outputDiagnostic:planningOutputDiagnostic(response.choices[0].message.content,response.choices[0].finish_reason,reason)});
       }
-      const adjusted=applyRecoveryResources(row.snapshot,proposal,{newRevision:(row.snapshot.resourceRevision??0)+1,completedTaskIds:done,history,ceiling:input.maxBudget,callCeilings,callRequirementVersion:recoveryCallRequirementVersion,maxTaskOutputTokens:input.maxTaskOutputTokens,taskContinuationLimits:input.taskContinuationLimits,contextBytes:input.contextBytes});
+      const adjusted=applyRecoveryResources(row.snapshot,proposal,{newRevision:(row.snapshot.resourceRevision??0)+1,completedTaskIds:done,history,ceiling:input.maxBudget,callCeilings,callRequirementVersion:recoveryCallRequirementVersion,maxTaskOutputTokens:input.maxTaskOutputTokens,taskContinuationLimits:input.taskContinuationLimits,coordinatorContinuationLimit:coordinator.nextRequestCount,contextBytes:input.contextBytes});
       const settledCosts=await projectCostReadiness(pool,row.project_id,row.snapshot.policy.maxBudget);
-      if(recoveryMinimumProjectBudget(adjusted,history,done,callCeilings,settledCosts,input.taskContinuationLimits)>proposal.maxBudget)
+      if(recoveryMinimumProjectBudget(adjusted,history,done,callCeilings,settledCosts,input.taskContinuationLimits,coordinator.nextRequestCount)>proposal.maxBudget)
         throw new AppError(422,'规划用量已记录，项目净额不足工作与交接纠正，旧运行未改变','RESOURCE_BUDGET_INSUFFICIENT');
       const previewId=randomUUID(),data={kind:'run-resource-proposal',sourceRunId:id,projectId:row.project_id,projectVersion:row.project_version,
         sourceGoalContract:row.snapshot.goalContract,sourceResourceRevision:row.snapshot.resourceRevision??0,ceiling:input.maxBudget,
         modelId:model.id,usageId:response.usageId,proposal,callCeilings,callRequirementVersion:recoveryCallRequirementVersion,
+        coordinatorContinuationLimit:coordinator.nextRequestCount,
+        coordinatorHistory:{calls:history.coordinatorCalls,requestOverheadBytes:history.coordinatorRequestOverheadBytes},
         ...(input.maxTaskOutputTokens===undefined?{}:{maxTaskOutputTokens:input.maxTaskOutputTokens}),
         ...(input.contextBytes===undefined?{}:{contextBytes:input.contextBytes}),
         ...(input.taskContinuationLimits===undefined?{}:{taskContinuationLimits:input.taskContinuationLimits})};

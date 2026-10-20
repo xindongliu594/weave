@@ -1,7 +1,7 @@
 """Remove only this phase's two verified disposable copies; keep original backup."""
 import json,pathlib,shutil,sys
 base=pathlib.Path('/home/jj/.local/share/weiwu')
-allowed=['final','runtime','correction','admission','snapshot']
+allowed=['final','runtime','correction','admission','snapshot','coordination']
 assert sys.argv[1:] in [[],['--apply']]+[[f'--{phase}-{mode}'] for phase in allowed for mode in ['check','apply']]
 suffix=next(('-'+phase for phase in allowed if sys.argv[1:] and sys.argv[1].startswith('--'+phase+'-')),'')
 phase=base/('validation/mvp-hardening'+suffix+'-20261020')

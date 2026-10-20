@@ -589,7 +589,7 @@ test('resource-approved recovery carries frozen knowledge and real QA seals to t
   const beforePlanning=contextRequests.length,rowsBefore=await countRuns();
   // Seven scripted task actions plus one actual compaction consume eight
   // calls. The last call must submit the formal handoff with complete evidence.
-  const candidate=await call('/runs/'+parent+'/resource-proposal','POST',{modelId,maxBudget:2,maxPlanningCost:.1,maxModelCalls:100,maxTaskModelCalls:40,maxTaskOutputTokens:8192,retainUncertainCosts:true,taskContinuationLimits:{review:8,accept:7}});
+  const candidate=await call('/runs/'+parent+'/resource-proposal','POST',{modelId,maxBudget:2,maxPlanningCost:.1,maxModelCalls:100,maxTaskModelCalls:40,maxTaskOutputTokens:8192,retainUncertainCosts:true,taskContinuationLimits:{review:8,accept:7},coordinatorContinuationLimit:6});
   assert.equal(candidate.kind,'run-resource-proposal');assert.deepEqual(candidate.completedTaskIds,['produce']);
   assert.equal(contextRequests.length,beforePlanning+1);assert.equal(await countRuns(),rowsBefore,'planning cannot start employees');
   assert.deepEqual((await run(parent)).snapshot,frozen,'a candidate cannot mutate the original approval');
@@ -600,6 +600,9 @@ test('resource-approved recovery carries frozen knowledge and real QA seals to t
   const qaApproval=await pendingApproval(child),running=await run(child);
   assert.deepEqual(running.snapshot.completedCheckpoints,['produce']);
   assert.equal(running.snapshot.resourceApproval.previewId,candidate.previewId);
+  assert.equal(candidate.callRequirementVersion,'handoff-coordination-v2');
+  assert.equal(candidate.coordinatorContinuationLimit,6);
+  assert.equal(running.snapshot.resourceApproval.coordinatorCallCeiling,running.snapshot.budgetHistory.coordinatorCalls+6);
   assert.deepEqual(candidate.taskContinuationLimits,{review:8,accept:7});
   assert.deepEqual(running.snapshot.resourceApproval.taskCallCeilings,{review:9,accept:7});
   assert.equal(running.snapshot.budgetHistory.calls,originalCalls.length);

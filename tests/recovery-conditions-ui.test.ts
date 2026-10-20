@@ -19,6 +19,14 @@ const key = () => recoveryConditionsKey(result.runId, result.planVersion, result
 const render = (props: Partial<Parameters<typeof RecoveryConditionsView>[0]> = {}) => renderToStaticMarkup(createElement(RecoveryConditionsView,
   { stale: false, checking: false, onCheck: () => {}, ...props }));
 
+test('inspection names coordination usage and sealed remaining calls separately from employee tasks',()=>{
+  const limited={...result,coordinatorCalls:{used:16,limit:20,remaining:4}};
+  assert.match(render({result:limited}),/经理协调已调用 16 \/ 20 次 · 剩余 4 次/);
+  const shared={...result,coordinatorCalls:{used:16}};
+  assert.match(render({result:shared}),/经理协调已调用 16 次 · 与员工共享项目总上限/);
+  assert.doesNotMatch(render({result:shared}),/协调已调用 0|协调.*不限/);
+});
+
 test('an unchecked, loading or failed inspection is distinguishable and never claims a current approval', () => {
   assert.match(render(), /尚未检查/); assert.match(render(), /检查不会调用模型或创建运行/);
   assert.match(render({ checking: true }), /正在只读检查/);

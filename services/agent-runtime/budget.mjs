@@ -5,7 +5,7 @@ const reached=(left,right)=>!over(right,left);
 // Reservations and counters are changed synchronously before fetch, so concurrent employees
 // cannot both spend the same remaining allowance. Actual receipts are recorded even on overrun.
 export class ExecutionBudget {
-  constructor({maxBudget,priorSpend=0,maxModelCalls=100,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},taskCallCeilings,onEvent}) {
+  constructor({maxBudget,priorSpend=0,maxModelCalls=100,priorModelCalls=0,tasks=[],maxTaskModelCalls=40,taskUsage={},taskCallCeilings,coordinatorCallCeiling,priorCoordinatorCalls,onEvent}) {
     if(taskCallCeilings!==undefined){
       const invalid=()=>new LlmError('恢复阶段的累计调用上限无效','INVALID_TASK_CALL_CEILING');
       if(!taskCallCeilings||typeof taskCallCeilings!=='object'||Array.isArray(taskCallCeilings)||!Object.keys(taskCallCeilings).length)throw invalid();
@@ -14,6 +14,14 @@ export class ExecutionBudget {
         if(!task||!Number.isSafeInteger(limit)||limit<1||limit>Math.min(task.maxModelCalls??maxTaskModelCalls,maxModelCalls))throw invalid();
       }
     }
+    if(coordinatorCallCeiling!==undefined&&(!Number.isSafeInteger(coordinatorCallCeiling)||coordinatorCallCeiling<1||
+      !Number.isSafeInteger(maxModelCalls)||coordinatorCallCeiling>maxModelCalls))
+      throw new LlmError('恢复阶段的累计协调调用上限无效','INVALID_COORDINATOR_CALL_CEILING');
+    if((coordinatorCallCeiling!==undefined||priorCoordinatorCalls!==undefined)&&(!Number.isSafeInteger(priorModelCalls)||priorModelCalls<0||
+      priorCoordinatorCalls===undefined&&coordinatorCallCeiling!==undefined&&priorModelCalls>0||
+      priorCoordinatorCalls!==undefined&&(!Number.isSafeInteger(priorCoordinatorCalls)||priorCoordinatorCalls<0||priorCoordinatorCalls>priorModelCalls)))
+      throw new LlmError('恢复阶段的协调调用历史无效','INVALID_COORDINATOR_CALL_HISTORY');
+    this.coordinator={calls:priorCoordinatorCalls??0,maxCalls:coordinatorCallCeiling};
     this.run={scope:'project',limit:maxBudget+priorSpend,spent:priorSpend,reserved:0,calls:priorModelCalls,maxCalls:maxModelCalls,warnings:new Set()};
     this.tasks=new Map(tasks.map(task=>[task.id,{scope:'task',taskId:task.id,employeeId:task.assigneeId,limit:task.maxBudget??this.run.limit,
       spent:taskUsage[task.id]?.cost??0,reserved:taskUsage[task.id]?.reserved??0,calls:taskUsage[task.id]?.calls??0,
@@ -36,7 +44,7 @@ export class ExecutionBudget {
   checkAvailable(attribution,fallback,notify) {
     const reject=(bucket,code,message)=>{if(notify)this.fail(bucket,code,message);throw new LlmError(message,code);};
     const task=attribution.taskId?this.tasks.get(attribution.taskId):undefined;
-    if(this.tasks.size&&attribution.taskId&&!task)reject(this.run,'TASK_BUDGET_UNKNOWN','模型请求没有可核对的任务预算');
+    if((this.tasks.size&&attribution.taskId||this.coordinator.maxCalls!==undefined&&attribution.taskId!=null)&&!task)reject(this.run,'TASK_BUDGET_UNKNOWN','模型请求没有可核对的任务预算');
     if(task&&task.employeeId&&attribution.employeeId!==task.employeeId)reject(task,'TASK_BUDGET_IDENTITY','模型请求的员工与批准的任务负责人不一致');
     const buckets=[this.run,...(task?[task]:[])];
     for(const bucket of buckets) {
@@ -45,11 +53,13 @@ export class ExecutionBudget {
       if(bucket.calls>=bucket.maxCalls)reject(bucket,task===bucket?'TASK_TURN_LIMIT':'TURN_LIMIT',task===bucket?'此员工在该任务的模型调用次数已达上限':'项目方案的模型调用次数已达上限');
       if(reached(bucket.spent,bucket.limit)||over(bucket.spent+bucket.reserved,bucket.limit))reject(bucket,task===bucket?'TASK_BUDGET_EXCEEDED':'BUDGET_EXCEEDED',task===bucket?'本次请求预留将超过任务费用上限':'模型请求的保守预留将超过本次运行预算');
     }
+    if(!task&&this.coordinator.maxCalls!==undefined&&this.coordinator.calls>=this.coordinator.maxCalls)
+      reject(this.run,'COORDINATOR_TURN_LIMIT','恢复阶段的协调模型调用次数已达封存上限');
     return Math.max(0,Math.min(...buckets.map(bucket=>bucket.limit-bucket.spent-bucket.reserved)));
   }
   reserve(amount,attribution={},fallback=false) {
     const task=attribution.taskId?this.tasks.get(attribution.taskId):undefined;
-    if(this.tasks.size&&attribution.taskId&&!task)this.fail(this.run,'TASK_BUDGET_UNKNOWN','模型请求没有可核对的任务预算');
+    if((this.tasks.size&&attribution.taskId||this.coordinator.maxCalls!==undefined&&attribution.taskId!=null)&&!task)this.fail(this.run,'TASK_BUDGET_UNKNOWN','模型请求没有可核对的任务预算');
     if(task&&task.employeeId&&attribution.employeeId!==task.employeeId)this.fail(task,'TASK_BUDGET_IDENTITY','模型请求的员工与批准的任务负责人不一致');
     const buckets=[this.run,...(task?[task]:[])];
     for(const bucket of buckets) {
@@ -59,7 +69,10 @@ export class ExecutionBudget {
       if(reached(bucket.spent,bucket.limit)||over(bucket.spent+bucket.reserved+amount,bucket.limit))
         this.fail(bucket,task===bucket?'TASK_BUDGET_EXCEEDED':'BUDGET_EXCEEDED',task===bucket?'本次请求预留将超过任务费用上限':'模型请求的保守预留将超过本次运行预算');
     }
+    if(!task&&this.coordinator.maxCalls!==undefined&&this.coordinator.calls>=this.coordinator.maxCalls)
+      this.fail(this.run,'COORDINATOR_TURN_LIMIT','恢复阶段的协调模型调用次数已达封存上限');
     for(const bucket of buckets){bucket.reserved+=amount;bucket.calls++;}
+    if(!task)this.coordinator.calls++;
     let held=true;
     const release=()=>{if(held){for(const bucket of buckets)bucket.reserved=Math.max(0,bucket.reserved-amount);held=false;}};
     return {release,settle:cost=>{release();for(const bucket of buckets)bucket.spent+=cost;},check:()=>{

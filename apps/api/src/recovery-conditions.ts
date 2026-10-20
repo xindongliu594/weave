@@ -20,6 +20,7 @@ export type RecoveryConditions = {
   runId: string; projectId: string; planVersion: number; checkedAt: string;
   originalBudget: number; costReadiness: ProjectCostReadiness;
   calls?: { used: number; limit: number; remaining: number };
+  coordinatorCalls?: { used:number;limit?:number;remaining?:number };
   tasks: { id: string; subject: string; recordedCost: number; reserved: number; budgetLimit: number;
     availableBudget: number; calls: number; callLimit: number; remainingCalls: number; completed: boolean }[];
   resume: { allowed: boolean; reasons: RecoveryIssue[]; completedTaskIds: string[] };
@@ -42,6 +43,14 @@ export function recoveryProjectBudgetIssues(cost: ProjectCostReadiness, maxBudge
 export function recoveryHistoryBudgetIssues(snapshot: any, history: History, completed = new Set<string>()): RecoveryIssue[] {
   const reasons: RecoveryIssue[] = [];
   if (history.calls >= (snapshot.policy.maxModelCalls ?? 100)) reasons.push(issue(422, 'TURN_LIMIT', '该方案的模型调用次数已用尽，请修改方案后重新批准'));
+  const coordinatorLimit=snapshot.resourceApproval?.coordinatorCallCeiling;
+  if(coordinatorLimit!==undefined){
+    if(!Number.isSafeInteger(coordinatorLimit)||coordinatorLimit<1||coordinatorLimit>(snapshot.policy.maxModelCalls??100)||
+      !Number.isSafeInteger(history.coordinatorCalls)||history.coordinatorCalls<0||history.coordinatorCalls>history.calls)
+      reasons.push(issue(409,'BUDGET_HISTORY_MISSING','协调调用额度或历史无法核对，请检查档案'));
+    else if(history.coordinatorCalls>=coordinatorLimit)
+      reasons.push(issue(422,'COORDINATOR_TURN_LIMIT','本段协调请求次数已用尽，请重新分配协调额度后确认恢复；旧调用保留'));
+  }
   for (const task of snapshot.approvedTasks ?? snapshot.tasks) {
     if (completed.has(task.id)) continue;
     const used = history.tasks[task.id];
@@ -124,6 +133,9 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
     ...(child ? { existingRunId: child.id } : {}),
     ...(history ? { calls: { used: history.calls, limit: snapshot.policy.maxModelCalls ?? 100,
       remaining: Math.max(0, (snapshot.policy.maxModelCalls ?? 100) - history.calls) } } : {}),
+    ...(history?{coordinatorCalls:{used:history.coordinatorCalls,
+      ...(snapshot.resourceApproval?.coordinatorCallCeiling===undefined?{}:{limit:snapshot.resourceApproval.coordinatorCallCeiling,
+        remaining:Math.max(0,snapshot.resourceApproval.coordinatorCallCeiling-history.coordinatorCalls)})}}:{}),
     tasks: history ? snapshot.tasks.map((task: any) => {
       const used = history!.tasks[task.id] ?? { cost: 0, reserved: 0, calls: 0 };
       const budgetLimit = task.maxBudget ?? maxBudget, callLimit = recoveryTaskCallLimit(snapshot,task);

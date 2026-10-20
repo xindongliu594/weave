@@ -2,10 +2,19 @@ import {useEffect,useRef,useState} from 'react';
 import {api} from './api.ts';
 
 type Candidate={previewId:string;sourceRunId:string;projectVersion:number;sourceGoalContract:{format:string;sha256:string};ceiling:number;
-  taskContinuationLimits?:Record<string,number>;
+  taskContinuationLimits?:Record<string,number>;coordinatorContinuationLimit?:number;coordinatorHistory?:{calls:number};
   proposal:{maxBudget:number;maxModelCalls?:number;contextBytes?:number;taskCallLimits:Record<string,number>;taskBudgetLimits?:Record<string,number>;taskOutputLimits?:Record<string,number>;rationale:string};completedTaskIds:string[]};
 const money=(value:number)=>'$'+value.toFixed(6);
 type ContinuationTask={id:string;subject:string};
+export function resourceCoordinatorContinuationLimit(value:string,inheritedCeiling?:number){
+  if(!value.trim()){
+    if(typeof inheritedCeiling==='number'&&Number.isSafeInteger(inheritedCeiling)&&inheritedCeiling>0)return undefined;
+    throw Error('请填写本段最多新增协调调用次数；没有已批准的协调上限时不能留空');
+  }
+  const limit=Number(value);
+  if(!Number.isSafeInteger(limit)||limit<1||limit>1000)throw Error('协调调用次数须为 1～1000 的整数');
+  return limit;
+}
 export function resourceContextBytes(value:string,original=64000){
   if(!value.trim())return undefined;
   const bytes=Number(value);
@@ -35,6 +44,9 @@ export function ResourceResumeConfirmation({candidate,snapshot,retained,disabled
     <p>保留已核验节点：{candidate.completedTaskIds.join('、')||'无'}。保留未知费用预留 {money(retained)}，旧调用次数继续计入。</p>
     {Object.entries(candidate.proposal.taskCallLimits).map(([id,limit])=><p key={id}>{snapshot.tasks.find((task:any)=>task.id===id)?.subject??id} · 调用上限 {snapshot.tasks.find((task:any)=>task.id===id)?.maxModelCalls??snapshot.policy.maxTaskModelCalls??40} → {limit}</p>)}
     {Object.entries(candidate.taskContinuationLimits??{}).map(([id,limit])=><p key={'continuation-'+id}>{snapshot.tasks.find((task:any)=>task.id===id)?.subject??id} · 本段最多新增 {limit} 次调用（重启恢复后继续累计）</p>)}
+    {candidate.coordinatorContinuationLimit!==undefined?<p>经理协调 · 本段最多新增 {candidate.coordinatorContinuationLimit} 次调用；经理正式验收任务单独计算。协调费用和次数计入项目总额，重启不会重置。</p>:
+      snapshot.resourceApproval?.coordinatorCallCeiling!==undefined&&<p>沿用协调累计上限 {snapshot.resourceApproval.coordinatorCallCeiling} 次；经理正式验收任务单独计算。</p>}
+    {candidate.coordinatorHistory&&<p>检查时协调已用 {candidate.coordinatorHistory.calls} 次，确认时再次核对。</p>}
     {Object.entries(candidate.proposal.taskBudgetLimits??{}).map(([id,limit])=><p key={'budget-'+id}>{snapshot.tasks.find((task:any)=>task.id===id)?.subject??id} · 节点累计费用上限 {money(snapshot.tasks.find((task:any)=>task.id===id)?.maxBudget??snapshot.policy.maxBudget)} → {money(limit)}（仍共享项目总上限）</p>)}
     {Object.entries(candidate.proposal.taskOutputLimits??{}).map(([id,limit])=><p key={'output-'+id}>{snapshot.tasks.find((task:any)=>task.id===id)?.subject??id} · 单次输出上限 {snapshot.tasks.find((task:any)=>task.id===id)?.maxOutputTokens??'原模型额度'} → {limit} Token</p>)}
     {candidate.proposal.taskOutputLimits&&<p>输出上限用于费用预留，最终按实际用量登记；不会每次用满。</p>}
@@ -49,6 +61,7 @@ export function RunResourceResume({id,snapshot,disabled,retained,retainUncertain
   const [totalCalls,setTotalCalls]=useState(String(snapshot.policy.maxModelCalls??100)),[taskCalls,setTaskCalls]=useState(String(snapshot.policy.maxTaskModelCalls??40));
   const [outputLimit,setOutputLimit]=useState(String(Math.max(16384,...snapshot.tasks.map((t:any)=>t.maxOutputTokens??0))));
   const [contextBytes,setContextBytes]=useState('');
+  const [coordinatorLimit,setCoordinatorLimit]=useState('');
   const [modelId,setModelId]=useState(snapshot.modelRoutes?.[0]?.id??''),[candidate,setCandidate]=useState<Candidate>();
   const [continuation,setContinuation]=useState<Record<string,string>>({});
   const [busy,setBusy]=useState(false),[error,setError]=useState('');const active=useRef(true),inFlight=useRef(false);
@@ -56,8 +69,9 @@ export function RunResourceResume({id,snapshot,disabled,retained,retainUncertain
   const invalidate=()=>{setCandidate(undefined);setError('');};
   const generate=async()=>{
     if(disabled||inFlight.current)return;inFlight.current=true;setBusy(true);invalidate();
-    try{const taskContinuationLimits=resourceContinuationLimits(continuation,continuationTasks),requestedContext=resourceContextBytes(contextBytes,snapshot.policy.contextBytes??64000);
-      const result=await api<Candidate>('/runs/'+id+'/resource-proposal','POST',{modelId,maxBudget:Number(ceiling),maxPlanningCost:Number(maxCost),retainUncertainCosts,maxModelCalls:Number(totalCalls),maxTaskModelCalls:Number(taskCalls),maxTaskOutputTokens:Number(outputLimit),...(requestedContext===undefined?{}:{contextBytes:requestedContext}),...(taskContinuationLimits?{taskContinuationLimits}:{})});
+    try{const taskContinuationLimits=resourceContinuationLimits(continuation,continuationTasks),requestedContext=resourceContextBytes(contextBytes,snapshot.policy.contextBytes??64000),
+      coordinatorContinuationLimit=resourceCoordinatorContinuationLimit(coordinatorLimit,snapshot.resourceApproval?.coordinatorCallCeiling);
+      const result=await api<Candidate>('/runs/'+id+'/resource-proposal','POST',{modelId,maxBudget:Number(ceiling),maxPlanningCost:Number(maxCost),retainUncertainCosts,maxModelCalls:Number(totalCalls),maxTaskModelCalls:Number(taskCalls),maxTaskOutputTokens:Number(outputLimit),...(requestedContext===undefined?{}:{contextBytes:requestedContext}),...(taskContinuationLimits?{taskContinuationLimits}:{}),...(coordinatorContinuationLimit===undefined?{}:{coordinatorContinuationLimit})});
       resourceResumeBody(result,id,snapshot,retainUncertainCosts);if(active.current)setCandidate(result);
     }catch(error){if(active.current)setError((error as Error).message);}finally{inFlight.current=false;if(active.current)setBusy(false);}
   };
@@ -74,6 +88,9 @@ export function RunResourceResume({id,snapshot,disabled,retained,retainUncertain
     <label>允许的项目累计上限（美元） <input type="number" min={snapshot.policy.maxBudget} step="0.01" value={ceiling} disabled={busy||disabled} onChange={event=>{setCeiling(event.target.value);invalidate();}}/></label>
     <label>允许的项目累计调用次数 <input type="number" min={snapshot.policy.maxModelCalls??100} max="1000" step="1" value={totalCalls} disabled={busy||disabled} onChange={event=>{setTotalCalls(event.target.value);invalidate();}}/></label>
     <label>允许的单节点累计调用次数 <input type="number" min={snapshot.policy.maxTaskModelCalls??40} max="1000" step="1" value={taskCalls} disabled={busy||disabled} onChange={event=>{setTaskCalls(event.target.value);invalidate();}}/></label>
+    <label>本段最多新增协调调用次数 <input type="number" min="1" max="1000" step="1" value={coordinatorLimit} disabled={busy||disabled} onChange={event=>{setCoordinatorLimit(event.target.value);invalidate();}}/></label>
+    <p>协调用于调度与汇总，经理正式验收任务单独计算。协调费用和次数计入项目总额；这里填写本段允许的次数，不保证在这些次数内完成。</p>
+    {snapshot.resourceApproval?.coordinatorCallCeiling!==undefined?<p>已封存协调累计上限 {snapshot.resourceApproval.coordinatorCallCeiling} 次；留空沿用剩余额度，生成候选前会重新核对。</p>:<p>尚无已批准的协调上限，请明确填写后再生成资源候选。</p>}
     <details><summary>限制本段新增调用（可选）</summary>
       <p>留空沿用现有次数规则。需要限定一次续验时，为全部未完成节点填写新增次数；确认后固定，重启不会重置，费用仍受上方总额约束。</p>
       {!continuationTasks?.length&&<p>先点击上方“检查恢复条件”，获取未完成节点后即可填写。</p>}
