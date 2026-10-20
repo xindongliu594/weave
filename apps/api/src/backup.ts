@@ -17,6 +17,7 @@ import { workFileTables } from './work-files.ts';
 import { automationTables } from './automation-learning.ts';
 import {storageTables} from './storage-governance.ts';
 import {validateBackupCheckpoints} from './backup-checkpoints.ts';
+import {assertBackupDestinationClear} from './backup-destination.ts';
 const scrypt=promisify(scryptCallback);
 const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','organization_conversations','model_reservations','knowledge_embeddings','model_capability_tests',...managerChatTables,...browserMcpTables,...workFileTables,...automationTables,...storageTables,...nativeCapabilityTables];
 const password=z.string().min(12).max(200);
@@ -57,6 +58,7 @@ export function backupRouter(traceRoot:string){const router=Router();const dataR
   }catch(error){rmSync(stage,{recursive:true,force:true});throw error;}
   const keyPath=join(dataRoot,'credential.key'),oldKey=existsSync(keyPath)?readFileSync(keyPath):null;const client=await pool.connect();let swapped=false;let movedOld=false;let undoVault:(()=>void)|undefined;
   try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918274)');await client.query('SELECT pg_advisory_xact_lock(918275)');await client.query('LOCK TABLE project_runs IN EXCLUSIVE MODE');if((await client.query("SELECT id FROM manager_messages WHERE status='replying' LIMIT 1")).rowCount)throw new AppError(409,'请等待经理回复结束');if((await client.query("SELECT id FROM model_capability_tests WHERE status='running' LIMIT 1")).rowCount)throw new AppError(409,'请等待模型能力测试结束');if((await client.query("SELECT id FROM model_reservations WHERE status='pending' LIMIT 1")).rowCount)throw new AppError(409,'请等待模型调用结束后再恢复');if((await client.query("SELECT id FROM project_runs WHERE status IN ('queued','running')")).rowCount)throw new AppError(409,'请先停止队列和运行任务');
+    await assertBackupDestinationClear(client);
     const previousPaths=(await client.query('SELECT vault_path FROM knowledge_documents WHERE vault_path IS NOT NULL')).rows.map(r=>r.vault_path);
     await client.query('TRUNCATE '+tables.join(',')+' CASCADE');
     // Device credentials and host-directory permissions are not portable backup data.

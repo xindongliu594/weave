@@ -1,0 +1,14 @@
+[
+  {
+    "path": "apps/api/src/backup-destination.ts",
+    "sha256": "3c7167b9185a06d66e9f6d7c538625dc315a36fe9ab641904d7e554484e3561f"
+  },
+  {
+    "path": "apps/api/src/backup.ts",
+    "sha256": "0e9bbefe45cf6a6cb6d028671f307a2f273f37f896de55d2ac9b6790ca67fff1"
+  },
+  {
+    "path": "tests/backup-enterprise-protection.test.ts",
+    "sha256": "605e9c2307cfd9a5935ee2d9394e7669e3f0d68b6ab0be845ff282be6615fb1d"
+  }
+]

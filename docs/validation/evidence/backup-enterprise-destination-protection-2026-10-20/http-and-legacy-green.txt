@@ -1,0 +1,27 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ legacy encrypted restore remains available for a destination without enterprise history (1986.503ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (89.1743ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (124.735ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2914.8012
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (2555.7442ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (190.1575ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (612.3625ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (606.0487ms)
+✔ active paid manager replies block export and restore before any database replacement (163.2336ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (427.2365ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5253.0696
