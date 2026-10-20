@@ -276,3 +276,5 @@ export function validatePlan(plan: Plan, policy: Policy, models: Model[],require
   check('预估执行费用', pricesKnown && estimate <= policy.maxBudget, pricesKnown ? '执行估算（含 20% 预留）超过剩余预算' : '模型配置不完整，暂时无法估算费用');
   return { valid: !errors.length, errors, estimate: pricesKnown ? estimate : null, checks };
 }
+export type * from './task-execution.ts';
+export type * from './task-workspace.ts';

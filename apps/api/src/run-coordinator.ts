@@ -1,5 +1,5 @@
 import {claimExpiredRun,finishRun,terminalStatus} from './run-state.ts';
-import {assertRunAuthorization} from './execution-policy.ts';
+import {assertRunAuthorization,assertExecutionProfile,executionMode} from './execution-policy.ts';
 import { executeBrowserMcpTool } from './work-tools-browser.ts';
 import { randomUUID } from 'node:crypto';
 import {join} from 'node:path';
@@ -27,8 +27,9 @@ async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
 export class RunCoordinator {
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
   constructor(public traceRoot:string,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor']){
+    executionMode();
     const local=new LocalOperationService(traceRoot,this.owner);
-    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined),onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data,signal)=>this.reserve(id,data,signal),onResponse:data=>recordProviderResponse(data.id,data),onCallError:async data=>{await recordProviderResponse(data.id,data);await markCallUncertain(data.id,data.code,data.dispatched);}});
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>{assertExecutionProfile(snapshot);return createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local):undefined);},onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data,signal)=>this.reserve(id,data,signal),onResponse:data=>recordProviderResponse(data.id,data),onCallError:async data=>{await recordProviderResponse(data.id,data);await markCallUncertain(data.id,data.code,data.dispatched);}});
     this.timer=setInterval(()=>{void this.heartbeat().catch(e=>{if(!this.stopped)console.error('Run heartbeat:',e instanceof Error?e.name:'error');});void this.tick();},1000);this.timer.unref();void this.tick();
   }
   async heartbeat(){

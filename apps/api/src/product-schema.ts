@@ -76,6 +76,15 @@ export async function migrateProduct(pool: pg.Pool) {
     );
     CREATE INDEX IF NOT EXISTS local_operations_device ON local_operations(device_id,status,created_at);
     ALTER TABLE local_devices ADD COLUMN IF NOT EXISTS backend jsonb NOT NULL DEFAULT '{"kind":"native"}'::jsonb;
+    CREATE TABLE IF NOT EXISTS task_attempt_workspaces (
+      run_id text NOT NULL REFERENCES project_runs(id),task_id text NOT NULL,attempt_id text NOT NULL,generation integer NOT NULL CHECK(generation>0),
+      principal text NOT NULL,session_id text NOT NULL,runtime_task_id text NOT NULL,contract_hash text NOT NULL,
+      permission_hash text NOT NULL,capability_hash text NOT NULL,contract jsonb NOT NULL,
+      input_origins jsonb NOT NULL DEFAULT '[]',committed_outputs jsonb NOT NULL DEFAULT '[]',sandbox_identity jsonb,
+      scope jsonb,work_revision text,phase text NOT NULL DEFAULT 'active' CHECK(phase IN ('active','retired','unknown')),
+      PRIMARY KEY(run_id,task_id,attempt_id,generation)
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS task_attempt_active_generation ON task_attempt_workspaces(run_id,task_id) WHERE phase='active';
   `);
   // Preserve the existing scope on upgrade; do not invent policies for older historical versions.
   const client=await pool.connect();

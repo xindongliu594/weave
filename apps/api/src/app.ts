@@ -6,7 +6,7 @@ import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-gov
 import { departmentWorkbenchRouter } from './department-workbench.ts';
 import { openRigRouter } from './openrig-router.ts';
 import { runLineageEvidenceRouter } from './run-lineage-evidence.ts';
-import {bindPolicy,assertPolicy,assertPlanningModel} from './execution-policy.ts';
+import {bindPolicy,assertPolicy,assertPlanningModel,executionProfileForApproval} from './execution-policy.ts';
 import { probeTools,routeFingerprint } from './model-capabilities.ts';
 import { startKnowledgeIndex,waitKnowledgeIndex } from './knowledge-vector.ts';
 import express from 'express';
@@ -472,7 +472,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
           orchestration:project.plan.orchestration,deliveryCriteria:project.plan.deliveryCriteria,
           approval: { kind: req.body.automatic ? 'automatic-policy' : 'project', approvedAt: new Date().toISOString(), projectVersion: project.version, retainUncertainCosts:input.retainUncertainCosts }, agents, tasks,
           modelRoutes: routes.map(({ apiKey: _secret, ...route }) => route),...(options.demo?{demo:{title:options.demo.title,fixture:true}}:{}) };
-        const approvedSnapshot={...snapshot,goalContract:createGoalContract(snapshot)};
+        const approvedSnapshot={...snapshot,executionProfile:executionProfileForApproval(snapshot),goalContract:createGoalContract(snapshot)};
         await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids) VALUES($1,$2,$3,$4,$5,$6)', [runId, project.id, project.version, 'queued', approvedSnapshot,participatingDepartments.map(d=>d.id)]);
         await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1", [project.id]);
         await client.query('COMMIT');

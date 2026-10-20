@@ -20,6 +20,15 @@ import { readOnlyEvidenceSignature, completedWriteEvidenceSignature } from './re
 import { captureBudgetEvidence, taskRunEvidence } from './run-evidence.mjs';
 import {assertDeliveryCriteria} from './delivery-criteria.mjs';
 import { handoffReportGuidance } from '../../packages/contracts/handoff-report.mjs';
+import {checkpointContract} from './step-checkpoints.mjs';
+
+export function trustedTaskCandidate({runId,agentId,sessionId,taskId,runtimeTaskId,state,snapshot,contract}) {
+  const task=state.tasks.find(t=>t.id===runtimeTaskId);
+  if(!contract||contract.id!==taskId||contract.assignee!==agentId||!snapshot.agents.some(a=>a.id===agentId)||
+     !state.members.some(m=>m.id===sessionId&&m.name===agentId&&m.status!=='removed')||
+     !task||task.assignee!==agentId||!task.attemptId||!['claimed','in_progress'].includes(task.status))throw Error('TASK_NOT_ACTIVE: 可信任务分派已失效');
+  return {runId,agentId,sessionId,taskId,runtimeTaskId,attemptId:task.attemptId,contractHash:checkpointContract(snapshot,contract)};
+}
 
 // Resolve base-owned providers through the installed bundle, including nested npm dependencies.
 const require = createRequire(import.meta.url);
@@ -46,6 +55,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   let removeFactory;
   const taskIds = new Map();
   const assignments=new Map();let teamId,workspaceRoot;
+  const executionBindings=new Map();
   let productDispose, captainId, locked = false;
   const internalStatusPolls = new Set();
   const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
@@ -115,7 +125,19 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     if (!task || !employee || task.assignee !== employee.id || !state.members.some(m => m.id === agent.id && m.name === employee.id) || !['claimed', 'in_progress'].includes(task.status)) throw Error('TASK_NOT_ACTIVE: 工具仅能用于当前分派的任务');
     const id = taskIds.get(task.id);
     if (!id) throw Error('UNAPPROVED_TASK: ' + task.id);
-    return { taskId: id, attemptId: task.attemptId, task };
+    return { taskId: id, attemptId: task.attemptId, task, executionBinding:executionBindings.get(task.id) };
+  }
+  async function bindActiveWork(agent,signal) {
+    if(product.snapshot.executionProfile!=='task-attempt-openshell-v1'||agent.id===captainId)return;
+    const work=activeWork(agent),employee=employeeFor(agent,product.snapshot,captainId),state=teamState();
+    const candidate=trustedTaskCandidate({runId:archive.id,agentId:employee.id,sessionId:agent.id,taskId:work.taskId,runtimeTaskId:work.task.id,state,snapshot:product.snapshot,contract:rework.contractFor(work.task.id)});
+    if(typeof product.sandbox.bindAttempt!=='function')throw Error('TASK_EXECUTION_UNAVAILABLE: 任务执行器未接通');
+    archive.append('team/checkpoint',state);
+    const binding=await product.sandbox.bindAttempt(candidate,signal);
+    const current=activeWork(agent);
+    if(current.task.id!==work.task.id||current.attemptId!==work.attemptId)throw Error('STALE_ATTEMPT: 注册期间任务已变化');
+    executionBindings.set(work.task.id,binding);
+    return binding;
   }
   function captureReadScope(agent) {
     if (!product || !handoff || agent.id === captainId) return undefined;
@@ -249,6 +271,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         if(!employee)throw Error('MODEL_PERMISSION_DENIED: 无法确认此会话所属员工');
         if (![employee.modelId, employee.fallbackModelId].includes(options.model)) throw Error('MODEL_PERMISSION_DENIED: 模型不属于此员工批准的范围');
         adapter.sessionPolicies?.set(options.sessionId,employee);
+        await bindActiveWork(ctx.agents.get(options.sessionId),options.signal);
         if (handoff && options.sessionId !== captainId) {
           const current = taskFor(options.sessionId), task = teamState().tasks.find(t => t.id === current.taskId);
           product.supervisor?.session(options.sessionId,current);
@@ -266,11 +289,12 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ctx.on('tools/pre-execute', async (exec,next) => {
         product.goal?.check('tool');
         product.supervisor?.check();
+        if(product.snapshot.executionProfile==='task-attempt-openshell-v1'&&exec.agent.id!==captainId&&!['agent_teams_status','agent_teams_claim_task','agent_teams_send_message'].includes(exec.name))await bindActiveWork(exec.agent,exec.signal);
         if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) {
           const error=Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
           throw product.goal?.expected ? product.goal.block(error,'plan-change') : error;
         }
-        return next();
+        try{return await next();}finally{if(product.snapshot.executionProfile==='task-attempt-openshell-v1')archive.append('team/checkpoint',teamState());}
       });
       ctx.on('tools/execute', async (exec, next) => {
         if (!handoff || exec.name !== 'agent_teams_update_task') return next();

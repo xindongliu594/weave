@@ -9,9 +9,11 @@ import type pg from 'pg';
 import {pool} from './db.ts';
 import {AppError} from './provider.ts';
 import {shareCostMaintenance} from './cost-control.ts';
-import {assertRunAuthorization} from './execution-policy.ts';
+import {assertRunAuthorization,assertExecutionProfile} from './execution-policy.ts';
+import {bindTrustedAttempt,resolveTaskScope} from './task-execution.ts';
+import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope} from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
-import {openRunArchive} from '../../../services/agent-runtime/trace-store.mjs';
+import {openRunArchive,readRun} from '../../../services/agent-runtime/trace-store.mjs';
 import {executionBackendSchema} from '../../../packages/contracts/index.ts';
 import {executionBackend,assertExecutionBackendBinding,assertExecutionBackendReceipt} from './execution-backend.ts';
 import {nativeToolBinding,nativeFileAccess} from '../../../services/agent-runtime/native-capabilities.mjs';
@@ -141,7 +143,38 @@ export class LocalRunExecutor {
  root:string;preparing?:Promise<void>;
  constructor(public archive:any,public snapshot:any,public service:LocalOperationService){this.root=join(archive.dir,'artifacts');mkdirSync(this.root,{recursive:true,mode:0o700});}
  revision(){return revision(exportFiles(this.root));}
+ private async taskTransaction<T>(signal:AbortSignal,fn:(db:pg.PoolClient,run:any)=>Promise<T>):Promise<T>{
+  if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')throw new AppError(409,'旧执行器没有可信任务上下文','TASK_SCOPE_DENIED');
+  const db=await pool.connect();
+  try{
+   signal.throwIfAborted();await db.query('BEGIN');
+   const identity=(await db.query('SELECT project_id FROM project_runs WHERE id=$1',[this.archive.id])).rows[0];
+   if(!identity)throw new AppError(404,'运行不存在');
+   const project=(await db.query('SELECT id,version FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
+   const run=(await db.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[this.archive.id])).rows[0];
+   if(!project||project.version!==run.project_version)throw new AppError(409,'项目方案已变化，请重新批准','RUN_REAPPROVAL_REQUIRED');
+   if(run.lease_owner!==this.service.owner)throw new AppError(409,'运行租约已转移','TASK_SCOPE_DENIED');
+   const archive=readRun(this.service.traceRoot,this.archive.id);
+   if(!archive||archive.integrity!=='ok')throw new AppError(409,'可信运行记录不可用','TASK_SCOPE_DENIED');
+   run.events=archive.events;
+   const value=await fn(db,run);signal.throwIfAborted();await db.query('COMMIT');return value;
+  }catch(error){await db.query('ROLLBACK');throw error;}finally{db.release();}
+ }
+ /** Trusted in-process Host admission only; not registered as a model tool or HTTP route. */
+ async bindAttempt(candidate:TrustedTaskCandidate&{generation?:number},signal:AbortSignal):Promise<TrustedTaskAssignment>{
+  return this.taskTransaction(signal,(db,run)=>bindTrustedAttempt(db,run,candidate));
+ }
+ async taskScope(context:{agentId:string;sessionId:string;taskId:string;attemptId:string;generation:number},signal:AbortSignal):Promise<TaskExecutionScope>{
+  if(!context||!Number.isSafeInteger(context.generation)||context.generation<1||Object.keys(context).some(k=>!['agentId','sessionId','taskId','attemptId','generation'].includes(k)))throw new AppError(409,'任务 scope 身份不完整','TASK_SCOPE_DENIED');
+  return this.taskTransaction(signal,async(db,run)=>{
+   const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active'",[run.id,context.taskId,context.attemptId,context.generation])).rows[0];
+   if(!row)throw new AppError(409,'任务未注册','TASK_SCOPE_DENIED');
+   const assignment={...context,runId:run.id,runtimeTaskId:row.runtime_task_id,contractHash:row.contract_hash};
+   return resolveTaskScope(db,run,assignment,{files:exportFiles(this.root),revision:this.revision()},row.scope);
+  });
+ }
  async prepare(signal:AbortSignal){
+  assertExecutionProfile(this.snapshot);
   return this.preparing??=(async()=>{
    const callId='local-prepare-'+this.archive.id,ref={callId};
    this.archive.append('runtime/operation-start',{name:'local_workspace',arguments:{deviceId:this.snapshot.executionTarget.deviceId}},ref);
@@ -150,6 +183,7 @@ export class LocalRunExecutor {
   })();
  }
  async execute(name:string,args:any,signal:AbortSignal,context:any){
+  assertExecutionProfile(this.snapshot);
   await this.prepare(signal);const id=await this.service.enqueue(this.archive.id,name,args,context,undefined,signal);const result=await this.service.wait(id,signal);
   const metadata=mirrorFiles(this.root,result.files);const {files:_files,...visible}=result;
   this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace,...(result.execution?{execution:result.execution}:{})});return {...visible,...metadata};
