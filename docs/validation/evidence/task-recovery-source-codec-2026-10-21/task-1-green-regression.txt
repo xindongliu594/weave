@@ -1,0 +1,98 @@
+✔ committed checkpoints retain exact file versions and deduplicate unchanged content (243.3238ms)
+✔ partial writes are not checkpoints and corrupt objects fail closed (101.4205ms)
+✔ oversized and excessive workspaces are rejected rather than silently truncated (344.1094ms)
+✔ failed archive commit never publishes a restorable checkpoint (90.4636ms)
+✖ hardlinked workspace files cannot enter a checkpoint (27.304ms)
+✖ hardlinked stored objects are refused on restore and reuse (79.6046ms)
+✔ v2 uses private immutable work refs while full canonical cache is absent (160.1445ms)
+✔ v2 rejects malformed identity, origins, hashes and receipts before publication (118.1797ms)
+✖ v2 authenticates private canonical objects and refuses corrupt or hardlinked refs (90.2795ms)
+✔ private canonical validation failures do not reveal another task filename (93.2855ms)
+✔ v2 latest canonical and own last merge are independent but own work must match receipt (104.5105ms)
+✔ task preparation holds and rejects a private checkpoint barrier before returning dispatch context (26.5111ms)
+✔ v2 reader rejects forged work alias, origin identity and missing private canonical objects (160.2018ms)
+✔ v2 failed append never publishes refs and unfinished evidence is always fresh (102.3599ms)
+✔ v2 source identity and capabilities change contract and environment digests (63.3392ms)
+✔ synchronous task checkpoint failure stays fatal across tasks and fresh generations before any tool body (425.9549ms)
+✔ failed task node checkpoint preserves history without publishing a runnable committed seal (88.3535ms)
+✔ task commit refuses missing session instead of publishing a checkpoint-free seal (82.1078ms)
+✔ task commit refuses missing task instead of publishing a checkpoint-free seal (70.6918ms)
+✔ v2 refuses redaction-changing legal filename in own work before archival publication (68.1204ms)
+✔ v2 refuses redaction-changing legal filename in full canonical only before archival publication (74.6999ms)
+✔ v2 refuses redaction-changing boundary and receipts without publishing a step checkpoint (98.4574ms)
+✔ v2 treats unexpected mutation in actual archive append return data as fatal publication (84.714ms)
+✔ prepared accepted-stop fences same-binding reuse, a first-generation B and scope mutation (3906.3349ms)
+✔ dispatching accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2929.1584ms)
+✔ unknown accepted-stop fences same-binding reuse, a first-generation B and scope mutation (3878.8946ms)
+✔ confirmed stopped A stays sealed while a distinct authorized B binds and resolves normally (2974.5165ms)
+✔ malformed or row-key-swapped SQL stop marker fails closed before B can bind (2136.936ms)
+✔ codec authenticates every immutable field with independent proof and record domains (4.6115ms)
+✔ codec enforces exact nested keys, byte bound, UUID SHA positive sequence and safe generation (10.2595ms)
+✔ codec requires state-specific absence and monotonic canonical ISO dates without resigning transitions (13.1181ms)
+✔ canonical ISO timestamps are ordered by time across expanded-year boundaries (1.104ms)
+﹣ existing-table product migration adds a nullable marker without changing prior task history (0.2453ms) # SKIP
+✔ valid records round trip without mutation and domain digests preserve array order (44.0344ms)
+✔ SQL NULL is distinct from explicit empty V1 evidence and cannot create source authority (3.2219ms)
+✔ source identity, generation, sequence, head and committed receipt are strictly bound (29.3302ms)
+✔ all nested keys, versions and identity text stay exact without dropping or repairing fields (93.0594ms)
+✔ manifest paths reject Windows aliases, links syntax, conflicts and noncanonical order (56.5186ms)
+✔ scope and delta cannot mutate outside writes, delete files, fake changes or mismatch either manifest (32.6229ms)
+✔ both digest domains are checked after structure and cross-field validation (9.6611ms)
+✔ non JSON, hidden values, custom objects, sparse arrays and overlarge records fail without mutation (16.4331ms)
+✔ archive redaction cannot silently rewrite identity or nested authority (5.845ms)
+ℹ tests 42
+ℹ suites 0
+ℹ pass 38
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 20385.3232
+
+✖ failing tests:
+
+test at services\agent-runtime\step-checkpoints.test.mjs:50:1
+✖ hardlinked workspace files cannot enter a checkpoint (27.304ms)
+  Error: EPERM: operation not permitted, link 'C:\Users\JJ\AppData\Local\Packages\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\AC\Temp\step-proof-rml4Zg\outside.txt' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\AC\Temp\step-proof-rml4Zg\b3638724-6b7b-4a6f-9ceb-b41eca2b0dd0\artifacts\linked.txt'
+      at linkSync (node:fs:1907:11)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\services\agent-runtime\step-checkpoints.test.mjs:54:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'link',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\\AC\\Temp\\step-proof-rml4Zg\\outside.txt',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\\AC\\Temp\\step-proof-rml4Zg\\b3638724-6b7b-4a6f-9ceb-b41eca2b0dd0\\artifacts\\linked.txt'
+  }
+
+test at services\agent-runtime\step-checkpoints.test.mjs:59:1
+✖ hardlinked stored objects are refused on restore and reuse (79.6046ms)
+  Error: EPERM: operation not permitted, link 'C:\Users\JJ\AppData\Local\Packages\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\AC\Temp\step-proof-G6vhOU\506f59f3-55bf-43fb-ada6-5020cf0444a4\checkpoint-objects\a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\AC\Temp\step-proof-G6vhOU\object-alias.txt'
+      at linkSync (node:fs:1907:11)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\services\agent-runtime\step-checkpoints.test.mjs:62:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'link',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\\AC\\Temp\\step-proof-G6vhOU\\506f59f3-55bf-43fb-ada6-5020cf0444a4\\checkpoint-objects\\a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\\AC\\Temp\\step-proof-G6vhOU\\object-alias.txt'
+  }
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:35:1
+✖ v2 authenticates private canonical objects and refuses corrupt or hardlinked refs (90.2795ms)
+  Error: EPERM: operation not permitted, link 'C:\Users\JJ\AppData\Local\Packages\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\AC\Temp\checkpoint-v2-F9o7w3\d71a0789-c737-4862-b47d-07200df8a6a0\checkpoint-objects\df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\AC\Temp\checkpoint-v2-F9o7w3\alias'
+      at linkSync (node:fs:1907:11)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\services\agent-runtime\task-checkpoint-v2.test.mjs:38:28)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'link',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\\AC\\Temp\\checkpoint-v2-F9o7w3\\d71a0789-c737-4862-b47d-07200df8a6a0\\checkpoint-objects\\df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{c93919d1-2a4d-4df8-9793-dfcaaab1b49d}\\AC\\Temp\\checkpoint-v2-F9o7w3\\alias'
+  }

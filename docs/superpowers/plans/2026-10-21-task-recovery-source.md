@@ -81,9 +81,11 @@ type TaskEvidenceV1 = {
 
 验收：
 
-- [ ] 先 RED：合法往返及摘要稳定，源/目标身份、错误 generation/seq/receipt、未知字段、非法文件路径/体积、错误 revision、变更越界/删文件、非 JSON/过大记录、归档脱敏变形分别拒绝。
-- [ ] 仅新增两文件实现；测试同时验证输入不被修补/变更，既有 v1/v2/stop codec 回归保持。
-- [ ] 独立审查 spec 与质量；保存命令、exit、源码哈希。只证明格式正确，不宣称已恢复任何项目。
+- [x] 先 RED：合法往返及摘要稳定，源/目标身份、错误 generation/seq/receipt、未知字段、非法文件路径/体积、错误 revision、变更越界/删文件、非 JSON/过大记录、归档脱敏变形分别拒绝。
+- [x] 仅新增两文件实现；测试同时验证输入不被修补/变更，既有 v1/v2/stop codec 回归保持。
+- [x] 独立审查 spec 与质量；保存命令、exit、源码哈希。只证明格式正确，不宣称已恢复任何项目。
+
+2026-10-21：12 项新 codec 测试通过，相关四文件回归 44 通过 / 1 原有迁移跳过；随后修正 TypeScript 收窄错误，新 codec 重测 12/12，类型检查与构建通过。独立审查无 P0–P2。原失败、跳过及最终源文件哈希保留于 [验收记录](../../validation/task-recovery-source-codec-2026-10-21.md)。
 
 ## Task 2：可信 live 来源核对
 
@@ -94,6 +96,8 @@ type TaskEvidenceV1 = {
 从源最新完整文件集构建 A 回退候选，复用 planner；保证 B 字节与有效验收关系。源权限/backend/capability 当前有效。Task 1 不替代这些正向事实。
 
 实现前在该批 brief 冻结实际 SQL 投影、唯一 snapshot、源静止 fence、锁顺序和具体可信入口；沿前置审查裁定，不能以未定义的数据库/归档跨进程原子性假设开工。
+
+2026-10-21 预检确认现有 SQL 终态、单进程 Map 和日志归档均不能提供 writer 静止保证。因此 Task 2/3 的成功入口暂不实施，先补跨进程写入隔离。现成 `fs-native-extensions@1.5.1` 已通过 Windows/JJ 隔离验证，产品接线仍未完成；详见 [复用调研](../../research/task-recovery-writer-fence-2026-10-21.md)。这不改变恢复门禁、费用或权限。
 
 ## Task 3：NULL-only 初始化与丢应答补证
 

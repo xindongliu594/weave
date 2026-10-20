@@ -1,0 +1,35 @@
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-state.ts' imported from C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-state.test.ts
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:861:10)
+    at defaultResolve (node:internal/modules/esm/resolve:988:11)
+    at nextResolve (node:internal/modules/esm/hooks:785:28)
+    at resolveBase (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/tsx/dist/esm/index.mjs?1792519039385:2:3744)
+    at async resolveDirectory (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/tsx/dist/esm/index.mjs?1792519039385:2:4237)
+    at async resolve (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/tsx/dist/esm/index.mjs?1792519039385:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:785:22)
+    at async AsyncLoaderHooksOnLoaderHookWorker.resolve (node:internal/modules/esm/hooks:269:24)
+    at async handleMessage (node:internal/modules/esm/worker:251:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/api/src/task-recovery-state.ts'
+}
+
+Node.js v24.15.0
+✖ tests\task-recovery-state.test.ts (478.3684ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 491.6457
+
+✖ failing tests:
+
+test at tests\task-recovery-state.test.ts:1:1
+✖ tests\task-recovery-state.test.ts (478.3684ms)
+  'test failed'

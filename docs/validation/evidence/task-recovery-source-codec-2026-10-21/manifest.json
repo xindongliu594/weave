@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "baseline": "35d2b1f",
+  "modelCalls": 0,
+  "productionMutations": 0,
+  "boundaries": "Pure private codec; native library pilot uses synthetic local files and real child processes on Windows/JJ. No live source authentication, initialization, product recovery or enterprise activation.",
+  "files": [
+    {
+      "file": "dependency-package-lock.json",
+      "bytes": 2785,
+      "sha256": "512ce43748bb2c5f56e04c00be31f30e8e90cc9283e1516bb9c47f90c386e54c"
+    },
+    {
+      "file": "dependency-package.json",
+      "bytes": 64,
+      "sha256": "6b9c05ca86a2a0a33462e2c1a8575f1ceaf0f0b491d63f13de44709efe452bda"
+    },
+    {
+      "file": "lock-pilot-jj-final.json",
+      "bytes": 2394,
+      "sha256": "7e361efb7faf6afb970ea13c030d76a44172044e6c257a341d06de81fcaf35e9"
+    },
+    {
+      "file": "lock-pilot-jj.json",
+      "bytes": 2345,
+      "sha256": "d06d19c7e5f3e74d8deb465d0a59ee0340c8c084751cd50c72688377e42a96cb"
+    },
+    {
+      "file": "lock-pilot-review.md",
+      "bytes": 4960,
+      "sha256": "79cb9754d8bae7a57a3001a4414c7117b075c410150c5a31726fc7800b53425f"
+    },
+    {
+      "file": "lock-pilot-windows-final.json",
+      "bytes": 2404,
+      "sha256": "4a20f5cb13db306944bf808fd9996deece223ff96aefed7f128d2820033e840d"
+    },
+    {
+      "file": "lock-pilot-windows-restricted.json",
+      "bytes": 2324,
+      "sha256": "96f3e5c9c7e945c5ba1febb98c4f11eec63124578d050d64f8f3284eb972e889"
+    },
+    {
+      "file": "native-file-lock-pilot-initial.cjs",
+      "bytes": 10374,
+      "sha256": "96760ff6a3e4efd9d897280098b8b19898494fd8c173176923344549eb93fb74"
+    },
+    {
+      "file": "task-1-build.txt",
+      "bytes": 660,
+      "sha256": "d14ab6bda03b73ba616b45cf94ca0195b40a2766d51b915362fccbd4e48d125e"
+    },
+    {
+      "file": "task-1-build.txt.json",
+      "bytes": 211,
+      "sha256": "23dadac4055d50c7fe7ddcf0b1d6992b5e0db174192f1375dbd2169f9e70f66f"
+    },
+    {
+      "file": "task-1-green-initial.txt",
+      "bytes": 1048,
+      "sha256": "efdfa542648cd5755946441f2a3ee739c8d8ca04e2ddf0c65361ae5e60d9161b"
+    },
+    {
+      "file": "task-1-green-regression-unsandboxed.txt",
+      "bytes": 4602,
+      "sha256": "d9729246711e9ad2652809981074ad2cd0cfc08b58dd3b2d54dc881f4765521e"
+    },
+    {
+      "file": "task-1-green-regression.txt",
+      "bytes": 8562,
+      "sha256": "74ccca790ea48f22737405b4a7724afe1e47fb8b4bd0024bbfd3c1dc8865c2be"
+    },
+    {
+      "file": "task-1-red-assertions.txt",
+      "bytes": 3142,
+      "sha256": "e694d5cd29fc21b011a937ef9610ab0cfffc095813b88d004cd046c9813e9532"
+    },
+    {
+      "file": "task-1-red-controls-proxy.txt",
+      "bytes": 3151,
+      "sha256": "2856091a1bbf9e58a653f1753436d3c8d4742f7baf3cab2a8de2c23133f00555"
+    },
+    {
+      "file": "task-1-red.txt",
+      "bytes": 1714,
+      "sha256": "495f7b604ffe13a6b974a8a87edb2859f150949fd5eb118a13053487b18e569d"
+    },
+    {
+      "file": "task-1-report.md",
+      "bytes": 8194,
+      "sha256": "e6d7c0a4346ed57300456909734c264d606b570bc418e201290aa4eaf23c8763"
+    },
+    {
+      "file": "task-1-review.md",
+      "bytes": 2153,
+      "sha256": "3388c34dd4b73334dae0efbe9be66ac15429742a8d565d5b84411fd68f7c92a8"
+    },
+    {
+      "file": "task-1-type-fix-build.txt",
+      "bytes": 794,
+      "sha256": "df2097d5f6e4e8a57a23ab021441cb5543d2512c671b0c3d04b38d500d83f312"
+    },
+    {
+      "file": "task-1-type-fix-codec.txt",
+      "bytes": 1294,
+      "sha256": "89fef3d39c6111219ffb38af7fadfc13959149489ffcb9ada914f048752c694c"
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/api/src/task-recovery-state.ts",
+      "sha256": "e5d978537531dbfa33bd66ba8f79e7222545d2b6ab712f6fc47cd78687458a77",
+      "lfSha256": "e5d978537531dbfa33bd66ba8f79e7222545d2b6ab712f6fc47cd78687458a77"
+    },
+    {
+      "path": "tests/task-recovery-state.test.ts",
+      "sha256": "493b86e864ca73b80c1a929ec6cb8a6236a04e4c66329cd252308d0833dffd43",
+      "lfSha256": "493b86e864ca73b80c1a929ec6cb8a6236a04e4c66329cd252308d0833dffd43"
+    },
+    {
+      "path": "scripts/validation/native-file-lock-pilot.cjs",
+      "sha256": "ee0714e7287bc53b9bd72898ca3faf1566b739fa91e62644633c22237d6809d9",
+      "lfSha256": "ee0714e7287bc53b9bd72898ca3faf1566b739fa91e62644633c22237d6809d9"
+    }
+  ]
+}

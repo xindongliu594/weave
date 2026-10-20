@@ -1,0 +1,53 @@
+✖ valid records round trip without mutation and domain digests preserve array order (5.9326ms)
+✖ SQL NULL is distinct from explicit empty V1 evidence and cannot create source authority (0.3374ms)
+✔ source identity, generation, sequence, head and committed receipt are strictly bound (18.7087ms)
+✔ all nested keys, versions and identity text stay exact without dropping or repairing fields (37.8141ms)
+✔ manifest paths reject Windows aliases, links syntax, conflicts and noncanonical order (15.5464ms)
+✔ scope and delta cannot mutate outside writes, delete files, fake changes or mismatch either manifest (22.1277ms)
+✔ both digest domains are checked after structure and cross-field validation (2.8487ms)
+✔ non JSON, hidden values, custom objects, sparse arrays and overlarge records fail without mutation (5.4861ms)
+✔ archive redaction cannot silently rewrite identity or nested authority (3.0002ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3359.1355
+
+✖ failing tests:
+
+test at tests\task-recovery-state.test.ts:1:3365
+✖ valid records round trip without mutation and domain digests preserve array order (5.9326ms)
+  Error: 任务恢复记录格式或摘要无效
+      at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-state.ts:2:32)
+      at decodeTaskRecoverySource (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-state.ts:3:61)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-state.test.ts:41:19)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_RECOVERY_STATE_INVALID',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-recovery-state.test.ts:1:4552
+✖ SQL NULL is distinct from explicit empty V1 evidence and cannot create source authority (0.3374ms)
+  Error: 任务恢复记录格式或摘要无效
+      at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-state.ts:2:32)
+      at decodeTaskRecoveryEvidence (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-state.ts:7:63)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-state.test.ts:54:19)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_RECOVERY_STATE_INVALID',
+    upstreamStatus: undefined
+  }

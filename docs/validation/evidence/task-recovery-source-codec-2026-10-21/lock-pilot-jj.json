@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "at": "2026-10-20T18:12:15.572Z",
+  "platform": "linux",
+  "arch": "x64",
+  "node": "v24.19.0",
+  "library": "fs-native-extensions@1.5.1",
+  "integrity": "sha512-abjiHKkYdcH5M9ikBEJb0MKb/fEpPtZx/yfLHzTptvUAoiFayX0tIe0BTLBU4SAoRyjZLzA0dP1Rn2p0+QRyVg==",
+  "scriptSha256": "96760ff6a3e4efd9d897280098b8b19898494fd8c173176923344549eb93fb74",
+  "packageLockSha256": "512ce43748bb2c5f56e04c00be31f30e8e90cc9283e1516bb9c47f90c386e54c",
+  "results": [
+    {
+      "name": "two descriptors in one process exclude each other",
+      "passed": true,
+      "milliseconds": 0.19172999999999973
+    },
+    {
+      "name": "two processes share; exclusive waits for both",
+      "passed": true,
+      "milliseconds": 55.15890400000001
+    },
+    {
+      "name": "exclusive blocks until owner close",
+      "passed": true,
+      "milliseconds": 43.319604999999996
+    },
+    {
+      "name": "exclusive blocks until owner exit",
+      "passed": true,
+      "milliseconds": 43.74109200000001
+    },
+    {
+      "name": "exclusive blocks until owner kill",
+      "passed": true,
+      "milliseconds": 43.74505499999998
+    },
+    {
+      "name": "bounded retries never steal a held lock",
+      "passed": true,
+      "milliseconds": 169.62356799999998,
+      "detail": {
+        "attempts": 20
+      }
+    },
+    {
+      "name": "two real processes serialize read-modify-write",
+      "passed": true,
+      "milliseconds": 179.64066099999997,
+      "detail": {
+        "actual": 60,
+        "expected": 60
+      }
+    },
+    {
+      "name": "locked descriptor does not imply stable pathname",
+      "passed": true,
+      "milliseconds": 0.32897400000001653,
+      "detail": {
+        "replaced": true,
+        "newFileLocked": true,
+        "interpretation": "Measurement only; integration must preserve the lock inode and cover all writers."
+      }
+    },
+    {
+      "name": "uncontended open-lock-unlock-close cost",
+      "passed": true,
+      "milliseconds": 11.204259999999977,
+      "detail": {
+        "iterations": 1000,
+        "microsecondsPerOperation": 11.124246999999968
+      }
+    }
+  ],
+  "passed": true,
+  "modelCalls": 0,
+  "productionAccess": false,
+  "limits": "Synthetic local files only. This tests the lock primitive, not product writer coverage, lifecycle draining, SQL atomicity, network filesystems, or recovery."
+}

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "fs-native-extensions": "1.5.1"
+  }
+}

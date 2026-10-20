@@ -1,0 +1,10 @@
+
+> agent-department@0.2.0 build
+> tsc --noEmit && vite build
+
+apps/api/src/task-recovery-state.ts(56,29): error TS2345: Argument of type '{} | undefined' is not assignable to parameter of type 'object'.
+  Type 'undefined' is not assignable to type 'object'.
+apps/api/src/task-recovery-state.ts(58,16): error TS2345: Argument of type '{} | undefined' is not assignable to parameter of type 'object'.
+  Type 'undefined' is not assignable to type 'object'.
+apps/api/src/task-recovery-state.ts(66,19): error TS2345: Argument of type '{} | undefined' is not assignable to parameter of type 'object'.
+  Type 'undefined' is not assignable to type 'object'.

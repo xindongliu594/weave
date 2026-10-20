@@ -1,0 +1,7 @@
+{
+  "command": "npm run build",
+  "exit": 2,
+  "startedAt": "2026-10-20T18:02:27.0860669+00:00",
+  "durationMs": 20816.4015,
+  "log": ".superpowers/sdd/2026-10-21-task-recovery-source/task-1-build.txt"
+}

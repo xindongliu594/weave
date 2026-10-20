@@ -1,0 +1,17 @@
+✔ valid records round trip without mutation and domain digests preserve array order (23.4718ms)
+✔ SQL NULL is distinct from explicit empty V1 evidence and cannot create source authority (3.4886ms)
+✔ source identity, generation, sequence, head and committed receipt are strictly bound (33.382ms)
+✔ all nested keys, versions and identity text stay exact without dropping or repairing fields (83.5552ms)
+✔ manifest paths reject Windows aliases, links syntax, conflicts and noncanonical order (30.9459ms)
+✔ scope and delta cannot mutate outside writes, delete files, fake changes or mismatch either manifest (24.0291ms)
+✔ both digest domains are checked after structure and cross-field validation (6.5481ms)
+✔ non JSON, hidden values, custom objects, sparse arrays and overlarge records fail without mutation (9.2145ms)
+✔ archive redaction cannot silently rewrite identity or nested authority (3.767ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3338.7352

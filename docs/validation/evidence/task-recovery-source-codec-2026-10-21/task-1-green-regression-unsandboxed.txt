@@ -1,0 +1,53 @@
+✔ committed checkpoints retain exact file versions and deduplicate unchanged content (159.3131ms)
+✔ partial writes are not checkpoints and corrupt objects fail closed (59.533ms)
+✔ oversized and excessive workspaces are rejected rather than silently truncated (226.6752ms)
+✔ failed archive commit never publishes a restorable checkpoint (46.7271ms)
+✔ hardlinked workspace files cannot enter a checkpoint (26.7662ms)
+✔ hardlinked stored objects are refused on restore and reuse (65.2926ms)
+✔ v2 uses private immutable work refs while full canonical cache is absent (91.1621ms)
+✔ v2 rejects malformed identity, origins, hashes and receipts before publication (61.5844ms)
+✔ v2 authenticates private canonical objects and refuses corrupt or hardlinked refs (53.5805ms)
+✔ private canonical validation failures do not reveal another task filename (55.7309ms)
+✔ v2 latest canonical and own last merge are independent but own work must match receipt (50.177ms)
+✔ task preparation holds and rejects a private checkpoint barrier before returning dispatch context (13.4153ms)
+✔ v2 reader rejects forged work alias, origin identity and missing private canonical objects (95.3459ms)
+✔ v2 failed append never publishes refs and unfinished evidence is always fresh (48.0971ms)
+✔ v2 source identity and capabilities change contract and environment digests (34.869ms)
+✔ synchronous task checkpoint failure stays fatal across tasks and fresh generations before any tool body (214.0987ms)
+✔ failed task node checkpoint preserves history without publishing a runnable committed seal (37.6278ms)
+✔ task commit refuses missing session instead of publishing a checkpoint-free seal (39.5172ms)
+✔ task commit refuses missing task instead of publishing a checkpoint-free seal (47.3547ms)
+✔ v2 refuses redaction-changing legal filename in own work before archival publication (42.2391ms)
+✔ v2 refuses redaction-changing legal filename in full canonical only before archival publication (38.5492ms)
+✔ v2 refuses redaction-changing boundary and receipts without publishing a step checkpoint (44.2325ms)
+✔ v2 treats unexpected mutation in actual archive append return data as fatal publication (48.3759ms)
+✔ prepared accepted-stop fences same-binding reuse, a first-generation B and scope mutation (3168.266ms)
+✔ dispatching accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2238.337ms)
+✔ unknown accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2189.7817ms)
+✔ confirmed stopped A stays sealed while a distinct authorized B binds and resolves normally (2206.6051ms)
+✔ malformed or row-key-swapped SQL stop marker fails closed before B can bind (2088.9447ms)
+✔ codec authenticates every immutable field with independent proof and record domains (4.5686ms)
+✔ codec enforces exact nested keys, byte bound, UUID SHA positive sequence and safe generation (9.9643ms)
+✔ codec requires state-specific absence and monotonic canonical ISO dates without resigning transitions (13.5409ms)
+✔ canonical ISO timestamps are ordered by time across expanded-year boundaries (1.274ms)
+﹣ existing-table product migration adds a nullable marker without changing prior task history (0.2407ms) # SKIP
+✔ valid records round trip without mutation and domain digests preserve array order (19.5947ms)
+✔ SQL NULL is distinct from explicit empty V1 evidence and cannot create source authority (2.1432ms)
+✔ source identity, generation, sequence, head and committed receipt are strictly bound (21.7974ms)
+✔ all nested keys, versions and identity text stay exact without dropping or repairing fields (59.0197ms)
+✔ manifest paths reject Windows aliases, links syntax, conflicts and noncanonical order (24.0766ms)
+✔ scope and delta cannot mutate outside writes, delete files, fake changes or mismatch either manifest (17.1566ms)
+✔ both digest domains are checked after structure and cross-field validation (4.1556ms)
+✔ non JSON, hidden values, custom objects, sparse arrays and overlarge records fail without mutation (7.4976ms)
+✔ archive redaction cannot silently rewrite identity or nested authority (4.0593ms)
+✔ identity text rejects Unicode control characters (1.1552ms)
+✔ proxy objects cannot masquerade as plain JSON identity data (0.5259ms)
+✔ exact file limits and unchanged child head remain valid without a fabricated delta (7.8521ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 14891.05
