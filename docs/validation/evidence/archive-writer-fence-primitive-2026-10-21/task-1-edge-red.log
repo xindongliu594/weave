@@ -1,0 +1,86 @@
+✖ UUID sets, options and pre-abort reject before acquisition (163.7532ms)
+✔ one acquisition deadline covers all run locks rather than restarting per file (1004.1399ms)
+✖ nested different-run journal scopes cannot release their still active outer guard (203.7996ms)
+✖ invalid roots and aliases are rejected without modifying invalid entries (28.6481ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1552.5539
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-write-fence.test.mjs:65:1
+✖ UUID sets, options and pre-abort reject before acquisition (163.7532ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:68:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_FENCE_RUNS' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-write-fence.test.mjs:90:1
+✖ nested different-run journal scopes cannot release their still active outer guard (203.7996ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:94:12
+      at Object.withJournalAppendSync (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:214:21)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:92:11)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_FENCE_BUSY' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-write-fence.test.mjs:198:1
+✖ invalid roots and aliases are rejected without modifying invalid entries (28.6481ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'E_ARCHIVE_FENCE_PATH'
+  - }
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:200:84)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at node:internal/test_runner/test:1133:31
+      at node:internal/process/task_queues:150:7
+      at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+      at AsyncResource.runMicrotask (node:internal/process/task_queues:147:8)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: TypeError: Cannot destructure property 'traceRoot' of '(intermediate value)(intermediate value)(intermediate value)' as it is null.
+        at createArchiveWriteFence (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:118:43)
+        at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:200:97
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:200:84)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1201:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+        at Test.postRun (node:internal/test_runner/test:1330:19)
+        at node:internal/test_runner/test:1133:31,
+    expected: { code: 'E_ARCHIVE_FENCE_PATH' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+command=node --test --test-name-pattern 'UUID|nested different|invalid roots|one acquisition' services/agent-runtime/archive-write-fence.test.mjs
+exit=1
+durationMs=2021

@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: private archive fence factory exists
+ok 1 - private archive fence factory exists
+  ---
+  duration_ms: 0.96723
+  type: 'test'
+  ...
+# Subtest: guards are frozen, privately owned, mode/run scoped and expire only on release
+ok 2 - guards are frozen, privately owned, mode/run scoped and expire only on release
+  ---
+  duration_ms: 13.412242
+  type: 'test'
+  ...
+# Subtest: UUID sets, options and pre-abort reject before acquisition
+ok 3 - UUID sets, options and pre-abort reject before acquisition
+  ---
+  duration_ms: 1.84759
+  type: 'test'
+  ...
+# Subtest: one acquisition deadline covers all run locks rather than restarting per file
+ok 4 - one acquisition deadline covers all run locks rather than restarting per file
+  ---
+  duration_ms: 404.80194
+  type: 'test'
+  ...
+# Subtest: nested different-run journal scopes cannot release their still active outer guard
+ok 5 - nested different-run journal scopes cannot release their still active outer guard
+  ---
+  duration_ms: 3.612789
+  type: 'test'
+  ...
+# Subtest: actual process writers coexist, block source and release independently
+ok 6 - actual process writers coexist, block source and release independently
+  ---
+  duration_ms: 110.138608
+  type: 'test'
+  ...
+# Subtest: root exclusive blocks writers in another process
+ok 7 - root exclusive blocks writers in another process
+  ---
+  duration_ms: 66.404326
+  type: 'test'
+  ...
+# Subtest: multi-run timeout and waiting abort clean earlier run and root locks
+ok 8 - multi-run timeout and waiting abort clean earlier run and root locks
+  ---
+  duration_ms: 121.158319
+  type: 'test'
+  ...
+# Subtest: journal returns values, retains outer guard, and rejects async/thenable/reentry/early release
+ok 9 - journal returns values, retains outer guard, and rejects async/thenable/reentry/early release
+  ---
+  duration_ms: 12.623507
+  type: 'test'
+  ...
+# Subtest: journal actual process contention times out without callback and short wait succeeds
+ok 10 - journal actual process contention times out without callback and short wait succeeds
+  ---
+  duration_ms: 572.956255
+  type: 'test'
+  ...
+# Subtest: two process journal increments produce exact contiguous sequence
+ok 11 - two process journal increments produce exact contiguous sequence
+  ---
+  duration_ms: 314.856943
+  type: 'test'
+  ...
+# Subtest: directory replacement invalidates old guards; root exclusive permits a legal trace swap
+ok 12 - directory replacement invalidates old guards; root exclusive permits a legal trace swap
+  ---
+  duration_ms: 10.853646
+  type: 'test'
+  ...
+# Subtest: renamed namespace invalidates guard (OS rename restrictions reported separately)
+ok 13 - renamed namespace invalidates guard (OS rename restrictions reported separately)
+  ---
+  duration_ms: 5.228212
+  type: 'test'
+  ...
+# Subtest: renamed lockRoot invalidates guard (OS rename restrictions reported separately)
+ok 14 - renamed lockRoot invalidates guard (OS rename restrictions reported separately)
+  ---
+  duration_ms: 5.010782
+  type: 'test'
+  ...
+# Subtest: renamed file invalidates guard (OS rename restrictions reported separately)
+ok 15 - renamed file invalidates guard (OS rename restrictions reported separately)
+  ---
+  duration_ms: 5.362166
+  type: 'test'
+  ...
+# Subtest: invalid roots and aliases are rejected without modifying invalid entries
+ok 16 - invalid roots and aliases are rejected without modifying invalid entries
+  ---
+  duration_ms: 4.913028
+  type: 'test'
+  ...
+# Subtest: hardlinked native file rejected (permission failures reported as skipped fixtures)
+ok 17 - hardlinked native file rejected (permission failures reported as skipped fixtures)
+  ---
+  duration_ms: 3.185686
+  type: 'test'
+  ...
+# Subtest: native files must be regular and existing native-file contents are not truncated
+ok 18 - native files must be regular and existing native-file contents are not truncated
+  ---
+  duration_ms: 6.790681
+  type: 'test'
+  ...
+# Subtest: symlink/junction roots, namespace and lock files are rejected
+ok 19 - symlink/junction roots, namespace and lock files are rejected
+  ---
+  duration_ms: 3.171458
+  type: 'test'
+  ...
+# Subtest: symlink lock file rejected without touching target
+ok 20 - symlink lock file rejected without touching target
+  ---
+  duration_ms: 2.968564
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1757.000246

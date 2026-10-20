@@ -1,6 +1,6 @@
 # 恢复来源读取期间的写入隔离：复用调研
 
-日期：2026-10-21。固定库已完成 Windows/JJ 隔离验证，尚未接入产品。只在独立验证目录安装候选依赖和写入合成文件，没有修改产品依赖、生产档案、服务或模型配置。
+日期：2026-10-21。固定库已完成 Windows/JJ 隔离验证，随后加入 runtime 依赖并实现私有锁适配器；生产 writer 尚未接入。生产档案、服务和模型配置没有变化。
 
 ## 当前缺口
 
@@ -21,6 +21,8 @@
 | [Node 内置 SQLite](https://nodejs.org/download/release/latest-v24.x/docs/api/sqlite.html) | 同步本地事务 | 不为一个档案锁先引入第二套数据记录；保留为比较项，当前不选 |
 
 实际查询 npm 并以 `--ignore-scripts` 安装了 `fs-native-extensions@1.5.1`；完整性为 `sha512-abjiHKkYdcH5M9ikBEJb0MKb/fEpPtZx/yfLHzTptvUAoiFayX0tIe0BTLBU4SAoRyjZLzA0dP1Rn2p0+QRyVg==`，Apache-2.0。隔离 lockfile 固定六个包及各自完整性，Windows/JJ 使用相同 lockfile；没有运行安装生命周期脚本。
+
+隔离实验完成后，按 [接入计划](../superpowers/plans/2026-10-21-archive-writer-fence.md) 将同版本加入 runtime package/lock，只有六个新增依赖记录，原有包记录不变。私有适配器又完成 Windows 17 通过/3 OS fixture 跳过、JJ 同源 20/20、独立审查；[独立验收报告](../validation/archive-writer-fence-primitive-2026-10-21.md) 与下面的库原语实验分开记录。
 
 ## 实测与下一步
 

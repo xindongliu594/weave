@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node",
+    "--test",
+    "--test-reporter=tap",
+    "/home/jj/.local/share/weiwu/validation/native-lock-2026-10-21/adapter/archive-write-fence.test.mjs"
+  ],
+  "exit": 0,
+  "startedAt": "2026-10-20T18:40:19.336318+00:00",
+  "durationMs": 1800.131,
+  "sources": {
+    "archive-write-fence.mjs": "1f0e293feb055d8bfc4def8c53359070eb0b57df5b6d56d4e4f96cedeaed83fd",
+    "archive-write-fence.d.mts": "d67cf194b1a70590224ff15751b78758c79a71f57f694b60fab05a1a6440a788",
+    "archive-write-fence.test.mjs": "30cecd4f033ed061d56e2a6cf02d376a646640028f19d2f095fd696567b16613",
+    "test-helpers/archive-write-fence-child.mjs": "98f2dda69b1de8b00f9719a352f6d0349ab0e9582532bda35173f2888fb07659"
+  },
+  "logSha256": "e8dccb39565550f51ee0356fbc679665541fe6ddb23532be1652ecfa2b7666ae",
+  "modelCalls": 0,
+  "productionAccess": false
+}

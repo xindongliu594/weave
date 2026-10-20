@@ -1,0 +1,15 @@
+✔ UUID sets, options and pre-abort reject before acquisition (86.4979ms)
+✔ one acquisition deadline covers all run locks rather than restarting per file (1069.9446ms)
+✔ nested different-run journal scopes cannot release their still active outer guard (282.3536ms)
+✔ invalid roots and aliases are rejected without modifying invalid entries (33.2091ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1635.4868
+command=node --test --test-name-pattern 'UUID|nested different|invalid roots|one acquisition' services/agent-runtime/archive-write-fence.test.mjs
+exit=0
+durationMs=2110

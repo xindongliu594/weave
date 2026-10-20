@@ -1,0 +1,217 @@
+✖ private archive fence factory exists (2.8017ms)
+✖ guards are frozen, privately owned, mode/run scoped and expire only on release (7.7547ms)
+✖ UUID sets, options and pre-abort reject before acquisition (7.1741ms)
+✖ actual process writers coexist, block source and release independently (5.8786ms)
+✖ root exclusive blocks writers in another process (6.0664ms)
+✖ multi-run timeout and waiting abort clean earlier run and root locks (5.9406ms)
+✖ journal returns values, retains outer guard, and rejects async/thenable/reentry/early release (5.774ms)
+✖ journal actual process contention times out without callback and short wait succeeds (5.9933ms)
+✖ two process journal increments produce exact contiguous sequence (5.96ms)
+✖ directory replacement invalidates old guards; root exclusive permits a legal trace swap (5.7768ms)
+✖ renamed namespace, lock root and lock file fail closed but release closes original FD (5.7825ms)
+✖ invalid roots and aliases are rejected without modifying invalid entries (5.4944ms)
+✖ hardlinked native file rejected (permission failures reported as skipped fixtures) (5.3393ms)
+✖ symlink/junction roots, namespace and lock files are rejected (5.3103ms)
+✖ symlink lock file rejected without touching target (5.4974ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 0
+ℹ fail 15
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 251.1938
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-write-fence.test.mjs:45:1
+✖ private archive fence factory exists (2.8017ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:45:59)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-write-fence.test.mjs:47:1
+✖ guards are frozen, privately owned, mode/run scoped and expire only on release (7.7547ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:48:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:63:1
+✖ UUID sets, options and pre-abort reject before acquisition (7.1741ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:64:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:76:1
+✖ actual process writers coexist, block source and release independently (5.8786ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:77:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:86:1
+✖ root exclusive blocks writers in another process (6.0664ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:87:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:93:1
+✖ multi-run timeout and waiting abort clean earlier run and root locks (5.9406ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:94:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:106:1
+✖ journal returns values, retains outer guard, and rejects async/thenable/reentry/early release (5.774ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:107:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:123:1
+✖ journal actual process contention times out without callback and short wait succeeds (5.9933ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:124:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:134:1
+✖ two process journal increments produce exact contiguous sequence (5.96ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:135:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:152:1
+✖ directory replacement invalidates old guards; root exclusive permits a legal trace swap (5.7768ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:153:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:164:1
+✖ renamed namespace, lock root and lock file fail closed but release closes original FD (5.7825ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:166:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:175:1
+✖ invalid roots and aliases are rejected without modifying invalid entries (5.4944ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:176:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:187:1
+✖ hardlinked native file rejected (permission failures reported as skipped fixtures) (5.3393ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:188:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:194:1
+✖ symlink/junction roots, namespace and lock files are rejected (5.3103ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:195:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-write-fence.test.mjs:203:1
+✖ symlink lock file rejected without touching target (5.4974ms)
+  TypeError: createArchiveWriteFence is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:26:48)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:204:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+command=node --test services/agent-runtime/archive-write-fence.test.mjs
+exit=1
+durationMs=553

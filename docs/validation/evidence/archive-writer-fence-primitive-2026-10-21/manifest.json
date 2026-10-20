@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "baseline": "3eaac81",
+  "modelCalls": 0,
+  "productionMutations": 0,
+  "boundaries": "Private native lock adapter only. Actual synthetic files and child processes on Windows/JJ. Production writer coverage, producer drain, SQL order, source authentication and recovery integration remain unimplemented; no enterprise profile activation.",
+  "files": [
+    {
+      "file": "task-1-red.log",
+      "bytes": 15044,
+      "sha256": "add35a63217af19fd04050606348d27a7f3e048f471d9c85ecadb27c179cd4f6"
+    },
+    {
+      "file": "task-1-green-2.log",
+      "bytes": 681,
+      "sha256": "b213fc3145d46a21905ba2bf7dfce0a30a5a02b914fe5d94b9503fbc8fe6e191"
+    },
+    {
+      "file": "task-1-green-3.log",
+      "bytes": 4269,
+      "sha256": "fce1765a35161d1dbea02ef2de31e3294d998400213b38bc4df82b7f89ec5dfe"
+    },
+    {
+      "file": "task-1-edge-red.log",
+      "bytes": 4699,
+      "sha256": "3e6d978b1cbae5580ba2d97255ed38a3a1053586232ead48d0b59a3e0f285b71"
+    },
+    {
+      "file": "task-1-edge-green.log",
+      "bytes": 655,
+      "sha256": "f4601a9543d9bb4f39fa812ae23d3b1a8f6d632f0f80833086351dd45e5f4df6"
+    },
+    {
+      "file": "task-1-ordinary-green.log",
+      "bytes": 3115,
+      "sha256": "02d82270b875063eac1fc3fa09f7ae55c3e0df2a84503419e86a8227b64b54b0"
+    },
+    {
+      "file": "task-1-regression-sandbox.log",
+      "bytes": 3432,
+      "sha256": "67d158f6b587e9679076b10607f4c155a78151ac36915d374a613fee210f90dc"
+    },
+    {
+      "file": "task-1-final-green.log",
+      "bytes": 2228,
+      "sha256": "4d11643d4c6e938d082208f52d9af7c1f5ba05c392efb799977307ae8839313e"
+    },
+    {
+      "file": "task-1-regression-green.log",
+      "bytes": 1931,
+      "sha256": "003b1adeb9a3d689b4b476d756883c5e0e441157ff79e78a67af1c8880d2ed36"
+    },
+    {
+      "file": "task-1-build.log",
+      "bytes": 842,
+      "sha256": "682b4301f3f180d03c9cc695781d8c2b512432de341b8e650c40878532bf07c4"
+    },
+    {
+      "file": "task-1-declaration.log",
+      "bytes": 198,
+      "sha256": "333f739c4d4e0910ec70213ffe812f220dfed8d862cbc6a721f46e1464257f9c"
+    },
+    {
+      "file": "task-1-report.md",
+      "bytes": 8971,
+      "sha256": "3b26faa1318f52cb705347c120558122a7e195d773049a220e0ae4b7cb2ab015"
+    },
+    {
+      "file": "task-1-review.md",
+      "bytes": 5313,
+      "sha256": "56fd8c8bb5ac7b0c44e1797cd2d99680c9ee676cc72b75449f92e72cf21b60f6"
+    },
+    {
+      "file": "final-test.json",
+      "bytes": 907,
+      "sha256": "c149eab394a006d629e5fa457308bdec84a11e3e45ac3961ffce9d4666208095"
+    },
+    {
+      "file": "final-test.tap",
+      "bytes": 4411,
+      "sha256": "e8dccb39565550f51ee0356fbc679665541fe6ddb23532be1652ecfa2b7666ae"
+    }
+  ],
+  "sources": [
+    {
+      "file": "services/agent-runtime/archive-write-fence.mjs",
+      "bytes": 10118,
+      "sha256": "1f0e293feb055d8bfc4def8c53359070eb0b57df5b6d56d4e4f96cedeaed83fd",
+      "lfSha256": "1f0e293feb055d8bfc4def8c53359070eb0b57df5b6d56d4e4f96cedeaed83fd"
+    },
+    {
+      "file": "services/agent-runtime/archive-write-fence.d.mts",
+      "bytes": 1116,
+      "sha256": "d67cf194b1a70590224ff15751b78758c79a71f57f694b60fab05a1a6440a788",
+      "lfSha256": "d67cf194b1a70590224ff15751b78758c79a71f57f694b60fab05a1a6440a788"
+    },
+    {
+      "file": "services/agent-runtime/archive-write-fence.test.mjs",
+      "bytes": 15352,
+      "sha256": "30cecd4f033ed061d56e2a6cf02d376a646640028f19d2f095fd696567b16613",
+      "lfSha256": "30cecd4f033ed061d56e2a6cf02d376a646640028f19d2f095fd696567b16613"
+    },
+    {
+      "file": "services/agent-runtime/test-helpers/archive-write-fence-child.mjs",
+      "bytes": 1363,
+      "sha256": "98f2dda69b1de8b00f9719a352f6d0349ab0e9582532bda35173f2888fb07659",
+      "lfSha256": "98f2dda69b1de8b00f9719a352f6d0349ab0e9582532bda35173f2888fb07659"
+    },
+    {
+      "file": "services/agent-runtime/package.json",
+      "bytes": 14524,
+      "sha256": "0fbc7299bcc0d9faf2e4a033eacad11042d7dfa7a7c33036ad33f9920a1d3948",
+      "lfSha256": "e67b7bb9f4f40cb16d9d3c023aa58125115555fd60455eef6a44096eaa647498"
+    },
+    {
+      "file": "services/agent-runtime/package-lock.json",
+      "bytes": 363322,
+      "sha256": "a82ccb7ab88ecbb05f672d6d60b4b8bcc668b8e073491c209d98b87625576a3c",
+      "lfSha256": "042e67775db2f9d90234e7772e47de59b2fb9e4b7a88d06b6e3d2b5c912a9de6"
+    }
+  ],
+  "dependencies": {
+    "added": [
+      "node_modules/bare-addon-resolve",
+      "node_modules/bare-module-resolve",
+      "node_modules/bare-semver",
+      "node_modules/fs-native-extensions",
+      "node_modules/require-addon",
+      "node_modules/which-runtime"
+    ],
+    "existingRecordsChanged": 0,
+    "pinnedNativeIntegrity": "sha512-abjiHKkYdcH5M9ikBEJb0MKb/fEpPtZx/yfLHzTptvUAoiFayX0tIe0BTLBU4SAoRyjZLzA0dP1Rn2p0+QRyVg=="
+  }
+}

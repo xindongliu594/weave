@@ -1,0 +1,31 @@
+✔ private archive fence factory exists (1.4795ms)
+✔ guards are frozen, privately owned, mode/run scoped and expire only on release (171.4414ms)
+✔ UUID sets, options and pre-abort reject before acquisition (16.8449ms)
+✔ one acquisition deadline covers all run locks rather than restarting per file (771.129ms)
+✔ nested different-run journal scopes cannot release their still active outer guard (87.9321ms)
+✔ actual process writers coexist, block source and release independently (331.4167ms)
+✔ root exclusive blocks writers in another process (244.7121ms)
+✔ multi-run timeout and waiting abort clean earlier run and root locks (368.201ms)
+✔ journal returns values, retains outer guard, and rejects async/thenable/reentry/early release (224.0729ms)
+✔ journal actual process contention times out without callback and short wait succeeds (770.3421ms)
+✔ two process journal increments produce exact contiguous sequence (1850.0027ms)
+✔ directory replacement invalidates old guards; root exclusive permits a legal trace swap (162.8309ms)
+﹣ renamed namespace invalidates guard (OS rename restrictions reported separately) (69.0134ms) # live namespace replacement fixture blocked by OS EPERM; rename works after guard release
+﹣ renamed lockRoot invalidates guard (OS rename restrictions reported separately) (65.0941ms) # live lockRoot replacement fixture blocked by OS EPERM; rename works after guard release
+✔ renamed file invalidates guard (OS rename restrictions reported separately) (67.8125ms)
+✔ invalid roots and aliases are rejected without modifying invalid entries (25.311ms)
+✔ hardlinked native file rejected (permission failures reported as skipped fixtures) (27.7305ms)
+✔ native files must be regular and existing native-file contents are not truncated (93.0872ms)
+✔ symlink/junction roots, namespace and lock files are rejected (26.6874ms)
+﹣ symlink lock file rejected without touching target (19.8884ms) # file link fixture unavailable: EPERM
+ℹ tests 20
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 3
+ℹ todo 0
+ℹ duration_ms 5545.673
+command=node --test services/agent-runtime/archive-write-fence.test.mjs
+exit=0
+durationMs=5872
