@@ -1,0 +1,164 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15
+  return Object.assign(new Error(`Archive fence ${code.toLowerCase()}`), { code: `E_ARCHIVE_FENCE_${code}` });
+                       ^
+
+Error: Archive fence timeout
+    at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15:24)
+    at take (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:177:35)
+    at acquire (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:184:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'E_ARCHIVE_FENCE_TIMEOUT'
+}
+
+Node.js v24.15.0
+✖ known cancellation denial drains before outward error: missing (2897.0596ms)
+file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15
+  return Object.assign(new Error(`Archive fence ${code.toLowerCase()}`), { code: `E_ARCHIVE_FENCE_${code}` });
+                       ^
+
+Error: Archive fence timeout
+    at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15:24)
+    at take (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:177:35)
+    at acquire (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:184:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'E_ARCHIVE_FENCE_TIMEOUT'
+}
+
+Node.js v24.15.0
+✖ known cancellation denial drains before outward error: missing-locked (431.9389ms)
+file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15
+  return Object.assign(new Error(`Archive fence ${code.toLowerCase()}`), { code: `E_ARCHIVE_FENCE_${code}` });
+                       ^
+
+Error: Archive fence timeout
+    at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15:24)
+    at take (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:177:35)
+    at acquire (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:184:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'E_ARCHIVE_FENCE_TIMEOUT'
+}
+
+Node.js v24.15.0
+✖ known cancellation denial drains before outward error: completed (373.4736ms)
+file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15
+  return Object.assign(new Error(`Archive fence ${code.toLowerCase()}`), { code: `E_ARCHIVE_FENCE_${code}` });
+                       ^
+
+Error: Archive fence timeout
+    at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15:24)
+    at take (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:177:35)
+    at acquire (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:184:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'E_ARCHIVE_FENCE_TIMEOUT'
+}
+
+Node.js v24.15.0
+✖ known cancellation denial drains before outward error: failed (368.0316ms)
+file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15
+  return Object.assign(new Error(`Archive fence ${code.toLowerCase()}`), { code: `E_ARCHIVE_FENCE_${code}` });
+                       ^
+
+Error: Archive fence timeout
+    at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15:24)
+    at take (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:177:35)
+    at acquire (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:184:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'E_ARCHIVE_FENCE_TIMEOUT'
+}
+
+Node.js v24.15.0
+✖ known cancellation denial drains before outward error: cancelled (392.786ms)
+file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15
+  return Object.assign(new Error(`Archive fence ${code.toLowerCase()}`), { code: `E_ARCHIVE_FENCE_${code}` });
+                       ^
+
+Error: Archive fence timeout
+    at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:15:24)
+    at take (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:177:35)
+    at acquire (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.mjs:184:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'E_ARCHIVE_FENCE_TIMEOUT'
+}
+
+Node.js v24.15.0
+ARCHIVE_WRITER_EXIT_CLEANUP=C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-MJz8My
+✖ known cancellation denial drains before outward error: interrupted (397.4945ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5460.7762
+
+✖ failing tests:
+
+test at tests\run-terminal-maintenance.test.ts:2:1781
+✖ known cancellation denial drains before outward error: missing (2897.0596ms)
+  Error: Source probe exited: 1/null
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async message (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:14)
+      at async Object.acquire (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:139:93)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:156:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+
+test at tests\run-terminal-maintenance.test.ts:2:1781
+✖ known cancellation denial drains before outward error: missing-locked (431.9389ms)
+  Error: Source probe exited: 1/null
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async message (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:14)
+      at async Object.acquire (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:139:93)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:156:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\run-terminal-maintenance.test.ts:2:1781
+✖ known cancellation denial drains before outward error: completed (373.4736ms)
+  Error: Source probe exited: 1/null
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async message (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:14)
+      at async Object.acquire (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:139:93)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:156:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\run-terminal-maintenance.test.ts:2:1781
+✖ known cancellation denial drains before outward error: failed (368.0316ms)
+  Error: Source probe exited: 1/null
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async message (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:14)
+      at async Object.acquire (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:139:93)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:156:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\run-terminal-maintenance.test.ts:2:1781
+✖ known cancellation denial drains before outward error: cancelled (392.786ms)
+  Error: Source probe exited: 1/null
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async message (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:14)
+      at async Object.acquire (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:139:93)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:156:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\run-terminal-maintenance.test.ts:2:1781
+✖ known cancellation denial drains before outward error: interrupted (397.4945ms)
+  Error: Source probe exited: 1/null
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async message (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:133:14)
+      at async Object.acquire (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:139:93)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:156:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+EXIT=1

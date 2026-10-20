@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-21",
+  "base": "fb183ea",
+  "candidate": "020ad4e",
+  "task": "Archive writer Task2c.2: known cancellation denial boundary",
+  "review": "PASS",
+  "reviewEvidence": "task-2c.2-review.md",
+  "source": [
+    {
+      "sha256": "a75dfead9fab88198bed2fc56c0f2e07c19b4d6fd53e6d67e2e68f4012c0736a",
+      "path": "apps/api/src/run-coordinator.ts",
+      "gitLfSha256": "660316d0c065da75530b52604c65272d760c2213679266580f33d240139ec780"
+    },
+    {
+      "sha256": "84495d54233876f4dc456531516bd15c882256dfc40d2b8d4edd8ffea9015ce6",
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "gitLfSha256": "0b24525b0afa7f829713bbffc5314e3d5d01dab90be48eb758271f56a86ec367"
+    },
+    {
+      "sha256": "0a7ce6b6943bf0c3e21aab71bc908949da133bf313276a207679db188a917483",
+      "path": "tests/run-live-lease.test.ts",
+      "gitLfSha256": "0a7ce6b6943bf0c3e21aab71bc908949da133bf313276a207679db188a917483"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "task-2c.2-report.md",
+      "bytes": 7692,
+      "sha256": "49ecdb6fe2bbe3aba39d3599fb3c28f5bfdaa73a4dc97550f6666b6d897562c8"
+    },
+    {
+      "path": "task-2c.2-sourceSHA.json",
+      "bytes": 520,
+      "sha256": "bf28871847f55dde55164185e3dbf36795af9dddcde0262f6497154f2a8fa69c"
+    },
+    {
+      "path": "task-2c.2-red-sandbox-setup.log",
+      "bytes": 6637,
+      "sha256": "540227c1f25533a65ff44089446f615e2eb1b765bce72f28efe70e410c7fa459"
+    },
+    {
+      "path": "task-2c.2-red.log",
+      "bytes": 11400,
+      "sha256": "688c5060bc0d7a6bb397a21e92e7a0f10c257dda989433afbd317ea5fede03a3"
+    },
+    {
+      "path": "task-2c.2-denial-green.log",
+      "bytes": 528,
+      "sha256": "1743543264145de04074bef93ab6da0dc2fcb3aad58ab7c66fee4a03e3427d1f"
+    },
+    {
+      "path": "task-2c.2-cancel-green.log",
+      "bytes": 1616,
+      "sha256": "9e893f61ef81c1449373c99ce2ef4c3aad31e438116e43b79919739dfd12c885"
+    },
+    {
+      "path": "task-2c.2-regression-green.log",
+      "bytes": 4284,
+      "sha256": "4629ba29e22f428237c0c3bc21c782d0377cdbd650cbb4297123700a2f0982c4"
+    },
+    {
+      "path": "task-2c.2-build.log",
+      "bytes": 339,
+      "sha256": "7d511bb9feb0d79e17f606ceadfc0b01496d1f80b50123a54691796da4b2eab1"
+    },
+    {
+      "path": "task-2c.2-lease-fixture-green.log",
+      "bytes": 504,
+      "sha256": "ce596ea5158b8f01416efee5ad1c053d4363dd342bacbd36f5a23b103409d195"
+    },
+    {
+      "path": "task-2c.2-cancel-final-green.log",
+      "bytes": 1618,
+      "sha256": "a31517171f6ab6c2adfc7413a1447a9ca0a59eafd6c78ca5733f9c7bf35ce2c2"
+    },
+    {
+      "path": "task-2c.2-build-final.log",
+      "bytes": 802,
+      "sha256": "b710c667bb1f6fd2e52128f36315e172c996ad47f56a05508a3df0db8383af11"
+    },
+    {
+      "path": "task-2c.2-interrupted-process-check.log",
+      "bytes": 47,
+      "sha256": "df38ccfef1782246b313882506bd0be495da6e7f08fea4cf89df2716626c4870"
+    },
+    {
+      "path": "task-2c.2-red-cleanup.log",
+      "bytes": 228,
+      "sha256": "6bc8ac1baf7bae9aec1e935472076448fc92e33d2e9f2dd55800b77b079b96fe"
+    },
+    {
+      "path": "task-2c.2-green-cleanup.log",
+      "bytes": 448,
+      "sha256": "eb303916acdd3b540bddd76e4150a712f294a8a311c82280046843808f3e550a"
+    },
+    {
+      "path": "task-2c.2-final-cleanup.log",
+      "bytes": 228,
+      "sha256": "6ad38570d6779952e27fad529490c1250fa8d7f6f76e76c6182e2a653575e949"
+    },
+    {
+      "path": "task-2c.2-parent-cleanup-note.md",
+      "bytes": 1315,
+      "sha256": "6cff6ec1ab7559b7b77a51904f116aefd4b0aad65a3c034c1737d0c683b56a05"
+    },
+    {
+      "path": "cleanup-2c.2-fixtures.ps1",
+      "bytes": 2107,
+      "sha256": "5d9c6f55a1473b358933423b3249e0635776d7b09bdb964f5be51b1e83307815"
+    },
+    {
+      "path": "task-2c.2-review.md",
+      "bytes": 4563,
+      "sha256": "7aea8618b3f91028a34845d74f8729418a0b0d4ea88c9b97d1721f5f2ef93152"
+    }
+  ],
+  "projectModelCalls": 0,
+  "jjProductionChanges": 0,
+  "results": {
+    "validRed": {
+      "fail": 6,
+      "exit": 1
+    },
+    "finalCancellation": {
+      "pass": 14,
+      "fail": 0,
+      "skip": 0,
+      "exit": 0
+    },
+    "earlierBoundedRun": {
+      "terminalPass": 22,
+      "leasePass": 6,
+      "leaseFail": 1,
+      "exit": 1,
+      "reason": "Existing fixture observed old pool.query maintenance path"
+    },
+    "correctedLeaseFixture": {
+      "pass": 1,
+      "exit": 0
+    },
+    "finalBuildExit": 0,
+    "nonPassingAttempts": [
+      {
+        "file": "task-2c.2-red-sandbox-setup.log",
+        "exit": 1,
+        "kind": "sandbox localhost setup failure"
+      },
+      {
+        "file": "task-2c.2-denial-green.log",
+        "exit": 1,
+        "kind": "fixture callback adapter hang; interrupted shell, child termination separately checked"
+      },
+      {
+        "file": "task-2c.2-build.log",
+        "exit": 2,
+        "kind": "new test spawn/query typing corrected before final build"
+      }
+    ]
+  },
+  "cleanup": {
+    "knownMarkedFixturesRemoved": 4,
+    "cleanupExits": [
+      0,
+      0,
+      0
+    ],
+    "initialSandboxPathCheck": "refused before deletion because Temp remapped",
+    "unidentifiedSetupOrInterruptedRemnants": "retained; cleanup unverified",
+    "forcedWriterUnlock": false
+  },
+  "exclusions": [
+    "No real model, Host, or device cancellation acceptance; runtime callbacks are explicit doubles.",
+    "PGlite does not establish PostgreSQL independent-backend concurrency.",
+    "Remaining writers, strict trace enrollment, source approval and enterprise profile remain incomplete/closed.",
+    "No JJ deployment or browser acceptance in this slice.",
+    "Repeated runs of the same14 tests are not extra unique coverage.",
+    "Existing Vite >500kB advisory remains."
+  ]
+}

@@ -158,7 +158,24 @@ SQL 尾部采用已有门禁，不增加另一套分布式锁：普通运行状�
 4. RED/GREEN 覆盖不存在和终态运行的原错误及后续另一个实际进程取得 source；注入 rollback/COMMIT 或原取消失败，source 仍应受阻。失败夹具由实际进程退出清理，不加测试专用强制解锁。
 5. 只运行受影响取消/租约用例、类型/构建并独立复核；保留失败日志，不重复已通过原语与全部调用方套件。
 
+2026-10-21：`020ad4e` 完成限定修复，独立审查 PASS。修复前六个普通拒绝均复现锁占用；最终取消 14/14，受影响 lease 夹具修正 1/1，类型/构建退出 0。中间环境、夹具及类型失败分别保留；四份有准确身份的临时目录已清理，无准确身份的中断残留明确未验证。[验收及边界](../../validation/cancellation-writer-scope-2026-10-21.md)。
+
 后续普通控制接线再覆盖 recovery、run-state 原事务、协调器原始 usage/approval SQL 和审批决定 SQL→trace。它们须复用 project/run 事务边界，并传播实际档案写入失败；不能只加 ALS 包装就宣称覆盖数据库尾部。创建/重试、verification、设备、canonical、accepted-stop 继续按原矩阵分步完成；当前不开放 source 或企业 profile。
+
+### Task 2c.3：普通恢复、状态和审批写入接线
+
+接续既有调用点审查，复用 `run-state.ts` 的 project→run 事务、`918275` 门禁和应用唯一 writer manager。无需引入新的调度器、事务库或异常分类框架。此步在 2c.2 复审通过后实施。
+
+**范围**：`run-coordinator.ts` 的 recover、recordUsage、approveTool、traceFinished，以及 launchOwned 的记录失败收尾；`run-state.ts` 的现有事务和三个状态入口；`run-management.ts` 的审批决定；`app.ts` 仅传入现有 manager，以及必要调用方测试。创建/重试、verification、设备协议、canonical、accepted-stop 和低层 trace 强制注册留在后续步骤。
+
+1. 每个待恢复候选先取得独立 run writer，再进入认领事务并重新核对租约、owner 和 active 状态；作用域持续覆盖原费用重放、状态收尾和档案记录。认领失败的 null 正常释放；不得持 SQL 锁等 native 锁。旧 Docker 恢复没有可核对的原停止收据，本步通过 `claimExpiredRun` 的锁内 exclusion 对 `executionTarget?.kind !== 'local'` 的旧路径明确延期：在 claim UPDATE 和 Docker 派发之前拒绝，不改操作、运行、费用或档案，沿现有日志报告。重复扫描、重启仍不派发，不把旧容器当作已停止。实际停止核对留在设备协议步骤。
+2. 状态 helper 接收并断言应用原 manager 的现有作用域，断言在任何 SQL 前执行；实际持久化在断言后的嵌套 `withWriter` 中完成，仅借原作用域，不自动取得另一条调用链的 owner。沿用 shared 门禁→project 行→run 行的锁序，等待原 COMMIT/ROLLBACK；错误时保留原错误，回滚失败丢弃原连接。保持租约、版本、attempt 的现有条件和 false/null 正常拒绝语义。
+3. 原 fallback usage INSERT、审批申请 INSERT/取消 UPDATE、恢复的 local_operations UPDATE 放入上述短事务，不使用仅有 ALS 包装的裸 pool 写入。recordUsage 的原收据结算/重复无修改也属于记录边界；审批申请及 requested append、最终取消记账分别属于记录边界。审批轮询不持 SQL 锁，其正常 denied/abort 业务结果在这些嵌套持久化回调外处理。正常预算与授权拒绝也留在原业务调用者；不要把 reserve 的整个准入判断改成失败锁存。
+4. 实际 SQL/档案持久化失败必须在原 owner 内留下失败事实，即使运行时已经处理回调错误或业务 catch 保留了验收结果，也不能把该 owner 误当作成功排空。`traceFinished` 不再吞掉档案完整性或 append 错误；它的异常穿过原状态事务。launchOwned 的记录部分失败后保留首个 `entry.drainFailure`、原验收结果并等待原 runtime drain，不再向已失败的作用域重试 finishRun、另取 owner 或绕过断言。若终态 SQL 未成功，它保持待核对；不能保证在持久化已经失败后仍能写入“已完成”注释，更不能把已验收成果改成未验收。不得增加清除失败接口。
+5. HTTP 审批先校验输入、只读发现 run 身份，再独立取得 writer；同一事务重新核对身份与运行/审批状态后做原条件 UPDATE，持 owner 到原提交及 append 完成。竞争输掉或运行已停止作为明确无修改结果，事务正常结束后在作用域外返回原 409。数据库成功但 append 失败不得返回成功、解锁或重复审批。
+6. 显式更新直接调用状态 helper / runManagementRouter 的测试配置，使用同一应用根的 manager；不增加测试专用无锁模式。失败锁存夹具仍由实际持有进程退出后清理。
+
+验收集中覆盖：native 在 SQL 前取得并在等待后重查；null/false 和审批竞争无修改结果释放；原 replay/append 未结束时其他进程不能取得 source；外层已验收或运行时已处理的记录失败仍保持占用且不重试终态写入；正常拒绝审批在成功收尾后可排空；旧 Docker 路径重复扫描零派发、零恢复修改；原状态原子性和租约行为不变。保留有效 RED、受影响控制/状态回归、类型构建与独立审查。PGlite 只证明业务行为，现有原生 PG 并行用例若未执行须明确标记，不用 SQL 字符串断言代替实际数据库尾部结论。本步不宣称全部 writer 或来源批准完成。
 
 ## Task 3：对象、维护与备份接线
 

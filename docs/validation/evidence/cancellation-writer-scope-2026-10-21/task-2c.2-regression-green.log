@@ -1,0 +1,69 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ shutdown joins an in-flight original heartbeat after SQL terminal without recancelling the released run (2829.0795ms)
+✔ known cancellation denial drains before outward error: missing (360.0224ms)
+✔ known cancellation denial drains before outward error: missing-locked (404.3151ms)
+✔ known cancellation denial drains before outward error: completed (356.995ms)
+✔ known cancellation denial drains before outward error: failed (360.7993ms)
+✔ known cancellation denial drains before outward error: cancelled (393.4504ms)
+✔ known cancellation denial drains before outward error: interrupted (378.5001ms)
+✔ uncertain cancellation keeps source blocked: sql-4xx (317.7724ms)
+✔ uncertain cancellation keeps source blocked: rollback-before (333.8459ms)
+✔ uncertain cancellation keeps source blocked: rollback-after (322.2937ms)
+✔ uncertain cancellation keeps source blocked: commit-before (322.7878ms)
+✔ uncertain cancellation keeps source blocked: commit-after (288.4619ms)
+✔ queued cancellation commits and drains its independent HTTP writer (402.698ms)
+✔ running cancellation preserves the original producer and HTTP owner: false (402.0598ms)
+✔ running cancellation preserves the original producer and HTTP owner: true (377.2453ms)
+✔ tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts (915.453ms)
+✔ detached heartbeat SQL and shutdown cancellation run in each original producer context (341.0732ms)
+✔ a rejected heartbeat waits for every original SQL update and retains the failed owner (360.5816ms)
+✔ cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure (171.784ms)
+✔ check-to-start quarantine race defers the same attempt before input preparation and prepares once after release (261.6984ms)
+✔ cancel racing the quarantine rejection remains cancelled and cannot revive as queued (182.9454ms)
+ARCHIVE_WRITER_EXIT_CLEANUP=C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-MhK39d
+✔ quarantine defer respects expired-lease fencing (160.3446ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10846.1488
+✖ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (2703.4845ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (97.1327ms)
+✔ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (261.2158ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (528.8253ms)
+✔ the real heartbeat timer renews its own fenced lease even while the scheduler remains busy (1082.0323ms)
+✔ caller abort exits immediately while the shared heartbeat waits for the single pool connection (189.126ms)
+✔ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (320.5038ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5789.702
+
+✖ failing tests:
+
+test at tests\run-live-lease.test.ts:1:4625
+✖ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (2703.4845ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-live-lease.test.ts:52:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT=1
