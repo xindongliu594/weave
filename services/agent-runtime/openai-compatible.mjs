@@ -491,23 +491,30 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     const route = this.routes.get(options.model);
     if (!route) throw new LlmError(`运行快照中不存在模型 ${options.model}`, 'UNKNOWN_MODEL');
     options.signal?.throwIfAborted();
+    const usageId = randomUUID();
+    let resolveRequest;
+    const activeRequest = { id: usageId, dispatched: false, done: new Promise(resolve => { resolveRequest = resolve; }) };
+    // Budget callbacks may synchronously stop admission; this request already
+    // owns its preparation, durable admission and any undispatched accounting.
+    this.activeRequests.set(usageId, activeRequest);
+    const finishRequest = () => { this.activeRequests.delete(usageId); resolveRequest(); this.checkWriterDrain(); };
     let prepared, ticket;
     try {
       prepared = this.#prepareRequest(options, true);
       // This deliberately rebuilds a preview. Fitting and reservation are
       // synchronous, so no employee can take this allowance between them.
       ticket = this.budget.reserve(prepared.reservation, prepared.attribution, prepared.fallback);
-    } catch (error) { this.onError?.(error); throw error; }
+    } catch (error) {
+      try { this.onError?.(error); throw error; }
+      finally { finishRequest(); }
+    }
     const { path, body, headers, protocol, fitted, attribution, maxTokens, reservation } = prepared;
     this.calls++;this.reserved+=reservation;
     let reservationHeld=true;
     const release=()=>{ticket.release();if(reservationHeld){this.reserved=Math.max(0,this.reserved-reservation);reservationHeld=false;}};
     let response, receivedMetadata;
     const started=Date.now();
-    const usageId=randomUUID();let registered=false,dispatched=false,accounted=false;
-    let finishRequest;
-    const activeRequest = { id: usageId, dispatched: false, done: new Promise(resolve => { finishRequest = resolve; }) };
-    this.activeRequests.set(usageId, activeRequest);
+    let registered=false,dispatched=false,accounted=false;
     try {
       if(fitted.removed || fitted.deduplicatedGroups || fitted.supersededRuntimeSnapshots) this.onContext?.({ sessionId: options.sessionId, modelId: route.id, requestPurpose: attribution.requestPurpose, removedGroups: fitted.removed,
         deduplicatedGroups:fitted.deduplicatedGroups,deduplicatedBytes:fitted.deduplicatedBytes,evidenceDuplicates:fitted.evidenceDuplicates,supersededReads:fitted.supersededReads,
@@ -620,7 +627,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       this.onError?.(normalized);
       throw normalized;
     } finally {
-      this.activeRequests.delete(usageId); finishRequest(); this.checkWriterDrain();
+      finishRequest();
     }
   }
 }
