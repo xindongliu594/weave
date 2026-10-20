@@ -123,6 +123,7 @@ function parse(input: AuditInput) {
   }
   const normalized = { ...parsed, changes }; bytes(normalized, 16384); return normalized;
 }
+export const normalizeAuditInput = parse;
 function actorSnapshot(principal: Principal): AuditActor {
   return principal.kind === 'human' ? { kind: principal.kind, userId: principal.userId, orgRole: principal.orgRole }
     : principal.kind === 'device' ? { kind: principal.kind, deviceId: principal.deviceId }

@@ -1,0 +1,24 @@
+✔ invalid limit and time are refused before database checkout (38.1929ms)
+✔ bounded selection atomically publishes only committed local projections and survives repeated restarts (417.3447ms)
+✔ full source and outbox linkage mismatch stays pending with fixed retry metadata (301.7319ms)
+✔ canonical source columns and strict normalized payload are verified before publication (413.2548ms)
+✔ projection hash uses complete deterministic canonical content and legacy attribution is preserved (259.3162ms)
+✔ projection preserves the source PostgreSQL microsecond timestamp for an identical published retry (308.2251ms)
+✔ retry follows bounded 1 2 4 8 16 30 second schedule without copying raw database errors (358.5346ms)
+✔ crash before projection commit replays once without false publication (393.5357ms)
+✔ crash after projection commit does not duplicate after restart or invalidate source retry (275.1148ms)
+✔ commit failure recovery derives retry delay from the current persisted attempt count (297.071ms)
+✔ incomplete or archived JSONL cannot block local publication and active appender remains its only writer (358.1641ms)
+✔ projection cap is serialized and never evicts evidence needed by published duplicates (6830.8823ms)
+✔ two native publishers produce one projection using independent backends (426.7253ms)
+✔ native publisher skips a source row locked by another backend (330.3162ms)
+✔ native competing publishers serialize the last projection capacity slot (6280.272ms)
+✔ native worker process restart retains publication and source deduplication (2389.2826ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20383.5549

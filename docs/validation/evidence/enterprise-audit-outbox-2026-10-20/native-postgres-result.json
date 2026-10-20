@@ -1,0 +1,14 @@
+{
+  "id": "4fc8a25f-8dc4-4be9-8a72-f4f94c6acead",
+  "postgresVersion": "postgres (PostgreSQL) 17.10",
+  "backendPids": [
+    46280,
+    42648
+  ],
+  "lockBlockers": [
+    46280
+  ],
+  "observabilityExit": 0,
+  "stopped": true,
+  "dataRemoved": true
+}

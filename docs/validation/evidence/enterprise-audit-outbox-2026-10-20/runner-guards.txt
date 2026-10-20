@@ -1,0 +1,12 @@
+✔ runner accepts explicit loopback test URLs and defaults to the owned native fixture only (2.7297ms)
+✔ runner refuses absent, remote and non-test URLs before any connection and hides credentials (1022.339ms)
+✔ restart worker refuses ambient database URL without explicit guarded test configuration (717.1979ms)
+✔ runner rejects files and options outside its narrow allowlist before connecting (520.8318ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2408.6104

@@ -1,0 +1,30 @@
+[
+  {
+    "path": "apps/api/src/audit-events.ts",
+    "sha256": "537a0200889a1add1528118a9d1118dc7415c4c1f15855024cb220b041bb6495"
+  },
+  {
+    "path": "apps/api/src/audit-outbox.ts",
+    "sha256": "702d7595c9814da093673dbcad3b12130e9b2b77b107c82b30114a2d501d1cb8"
+  },
+  {
+    "path": "scripts/test-observability-postgres.mjs",
+    "sha256": "4d1e9ed49ef6644feb66930dbe62191e4d5e35b75ce9575d570538b2cbd92a17"
+  },
+  {
+    "path": "scripts/test-observability-postgres.d.mts",
+    "sha256": "f8df0fbc2c15acb95864bef2052188afe031494ba75ea774b2782931bb91a791"
+  },
+  {
+    "path": "tests/audit-outbox.test.ts",
+    "sha256": "24aa04a3dd6bd92a533f2d376c2a359f446819d4cb13617a5772bf024b8b431a"
+  },
+  {
+    "path": "tests/observability-test-runner.test.mjs",
+    "sha256": "325cf4ca4dc0933264d5f1d4d749631efec5201a07590457ddfee123fad82a1d"
+  },
+  {
+    "path": "tests/fixtures/observability/project-once.ts",
+    "sha256": "47bdde24fb563d4e3b0c6f63225a46330ef28672b94bd20e10303b2601a2aefe"
+  }
+]
