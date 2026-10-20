@@ -36,7 +36,7 @@ before(async () => {
     } catch (error) { faults.push(error); response.writeHead(500); response.end('{}'); }
   });
   gateway.listen(0, '127.0.0.1'); await once(gateway, 'listening');
-  const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown();
+  const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdownBackground();
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as any).port + '/api';
   const configured = await call('/gateways', 'POST', { name: 'Local thinking protocol fixture', baseUrl: 'http://127.0.0.1:' + (gateway.address() as any).port + '/v1' });
   assert.equal(configured.status, 201, JSON.stringify(configured.data)); gatewayId = configured.data.id;

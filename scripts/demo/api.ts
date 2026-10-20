@@ -13,6 +13,7 @@ const gateway = await createDemoGateway();
 const gatewayAddress = gateway.address(); if (!gatewayAddress || typeof gatewayAddress === 'string') throw Error('演示模型启动失败');
 const demo = { title: 'Todo API 团队开发演示', projectId: '', gatewayUrl: `http://127.0.0.1:${gatewayAddress.port}/v1` };
 const app = createApp({ createExecutor: archive => new DemoSandbox(archive), assertExecutorReady: async signal => { signal.throwIfAborted(); }, demo });
+await app.locals.ready;
 const server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
 const address = server.address(); if (!address || typeof address === 'string') throw Error('演示 API 启动失败');
 const url = `http://127.0.0.1:${address.port}/api`;

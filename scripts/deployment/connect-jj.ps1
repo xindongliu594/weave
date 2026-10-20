@@ -19,9 +19,9 @@ try {
         $tunnelProcess.Refresh()
         if ($tunnelProcess.HasExited) { throw "SSH 隧道已退出：$($tunnelProcess.ExitCode)。请检查 ssh $ComputerAlias。" }
         try {
-            $reply = Invoke-WebRequest -Uri "$($url)api/health" -TimeoutSec 2 -UseBasicParsing
+            $reply = Invoke-WebRequest -Uri "$($url)healthz" -TimeoutSec 2 -UseBasicParsing
             $health = $reply.Content | ConvertFrom-Json
-            if ($reply.StatusCode -eq 200 -and $health.database -eq 'connected' -and $health.workspace.kind -eq 'local') {
+            if ($reply.StatusCode -eq 200 -and $health.ok -eq $true) {
                 $connected = $true
                 break
             }
@@ -29,7 +29,7 @@ try {
         Start-Sleep -Milliseconds 500
     }
     if (-not $connected) { throw 'SSH 隧道未能连接到为伍，请检查 JJ 上的 weiwu-jj.service。' }
-    $record = [ordered]@{ url=$url; tunnelPid=$tunnelProcess.Id; processStartedAt=$tunnelProcess.StartTime.ToUniversalTime().ToString('o'); computerAlias=$ComputerAlias; localPort=$LocalPort; remotePort=$RemotePort; database=$health.database }
+    $record = [ordered]@{ url=$url; tunnelPid=$tunnelProcess.Id; processStartedAt=$tunnelProcess.StartTime.ToUniversalTime().ToString('o'); computerAlias=$ComputerAlias; localPort=$LocalPort; remotePort=$RemotePort; health='alive' }
     $record | ConvertTo-Json
     Write-Host "网页地址：$url"
     Write-Host "本次隧道 PID：$($tunnelProcess.Id)。关闭该 PID 的 SSH 进程即可断开；JJ 服务继续运行。"

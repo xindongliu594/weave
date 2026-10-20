@@ -27,7 +27,11 @@ import { RunSandbox } from '../../../services/agent-runtime/sandbox.mjs';
 import { resolve } from 'node:path';
 import { listRuns, readRun } from '../../../services/agent-runtime/trace-store.mjs';
 import { runTraceVerification } from '../../../services/agent-runtime/verification.mjs';
-import { configuredOrigins, isAllowedRequestOrigin } from './request-origin.ts';
+import { configuredOrigins, isAllowedRequestOrigin,isAllowedCallbackNavigation } from './request-origin.ts';
+import {loadIdentityConfig} from './identity-config.ts';
+import {createIdentityHttp} from './identity-http.ts';
+import {apiAccess} from './api-access.ts';
+import {assertRouteInventory,routePolicy,isClassifiedEntry} from './api-route-policies.ts';
 import { knowledgeRouter } from './knowledge.ts';
 import { productRouter } from './product.ts';
 import { runManagementRouter } from './run-management.ts';
@@ -84,7 +88,14 @@ function assertCarriedOperationOutcomes(traceRoot:string,projectId:string,readin
 }
 export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|undefined;createExecutor?:ConstructorParameters<typeof RunCoordinator>[1];assertExecutorReady?:(signal:AbortSignal)=>Promise<void>;demo?:{title:string;projectId:string;gatewayUrl:string};localWorkspace?:{kind:'local';database:'pglite';workspacesPath:string;executionTarget:NonNullable<Policy['executionTarget']>}}={}) {
   const app = express();
+  const identityConfig=loadIdentityConfig(process.env);
+  assertRouteInventory();
+  const identity=createIdentityHttp({pool,config:identityConfig});
+  app.locals.ready=identity.ready;
+  void identity.ready.catch(()=>{});
+  if(identityConfig.mode==='oidc')app.set('trust proxy',(ip:string)=>ip==='127.0.0.1'||ip==='::1'||ip==='::ffff:127.0.0.1');
   const allowedOrigins = configuredOrigins();
+  if(identityConfig.mode==='oidc')allowedOrigins.add(identityConfig.publicOrigin);
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
   const coordinator = new RunCoordinator(traceRoot,options.createExecutor);
   const runtime = coordinator.runtime;
@@ -93,13 +104,24 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   const reconciliation = new ProviderReconciliationService(); reconciliation.start();
   let stopping=false,vaultBusy=false,vaultWork=Promise.resolve();
   const vaultTimer = setInterval(() => { if(stopping||vaultBusy)return;vaultBusy=true;vaultWork=syncObsidian().then(async()=>{const row=(await pool.query('SELECT data FROM product_settings WHERE id=1')).rows[0];if(!stopping&&row?.data.knowledgeSearchMode==='hybrid')await startKnowledgeIndex();}).catch(() => {}).finally(()=>{vaultBusy=false;}); }, 10000); vaultTimer.unref();
-  app.locals.shutdown = async () => { stopping=true;clearInterval(vaultTimer); await managerChat.close(); await automation.close(); await coordinator.close(); await reconciliation.close(); await closeBrowserMcp(); await vaultWork;await waitKnowledgeIndex(); };
+  app.locals.shutdownBackground = async () => { stopping=true;clearInterval(vaultTimer); await managerChat.close(); await automation.close(); await coordinator.close(); await reconciliation.close(); await closeBrowserMcp(); await vaultWork;await waitKnowledgeIndex(); };
+  let identityClosed=false;
+  app.locals.shutdown = async () => {identityClosed=true;await app.locals.shutdownBackground();await identity.close();};
   let verifying = false;
   app.disable('x-powered-by');
   app.use((req, res, next) => {
-    if (!['127.0.0.1', 'localhost', '[::1]'].includes(req.hostname)) return res.status(403).json({ message: '仅允许本机访问' });
+    if(identityConfig.mode==='legacy-local'){
+      if (!['127.0.0.1', 'localhost', '[::1]'].includes(req.hostname)) return res.status(403).json({ message: '仅允许本机访问' });
+    }else {
+      const localHost=['127.0.0.1','localhost','[::1]'].includes(req.hostname)&&!req.get('origin');
+      const machine=routePolicy(req.method,req.path)?.access==='device'
+        &&localHost;
+      const liveness=req.method==='GET'&&req.path==='/healthz'&&localHost;
+      if(!machine&&!liveness&&(req.hostname!==new URL(identityConfig.publicOrigin).hostname||req.protocol!=='https'))return res.status(403).json({error:'Invalid public origin'});
+    }
     const origin = req.get('origin');
-    if (req.get('sec-fetch-site') === 'cross-site' || (origin && !isAllowedRequestOrigin(origin, req.get('sec-fetch-site'), allowedOrigins))) return res.status(403).json({ message: '不允许跨站请求，请从当前工作台页面操作。' });
+    const callback=identityConfig.mode==='oidc'&&isAllowedCallbackNavigation(req.method,req.path,req.get('sec-fetch-mode'));
+    if (!callback&&(req.get('sec-fetch-site') === 'cross-site' || (origin && !isAllowedRequestOrigin(origin, req.get('sec-fetch-site'), allowedOrigins)))) return res.status(403).json({ message: '不允许跨站请求，请从当前工作台页面操作。' });
     if (!['GET', 'HEAD'].includes(req.method) && !req.is('application/json')) return res.status(415).json({ message: '请求必须使用 application/json' });
     res.setHeader('Cache-Control', 'no-store'); next();
   });
@@ -107,6 +129,14 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.use('/api/local-devices',express.json({limit:'32mb'}));
   app.use('/api/work-files', express.json({ limit: '12mb' }));
   app.use(express.json({ limit: '2mb' }));
+  app.get('/healthz',(_req,res)=>res.json({ok:true}));
+  app.use((req,res,next)=>{
+    if(identityClosed){res.status(503).json({error:'Identity service unavailable'});return;}
+    void identity.ready.then(()=>next(),()=>res.status(503).json({error:'Identity service unavailable'}));
+  });
+  app.use((req,res,next)=>routePolicy(req.method,req.path)?.access==='device'?next():identity.sessionMiddleware(req,res,next));
+  app.use((req,res,next)=>isClassifiedEntry(req.method,req.path)?next():res.sendStatus(404));
+  app.use(identity.router);
   if(options.localWorkspace)app.use((req,_res,next)=>{
     if(req.method==='POST'&&/^\/api\/(projects|organizations|organizations\/preview|organizations\/chat)\/?$/i.test(req.path)&&req.body?.policy&&typeof req.body.policy==='object'&&!Array.isArray(req.body.policy)&&req.body.policy.executionTarget===undefined)req.body.policy.executionTarget=options.localWorkspace!.executionTarget;
     next();
@@ -116,6 +146,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     if(req.method==='POST'&&/^\/api\/backup\/restore\/?$/i.test(req.path))return res.status(422).json({message:'演示环境不能导入正式工作空间备份。'});
     next();
   });
+  app.use('/api',apiAccess(identity,identityConfig));
   app.use('/api', idempotency);
   app.use('/api', managerChatRouter());
   app.use('/api', browserMcpRouter());

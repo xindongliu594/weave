@@ -28,7 +28,7 @@ before(async()=>{
   const database=new URL(base);database.searchParams.set('options','-c search_path='+schema);process.env.DATABASE_URL=database.toString();
   dir=await mkdtemp(join(tmpdir(),'knowledge-'));process.env.DATA_DIR=dir;process.env.TRACE_ROOT=join(dir,'runs');process.env.OBSIDIAN_VAULT=join(dir,'vault');
   const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();store=await import('../apps/api/src/knowledge-store.ts');
-  const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();
+  const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdownBackground();
   server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'测试部门',agents:[manager,other]}]);
   await pool.query(`INSERT INTO knowledge_spaces(id,name,scope,department_id,agent_ids) VALUES

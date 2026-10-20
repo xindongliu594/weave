@@ -5,9 +5,9 @@ const {LocalExecutor}=require('./local-executor.cjs');
 const {normalizeServer}=require('./connection.cjs');
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 class LocalDeviceClient {
- constructor({connection,device,journalRoot,fetch:request=globalThis.fetch,onState=()=>{},pollMs=1000,executor}){
+ constructor({connection,device,journalRoot,fetch:request=globalThis.fetch,onState=()=>{},pollMs=1000,executor,registerOnStart=true}){
   if(!/^[a-f0-9-]{36}$/.test(device?.id)||!/^[a-f0-9]{64}$/.test(device?.token))throw Error('本机设备凭证不正确');
-  this.connection={...connection,server:normalizeServer(connection.server)};this.device=device;this.journalRoot=journalRoot;this.request=request;this.onState=onState;this.pollMs=pollMs;
+  this.connection={...connection,server:normalizeServer(connection.server)};this.device=device;this.journalRoot=journalRoot;this.request=request;this.onState=onState;this.pollMs=pollMs;this.registerOnStart=registerOnStart;
   if(executor!==undefined&&(!executor||typeof executor.execute!=='function'))throw Error('执行设备适配器无效；拒绝回退到本机执行');
   this.executor=executor===undefined?new LocalExecutor(device.grant):executor;this.controller=new AbortController();this.pending=new Map();this.active=null;this.stopped=false;
   fs.mkdirSync(journalRoot,{recursive:true,mode:0o700});if(fs.lstatSync(journalRoot).isSymbolicLink())throw Error('本机回执目录不能是链接');
@@ -35,9 +35,13 @@ class LocalDeviceClient {
   const data=await response.json();if(!response.ok)throw Object.assign(Error(data.message||'本机设备连接失败'),{code:data.code,status:response.status});return data;
  }
  async start(){
-  await this.api('register',{id:this.device.id,token:this.device.token,name:this.device.name,platform:process.platform,grant:{id:this.device.grant.id,label:path.basename(this.device.grant.root),allowCommands:!!this.device.grant.allowCommands},...(this.device.backend?{backend:this.device.backend}:{})});
+  if(this.registerOnStart)await this.api('register',{id:this.device.id,token:this.device.token,name:this.device.name,platform:process.platform,grant:{id:this.device.grant.id,label:path.basename(this.device.grant.root),allowCommands:!!this.device.grant.allowCommands},...(this.device.backend?{backend:this.device.backend}:{})});
   for(const name of fs.readdirSync(this.journalRoot)){if(/^[a-f0-9-]{36}\.json$/.test(name)){const id=name.slice(0,-5),previous=this.read(id);if(previous?.phase==='completed'&&previous.receipt)this.pending.set(id,previous.receipt);if(this.pending.size>=4)break;}}
-  this.onState({status:'connected'});this.loop=this.poll();return this;
+  if(!this.registerOnStart){
+   try{await this.pollOnce();}
+   catch(error){this.stopped=true;this.controller.abort(error);this.onState({status:'offline',message:error.message});throw error;}
+  }else this.onState({status:'connected'});
+  this.loop=this.poll();return this;
  }
  async deliver(id,receipt){
   await this.api(this.device.id+'/operations/'+id+'/result',receipt);
@@ -64,9 +68,7 @@ class LocalDeviceClient {
    try{if(!this.stopped)await this.deliver(job.id,receipt);}catch{}
   })().catch(error=>{this.stopped=true;this.controller.abort(error);this.onState({status:'offline',message:'本机回执无法持久保存：'+error.message});}).finally(()=>{if(this.active===active)this.active=null;});
  }
- async poll(){
-  while(!this.stopped){
-   try{
+ async pollOnce(){
     for(const [id,receipt] of this.pending)await this.deliver(id,receipt);
     const reply=await this.api(this.device.id+'/poll',{active:this.active?{id:this.active.id,claimToken:this.active.claimToken}:null});
     if(reply.cancel)this.active?.controller.abort(Error('服务端取消或设备授权失效'));
@@ -76,6 +78,10 @@ class LocalDeviceClient {
     }
     if(reply.job&&!this.active)this.run(reply.job);
     this.onState({status:this.active?'running':'connected',operationId:this.active?.id});
+ }
+ async poll(){
+  while(!this.stopped){
+   try{await this.pollOnce();
    }catch(error){
     this.active?.controller.abort(Error('设备与后端失去连接'));this.onState({status:'offline',message:error.message});
     if(error.status===403||error.status===401){this.stopped=true;break;}

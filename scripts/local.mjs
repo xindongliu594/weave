@@ -146,7 +146,7 @@ try {
   } else {
     stage = 'web-starting';
     if (production) web = await staticWeb.createLocalStaticWeb({ buildRoot: join(root, 'dist/web'), apiPort: ready.apiPort, webPort: port });
-    else { const { createServer } = await import('vite'); web = await createServer({ configFile: join(root, 'vite.config.ts'), server: { host: '127.0.0.1', port, strictPort: true, proxy: { '/api': `http://127.0.0.1:${ready.apiPort}` } } }); }
+    else { const { createServer } = await import('vite'); web = await createServer({ configFile: join(root, 'vite.config.ts'), server: { host: '127.0.0.1', port, strictPort: true, proxy: { '/api': `http://127.0.0.1:${ready.apiPort}`, '/healthz': `http://127.0.0.1:${ready.apiPort}` } } }); }
     ensureActive();
     await web.listen(); ensureActive();
     stage = 'ready'; recordEvent('workbench-ready');

@@ -33,7 +33,7 @@ function implementationCandidate() {
 before(async () => {
   await admin.query('CREATE SCHEMA ' + schema); const connection = new URL(base); connection.searchParams.set('options', '-c search_path=' + schema); process.env.DATABASE_URL = connection.toString();
   directory = await mkdtemp(join(tmpdir(), 'organization-chat-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs'); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
-  const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown(); server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as AddressInfo).port + '/api';
+  const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdownBackground(); server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as AddressInfo).port + '/api';
   gateway = http.createServer(async (req, res) => { assert.equal(req.url, '/v1/chat/completions'); let raw = ''; for await (const chunk of req) raw += chunk; wire = JSON.parse(raw); requests++; assert.ok(['fixture-model', 'fixture-team-astra', 'gpt-4.1-mini', 'deepseek-v4.1-flash'].includes(wire.model)); assert.equal(wire.tools, undefined); res.setHeader('content-type', 'application/json');
     if (timeoutMode === 'headers') return;
     if (timeoutMode === 'body') { res.writeHead(200); res.flushHeaders(); res.write('{"choices":'); return; }

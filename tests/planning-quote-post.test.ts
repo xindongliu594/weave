@@ -28,7 +28,7 @@ before(async()=>{
  provider=http.createServer((_req,res)=>{modelCalls++;res.writeHead(500);res.end('must never dispatch');});provider.listen(0,'127.0.0.1');await once(provider,'listening');
  await pool.query('INSERT INTO gateways(id,data) VALUES($1,$2)',['long-quote-gateway',{name:'No-call loopback fixture',baseUrl:'http://127.0.0.1:'+(provider.address() as any).port+'/v1'}]);
  for(const id of [modelId,'not-granted-model'])await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[id,{name:id,gatewayId:'long-quote-gateway',model:'fixture',inputRate:.3,outputRate:1.2},toolEvidence]);
- app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdown();
+ app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdownBackground();
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',[departmentId,{name:'Isolated readonly quote',agents:[employee]}]);
  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',[projectId,departmentId,'Isolated readonly quote','Keep all state unchanged',policy,plan,'manual']);
  await pool.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,1,$2,$3)',[projectId,plan,policy]);

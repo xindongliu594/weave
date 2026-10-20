@@ -18,7 +18,7 @@ before(async()=>{
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
  await pool.query("INSERT INTO gateways(id,data) VALUES('g',$1)",[{name:'Local fixture',baseUrl:'http://127.0.0.1:1/v1'}]);
  await pool.query("INSERT INTO models(id,data,status) VALUES('m',$1,'available')",[{name:'fixture',model:'fixture',gatewayId:'g',inputRate:1,outputRate:1}]);
- app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
+ app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
 });
 after(async()=>{await app?.locals.shutdown();if(server)await new Promise<void>(r=>server.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
 async function fixture(kind:'existing'|'new'='existing'){

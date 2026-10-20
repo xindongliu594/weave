@@ -19,7 +19,7 @@ before(async()=>{
  const mod=await import('../apps/api/src/db.ts');db=mod.pool;await mod.migrate();
  await db.query('INSERT INTO departments(id,data) VALUES($1,$2)',[department,{name:'隔离统计验证',agents:[agent]}]);
  await db.query("INSERT INTO knowledge_spaces(id,name,scope,department_id,agent_ids) VALUES($1,'部门方法','department',$2,'[]')",[space,department]);
- const {createApp}=await import('../apps/api/src/app.ts');const app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
+ const {createApp}=await import('../apps/api/src/app.ts');const app=createApp();await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
  const saved=(await api('/knowledge/documents','POST',{spaceId:space,title:'方法夹具',content:'先列出边界条件，再检查预期结果。',source:{skillName:'boundary-check'}})).data;
  doc=(await api('/knowledge/documents')).data.find((row:any)=>row.id===saved.id);assert.match(doc.sha256,/^[a-f0-9]{64}$/);
 });

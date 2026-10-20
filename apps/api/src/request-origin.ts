@@ -4,6 +4,10 @@ const directOrigins = new Set([
   'http://127.0.0.1:4311', 'http://localhost:4311', 'http://[::1]:4311',
 ]);
 
+export function isAllowedCallbackNavigation(method:string,path:string,fetchMode:string|undefined):boolean {
+  return method==='GET'&&path==='/auth/callback'&&fetchMode==='navigate';
+}
+
 export function configuredOrigins(raw = process.env.ALLOWED_ORIGINS ?? ''): Set<string> {
   const origins = new Set(raw.split(',').map(value => value.trim()).filter(Boolean));
   for (const origin of origins) {

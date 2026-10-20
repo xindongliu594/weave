@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {randomUUID,randomBytes,createHash}=require('node:crypto');
-const {FIXED,readConfig,prepareDevice,readDevice}=require('../scripts/local-openshell-bootstrap.cjs');
+const {FIXED,readConfig,prepareDevice,prepareApprovedDevice,readDevice}=require('../scripts/local-openshell-bootstrap.cjs');
 const {LocalDeviceClient}=require('../apps/desktop/local-client.cjs');
 const sha=x=>createHash('sha256').update(x).digest('hex');
 // Stubbed transport/cryptography only for local bootstrap regression; no model/CLI/API.
@@ -54,6 +54,20 @@ test('explicit same-config re-enable keeps retired credential bytes and operatio
   const retired=fs.readdirSync(path.dirname(old.deviceFile)).filter(x=>x.startsWith('device.credential.retired-'));
   assert.equal(retired.length,1);assert.ok(fs.readFileSync(path.join(path.dirname(old.deviceFile),retired[0])).equals(bytes));assert.equal(fs.readFileSync(path.join(old.journalRoot,'old-unknown.json'),'utf8'),'RETAINED');
   assert.equal(readDevice(f.root,unseal).id,fresh.device.id);
+ }finally{f.cleanup();}
+});
+test('enterprise bootstrap checks saved approval before any credential rotation',async()=>{
+ const f=fixture();try{
+  const input={root:f.root,config:f.config,fingerprint:sha('same-config'),seal,unseal};
+  const approved=prepareDevice(input),before=fs.readFileSync(approved.deviceFile);
+  let checked=false;
+  const reused=await prepareApprovedDevice({...input,reenable:true,assertApproved:async device=>{checked=true;assert.equal(device.id,approved.device.id);}});
+  assert.equal(checked,true);assert.equal(reused.device.id,approved.device.id);assert.ok(fs.readFileSync(approved.deviceFile).equals(before));
+  await assert.rejects(prepareApprovedDevice({...input,reenable:true,assertApproved:async()=>{throw Error('not approved');}}),/not approved/);
+  assert.ok(fs.readFileSync(approved.deviceFile).equals(before));
+  fs.rmSync(approved.deviceFile);
+  await assert.rejects(prepareApprovedDevice({...input,assertApproved:async()=>{throw Error('must not be called');}}),/saved|已保存|管理员/);
+  assert.equal(fs.existsSync(approved.deviceFile),false);
  }finally{f.cleanup();}
 });
 test('configuration symlinks and failed credential replacement preserve the prior grant',()=>{

@@ -234,7 +234,7 @@ async function worker() {
     };
   });
   const { createApp } = await import('../apps/api/src/app.ts');
-  const app = createApp(); await app.locals.shutdown();
+  const app = createApp(); await app.locals.ready; await app.locals.shutdownBackground();
   const server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
   server.on('request', (req, res) => { res.once('finish', () => console.log(`HTTP ${req.method} ${new URL(req.url, 'http://local').pathname} ${res.statusCode}`)); });
   const base = `http://127.0.0.1:${server.address().port}/api`;

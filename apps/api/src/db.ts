@@ -5,6 +5,7 @@ import { migrateManagerChat } from './manager-chat.ts';
 import { migrateBrowserMcp } from './work-tools-browser.ts';
 import { migrateWorkFiles } from './work-files.ts';
 import { migrateAutomationLearning } from './automation-learning.ts';
+import {migrateIdentity} from './identity-schema.ts';
 export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL ?? 'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department' });
 export async function migrate() {
   await pool.query(`
@@ -48,6 +49,19 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS project_runs_project ON project_runs(project_id, created_at DESC);
   `);
   await migrateProduct(pool);
+  await pool.query(`
+    ALTER TABLE request_keys ADD COLUMN IF NOT EXISTS principal_key text;
+    UPDATE request_keys SET principal_key='legacy-local' WHERE principal_key IS NULL;
+    ALTER TABLE request_keys ALTER COLUMN principal_key SET NOT NULL;
+    DO $$ BEGIN
+      IF EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='request_keys'::regclass AND conname='request_keys_pkey'
+        AND pg_get_constraintdef(oid)='PRIMARY KEY (key)') THEN
+        ALTER TABLE request_keys DROP CONSTRAINT request_keys_pkey;
+        ALTER TABLE request_keys ADD PRIMARY KEY (principal_key,key);
+      END IF;
+    END $$;
+  `);
+  await migrateIdentity(pool);
   await migrateStorage(pool);
   await migrateManagerChat(pool);
   await migrateBrowserMcp(pool);

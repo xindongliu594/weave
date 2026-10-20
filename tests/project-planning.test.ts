@@ -45,7 +45,7 @@ before(async () => {
   await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)", [responsesId,
     { name: responsesId, model: 'fixture-responses-planner', protocol: 'responses', contextWindowTokens: 256000, gatewayId, inputRate: 10, outputRate: 50 }, toolEvidence]);
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [departmentId, { name: '隔离规划部门', description: 'No production data', agents: [employee] }]);
-  const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown();
+  const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdownBackground();
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as any).port + '/api';
 });
 beforeEach(async () => {

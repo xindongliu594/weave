@@ -81,6 +81,13 @@ test('API proxy retains bytes, query, status, end-to-end headers and original id
   assert.deepEqual(packet.body, body); assert.equal(packet.headers['idempotency-key'], key); assert.equal(packet.headers['x-caller-marker'], 'preserved');
 });
 
+test('liveness probe reaches the API instead of the SPA',async()=>{
+  const response=await request('/healthz');
+  assert.equal(response.status,201);
+  assert.equal(received.at(-1)?.path,'/healthz');
+  assert.notEqual(response.body.toString(),html);
+});
+
 test('upstream permission failure and API 404 remain API responses', async () => {
   const denied = await request('/api/rejected'); assert.equal(denied.status, 403); assert.equal(denied.headers['x-refusal'], 'upstream'); assert.equal(denied.body.toString(), '{"code":"DEVICE_DISABLED"}');
   const missing = await request('/api/missing'); assert.equal(missing.status, 404); assert.equal(missing.body.toString(), '{"message":"接口不存在"}');

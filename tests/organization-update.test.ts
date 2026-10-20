@@ -30,7 +30,7 @@ const targetOf = (saved: any) => ({ departmentId: saved.departmentId, projectId:
 before(async () => {
   await admin.query('CREATE SCHEMA ' + schema); const connection = new URL(base); connection.searchParams.set('options', '-c search_path=' + schema); process.env.DATABASE_URL = connection.toString();
   directory = await mkdtemp(join(tmpdir(), 'organization-update-')); process.env.DATA_DIR = directory; process.env.TRACE_ROOT = join(directory, 'runs'); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
-  const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown();
+  const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate(); const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdownBackground();
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as AddressInfo).port + '/api';
   const gateway = await call('/gateways', { name: '固定配置，不发模型请求', baseUrl: 'http://127.0.0.1:45999/v1' });
   const model = await call('/models', { name: '固定模型', model: 'fixture', gatewayId: gateway.data.id, inputRate: .1, outputRate: .2 }); modelId = model.data.id;

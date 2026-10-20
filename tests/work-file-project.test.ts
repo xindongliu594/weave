@@ -27,7 +27,7 @@ before(async()=>{
   await admin.query('CREATE SCHEMA '+schema);const connection=new URL(base);connection.searchParams.set('options','-c search_path='+schema);process.env.DATABASE_URL=connection.toString();
   directory=await mkdtemp(join(tmpdir(),'work-file-project-'));traceRoot=join(directory,'runs');process.env.DATA_DIR=directory;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(directory,'vault');
   const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
-  const {createApp}=await import('../apps/api/src/app.ts');app=createApp({assertExecutorReady:async()=>{}});await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as AddressInfo).port+'/api';
+  const {createApp}=await import('../apps/api/src/app.ts');app=createApp({assertExecutorReady:async()=>{}});await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as AddressInfo).port+'/api';
   const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot);await worker.close();
   mock.method(worker.runtime,'start',async({runId}:any)=>{runtimeStarts++;return {runtimeRunId:runId,completion:Promise.resolve({status:'completed' as const,usages:[]})};});
   gateway=http.createServer(async(req,res)=>{

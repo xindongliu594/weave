@@ -16,7 +16,7 @@ before(async()=>{
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();store=await import('../apps/api/src/knowledge-store.ts');
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'研发',agents:[reader,other]}]);
  await pool.query("INSERT INTO knowledge_spaces(id,name,scope,agent_ids) VALUES('company','公司方法','company','[]')");
- const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
+ const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
 });
 after(async()=>{await app?.locals.shutdown();if(server)await new Promise<void>(r=>server.close(()=>r()));await pool?.end();if(root)await rm(root,{recursive:true,force:true});});
 

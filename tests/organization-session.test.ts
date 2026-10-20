@@ -69,7 +69,7 @@ before(async () => {
   const { organizationChatRouter } = await import('../apps/api/src/organization-chat.ts');
   const { idempotency } = await import('../apps/api/src/idempotency.ts');
   const { AppError } = await import('../apps/api/src/provider.ts');
-  const app = express(); app.use(express.json()); app.use('/api', idempotency, organizationChatRouter());
+  const app = express(); app.use(express.json()); app.use('/api',(_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();}, idempotency, organizationChatRouter());
   app.use((error: any, _req: express.Request, res: express.Response, _next: express.NextFunction) =>
     res.status(error instanceof AppError ? error.status : error?.name === 'ZodError' ? 422 : 500)
       .json({ code: error instanceof AppError ? error.code : 'INVALID_INPUT', message: 'Local fixture rejected the request' }));

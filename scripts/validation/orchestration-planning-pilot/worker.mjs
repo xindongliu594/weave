@@ -42,7 +42,7 @@ const gateway=http.createServer(async(req,res)=>{
 gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
 await pool.query("INSERT INTO gateways(id,data) VALUES('pilot',$1)",[{name:'Isolated expense bridge',baseUrl:`http://127.0.0.1:${gateway.address().port}/v1`}]);
 await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available')",[model.id,{...model,gatewayId:'pilot'}]);
-const app=(await import('../../../apps/api/src/app.ts')).createApp();await app.locals.shutdown();const server=app.listen(0,'127.0.0.1');await once(server,'listening');
+const app=(await import('../../../apps/api/src/app.ts')).createApp();await app.locals.ready;await app.locals.shutdownBackground();const server=app.listen(0,'127.0.0.1');await once(server,'listening');
 const results=[];let stoppedAfterInvalid=false;
 try{
  for(const item of cases){

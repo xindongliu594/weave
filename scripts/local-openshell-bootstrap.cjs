@@ -57,4 +57,14 @@ function prepareDevice({root,config,fingerprint,seal,unseal,reenable=false}){
  }else fs.writeFileSync(paths.deviceFile,sealed,{flag:'wx',mode:0o600});
  return {...paths,device,backend};
 }
-module.exports={FIXED,readConfig,readDevice,prepareDevice,locations};
+async function prepareApprovedDevice({root,config,fingerprint,seal,unseal,assertApproved}){
+ if(typeof assertApproved!=='function')fail('企业模式缺少设备授权检查','OPENSHELL_DEVICE_INVALID');
+ const saved=readDevice(root,unseal);
+ if(!saved)fail('企业模式需要已保存且由管理员登记的 OpenShell 设备','OPENSHELL_DEVICE_INVALID');
+ await assertApproved(saved);
+ // Enterprise startup never rotates a saved grant, including explicit re-enable.
+ const opened=prepareDevice({root,config,fingerprint,seal,unseal,reenable:false});
+ if(opened.device.id!==saved.id||opened.device.grant.id!==saved.grant.id)fail('OpenShell 已保存的授权发生变化','OPENSHELL_GRANT_CHANGED');
+ return opened;
+}
+module.exports={FIXED,readConfig,readDevice,prepareDevice,prepareApprovedDevice,locations};

@@ -35,7 +35,7 @@ before(async()=>{
  await pool.query('INSERT INTO gateways(id,data) VALUES($1,$2)',['planning-output-gateway',{name:'Loopback fixture',baseUrl:'http://127.0.0.1:'+(gateway.address() as any).port+'/v1'}]);
  await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[modelId,{name:'Loopback fixture',gatewayId:'planning-output-gateway',model:'fixture-planner',thinkingMode:'disabled',inputRate:.2,outputRate:.4},toolEvidence]);
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',[departmentId,{name:'Isolated parsing',description:'Engineering fixture',agents:[employee]}]);
- app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdown();api=app.listen(0,'127.0.0.1');await once(api,'listening');url='http://127.0.0.1:'+(api.address() as any).port+'/api';
+ app=(await import('../apps/api/src/app.ts')).createApp();await app.locals.shutdownBackground();api=app.listen(0,'127.0.0.1');await once(api,'listening');url='http://127.0.0.1:'+(api.address() as any).port+'/api';
 });
 beforeEach(async()=>{
  if(!isolated)return;await pool.query('TRUNCATE usage,model_reservations,organization_previews,project_runs,plan_versions,projects,request_keys CASCADE');

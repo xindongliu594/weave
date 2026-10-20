@@ -134,7 +134,7 @@ before(async () => {
   await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)", [modelId, data, toolEvidence]);
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [departmentId,
     { name: '任务费用反馈隔离部门', description: 'Only in-memory validation evidence', agents: taskPlan().agents }]);
-  const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdown();
+  const { createApp } = await import('../apps/api/src/app.ts'); app = createApp(); await app.locals.shutdownBackground();
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
   const apiOrigin = 'http://127.0.0.1:' + (server.address() as any).port; url = apiOrigin + '/api';
   globalThis.fetch = async (input, init) => {

@@ -84,7 +84,7 @@ export async function createLocalStaticWeb({ buildRoot, apiPort, webPort, allowe
     if (!localRequest(request, response, allowedOrigins)) return;
     if (typeof request.url !== 'string' || !request.url.startsWith('/') || request.url.startsWith('//')) return reply(response, 400, 'INVALID_PATH', '请求路径无效');
     const rawPath = request.url.split('?')[0];
-    if (/^\/api(?:\/|$)/i.test(rawPath)) { proxy(request, response); return; }
+    if (/^\/api(?:\/|$)/i.test(rawPath) || rawPath==='/healthz') { proxy(request, response); return; }
     if (!['GET', 'HEAD'].includes(request.method)) { response.setHeader('allow', 'GET, HEAD'); return reply(response, 405, 'METHOD_NOT_ALLOWED', '网页文件仅支持读取。'); }
     let pathname;
     try { pathname = decodeURIComponent(rawPath); } catch { return reply(response, 400, 'INVALID_PATH', '请求路径无效'); }

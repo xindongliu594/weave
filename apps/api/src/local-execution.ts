@@ -46,12 +46,13 @@ export async function localTarget(policy:any,agents:any[],db:Pick<pg.PoolClient,
  if(online&&!row.online)throw new AppError(422,'本机执行器状态未刷新，请确认本机服务仍在运行，然后检查恢复条件','LOCAL_DEVICE_OFFLINE');
  return {kind:'local',deviceId:row.id,grantId:row.grant_id,name:row.name,platform:row.platform,label:row.label,allowCommands:row.allow_commands,backend};
 }
-async function proof(id:string,key:unknown,db:Pick<pg.PoolClient,'query'>=pool){
+export async function proveLocalDevice(id:string,key:unknown,db:Pick<pg.PoolClient,'query'>=pool){
  if(typeof key!=='string'||!/^[a-f0-9]{64}$/.test(key))throw new AppError(403,'本机设备凭证无效','LOCAL_DEVICE_DENIED');
  const row=(await db.query('SELECT * FROM local_devices WHERE id=$1',[id])).rows[0];
  if(!row||!timingSafeEqual(Buffer.from(row.token_hash,'hex'),digest(key)))throw new AppError(403,'本机设备凭证无效','LOCAL_DEVICE_DENIED');
  return row;
 }
+const proof=proveLocalDevice;
 async function operationTransaction<T>(id:string,fn:(db:pg.PoolClient,row:any,run:any,device:any)=>Promise<T>){
  const db=await pool.connect();
  try{

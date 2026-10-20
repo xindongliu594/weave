@@ -29,7 +29,7 @@ async function project(agents=[agent],requirement='验证所有执行权限限�
 before(async()=>{
  await admin.query('CREATE SCHEMA '+schema);const dbURL=new URL(base);dbURL.searchParams.set('options','-c search_path='+schema);process.env.DATABASE_URL=dbURL.toString();
  dir=await mkdtemp(join(tmpdir(),'execution-policy-'));process.env.DATA_DIR=dir;process.env.TRACE_ROOT=join(dir,'runs');process.env.OBSIDIAN_VAULT=join(dir,'vault');
- const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
+ const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
  gateway=http.createServer(async(req,res)=>{let raw='';for await(const chunk of req)raw+=chunk;lastInput=JSON.parse(raw);requests++;res.setHeader('content-type','application/json');res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(candidate)}}],usage:{prompt_tokens:20,completion_tokens:20}}));});gateway.listen(0,'127.0.0.1');await once(gateway,'listening');
  await pool.query("INSERT INTO gateways(id,data) VALUES('gateway',$1)",[{name:'Local fixture',baseUrl:'http://127.0.0.1:'+gateway.address().port+'/v1'}]);
  for(const id of ['model','outside'])await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[id,{name:id,gatewayId:'gateway',model:id,inputRate:1,outputRate:1},toolEvidence]);

@@ -25,7 +25,7 @@ before(async()=>{
  await admin.query('CREATE SCHEMA '+schema);const dbURL=new URL(base);dbURL.searchParams.set('options','-c search_path='+schema);process.env.DATABASE_URL=dbURL.toString();
  dir=await mkdtemp(join(tmpdir(),'hybrid-'));process.env.DATA_DIR=dir;process.env.TRACE_ROOT=join(dir,'runs');process.env.OBSIDIAN_VAULT=join(dir,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();store=await import('../apps/api/src/knowledge-store.ts');vectors=await import('../apps/api/src/knowledge-vector.ts');
- const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
+ const {createApp}=await import('../apps/api/src/app.ts');app=createApp();await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port+'/api';
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'Hybrid fixture',agents:[manager,other]}]);
  await pool.query("INSERT INTO knowledge_spaces(id,name,scope,department_id,agent_ids) VALUES('shared','Shared','company',NULL,'[]'),('private','Private','employee','department','[\"other\"]')");
  await document('cars','shared','Car crash reporting: contact the police and photograph vehicle damage.');
