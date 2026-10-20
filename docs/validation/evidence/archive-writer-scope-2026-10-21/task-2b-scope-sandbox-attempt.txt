@@ -1,0 +1,98 @@
+✔ private archive fence factory exists (1.4781ms)
+✔ guards are frozen, privately owned, mode/run scoped and expire only on release (392.0817ms)
+✔ UUID sets, options and pre-abort reject before acquisition (45.001ms)
+✔ one acquisition deadline covers all run locks rather than restarting per file (1071.8915ms)
+✔ nested different-run journal scopes cannot release their still active outer guard (263.2486ms)
+✔ actual process writers coexist, block source and release independently (550.2694ms)
+✔ root exclusive blocks writers in another process (398.7976ms)
+✔ multi-run timeout and waiting abort clean earlier run and root locks (730.7758ms)
+✔ journal returns values, retains outer guard, and rejects async/thenable/reentry/early release (636.6098ms)
+✔ journal actual process contention times out without callback and short wait succeeds (996.4267ms)
+✔ two process journal increments produce exact contiguous sequence (2449.8645ms)
+✖ directory replacement invalidates old guards; root exclusive permits a legal trace swap (165.8165ms)
+✖ renamed namespace invalidates guard (OS rename restrictions reported separately) (137.5685ms)
+✖ renamed lockRoot invalidates guard (OS rename restrictions reported separately) (138.2472ms)
+✖ renamed file invalidates guard (OS rename restrictions reported separately) (135.9518ms)
+✔ invalid roots and aliases are rejected without modifying invalid entries (47.9681ms)
+﹣ hardlinked native file rejected (permission failures reported as skipped fixtures) (37.2743ms) # hardlink fixture unavailable: EPERM
+✔ native files must be regular and existing native-file contents are not truncated (217.1242ms)
+﹣ symlink/junction roots, namespace and lock files are rejected (43.9988ms) # directory link fixture unavailable: EPERM
+﹣ symlink lock file rejected without touching target (45.658ms) # file link fixture unavailable: EPERM
+✔ manager exists (2.2177ms)
+✔ stable mapping is shared, conflicts and tool workspace overlap fail at startup (114.8342ms)
+✔ subset borrows only the active originating chain and rejects expansion and another manager (323.7584ms)
+✔ independent chains acquire independent owners rather than borrowing live run IDs (339.4709ms)
+✔ parent closes admission, retained original promise blocks release even after premature finish (288.1195ms)
+✔ failed original producer latches failure and never grants source (559.005ms)
+✔ real source process cannot enter until delayed retained writer actually settles (524.8548ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 20
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 3
+ℹ todo 0
+ℹ duration_ms 8678.9977
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-write-fence.test.mjs:193:1
+✖ directory replacement invalidates old guards; root exclusive permits a legal trace swap (165.8165ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-9YKwws\traces' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-9YKwws\old'
+      at Object.renameSync (node:fs:1013:11)
+      at renameInside (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:44:6)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:196:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-9YKwws\\traces',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-9YKwws\\old'
+  }
+
+test at services\agent-runtime\archive-write-fence.test.mjs:207:3
+✖ renamed namespace invalidates guard (OS rename restrictions reported separately) (137.5685ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-DYu5oi\locks\de837ddeb740839692b9893964d55883fa49406869cd6914a981b6963f1fc7d4' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-DYu5oi\locks\de837ddeb740839692b9893964d55883fa49406869cd6914a981b6963f1fc7d4-old'
+      at Object.renameSync (node:fs:1013:11)
+      at renameInside (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:44:6)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:215:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-DYu5oi\\locks\\de837ddeb740839692b9893964d55883fa49406869cd6914a981b6963f1fc7d4',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-DYu5oi\\locks\\de837ddeb740839692b9893964d55883fa49406869cd6914a981b6963f1fc7d4-old'
+  }
+
+test at services\agent-runtime\archive-write-fence.test.mjs:207:3
+✖ renamed lockRoot invalidates guard (OS rename restrictions reported separately) (138.2472ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-snsuMx\locks' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-snsuMx\locks-old'
+      at Object.renameSync (node:fs:1013:11)
+      at renameInside (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:44:6)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:215:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-snsuMx\\locks',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-snsuMx\\locks-old'
+  }
+
+test at services\agent-runtime\archive-write-fence.test.mjs:207:3
+✖ renamed file invalidates guard (OS rename restrictions reported separately) (135.9518ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-KIHBHY\locks\6c33c839a59e480b6af1838a365fde96ffcad748d47af28d8e09aa42cd3214cd\00000000-0000-4000-8000-000000000001.lifetime' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\AC\Temp\archive-fence-KIHBHY\locks\6c33c839a59e480b6af1838a365fde96ffcad748d47af28d8e09aa42cd3214cd\00000000-0000-4000-8000-000000000001.lifetime-old'
+      at Object.renameSync (node:fs:1013:11)
+      at renameInside (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:44:6)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-write-fence.test.mjs:215:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-KIHBHY\\locks\\6c33c839a59e480b6af1838a365fde96ffcad748d47af28d8e09aa42cd3214cd\\00000000-0000-4000-8000-000000000001.lifetime',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{a279ddaa-79d8-4975-b1fb-cb923e0b2668}\\AC\\Temp\\archive-fence-KIHBHY\\locks\\6c33c839a59e480b6af1838a365fde96ffcad748d47af28d8e09aa42cd3214cd\\00000000-0000-4000-8000-000000000001.lifetime-old'
+  }
+EXIT=1

@@ -1,0 +1,15 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ only a complete tool roundtrip enables execution; evidence, cost and route revision are retained (5764.0774ms)
+✔ bad arguments, ignored tool results and missing usage never mark the model supported (271.1645ms)
+✔ local budget rejection retains prior evidence, and configuration changes prevent the second request (165.1478ms)
+✔ backups reject a live capability probe without deadlocking and restore completed evidence (552.4671ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7385.6006
+EXIT=0

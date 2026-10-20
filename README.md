@@ -96,7 +96,7 @@ npm run demo
 
 ## 当前实现与验证
 
-2026-10-21 正在加固企业任务隔离与恢复，企业 task profile 尚未开放。已完成恢复记录严格校验、Windows/JJ 文件锁私有适配器验证；实际运行尾部与清理等待已通过本地回归及独立复审。跨进程写入作用域、全部入口覆盖和恢复来源核对仍待接线。本轮代码尚未发布到 JJ 生产服务。[企业阶段清单](docs/superpowers/plans/2026-10-20-enterprise-foundations.md) · [写入锁证据](docs/validation/archive-writer-fence-primitive-2026-10-21.md) · [实际排空证据](docs/validation/runtime-writer-drain-2026-10-21.md)
+2026-10-21 正在加固企业任务隔离与恢复，企业 task profile 尚未开放。已完成恢复记录严格校验、Windows/JJ 文件锁私有适配器验证；实际运行尾部、清理等待和协调器写入作用域已通过本地回归及独立复审。全部写入入口覆盖、数据库尾部互斥和恢复来源核对仍待完成。本轮代码尚未发布到 JJ 生产服务。[企业阶段清单](docs/superpowers/plans/2026-10-20-enterprise-foundations.md) · [写入锁证据](docs/validation/archive-writer-fence-primitive-2026-10-21.md) · [实际排空证据](docs/validation/runtime-writer-drain-2026-10-21.md) · [写入作用域证据](docs/validation/archive-writer-scope-2026-10-21.md)
 
 同日核对固定 OpenShell 0.1.2 后，确认旧“删除成功”回执不能证明原沙箱已被删除。当前代码关闭沙箱回收按钮，历史记录保留并标为待物理复核；工作区副本清理与日志归档入口保留。下方历史 MVP 验证记录不能替代这项物理回收验证。[问题、修复与限制](docs/validation/openshell-cli-protocol-2026-10-21.md)
 

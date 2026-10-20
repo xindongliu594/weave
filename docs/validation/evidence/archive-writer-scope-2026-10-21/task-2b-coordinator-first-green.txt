@@ -1,0 +1,13 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts (3643.6328ms)
+✔ tick transfers its original owner without waiting for business terminal or actual tail (328.9529ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4554.0142
+EXIT=0

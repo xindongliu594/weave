@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-21",
+  "base": "f15eab4",
+  "candidate": "d9bb4a4",
+  "task": "Archive writer Task 2b: shared configuration and retained runtime scopes",
+  "review": "PASS after scoped fix round 1; initial findings preserved",
+  "projectModelCalls": 0,
+  "jjProductionChanges": 0,
+  "source": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "36d8aa5e892319fbea9600861746486b2c6fd407ee3ce2fd12c5ab5fc75b5282",
+      "gitLfSha256": "9365abac684e99263be0f0ca42cb43e0a5c8e3e5a02a7c92978f2de9a40c2f0d"
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "sha256": "75fcec87c8fa6c85dda26d8dfbb200484e554b02e72a49038f3ca261f8661100",
+      "gitLfSha256": "0924b05705155b4a0aee28a5d16e1e0a25b54ec0cfbe0066b7f88d4eb7a549a7"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256": "86e00f1f49a873b119c94abcf472ba84d8dc7ff1d86f2d6fd1f3407e9c5c4aa4",
+      "gitLfSha256": "86e00f1f49a873b119c94abcf472ba84d8dc7ff1d86f2d6fd1f3407e9c5c4aa4"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.d.mts",
+      "sha256": "87da1888141f10bc7691433c784e98cf9e94fc72c7dd1c7c1bd45fc947b8f9f7",
+      "gitLfSha256": "87da1888141f10bc7691433c784e98cf9e94fc72c7dd1c7c1bd45fc947b8f9f7"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.test.mjs",
+      "sha256": "974104f4f047aa300aa05559b880a3058814c2472494d363d3d3cd53fecde659",
+      "gitLfSha256": "974104f4f047aa300aa05559b880a3058814c2472494d363d3d3cd53fecde659"
+    },
+    {
+      "path": "services/agent-runtime/test-helpers/archive-writer-source-child.mjs",
+      "sha256": "7182cec4d88fc4abdd341de046b1310e25b0374f0f906edbb062b2261413d86f",
+      "gitLfSha256": "7182cec4d88fc4abdd341de046b1310e25b0374f0f906edbb062b2261413d86f"
+    },
+    {
+      "path": "tests/capabilities.test.ts",
+      "sha256": "a4274c4a4e3135f61cc58ae470cb3582a1a8e50e67dade58d3ecfd90fef9e58d",
+      "gitLfSha256": "0f39c3db7a95d91df09be6da0d0373c2d83b27cc729b14e73fb51e948a897352"
+    },
+    {
+      "path": "tests/collaboration.test.ts",
+      "sha256": "b97fa2138f1bf228663e1233a09c26c524613fa38fca7b346e3e40d5d5735740",
+      "gitLfSha256": "38aaeba92d079d23a2a756eff3738926aceca6d5633ba83a9fc10e97cd7f1c21"
+    },
+    {
+      "path": "tests/cost-carryover.test.ts",
+      "sha256": "00a91014ed8d43fdc4f382faa980810869e37f73abe5bef56593568d5884ce74",
+      "gitLfSha256": "00a91014ed8d43fdc4f382faa980810869e37f73abe5bef56593568d5884ce74"
+    },
+    {
+      "path": "tests/execution-policy.test.ts",
+      "sha256": "52d853877c1e082df2103b451bc425ccb558c157a1b702e75ccf12b1dacefbb0",
+      "gitLfSha256": "2939abb083a6167438f6baaa2b2360b26b7b89ac9cacf686b3b852da4e726046"
+    },
+    {
+      "path": "tests/local-device-admission.test.ts",
+      "sha256": "dd32141739d900a6f7869c1f5d039aa3a710444994ddbda87dfcef35e9c18afe",
+      "gitLfSha256": "dd32141739d900a6f7869c1f5d039aa3a710444994ddbda87dfcef35e9c18afe"
+    },
+    {
+      "path": "tests/product.test.ts",
+      "sha256": "f00b9232f53947750dc7692baa53de0980c0babfa953e9fb06fbcc09796691a3",
+      "gitLfSha256": "3d267551d751f62ba00f13c15bff5db24e149cdeb5ca81973c6398f97f785e4c"
+    },
+    {
+      "path": "tests/run-live-lease.test.ts",
+      "sha256": "478c10f949e72cccc2dc2dfc54824137271beb2951d7aa296fd14f8728495411",
+      "gitLfSha256": "478c10f949e72cccc2dc2dfc54824137271beb2951d7aa296fd14f8728495411"
+    },
+    {
+      "path": "tests/run-state.test.ts",
+      "sha256": "5e41409b3f2570c350736bb999547b8e39f3037219cd74a9bc7df66a11b2eb3d",
+      "gitLfSha256": "988d3ad162f2c2d3b44f436135d5a4ed736009e9f3fb24f8d21674329a5839fe"
+    },
+    {
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "sha256": "70e35401648e987187b04b3f0ab2f8d2a4bc63a9f67c961c60a9ec01adc9a195",
+      "gitLfSha256": "887c5b286e5805543b8cdd038dfa876bf1c3b7c0582bfd4dd0fd52b5174fd1c9"
+    },
+    {
+      "path": "tests/work-file-project.test.ts",
+      "sha256": "ddfd838bc788520a2d2f7aff37438a239992f0f2aa4b5ee21a5a6a11129ebe3c",
+      "gitLfSha256": "948fae7474f249c449a857fbbe754fa3bac3be91a616f402b5ac24833eb2a583"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "cleanup-2b-fixtures.ps1",
+      "sha256": "b6caddedd31c41adcff1781d1a5ac5d1d1a6ed3a45627d870507411b856509f0",
+      "bytes": 1489
+    },
+    {
+      "path": "task-2b-borrow-red.txt",
+      "sha256": "fb93808beb1dd6e91c0067512746cb6533a167122f4bf2f2929ee26e5e7fc1c8",
+      "bytes": 2196
+    },
+    {
+      "path": "task-2b-build-green.txt",
+      "sha256": "82cb7fafc8220708855d20ce76478e17c0bafdc8022019deedd3ef1ed98467e4",
+      "bytes": 802
+    },
+    {
+      "path": "task-2b-callers-first-attempt.txt",
+      "sha256": "713706d2d68332f2539d39aaa6ac3e56083d37b93fd8b8ae24860baf99f5c534",
+      "bytes": 8049
+    },
+    {
+      "path": "task-2b-callers-green.txt",
+      "sha256": "4a1da1ffcfc3ad6f5445b198d3a4cb795e2f06c461c2b2407a5e6afd24a6bb11",
+      "bytes": 6529
+    },
+    {
+      "path": "task-2b-capabilities-final.txt",
+      "sha256": "37ae4edbc3f51169c38d155ed830cf2aedf869dfb0a3d7f1d9617efbb6537fa6",
+      "bytes": 817
+    },
+    {
+      "path": "task-2b-coordinator-first-green.txt",
+      "sha256": "4eeb21a4f800d53c88ceaaeebe77e2932560d95db72861ffe4ada50cb49a1a17",
+      "bytes": 598
+    },
+    {
+      "path": "task-2b-coordinator-green.txt",
+      "sha256": "a5eac919edc3b3a77992a27c1da067f962a407214e24d5ab8cc74df0e96d6790",
+      "bytes": 3065
+    },
+    {
+      "path": "task-2b-coordinator-red.txt",
+      "sha256": "aa0734bc1c803a395073a492327ef6568c8adc2c7134f1630c2f0d546fbd49f3",
+      "bytes": 2229
+    },
+    {
+      "path": "task-2b-declarations-green.txt",
+      "sha256": "cc258d839e50d5e0cf220528399d5c29a6bcc5c3a9ee2616a915627e0363d91d",
+      "bytes": 8
+    },
+    {
+      "path": "task-2b-diffcheck.txt",
+      "sha256": "ba7eecb4711a18f1668d94d52fb40cf6fdf8bfbacb8b620c28aa7613c48dc7ab",
+      "bytes": 1217
+    },
+    {
+      "path": "task-2b-final-typecheck.txt",
+      "sha256": "cc258d839e50d5e0cf220528399d5c29a6bcc5c3a9ee2616a915627e0363d91d",
+      "bytes": 8
+    },
+    {
+      "path": "task-2b-fix1-build-green.txt",
+      "sha256": "de3a41c6a86dcd07cbe3b6c4b4ba2283204eac459ca5fb4656f9a7937a2a3a7b",
+      "bytes": 802
+    },
+    {
+      "path": "task-2b-fix1-cleanup-transcript.txt",
+      "sha256": "aefa4d3661e344cbcfea505044acc265686b9fe7f914ea7fd428b83127baed58",
+      "bytes": 1635
+    },
+    {
+      "path": "task-2b-fix1-diffcheck.txt",
+      "sha256": "e515980e35241a649c33d03b33e400a1385b804c203ac3af209cf99db271ee10",
+      "bytes": 456
+    },
+    {
+      "path": "task-2b-fix1-heartbeat-green.txt",
+      "sha256": "76245588221f4c99b60215a3ab5a858029cec85fd15cf1a8494cd7d5106c98e4",
+      "bytes": 569
+    },
+    {
+      "path": "task-2b-fix1-red.txt",
+      "sha256": "06f4c6f500da5b21e4d87d863fbb2856717143a10a9e8e5a228abbcb992bbff9",
+      "bytes": 5093
+    },
+    {
+      "path": "task-2b-fix1-report.md",
+      "sha256": "627ca2e5c1f4dcae43f994ec48816eb412de18240a14627be6f2aaf45f40c9d2",
+      "bytes": 7938
+    },
+    {
+      "path": "task-2b-fix1-review.md",
+      "sha256": "92d6bc72cfba0d647ad5623c634c28b349a62449148b026213417f004a6c524b",
+      "bytes": 5179
+    },
+    {
+      "path": "task-2b-fix1-scope-green.txt",
+      "sha256": "d9f0f7b1a368ad78c1e1ccef16da89a0b582df5c03faf8394f57ccb77a22c904",
+      "bytes": 1261
+    },
+    {
+      "path": "task-2b-fix1-sourceSHA.json",
+      "sha256": "dfccdb87944719367ae89154255c4f788f6db8493a033c15d511c1a489dd3465",
+      "bytes": 649
+    },
+    {
+      "path": "task-2b-fixture-exit-cleanup.txt",
+      "sha256": "7ddacaafa4c8e4d82148928b66aac73f4729903af6b73cdf66d2c31c9498eda9",
+      "bytes": 671
+    },
+    {
+      "path": "task-2b-fixture-fixes-first-attempt.txt",
+      "sha256": "813f9605ee0f3f060195e548c16706bd14627d6f8b162ef7437aab96116b0a40",
+      "bytes": 2554
+    },
+    {
+      "path": "task-2b-heartbeat-red.txt",
+      "sha256": "ab67d13d0ab527333b0aafc364859d25110733f8aea7c59dcfbb4a99c5dcaddf",
+      "bytes": 1547
+    },
+    {
+      "path": "task-2b-primitive-unchanged.txt",
+      "sha256": "cc258d839e50d5e0cf220528399d5c29a6bcc5c3a9ee2616a915627e0363d91d",
+      "bytes": 8
+    },
+    {
+      "path": "task-2b-report.md",
+      "sha256": "0699b5fd0ae97cf0adb45e359b2a01e8ce6c5dcb6d92d943728329025904a354",
+      "bytes": 15302
+    },
+    {
+      "path": "task-2b-review.md",
+      "sha256": "9f69106e0e1f1dea5b71d1b17a8563275fca1dcd5a857c1a5d295ecf0b5759d8",
+      "bytes": 9955
+    },
+    {
+      "path": "task-2b-scope-green.txt",
+      "sha256": "901ceb6a82cf4133e76a60e12b321354ecc74cda92001297cf5d8806877cbede",
+      "bytes": 2769
+    },
+    {
+      "path": "task-2b-scope-red.txt",
+      "sha256": "549e5b0efbf4d3a435b3f27a9c0145fce48f8cfcaa84fe700cfe9c6699b8ac9e",
+      "bytes": 7107
+    },
+    {
+      "path": "task-2b-scope-sandbox-attempt.txt",
+      "sha256": "cd22193112adda772bb3a210e3b876732ec5901915a2fd660c82b2f5d9cc9b52",
+      "bytes": 8620
+    },
+    {
+      "path": "task-2b-sourceSHA.json",
+      "sha256": "dd8ce8a3f7bd03d6a560950657c1f3740d3be079f7a72c918f35e6165f16f41a",
+      "bytes": 2318
+    }
+  ],
+  "results": {
+    "nativeScope": {
+      "pass": 24,
+      "skip": 3,
+      "exit": 0,
+      "newScopeCases": 7
+    },
+    "isolatedSqlCallers": {
+      "pass": 48,
+      "skip": 2,
+      "exit": 0
+    },
+    "capabilities": {
+      "pass": 4,
+      "exit": 0
+    },
+    "product": {
+      "pass": 7,
+      "enclosingCommandExit": 1,
+      "note": "Same command had separate capabilities failure, later fixed and rerun. Product not repeated."
+    },
+    "declarationsExit": 0,
+    "buildExit": 0,
+    "finalTypecheckExit": 0,
+    "fixtureCleanupExit": 0,
+    "fix1": {
+      "red": {
+        "pass": 0,
+        "fail": 5,
+        "exit": 1
+      },
+      "scope": {
+        "pass": 12,
+        "skip": 0,
+        "exit": 0
+      },
+      "heartbeat": {
+        "pass": 1,
+        "skip": 0,
+        "exit": 0
+      },
+      "buildExit": 0,
+      "diffcheckExit": 0,
+      "fixtureCleanupExit": 0
+    }
+  },
+  "exclusions": [
+    "No native PostgreSQL concurrent lock-order proof; 2 explicit native-only skips.",
+    "3 OS fixture skips are environment limitations, not proof of rejection.",
+    "Cost-carryover, local-device-admission and run-state constructor migrations typechecked only.",
+    "No strict trace registration, source approval, child initialization or enterprise-profile activation.",
+    "Remaining HTTP/cost/device/canonical writers and maintenance/backup/object coverage are later tasks.",
+    "No JJ deployment, production access or real model/device acceptance.",
+    "Existing Vite >500kB chunk advisory remains."
+  ],
+  "reviewHistory": [
+    {
+      "candidate": "d9bb4a4",
+      "verdict": "NEEDS_FIXES",
+      "evidence": "task-2b-review.md"
+    },
+    {
+      "candidate": "a8852f4",
+      "base": "d9bb4a4",
+      "verdict": "PASS",
+      "evidence": "task-2b-fix1-review.md"
+    }
+  ],
+  "finalCommit": "a8852f4",
+  "fixSource": [
+    {
+      "path": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256": "7dd3eaaa6eff551dbad78f44c0a8f7071ab0679e5366bb2e071bf72bb2d44a7a"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.test.mjs",
+      "sha256": "83dc16ad7cff58d0bf71dfe2d16f5433927eb9d5b1b5f47abed44b8f0e44b610"
+    },
+    {
+      "path": "services/agent-runtime/test-helpers/archive-writer-source-child.mjs",
+      "sha256": "f187f8f4ef8d55692d85ca4c1b26bfe8b163a9799aeca71e7c63e631013927b7"
+    },
+    {
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "sha256": "4a3d642054c30f52f2a0e40229f590756ac843bceddaef91e3b6693f11fc1de6"
+    }
+  ],
+  "finalSource": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "36d8aa5e892319fbea9600861746486b2c6fd407ee3ce2fd12c5ab5fc75b5282",
+      "gitLfSha256": "9365abac684e99263be0f0ca42cb43e0a5c8e3e5a02a7c92978f2de9a40c2f0d"
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "sha256": "75fcec87c8fa6c85dda26d8dfbb200484e554b02e72a49038f3ca261f8661100",
+      "gitLfSha256": "0924b05705155b4a0aee28a5d16e1e0a25b54ec0cfbe0066b7f88d4eb7a549a7"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256": "7dd3eaaa6eff551dbad78f44c0a8f7071ab0679e5366bb2e071bf72bb2d44a7a",
+      "gitLfSha256": "7dd3eaaa6eff551dbad78f44c0a8f7071ab0679e5366bb2e071bf72bb2d44a7a"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.d.mts",
+      "sha256": "87da1888141f10bc7691433c784e98cf9e94fc72c7dd1c7c1bd45fc947b8f9f7",
+      "gitLfSha256": "87da1888141f10bc7691433c784e98cf9e94fc72c7dd1c7c1bd45fc947b8f9f7"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.test.mjs",
+      "sha256": "83dc16ad7cff58d0bf71dfe2d16f5433927eb9d5b1b5f47abed44b8f0e44b610",
+      "gitLfSha256": "83dc16ad7cff58d0bf71dfe2d16f5433927eb9d5b1b5f47abed44b8f0e44b610"
+    },
+    {
+      "path": "services/agent-runtime/test-helpers/archive-writer-source-child.mjs",
+      "sha256": "f187f8f4ef8d55692d85ca4c1b26bfe8b163a9799aeca71e7c63e631013927b7",
+      "gitLfSha256": "f187f8f4ef8d55692d85ca4c1b26bfe8b163a9799aeca71e7c63e631013927b7"
+    },
+    {
+      "path": "tests/capabilities.test.ts",
+      "sha256": "a4274c4a4e3135f61cc58ae470cb3582a1a8e50e67dade58d3ecfd90fef9e58d",
+      "gitLfSha256": "0f39c3db7a95d91df09be6da0d0373c2d83b27cc729b14e73fb51e948a897352"
+    },
+    {
+      "path": "tests/collaboration.test.ts",
+      "sha256": "b97fa2138f1bf228663e1233a09c26c524613fa38fca7b346e3e40d5d5735740",
+      "gitLfSha256": "38aaeba92d079d23a2a756eff3738926aceca6d5633ba83a9fc10e97cd7f1c21"
+    },
+    {
+      "path": "tests/cost-carryover.test.ts",
+      "sha256": "00a91014ed8d43fdc4f382faa980810869e37f73abe5bef56593568d5884ce74",
+      "gitLfSha256": "00a91014ed8d43fdc4f382faa980810869e37f73abe5bef56593568d5884ce74"
+    },
+    {
+      "path": "tests/execution-policy.test.ts",
+      "sha256": "52d853877c1e082df2103b451bc425ccb558c157a1b702e75ccf12b1dacefbb0",
+      "gitLfSha256": "2939abb083a6167438f6baaa2b2360b26b7b89ac9cacf686b3b852da4e726046"
+    },
+    {
+      "path": "tests/local-device-admission.test.ts",
+      "sha256": "dd32141739d900a6f7869c1f5d039aa3a710444994ddbda87dfcef35e9c18afe",
+      "gitLfSha256": "dd32141739d900a6f7869c1f5d039aa3a710444994ddbda87dfcef35e9c18afe"
+    },
+    {
+      "path": "tests/product.test.ts",
+      "sha256": "f00b9232f53947750dc7692baa53de0980c0babfa953e9fb06fbcc09796691a3",
+      "gitLfSha256": "3d267551d751f62ba00f13c15bff5db24e149cdeb5ca81973c6398f97f785e4c"
+    },
+    {
+      "path": "tests/run-live-lease.test.ts",
+      "sha256": "478c10f949e72cccc2dc2dfc54824137271beb2951d7aa296fd14f8728495411",
+      "gitLfSha256": "478c10f949e72cccc2dc2dfc54824137271beb2951d7aa296fd14f8728495411"
+    },
+    {
+      "path": "tests/run-state.test.ts",
+      "sha256": "5e41409b3f2570c350736bb999547b8e39f3037219cd74a9bc7df66a11b2eb3d",
+      "gitLfSha256": "988d3ad162f2c2d3b44f436135d5a4ed736009e9f3fb24f8d21674329a5839fe"
+    },
+    {
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "sha256": "4a3d642054c30f52f2a0e40229f590756ac843bceddaef91e3b6693f11fc1de6",
+      "gitLfSha256": "e1bc93aeda059532423b385df6a3b92a8ddd92f8eb59f6f97620a4b2cee482b8"
+    },
+    {
+      "path": "tests/work-file-project.test.ts",
+      "sha256": "ddfd838bc788520a2d2f7aff37438a239992f0f2aa4b5ee21a5a6a11129ebe3c",
+      "gitLfSha256": "948fae7474f249c449a857fbbe754fa3bac3be91a616f402b5ac24833eb2a583"
+    }
+  ]
+}

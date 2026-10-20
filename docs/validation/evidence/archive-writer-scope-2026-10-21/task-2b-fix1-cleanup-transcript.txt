@@ -1,0 +1,10 @@
+Recorded from the actual parent exec_command call after the original heartbeat test process returned EXIT=0. This is a transcript, not a rerun.
+
+Command (PowerShell):
+$taskLog='.superpowers/sdd/2026-10-21-archive-writer-fence/task-2b-fix1-heartbeat-green.txt'; $taskLines=Get-Content -LiteralPath $taskLog; if($taskLines[-1] -ne 'EXIT=0'){throw 'Original heartbeat test process has not completed successfully'}; $taskLine=$taskLines | Where-Object {$_ -match '^ARCHIVE_WRITER_EXIT_CLEANUP='}; if(@($taskLine).Count -ne 1){throw 'Expected one exclusive fixture target'}; $taskTarget=[IO.Path]::GetFullPath(($taskLine -replace '^ARCHIVE_WRITER_EXIT_CLEANUP=','')); $taskTempRoot=(Get-Item -LiteralPath ([IO.Path]::GetTempPath())).FullName.TrimEnd('\'); if([IO.Path]::GetDirectoryName($taskTarget) -ine $taskTempRoot -or [IO.Path]::GetFileName($taskTarget) -notmatch '^run-terminal-maintenance-[A-Za-z0-9]+$'){throw 'Fixture outside expected exclusive Temp root'}; $taskItem=Get-Item -LiteralPath $taskTarget -Force; if(-not $taskItem.PSIsContainer -or ($taskItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -or (Resolve-Path -LiteralPath $taskTarget).ProviderPath -ine $taskTarget){throw 'Fixture identity is not a plain resolved directory'}; Write-Output "Verified completed original process; remove exclusive synthetic target: $taskTarget"; Remove-Item -LiteralPath $taskTarget -Recurse -Force; Write-Output 'CLEANUP_EXIT=0'
+
+Observed stdout:
+Verified completed original process; remove exclusive synthetic target: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-kNF28T
+CLEANUP_EXIT=0
+
+Actual exec_command exit_code: 0

@@ -1,0 +1,13 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+ARCHIVE_WRITER_EXIT_CLEANUP=C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-kNF28T
+✔ a rejected heartbeat waits for every original SQL update and retains the failed owner (4221.3956ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5060.1181
+EXIT=0

@@ -1,0 +1,46 @@
+✖ subset borrows only the active originating chain and rejects expansion and another manager (357.1374ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 522.4602
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:28:1
+✖ subset borrows only the active originating chain and rejects expansion and another manager (357.1374ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" not to be reference-equal to "expected":
+  
+  {
+    closeAdmission: [Function: closeAdmission],
+    finish: [Function: finish],
+    retain: [Function: retain],
+    run: [Function: run],
+    writerDrained: Promise {
+      <pending>,
+      Symbol(async_id_symbol): 109,
+      Symbol(trigger_async_id_symbol): 80
+    }
+  }
+  
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:32:60
+      at Object.withWriter (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:91:64)
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:32:21
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:94:38
+      at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+      at Object.run (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:52:30)
+      at Object.withWriter (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:94:30)
+      at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:30:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Object],
+    expected: [Object],
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+EXIT=1

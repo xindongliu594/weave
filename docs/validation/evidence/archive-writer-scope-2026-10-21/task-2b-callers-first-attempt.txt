@@ -1,0 +1,153 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (2696.0083ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (98.8574ms)
+✔ dead or foreign expired owners remain recoverable and atomic terminal state still closes pending approvals (148.6429ms)
+✔ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (250.7762ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (551.2662ms)
+✔ the real heartbeat timer renews its own fenced lease even while the scheduler remains busy (1109.2189ms)
+✔ caller abort exits immediately while the shared heartbeat waits for the single pool connection (203.628ms)
+✖ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (257.9948ms)
+✔ terminal persistence rollback is atomic and a recorded completion is reconciled under a fresh recovery owner (181.8094ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6191.724
+
+✖ failing tests:
+
+test at tests\run-live-lease.test.ts:1:12130
+✖ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (257.9948ms)
+  AssertionError [ERR_ASSERTION]: one initial snapshot and exactly one renewal covering the new run
+  
+  3 !== 2
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-live-lease.test.ts:109:78)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✖ only a complete tool roundtrip enables execution; evidence, cost and route revision are retained (4820.55ms)
+✔ bad arguments, ignored tool results and missing usage never mark the model supported (300.5258ms)
+✔ local budget rejection retains prior evidence, and configuration changes prevent the second request (168.2721ms)
+✔ backups reject a live capability probe without deadlocking and restore completed evidence (465.576ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6377.1539
+
+✖ failing tests:
+
+test at tests\capabilities.test.ts:1:3820
+✖ only a complete tool roundtrip enables execution; evidence, cost and route revision are retained (4820.55ms)
+  AssertionError [ERR_ASSERTION]: {"code":"PLAN_NOT_READY","message":"当前仍有默认占位任务。请先生成 AI 方案，或编辑任务的具体目标、负责人和验收标准，再批准运行。"}
+  
+  422 !== 202
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\capabilities.test.ts:47:90)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 422,
+    expected: 202,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ cross-department plans pin employee identity, knowledge scope, approval versions and billing ownership (4959.5435ms)
+✔ shared collaborator departments serialize runs and team limits fail before project creation (347.159ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5881.4973
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (4920.6664ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (421.3308ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (169.0463ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (164.0856ms)
+✔ approval freezes per-call output limits separately from the cumulative task estimates (145.1868ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (338.1906ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.2866ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.1494ms) # requires independent PostgreSQL backends and row locks
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (921.3308ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 7937.2669
+✔ organization templates, prompt versions, archive and restore remain durable (4678.649ms)
+✔ knowledge permissions filter before retrieval and revisions keep stable source references (180.034ms)
+✔ Obsidian edits, wiki links and deletion preserve immutable versions and permissions (224.0844ms)
+✔ idempotency rejects mismatched content and encrypted backup restores data (530.1689ms)
+✔ approval knowledge grants reject missing, archived and foreign employee spaces (33.6558ms)
+✖ expired runs require explicit checkpoint resume and cancelled queue entries stay visible (64.2608ms)
+✖ retry admission preserves billed task cost and all wire calls, and refuses exhausted allowances (68.0265ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6423.6951
+
+✖ failing tests:
+
+test at tests\product.test.ts:1:10838
+✖ expired runs require explicit checkpoint resume and cancelled queue entries stay visible (64.2608ms)
+  TypeError: Cannot read properties of undefined (reading 'id')
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product.test.ts:83:61)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\product.test.ts:1:13203
+✖ retry admission preserves billed task cost and all wire calls, and refuses exhausted allowances (68.0265ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  503 !== 202
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product.test.ts:124:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 202,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ selected imports reach planning and approval with exact path/SHA while unselected and private references stay isolated (5180.0084ms)
+✔ approval rejects a shared workspace import missing any file-tool employee grant (74.1761ms)
+✔ workspace files can be approved by file workers without granting knowledge tools (120.7726ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5982.7279
+EXIT=1

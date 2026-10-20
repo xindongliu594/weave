@@ -1,0 +1,48 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts (2764.5457ms)
+✖ tick transfers its original owner without waiting for business terminal or actual tail (183.8624ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3539.2013
+
+✖ failing tests:
+
+test at tests\run-terminal-maintenance.test.ts:2:534
+✖ tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts (2764.5457ms)
+  AssertionError [ERR_ASSERTION]: candidate must be read outside SQL before native acquisition
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:126:11)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\run-terminal-maintenance.test.ts:2:2087
+✖ tick transfers its original owner without waiting for business terminal or actual tail (183.8624ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:143:27)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_FENCE_TIMEOUT' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+EXIT=1

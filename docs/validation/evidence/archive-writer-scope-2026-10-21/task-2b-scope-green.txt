@@ -1,0 +1,36 @@
+✔ private archive fence factory exists (1.4976ms)
+✔ guards are frozen, privately owned, mode/run scoped and expire only on release (206.4692ms)
+✔ UUID sets, options and pre-abort reject before acquisition (23.1165ms)
+✔ one acquisition deadline covers all run locks rather than restarting per file (760.7004ms)
+✔ nested different-run journal scopes cannot release their still active outer guard (113.2382ms)
+✔ actual process writers coexist, block source and release independently (350.4497ms)
+✔ root exclusive blocks writers in another process (266.6645ms)
+✔ multi-run timeout and waiting abort clean earlier run and root locks (355.2699ms)
+✔ journal returns values, retains outer guard, and rejects async/thenable/reentry/early release (260.4746ms)
+✔ journal actual process contention times out without callback and short wait succeeds (777.6687ms)
+✔ two process journal increments produce exact contiguous sequence (1776.2002ms)
+✔ directory replacement invalidates old guards; root exclusive permits a legal trace swap (167.6953ms)
+﹣ renamed namespace invalidates guard (OS rename restrictions reported separately) (70.8153ms) # live namespace replacement fixture blocked by OS EPERM; rename works after guard release
+﹣ renamed lockRoot invalidates guard (OS rename restrictions reported separately) (66.3703ms) # live lockRoot replacement fixture blocked by OS EPERM; rename works after guard release
+✔ renamed file invalidates guard (OS rename restrictions reported separately) (72.7492ms)
+✔ invalid roots and aliases are rejected without modifying invalid entries (21.8685ms)
+✔ hardlinked native file rejected (permission failures reported as skipped fixtures) (25.434ms)
+✔ native files must be regular and existing native-file contents are not truncated (92.4674ms)
+✔ symlink/junction roots, namespace and lock files are rejected (26.292ms)
+﹣ symlink lock file rejected without touching target (19.5677ms) # file link fixture unavailable: EPERM
+✔ manager exists (2.258ms)
+✔ stable mapping is shared, conflicts and tool workspace overlap fail at startup (59.8043ms)
+✔ subset borrows only the active originating chain and rejects expansion and another manager (142.2565ms)
+✔ independent chains acquire independent owners rather than borrowing live run IDs (140.6294ms)
+✔ parent closes admission, retained original promise blocks release even after premature finish (126.8616ms)
+✔ failed original producer latches failure and never grants source (315.5724ms)
+✔ real source process cannot enter until delayed retained writer actually settles (298.626ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 3
+ℹ todo 0
+ℹ duration_ms 5600.2422
+EXIT=0

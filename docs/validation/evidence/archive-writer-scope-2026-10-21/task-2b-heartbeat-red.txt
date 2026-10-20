@@ -1,0 +1,28 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+Run lease cancellation: Error
+Run lease cancellation: Error
+ARCHIVE_WRITER_EXIT_CLEANUP=C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-R0CqcF
+✖ detached heartbeat SQL and shutdown cancellation run in each original producer context (2941.3177ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3587.2322
+
+✖ failing tests:
+
+test at tests\run-terminal-maintenance.test.ts:2:3229
+✖ detached heartbeat SQL and shutdown cancellation run in each original producer context (2941.3177ms)
+  Error: Archive writer scope
+      at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:10:46)
+      at assertContext (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:29:153)
+      at Object.assertWriter (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:87:25)
+      at pg.Pool.pool.query (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-terminal-maintenance.test.ts:161:47)
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\run-coordinator.ts:48:59) {
+    code: 'E_ARCHIVE_WRITER_SCOPE'
+  }
+EXIT=1

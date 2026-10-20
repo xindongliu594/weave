@@ -1,0 +1,66 @@
+[
+  {
+    "path": "apps/api/src/app.ts",
+    "sha256": "36d8aa5e892319fbea9600861746486b2c6fd407ee3ce2fd12c5ab5fc75b5282"
+  },
+  {
+    "path": "apps/api/src/run-coordinator.ts",
+    "sha256": "75fcec87c8fa6c85dda26d8dfbb200484e554b02e72a49038f3ca261f8661100"
+  },
+  {
+    "path": "services/agent-runtime/archive-writer-scope.mjs",
+    "sha256": "86e00f1f49a873b119c94abcf472ba84d8dc7ff1d86f2d6fd1f3407e9c5c4aa4"
+  },
+  {
+    "path": "services/agent-runtime/archive-writer-scope.d.mts",
+    "sha256": "87da1888141f10bc7691433c784e98cf9e94fc72c7dd1c7c1bd45fc947b8f9f7"
+  },
+  {
+    "path": "services/agent-runtime/archive-writer-scope.test.mjs",
+    "sha256": "974104f4f047aa300aa05559b880a3058814c2472494d363d3d3cd53fecde659"
+  },
+  {
+    "path": "services/agent-runtime/test-helpers/archive-writer-source-child.mjs",
+    "sha256": "7182cec4d88fc4abdd341de046b1310e25b0374f0f906edbb062b2261413d86f"
+  },
+  {
+    "path": "tests/capabilities.test.ts",
+    "sha256": "a4274c4a4e3135f61cc58ae470cb3582a1a8e50e67dade58d3ecfd90fef9e58d"
+  },
+  {
+    "path": "tests/collaboration.test.ts",
+    "sha256": "b97fa2138f1bf228663e1233a09c26c524613fa38fca7b346e3e40d5d5735740"
+  },
+  {
+    "path": "tests/cost-carryover.test.ts",
+    "sha256": "00a91014ed8d43fdc4f382faa980810869e37f73abe5bef56593568d5884ce74"
+  },
+  {
+    "path": "tests/execution-policy.test.ts",
+    "sha256": "52d853877c1e082df2103b451bc425ccb558c157a1b702e75ccf12b1dacefbb0"
+  },
+  {
+    "path": "tests/local-device-admission.test.ts",
+    "sha256": "dd32141739d900a6f7869c1f5d039aa3a710444994ddbda87dfcef35e9c18afe"
+  },
+  {
+    "path": "tests/product.test.ts",
+    "sha256": "f00b9232f53947750dc7692baa53de0980c0babfa953e9fb06fbcc09796691a3"
+  },
+  {
+    "path": "tests/run-live-lease.test.ts",
+    "sha256": "478c10f949e72cccc2dc2dfc54824137271beb2951d7aa296fd14f8728495411"
+  },
+  {
+    "path": "tests/run-state.test.ts",
+    "sha256": "5e41409b3f2570c350736bb999547b8e39f3037219cd74a9bc7df66a11b2eb3d"
+  },
+  {
+    "path": "tests/run-terminal-maintenance.test.ts",
+    "sha256": "70e35401648e987187b04b3f0ab2f8d2a4bc63a9f67c961c60a9ec01adc9a195"
+  },
+  {
+    "path": "tests/work-file-project.test.ts",
+    "sha256": "ddfd838bc788520a2d2f7aff37438a239992f0f2aa4b5ee21a5a6a11129ebe3c"
+  }
+]

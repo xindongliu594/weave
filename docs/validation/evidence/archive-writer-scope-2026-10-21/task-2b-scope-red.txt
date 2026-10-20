@@ -1,0 +1,111 @@
+✖ manager exists (2.4136ms)
+✖ stable mapping is shared, conflicts and tool workspace overlap fail at startup (4.5277ms)
+✖ subset borrows only the active originating chain and rejects expansion and another manager (2.9127ms)
+✖ independent chains acquire independent owners rather than borrowing live run IDs (2.6367ms)
+✖ parent closes admission, retained original promise blocks release even after premature finish (38.9696ms)
+✖ failed original producer latches failure and never grants source (2.9024ms)
+✖ real source process cannot enter until delayed retained writer actually settles (2.6796ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 211.8585
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:20:1
+✖ manager exists (2.4136ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:20:34)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:21:1
+✖ stable mapping is shared, conflicts and tool workspace overlap fail at startup (4.5277ms)
+  TypeError: createArchiveWriterManager is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:16:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:22:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:27:1
+✖ subset borrows only the active originating chain and rejects expansion and another manager (2.9127ms)
+  TypeError: createArchiveWriterManager is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:16:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:28:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:38:1
+✖ independent chains acquire independent owners rather than borrowing live run IDs (2.6367ms)
+  TypeError: createArchiveWriterManager is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:16:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:39:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:44:1
+✖ parent closes admission, retained original promise blocks release even after premature finish (38.9696ms)
+  TypeError: createArchiveWriterManager is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:16:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:45:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:55:1
+✖ failed original producer latches failure and never grants source (2.9024ms)
+  TypeError: createArchiveWriterManager is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:16:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:56:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:62:1
+✖ real source process cannot enter until delayed retained writer actually settles (2.6796ms)
+  TypeError: createArchiveWriterManager is not a function
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:16:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:63:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+EXIT=1

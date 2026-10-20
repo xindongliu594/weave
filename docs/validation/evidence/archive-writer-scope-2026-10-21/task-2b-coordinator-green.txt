@@ -1,0 +1,38 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ SQL terminal retains active actual drain and shutdown observes its original: false (3298.7381ms)
+✔ SQL terminal retains active actual drain and shutdown observes its original: true (231.3233ms)
+✔ shutdown joins an in-flight original heartbeat after SQL terminal without recancelling the released run (211.4645ms)
+✔ missing runtime writer contract preserves business completion but latches shutdown unproven (183.2161ms)
+✔ tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts (986.6331ms)
+✔ tick transfers its original owner without waiting for business terminal or actual tail (360.4487ms)
+✔ detached heartbeat SQL and shutdown cancellation run in each original producer context (345.5041ms)
+✔ trusted accepted recording-incomplete completion remains SQL completed without a fabricated terminal trace (188.8884ms)
+✔ usage replay error after trusted completion cannot rewrite business failure or invent usage (182.8045ms)
+✔ finish bookkeeping error after trusted completion retries completed bookkeeping without failed trace (190.1823ms)
+✔ cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure (210.4146ms)
+✔ trusted acceptance fallback cannot overwrite a replacement owner after replay bookkeeping loses ownership (156.2689ms)
+✔ an ordinary pre-completion runtime rejection retains the existing failed classification (167.576ms)
+✔ tick leaves a quarantined project queued and unprepared until the same close promise settles (222.7619ms)
+✔ launch readiness check defers an already claimed run before any workspace preparation (159.7481ms)
+✔ check-to-start quarantine race defers the same attempt before input preparation and prepares once after release (286.6485ms)
+✔ quarantine cannot requeue a run with existing local-operation evidence (162.887ms)
+✔ quarantine cannot requeue a run with existing uncertain-reservation evidence (180.9253ms)
+✔ quarantine cannot requeue a run with existing settled-reservation evidence (161.6002ms)
+✔ quarantine cannot requeue a run with existing usage evidence (274.0973ms)
+✔ cancel racing the quarantine rejection remains cancelled and cannot revive as queued (184.1046ms)
+✔ quarantine defer respects foreign-owner fencing (160.8863ms)
+✔ quarantine defer respects expired-lease fencing (159.6184ms)
+✔ quarantine defer respects project-version fencing (168.0785ms)
+✔ quarantine defer respects attempt fencing (163.6304ms)
+ARCHIVE_WRITER_EXIT_CLEANUP=C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-AdgN6o
+✔ quarantine defer respects successor fencing (163.32ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9721.003
+EXIT=0

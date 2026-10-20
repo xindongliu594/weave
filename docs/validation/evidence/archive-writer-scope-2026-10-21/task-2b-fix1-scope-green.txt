@@ -1,0 +1,21 @@
+✔ manager exists (1.4989ms)
+✔ stable mapping is shared, conflicts and tool workspace overlap fail at startup (102.2562ms)
+✔ subset borrows only the active originating chain and rejects expansion and another manager (316.094ms)
+✔ independent chains acquire independent owners rather than borrowing live run IDs (333.6759ms)
+✔ parent closes admission, retained original promise blocks release even after premature finish (255.7308ms)
+✔ nested invocation expires before the live parent and preserves its explicitly retained tail (288.2242ms)
+✔ borrowed view rejects a different live owner of the same run while retained producers remain transferable (352.3999ms)
+✔ borrowed view cannot retain after its nested invocation settles even inside the original parent (244.8561ms)
+✔ caught nested failure latches the original OS guard: sync (492.9473ms)
+✔ caught nested failure latches the original OS guard: async (622.4582ms)
+✔ failed original producer latches failure and never grants source (563.4757ms)
+✔ real source process cannot enter until delayed retained writer actually settles (506.3173ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4237.8892
+EXIT=0

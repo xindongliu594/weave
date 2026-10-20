@@ -1,0 +1,18 @@
+[
+  {
+    "path": "services/agent-runtime/archive-writer-scope.mjs",
+    "sha256": "7dd3eaaa6eff551dbad78f44c0a8f7071ab0679e5366bb2e071bf72bb2d44a7a"
+  },
+  {
+    "path": "services/agent-runtime/archive-writer-scope.test.mjs",
+    "sha256": "83dc16ad7cff58d0bf71dfe2d16f5433927eb9d5b1b5f47abed44b8f0e44b610"
+  },
+  {
+    "path": "services/agent-runtime/test-helpers/archive-writer-source-child.mjs",
+    "sha256": "f187f8f4ef8d55692d85ca4c1b26bfe8b163a9799aeca71e7c63e631013927b7"
+  },
+  {
+    "path": "tests/run-terminal-maintenance.test.ts",
+    "sha256": "4a3d642054c30f52f2a0e40229f590756ac843bceddaef91e3b6693f11fc1de6"
+  }
+]

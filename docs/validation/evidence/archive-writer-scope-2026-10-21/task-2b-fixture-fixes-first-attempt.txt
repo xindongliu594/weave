@@ -1,0 +1,52 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ only a complete tool roundtrip enables execution; evidence, cost and route revision are retained (5130.4706ms)
+✔ bad arguments, ignored tool results and missing usage never mark the model supported (274.9235ms)
+✔ local budget rejection retains prior evidence, and configuration changes prevent the second request (167.3068ms)
+✔ backups reject a live capability probe without deadlocking and restore completed evidence (471.3529ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6691.7778
+
+✖ failing tests:
+
+test at tests\capabilities.test.ts:1:3820
+✖ only a complete tool roundtrip enables execution; evidence, cost and route revision are retained (5130.4706ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'GOAL_CONTRACT_CHANGED'
+  - 'MODEL_CAPABILITY_REQUIRED'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\capabilities.test.ts:54:59)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'GOAL_CONTRACT_CHANGED',
+    expected: 'MODEL_CAPABILITY_REQUIRED',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ organization templates, prompt versions, archive and restore remain durable (4716.7253ms)
+✔ knowledge permissions filter before retrieval and revisions keep stable source references (182.0327ms)
+✔ Obsidian edits, wiki links and deletion preserve immutable versions and permissions (184.7418ms)
+✔ idempotency rejects mismatched content and encrypted backup restores data (506.6103ms)
+✔ approval knowledge grants reject missing, archived and foreign employee spaces (34.8815ms)
+✔ expired runs require explicit checkpoint resume and cancelled queue entries stay visible (333.5266ms)
+✔ retry admission preserves billed task cost and all wire calls, and refuses exhausted allowances (378.6616ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6945.1239
+EXIT=1

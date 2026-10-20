@@ -40,3 +40,15 @@
 接下来冻结唯一锁文件位置、不可替换要求、锁顺序、所有 writer 接入点与来源读取的持锁范围。锁可用不等于历史已静止；还要处理取得锁前已排队的晚到回调，并保留未知动作。实际接线与竞争验证完成前，Task 2 的在线来源签发和 Task 3 发布仍保持关闭。Task 1 纯格式校验不能冒充恢复成功。
 
 本实验比较现成原语，避免重新实现平台锁；业务授权、源/目标身份和检查点关系仍由为伍负责。
+
+## SQL 尾部验证工具补充（2026-10-21）
+
+PGlite 的单后端不能证明独立 PostgreSQL 事务锁和连接断开后的尾部。既有公开验收曾使用本机 PostgreSQL 17.10，但旧测试集群已删除；当前 PATH 和普通工作区没有可用二进制，不读取其他计划的私有工作目录。
+
+核对了 [PostgreSQL 官方 Windows 入口](https://www.postgresql.org/download/windows/) 推荐的 [EDB 独立二进制归档](https://www.enterprisedb.com/download-postgresql-binaries)，以及 [embedded-postgres](https://github.com/leinelissen/embedded-postgres) 的启动、停止、指定目录和端口接口。后者提供 Windows x64 原生包，可以复用二进制分发，不安装系统服务。
+
+已在当前计划私有目录以 `--ignore-scripts` 安装 `embedded-postgres@17.10.0-beta.17` 和同版本 `@embedded-postgres/windows-x64`。实际 Windows 包的 symlink 列表为空；没有执行安装脚本。`postgres`、`pg_ctl`、`initdb` 的 `--version` 均确认 17.10，npm integrity、三个二进制 SHA256 已保存在私有 provisioning 记录。不修改产品 package/lock，不注册系统服务、不创建 OS 用户、不读取生产连接串。
+
+检查固定版本代码后发现，其 Windows `stop()` 使用 `taskkill /f /t`。隔离夹具改用该原生包提供的官方 [initdb](https://www.postgresql.org/docs/17/app-initdb.html) 和 [pg_ctl](https://www.postgresql.org/docs/17/app-pg-ctl.html)：明确数据目录、回环地址、随机端口、生成的测试密码，后台子进程隐藏窗口，等待启动与 `fast` 正常关闭完成。无需自行实现服务管理器，也不使用 wrapper 的强制终止及自动递归删除。停止成功并核对专属路径后才清理；失败保留证据，不删除仍可能被进程使用的目录。
+
+本段记录调研和选择，尚未证明原生测试通过。Task 2c.1 仍需实际双 backend 的等待关系、原 UPDATE/COMMIT 尾部和连接断开验证；工具能启动也不等于数据库写入合同已通过。

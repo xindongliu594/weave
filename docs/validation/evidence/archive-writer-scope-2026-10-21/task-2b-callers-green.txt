@@ -1,0 +1,95 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ SQL terminal retains active actual drain and shutdown observes its original: false (3125.2837ms)
+✔ SQL terminal retains active actual drain and shutdown observes its original: true (191.1132ms)
+✔ shutdown joins an in-flight original heartbeat after SQL terminal without recancelling the released run (188.7529ms)
+✔ missing runtime writer contract preserves business completion but latches shutdown unproven (153.6475ms)
+✔ tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts (909.0535ms)
+✔ tick transfers its original owner without waiting for business terminal or actual tail (309.6495ms)
+✔ detached heartbeat SQL and shutdown cancellation run in each original producer context (305.1298ms)
+Run lease cancellation: Error
+✔ a rejected heartbeat waits for every original SQL update and retains the failed owner (383.7399ms)
+✔ trusted accepted recording-incomplete completion remains SQL completed without a fabricated terminal trace (192.284ms)
+✔ usage replay error after trusted completion cannot rewrite business failure or invent usage (169.1175ms)
+✔ finish bookkeeping error after trusted completion retries completed bookkeeping without failed trace (163.4249ms)
+✔ cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure (173.0375ms)
+✔ trusted acceptance fallback cannot overwrite a replacement owner after replay bookkeeping loses ownership (140.3812ms)
+✔ an ordinary pre-completion runtime rejection retains the existing failed classification (146.7563ms)
+✔ tick leaves a quarantined project queued and unprepared until the same close promise settles (196.5583ms)
+✔ launch readiness check defers an already claimed run before any workspace preparation (141.5872ms)
+✔ check-to-start quarantine race defers the same attempt before input preparation and prepares once after release (263.894ms)
+✔ quarantine cannot requeue a run with existing local-operation evidence (145.7485ms)
+✔ quarantine cannot requeue a run with existing uncertain-reservation evidence (145.3789ms)
+✔ quarantine cannot requeue a run with existing settled-reservation evidence (151.9244ms)
+✔ quarantine cannot requeue a run with existing usage evidence (153.3103ms)
+✔ cancel racing the quarantine rejection remains cancelled and cannot revive as queued (156.8118ms)
+✔ quarantine defer respects foreign-owner fencing (142.236ms)
+✔ quarantine defer respects expired-lease fencing (136.4464ms)
+✔ quarantine defer respects project-version fencing (137.2716ms)
+✔ quarantine defer respects attempt fencing (142.4312ms)
+ARCHIVE_WRITER_EXIT_CLEANUP=C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-nONCU7
+✔ quarantine defer respects successor fencing (144.1032ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9320.5961
+✔ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (3001.5716ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (92.3506ms)
+✔ dead or foreign expired owners remain recoverable and atomic terminal state still closes pending approvals (153.1308ms)
+✔ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (232.3151ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (558.1583ms)
+✔ the real heartbeat timer renews its own fenced lease even while the scheduler remains busy (1085.4158ms)
+✔ caller abort exits immediately while the shared heartbeat waits for the single pool connection (166.9009ms)
+✔ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (305.8568ms)
+✔ terminal persistence rollback is atomic and a recorded completion is reconciled under a fresh recovery owner (141.6904ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6553.4688
+✔ cross-department plans pin employee identity, knowledge scope, approval versions and billing ownership (4924.4884ms)
+✔ shared collaborator departments serialize runs and team limits fail before project creation (349.9575ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5801.0162
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (4725.2738ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (446.9719ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (166.3633ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (173.3808ms)
+✔ approval freezes per-call output limits separately from the cumulative task estimates (156.4893ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (394.8341ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.6418ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.277ms) # requires independent PostgreSQL backends and row locks
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (932.9651ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 7779.0176
+✔ selected imports reach planning and approval with exact path/SHA while unselected and private references stay isolated (5263.9867ms)
+✔ approval rejects a shared workspace import missing any file-tool employee grant (79.7755ms)
+✔ workspace files can be approved by file workers without granting knowledge tools (129.0829ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6043.1552
+EXIT=0

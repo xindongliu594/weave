@@ -1,0 +1,11 @@
+warning: in the working copy of 'apps/api/src/app.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/capabilities.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/collaboration.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/cost-carryover.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/execution-policy.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-device-admission.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/run-live-lease.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/run-state.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/work-file-project.test.ts', LF will be replaced by CRLF the next time Git touches it
+EXIT=0

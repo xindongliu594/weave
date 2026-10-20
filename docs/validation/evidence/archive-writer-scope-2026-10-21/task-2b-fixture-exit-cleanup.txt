@@ -1,0 +1,7 @@
+Completed original process; verified exclusive synthetic target: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-R0CqcF
+Removed after process exit: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-R0CqcF
+Completed original process; verified exclusive synthetic target: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-AdgN6o
+Removed after process exit: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-AdgN6o
+Completed original process; verified exclusive synthetic target: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-nONCU7
+Removed after process exit: C:\Users\JJ\AppData\Local\Temp\run-terminal-maintenance-nONCU7
+EXIT=0

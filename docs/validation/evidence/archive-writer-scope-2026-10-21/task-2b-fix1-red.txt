@@ -1,0 +1,119 @@
+✖ nested invocation expires before the live parent and preserves its explicitly retained tail (299.262ms)
+✖ borrowed view rejects a different live owner of the same run while retained producers remain transferable (302.58ms)
+✖ borrowed view cannot retain after its nested invocation settles even inside the original parent (185.2661ms)
+✖ caught nested failure latches the original OS guard: sync (375.8584ms)
+✖ caught nested failure latches the original OS guard: async (372.088ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1691.2624
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:70:1
+✖ nested invocation expires before the live parent and preserves its explicitly retained tail (299.262ms)
+  AssertionError [ERR_ASSERTION]: completed nested context must not borrow its still-live parent
+  + actual - expected
+  
+  + undefined
+  - 'E_ARCHIVE_WRITER_SCOPE'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:85:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'E_ARCHIVE_WRITER_SCOPE',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:88:1
+✖ borrowed view rejects a different live owner of the same run while retained producers remain transferable (302.58ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'E_ARCHIVE_WRITER_SCOPE'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:99:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'E_ARCHIVE_WRITER_SCOPE',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:102:1
+✖ borrowed view cannot retain after its nested invocation settles even inside the original parent (185.2661ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'E_ARCHIVE_WRITER_SCOPE'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:108:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'E_ARCHIVE_WRITER_SCOPE',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:111:37
+✖ caught nested failure latches the original OS guard: sync (375.8584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      caught: true,
+  +   outerError: null
+  -   outerError: 'nested producer failed'
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:114:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { caught: true, outerError: null },
+    expected: { caught: true, outerError: 'nested producer failed' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-writer-scope.test.mjs:111:37
+✖ caught nested failure latches the original OS guard: async (372.088ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      caught: true,
+  +   outerError: null
+  -   outerError: 'nested producer failed'
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.test.mjs:114:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { caught: true, outerError: null },
+    expected: { caught: true, outerError: 'nested producer failed' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+EXIT=1

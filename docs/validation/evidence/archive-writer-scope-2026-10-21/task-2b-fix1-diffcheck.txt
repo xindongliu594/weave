@@ -1,0 +1,4 @@
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/test-helpers/archive-writer-source-child.mjs', LF will be replaced by CRLF the next time Git touches it
+EXIT=0
