@@ -3,7 +3,7 @@ import type pg from 'pg';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { billingFailureReason, queryNewApiBilling, type BillingFailureReason, type NewApiLogRecord } from './new-api-billing.ts';
-import { receiptTransaction, settleCall } from './cost-control.ts';
+import { costMaintenanceTransaction, receiptTransaction, settleCall } from './cost-control.ts';
 
 export type ProviderQueryResult={status:'settled'|'unresolved'|'failed'|'already-settled';message:string;checkedAt:string;requestId?:string;cost?:number;inputTokens?:number;outputTokens?:number;providerQuota?:number;code?:string;upstreamStatus?:number;failureReason?:BillingFailureReason;automaticPaused?:true};
 const integer=(value:unknown):value is number=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0;
@@ -154,13 +154,19 @@ export async function queryProviderForCall(id:string,automatic=false):Promise<Pr
  }
 }
 
+export async function expireProviderQueries(){
+ await costMaintenanceTransaction(async db=>{
+  await db.query(`UPDATE model_reservations SET context=jsonb_set(context-'billingQueryClaim','{providerReconciliation}',(context->'providerReconciliation')||jsonb_build_object('status','unresolved','message','上次账单查询中断；预留仍保留，可在网页重新查询。','checkedAt',now())),history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','billing-query','status','unresolved','note','中断的账单查询已停止，未释放费用')) WHERE status='uncertain' AND context->'providerReconciliation'->>'status'='querying' AND (context->'providerReconciliation'->>'checkedAt')::timestamptz<now()-interval '30 seconds'`);
+ });
+}
+
 export class ProviderReconciliationService{
  private timer?:NodeJS.Timeout;private work:Promise<void>=Promise.resolve();private busy=false;private stopped=false;
  start(){this.timer=setInterval(()=>this.tick(),10000);this.timer.unref();this.tick();}
  private tick(){
   if(this.busy||this.stopped)return;this.busy=true;
   this.work=(async()=>{
-   await pool.query(`UPDATE model_reservations SET context=jsonb_set(context-'billingQueryClaim','{providerReconciliation}',(context->'providerReconciliation')||jsonb_build_object('status','unresolved','message','上次账单查询中断；预留仍保留，可在网页重新查询。','checkedAt',now())),history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','billing-query','status','unresolved','note','中断的账单查询已停止，未释放费用')) WHERE status='uncertain' AND context->'providerReconciliation'->>'status'='querying' AND (context->'providerReconciliation'->>'checkedAt')::timestamptz<now()-interval '30 seconds'`);
+   await expireProviderQueries();
    const rows=(await pool.query(`SELECT id FROM model_reservations WHERE status='uncertain' AND context->'billingRoute'->>'autoReconcile'='true'
     AND COALESCE((context->'providerReconciliation'->>'attempts')::int,0)<3
     AND COALESCE(context->'providerReconciliation'->>'automaticPaused','false')<>'true'

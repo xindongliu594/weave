@@ -201,3 +201,21 @@ test('backup refuses live calls and restores unresolved reservations without inv
  const restored=await call('/backup/restore','POST',{password,backup:exported.data,confirmation:'RESTORE'});assert.equal(restored.status,200,JSON.stringify(restored.data));
  const status=(await call('/costs')).data;assert.equal(status.calls[0].id,id);assert.equal(status.calls[0].status,'uncertain');assert.equal(status.reserved,1);assert.equal(status.spent,0);
 });
+
+test('standalone expiry rolls back probe interruption when its reservation UPDATE fails',async()=>{
+ const id=await cost.reserveCall({model,amount:.17,purpose:'Synthetic expiry rollback'});
+ await pool.query("UPDATE model_reservations SET expires_at=now()-interval '1 second' WHERE id=$1",[id]);
+ await pool.query("INSERT INTO model_capability_tests(id,model_id,model_version,probe_version,status,created_at) VALUES('expiry-rollback-probe','model',1,'fixture','running',now()-interval '7 minutes')");
+ await pool.query(`CREATE FUNCTION reject_expiry() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'EXPIRY_UPDATE_REJECTED'; END $$;
+  CREATE TRIGGER reject_expiry AFTER UPDATE ON model_reservations FOR EACH STATEMENT EXECUTE FUNCTION reject_expiry()`);
+ try{
+  await assert.rejects(cost.expireReservations(),/EXPIRY_UPDATE_REJECTED/);
+  const probe=(await pool.query("SELECT status,code,finished_at FROM model_capability_tests WHERE id='expiry-rollback-probe'")).rows[0];
+  assert.deepEqual(probe,{status:'running',code:null,finished_at:null});
+  const reservation=(await pool.query('SELECT status,amount,history FROM model_reservations WHERE id=$1',[id])).rows[0];
+  assert.equal(reservation.status,'pending');assert.equal(Number(reservation.amount),.17);assert.deepEqual(reservation.history,[]);
+ }finally{
+  await pool.query('DROP TRIGGER reject_expiry ON model_reservations;DROP FUNCTION reject_expiry()');
+  await pool.query("DELETE FROM model_capability_tests WHERE id='expiry-rollback-probe'");
+ }
+});

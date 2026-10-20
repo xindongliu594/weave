@@ -14,7 +14,23 @@ const open="status IN ('pending','uncertain')";
 const greater=(a:number,b:number)=>a-b>Number.EPSILON*Math.max(Math.abs(a),Math.abs(b))*8;
 export async function shareCostMaintenance(db:Database){await db.query('SELECT pg_advisory_xact_lock_shared(918275)');}
 
-export async function expireReservations(db:Database=pool) {
+export async function costMaintenanceTransaction<T>(work:(db:Database)=>Promise<T>):Promise<T>{
+ const client=await pool.connect();let discard=false;
+ try{
+  await client.query('BEGIN');await shareCostMaintenance(client);
+  const result=await work(client);await client.query('COMMIT');return result;
+ }catch(error){
+  try{await client.query('ROLLBACK');}catch{discard=true;}
+  throw error;
+ }finally{client.release(discard);}
+}
+
+export async function expireReservations() {
+ await costMaintenanceTransaction(expireReservationsInTransaction);
+}
+
+// Only the owning admission/maintenance transaction calls this after its shared gate.
+async function expireReservationsInTransaction(db:Database) {
  await db.query("UPDATE model_capability_tests SET status='interrupted',code='PROBE_INTERRUPTED',finished_at=now() WHERE status='running' AND created_at<now()-interval '6 minutes'");
  await db.query(`UPDATE model_reservations SET status='uncertain',history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','timeout','note','请求租约过期，费用待核对')) WHERE status='pending' AND expires_at<now()`);
 }
@@ -122,7 +138,7 @@ async function reserveCallAttempt(input:CallInput) {
   // pending request cannot become admissible merely because maintenance would
   // expire its lease between the read-only quote and this locked admission.
   if(project&&!input.runId)await requireProjectCostReady(client,project.id,input.retainUncertainCosts===true,planningBudget);
-  await expireReservations(client);
+  await expireReservationsInTransaction(client);
   if(input.context?.probeId&&!(await client.query("SELECT id FROM model_capability_tests WHERE id=$1 AND status='running' AND created_at>now()-interval '3 minutes' FOR SHARE",[input.context.probeId])).rowCount)throw new AppError(409,'能力测试已中断或超时，请重新开始','PROBE_EXPIRED');
   const existing=(await client.query('SELECT id FROM model_reservations WHERE id=$1',[id])).rows[0];
   if(existing)throw new AppError(409,'该模型请求已创建费用预留');
