@@ -66,6 +66,7 @@ test('employee Hosts isolate registries, cancellation, failures and resumed hist
     assert.ok(!JSON.stringify(requestB).includes('ROLE_A'));
 
     mode = 'failure';
+    host.ctx.logger.error(Error('ACTIVE_BUSINESS_ERROR_CONTROL'));
     handleA = await host.ctx.agents.resume({ resumeSessionId: a.id, agentOptions: { provider: 'fixture', model: 'a' }, setup: setup('ROLE_A') });
     assert.notEqual(host.employeeHosts().find(item => item.sessionId === a.id).ctx, worldA.ctx);
     handleA.agent.followup(prompt('FAIL_A')); await handleA.agent.whenIdle();
@@ -87,18 +88,19 @@ test('employee Hosts isolate registries, cancellation, failures and resumed hist
   assert.equal(host.ctx.agents, undefined, 'closing coordination removes its creation service');
 });
 
-test('failed employee setup leaves no published Agent or resident Host', { timeout: 5000 }, async () => {
+test('failed employee setup leaves no published Agent and retains unproven native resources', { timeout: 5000 }, async () => {
   const root = await mkdtemp(join(tmpdir(), 'employee-setup-'));
   const adapter = new class extends LlmAdapter { async *stream() { yield* textReply('unused'); } }();
   const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions') });
   try {
     const id = randomUUID();
     await assert.rejects(host.ctx.agents.create({ sessionId: id, meta: { cwd: root }, agentOptions: { provider: 'fixture', model: 'fixture' }, setup() { throw Error('setup rejected'); } }), /setup rejected/);
-    assert.equal(host.ctx.agents.get(id), undefined); assert.equal(host.employeeHosts().length, 0);
-  } finally { await host.close(); await rm(root, { recursive: true, force: true }); }
+    assert.equal(host.ctx.agents.get(id), undefined); assert.equal(host.employeeHosts().length, 1);
+    await assert.rejects(host.close(), error => error.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN');
+  } finally { await host.close().catch(() => {}); await rm(root, { recursive: true, force: true }); }
 });
 
-test('closing coordination cancels an unpublished employee setup and drains its Host', { timeout: 5000 }, async () => {
+test('closing coordination retains original unpublished native setup and latches unproven cleanup', { timeout: 5000 }, async () => {
   const root = await mkdtemp(join(tmpdir(), 'employee-startup-'));
   const setupStarted = Promise.withResolvers(), releaseSetup = Promise.withResolvers();
   let modelCalls = 0;
@@ -110,9 +112,18 @@ test('closing coordination cancels an unpublished employee setup and drains its 
     } });
     const rejected = assert.rejects(creating, /disposed|aborted/i);
     await setupStarted.promise;
-    await host.close(); await rejected;
-    assert.equal(host.employeeHosts().length, 0); assert.equal(modelCalls, 0);
-  } finally { releaseSetup.resolve(); await host.close(); await rm(root, { recursive: true, force: true }); }
+    let settled = false;
+    const closing = host.close();
+    const observed = closing.catch(error => error);
+    closing.then(() => { settled = true; }, () => { settled = true; });
+    await new Promise(setImmediate); await new Promise(setImmediate);
+    assert.equal(settled, false, 'original setup still owns a writer');
+    releaseSetup.resolve();
+    const failure = await observed;
+    assert.equal(failure.code, 'RUNTIME_WRITER_DRAIN_UNPROVEN');
+    await rejected;
+    assert.equal(host.employeeHosts().length, 1); assert.equal(modelCalls, 0);
+  } finally { releaseSetup.resolve(); await host.close().catch(() => {}); await rm(root, { recursive: true, force: true }); }
 });
 
 test('approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume', { timeout: 10000 }, async () => {

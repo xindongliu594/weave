@@ -25,7 +25,7 @@ before(async()=>{
  server=http.createServer((_req,res)=>{modelCalls++;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({choices:[{message:{role:'assistant',content:'isolated lease fixture'},finish_reason:'stop'}],usage:{prompt_tokens:4,completion_tokens:2}}));});server.listen(0,'127.0.0.1');await once(server,'listening');baseUrl='http://127.0.0.1:'+(server.address() as any).port+'/v1';
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(join(root,'runs'));await worker.close();state=await import('../apps/api/src/run-state.ts');
 });
-beforeEach(async()=>{if(!isolated)return;worker.stopped=false;worker.active.clear();await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,departments,tool_approvals CASCADE');modelCalls=0;});
+beforeEach(async()=>{if(!isolated)return;worker.stopped=false;worker.closing=undefined;worker.active.clear();await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,departments,tool_approvals CASCADE');modelCalls=0;});
 after(async()=>{if(!isolated)return;worker.active.clear();await worker.close();server.closeAllConnections();await new Promise<void>(done=>server.close(()=>done()));await pool.end();});
 async function fixture(owner:string=worker.owner){
  const models=await recoveryModel(pool),departmentId=randomUUID(),projectId=randomUUID(),runId=randomUUID();

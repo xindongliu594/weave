@@ -30,8 +30,9 @@ async function fixture(t, taskProfile = true) {
   const adapter = new OpenAiCompatibleAdapter({ routes: [route], maxBudget: 1, beforeRequest: () => { throw Error('MODEL_TRANSPORT_FORBIDDEN'); } });
   const host = await createTeamHost({ adapter, provider: 'fixture', sessionRoot: join(root, 'sessions'), archive,
     ...(taskProfile ? { product: { snapshot, sandbox: { root: artifacts }, gate: new Semaphore(1) } } : {}) });
-  t.after(async () => { await host.close(); assert.ok(root.startsWith(join(tmpdir(), 'host-admission-'))); await rm(root, { recursive: true, force: true }); });
-  return { root, host, adapter, archive, employee };
+  let expectedFailure = false;
+  t.after(async () => { if(expectedFailure)await assert.rejects(host.close(), error => error.code === 'RUNTIME_WRITER_DRAIN_FAILED');else await host.close(); assert.ok(root.startsWith(join(tmpdir(), 'host-admission-'))); await rm(root, { recursive: true, force: true }); });
+  return { root, host, adapter, archive, employee, expectCloseFailure() { expectedFailure = true; } };
 }
 
 test('Host stopAdmission synchronously fences the real model adapter and employee creation', { timeout: 10000 }, async t => {
@@ -88,7 +89,8 @@ for (const local of [false, true]) test('Host close retains the '+(local ? 'empl
 });
 
 for (const local of [false, true]) test('Host close retains the '+(local ? 'employee' : 'coordinator')+' fence after Cordis swallows a real disposer failure', { timeout: 10000 }, async t => {
-  const { host, root } = await fixture(t);
+  const f = await fixture(t), { host, root } = f;
+  f.expectCloseFailure();
   const agent = await host.captain({ cwd: root, model: 'fixture' });
   const ctx = local ? host.employeeHosts()[0].ctx : host.ctx, tools = ctx.tools;
   const name = local ? 'capability_search' : 'knowledge_search', scheduler = tools[TOOL_RUNTIME_SCHEDULER];
@@ -99,8 +101,8 @@ for (const local of [false, true]) test('Host close retains the '+(local ? 'empl
   const fiber = [...ctx.registry.get(plugin.default ?? plugin).fibers][0];
   let disposerCalls = 0, lateBodies = 0;
   fiber.ctx.effect(() => () => { disposerCalls++; throw Error('TEARDOWN_PROBE'); });
-  await host.close();
-  assert.equal(disposerCalls, 1, 'the real installed Cordis disposer threw but close still resolved');
+  await assert.rejects(host.close(), error => error.code === 'RUNTIME_WRITER_DRAIN_FAILED');
+  assert.equal(disposerCalls, 1, 'the original installed Cordis disposer ran once');
   await assert.rejects(held.execute(prepared.exec.arguments, prepared.exec));
   tools.register(tool('late_failed_teardown', async () => { lateBodies++; return {}; }));
   let lateError;
@@ -141,8 +143,9 @@ test('employee materialization stopped during setup cannot commit an already mou
     factory.stopAdmission();
     release.resolve();
     await assert.rejects(creating.then(value => { handle = value; }), /EMPLOYEE_HOSTS_CLOSED/);
-    assert.equal(factory.list().length, 0);
-  } finally { release.resolve(); await handle?.dispose(); await factory.close(); }
+    assert.equal(factory.list().length, 1);
+    await assert.rejects(factory.close(), error => error.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN');
+  } finally { release.resolve(); await handle?.dispose(); await factory.close().catch(() => {}); }
 });
 
 test('legacy Host can fence model and employee admission without a task boundary', { timeout: 10000 }, async t => {

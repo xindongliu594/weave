@@ -15,6 +15,7 @@ export class OpenAiCompatibleAdapter {
   prepareRequest(options:any):PreparedRelayRequest;
   stopAdmission(error?: unknown): void;
   readonly pendingRequests: number;
+  readonly writerDrained: Promise<void>;
   drain(timeoutMs?: number, signal?: AbortSignal): Promise<{pendingRequests:number;finishedRequests:number;timedOut:boolean;aborted:boolean}>;
   constructor(input: { routes: RelayRoute[]; maxBudget: number; priorSpend?: number; priorModelCalls?: number; maxModelCalls?: number; maxTaskModelCalls?: number;
     tasks?: {id:string;assigneeId?:string;maxBudget?:number;maxModelCalls?:number;maxOutputTokens?:number}[]; taskUsage?:Record<string,{cost:number;calls:number;reserved?:number}>;

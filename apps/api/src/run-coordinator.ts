@@ -21,6 +21,7 @@ import {LocalOperationService,LocalRunExecutor} from './local-execution.ts';
 import type {SandboxMaintenance} from './storage-lifecycle.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const acceptedRecordingPending='业务已完成，终态记录或费用回填尚待核对；请保留原运行记录与未知费用。';
+type ActiveRun={projectId:string;phase?:'executing'|'draining'|'drain-failed';work?:Promise<void>;writerDrained?:Promise<void>;drainFailure?:Error};
 type Heartbeat={ids:string[];held:string[]};
 async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
   signal?.throwIfAborted();if(!signal)return work;
@@ -28,7 +29,7 @@ async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
   try{return await Promise.race([work,cancelled]);}finally{signal.removeEventListener('abort',abort!);}
 }
 export class RunCoordinator {
-  owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,{projectId:string}>(); ticking=false; stopped=false; timer:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
+  owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,ActiveRun>();closing?:Promise<void>; ticking=false; stopped=false; timer:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
   constructor(public traceRoot:string,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor'],maintenance:{sandboxMaintenance?:()=>SandboxMaintenance|undefined}={}){
     executionMode();
     const local=new LocalOperationService(traceRoot,this.owner);
@@ -37,12 +38,12 @@ export class RunCoordinator {
   }
   async heartbeat(){
     if(this.stopped)return {ids:[],held:[]};if(this.heartbeatWork)return this.heartbeatWork;
-    const ids=[...this.active.keys()];if(!ids.length)return {ids,held:[]};
+    const ids=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing').map(([id])=>id);if(!ids.length)return {ids,held:[]};
     this.heartbeatWork=(async()=>{
       const held=(await pool.query("UPDATE project_runs SET lease_until=clock_timestamp()+interval '30 seconds' WHERE id=ANY($1::text[]) AND lease_owner=$2 AND status='running' RETURNING id",[ids,this.owner])).rows.map(r=>r.id);
       // Cancellation may wait for model settlement; it must not hold the shared
       // heartbeat promise that an admission callback itself is awaiting.
-      for(const id of ids)if(!held.includes(id))void this.runtime.cancel(id).catch(e=>{if(!this.stopped)console.error('Run lease cancellation:',e instanceof Error?e.name:'error');});
+      for(const id of ids){const entry=this.active.get(id);if(!held.includes(id)&&entry&&(!entry.phase||entry.phase==='executing'))void this.runtime.cancel(id).catch(e=>{if(!this.stopped)console.error('Run lease cancellation:',e instanceof Error?e.name:'error');});}
       return {ids,held};
     })();
     try{return await this.heartbeatWork;}finally{this.heartbeatWork=undefined;}
@@ -133,7 +134,14 @@ export class RunCoordinator {
       if(job){this.active.set(job.id,{projectId:job.project_id});void this.launch(job);}
     }catch(e){if(!this.stopped)console.error('Run worker:',e instanceof Error?e.name:'error');}finally{this.ticking=false;}
   }
-  async launch(row:any){
+  launch(row:any){
+    const entry:ActiveRun=this.active.get(row.id)??{projectId:row.project_id};
+    this.active.set(row.id,entry);
+    const work=this.launchOwned(row,entry);entry.work=work;
+    work.catch(error=>{if(!this.stopped)console.error('Run completion:',error instanceof Error?error.name:'error');});
+    return work;
+  }
+  private async launchOwned(row:any,entry:ActiveRun){
     let completion:RuntimeCompletion|undefined,runtimeStarted=false;
     try{
       if(!(await this.runtime.inspect()).ready)throw new AppError(409,'上一运行资源仍在收尾，本次运行尚未启动','RUNTIME_TEARDOWN_PENDING');
@@ -152,7 +160,13 @@ export class RunCoordinator {
         prepareWorkspace=()=>prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind,canonical);
       }
       const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes,prepareWorkspace});runtimeStarted=true;
-      completion=await started.completion;
+      if(!(started.writerDrained instanceof Promise)){
+        entry.drainFailure=Object.assign(Error('RUNTIME_WRITER_DRAIN_UNPROVEN'),{code:'RUNTIME_WRITER_DRAIN_UNPROVEN'});
+      }else{
+        entry.writerDrained=started.writerDrained;
+        started.writerDrained.catch(()=>{});
+      }
+      try{completion=await started.completion;}finally{entry.phase='draining';}
       for(const usage of completion.usages)await this.recordUsage(row.id,usage);
       await finishRun(row.id,this.owner,completion.status,completion.recording==='incomplete'?acceptedRecordingPending:completion.message??null);
     }catch(error){
@@ -166,7 +180,15 @@ export class RunCoordinator {
       }
       const message=error instanceof Error?error.message:'启动失败';
       await finishRun(row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
-    }finally{this.active.delete(row.id);}
+    }finally{
+      entry.phase='draining';
+      try{await entry.writerDrained;}catch(error){
+        const code=(error as any)?.code==='RUNTIME_WRITER_DRAIN_UNPROVEN'?'RUNTIME_WRITER_DRAIN_UNPROVEN':'RUNTIME_WRITER_DRAIN_FAILED';
+        entry.drainFailure=Object.assign(Error(code),{code});
+      }
+      if(entry.drainFailure)entry.phase='drain-failed';
+      else if(this.active.get(row.id)===entry)this.active.delete(row.id);
+    }
   }
   async cancel(id:string){
     const client=await pool.connect();
@@ -178,5 +200,22 @@ export class RunCoordinator {
     }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
     await this.runtime.cancel(id);
   }
-  async close(){this.stopped=true;clearInterval(this.timer);await Promise.all([...this.active.keys()].map(id=>this.runtime.cancel(id)));while(this.active.size||this.ticking||this.heartbeatWork)await sleep(50);}
+  close(){
+    if(!this.closing){
+      this.stopped=true;clearInterval(this.timer);
+      this.closing=(async()=>{
+        const cancellations=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing').map(([id])=>this.runtime.cancel(id));
+        const results=await Promise.allSettled(cancellations);
+        while(this.ticking)await sleep(50);
+        await this.heartbeatWork;
+        const work=await Promise.allSettled([...this.active.values()].map(entry=>entry.work));
+        const failure=[...this.active.values()].find(entry=>entry.drainFailure)?.drainFailure;
+        if(failure)throw failure;
+        const rejected=[...results,...work].find(result=>result.status==='rejected');
+        if(rejected?.status==='rejected')throw rejected.reason;
+      })();
+      this.closing.catch(()=>{});
+    }
+    return this.closing;
+  }
 }

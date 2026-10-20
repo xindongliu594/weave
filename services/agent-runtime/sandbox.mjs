@@ -49,7 +49,9 @@ export class RunSandbox {
     mkdirSync(this.root,{recursive:true,mode:0o700});
   }
   async start(signal){
+    if(this.closing)await this.closing;
     if(this.started)return;
+    this.closing=undefined;
     return this.starting??=(async()=>{
       await RunSandbox.assertReady(signal);
       this.started=true;
@@ -69,7 +71,7 @@ export class RunSandbox {
   revision(){return createHash('sha256').update(JSON.stringify(canonicalManifest(listArtifacts(this.root)))).digest('hex');}
   async execute(name,args,signal){
     const release=await this.mutex.acquire(signal);
-    const abort=()=>{void this.close();};signal?.addEventListener('abort',abort,{once:true});
+    const abort=()=>{void this.close().catch(()=>{});};signal?.addEventListener('abort',abort,{once:true});
     try{
       if(args.expectedWorkspaceRevision&&args.expectedWorkspaceRevision!==this.revision())throw Error('WORKSPACE_VERSION_CONFLICT: 审批后的工作区已变化，请重新申请审批');
       await this.start(signal);
@@ -87,5 +89,18 @@ export class RunSandbox {
       const artifacts=await this.sync(signal);if(name==='terminal'||name==='terminal_test')await this.close();return {...result,artifacts,workspaceRevision:this.revision()};
     }finally{signal?.removeEventListener('abort',abort);release();}
   }
-  async close(){if(this.started){this.started=false;this.starting=undefined;await command(['rm','-f',this.name]).catch(()=>{});}}
+  close(){
+    if(this.closing)return this.closing;
+    this.closing=(async()=>{
+      try{await this.starting;}catch{
+        if(this.started)throw Object.assign(Error('RUNTIME_WRITER_DRAIN_UNPROVEN'),{code:'RUNTIME_WRITER_DRAIN_UNPROVEN'});
+      }
+      if(this.started){
+        await command(['rm','-f',this.name]);
+        this.started=false;this.starting=undefined;
+      }
+    })();
+    this.closing.catch(()=>{});
+    return this.closing;
+  }
 }

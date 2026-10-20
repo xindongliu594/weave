@@ -24,6 +24,7 @@ import {checkpointContract} from './step-checkpoints.mjs';
 import {installTaskToolBoundary} from './task-tool-boundary.mjs';
 import {EMPLOYEE_INFRASTRUCTURE_TOOLS} from './employee-tool-access.mjs';
 import {prepareTaskTool} from './task-tool-context.mjs';
+import { observeNativeTeardown } from './host-lifecycle.mjs';
 
 export function trustedTaskCandidate({runId,agentId,sessionId,taskId,runtimeTaskId,state,snapshot,contract}) {
   const task=state.tasks.find(t=>t.id===runtimeTaskId);
@@ -47,12 +48,13 @@ export function reviewCompletionGuidance(contract, outputLimit) {
 }
 
 /** Department coordination Host; execution loops live in employee-owned Hosts. */
-export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product, context }) {
+export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product, context, onLifecycle }) {
   if (!sessionRoot || !isAbsolute(sessionRoot)) throw new Error('An absolute, dedicated sessionRoot is required');
   const ctx = new Context();
+  const nativeTeardown = observeNativeTeardown(ctx);
   const fibers = [];
   const handles = [];
-  let closing, taskBoundary, admissionStopped = false;
+  let closing, taskBoundary, admissionStopped = false, startupUnproven = false;
   let trace;
   let employees;
   let removeFactory;
@@ -225,7 +227,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       runtimeTaskId: current.taskId, attemptId: current.attemptId, status: task?.status, progress: task?.output });
   }
   async function mount(name, config) {
+    if(admissionStopped)throw Error('RUNTIME_STOPPING');
     const mod = await import(pathToFileURL(baseRequire.resolve(name)).href);
+    if(admissionStopped)throw Error('RUNTIME_STOPPING');
     const fiber = ctx.plugin(mod.default ?? mod, config);
     fibers.push(fiber);
     await fiber.await();
@@ -239,7 +243,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   }
   function close() {
     stopAdmission();
-    return closing ??= (async () => {
+    if (!closing) closing = (async () => {
       const failures = [];
       for (const item of [...handles].reverse()) {
         try { await item.dispose(); } catch (error) { failures.push(error); }
@@ -252,10 +256,20 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       trace?.dispose();
       productDispose?.();
       try { trace?.check(); } catch (error) { failures.push(error); }
+      try { nativeTeardown.check(); } catch (error) { failures.push(error); }
+      if(startupUnproven)failures.push(Object.assign(Error('RUNTIME_WRITER_DRAIN_UNPROVEN'),{code:'RUNTIME_WRITER_DRAIN_UNPROVEN'}));
       if (!failures.length) taskBoundary?.dispose();
-      if (failures.length) throw new AggregateError(failures, 'Runtime teardown failed');
+      if (failures.length) {
+        const error = new AggregateError(failures, 'Runtime teardown failed');
+        error.code = failures.some(failure => failure.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN') ? 'RUNTIME_WRITER_DRAIN_UNPROVEN' : 'RUNTIME_WRITER_DRAIN_FAILED';
+        throw error;
+      }
+      nativeTeardown.detach();
     })();
+    closing.catch(() => {});
+    return closing;
   }
+  onLifecycle?.({ ctx, close });
   try {
     await mount('@deepseek-ai/dsh-llm');
     ctx.llm.registerAdapter([provider], adapter);
@@ -495,16 +509,21 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         archive.append('team/checkpoint',{ ...state, budgetEvidence: captureBudgetEvidence(product.snapshot, adapter.budget, archive.id, 'restored') });
       },
       async captain({ cwd, model, instructions, maxTokens, id = randomUUID() }) {
+        if(admissionStopped)throw Error('EMPLOYEE_HOSTS_CLOSED');
         workspaceRoot=cwd;
-        const handle = await ctx.agents.create({ sessionId: id, meta: { cwd }, agentOptions: { provider, model, ...(maxTokens ? { maxTokens } : {}) },
+        let handle;
+        try { handle = await ctx.agents.create({ sessionId: id, meta: { cwd }, agentOptions: { provider, model, ...(maxTokens ? { maxTokens } : {}) },
           setup: instructions ? agentCtx => { agentCtx.systemPrompt.section({ name: 'department:role', order: 118, text: instructions }); } : undefined });
+        } catch(error) { startupUnproven=true; throw error; }
         handles.push(handle);
         captainId = handle.agent.id;
         if(product)adapter.sessionPolicies?.set(captainId,product.snapshot.agents.find(a=>a.role==='manager'));
         return handle.agent;
       },
       async resumeCaptain({ id, model }) {
-        const handle = await ctx.agents.resume({ resumeSessionId: id, agentOptions: { provider, model } });
+        if(admissionStopped)throw Error('EMPLOYEE_HOSTS_CLOSED');
+        let handle;
+        try { handle = await ctx.agents.resume({ resumeSessionId: id, agentOptions: { provider, model } }); } catch(error) { startupUnproven=true; throw error; }
         handles.push(handle);
         return handle.agent;
       },
@@ -524,7 +543,8 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       },
     };
   } catch (error) {
-    await close();
-    throw error;
+    startupUnproven=true;
+    try { await close(); } catch { /* Original lifecycle is retained by its owner. */ }
+    throw Object.assign(Error('RUNTIME_WRITER_DRAIN_UNPROVEN'),{code:'RUNTIME_WRITER_DRAIN_UNPROVEN'});
   }
 }

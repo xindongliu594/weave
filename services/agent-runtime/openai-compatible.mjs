@@ -334,9 +334,13 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
     }
     this.beforeRequest=beforeRequest;this.onResponse=onResponse;this.onCallError=onCallError;
     this.activeRequests = new Map();
+    const drained = Promise.withResolvers();
+    Object.defineProperty(this, 'writerDrained', { value: drained.promise, enumerable: true });
+    this.finishWriterDrain = drained.resolve;
   }
 
-  stopAdmission(error = new LlmError('运行正在停止，禁止新的模型调用', 'RUNTIME_STOPPING')) { this.stopReason ??= error; }
+  stopAdmission(error = new LlmError('运行正在停止，禁止新的模型调用', 'RUNTIME_STOPPING')) { this.stopReason ??= error; this.checkWriterDrain(); }
+  checkWriterDrain() { if (this.stopReason && !this.activeRequests.size) this.finishWriterDrain(); }
   get pendingRequests() { return [...this.activeRequests.values()].filter(request => request.dispatched).length; }
   async drain(timeoutMs = 30000, signal = this.signal) {
     const requests = [...this.activeRequests.values()].filter(request => request.dispatched);
@@ -616,7 +620,7 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       this.onError?.(normalized);
       throw normalized;
     } finally {
-      this.activeRequests.delete(usageId); finishRequest();
+      this.activeRequests.delete(usageId); finishRequest(); this.checkWriterDrain();
     }
   }
 }

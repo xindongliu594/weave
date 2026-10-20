@@ -184,6 +184,8 @@ test('the actual runtime fences failed work while preserving a late original man
     const started = await runtime.start({ runId: id, approvedSnapshot: snapshot, routes: ['manager-fixture', 'worker-fixture'].map(model => ({ ...route, id: model, wireModel: model, baseUrl: `${origin}/v1` })) });
     completion = started.completion;
     const result = await bounded(Promise.race([completion, fixtureFailed.promise.then(error => { throw error; })]), 'runtime completion'), archived = readRun(root, id), events = archived.events;
+    await bounded(started.writerDrained, 'original failed-business writer drain');
+    assert.equal((await runtime.inspect()).ready, true);
     assert.equal(result.status, 'failed'); assert.match(result.message, /NO_PROGRESS/); assert.equal(archived.integrity, 'ok');
     const anomaly = events.find(event => event.type === 'runtime/anomaly'); assert.ok(anomaly);
     assert.equal(anomaly.data.code, 'NO_PROGRESS');

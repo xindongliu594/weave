@@ -27,7 +27,7 @@ before(async()=>{
 });
 beforeEach(async()=>{
  if(!isolated)return;
- worker.stopped=false;worker.active.clear();
+ worker.stopped=false;worker.closing=undefined;worker.active.clear();
  await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,departments,tool_approvals CASCADE');
  runtime();
 });
@@ -42,13 +42,63 @@ function runtime(options:{ready?:()=>boolean;start?:(input:any)=>Promise<any>}={
  const fixture={inspect:async()=>({ready:options.ready?.()??true,reason:'isolated readiness fixture'}),cancel:async()=>false,
   start:async(input:any)=>{
    starts++;
-   const accepted=options.start?await options.start(input):{runtimeRunId:input.runId,completion:Promise.resolve(completed())};
+   const accepted=options.start?await options.start(input):{runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed())};
    input.prepareWorkspace?.();
    return accepted;
   }};
  worker.runtime=fixture as any;
  return {fixture,get starts(){return starts;}};
 }
+
+for(const fail of [false,true])test('SQL terminal retains active actual drain and shutdown observes its original: '+fail,{skip:!isolated,timeout:10000},async()=>{
+ const f=await fixture(),receipt=await unknownReceipt(f);
+ let release!:()=>void,reject!:(error:Error)=>void,cancels=0;
+ const writerDrained=new Promise<void>((yes,no)=>{release=yes;reject=no;});
+ const r=runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed()),writerDrained})});
+ r.fixture.cancel=async()=>{cancels++;return false;};
+ worker.active.set(f.id,{projectId:f.projectId});
+ const launching=worker.launch(f.row);let ended=false;launching.then(()=>{ended=true;});
+ try{
+  const deadline=Date.now()+4000;while((await stored(f.id)).status!=='completed'&&Date.now()<deadline)await wait();
+  assert.equal((await stored(f.id)).status,'completed');
+  await wait();assert.equal(ended,false);assert.equal(worker.active.has(f.id),true);
+  assert.deepEqual(await worker.heartbeat(),{ids:[],held:[]});assert.equal(cancels,0);
+  const closing=worker.close(),observed=closing.catch(error=>error);let closed=false;closing.then(()=>{closed=true;},()=>{closed=true;});
+  await wait();assert.equal(closed,false);
+  if(fail)reject(Object.assign(Error('RUNTIME_WRITER_DRAIN_FAILED'),{code:'RUNTIME_WRITER_DRAIN_FAILED'}));else release();
+  await launching;const result=await observed;
+  if(fail){assert.equal(result.code,'RUNTIME_WRITER_DRAIN_FAILED');assert.equal(worker.active.has(f.id),true);await assert.rejects(worker.close(),/RUNTIME_WRITER_DRAIN_FAILED/);}
+  else {assert.equal(result,undefined);assert.equal(worker.active.has(f.id),false);}
+  assert.equal(cancels,0,'business terminal never resends cancellation');
+  assert.deepEqual((await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receipt.id])).rows[0],receipt);
+  assert.equal((await stored(f.id)).status,'completed');
+ }finally{release();await launching;worker.active.clear();worker.stopped=false;(worker as any).closing=undefined;}
+});
+
+test('shutdown joins an in-flight original heartbeat after SQL terminal without recancelling the released run',{skip:!isolated,timeout:10000},async()=>{
+ const f=await fixture();let release!:()=>void,entered!:()=>void,cancels=0;
+ const held=new Promise<void>(yes=>{release=yes;}),started=new Promise<void>(yes=>{entered=yes;});
+ const query=pool.query;
+ (pool as any).query=async(text:any,...args:any[])=>{
+  if(typeof text==='string'&&text.startsWith('UPDATE project_runs SET lease_until=')){entered();await held;}
+  return (query as any).call(pool,text,...args);
+ };
+ const r=runtime();r.fixture.cancel=async()=>{cancels++;return false;};
+ worker.active.set(f.id,{projectId:f.projectId});
+ try{
+  const heartbeat=worker.heartbeat();await started;
+  await worker.launch(f.row);assert.equal((await stored(f.id)).status,'completed');assert.equal(worker.active.has(f.id),false);
+  const closing=worker.close();let closed=false;closing.then(()=>{closed=true;});await wait();assert.equal(closed,false);
+  release();await heartbeat;await closing;assert.equal(cancels,0);
+ }finally{release();pool.query=query;worker.active.clear();worker.closing=undefined;worker.stopped=false;}
+});
+
+test('missing runtime writer contract preserves business completion but latches shutdown unproven',{skip:!isolated},async()=>{
+ const f=await fixture();runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed())})});
+ await launch(f.row);assert.equal((await stored(f.id)).status,'completed');assert.equal(worker.active.get(f.id)?.phase,'drain-failed');
+ await assert.rejects(worker.close(),error=>(error as any).code==='RUNTIME_WRITER_DRAIN_UNPROVEN');
+ worker.active.clear();worker.closing=undefined;worker.stopped=false;
+});
 async function fixture(status:'queued'|'running'='running',imported=true){
  const models=await recoveryModel(pool),departmentId=randomUUID(),projectId=randomUUID(),id=randomUUID();
  const policy={maxBudget:1,maxAgents:1,maxConcurrentAgents:1,maxModelCalls:20,deadlineSeconds:180,allowedModelIds:['recovery-model'],allowedTools:[],allowedKnowledgeSpaceIds:[],allowedDepartmentIds:[departmentId]};
@@ -75,7 +125,7 @@ async function unknownReceipt(f:Awaited<ReturnType<typeof fixture>>){
 
 test('trusted accepted recording-incomplete completion remains SQL completed without a fabricated terminal trace',{skip:!isolated},async()=>{
  const f=await fixture(),receipt=await unknownReceipt(f);
- runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed('incomplete'))})});
+ runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed('incomplete'))})});
  await launch(f.row);
  const row=await stored(f.id);assert.equal(row.status,'completed');assert.match(row.error,/待核对|记录不完整/);
  assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[f.projectId])).rows[0].status,'COMPLETED');
@@ -85,7 +135,7 @@ test('trusted accepted recording-incomplete completion remains SQL completed wit
 
 test('usage replay error after trusted completion cannot rewrite business failure or invent usage',{skip:!isolated},async()=>{
  const f=await fixture(),receipt=await unknownReceipt(f),original=worker.recordUsage;
- runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed('complete',[{id:receipt.id,modelId:'recovery-model',inputTokens:4,outputTokens:2,cost:0}]))})});
+ runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed('complete',[{id:receipt.id,modelId:'recovery-model',inputTokens:4,outputTokens:2,cost:0}]))})});
  worker.recordUsage=async()=>{throw Error('PRIVATE_USAGE_REPLAY_FAILURE');};
  try{await launch(f.row);}finally{worker.recordUsage=original;}
  const row=await stored(f.id);assert.equal(row.status,'completed');assert.match(row.error,/待核对|记录不完整/);assert.ok(!row.error.includes('PRIVATE_USAGE'));
@@ -110,7 +160,7 @@ test('finish bookkeeping error after trusted completion retries completed bookke
 
 test('cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure',{skip:!isolated},async()=>{
  const f=await fixture(),original=worker.recordUsage;
- runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed('complete',[{id:randomUUID()}]))})});
+ runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed('complete',[{id:randomUUID()}]))})});
  worker.recordUsage=async()=>{await worker.cancel(f.id);throw Error('PRIVATE_POST_ACCEPTANCE_REPLAY_FAILURE');};
  try{await launch(f.row);}finally{worker.recordUsage=original;}
  const row=await stored(f.id);assert.equal(row.status,'completed');assert.equal(row.cancel_requested,true);assert.match(row.error,/待核对|记录不完整/);assert.deepEqual(endings(f.id),[]);
@@ -118,7 +168,7 @@ test('cancellation after trusted acceptance cannot turn bookkeeping uncertainty 
 
 test('trusted acceptance fallback cannot overwrite a replacement owner after replay bookkeeping loses ownership',{skip:!isolated},async()=>{
  const f=await fixture(),original=worker.recordUsage;
- runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed('complete',[{id:randomUUID()}]))})});
+ runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed('complete',[{id:randomUUID()}]))})});
  worker.recordUsage=async()=>{await pool.query("UPDATE project_runs SET lease_owner='replacement-owner' WHERE id=$1",[f.id]);throw Error('PRIVATE_POST_ACCEPTANCE_OWNER_CHANGE');};
  try{await launch(f.row);}finally{worker.recordUsage=original;}
  const row=await stored(f.id);assert.equal(row.status,'running');assert.equal(row.lease_owner,'replacement-owner');assert.deepEqual(endings(f.id),[]);
@@ -132,7 +182,7 @@ test('an ordinary pre-completion runtime rejection retains the existing failed c
 test('tick leaves a quarantined project queued and unprepared until the same close promise settles',{skip:!isolated},async()=>{
  const f=await fixture('queued');let releaseClose!:()=>void,quarantined=true;
  const closing=new Promise<void>(resolve=>{releaseClose=resolve;});void closing.then(()=>{quarantined=false;});
- const r=runtime({ready:()=>!quarantined,start:async input=>{if(quarantined)throw pending();return {runtimeRunId:input.runId,completion:Promise.resolve(completed())};}});
+ const r=runtime({ready:()=>!quarantined,start:async input=>{if(quarantined)throw pending();return {runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed())};}});
  await worker.tick();await idle();
  assert.equal((await stored(f.id)).status,'queued');assert.equal(r.starts,0);assert.equal(existsSync(f.path),false);assert.deepEqual(endings(f.id),[]);
  await worker.tick();assert.equal(r.starts,0);releaseClose();await closing;await wait();
@@ -150,7 +200,7 @@ test('check-to-start quarantine race defers the same attempt before input prepar
  const f=await fixture();let quarantined=false,rejectOnce=true,prepared=0;
  const r=runtime({ready:()=>!quarantined,start:async input=>{
   if(rejectOnce){rejectOnce=false;quarantined=true;throw pending();}
-  prepared++;return {runtimeRunId:input.runId,completion:Promise.resolve(completed())};
+  prepared++;return {runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed())};
  }});
  await launch(f.row);const deferred=await stored(f.id);assert.equal(deferred.status,'queued');assert.equal(deferred.lease_owner,null);assert.equal(deferred.attempt,1);
  assert.equal(prepared,0);assert.equal(existsSync(f.path),false);assert.deepEqual(endings(f.id),[]);

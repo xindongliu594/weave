@@ -13,6 +13,11 @@ import { GoalGuard } from './goal-guard.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+function drainError(error) {
+  const unproven = value => value?.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN' || value?.errors?.some(unproven);
+  const code = unproven(error) ? 'RUNTIME_WRITER_DRAIN_UNPROVEN' : 'RUNTIME_WRITER_DRAIN_FAILED';
+  return Object.assign(Error(code), { code });
+}
 const maintenancePending = reasonCode => ({ version: 1, state: 'pending', reasonCode });
 function maintenanceResult(value) {
   if (!value || value.version !== 1 || !['stopped', 'pending'].includes(value.state) ||
@@ -47,6 +52,8 @@ export class ProductDshRuntime {
   }
 
   async inspect() {
+    if ([...this.jobs.values()].some(job => job.drainFailure))
+      return { ready: false, reason: [...this.jobs.values()].find(job => job.drainFailure).drainFailure.code };
     if ([...this.jobs.values()].some(job => job.teardownPending))
       return { ready: false, reason: 'RUNTIME_TEARDOWN_PENDING: 已验收项目的宿主清理尚未结束，工具已停止；原清理结束后恢复接收新项目。' };
     return { ready: true, reason: 'DSH + AgentTeams：员工独立宿主、受限工作区、工具审批、知识引用、预算与并发控制已接入。真实模型兼容性需单独验证。' };
@@ -67,40 +74,63 @@ export class ProductDshRuntime {
     const completion = Promise.resolve().then(() => this.execute(job, archive, approvedSnapshot, routes));
     job.completion = completion;
     this.jobs.set(runId, job);
-    const finished = () => { job.completionSettled = true; this.releaseJob(job); };
+    const finished = () => { job.completionSettled = true; };
     completion.then(finished, finished);
-    return { runtimeRunId: runId, completion };
+    job.writerDrained = completion.then(() => this.drainJob(job), () => this.drainJob(job));
+    job.writerDrained.then(() => { job.drained = true; this.releaseJob(job); }, error => { job.drainFailure = drainError(error); });
+    return { runtimeRunId: runId, completion, writerDrained: job.writerDrained };
   }
 
   releaseJob(job) {
-    if (!job.completionSettled || job.teardownPending) return;
+    if (!job.completionSettled || !job.drained) return;
     job.host = undefined;
+    job.hostLifecycle = undefined;
+    job.adapter = undefined;
     job.executor = undefined;
     if (this.jobs.get(job.runId) === job) this.jobs.delete(job.runId);
   }
 
-  async closeAcceptedResources(job, host, sandbox) {
-    // Only called after the durable acceptance boundary and synchronous Host
-    // admission fence. This wait never wraps a device stop/dispatch operation.
+  closeHost(job) {
+    const host=job.host??job.hostLifecycle;
+    if (!host) return Promise.resolve();
+    if (!job.hostClosePromise) {
+      job.hostClosePromise = Promise.resolve().then(() => host.close());
+      job.hostClosePromise.catch(() => {});
+    }
+    return job.hostClosePromise;
+  }
+
+  closeResources(job) {
     if (!job.teardownPromise) {
       job.teardownPending = true;
-      job.executor = sandbox;
-      job.hostClosePromise = Promise.resolve().then(() => host.close());
-      job.executorClosePromise = Promise.resolve().then(() => sandbox?.close?.());
-      job.teardownPromise = Promise.allSettled([job.hostClosePromise, job.executorClosePromise]).then(results => {
-        job.teardownPending = false;
-        this.releaseJob(job);
-        return results.some(result => result.status === 'rejected')
-          ? maintenancePending('TASK_HOST_TEARDOWN_FAILED')
-          : { version: 1, state: 'stopped' };
+      const hostClose = this.closeHost(job);
+      job.executorClosePromise = Promise.resolve().then(() => job.executor?.close?.());
+      job.executorClosePromise.catch(() => {});
+      job.teardownPromise = Promise.allSettled([hostClose, job.executorClosePromise]).then(results => {
+        const failure = results.find(result => result.status === 'rejected');
+        if (failure) throw drainError(failure.reason);
       });
+      job.teardownPromise.catch(() => {});
     }
+    return job.teardownPromise;
+  }
+
+  async drainJob(job) {
+    const results = await Promise.allSettled([this.closeResources(job), job.adapter?.writerDrained]);
+    const failure = results.find(result => result.status === 'rejected');
+    if (job.drainFailure || failure) throw drainError(job.drainFailure ?? failure.reason);
+    job.teardownPending = false;
+  }
+
+  async closeAcceptedResources(job) {
+    // The business timeout never replaces the original cleanup promises.
+    const teardown = this.closeResources(job).then(() => ({ version: 1, state: 'stopped' }), () => maintenancePending('TASK_HOST_TEARDOWN_FAILED'));
     let timer;
     try {
       // The original promises and resource references remain in jobs after a
       // timeout. Their one eventual settlement, never a second close, releases
       // readiness and the completed job.
-      return await Promise.race([job.teardownPromise, new Promise(resolve => {
+      return await Promise.race([teardown, new Promise(resolve => {
         timer = setTimeout(() => resolve(maintenancePending('TASK_HOST_TEARDOWN_PENDING')), 10000);
       })]);
     } finally { clearTimeout(timer); }
@@ -112,7 +142,7 @@ export class ProductDshRuntime {
     if (!job.businessAccepted) job.cancelled = true;
     job.controller.abort(new Error('Run cancelled'));
     if (job.businessAccepted) return true;
-    await job.host?.close();
+    await this.closeHost(job);
     return true;
   }
 
@@ -127,19 +157,20 @@ export class ProductDshRuntime {
       job.deadlineExceeded = true;
       archive.append('run/deadline-exceeded', { deadlineSeconds: snapshot.policy.deadlineSeconds });
       job.controller.abort(new Error('Run deadline exceeded'));
-      void job.host?.close().catch(() => {});
+      void this.closeHost(job).catch(() => {});
     }, snapshot.policy.deadlineSeconds * 1000);
     try {
       if(taskMode){
         if(snapshot.executionTarget?.kind!=='local'||snapshot.executionTarget.backend?.kind!=='openshell'||typeof this.createExecutor!=='function')throw Error('TASK_EXECUTION_REQUIRED: 任务执行只能使用已配置的 OpenShell 任务执行器');
         if(snapshot.recovery)throw Error('TASK_RECOVERY_UNAVAILABLE: 任务检查点恢复链路尚未完成');
-        sandbox=this.createExecutor(archive,snapshot);
+        sandbox=this.createExecutor(archive,snapshot); job.executor=sandbox;
         if(!sandbox||['prepare','prepareTask','prepareCheckpoint','bindAttempt','execute','close'].some(name=>typeof sandbox[name]!=='function'))throw Error('TASK_EXECUTION_REQUIRED: 任务执行器缺少可信接口');
         if(typeof sandbox.finalizeAccepted!=='function')throw Error('TASK_FINALIZATION_REQUIRED: 任务执行器缺少可信终态停止接口');
         // The root is a compatibility cache, never the publication authority.
         // Rebuild it from the committed head before supervisor/Handoff reads.
         await sandbox.prepare(job.controller.signal);job.controller.signal.throwIfAborted();
       }else sandbox=this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id,join(archive.dir,'artifacts'));
+      job.executor=sandbox;
       supervisor=new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
       const durableArchive=archive;
       archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
@@ -178,11 +209,13 @@ export class ProductDshRuntime {
           runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error);
         },
       });
+      job.adapter=adapter;
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
-      host = await createTeamHost({ adapter, provider, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
+      job.hostCreatePromise = createTeamHost({ adapter, provider, onLifecycle: lifecycle => { job.hostLifecycle=lifecycle; }, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
         product: { snapshot, sandbox, gate, supervisor, goal, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; supervisor.stop(error); adapter.stopAdmission(error); } } });
+      host = await job.hostCreatePromise;
       job.host = host;
       job.controller.signal.throwIfAborted();
       const manager = snapshot.agents.find(agent => agent.role === 'manager');
@@ -256,17 +289,17 @@ export class ProductDshRuntime {
         } catch {
           maintenance = maintenancePending('TASK_ACCEPTED_STOP_UNRESOLVED');
         }
-        const teardown = await this.closeAcceptedResources(job, host, sandbox);
+        const teardown = await this.closeAcceptedResources(job);
         if (teardown.state === 'pending') maintenance = teardown;
         archive.append(maintenance.state === 'stopped' ? 'runtime/maintenance-completed' : 'runtime/maintenance-pending', maintenance);
         archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, maintenance, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
         return { status: 'completed', usages, summary, maintenance, recording: 'complete' };
       }
-      await host.close();
-      host = undefined;
+      await this.closeHost(job).catch(() => {});
       archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       return { status: 'completed', usages, summary };
     } catch (error) {
+      if (['RUNTIME_WRITER_DRAIN_UNPROVEN','RUNTIME_WRITER_DRAIN_FAILED'].includes(error?.code)) job.drainFailure=drainError(error);
       // The final task checkpoint is already durable. Keep that trusted
       // business outcome even if later recording fails; do not fabricate a
       // terminal trace or let the coordinator relabel acceptance as failure.
@@ -287,7 +320,7 @@ export class ProductDshRuntime {
       const message = job.deadlineExceeded
         ? `运行达到已批准的 ${snapshot.policy.deadlineSeconds} 秒时限，已停止。已完成任务和文件保留；先核对待结算调用，再恢复未完成任务。`
         : error instanceof Error ? error.message : String(error);
-      try { await host?.close(); } finally {
+      try { await this.closeHost(job).catch(() => {}); } finally {
         try { const checkpoint=host?.checkpointState();if(checkpoint)archive.append('team/checkpoint',checkpoint); } catch { /* Missing/incomplete evidence will refuse recovery. */ }
         const status = job.cancelled ? 'cancelled' : 'failed';
         archive.append('run/finished', { status, message, ...(job.deadlineExceeded ? { code: 'RUN_DEADLINE_EXCEEDED' } : {}), usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
@@ -295,8 +328,8 @@ export class ProductDshRuntime {
       return { status: job.cancelled ? 'cancelled' : 'failed', usages, message };
     } finally {
       clearTimeout(timer);
-      if (!job.teardownPromise) await sandbox?.close?.();
-      if (!job.teardownPending) job.host = undefined;
+      adapter?.stopAdmission();
+      this.closeResources(job);
     }
   }
 

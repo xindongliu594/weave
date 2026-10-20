@@ -10,6 +10,7 @@ import { installEmployeeCapabilities } from './employee-capabilities.mjs';
 import { projectAssignmentReports, projectClaimReport } from './assignment-reports.mjs';
 import { employeeHandoffDefinition, nativeHandoffArguments } from './employee-handoff.mjs';
 import {installTaskToolBoundary} from './task-tool-boundary.mjs';
+import { observeNativeTeardown } from './host-lifecycle.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
@@ -38,9 +39,11 @@ export class EmployeeHostFactory {
     const sessionId = resume ? options.resumeSessionId : options.sessionId;
     if (this.live.has(sessionId)) throw Error('EMPLOYEE_ALREADY_ACTIVE: ' + sessionId);
     const hostId = randomUUID(), ctx = new Context(), fibers = [];
+    const nativeTeardown = observeNativeTeardown(ctx);
     const abort = new AbortController(), ready = Promise.withResolvers();
     const slot = { hostId, sessionId, ctx, agent: undefined, close: undefined, stopAdmission: () => boundary?.stopAdmission() };
-    let handle, detachAgent, unfollowOwner, disposing, boundary;
+    let handle, detachAgent, unfollowOwner, disposing, boundary, nativeStarted = false;
+    const setups = new Set();
     const signal = AbortSignal.any([abort.signal, ...(options.signal ? [options.signal] : [])]);
     const checkAdmission = () => {
       signal.throwIfAborted();
@@ -51,6 +54,8 @@ export class EmployeeHostFactory {
       abort.abort(Error('Employee host disposed'));
       await ready.promise;
       const failures = [];
+      await Promise.allSettled([...setups]);
+      if (nativeStarted && !handle) failures.push(Object.assign(Error('RUNTIME_WRITER_DRAIN_UNPROVEN'), { code: 'RUNTIME_WRITER_DRAIN_UNPROVEN' }));
       try { if (handle) await this.coordinator.subagents?.drainContinuableDescendants([handle.agent]); }
       catch (error) { failures.push(error); }
       try { await handle?.dispose(); } catch (error) { failures.push(error); }
@@ -58,14 +63,21 @@ export class EmployeeHostFactory {
       for (const fiber of fibers.reverse()) {
         try { await fiber.dispose(); } catch (error) { failures.push(error); }
       }
-      if (!failures.length) boundary?.dispose();
-      this.live.delete(sessionId);
+
       try { if (handle) this.archive?.append('runtime/disposed', { hostId, sessionId, agentId: slot.agentId, employeeId: slot.employeeId }, { sessionId }); }
       catch (error) { failures.push(error); }
       try { if (!ownerTriggered) await unfollowOwner?.(); } catch (error) { failures.push(error); }
-      if (failures.length) throw new AggregateError(failures, 'Employee host teardown failed');
+      try { nativeTeardown.check(); } catch (error) { failures.push(error); }
+      if (failures.length) {
+        const error = new AggregateError(failures, 'Employee host teardown failed');
+        if (failures.some(failure => failure.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN')) error.code = 'RUNTIME_WRITER_DRAIN_UNPROVEN';
+        throw error;
+      }
+      this.live.delete(sessionId);
+      boundary?.dispose();
+      nativeTeardown.detach();
     })();
-    slot.close = dispose;
+    slot.close = (...args) => { const work = dispose(...args); work.catch(() => {}); return work; };
     this.live.set(sessionId, slot);
     this.pending.add(ready.promise);
     unfollowOwner = ownerCtx.effect(() => () => { if (!disposing) return dispose(true); }, `employeeHost(${sessionId})`);
@@ -156,7 +168,7 @@ export class EmployeeHostFactory {
       for (const name of ['agent/session-start', 'agent/status']) {
         ctx.on(name, ({ agent, ...payload }) => emitAgentEvent(coordinator, agent, name, payload));
       }
-      const setup = async (agentCtx, agent) => {
+      const setupBody = async (agentCtx, agent) => {
         const prepared = await options.setup?.(agentCtx, agent);
         checkAdmission();
         if(this.handoffClosure)agentCtx.on('agent/pre-step',async(event,next)=>{
@@ -225,6 +237,12 @@ export class EmployeeHostFactory {
           detachAgent = coordinator.agents.enter(agent, options.parentAgent);
         } };
       };
+      const setup = (...args) => {
+        const work = setupBody(...args); setups.add(work);
+        work.then(() => setups.delete(work), () => setups.delete(work));
+        return work;
+      };
+      nativeStarted = true;
       handle = await ctx.agents[resume ? 'resume' : 'create']({ ...options, signal, setup });
       slot.agent = handle.agent;
       const employee = this.identify?.(handle.agent);
@@ -248,11 +266,21 @@ export class EmployeeHostFactory {
     for (const slot of this.live.values()) slot.stopAdmission();
   }
 
-  async close() {
+  close() {
     this.stopAdmission();
-    const results = await Promise.allSettled([...this.live.values()].map(slot => slot.close()));
-    await Promise.all([...this.pending]);
-    const failures = results.filter(result => result.status === 'rejected').map(result => result.reason);
-    if (failures.length) throw new AggregateError(failures, 'Employee hosts teardown failed');
+    if (!this.closing) {
+      this.closing = (async () => {
+        const results = await Promise.allSettled([...this.live.values()].map(slot => slot.close()));
+        await Promise.all([...this.pending]);
+        const failures = results.filter(result => result.status === 'rejected').map(result => result.reason);
+        if (failures.length) {
+          const error = new AggregateError(failures, 'Employee hosts teardown failed');
+          if (failures.some(failure => failure.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN')) error.code = 'RUNTIME_WRITER_DRAIN_UNPROVEN';
+          throw error;
+        }
+      })();
+      this.closing.catch(() => {});
+    }
+    return this.closing;
   }
 }

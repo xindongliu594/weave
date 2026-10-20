@@ -86,6 +86,7 @@ async function scenario(t, hooks = {}) {
           fiber.ctx.effect(() => async () => {
             closeDisposals++; order.push('host-close'); closeEntered.resolve();
             if (hooks.holdClose) await releaseClose.promise;
+            if (hooks.failHostClose) throw Error('PRIVATE_NATIVE_DISPOSAL_FAILURE');
           });
         }
         if (type === 'team/checkpoint' && verified) {
@@ -138,7 +139,7 @@ async function scenario(t, hooks = {}) {
     id: model, name: model, wireModel: model, baseUrl: 'https://fixture.invalid/v1', inputRate: 1, outputRate: 2, maxOutputTokens: 512,
   })) });
   completion = start.completion;
-  return { root, id, runtime, snapshot, order, requests, completion, closeEntered, releaseClose, releaseManager, settlementStarted, get host() { return host; },
+  return { root, id, runtime, snapshot, order, requests, completion, writerDrained: start.writerDrained, closeEntered, releaseClose, releaseManager, settlementStarted, get host() { return host; },
     get finalizations() { return finalizations; }, get closeDisposals() { return closeDisposals; }, get sandboxCloses() { return sandboxCloses; }, get finalSignal() { return finalSignal; }, get workspacePreparations() { return workspacePreparations; },
     read: () => readRun(root, id) };
 }
@@ -225,6 +226,9 @@ test('held native teardown retains the original Host, blocks launches and cannot
   assert.equal(result.status, 'completed', result.message);
   assert.equal(result.maintenance.state, 'pending');
   assert.equal((await f.runtime.inspect()).ready, false);
+  assert.ok(f.writerDrained instanceof Promise);
+  let drained = false; f.writerDrained.then(() => { drained = true; });
+  await tick(); assert.equal(drained, false);
   assert.equal(f.runtime.jobs.get(f.id).host, f.host);
   let bodies = 0;
   const late = defineTool({ name: 'terminal_late', description: 'fixture', parameters: {},
@@ -238,6 +242,7 @@ test('held native teardown retains the original Host, blocks launches and cannot
   const before = f.requests.length; await tick(); assert.equal(f.requests.length, before); assert.equal(bodies, 0);
   assert.equal(f.closeDisposals, 1);
   f.releaseClose.resolve();
+  await f.writerDrained;
   await bounded((async () => { while (!(await f.runtime.inspect()).ready) await tick(); })(), 'same close settlement');
   assert.equal(f.closeDisposals, 1);
   assert.equal(f.runtime.jobs.has(f.id), false);
@@ -251,6 +256,21 @@ test('sandbox cleanup rejection cannot replace completed business acceptance', {
   assert.equal(result.maintenance.state, 'pending');
   assert.equal(f.sandboxCloses, 1);
   assert.equal(f.read().events.findLast(e => e.type === 'run/finished').data.status, 'completed');
+  await assert.rejects(f.writerDrained, error => error.code === 'RUNTIME_WRITER_DRAIN_FAILED');
+  assert.equal((await f.runtime.inspect()).ready, false);
+  assert.equal(f.runtime.jobs.has(f.id), true);
+});
+
+test('actual native disposer rejection retains accepted business and original failed drain', { timeout: 16000 }, async t => {
+  const f = await scenario(t, { failHostClose: true });
+  const result = await f.completion;
+  assert.equal(result.status, 'completed', result.message);
+  await assert.rejects(f.writerDrained, error => error.code === 'RUNTIME_WRITER_DRAIN_FAILED' && !error.message.includes('PRIVATE'));
+  assert.equal((await f.runtime.inspect()).ready, false);
+  const original = f.runtime.jobs.get(f.id).hostClosePromise;
+  await f.runtime.cancel(f.id);
+  assert.equal(f.runtime.jobs.get(f.id).hostClosePromise, original);
+  assert.equal(f.closeDisposals, 1);
 });
 
 test('archiving failure after durable acceptance is not recorded as fully persisted completion or business failure', { timeout: 16000 }, async t => {
