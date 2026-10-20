@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "status": "host-admission-fence-only-runtime-finalization-pending",
+  "files": [
+    {
+      "file": "boundary-red.txt",
+      "bytes": 3163,
+      "sha256": "ec732b2d56e70ef5f01cd7d63c02cde617e1f0acd6d7c4005f15cfd29a9de856",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/host-admission-boundary-red.txt",
+      "sourceSha256": "566fdc93b2f810f12b806ae00c41c064dc2be950445305550267c2f7c69c348e",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "host-red.txt",
+      "bytes": 6276,
+      "sha256": "44495df9cc93dc0ce9d253a41926af147ce72c70dc126e2c72ae80d5801366a6",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/host-admission-host-red-workspace.txt",
+      "sourceSha256": "5e604b600c4956d46f83edf6427888afd7c1236637ebeda2f5fb2989e7c93d14",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "disposer-red.txt",
+      "bytes": 2676,
+      "sha256": "8cc32a22a35bf97d7bd3a3c7e82921f713c5e0e71f87d86892aec6db86790a9c",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/host-admission-swallowed-disposer-red.txt",
+      "sourceSha256": "5e54a170f213510f6cd0b8af6f4c181a47326a2c8603fbf784b275d3636085cd",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "regression.txt",
+      "bytes": 6172,
+      "sha256": "5735208392f20e037af6f975d6fe7f6bee70b81cd7404678a82ecc558c9c7dca",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/host-admission-swallowed-disposer-green.txt",
+      "sourceSha256": "5735208392f20e037af6f975d6fe7f6bee70b81cd7404678a82ecc558c9c7dca",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "source-sha.json",
+      "bytes": 1127,
+      "sha256": "9e9dd7c2c9b7b95b9bea6d4becf859f9bff0f265c05133e60d0e995a5e650ab4",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/host-admission-source-sha.json",
+      "sourceSha256": "9e9dd7c2c9b7b95b9bea6d4becf859f9bff0f265c05133e60d0e995a5e650ab4",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "initial-review.md",
+      "bytes": 6612,
+      "sha256": "c22c0e598529b864cbcf7966e48bd5526f524c6e3a2c27c3d516da4256638fe6",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-host-independent-review.md",
+      "sourceSha256": "c22c0e598529b864cbcf7966e48bd5526f524c6e3a2c27c3d516da4256638fe6",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "independent-review.md",
+      "bytes": 3787,
+      "sha256": "6d5ff55d6633c2fecfebde54c423dc53deffb14e2431c500727d93872a7b4cf9",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-host-independent-review-final.md",
+      "sourceSha256": "6d5ff55d6633c2fecfebde54c423dc53deffb14e2431c500727d93872a7b4cf9",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    },
+    {
+      "file": "implementation-report.md",
+      "bytes": 6653,
+      "sha256": "15547f28c0a094884147773685211c6bec437d5d54854ffcf62e82dae010f975",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/host-admission-report.md",
+      "sourceSha256": "15547f28c0a094884147773685211c6bec437d5d54854ffcf62e82dae010f975",
+      "transformation": "UTF-8; absolute workspace/temp roots redacted"
+    }
+  ]
+}

@@ -189,6 +189,77 @@ test('signal replacement stays supported and disposed boundary fails closed', as
   boundary.dispose(); assert.equal((await call('normal')).isError, true); assert.equal(bodies, 1);
 });
 
+test('stopAdmission rejects an actual DSH execution held after its final guard', async t => {
+  const { ctx, agent, boundary, admit } = await fixture(t);
+  let bodies = 0;
+  admit('held', false, definition('held', async () => { bodies++; return {}; }));
+  const scheduler = ctx.tools[TOOL_RUNTIME_SCHEDULER];
+  const prepared = await scheduler.prepare({ callId: randomUUID(), name: 'held', arguments: {}, agent, signal: AbortSignal.timeout(2000) });
+  assert.equal(prepared.kind, 'dispatch');
+  boundary.stopAdmission();
+  boundary.setPolicy(() => undefined);
+  boundary.stopAdmission();
+  const outcome = await scheduler.dispatch(prepared.exec);
+  const result = await scheduler.finalize(prepared.exec, outcome.result);
+  assert.equal(result.isError, true, 'the body must recheck the irreversible admission fence');
+  assert.match(result.error.message, /TASK_TOOL_DENIED/);
+  assert.equal(bodies, 0);
+});
+
+test('stopAdmission rejects fresh DSH executions even after policy is replaced', async t => {
+  const { boundary, admit, call } = await fixture(t);
+  let bodies = 0;
+  admit('fresh', false, definition('fresh', async () => { bodies++; return {}; }));
+  boundary.stopAdmission();
+  boundary.setPolicy(() => undefined);
+  boundary.stopAdmission();
+  const result = await call('fresh');
+  assert.equal(result.isError, true);
+  assert.equal(bodies, 0);
+});
+
+for (const inScope of [false, true]) test('stopAdmission rejects late '+(inScope ? 'scoped' : 'global')+' DSH registrations', async t => {
+  const { boundary, admit, call } = await fixture(t);
+  let bodies = 0;
+  boundary.stopAdmission();
+  admit('late', inScope, definition('late', async () => { bodies++; return {}; }));
+  boundary.setPolicy(() => undefined);
+  const result = await call('late');
+  assert.equal(result.isError, true);
+  assert.equal(bodies, 0);
+});
+
+test('stopped boundary disposal retains its DSH guard and wrapper for held fresh and late executions', async t => {
+  const { ctx, agent, boundary, admit } = await fixture(t), tools = ctx.tools;
+  let bodies = 0;
+  admit('held_disposal', false, definition('held_disposal', async () => { bodies++; return {}; }));
+  const scheduler = tools[TOOL_RUNTIME_SCHEDULER];
+  const prepared = await scheduler.prepare({ callId: randomUUID(), name: 'held_disposal', arguments: {}, agent, signal: AbortSignal.timeout(2000) });
+  assert.equal(prepared.kind, 'dispatch');
+  boundary.stopAdmission();
+  await boundary.dispose();
+  await boundary.dispose();
+  const outcome = await scheduler.dispatch(prepared.exec);
+  assert.equal((await scheduler.finalize(prepared.exec, outcome.result)).isError, true);
+  tools.register(definition('late_disposal', async () => { bodies++; return {}; }));
+  let lateError;
+  try { await tools.get('late_disposal').execute({}, { agent, name: 'late_disposal' }); } catch (error) { lateError = error; }
+  const fresh = await scheduler.prepare({ callId: randomUUID(), name: 'late_disposal', arguments: {}, agent, signal: AbortSignal.timeout(2000) });
+  assert.equal(bodies, 0, 'closed disposal must not expose a new raw registered body');
+  assert.match(lateError?.message ?? '', /TASK_TOOL_BINDING_CHANGED/);
+  assert.equal(fresh.kind, 'post-result', 'the native final guard must remain installed after closed disposal');
+  assert.match(fresh.result.error.message, /TASK_TOOL_DENIED/);
+});
+
+test('unstopped boundary disposal leaves the native registry reusable', async t => {
+  const { ctx, boundary, call } = await fixture(t);
+  await boundary.dispose();
+  let bodies = 0;
+  ctx.tools.register(definition('after_disposal', async () => { bodies++; return {}; }));
+  assert.equal((await call('after_disposal', { agent: undefined })).isError, false);
+  assert.equal(bodies, 1);
+});
+
 test('uninstalled legacy registry remains native', async t => {
   const { ctx, call } = await fixture(t, false);
   let bodies = 0; const raw = definition('legacy', async () => { bodies++; return {}; });

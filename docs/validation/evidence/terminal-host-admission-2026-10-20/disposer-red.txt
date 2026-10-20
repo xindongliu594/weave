@@ -1,0 +1,65 @@
+✖ Host close retains the coordinator fence after Cordis swallows a real disposer failure (432.7096ms)
+✖ Host close retains the employee fence after Cordis swallows a real disposer failure (175.9971ms)
+✖ stopped boundary disposal retains its DSH guard and wrapper for held fresh and late executions (70.3297ms)
+✔ unstopped boundary disposal leaves the native registry reusable (13.3079ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2288.4595
+
+✖ failing tests:
+
+test at services\agent-runtime\host-admission.test.mjs:90:36
+✖ Host close retains the coordinator fence after Cordis swallows a real disposer failure (432.7096ms)
+  AssertionError [ERR_ASSERTION]: a swallowed disposer failure cannot expose raw registration after close
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:109:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:90:36
+✖ Host close retains the employee fence after Cordis swallows a real disposer failure (175.9971ms)
+  AssertionError [ERR_ASSERTION]: a swallowed disposer failure cannot expose raw registration after close
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:109:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\task-tool-boundary.test.mjs:232:1
+✖ stopped boundary disposal retains its DSH guard and wrapper for held fresh and late executions (70.3297ms)
+  AssertionError [ERR_ASSERTION]: closed disposal must not expose a new raw registered body
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/task-tool-boundary.test.mjs:248:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

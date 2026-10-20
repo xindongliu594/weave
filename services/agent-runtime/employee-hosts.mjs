@@ -39,10 +39,15 @@ export class EmployeeHostFactory {
     if (this.live.has(sessionId)) throw Error('EMPLOYEE_ALREADY_ACTIVE: ' + sessionId);
     const hostId = randomUUID(), ctx = new Context(), fibers = [];
     const abort = new AbortController(), ready = Promise.withResolvers();
-    const slot = { hostId, sessionId, ctx, agent: undefined, close: undefined };
+    const slot = { hostId, sessionId, ctx, agent: undefined, close: undefined, stopAdmission: () => boundary?.stopAdmission() };
     let handle, detachAgent, unfollowOwner, disposing, boundary;
     const signal = AbortSignal.any([abort.signal, ...(options.signal ? [options.signal] : [])]);
+    const checkAdmission = () => {
+      signal.throwIfAborted();
+      if (this.closed) throw Error('EMPLOYEE_HOSTS_CLOSED');
+    };
     const dispose = (ownerTriggered = false) => disposing ??= (async () => {
+      slot.stopAdmission();
       abort.abort(Error('Employee host disposed'));
       await ready.promise;
       const failures = [];
@@ -50,10 +55,10 @@ export class EmployeeHostFactory {
       catch (error) { failures.push(error); }
       try { await handle?.dispose(); } catch (error) { failures.push(error); }
       detachAgent?.();
-      boundary?.dispose();
       for (const fiber of fibers.reverse()) {
         try { await fiber.dispose(); } catch (error) { failures.push(error); }
       }
+      if (!failures.length) boundary?.dispose();
       this.live.delete(sessionId);
       try { if (handle) this.archive?.append('runtime/disposed', { hostId, sessionId, agentId: slot.agentId, employeeId: slot.employeeId }, { sessionId }); }
       catch (error) { failures.push(error); }
@@ -65,12 +70,12 @@ export class EmployeeHostFactory {
     this.pending.add(ready.promise);
     unfollowOwner = ownerCtx.effect(() => () => { if (!disposing) return dispose(true); }, `employeeHost(${sessionId})`);
     const mount = async (name, config) => {
-      signal.throwIfAborted();
+      checkAdmission();
       const mod = typeof name === 'string' ? await this.loadPlugin(name) : { default: name };
-      signal.throwIfAborted();
+      checkAdmission();
       const fiber = ctx.plugin(mod.default ?? mod, config);
       fibers.push(fiber);
-      await fiber.await(); signal.throwIfAborted();
+      await fiber.await(); checkAdmission();
     };
     try {
       await mount('@deepseek-ai/dsh-llm');
@@ -153,6 +158,7 @@ export class EmployeeHostFactory {
       }
       const setup = async (agentCtx, agent) => {
         const prepared = await options.setup?.(agentCtx, agent);
+        checkAdmission();
         if(this.handoffClosure)agentCtx.on('agent/pre-step',async(event,next)=>{
           const decision=await next();
           if(decision.kind!=='enter'||event.signal.aborted)return decision;
@@ -215,7 +221,7 @@ export class EmployeeHostFactory {
           this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, ...access, resumed: resume }, { sessionId: agent.id });
         }
         return { commit: () => {
-          signal.throwIfAborted(); prepared?.commit();
+          checkAdmission(); prepared?.commit();
           detachAgent = coordinator.agents.enter(agent, options.parentAgent);
         } };
       };
@@ -225,7 +231,7 @@ export class EmployeeHostFactory {
       slot.agentId = employee?.id;
       slot.employeeId = employee?.employeeId;
       this.archive?.append('runtime/created', { hostId, sessionId, agentId: employee?.id, employeeId: employee?.employeeId, resumed: resume, parentSessionId: options.parentAgent?.id, model: handle.agent.options.model }, { sessionId });
-      signal.throwIfAborted();
+      checkAdmission();
       return { agent: handle.agent, dispose };
     } catch (error) {
       ready.resolve();
@@ -237,7 +243,10 @@ export class EmployeeHostFactory {
   }
 
   list() { return [...this.live.values()]; }
-  stopAdmission() { this.closed = true; }
+  stopAdmission() {
+    this.closed = true;
+    for (const slot of this.live.values()) slot.stopAdmission();
+  }
 
   async close() {
     this.stopAdmission();

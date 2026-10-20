@@ -1,0 +1,134 @@
+✖ Host stopAdmission synchronously fences the real model adapter and employee creation (289.2219ms)
+✖ Host stopAdmission rejects coordinator tool held after DSH final guard (224.8908ms)
+✖ Host stopAdmission rejects employee local capability held after DSH final guard (198.3498ms)
+✖ Host close retains the coordinator wrapper during pending plugin teardown (133.0251ms)
+✖ Host close retains the employee wrapper during pending plugin teardown (130.8641ms)
+✖ employee materialization stopped before tool mounting cannot commit a late Host (218.9945ms)
+✖ employee materialization stopped during setup cannot reopen its installed boundary or commit (119.2732ms)
+✖ legacy Host can fence model and employee admission without a task boundary (140.3937ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 0
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2295.1115
+
+✖ failing tests:
+
+test at services\agent-runtime\host-admission.test.mjs:37:1
+✖ Host stopAdmission synchronously fences the real model adapter and employee creation (289.2219ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:41:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:47:36
+✖ Host stopAdmission rejects coordinator tool held after DSH final guard (224.8908ms)
+  AssertionError [ERR_ASSERTION]: an already guarded execution cannot start its body after the Host fence
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:60:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:47:36
+✖ Host stopAdmission rejects employee local capability held after DSH final guard (198.3498ms)
+  AssertionError [ERR_ASSERTION]: an already guarded execution cannot start its body after the Host fence
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:60:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:67:36
+✖ Host close retains the coordinator wrapper during pending plugin teardown (133.0251ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:82:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /TASK_TOOL_BINDING_CHANGED/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:67:36
+✖ Host close retains the employee wrapper during pending plugin teardown (130.8641ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:82:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /TASK_TOOL_BINDING_CHANGED/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:88:1
+✖ employee materialization stopped before tool mounting cannot commit a late Host (218.9945ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:99:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /EMPLOYEE_HOSTS_CLOSED/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:104:1
+✖ employee materialization stopped during setup cannot reopen its installed boundary or commit (119.2732ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:116:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /EMPLOYEE_HOSTS_CLOSED/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\host-admission.test.mjs:121:1
+✖ legacy Host can fence model and employee admission without a task boundary (140.3937ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///<workspace-or-temp>/services/agent-runtime/host-admission.test.mjs:129:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }

@@ -1,0 +1,30 @@
+[
+  {
+    "path": "services/agent-runtime/task-tool-boundary.mjs",
+    "sha256": "1fd92ca4a596fb8c4b0d6c8a1be85c5ecc48e14aff800daf9a6f4a7acdeffb95"
+  },
+  {
+    "path": "services/agent-runtime/task-tool-boundary.test.mjs",
+    "sha256": "ce56bb1829b82153aa80a817e2f3da08dd2ee8216feb6e9e199de92fc1254600"
+  },
+  {
+    "path": "services/agent-runtime/host.mjs",
+    "sha256": "422d2f9130d59e3f51bb750f35d3400964b24ee7c97ad7c43e1623c2377b2899"
+  },
+  {
+    "path": "services/agent-runtime/employee-hosts.mjs",
+    "sha256": "0c929d379edcd5c7aeadeb58e52db640f939520bdf94ec10a07c58c32d4decf8"
+  },
+  {
+    "path": "services/agent-runtime/host-admission.test.mjs",
+    "sha256": "020945ad6c6ace5607bb41963aeeed8ea9c2e94131f88884c27c44dd8c431a55"
+  },
+  {
+    "path": "services/agent-runtime/node_modules/@deepseek-ai/dsh-tools/lib/index.js",
+    "sha256": "aaba52bf5d0149355407642b3965c06977d1e9143f5c61bc19429abbe6a11c5d"
+  },
+  {
+    "path": "services/agent-runtime/node_modules/@deepseek-ai/cordis/lib/index.js",
+    "sha256": "1729cdbf8ee40b17c8839e06bf96491490548559e11ef7e411271e0754e751c5"
+  }
+]

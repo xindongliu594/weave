@@ -52,7 +52,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const ctx = new Context();
   const fibers = [];
   const handles = [];
-  let closing, taskBoundary;
+  let closing, taskBoundary, admissionStopped = false;
   let trace;
   let employees;
   let removeFactory;
@@ -230,22 +230,29 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     fibers.push(fiber);
     await fiber.await();
   }
+  function stopAdmission() {
+    if (admissionStopped) return;
+    admissionStopped = true;
+    taskBoundary?.stopAdmission();
+    employees?.stopAdmission();
+    adapter.stopAdmission?.();
+  }
   function close() {
+    stopAdmission();
     return closing ??= (async () => {
       const failures = [];
-      employees?.stopAdmission();
       for (const item of [...handles].reverse()) {
         try { await item.dispose(); } catch (error) { failures.push(error); }
       }
       try { await employees?.close(); } catch (error) { failures.push(error); }
       try { await removeFactory?.(); } catch (error) { failures.push(error); }
-      taskBoundary?.dispose();
       for (const fiber of [...fibers].reverse()) {
         try { await fiber.dispose(); } catch (error) { failures.push(error); }
       }
       trace?.dispose();
       productDispose?.();
       try { trace?.check(); } catch (error) { failures.push(error); }
+      if (!failures.length) taskBoundary?.dispose();
       if (failures.length) throw new AggregateError(failures, 'Runtime teardown failed');
     })();
   }
@@ -457,6 +464,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       checkpointState,
       attestReadGroup,
       attestSupersededRead,
+      stopAdmission,
       close,
       lockPlan() { locked = true; },
       handoffStatus() { return handoff?.summary() ?? []; },
