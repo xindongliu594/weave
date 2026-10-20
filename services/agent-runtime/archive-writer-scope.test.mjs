@@ -15,8 +15,22 @@ function fixture(t){
   const temp=fs.realpathSync(os.tmpdir()),base=fs.mkdtempSync(path.join(temp,'writer-scope-'));
   const traceRoot=path.join(base,'runs'),lockRoot=path.join(base,'.archive-write-locks');
   const writers=createArchiveWriterManager({traceRoot});
-  t.after(()=>{assert.equal(fs.realpathSync(base),base);assert.match(path.relative(temp,base),/^writer-scope-[A-Za-z0-9]+$/);fs.rmSync(base,{recursive:true,force:true});});
-  return {base,traceRoot,lockRoot,writers,fence:createArchiveWriteFence({traceRoot,lockRoot})};
+  const children=[];
+  t.after(async()=>{
+    for(const {child,exited} of children)if(child.exitCode===null&&child.signalCode===null){child.kill();await exited;}
+    assert.equal(fs.realpathSync(base),base);assert.match(path.relative(temp,base),/^writer-scope-[A-Za-z0-9]+$/);fs.rmSync(base,{recursive:true,force:true});
+  });
+  return {base,traceRoot,lockRoot,writers,children,fence:createArchiveWriteFence({traceRoot,lockRoot})};
+}
+async function probe(f,extra={}){
+  const child=fork(fileURLToPath(new URL('./test-helpers/archive-writer-source-child.mjs',import.meta.url)),[],{windowsHide:true,stdio:['ignore','inherit','inherit','ipc'],env:{...process.env,ARCHIVE_WRITER_TEST:JSON.stringify({traceRoot:f.traceRoot,lockRoot:f.lockRoot,runId:A,...extra})}});
+  const exited=once(child,'exit');f.children.push({child,exited});let timer;
+  const message=await Promise.race([
+    once(child,'message').then(([value])=>value),
+    exited.then(([code])=>{throw Error('Probe exited before result: '+code);}),
+    new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Probe readiness deadline')),10000);}),
+  ]).finally(()=>clearTimeout(timer));
+  return {child,exited,message};
 }
 test('manager exists',()=>assert.equal(typeof createArchiveWriterManager,'function'));
 test('stable mapping is shared, conflicts and tool workspace overlap fail at startup',t=>{
@@ -53,11 +67,58 @@ test('parent closes admission, retained original promise blocks release even aft
   await assert.rejects(late(),scopeError);
   const source=await f.fence.acquireSource(A);source.release();
 });
+test('nested invocation expires before the live parent and preserves its explicitly retained tail',async t=>{
+  const f=fixture(t);let late,tail,lateError,returned;const bodyReturned=new Promise(resolve=>{returned=resolve;});
+  const parent=f.writers.withWriter([A],async()=>{
+    await f.writers.withWriter([A],async borrowed=>{
+      tail=borrowed.retain('nested original tail');
+      late=AsyncResource.bind(()=>f.writers.withWriter([A],async()=>f.writers.assertWriter(A)));
+    });
+    try{await late();}catch(error){lateError=error;}
+    returned();
+  });
+  await bodyReturned;
+  let resume;const gate=new Promise(resolve=>{resume=resolve;});
+  const original=tail.run(async()=>{await gate;f.writers.assertWriter(A);});tail.finish();
+  await assert.rejects(f.fence.acquireSource(A),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+  resume();await original;await parent;
+  assert.equal(lateError?.code,scopeError.code,'completed nested context must not borrow its still-live parent');
+  const source=await f.fence.acquireSource(A);source.release();
+});
+test('borrowed view rejects a different live owner of the same run while retained producers remain transferable',async t=>{
+  const f=fixture(t),one=await f.writers.acquireOwner([A]),two=await f.writers.acquireOwner([A]);
+  let view,retained,ready,resume,foreignError,transferred=false;
+  const registered=new Promise(resolve=>{ready=resolve;}),gate=new Promise(resolve=>{resume=resolve;});
+  const original=one.run(()=>f.writers.withWriter([A],async borrowed=>{view=borrowed;retained=borrowed.retain('explicit transfer');ready();await gate;}));
+  await registered;
+  two.run(()=>{
+    try{const accidental=view.retain('foreign owner must not retain');accidental.finish();}catch(error){foreignError=error;}
+    retained.run(()=>{f.writers.assertWriter(A);transferred=true;});retained.finish();
+  });
+  resume();await original;one.finish();two.finish();await Promise.all([one.writerDrained,two.writerDrained]);
+  assert.equal(foreignError?.code,scopeError.code);assert.equal(transferred,true);
+  const source=await f.fence.acquireSource(A);source.release();
+});
+test('borrowed view cannot retain after its nested invocation settles even inside the original parent',async t=>{
+  const f=fixture(t);let stale,staleError;
+  await f.writers.withWriter([A],async()=>{
+    await f.writers.withWriter([A],async borrowed=>{stale=borrowed;});
+    try{const accidental=stale.retain('late unretained view');accidental.finish();}catch(error){staleError=error;}
+  });
+  assert.equal(staleError?.code,scopeError.code);
+  const source=await f.fence.acquireSource(A);source.release();
+});
+for(const style of ['sync','async'])test('caught nested failure latches the original OS guard: '+style,async t=>{
+  const f=fixture(t),{child,exited,message}=await probe(f,{action:'failed-nested',style});
+  try{
+    assert.deepEqual(message,{caught:true,outerError:'nested producer failed'});
+    await assert.rejects(f.fence.acquireSource(A),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+  }finally{child.send('exit');assert.equal((await exited)[0],0);}
+  const source=await f.fence.acquireSource(A);source.release();
+});
 test('failed original producer latches failure and never grants source',async t=>{
-  const f=fixture(t);
-  const child=fork(fileURLToPath(new URL('./test-helpers/archive-writer-source-child.mjs',import.meta.url)),[],{windowsHide:true,stdio:['ignore','inherit','inherit','ipc'],env:{...process.env,ARCHIVE_WRITER_TEST:JSON.stringify({traceRoot:f.traceRoot,lockRoot:f.lockRoot,runId:A,action:'failed-producer'})}});
-  const exited=once(child,'exit');t.after(async()=>{if(child.exitCode===null&&child.signalCode===null){child.kill();await exited;}});
-  assert.deepEqual((await once(child,'message'))[0],{latched:true});
+  const f=fixture(t),{child,exited,message}=await probe(f,{action:'failed-producer'});
+  assert.deepEqual(message,{latched:true});
   await assert.rejects(f.fence.acquireSource(A),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
   child.send('exit');assert.equal((await exited)[0],0);
   const source=await f.fence.acquireSource(A);source.release();
@@ -66,9 +127,8 @@ test('real source process cannot enter until delayed retained writer actually se
   const f=fixture(t),owner=await f.writers.acquireOwner([A]),producer=owner.retain('delayed terminal tail');
   let resume;const gate=new Promise(resolve=>{resume=resolve;});const work=producer.run(async()=>{await gate;f.writers.assertWriter(A);});
   owner.finish();producer.finish();
-  const child=fork(fileURLToPath(new URL('./test-helpers/archive-writer-source-child.mjs',import.meta.url)),[],{windowsHide:true,stdio:['ignore','pipe','pipe','ipc'],env:{...process.env,ARCHIVE_WRITER_TEST:JSON.stringify({traceRoot:f.traceRoot,lockRoot:f.lockRoot,runId:A})}});
-  const exited=once(child,'exit');t.after(async()=>{if(child.exitCode===null&&child.signalCode===null){child.kill();await exited;}});
-  assert.deepEqual((await once(child,'message'))[0],{blocked:true});
+  const {child,exited,message}=await probe(f);
+  assert.deepEqual(message,{blocked:true});
   resume();await work;await owner.writerDrained;child.send('retry');
   assert.deepEqual((await once(child,'message'))[0],{acquired:true});assert.equal((await exited)[0],0);
 });

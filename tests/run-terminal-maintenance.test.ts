@@ -171,7 +171,8 @@ test('a rejected heartbeat waits for every original SQL update and retains the f
  const completion=new Promise<any>(yes=>{finish=()=>yes(completed());}),gate=new Promise<void>(yes=>{resume=yes;}),started=new Promise<void>(yes=>{entered=yes;});
  const r=runtime({start:async()=>({completion,writerDrained:Promise.resolve()})}),launching=fixtures.map(f=>worker.launch(f.row));
  const deadline=Date.now()+3000;while(r.starts<2&&Date.now()<deadline)await wait();assert.equal(r.starts,2);
- const query=pool.query;
+ const query=pool.query,logError=console.error,diagnostics:unknown[][]=[];
+ console.error=(...args:unknown[])=>{diagnostics.push(args);};
  (pool as any).query=async(text:any,...args:any[])=>{
   if(typeof text==='string'&&text.startsWith('UPDATE project_runs SET lease_until=')){
    if(args[0][0][0]===fixtures[0].id)throw Error('isolated heartbeat failure');entered();await gate;
@@ -187,7 +188,8 @@ test('a rejected heartbeat waits for every original SQL update and retains the f
   assert.equal(worker.active.get(fixtures[0].id)?.phase,'drain-failed');
   await assert.rejects(fence.acquireSource(fixtures[0].id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
   const source=await fence.acquireSource(fixtures[1].id);source.release();
- }finally{pool.query=query;resume();finish();await Promise.allSettled(launching);}
+  assert.deepEqual(diagnostics,[['Run lease cancellation:','Error']]);
+ }finally{pool.query=query;resume();finish();await Promise.allSettled(launching);console.error=logError;}
 });
 const endings=(id:string)=>readRun(traceRoot,id)!.events.filter(event=>event.type==='run/finished');
 async function idle(){const deadline=Date.now()+5000;while(Date.now()<deadline){if(!worker.active.size&&!worker.ticking)return;await new Promise(done=>setTimeout(done,5));}throw Error('isolated coordinator did not settle');}

@@ -40,20 +40,25 @@ export function createArchiveWriterManager({traceRoot,lockRoot=path.join(path.di
       if(state.admission||state.failed||state.released||state.producers.size)return;
       try{guard.release();state.released=true;resolve();}catch(error){latch(error);}
     }
+    function invoke(record,fn){
+      if(state.failed||state.released)throw fail();
+      for(const id of ids)fence.assertGuard(guard,{mode:'writer',runId:id});
+      const context={state,live:true,invoke:nested=>invoke(record,nested)};record.inflight++;
+      const settle=()=>{context.live=false;record.inflight--;if(record.finished&&!record.inflight)state.producers.delete(record);drain();};
+      let result;
+      try{result=current.run(context,()=>fn(context));}catch(error){latch(error);settle();throw error;}
+      if(result&&typeof result.then==='function'){
+        Promise.resolve(result).then(settle,error=>{latch(error);settle();});
+      }else settle();
+      return result;
+    }
     function producer(isOwner=false){
       const record={finished:false,inflight:0};state.producers.add(record);
       function settle(){if(record.finished&&!record.inflight)state.producers.delete(record);drain();}
       const handle={
         run(fn){
           if(record.finished||state.failed||state.released)throw fail();
-          for(const id of ids)fence.assertGuard(guard,{mode:'writer',runId:id});
-          const context={state,live:true};record.inflight++;
-          let result;
-          try{result=current.run(context,fn);}catch(error){context.live=false;record.inflight--;latch(error);settle();throw error;}
-          if(result&&typeof result.then==='function'){
-            Promise.resolve(result).then(()=>{context.live=false;record.inflight--;settle();},error=>{context.live=false;record.inflight--;latch(error);settle();});
-          }else{context.live=false;record.inflight--;settle();}
-          return result;
+          return invoke(record,()=>fn());
         },
         finish(error){
           if(error)latch(error);
@@ -90,9 +95,11 @@ export function createArchiveWriterManager({traceRoot,lockRoot=path.join(path.di
       const ids=runSet(runIds),context=current.getStore();
       if(context){
         for(const id of ids)assertContext(id);
-        // A borrower can retain original work, but cannot close its parent.
-        const borrowed=Object.freeze({retain(label){for(const id of ids)assertContext(id);return context.state.owner.retain(label);}});
-        return fn(borrowed);
+        return context.invoke(nested=>{
+          // An unretained view belongs to this exact invocation, not another owner.
+          const borrowed=Object.freeze({retain(label){if(current.getStore()!==nested)throw fail();for(const id of ids)assertContext(id);return nested.state.owner.retain(label);}});
+          return fn(borrowed);
+        });
       }
       const owner=await manager.acquireOwner(ids,options);
       let result;
