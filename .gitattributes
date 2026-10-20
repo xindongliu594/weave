@@ -25,3 +25,6 @@ docs/validation/evidence/task-driven-organization-2026-10-19/report.docx -text
 docs/validation/evidence/task-driven-organization-2026-10-19/qa.json -text
 docs/validation/evidence/task-driven-organization-2026-10-19/acceptance.json -text
 docs/validation/evidence/acceptance-loop-2026-10-19/employee-delivery/** -text
+
+# Synthetic evaluation fixtures carry byte-level digests; preserve on every OS.
+tools/evaluations/datasets/*.json -text

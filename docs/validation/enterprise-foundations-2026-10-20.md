@@ -51,10 +51,21 @@
 
 评测桥独立复审：6/6 门禁回归及 13 种一致改写 raw/manifest 的负面案例全部按预期拒绝；原生错误、跳过、子断言失败或未知费用不会被正面汇总字段掩盖。源码清单只选相关应用/构建/依赖/规则输入，含未提交源码；私有资料和历史验收文档在读取前排除。真实 CLI 证据固定于 `ccf006c` 的当时 dirty 源码，源码摘要 `70083fa65758dec4f941ded5a2b489f54a0e6a914707630bb4dd15dcd018b3bb`。提交/源码改变后旧报告按预期拒绝，不能拿它替代新版本评测。
 
-Promptfoo 0.124.1 独立锁定安装，开发依赖实测约 1.21 GiB，不进入 JJ 生产包；生命周期脚本禁用，本轮未做 npm 安全审计。执行模式保持禁止，尚未接服务端真实评测授权、CI 或真实业务。
+Promptfoo 0.124.1 独立锁定安装，开发依赖实测约 1.21 GiB，不进入 JJ 生产包；生命周期脚本禁用，本轮未做 npm 安全审计。执行模式保持禁止，尚未接服务端真实评测授权或真实业务。离线 CI 的实际结果见下文。
 
 身份内核复审同时验证旧 schema 三种 bootstrap 状态升级及重复迁移；已有管理员停用/删除不会重开初始化，闭合事件与状态在同一事务写入。PGlite 隔离验证不替代真实 PostgreSQL 并发。
 
 截至 `ccf006c` 加上述待提交内核，父任务再次执行 `node node_modules/typescript/bin/tsc --noEmit` 和 `node node_modules/vite/bin/vite.js build`，均退出 0；Vite 构建 18.27 秒、1715 模块，保留单个 JS chunk 超过 500 kB 的优化提示，不将其列为构建失败。
 
 接续具体计划已保存：`docs/superpowers/plans/2026-10-20-oidc-api-integration.md`、`docs/superpowers/plans/2026-10-20-task-sandbox-integration.md`。先接协议/执行器，再完成路由/消费者/恢复/网页和 JJ 验证。所有十项持续记录，不能因当前局部测试通过而关闭整个目标。
+
+## 双平台离线 CI：首次运行与修复
+
+提交 `482631a43d1400f6507ddee2a179c0f6ba62ee7a` 的实际 GitHub Actions [运行 39364813640](https://github.com/xindongliu594/agent-department/actions/runs/39364813640)：Linux job `118439106681` 成功，Windows job `118439106467` 在离线 CLI 检查失败，安装和预检通过。Windows 报 `fixture-digest-mismatch`；Git 的换行转换改变了固定样本字节。
+
+用 `git -c core.autocrlf=true cat-file --filters HEAD:<fixture>` 实际复现：五份样本转换为 CRLF 后均与登记的 SHA256 不符。只在 `.gitattributes` 增加 `tools/evaluations/datasets/*.json -text` 后，同一 Git 过滤检查五份均匹配。独立审查同样复现并批准；没有修改摘要校验或全局 Git 配置。修复后的远端新 checkout 检查仍待运行，不将本地验证替代双平台 CI。
+
+## 未发布的集成工作
+
+- OIDC 协议层复用真实 `openid-client`、Express 会话及隔离 TLS IdP。协议检查 9/9、类型检查通过，但独立审查复现了 P1：退出后，已加载旧会话的并发请求可经存储 UPSERT 重建旧 SID，随后旧 cookie 仍可访问。修复及复审未完成，因此该模块未提交、未发布，也未接入业务路由。
+- 任务执行 scope 已加入可信 employee/task/attempt/session 绑定、服务端 generation、租约/项目版本校验和输入来源。报告为 24 项 scope、8 项 host、9 项 rework 检查及构建通过，独立审查进行中。新 profile 保持禁止执行；实际 task OpenShell、持久成果合并与跨 run 恢复尚未接通。
