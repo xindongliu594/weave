@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUp, CheckCircle2, ChevronDown, LoaderCircle, MessageSquare, Plus, Settings2, ShieldCheck, Users } from 'lucide-react';
 import { departmentSchema, planSchema, policySchema, type Model, type Policy } from '../../../packages/contracts/index.ts';
 import { api, ApiError } from './api.ts';
+import {principalStorage} from './identity-session.ts';
 import { createOrganizationChatRequest, ensureOrganizationConversation, finishOrganizationReply, organizationReplyFailure,hasUnconfirmedOrganizationChanges, isOrganizationConversationId, normalizeOrganizationSettings, organizationSettingsFingerprint, type ChatReply, type ChatRequest, type Draft, type Message, type SavedTeam } from './organization-draft.ts';
 import './OrganizationChat.css';
 import {OrganizationRecommendation,OrganizationDepartmentScope} from './OrganizationRecommendation.tsx';
@@ -102,18 +103,19 @@ export function readOrganizationDraft(storage?: Pick<Storage, 'getItem'>): Draft
     return ensureOrganizationConversation({ ...value, input: typeof value.input === 'string' ? value.input.slice(0, 6000) : '', policy: policy.data, previewSettings });
   } catch { return ensureOrganizationConversation(empty); }
 }
-function initialDraft(): Draft {
-  try { return readOrganizationDraft(sessionStorage); }
+function initialDraft(storage:Pick<Storage,'getItem'>): Draft {
+  try { return readOrganizationDraft(storage); }
   catch { return readOrganizationDraft(); }
 }
 
 export function OrganizationChat({ models, onSaved, onDepartments, onProject, onModels, demo = false, onDemo }: { models: Model[]; onSaved: () => Promise<void>; onDepartments: () => void; onProject: (projectId: string) => void; onModels: () => void; demo?: boolean; onDemo?: () => void }) {
+  const [storage]=useState(()=>principalStorage({getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)}));
   const nativeToolCatalog=useToolOptions();
   const availableToolNames={...toolNames,...Object.fromEntries(nativeToolCatalog.options.filter(tool=>tool.id.startsWith('plugin__')).map(tool=>[tool.id,tool.name]))};
-  const [draft, setDraft] = useState<Draft>(initialDraft), [busy, setBusy] = useState<'chat' | 'save' | null>(null), [error, setError] = useState(''), [pending, setPending] = useState('');
+  const [draft, setDraft] = useState<Draft>(()=>initialDraft(storage)), [busy, setBusy] = useState<'chat' | 'save' | null>(null), [error, setError] = useState(''), [pending, setPending] = useState('');
   const [departments,setDepartments]=useState<{id:string;name:string}[]>([]),[departmentError,setDepartmentError]=useState('');
   useEffect(()=>{if(demo)return;let active=true;api<{id:string;name:string}[]>('/departments').then(rows=>{if(active)setDepartments(rows);}).catch(cause=>{if(active)setDepartmentError((cause as Error).message);});return()=>{active=false;};},[demo]);
-  const [requestHistory, setRequestHistory] = useState<OrganizationPendingRequestHistory[]>(() => { try { return readOrganizationPendingHistory(sessionStorage); } catch { return []; } });
+  const [requestHistory, setRequestHistory] = useState<OrganizationPendingRequestHistory[]>(() => { try { return readOrganizationPendingHistory(storage); } catch { return []; } });
   const end = useRef<HTMLDivElement>(null), inputRef = useRef<HTMLTextAreaElement>(null), inFlight = useRef(false);
   const available = models.filter(m => m.status === 'available');
   const model = available.find(m => m.id === draft.modelId);
@@ -123,13 +125,13 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
   const savedCurrent = !!draft.preview && draft.preview.previewId === draft.saved?.previewId;
   const settingsValid = policySchema.safeParse(draft.policy).success && (!draft.modelId || organizationAllowedModelIds(draft.policy, draft.modelId).includes(draft.modelId));
   useEffect(() => { if (!draft.modelId && available.length) setDraft(value => ({ ...value, modelId: available[0].id })); }, [draft.modelId, models]);
-  useEffect(() => { if (!demo && settingsValid) try { sessionStorage.setItem(storageKey, JSON.stringify(draft)); } catch { /* Conversation remains usable if browser storage is unavailable. */ } }, [draft, demo, settingsValid]);
+  useEffect(() => { if (!demo && settingsValid) try { storage.setItem(storageKey, JSON.stringify(draft)); } catch { /* Conversation remains usable if browser storage is unavailable. */ } }, [draft, demo, settingsValid,storage]);
   useEffect(() => { if (draft.messages.length || pending) end.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, [draft.messages.length, pending]);
   function changePolicy(patch: Partial<Policy>) { setDraft(value => ({ ...value, policy: { ...value.policy, ...patch } })); }
   function reset() {
     if (inFlight.current || busy) return;
     try {
-      const result = resetOrganizationDraft(draft, { confirm: message => window.confirm(message), ...(draft.pendingRequest ? { storage: sessionStorage } : {}) });
+      const result = resetOrganizationDraft(draft, { confirm: message => window.confirm(message), ...(draft.pendingRequest ? { storage } : {}) });
       if (!result) return;
       setDraft(result.draft); if (result.history) setRequestHistory(result.history); setError(''); inputRef.current?.focus();
     } catch { setError('未能保存完整的待核对请求记录，当前草稿和原请求编号仍保留。请先保存或检查本标签页的浏览器存储，再开始新需求。'); }
@@ -142,7 +144,7 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
     if (messages.reduce((total, item) => total + item.content.length, 0) > 200000 || requirementLength > 50000) { setError('这段对话的资料量已达到容量上限。可以先保存当前团队，再开始新需求继续。'); return; }
     const request = createOrganizationChatRequest(draft, content, settingsKey);
     const next = { ...draft, conversationId: request.body.conversationId, pendingRequest: request }; setDraft(next);
-    try { sessionStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* The in-memory request remains recoverable. */ }
+    try { storage.setItem(storageKey, JSON.stringify(next)); } catch { /* The in-memory request remains recoverable. */ }
     await requestReply(request);
   }
   async function requestReply(request: ChatRequest) {
@@ -173,7 +175,7 @@ export function OrganizationChat({ models, onSaved, onDepartments, onProject, on
       const result = await api<Omit<SavedTeam, 'previewId'>>(confirmation.path, 'POST', confirmation.body);
       const next = { ...draft, projectId: result.projectId, saved: { ...result, previewId: draft.preview.previewId } };
       setDraft(next);
-      try { sessionStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* Saved team remains recoverable from the department list. */ }
+      try { storage.setItem(storageKey, JSON.stringify(next)); } catch { /* Saved team remains recoverable from the department list. */ }
       await onSaved();
     } catch (cause) { setError((cause as Error).message); }
     finally { inFlight.current = false; setBusy(null); }

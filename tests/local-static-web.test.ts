@@ -88,6 +88,13 @@ test('liveness probe reaches the API instead of the SPA',async()=>{
   assert.notEqual(response.body.toString(),html);
 });
 
+test('session and login routes proxy once with CSRF/cookies instead of serving the SPA',async()=>{
+ for(const [path,method] of [['/auth/session','GET'],['/auth/login','POST'],['/auth/callback?state=fixture','GET'],['/auth/logout','POST']] as const){
+  const start=received.length,response=await request(path,{method,headers:{cookie:'__Host-weiwu.sid=fixture','x-csrf-token':'fixture-token'}});
+  assert.equal(response.status,201);assert.equal(received.length,start+1);assert.equal(received.at(-1)?.path,path);assert.equal(received.at(-1)?.headers['x-csrf-token'],'fixture-token');assert.equal(received.at(-1)?.headers.cookie,'__Host-weiwu.sid=fixture');assert.notEqual(response.body.toString(),html);
+ }
+});
+
 test('upstream permission failure and API 404 remain API responses', async () => {
   const denied = await request('/api/rejected'); assert.equal(denied.status, 403); assert.equal(denied.headers['x-refusal'], 'upstream'); assert.equal(denied.body.toString(), '{"code":"DEVICE_DISABLED"}');
   const missing = await request('/api/missing'); assert.equal(missing.status, 404); assert.equal(missing.body.toString(), '{"message":"接口不存在"}');

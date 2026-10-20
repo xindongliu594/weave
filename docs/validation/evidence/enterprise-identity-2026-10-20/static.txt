@@ -1,0 +1,23 @@
+✔ static page, assets and HEAD use correct MIME without a development server (209.2997ms)
+✔ API proxy retains bytes, query, status, end-to-end headers and original idempotency key (18.8887ms)
+✔ liveness probe reaches the API instead of the SPA (7.5859ms)
+✔ session and login routes proxy once with CSRF/cookies instead of serving the SPA (30.1034ms)
+✔ upstream permission failure and API 404 remain API responses (11.6961ms)
+✔ successive API reads use a fresh upstream socket for every request (40.5545ms)
+✔ upstream disconnect after receiving a GET or mutation dispatches once and never replays an unknown result (186.1504ms)
+✔ Host and browser Origin guards reject both HTML and API before upstream operations (22.9103ms)
+✔ SPA fallback excludes API, missing assets, encoded traversal and non-read methods (23.357ms)
+✔ static serving refuses a directory link outside the build root (9.4088ms)
+✔ streamed API response starts before the upstream completes (6.9803ms)
+✔ unavailable API returns an explicit 502 and never falls through to the SPA (12.477ms)
+✔ closing static host aborts an outstanding API stream, releases the port and is idempotent (19.3142ms)
+✔ missing build fails with a build instruction and does not create a data directory (3.9543ms)
+✔ existing built product index and assets are served unchanged (34.5859ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1777.7844

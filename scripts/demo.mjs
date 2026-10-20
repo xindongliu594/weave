@@ -57,7 +57,7 @@ try {
     console.log('Todo 演示验收通过：开发自检 2 项、独立接口验收 6 项，实际员工交接、两次审批、6 个交付物、费用为 0。');
   } else {
     const { createServer } = await import('vite');
-    web = await createServer({ configFile: join(root, 'vite.config.ts'), server: { host: '127.0.0.1', port, strictPort: true, proxy: { '/api': `http://127.0.0.1:${ready.apiPort}` } } });
+    web = await createServer({ configFile: join(root, 'vite.config.ts'), server: { host: '127.0.0.1', port, strictPort: true, proxy: { '/auth': `http://127.0.0.1:${ready.apiPort}`, '/api': `http://127.0.0.1:${ready.apiPort}`, '/healthz': `http://127.0.0.1:${ready.apiPort}` } } });
     ensureActive();
     await web.listen();
     console.log(`\n为伍演示已就绪：http://127.0.0.1:${port}\n一个想法，一支团队。\n在首页打开 Todo 示例方案，点击“批准并运行”。在执行页逐次批准两条测试命令。\n演示档案：${sessionRoot}\n每次启动创建独立演示空间；Ctrl+C 停止，文件保留。`);

@@ -1,8 +1,11 @@
-import test from 'node:test';
+import test,{before} from 'node:test';
+import {identitySession} from '../apps/web/src/identity-session.ts';
 import assert from 'node:assert/strict';
 import {api,ApiError,readApiResponse} from '../apps/web/src/api.ts';
 import {generatePlanningCandidate,uncertainResponse,restoredPlanningDraft,type PlanningParameters} from '../apps/web/src/ProjectPlanning.tsx';
 import {createOrganizationChatRequest,ensureOrganizationConversation,organizationReplyFailure,type Draft} from '../apps/web/src/organization-draft.ts';
+
+before(async()=>{const original=globalThis.fetch;try{globalThis.fetch=async()=>Response.json({mode:'legacy-local',authenticated:true,user:null,csrf:null,loginAvailable:false});await identitySession.refresh();}finally{globalThis.fetch=original;}});
 
 test('empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success',async()=>{
  for(const [status,body] of [[431,''],[502,'<html>sk-synthetic-body-value</html>'],[503,'not json']] as const){
@@ -33,12 +36,13 @@ test('explicitly cancelled body reads preserve cancellation and failed writes re
 
 test('body AbortError caused by the request deadline is reported as timeout',async()=>{
  const originalFetch=globalThis.fetch,originalTimeout=AbortSignal.timeout,deadline=new AbortController();
+ let arrive!:()=>void;const started=new Promise<void>(resolve=>{arrive=resolve;});
  try {
   AbortSignal.timeout=()=>deadline.signal;
-  globalThis.fetch=async(_input,init)=>new Response(new ReadableStream({start(controller){
+  globalThis.fetch=async(_input,init)=>new Response(new ReadableStream({start(controller){arrive();
    init!.signal!.addEventListener('abort',()=>controller.error(new DOMException('body aborted','AbortError')),{once:true});
   }}));
-  const pending=api('/runs/fixture');deadline.abort(new DOMException('deadline','TimeoutError'));
+  const pending=api('/runs/fixture');await started;deadline.abort(new DOMException('deadline','TimeoutError'));
   await assert.rejects(pending,error=>error instanceof ApiError&&error.code==='READ_TIMEOUT');
  } finally {globalThis.fetch=originalFetch;AbortSignal.timeout=originalTimeout;}
 });

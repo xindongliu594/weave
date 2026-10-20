@@ -1,7 +1,9 @@
-import test from 'node:test';
+import test,{before} from 'node:test';
+import {identitySession} from '../apps/web/src/identity-session.ts';
 import assert from 'node:assert/strict';
 import { createProjectSync, projectIsActive, PROJECT_POLL_LIMIT, PROJECT_POLL_MS } from '../apps/web/src/project-sync.ts';
 import { api } from '../apps/web/src/api.ts';
+before(async()=>{const original=globalThis.fetch;try{globalThis.fetch=async()=>Response.json({mode:'legacy-local',authenticated:true,user:null,csrf:null,loginAvailable:false});await identitySession.refresh();}finally{globalThis.fetch=original;}});
 import type { Project } from '../packages/contracts/index.ts';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';

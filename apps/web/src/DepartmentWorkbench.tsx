@@ -40,7 +40,7 @@ export function DepartmentWorkbench({ departments, selectedDepartmentId, onDepar
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [revision, setRevision] = useState(0);
-  const visible = data?.departmentId === departmentId && data.offset === offset ? data : null;
+  const visible = data && data.departmentId === departmentId && data.offset === offset ? data : null;
   const openRig = useOpenRigWorkbench(departmentId, visible?.items ?? [], visible?.refreshedAt);
 
   useEffect(() => {

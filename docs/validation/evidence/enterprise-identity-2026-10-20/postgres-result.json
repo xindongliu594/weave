@@ -1,0 +1,14 @@
+{
+  "id": "7f00ee2d-c412-4052-a98d-907063de1b8c",
+  "postgresVersion": "postgres (PostgreSQL) 17.10",
+  "backendPids": [
+    44964,
+    1264
+  ],
+  "lockBlockers": [
+    44964
+  ],
+  "identityExit": 0,
+  "stopped": true,
+  "dataRemoved": true
+}

@@ -1,0 +1,46 @@
+oidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+▶ real OIDC over trusted TLS and persistent HTTP sessions
+  ✔ session cookie, CSRF, exact routes and relative return target reject forgery (126.1526ms)
+oidc-provider NOTICE: default ttl.Interaction function called, you SHOULD change it in order to define the expiration for Interaction artifacts.
+oidc-provider NOTICE: default ttl.Grant function called, you SHOULD change it in order to define the expiration for Grant artifacts.
+oidc-provider NOTICE: default ttl.Session function called, you SHOULD change it in order to define the expiration for Session artifacts.
+oidc-provider NOTICE: default ttl.AccessToken function called, you SHOULD change it in order to define the expiration for AccessToken artifacts.
+oidc-provider NOTICE: default ttl.IdToken function called, you SHOULD change it in order to define the expiration for IdToken artifacts.
+  ✔ PKCE S256 and state binding, three transaction limit, wrong SID denied (142.4124ms)
+  ✔ verified administrator, SID and CSRF rotate; replay fails; tokens never persisted (71.4715ms)
+  ✔ authenticated late explicit save cannot resurrect logout SID (64.4172ms)
+  ✔ authenticated late end save cannot resurrect logout SID (60.7305ms)
+  ✔ rotation permanently invalidates authenticated old SID despite late response-end save (88.5014ms)
+  ✔ logout cancels a pending real token exchange callback in the same login lineage (47.3029ms)
+  ✔ logout already loaded before rotation revokes its child while another login stays valid (142.0638ms)
+  ✔ migration invalidates untracked old sessions and preserves tracked sessions on repeat (48.1603ms)
+  ✔ expired ancestor tombstones are pruned while a newer child in the lineage stays valid (105.899ms)
+  ✔ store recreation retains identity, epoch and disabled user recheck immediately (118.1464ms)
+  ✔ expiry and failed exchange consume transaction; cryptographic and claim checks remain enabled (385.8179ms)
+  ✔ pending user stays unauthenticated; logout destroys SID and CSRF (61.6771ms)
+  ✔ idle and absolute bounds rechecked on each request (96.1683ms)
+  ✔ IdP outage prevents new login while persisted valid sessions retain their TTL; store outage fails closed (75.9526ms)
+  ✔ bounded lifecycle pruning cannot readmit a late response-end save after tombstones disappear (118.0734ms)
+✔ real OIDC over trusted TLS and persistent HTTP sessions (2430.0844ms)
+✔ native identity fixture refuses production, remote and ambiguous URLs before connecting (2.06ms)
+▶ unused bootstrap closes permanently when prior administration or disabled identity is recognized
+  ✔ prior administrators close bootstrap without a fictitious grant, even after they are disabled (282.6429ms)
+  ✔ an existing disabled bootstrap identity cannot be reactivated by verified login (170.4111ms)
+  ✔ closure audit failure rolls back closure and identity creation together (207.638ms)
+✔ unused bootstrap closes permanently when prior administration or disabled identity is recognized (664.3298ms)
+▶ identity persistence, bootstrap, lifecycle and audit stay fail closed
+  ✔ additive repeatable migration preserves old data and enforces constraints (234.7569ms)
+  ✔ OIDC activation persists and forbids local downgrade (68.6865ms)
+  ✔ exact issuer/subject only, same email never links, bootstrap consumes once (76.4248ms)
+  ✔ current user role, status and epoch control session with strict time boundaries (10.9591ms)
+  ✔ audit is constrained, append only and stores no arbitrary payload (62.5671ms)
+  ✔ audit failure rolls back a new identity and bootstrap grant (179.759ms)
+✔ identity persistence, bootstrap, lifecycle and audit stay fail closed (832.799ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7089.13

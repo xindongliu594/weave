@@ -1,0 +1,30 @@
+{
+  "baseCommit": "d38cfa7377f06dce8b426aac70bddca716d0da30",
+  "sourceState": "reviewed worktree changes before commit",
+  "sha256": {
+    "apps/api/src/identity-http.ts": "599ae8a9647e0ae93bcf996011691cfca3d6103aae188b8186d81529cfd6e81c",
+    "apps/web/src/identity-session.ts": "baa35965081c8c6fd5a3db4e11485dd1a772bedb0a9a937d10eacf36aa66fec6",
+    "apps/web/src/identity-reset.ts": "5862b38d701b4db7ff85ff0921deec92bcec79b5359c383ea02849d1be3d2b58",
+    "apps/web/src/IdentityGate.tsx": "99b73a6b8862fb4d85f82792c77ae662f5ac68772e65feb6d850e8d94d8f576d",
+    "apps/web/src/api.ts": "4b67ecd5ebcd3d40d421642a33e44e18486daa8cb69d50ebb17dd052b577b5a8",
+    "apps/web/src/main.tsx": "a66b60548bef9c7e49b3011e52fd4e6e9831131492e0e3b414b9baca044e1c29",
+    "apps/web/src/health-sync.ts": "c557e6866054754d605fbcf1875a7275efbfafcfe54fe1c42f28f149566f4a37",
+    "apps/web/src/usage-sync.ts": "629823f717561d2ecd4236eb3a51c5af1c60f2bd182605b033bbfde7f757e70e",
+    "apps/web/src/project-sync.ts": "be3856f99da1a3fa4b614a6b149a30de60b4a3774f006215e7d46fe6d465e456",
+    "apps/web/src/OrganizationChat.tsx": "dbf96df62cfbf4432a1904a71d4f1abd144ae11cea77df112b56d362f98c2ef1",
+    "apps/web/src/ProjectPlanning.tsx": "ba64e2ebc5753b91abf8e0a283205732b49f09248d402eaf7e6b62b036d56768",
+    "apps/web/src/OpenRigWorkbench.tsx": "acb6a1ce8b8322eb713b79c5959d7a11540e4fb7889e62a80b718587d421db63",
+    "apps/web/src/RunExtras.tsx": "2431bdd124037145512dbc08b5e6c816058a708a10317b99c00f50c5855620a5",
+    "apps/web/src/DepartmentWorkbench.tsx": "9ed4fa3389475727b69eddabf08db7d71450e2015a1104d4c6e7b7c495430f1f",
+    "apps/web/src/styles.css": "73c8fba22d4ddf54bf39351ed6cfca65b8ead680cc1071204601c9b3b5e1e335",
+    "scripts/local.mjs": "cfbd5c23dbb65d453ef842bb024bd1168d2e2df8cd30ac4a7e80c81743f53204",
+    "scripts/demo.mjs": "b270317aa0e6773d017a328f4ad9c15c7a60fb547afc237f8989482918d7f30a",
+    "scripts/local-static-web.mjs": "0b092e2ca4355a9bbf3470a584af3f2df0e048c71e7d95388b84c7e239f2ccac",
+    "vite.config.ts": "10033ee966d472d005577c7a44432a9fd46caddafde2950847786820594d10fc",
+    "tests/fixtures/identity/postgres.ts": "9f5acf38c509f59a7a1a128e796cbdf189a4a058e9f7cd6cd765cd6f6ec00c57",
+    "tests/fixtures/identity/idp.ts": "1786c21191972e213ddc5660fee41624aa676dbdec8465a53408bf4b068d2106"
+  },
+  "paidModelCalls": 0,
+  "productionChanges": 0,
+  "browserEvidence": "built application with explicitly synthetic UI-only identity/empty-list fixture; not real IdP browser acceptance"
+}

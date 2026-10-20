@@ -167,7 +167,7 @@ export function createIdentityHttp({pool,config,transport,now=()=>new Date()}: {
   });
   router.post('/auth/login',csrf,async(req,res,next)=>{
     if(!protocol){res.sendStatus(404);return;}
-    try {await save(req);const url=await protocol.begin(req.sessionID,req.body?.returnTo);res.redirect(303,url.href);}
+    try {await save(req);const url=await protocol.begin(req.sessionID,req.body?.returnTo);res.json({authorizationUrl:url.href});}
     catch(error){if(error instanceof Error&&error.message==='Invalid return target'){res.status(400).json({error:'Invalid return target'});return;}
       if((error as {status?:number}).status===429){res.sendStatus(429);return;}next(error);}
   });
@@ -187,5 +187,6 @@ export function createIdentityHttp({pool,config,transport,now=()=>new Date()}: {
     if(config.mode==='oidc')await destroy(req);
     res.clearCookie(cookieName,cookieOptions);res.sendStatus(204);
   });
-  return {router,sessionMiddleware,ready,authenticate,csrf,async close(){closed=true;if(timer)clearInterval(timer);await cleanup;await store?.close();}};
+  const drainMaintenance=async()=>{await cleanup;};
+  return {router,sessionMiddleware,ready,authenticate,csrf,drainMaintenance,async close(){closed=true;if(timer)clearInterval(timer);await drainMaintenance();await store?.close();}};
 }

@@ -10,9 +10,11 @@ import { PGlite } from '@electric-sql/pglite';
 import type pg from 'pg';
 import type { CustomFetch } from 'openid-client';
 import { migrateIdentity } from '../../../apps/api/src/identity-schema.ts';
+import {identityPostgresPool} from './postgres.ts';
 
-// A private in-memory database and schema; never reads DATABASE_URL.
+// A private fixture; real PostgreSQL requires an explicit guarded test URL.
 export async function identityTestPool(): Promise<pg.Pool> {
+  if(process.env.IDENTITY_TEST_POSTGRES_URL!==undefined)return identityPostgresPool(process.env.IDENTITY_TEST_POSTGRES_URL);
   const db = await PGlite.create();
   const schema = `oidc_${randomUUID().replaceAll('-', '')}`;
   await db.exec(`CREATE SCHEMA ${schema}; SET search_path TO ${schema}; CREATE TABLE departments(id text PRIMARY KEY)`);

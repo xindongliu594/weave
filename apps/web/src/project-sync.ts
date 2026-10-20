@@ -57,7 +57,8 @@ export function createProjectSync(load: (signal: AbortSignal) => Promise<Project
     listeners.add(listener); if (listeners.size === 1) options.visibility?.addEventListener('visibilitychange', visibilityChanged);
     return () => { listeners.delete(listener); if (!listeners.size) { stopTimer(); cancelRead(); options.visibility?.removeEventListener('visibilitychange', visibilityChanged); } };
   }
-  return { refresh, watch, subscribe, getSnapshot: () => snapshot };
+  function reset(){stopTimer();enabled=false;projectId=null;remaining=PROJECT_POLL_LIMIT;serial++;inFlight?.controller.abort();inFlight=undefined;publish({rows:[],refreshing:false,error:'',updatedAt:null});}
+  return { refresh, watch, subscribe, reset, getSnapshot: () => snapshot };
 }
 
 export const projectSync = createProjectSync(signal => api<Project[]>('/projects', 'GET', undefined, undefined, signal), {

@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from './api.ts';
+import {principalStorage} from './identity-session.ts';
 import { canSyncOpenRigProject, confirmOpenRigIntent, hasOpenRigIntent, mergeOpenRigProject, openRigProjectLabel, openRigStatusSchema, readOpenRigProjects, reconcileOpenRigProject, syncOpenRigProject, type OpenRigProject, type OpenRigStatus } from './openrig-workbench.ts';
 
-const intentStorage = {
+const browserStorage = {
   getItem: (key: string) => window.localStorage.getItem(key),
   setItem: (key: string, value: string) => window.localStorage.setItem(key, value),
   removeItem: (key: string) => window.localStorage.removeItem(key),
 };
 
 export function useOpenRigWorkbench(departmentId: string | undefined, projects: { id: string; version: number }[], refreshedAt?: string) {
+  const [intentStorage]=useState(()=>principalStorage(browserStorage));
   const ids = [...new Set(projects.map(item => item.id))].sort().join(',');
   const scope = (departmentId ?? '') + ':' + ids, currentScope = useRef(scope); currentScope.current = scope;
   const [status, setStatus] = useState<OpenRigStatus | null>(null);

@@ -29,7 +29,7 @@ test('real OIDC over trusted TLS and persistent HTTP sessions', async t => {
   const request=(path:string,init?:RequestInit)=>b.request(`${origin}${path}`,init);
   const info=async()=>{const response=await request('/auth/session'); assert.equal(response.status,200); return response.json();};
   const login=async(returnTo='/private')=>{const current=await info();return request('/auth/login',{method:'POST',headers:{'content-type':'application/json','x-csrf-token':current.csrf},body:JSON.stringify({returnTo})});};
-  const begin=async()=>{const response=await login();assert.equal(response.status,303);return b.authorize(response.headers.get('location')!);};
+  const begin=async()=>{const response=await login();assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');return b.authorize((await response.json()).authorizationUrl);};
   const callback=(url:string)=>request(`/auth/callback${new URL(url).search}`);
   try {
     await identity.ready;
@@ -44,7 +44,7 @@ test('real OIDC over trusted TLS and persistent HTTP sessions', async t => {
       assert.equal((await request('/auth/session',{method:'HEAD'})).status,404);
     });
     await t.test('PKCE S256 and state binding, three transaction limit, wrong SID denied',async()=>{
-      for(let i=0;i<3;i++){const response=await login();assert.equal(response.status,303);const url=new URL(response.headers.get('location')!);assert.equal(url.searchParams.get('code_challenge_method'),'S256');assert.ok(url.searchParams.get('nonce'));}
+      for(let i=0;i<3;i++){const response=await login();assert.equal(response.status,200);const url=new URL((await response.json()).authorizationUrl);assert.equal(url.searchParams.get('code_challenge_method'),'S256');assert.ok(url.searchParams.get('nonce'));}
       assert.equal((await login()).status,429);
       await pool.query('DELETE FROM oidc_login_transactions');
       const url=await begin();const alien=browser(idp.fetchTls);assert.equal((await alien.request(`${origin}/auth/callback${new URL(url).search}`)).status,400);
@@ -84,7 +84,7 @@ test('real OIDC over trusted TLS and persistent HTTP sessions', async t => {
     await t.test('logout already loaded before rotation revokes its child while another login stays valid',async()=>{
       const independent=browser(idp.fetchTls),safe=await (await independent.request(`${origin}/auth/session`)).json();
       const redirect=await independent.request(`${origin}/auth/login`,{method:'POST',headers:{'content-type':'application/json','x-csrf-token':safe.csrf},body:'{}'});
-      const independentCallback=await independent.authorize(redirect.headers.get('location')!);
+      const independentCallback=await independent.authorize((await redirect.json()).authorizationUrl);
       assert.equal((await independent.request(`${origin}/auth/callback${new URL(independentCallback).search}`)).status,303);
       assert.equal((await callback(await begin())).status,303);const current=await info();
       logoutGate=gate();const pending=request('/auth/logout',{method:'POST',headers:{'x-csrf-token':current.csrf}});await logoutGate.started;
@@ -106,7 +106,7 @@ test('real OIDC over trusted TLS and persistent HTTP sessions', async t => {
       const old=(await pool.query("SELECT sid FROM human_sessions WHERE sess::jsonb->>'csrf'=$1",[current.csrf])).rows[0].sid;
       assert.equal((await callback(await begin())).status,303);
       await pool.query('UPDATE human_session_lifecycles SET valid_until=$2 WHERE sid=$1',[old,new Date(now-1000)]);
-      t.mock.timers.tick(60_000);for(let step=0;step<16;step++)await pool.query('SELECT 1');
+      t.mock.timers.tick(60_000);await identity.drainMaintenance();
       assert.equal((await pool.query('SELECT sid FROM human_session_lifecycles WHERE sid=$1',[old])).rows.length,0);
       assert.equal((await request('/private')).status,200);
     });
@@ -152,12 +152,12 @@ test('real OIDC over trusted TLS and persistent HTTP sessions', async t => {
         const expired=new Date(now-48*60*60_000);
         await pool.query("INSERT INTO human_session_lifecycles(sid,family_sid,valid_until,retain_until) VALUES('cleanup-root','cleanup-root',$1,$1)",[expired]);
         await pool.query("INSERT INTO human_session_lifecycles(sid,family_sid,valid_until,retain_until) SELECT 'cleanup-child-'||n,'cleanup-root',$1,$1 FROM generate_series(1,501) n",[expired]);
-        t.mock.timers.tick(60_000);for(let step=0;step<16;step++)await pool.query('SELECT 1');
+        t.mock.timers.tick(60_000);await identity.drainMaintenance();
         assert.equal(Number((await pool.query("SELECT count(*) AS count FROM human_session_lifecycles WHERE family_sid='cleanup-root'")).rows[0].count),2,'one cleanup removes at most 500 children and retains their root');
         for(let cycle=0;cycle<40;cycle++){
           t.mock.timers.tick(60_000);
           // Flush each bounded asynchronous cleanup before deciding whether another minute is needed.
-          for(let step=0;step<12;step++)await pool.query('SELECT 1');
+          await identity.drainMaintenance();
           if(!(await pool.query('SELECT sid FROM human_session_lifecycles')).rows.length)break;
         }
         assert.equal((await pool.query('SELECT sid FROM human_session_lifecycles')).rows.length,0);

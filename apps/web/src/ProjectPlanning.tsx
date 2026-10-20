@@ -3,6 +3,7 @@ import type { Model, Plan, Policy, Project, Validation } from '../../../packages
 import type { CostReadiness } from './CostCarryoverChoice.tsx';
 import type { PlanningExecutionContext } from '../../api/src/planning-execution-context.ts';
 import { api, ApiError } from './api.ts';
+import {principalStorage} from './identity-session.ts';
 import { PlanTaskBudgetSummary } from './PlanTaskBudget.tsx';
 import {OrganizationRecommendation} from './OrganizationRecommendation.tsx';
 import { notifyCostsChanged } from './usage-sync.ts';
@@ -218,10 +219,10 @@ export function GeneratedPlanView({ candidate, currentVersion, models, busy, dis
 export function uncertainResponse(error: unknown) {
   return !(error instanceof ApiError) || (error.status === 409 && !error.code);
 }
-export function restoredPlanningDraft(project: Project) {
+export function restoredPlanningDraft(project: Project,storage?:Pick<Storage,'getItem'>) {
   const defaults = defaultPlanningParameters(project);
   try {
-    const stored = JSON.parse(sessionStorage.getItem('agent-department:project-planning:' + project.id) ?? 'null');
+    const stored = JSON.parse((storage??principalStorage(sessionStorage)).getItem('agent-department:project-planning:' + project.id) ?? 'null');
     const parameters = stored?.parameters;
     const valid = parameters?.projectId === project.id && parameters?.version === project.version && planningParametersValid(parameters);
     const generation = stored?.generation;
@@ -237,7 +238,8 @@ export function ProjectPlanning({ project, models, allowedModelIds, disabled, on
   project: Project; models: Model[]; allowedModelIds: string[]; disabled?: boolean;
   onChanged: () => Promise<void>; onBusyChange?: (busy: boolean) => void; onCosts: () => void;
 }) {
-  const [initial] = useState(() => restoredPlanningDraft(project));
+  const [storage]=useState(()=>principalStorage({getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)}));
+  const [initial] = useState(() => restoredPlanningDraft(project,storage));
   const [parameters, setParameters] = useState(initial.parameters), [quote, setQuote] = useState<PlanningQuote>();
   const [candidate, setCandidate] = useState<GeneratedPlan>(), [pendingGeneration, setPendingGeneration] = useState(initial.generation);
   const [pendingConfirmation, setPendingConfirmation] = useState(initial.confirmation);
@@ -252,7 +254,7 @@ export function ProjectPlanning({ project, models, allowedModelIds, disabled, on
   const locked = !!disabled || !!busy || !!pendingGeneration || !!pendingConfirmation || !!candidate;
 
   function persist(nextParameters = currentParameters) {
-    try { sessionStorage.setItem('agent-department:project-planning:' + project.id, JSON.stringify({ parameters: nextParameters, generation: generation.current, confirmation: confirmation.current })); } catch { /* Keep the same request key in memory when browser storage is unavailable. */ }
+    try { storage.setItem('agent-department:project-planning:' + project.id, JSON.stringify({ parameters: nextParameters, generation: generation.current, confirmation: confirmation.current })); } catch { /* Keep the same request key in memory when browser storage is unavailable. */ }
   }
   function change(patch: Partial<PlanningParameters>) {
     const next = { ...currentParameters, ...patch }; setParameters(next); setQuote(undefined); setSavedCosts(undefined); setError(''); setNotice(''); persist(next);
