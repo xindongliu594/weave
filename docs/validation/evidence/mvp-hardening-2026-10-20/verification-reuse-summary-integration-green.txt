@@ -1,0 +1,36 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ confirmation creates a project only, freezes selected sources, and duplicate requests are idempotent (3091.5889ms)
+✔ superseded, edited or archived source drafts cannot create a project (107.9169ms)
+✔ new team uses the same explicit confirmation and V2 cannot enter the legacy department-update endpoint (56.6891ms)
+✔ confirmed verification reuse choices survive the formal execution snapshot (123.8685ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3896.0445
+✔ gateway discovery, formal execution, versioned plans and deletion preserve history (5660.452ms)
+✔ organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost (472.9668ms)
+✔ model planning preserves user input scope and refuses to remove an input recipient (356.5156ms)
+✔ dynamic loopback preview can save a gateway through the local proxy (20.0078ms)
+✔ cross-origin mutations, remote host headers, and malformed data fail closed (31.2872ms)
+✔ small trace pages preserve every complete event and do not change the full export (256.6924ms)
+✔ trace verification API persists a run and serves history after recreating the app (1262.5122ms)
+✔ one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings (137.9475ms)
+✔ catalog refuses quotes fetched across a concurrent gateway edit (20.2056ms)
+✔ text replies accept null tool calls but reject malformed non-null calls and retain usage (169.5146ms)
+✔ gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes (79.7397ms)
+✔ gateway service checks reject results from a changed connection and diagnose a closed port (36.1327ms)
+✔ official pricing is the default, matches exact models, and does not fetch relay public prices (11.2418ms)
+✔ planning timeouts preserve the saved plan and keep unresolved billing without automatic retries (654.3345ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9730.2581

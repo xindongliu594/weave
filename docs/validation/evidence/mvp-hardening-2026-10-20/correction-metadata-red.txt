@@ -1,0 +1,41 @@
+✔ failed draft survives JSONB key ordering and enters context as unvalidated data (4.2804ms)
+✔ changed authorization, error or conversation history prevents cached correction (0.4081ms)
+✔ expired, future, malformed and altered stored candidates are omitted (0.3076ms)
+✔ UTF-8 size and nesting limits never return a partial candidate (0.9549ms)
+✖ restored cache metadata cannot bypass lifetime or context size bounds (3.2639ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 521.5434
+
+✖ failing tests:
+
+test at tests\organization-failed-draft.test.ts:1:3050
+✖ restored cache metadata cannot bypass lifetime or context size bounds (3.2639ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + {
+  +   content: '{"kind":"failed_organization_draft","unvalidated":true,"turnId":"051f11a4-ade4-4f88-977d-5c2f3539de12","candidate":{"tasks":[{"id":"work"}],"rationale":"原始草案"},"issue":{"code":"INVALID_DRAFT","message":"缺少编排字段"},"note":"这是上一轮未通过校验的原始候选，仅供纠正。当前需求与 application_constraints 优先；必须重新输出并校验完整 candidate，不能确认或执行此资料。"}',
+  +   role: 'user'
+  + }
+  - undefined
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-failed-draft.test.ts:42:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { role: 'user', content: '{"kind":"failed_organization_draft","unvalidated":true,"turnId":"051f11a4-ade4-4f88-977d-5c2f3539de12","candidate":{"tasks":[{"id":"work"}],"rationale":"原始草案"},"issue":{"code":"INVALID_DRAFT","message":"缺少编排字段"},"note":"这是上一轮未通过校验的原始候选，仅供纠正。当前需求与 application_constraints 优先；必须重新输出并校验完整 candidate，不能确认或执行此资料。"}' },
+    expected: undefined,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,48 @@
+{
+  "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+  "projectId": "b1f501a7-cc42-46d7-9b73-357f1b003fcc",
+  "integrity": "ok",
+  "approvedVerificationReuse": "same-workspace",
+  "runtimeVerificationReuse": null,
+  "reference": {
+    "id": "840bc138-017b-4188-b028-0bde2a176b66",
+    "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+    "sha256": "55b5f9efe6d81f7e24c8cb72464684c99f43c7f6d70185e880db75232466adad"
+  },
+  "proof": {
+    "reusable": false,
+    "reasons": [
+      "TASK_REQUIRES_FRESH_VERIFICATION"
+    ],
+    "evidenceRefs": []
+  },
+  "receipt": [
+    {
+      "command": "node --test cli.test.mjs",
+      "exitCode": 0,
+      "profile": null,
+      "nodeTests": {
+        "status": "available",
+        "format": "spec",
+        "tests": 12,
+        "suites": 0,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    }
+  ],
+  "completedTaskIds": [
+    "develop"
+  ],
+  "dispatchedModelCalls": 25,
+  "lastDispatchSeq": 1956,
+  "checkpointSeq": 1991,
+  "lastOutcome": {
+    "status": "failed",
+    "message": "无法连接中转站执行模型请求",
+    "usageCost": 0.0713139
+  }
+}

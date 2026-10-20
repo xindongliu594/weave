@@ -1,0 +1,13 @@
+✔ failed draft survives JSONB key ordering and enters context as unvalidated data (7.0253ms)
+✔ changed authorization, error or conversation history prevents cached correction (0.9221ms)
+✔ expired, future, malformed and altered stored candidates are omitted (1.2211ms)
+✔ UTF-8 size and nesting limits never return a partial candidate (0.5395ms)
+✔ restored cache metadata cannot bypass lifetime or context size bounds (1.5044ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 630.1572

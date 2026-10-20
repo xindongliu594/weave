@@ -1,0 +1,31 @@
+✔ local pre-dispatch failure is not reported as a relay connection failure or charged (7.854305ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (4.708654ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (1.634611ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.574226ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.635363ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.29828ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (1348.298096ms)
+✔ real local HTTP Responses exchange persists the actual path/body and replays complete call/output history without remote conversation (40.741393ms)
+✔ actual Responses envelope expansion is checked before taking calls, reserving or dispatching (3.833348ms)
+✔ context window guards include actual wire bytes, the 1024 guard and unchanged output, at the exact boundary (1.724254ms)
+✔ financial fitting preserves the latest contract, old full SHA file and pinned knowledge groups while removing old discussion (15.967886ms)
+✔ per-task max output cap remains distinct from whole-task estimates and is honored on Responses wire (8.47504ms)
+✔ HTTP failures and missing or invalid usage retain one run/task hold despite a configured fallback, with no retry or tool execution (49.161757ms)
+✔ invalid, incomplete, unapproved and nonempty reasoning outputs settle actual usage but yield no executable calls (14.508482ms)
+✔ reasoning policy refusal and malformed native history occur before any durable receipt or HTTP request (2.021848ms)
+✔ legacy Chat route keeps its endpoint and body despite a Responses-named wire model (3.488824ms)
+✔ multiple tool rounds replay every text, parallel call and full file/knowledge result with stable call IDs (15.254769ms)
+✔ unknown dispatched fees stay held even without durable callbacks or when success JSON is malformed (5.389449ms)
+✔ metadata, usage or unknown-fee persistence failures retain the sent hold and never yield executable output (6.359152ms)
+✔ the run/task reservation remains held while known usage persists, then settles before invalid output is rejected (3.321403ms)
+✔ a cancellation before dispatch releases the local hold, while cancellation after headers retains it (4.46721ms)
+✔ Go identity is stable across previews and requires a local session before reservation; unrelated routes receive no Go identity (1.36651ms)
+✔ an internal stop settles only the late original Responses receipt and never executes its tool call or sends another request (2.892621ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1625.597423

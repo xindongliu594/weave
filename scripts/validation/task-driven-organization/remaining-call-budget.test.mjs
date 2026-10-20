@@ -9,3 +9,10 @@ test('remaining real planning request is bounded before reserve or dispatch',()=
  assert.throws(()=>assertRemainingCall('only-this',{...body,messages:[{role:'user',content:'x'.repeat(60000)}]},options),/allowance/);
  assert.throws(()=>assertRemainingCall('only-this',{...body,max_tokens:0},options),/invalid/);
 });
+test('over-budget rejection exposes bounded quote metadata for the local acceptance controller',()=>{
+ const body={model:'fixture',messages:[{role:'user',content:'x'.repeat(60000)}],max_tokens:4000};
+ assert.throws(()=>assertRemainingCall('only-this',body,options),error=>{
+  assert.equal(error.code,'ACCEPTANCE_PLANNING_BUDGET');assert.ok(error.quote>options.allowance);assert.equal(error.allowance,options.allowance);
+  assert.equal(error.modelDispatched,false);assert.equal(error.body,undefined);return true;
+ });
+});

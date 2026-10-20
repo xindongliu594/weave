@@ -7,7 +7,8 @@ BASE=pathlib.Path('/home/jj/.local/share/weiwu')
 TARGETS=['scripts/local-api.ts','apps/api/src/cost-control.ts']
 def sha(data):return hashlib.sha256(data).hexdigest()
 
-def patches(originals,release,root,state):
+def patches(originals,release,root,state,control_root=None):
+    control_root=control_root or root
     anchor=' const prepared=prepareCompletionRequest(model,messages,maxTokens,request);'
     source=originals[TARGETS[1]].decode();assert source.count(anchor)==1,'Source changed: do not patch by guess'
     bootstrap='''import {existsSync,readFileSync,openSync,writeSync,fsyncSync,closeSync} from 'node:fs';
@@ -33,11 +34,17 @@ ProductDshRuntime.prototype.start=function(input){
   const expected=%s;
   if(config.sessionId!==options.sessionId||model.id!==expected.id||model.version!==expected.version||model.inputRate!==expected.inputRate||model.outputRate!==expected.outputRate)throw Error('Acceptance model/config changed');
   const {assertRemainingCall}=await import(%s);
-  const quote=assertRemainingCall(options.sessionId,prepared.body,config);
+  let quote;
+  try{quote=assertRemainingCall(options.sessionId,prepared.body,config);}
+  catch(error){
+   if(error.code!=='ACCEPTANCE_PLANNING_BUDGET')throw error;
+   writeFileSync(config.quotePath+'.rejected.json',JSON.stringify({code:error.code,quote:error.quote,allowance:error.allowance,modelDispatched:false}),{flag:'wx',mode:0o600});
+   throw new AppError(422,'本次完整请求预留超过本轮规划剩余额度，未发送给模型。',error.code);
+  }
   writeFileSync(config.quotePath,JSON.stringify({quote,maxTokens,sessionId:options.sessionId}),{flag:'wx',mode:0o600});
  }
 ''' % tuple(json.dumps(x) for x in ['organization:'+state['conversationId'],str(root/'planning-guard.json'),expected,(release/'scripts/validation/task-driven-organization/remaining-call-budget.mjs').as_uri()])
-    return {'files':{TARGETS[0]:('await import('+json.dumps((root/'boundary-bootstrap.mjs').as_uri())+');\n').encode()+originals[TARGETS[0]],TARGETS[1]:source.replace(anchor,anchor+guard).encode()},'bootstrap':bootstrap}
+    return {'files':{TARGETS[0]:('await import('+json.dumps((control_root/'boundary-bootstrap.mjs').as_uri())+');\n').encode()+originals[TARGETS[0]],TARGETS[1]:source.replace(anchor,anchor+guard).encode()},'bootstrap':bootstrap}
 
 def service(action):subprocess.run(['systemctl','--user',action,SERVICE],check=True)
 def health(app):
@@ -55,19 +62,20 @@ def run(root,mode):
     release=pathlib.Path(subprocess.check_output(['systemctl','--user','show',SERVICE,'--property=WorkingDirectory','--value'],text=True).strip()).resolve()
     assert release.is_relative_to((BASE/'releases').resolve()) and (release/'scripts/validation/step-checkpoints/controlled-step-boundary.mjs').is_file()
     assert all((release/name).resolve().is_relative_to(release) for name in TARGETS)
-    record=root/'control-installed.json'
+    control_root=app.control_root();record=control_root/'control-installed.json'
     if mode in ['check','install']:
         assert not record.exists(),'Controls already recorded: inspect, do not reinstall'
         assert not [r for r in app.api('/runs') if r['status'] in ['running','queued']]
         app.money()
         originals={name:(release/name).read_bytes() for name in TARGETS}
-        result=patches(originals,release,root,app.s)
+        result=patches(originals,release,root,app.s,control_root)
         if mode=='check':return {'preflight':True,'release':str(release),'targets':TARGETS,'modelCalls':0}
         assert app.s.get('authorized') is True,'Paid phase allocation not yet authorized'
-        saved={name:{'originalSha256':sha(originals[name]),'patchedSha256':sha(result['files'][name]),'backup':str(root/(pathlib.Path(name).name+'.original'))} for name in TARGETS}
+        control_root.mkdir(exist_ok=True,mode=0o700)
+        saved={name:{'originalSha256':sha(originals[name]),'patchedSha256':sha(result['files'][name]),'backup':str(control_root/(pathlib.Path(name).name+'.original'))} for name in TARGETS}
         for name in TARGETS:
             with pathlib.Path(saved[name]['backup']).open('xb') as file:file.write(originals[name]);file.flush();os.fsync(file.fileno())
-        with (root/'boundary-bootstrap.mjs').open('x',encoding='utf-8') as file:file.write(result['bootstrap'])
+        with (control_root/'boundary-bootstrap.mjs').open('x',encoding='utf-8') as file:file.write(result['bootstrap'])
         # Persist the restoration recipe before the first service/source mutation.
         # A crash must leave enough information to inspect or restore originals.
         with record.open('x',encoding='utf-8') as file:
@@ -96,7 +104,7 @@ def run(root,mode):
         run=app.api('/runs/'+rid+'?limit=1');assert not run['recovery']['unknownOperations']
         before.update(run=run,boundary=boundary,artifacts=app.api('/runs/'+rid+'/artifacts'))
     else:assert not active
-    with (root/('before-'+mode+'.json')).open('x',encoding='utf-8') as file:json.dump(before,file,ensure_ascii=False,indent=2)
+    with (control_root/('before-'+mode+'.json')).open('x',encoding='utf-8') as file:json.dump(before,file,ensure_ascii=False,indent=2)
     service('stop')
     for name,proof in installed['files'].items():(release/name).write_bytes(pathlib.Path(proof['backup']).read_bytes())
     service('start');health(app)
@@ -104,7 +112,7 @@ def run(root,mode):
     assert {c['id']:(c['amount'],c['status']) for c in app.api('/costs')['calls']}=={c['id']:(c['amount'],c['status']) for c in before['costs']['calls']}
     after={'restored':True,'usageUnchanged':True,'unknownFeesUnchanged':True,'money':app.money()}
     if mode=='restart':after['run']=app.api('/runs/'+app.s['runId']+'?limit=1')
-    with (root/('after-'+mode+'.json')).open('x',encoding='utf-8') as file:json.dump(after,file,ensure_ascii=False,indent=2)
+    with (control_root/('after-'+mode+'.json')).open('x',encoding='utf-8') as file:json.dump(after,file,ensure_ascii=False,indent=2)
     return {'restored':True,'status':after.get('run',{}).get('status'),'money':after['money']}
 
 if __name__=='__main__':

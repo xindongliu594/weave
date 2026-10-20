@@ -610,7 +610,9 @@ export class OpenAiCompatibleAdapter extends LlmAdapter {
       try{if(registered&&!accounted)await this.onCallError?.({...receivedMetadata,id:usageId,dispatched,code:typeof error.code==='string'?error.code:'CALL_INTERRUPTED'});}catch(failure){accountingError=failure;}
       const normalized = accountingError?new LlmError('费用状态未能持久化，停止运行并保留请求预留','BILLING_PERSISTENCE_FAILED',{cause:accountingError}):
         error instanceof LlmError || error === this.stopReason ? error : !dispatched&&typeof error.status==='number'&&typeof error.code==='string'?new LlmError(error.message,error.code):
-        options.signal?.aborted ? options.signal.reason ?? error : new LlmError('无法连接中转站执行模型请求', 'CONNECTION_FAILED', { cause: error });
+        options.signal?.aborted ? options.signal.reason ?? error : !dispatched ?
+        new LlmError('本地请求准备或验收校验失败，请求尚未发送到中转站；请查看运行诊断。', 'MODEL_ADMISSION_FAILED', { cause: error }) :
+        new LlmError('无法连接中转站执行模型请求', 'CONNECTION_FAILED', { cause: error });
       this.onError?.(normalized);
       throw normalized;
     } finally {

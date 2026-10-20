@@ -16,6 +16,19 @@ const options = { model: route.id, messages: [{ role: 'user', content: [{ type: 
 const consume = async (adapter, chunks = []) => { for await (const chunk of adapter.stream(options)) chunks.push(chunk); };
 const response = () => Response.json({ choices: [{ message: { tool_calls: [{ id: 'late-call', type: 'function', function: { name: 'artifact_write', arguments: '{"path":"late.txt","content":"late"}' } }] }, finish_reason: 'tool_calls' }], usage: { prompt_tokens: 37, completion_tokens: 5 } }, { headers: { 'X-Oneapi-Request-Id': 'original-response' } });
 
+test('local pre-dispatch failure is not reported as a relay connection failure or charged', async () => {
+  const original=globalThis.fetch;let fetches=0;const usages=[],errors=[];
+  globalThis.fetch=async()=>{fetches++;return response();};
+  try {
+    const adapter=new OpenAiCompatibleAdapter({routes:[route],maxBudget:1,
+      beforeRequest:async()=>{throw Error('private diagnostic must not be exposed');},
+      onUsage:value=>usages.push(value),onCallError:value=>errors.push(value)});
+    await assert.rejects(consume(adapter),error=>error.code==='MODEL_ADMISSION_FAILED'&&/尚未发送/.test(error.message)&&!error.message.includes('private diagnostic'));
+    assert.equal(fetches,0);assert.deepEqual(usages,[]);assert.deepEqual(errors,[]);
+    assert.equal(adapter.spent,0);assert.equal(adapter.reserved,0);assert.equal(adapter.pendingRequests,0);
+  }finally{globalThis.fetch=original;}
+});
+
 test('an internal stop settles only its original late response and emits no tool calls or new requests', async () => {
   const original = globalThis.fetch, usages = [], errors = [], metadata = [], chunks = [], ids = [];
   let resolveResponse, dispatched, fetches = 0;

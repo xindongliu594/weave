@@ -55,3 +55,21 @@ test('new team uses the same explicit confirmation and V2 cannot enter the legac
  const r=await call('/organizations/previews/'+f.previewId+'/confirm',{previewVersion:1});assert.equal(r.status,201,JSON.stringify(r));assert.notEqual(r.data.departmentId,f.departmentId);
  const p=(await pool.query('SELECT plan,policy FROM projects WHERE id=$1',[r.data.projectId])).rows[0];assert.ok(p.policy.allowedDepartmentIds.includes(r.data.departmentId));assert.equal(p.plan.agents.length,2);
 });
+
+test('confirmed verification reuse choices survive the formal execution snapshot', {timeout:10000}, async()=>{
+ const f=await fixture();
+ Object.assign(f.draft.plan.tasks[0],{verificationReuse:'never'});
+ Object.assign(f.draft.plan.tasks[1],{verificationReuse:'same-workspace'});
+ await pool.query('UPDATE organization_previews SET data=$2 WHERE id=$1',[f.previewId,f.draft]);
+ // The coordinator is closed by this API fixture; no model or command executes.
+ await pool.query('UPDATE models SET capabilities=$1 WHERE id=$2',[{tools:{status:'supported',checkedAt:new Date().toISOString(),testId:'confirmation-fixture',probeVersion:'fixture'}},'m']);
+ const confirmed=await call('/organizations/previews/'+f.previewId+'/confirm',{previewVersion:1});assert.equal(confirmed.status,201,JSON.stringify(confirmed));
+ const project=(await pool.query('SELECT plan,version FROM projects WHERE id=$1',[confirmed.data.projectId])).rows[0];
+ assert.equal(project.plan.tasks.find((task:any)=>task.id==='check').verificationReuse,'same-workspace');
+ const started=await call('/projects/'+confirmed.data.projectId+'/approve',{version:project.version});assert.equal(started.status,202,JSON.stringify(started));
+ const run=(await pool.query('SELECT snapshot,status FROM project_runs WHERE id=$1',[started.data.id])).rows[0];
+ assert.equal(run.status,'queued');
+ assert.equal(run.snapshot.tasks.find((task:any)=>task.id==='check').verificationReuse,'same-workspace');
+ assert.equal(run.snapshot.tasks.find((task:any)=>task.id==='write').verificationReuse,'never');
+ assert.equal(Object.hasOwn(run.snapshot.tasks.find((task:any)=>task.id==='deliver'),'verificationReuse'),false);
+});

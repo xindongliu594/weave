@@ -1,0 +1,171 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ V2 correction retains the failed candidate only for the matching conversation and error (3321.972ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3959.2201
+
+✖ failing tests:
+
+test at tests\organization-chat.test.ts:1:17542
+✖ V2 correction retains the failed candidate only for the matching conversation and error (3321.972ms)
+  AssertionError [ERR_ASSERTION]: correction must receive the actual failed candidate, not only its prose summary
+  + actual - expected
+
+  + undefined
+  - {
+  -   deliveryCriteria: [],
+  -   rationale: '开发先产出，再由独立员工验收，经理汇总。',
+  -   schemaVersion: 2,
+  -   target: {
+  -     department: {
+  -       agents: [
+  -         {
+  -           id: 'manager',
+  -           instructions: '明确职责、记录依据并遵守批准范围。',
+  -           modelId: '66e790df-7a78-45d7-a975-c6fcbcf68a35',
+  -           name: '需求经理',
+  -           role: 'manager',
+  -           title: '项目经理',
+  -           tools: []
+  -         },
+  -         {
+  -           id: 'developer',
+  -           instructions: '明确职责、记录依据并遵守批准范围。',
+  -           modelId: '66e790df-7a78-45d7-a975-c6fcbcf68a35',
+  -           name: '开发员工',
+  -           role: 'member',
+  -           title: '开发工程师',
+  -           tools: [
+  -             'filesystem',
+  -             'artifact_write',
+  -             'terminal_test'
+  -           ]
+  -         },
+  -         {
+  -           id: 'reviewer',
+  -           instructions: '明确职责、记录依据并遵守批准范围。',
+  -           modelId: '66e790df-7a78-45d7-a975-c6fcbcf68a35',
+  -           name: '开发员工',
+  -           role: 'member',
+  -           title: '开发工程师',
+  -           tools: [
+  -             'filesystem',
+  -             'terminal_test'
+  -           ]
+  -         }
+  -       ],
+  -       description: '独立实现和测试。',
+  -       name: 'Todo 研发部'
+  -     },
+  -     kind: 'new'
+  -   },
+  -   tasks: [
+  -     {
+  -       acceptanceChecks: [
+  -         {
+  -           command: 'node --test smoke.test.mjs',
+  -           criterionIndex: 0,
+  -           minimumTests: 1
+  -         }
+  -       ],
+  -       acceptanceCriteria: [
+  -         '接口自检通过'
+  -       ],
+  -       assigneeId: 'developer',
+  -       dependencies: [],
+  -       estimatedInputTokens: 500,
+  -       estimatedOutputTokens: 400,
+  -       id: 'implement',
+  -       inScope: [
+  -         'todo.mjs',
+  -         'smoke.test.mjs'
+  -       ],
+  -       inputs: [],
+  -       kind: 'implementation',
+  -       objective: '在批准目录实现 Todo 接口与测试。',
+  -       outputs: [
+  -         {
+  -           path: 'todo.mjs'
+  -         },
+  -         {
+  -           path: 'smoke.test.mjs'
+  -         }
+  -       ],
+  -       subject: '开发 Todo API',
+  -       verify: [
+  -         'node --test smoke.test.mjs'
+  -       ]
+  -     },
+  -     {
+  -       acceptanceChecks: [
+  -         {
+  -           command: 'node --test smoke.test.mjs',
+  -           criterionIndex: 0,
+  -           minimumTests: 1
+  -         }
+  -       ],
+  -       acceptanceCriteria: [
+  -         '读取当前产物并核对真实命令结果'
+  -       ],
+  -       assigneeId: 'reviewer',
+  -       dependencies: [
+  -         'implement'
+  -       ],
+  -       estimatedInputTokens: 500,
+  -       estimatedOutputTokens: 200,
+  -       id: 'review',
+  -       inputs: [
+  -         {
+  -           path: 'todo.mjs',
+  -           producerTaskId: 'implement'
+  -         },
+  -         {
+  -           path: 'smoke.test.mjs',
+  -           producerTaskId: 'implement'
+  -         }
+  -       ],
+  -       kind: 'review',
+  -       maxReworkRounds: 0,
+  -       objective: '读取开发文件并实际运行已授权的验证命令，返回审查结论。',
+  -       outputs: [],
+  -       reviewedTaskId: 'implement',
+  -       subject: '独立检查实现',
+  -       verify: [
+  -         'node --test smoke.test.mjs'
+  -       ]
+  -     },
+  -     {
+  -       acceptanceCriteria: [
+  -         '清楚区分通过项与未完成项'
+  -       ],
+  -       assigneeId: 'manager',
+  -       dependencies: [
+  -         'review'
+  -       ],
+  -       estimatedInputTokens: 200,
+  -       estimatedOutputTokens: 200,
+  -       id: 'deliver',
+  -       kind: 'work',
+  -       objective: '汇总审查结论、使用方法和未完成项。',
+  -       subject: '经理汇总验收'
+  -     }
+  -   ]
+  - }
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-chat.test.ts:159:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { schemaVersion: 2, target: { kind: 'new', department: [Object] }, rationale: '开发先产出，再由独立员工验收，经理汇总。', tasks: [ [Object], [Object], [Object] ], deliveryCriteria: [] },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

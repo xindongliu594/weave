@@ -1,0 +1,594 @@
+{
+  "passed": false,
+  "reason": "QA handoff/manager acceptance and eligible test reuse remain unverified",
+  "projectId": "b1f501a7-cc42-46d7-9b73-357f1b003fcc",
+  "conversationId": "dfbbdb84-030d-49b5-b685-bf5444b21ab1",
+  "limits": {
+    "planning": 0.05,
+    "execution": 0.13,
+    "phase": 0.18,
+    "cumulative": 3.41,
+    "planningCalls": 4,
+    "executionCalls": 32
+  },
+  "money": {
+    "phaseSpent": 0.0994842,
+    "occupied": 3.3199451,
+    "phaseRemaining": 0.0805158
+  },
+  "planningCalls": 4,
+  "planningCost": 0.0207528,
+  "modelCalls": 31,
+  "calls": [
+    {
+      "id": "8c23d631-98da-4be1-a880-857deeffbca2",
+      "runId": "58de522b-7015-4d8b-98dd-6e3d7557bfc1",
+      "sessionId": "ab9b32c7-eaf7-404e-8e2c-608947923bc7",
+      "taskId": "verify",
+      "requestId": "2b1b8211-ddf3-45ba-afc5-e652d45d6963",
+      "inputTokens": 12157,
+      "outputTokens": 220,
+      "durationMs": 2183,
+      "cost": 0.0039111,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "5c4b5505-0b0f-46bc-a180-5ea3b61c0732",
+      "runId": "58de522b-7015-4d8b-98dd-6e3d7557bfc1",
+      "sessionId": "ab9b32c7-eaf7-404e-8e2c-608947923bc7",
+      "taskId": "verify",
+      "requestId": "fa1c4cd4-1d8f-4dbc-8426-640d134512e6",
+      "inputTokens": 11292,
+      "outputTokens": 99,
+      "durationMs": 2402,
+      "cost": 0.0035064000000000002,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "0fcb5773-1aad-4bd4-b533-a9587d001b2e",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "8ca3c06e-1b3a-463e-95c4-148c4dfffb41",
+      "inputTokens": 9031,
+      "outputTokens": 56,
+      "durationMs": 2270,
+      "cost": 0.0027764999999999995,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "4aab6242-d2b5-45a4-bda0-16e5eae80614",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "d886a0eb-27d3-4121-b55a-16d23ca9c00f",
+      "inputTokens": 8916,
+      "outputTokens": 63,
+      "durationMs": 1568,
+      "cost": 0.0027503999999999996,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "576bfe9c-2cdd-48ba-9c75-33f96f22a6c2",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "4cba95b1-ec2b-4239-8085-012ddb71ce36",
+      "inputTokens": 8849,
+      "outputTokens": 39,
+      "durationMs": 1661,
+      "cost": 0.0027015,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "b8c0bda5-f7de-4f0f-a3ae-972c0f4abed9",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "d80596e5-63b4-4644-985e-e43b5b0925c6",
+      "inputTokens": 8715,
+      "outputTokens": 61,
+      "durationMs": 1670,
+      "cost": 0.0026877,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "83751900-65df-44c1-bb2e-7e807b851afd",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "bef6450c-2982-4ebb-8a98-083392216a7d",
+      "inputTokens": 8587,
+      "outputTokens": 55,
+      "durationMs": 1389,
+      "cost": 0.0026421,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "d59a6982-dc44-4703-a7d6-d16f5a058777",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "0e4bb5c7-55e2-4d04-9497-65e9d111cb94",
+      "inputTokens": 8404,
+      "outputTokens": 84,
+      "durationMs": 1490,
+      "cost": 0.002622,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "74dcea65-c754-46ce-a34c-54fcfba68c1c",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "6cd5c20a-1941-4e4e-8118-da94d62c0266",
+      "inputTokens": 8273,
+      "outputTokens": 58,
+      "durationMs": 2167,
+      "cost": 0.0025515,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "e21b5073-52c2-4e35-985c-0f6dfa7dcf75",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "6b5cd689-91a8-40ee-82ac-58d496b80be2",
+      "inputTokens": 8140,
+      "outputTokens": 60,
+      "durationMs": 4312,
+      "cost": 0.002514,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "3707d136-addd-4482-86b0-1e0a2558afcc",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "9e317879-2a6c-4263-ab8f-3763b2756464",
+      "inputTokens": 8028,
+      "outputTokens": 62,
+      "durationMs": 1674,
+      "cost": 0.0024828000000000003,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "bfc412cf-dc87-49a6-af82-5a688d56431f",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "bc3915da-d99a-4889-bc98-290a6a6f5c61",
+      "inputTokens": 7920,
+      "outputTokens": 58,
+      "durationMs": 1467,
+      "cost": 0.0024456,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "975ce220-4152-42b8-8d92-2df3e3b8bc77",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "55d65d1b-6056-4b2f-93bd-587d00b6867c",
+      "inputTokens": 7819,
+      "outputTokens": 51,
+      "durationMs": 20528,
+      "cost": 0.0024068999999999996,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "11e4abac-5a0d-47cd-af67-7f9f2a74721c",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "2bfc14c1-3fdd-4567-bd53-f0381bf0119d",
+      "taskId": "verify",
+      "requestId": "6b717c8b-11cd-4497-b7dc-5eb408f4c7b9",
+      "inputTokens": 13833,
+      "outputTokens": 54,
+      "durationMs": 1754,
+      "cost": 0.0042147,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "b7257db3-a507-4b81-96e7-2f4908b48df0",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "9db2ed7f-cf85-4370-b8f3-d3c99b6a886e",
+      "inputTokens": 7692,
+      "outputTokens": 54,
+      "durationMs": 17762,
+      "cost": 0.0023724,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "e9ef4480-af24-4661-8fbb-6298c1432da1",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "c4eae1c1-16e8-43b6-bd0d-63b633bc8c50",
+      "inputTokens": 7591,
+      "outputTokens": 51,
+      "durationMs": 22379,
+      "cost": 0.0023384999999999994,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "d5bf0706-1cc2-4c47-b453-43caa51604be",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "2bfc14c1-3fdd-4567-bd53-f0381bf0119d",
+      "taskId": "verify",
+      "requestId": "f7eaff1e-b14e-4fe0-8a1e-5eb83fc63494",
+      "inputTokens": 12247,
+      "outputTokens": 862,
+      "durationMs": 4315,
+      "cost": 0.0047085,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "16514daf-696c-42d3-a3d4-38871e0a5d37",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "f3be031e-9f63-49bb-a48f-11d1b1100666",
+      "inputTokens": 7466,
+      "outputTokens": 52,
+      "durationMs": 5105,
+      "cost": 0.0023022,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "b610f4be-3c07-413f-aa00-a38fb090f1d6",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "2447c873-a5e6-4c51-8f3f-630673699b9c",
+      "inputTokens": 7306,
+      "outputTokens": 104,
+      "durationMs": 3271,
+      "cost": 0.0023166,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "25494879-97a1-4d41-8f3a-2ff59ee3b360",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "2bfc14c1-3fdd-4567-bd53-f0381bf0119d",
+      "taskId": "verify",
+      "requestId": "d3f0f923-1312-49a7-a86b-735f8d5825f6",
+      "inputTokens": 9830,
+      "outputTokens": 162,
+      "durationMs": 23033,
+      "cost": 0.0031434,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "542bcd58-39a6-466b-9f72-ab463eaff9a4",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "ec503413-87ad-455f-a571-3a7202db4485",
+      "taskId": null,
+      "requestId": "9fe11105-e691-496d-9773-d72b669ddf82",
+      "inputTokens": 7225,
+      "outputTokens": 72,
+      "durationMs": 1736,
+      "cost": 0.0022539,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "11dea1fb-3f9b-40d4-8abf-e50e9f7f57be",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "2bfc14c1-3fdd-4567-bd53-f0381bf0119d",
+      "taskId": "verify",
+      "requestId": "c8fe70ab-b912-4333-b477-83f7d75417a6",
+      "inputTokens": 9032,
+      "outputTokens": 103,
+      "durationMs": 18701,
+      "cost": 0.0028331999999999997,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "97522dee-a931-4c70-a619-b410c7f4b028",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "8add598e-59a7-4e7a-ba59-7d5324673787",
+      "taskId": "develop",
+      "requestId": "e4bad2c3-ca69-4d3e-8813-41b61f10b7e2",
+      "inputTokens": 9912,
+      "outputTokens": 1030,
+      "durationMs": 5277,
+      "cost": 0.0042096,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "9fff5d04-6825-4747-890c-20de732ee3e2",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "8add598e-59a7-4e7a-ba59-7d5324673787",
+      "taskId": "develop",
+      "requestId": "69077a3e-6377-4320-a7f6-42d477490953",
+      "inputTokens": 10711,
+      "outputTokens": 86,
+      "durationMs": 2181,
+      "cost": 0.0033164999999999996,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "39333486-b330-43de-8f17-ddcc4732b687",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "8add598e-59a7-4e7a-ba59-7d5324673787",
+      "taskId": "develop",
+      "requestId": "9f9a1445-88b2-4995-92ba-da86192294e7",
+      "inputTokens": 8511,
+      "outputTokens": 925,
+      "durationMs": 4017,
+      "cost": 0.0036632999999999995,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "5ad6dffc-b855-4381-be0f-c6a394d5470a",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "8add598e-59a7-4e7a-ba59-7d5324673787",
+      "taskId": "develop",
+      "requestId": "1bb9edd0-c7c8-4023-8032-5659ca008ce7",
+      "inputTokens": 8350,
+      "outputTokens": 137,
+      "durationMs": 2005,
+      "cost": 0.0026694,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "0d634f83-d076-484f-8889-40c731ab0fd1",
+      "runId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "sessionId": "8add598e-59a7-4e7a-ba59-7d5324673787",
+      "taskId": "develop",
+      "requestId": "833f4764-ef58-49ec-9280-770fa5e5cd2e",
+      "inputTokens": 7597,
+      "outputTokens": 93,
+      "durationMs": 2145,
+      "cost": 0.0023907,
+      "purpose": "项目执行"
+    },
+    {
+      "id": "f7c0130a-1a66-413e-a1ec-ab66dfe6ca24",
+      "runId": null,
+      "sessionId": "organization:dfbbdb84-030d-49b5-b685-bf5444b21ab1",
+      "taskId": null,
+      "requestId": null,
+      "inputTokens": 11260,
+      "outputTokens": 1561,
+      "durationMs": null,
+      "cost": 0.0052512,
+      "purpose": "组织需求对话"
+    },
+    {
+      "id": "9119579c-1f92-429c-a0fb-d9159a2333b0",
+      "runId": null,
+      "sessionId": "organization:dfbbdb84-030d-49b5-b685-bf5444b21ab1",
+      "taskId": null,
+      "requestId": null,
+      "inputTokens": 11038,
+      "outputTokens": 1602,
+      "durationMs": null,
+      "cost": 0.0052338,
+      "purpose": "组织需求对话"
+    },
+    {
+      "id": "32b87799-c214-47a8-bcef-9f7bdcc0dfb0",
+      "runId": null,
+      "sessionId": "organization:dfbbdb84-030d-49b5-b685-bf5444b21ab1",
+      "taskId": null,
+      "requestId": null,
+      "inputTokens": 10768,
+      "outputTokens": 1549,
+      "durationMs": null,
+      "cost": 0.0050891999999999995,
+      "purpose": "组织需求对话"
+    },
+    {
+      "id": "f0995507-1c45-4a71-ad40-ad43247fbda7",
+      "runId": null,
+      "sessionId": "organization:dfbbdb84-030d-49b5-b685-bf5444b21ab1",
+      "taskId": null,
+      "requestId": null,
+      "inputTokens": 10518,
+      "outputTokens": 1686,
+      "durationMs": null,
+      "cost": 0.0051786,
+      "purpose": "组织需求对话"
+    }
+  ],
+  "parent": {
+    "id": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+    "status": "failed",
+    "outcome": {
+      "status": "failed",
+      "message": "无法连接中转站执行模型请求",
+      "usageCost": 0.0713139
+    },
+    "wireRequests": 25,
+    "completedTaskIds": [
+      "develop"
+    ],
+    "restored": null,
+    "artifacts": [
+      {
+        "path": "README.md",
+        "size": 1922,
+        "sha256": "24267fad691c2c8a2bc671a0ad1dab89fd5bc9cdc3a36eddc72951e77d4f8c9b"
+      },
+      {
+        "path": "cli.mjs",
+        "size": 886,
+        "sha256": "f646988cd3e1514220822a1e4d8e0042d7fd535642950898627d90e45646048d"
+      },
+      {
+        "path": "cli.test.mjs",
+        "size": 2896,
+        "sha256": "a041570018409ee9a5a9688e8442432555108d52d8624b1de8c9e88a8feccef9"
+      }
+    ],
+    "commands": [
+      {
+        "id": "d6e346e0-3c1e-4cb4-b9dc-e6e8d4ffff07",
+        "status": "completed",
+        "command": "node --check cli.mjs",
+        "exitCode": 0,
+        "output": ""
+      },
+      {
+        "id": "1b4638b9-74ea-4d29-8c4d-f37e25cd11cd",
+        "status": "completed",
+        "command": "node --test cli.test.mjs",
+        "exitCode": 0,
+        "output": "✔ 0 摄氏度转换为 32 华氏度（冰点） (1.184643ms)\n✔ 100 摄氏度转换为 212 华氏度（沸点） (0.135441ms)\n✔ -40 摄氏度与华氏度数值相等 (0.160763ms)\n✔ 小数输入：37.5 摄氏度转换为 99.5 华氏度 (0.149121ms)\n✔ 负小数输入：-0.5 摄氏度按公式换算 (0.316096ms)\n✔ 字符串输入抛出 TypeError (0.407438ms)\n✔ null 输入抛出 TypeError (0.144824ms)\n✔ NaN 输入抛出 TypeError (0.192357ms)\n✔ Infinity 输入抛出 TypeError (0.172463ms)\n✔ -Infinity 输入抛出 TypeError (0.239314ms)\n✔ 其它非 number 类型（undefined、boolean、对象、数组）抛出 TypeError (0.240813ms)\n✔ 有限数值均返回有限 number 结果 (0.152338ms)\nℹ tests 12\nℹ suites 0\nℹ pass 12\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 67.410527\n"
+      }
+    ]
+  },
+  "child": {
+    "id": "58de522b-7015-4d8b-98dd-6e3d7557bfc1",
+    "status": "failed",
+    "outcome": {
+      "status": "failed",
+      "message": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 59604 字节，精简前预留 $0.02801880；当前请求字节上限 96000；可用预算 $0.02268270；输出上限 8192 tokens 保持不变；单次完整上下文最低预留 $0.02482620，至少另需 $0.00214350",
+      "usageCost": 0.0074175000000000005
+    },
+    "wireRequests": 2,
+    "completedTaskIds": [],
+    "restored": {
+      "sourceRunId": "4f739f61-0cbb-49b5-9ea5-719d851dd56f",
+      "completed": [
+        "develop"
+      ],
+      "files": [
+        {
+          "path": "cli.mjs",
+          "size": 886,
+          "state": "accepted",
+          "sha256": "f646988cd3e1514220822a1e4d8e0042d7fd535642950898627d90e45646048d",
+          "producerTaskId": "develop"
+        },
+        {
+          "path": "cli.test.mjs",
+          "size": 2896,
+          "state": "unverified",
+          "sha256": "a041570018409ee9a5a9688e8442432555108d52d8624b1de8c9e88a8feccef9"
+        },
+        {
+          "path": "README.md",
+          "size": 1922,
+          "state": "accepted",
+          "sha256": "24267fad691c2c8a2bc671a0ad1dab89fd5bc9cdc3a36eddc72951e77d4f8c9b",
+          "producerTaskId": "develop"
+        }
+      ]
+    },
+    "artifacts": [
+      {
+        "path": "README.md",
+        "size": 1922,
+        "sha256": "24267fad691c2c8a2bc671a0ad1dab89fd5bc9cdc3a36eddc72951e77d4f8c9b"
+      },
+      {
+        "path": "cli.mjs",
+        "size": 886,
+        "sha256": "f646988cd3e1514220822a1e4d8e0042d7fd535642950898627d90e45646048d"
+      },
+      {
+        "path": "cli.test.mjs",
+        "size": 2896,
+        "sha256": "a041570018409ee9a5a9688e8442432555108d52d8624b1de8c9e88a8feccef9"
+      }
+    ],
+    "commands": []
+  },
+  "recoveryConditions": {
+    "runId": "58de522b-7015-4d8b-98dd-6e3d7557bfc1",
+    "projectId": "b1f501a7-cc42-46d7-9b73-357f1b003fcc",
+    "planVersion": 1,
+    "checkedAt": "2026-10-20T01:09:02.410Z",
+    "originalBudget": 0.13,
+    "costReadiness": {
+      "recordedCost": 0.07873139999999999,
+      "reserved": 0,
+      "availableBudget": 0.05126860000000001,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    },
+    "choices": {
+      "retainUncertainCosts": false,
+      "acknowledgeUnknownOperations": false
+    },
+    "nativeRequestChecked": false,
+    "unknownOperationCount": 0,
+    "unknownOperationIds": [],
+    "calls": {
+      "used": 27,
+      "limit": 32,
+      "remaining": 5
+    },
+    "tasks": [
+      {
+        "id": "develop",
+        "subject": "实现纯函数 CLI 与使用说明",
+        "recordedCost": 0.0162495,
+        "reserved": 0,
+        "budgetLimit": 0.035,
+        "availableBudget": 0.018750500000000003,
+        "calls": 5,
+        "callLimit": 10,
+        "remainingCalls": 5,
+        "completed": true
+      },
+      {
+        "id": "verify",
+        "subject": "独立测试纯函数 temperature",
+        "recordedCost": 0.022317299999999998,
+        "reserved": 0,
+        "budgetLimit": 0.045,
+        "availableBudget": 0.0226827,
+        "calls": 6,
+        "callLimit": 12,
+        "remainingCalls": 6,
+        "completed": false
+      },
+      {
+        "id": "review",
+        "subject": "经理只读验收实现与测试证据",
+        "recordedCost": 0,
+        "reserved": 0,
+        "budgetLimit": 0.02,
+        "availableBudget": 0.02,
+        "calls": 0,
+        "callLimit": 8,
+        "remainingCalls": 8,
+        "completed": false
+      }
+    ],
+    "resume": {
+      "allowed": true,
+      "reasons": [],
+      "completedTaskIds": [
+        "develop"
+      ]
+    },
+    "retry": {
+      "allowed": true,
+      "reasons": [],
+      "completedTaskIds": []
+    }
+  },
+  "filesMatch": true,
+  "developerNotRerun": true,
+  "controlledBoundaryReached": false,
+  "originalControlsRestored": true,
+  "sevenUnknownHoldsUnchanged": true,
+  "deployment": {
+    "passed": true,
+    "release": "/home/jj/.local/share/weiwu/releases/weiwu-hardening-snapshot-20261020",
+    "backup": "/home/jj/.local/share/weiwu/backups/mvp-hardening-snapshot-predeploy-20261020",
+    "packageSha256": "e03ad9daf8ed8b403b8cfdd0a14c91b51f386fe4860f3b81401a6774d5143f0b",
+    "stoppedAudit": {
+      "activeRuns": 0,
+      "activeMessages": 0,
+      "pendingCalls": 0,
+      "activeCapabilities": 0
+    }
+  }
+}

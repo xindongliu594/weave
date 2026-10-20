@@ -1,0 +1,15 @@
+✔ remaining real planning request is bounded before reserve or dispatch (1.226593ms)
+✔ over-budget rejection exposes bounded quote metadata for the local acceptance controller (0.287104ms)
+✔ failed draft survives JSONB key ordering and enters context as unvalidated data (4.272947ms)
+✔ changed authorization, error or conversation history prevents cached correction (1.017438ms)
+✔ expired, future, malformed and altered stored candidates are omitted (1.294366ms)
+✔ UTF-8 size and nesting limits never return a partial candidate (0.683146ms)
+✔ restored cache metadata cannot bypass lifetime or context size bounds (1.446898ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 303.115881

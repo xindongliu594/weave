@@ -1,8 +1,9 @@
 """Remove only this phase's two verified disposable copies; keep original backup."""
 import json,pathlib,shutil,sys
 base=pathlib.Path('/home/jj/.local/share/weiwu')
-assert sys.argv[1:] in [[],['--apply'],['--final-check'],['--final-apply'],['--runtime-check'],['--runtime-apply']]
-suffix='-runtime' if sys.argv[1:] and sys.argv[1].startswith('--runtime-') else '-final' if sys.argv[1:] and sys.argv[1].startswith('--final-') else ''
+allowed=['final','runtime','correction','admission','snapshot']
+assert sys.argv[1:] in [[],['--apply']]+[[f'--{phase}-{mode}'] for phase in allowed for mode in ['check','apply']]
+suffix=next(('-'+phase for phase in allowed if sys.argv[1:] and sys.argv[1].startswith('--'+phase+'-')),'')
 phase=base/('validation/mvp-hardening'+suffix+'-20261020')
 if suffix:
  deployment=json.loads((phase/'deployment.json').read_text())
@@ -24,7 +25,7 @@ for target in targets:
  assert not (target/'postmaster.pid').exists() and not (target/'database/postmaster.pid').exists()
  files=list(target.rglob('*'));assert not any(p.is_symlink() for p in files)
  proof.append({'path':str(target),'bytes':sum(p.stat().st_size for p in files if p.is_file())})
-if sys.argv[1:] in [['--apply'],['--final-apply'],['--runtime-apply']]:
+if sys.argv[1:] and sys.argv[1].endswith('apply'):
  destination=phase/'probe-cleanup.json';assert not destination.exists()
  # Re-assert each literal resolved path at the mutation boundary.
  for target in targets:

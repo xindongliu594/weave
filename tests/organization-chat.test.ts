@@ -137,6 +137,74 @@ test('an explicit next turn sends validation feedback to one model call without 
   assert.equal(repeated.data.preview.previewId, result.data.preview.previewId); assert.equal(requests, beforeRequests + 2);
 });
 
+test('V2 correction retains the failed candidate only for the matching conversation and error', async t => {
+  const source = implementationCandidate(), conversationId = randomUUID();
+  const draft: any = { schemaVersion: 2, target: { kind: 'new', department: source.department }, rationale: source.rationale, tasks: source.tasks,
+    orchestration: { pattern: 'pipeline', rationale: '开发后独立检查' }, deliveryCriteria: [] };
+  delete draft.orchestration;
+  const args = input({ organizationRouting: true, conversationId, policy: { ...policy, allowedModelIds: [modelId], allowedTools: ['filesystem', 'artifact_write', 'terminal_test'] } });
+  const before = await counts(), calls = requests;
+  response = { reply: '待补齐编排说明。', candidate: draft };
+  const failed = await call('/organizations/chat', args);
+  assert.equal(failed.status, 200); assert.equal(failed.data.preview, undefined);
+  assert.equal(failed.data.draftIssue.code, 'ORGANIZATION_CHAT_PLAN_INVALID');
+  assert.deepEqual(await counts(), before);
+  response = { reply: '继续讨论方案。' };
+  const findFailed = () => wire.messages.map((item: any) => { try { return JSON.parse(item.content); } catch { return {}; } }).find((item: any) => item.kind === 'failed_organization_draft');
+  await call('/organizations/chat', { ...args, conversationId: randomUUID(), previousDraftIssue: failed.data.draftIssue });
+  assert.equal(findFailed(), undefined, 'another conversation cannot borrow a failed candidate');
+  const key = randomUUID(), correction = { ...args, previousDraftIssue: failed.data.draftIssue, messages: [firstMessage, { role: 'user', content: '请根据校验问题修正刚才的方案。' }] };
+  const rejectLocally = t.mock.method(AbortSignal, 'timeout', () => { throw new Error('local request-setup failure fixture'); });
+  try {
+    const rejected = await call('/organizations/chat', correction);
+    assert.equal(rejected.status, 502); assert.equal(requests, calls + 2, 'request setup failed before an upstream request');
+    const retained = (await pool.query('SELECT failed_draft FROM organization_conversations WHERE id=$1', [conversationId])).rows[0].failed_draft;
+    assert.deepEqual(retained?.candidate, draft, 'local pre-dispatch failure must not consume the last correctable candidate');
+  } finally { rejectLocally.mock.restore(); }
+  const result = await call('/organizations/chat', correction, key);
+  assert.equal(result.status, 200);
+  assert.deepEqual(findFailed()?.candidate, draft, 'correction must receive the actual failed candidate, not only its prose summary');
+  assert.equal(JSON.stringify(result.data).includes('failed_organization_draft'), false, 'invalid draft stays server-side');
+  assert.deepEqual(await counts(), before); assert.equal(requests, calls + 3);
+  await call('/organizations/chat', correction, key); assert.equal(requests, calls + 3, 'idempotency never makes another call');
+  await call('/organizations/chat', correction); assert.equal(findFailed(), undefined, 'consumed failure is not reused across later turns');
+});
+
+test('V2 failed candidates expire, bind current permissions, and cannot publish out of order', async () => {
+  const source = implementationCandidate();
+  const draft: any = { schemaVersion: 2, target: { kind: 'new', department: source.department }, rationale: source.rationale, tasks: source.tasks,
+    orchestration: { pattern: 'pipeline', rationale: '开发后独立检查' }, deliveryCriteria: [{ id: 'todo', description: '接口可用', producerTaskIds: ['implement'], checkTaskId: 'review', checkCriteriaIndexes: [0], independent: true }] };
+  const broken = structuredClone(draft); delete broken.orchestration;
+  const args = input({ organizationRouting: true, conversationId: randomUUID(), policy: { ...policy, allowedModelIds: [modelId], allowedTools: ['filesystem', 'artifact_write', 'terminal_test'] } });
+  response = { reply: '需要修正草案。', candidate: broken };
+  const failed = await call('/organizations/chat', args);
+  const saved = (await pool.query('SELECT failed_draft FROM organization_conversations WHERE id=$1', [args.conversationId])).rows[0].failed_draft;
+  assert.deepEqual(saved.candidate, broken); assert.ok(saved.usageId);
+  const correction = { ...args, previousDraftIssue: failed.data.draftIssue, messages: [firstMessage, { role: 'user', content: '继续修正。' }] };
+  response = { reply: '按收缩后的授权继续讨论。' };
+  await call('/organizations/chat', { ...correction, policy: { ...args.policy, allowedTools: [] } });
+  assert.equal(wire.messages.some((m: any) => m.content.includes('"kind":"failed_organization_draft"')), false);
+  assert.deepEqual(JSON.parse(wire.messages[1].content).policy.allowedTools, []);
+  assert.equal((await pool.query('SELECT failed_draft FROM organization_conversations WHERE id=$1', [args.conversationId])).rows[0].failed_draft, null);
+  await pool.query('UPDATE organization_conversations SET failed_draft=$2 WHERE id=$1', [args.conversationId, { ...saved, expiresAt: '2000-01-01T00:00:00.000Z' }]);
+  await call('/organizations/chat', correction);
+  assert.equal(wire.messages.some((m: any) => m.content.includes('"kind":"failed_organization_draft"')), false);
+  assert.equal((await pool.query('SELECT failed_draft FROM organization_conversations WHERE id=$1', [args.conversationId])).rows[0].failed_draft, null);
+  heldResponses = [];
+  const waitFor = async (count: number) => { for (let i = 0; i < 200 && heldResponses!.length < count; i++) await new Promise(r => setTimeout(r, 10)); assert.equal(heldResponses!.length, count); };
+  try {
+    response = { reply: '旧的失败草案。', candidate: broken };
+    const old = call('/organizations/chat', args); await waitFor(1);
+    response = { reply: '最新可确认方案。', candidate: draft };
+    const current = call('/organizations/chat', correction); await waitFor(2);
+    heldResponses[1](); const valid = await current; assert.ok(valid.data.preview, JSON.stringify(valid));
+    heldResponses[0](); const stale = await old; assert.equal(stale.status, 409); assert.equal(stale.data.code, 'ORGANIZATION_PREVIEW_STALE');
+    const row = (await pool.query('SELECT preview_id,failed_draft FROM organization_conversations WHERE id=$1', [args.conversationId])).rows[0];
+    assert.equal(row.preview_id, valid.data.preview.previewId); assert.equal(row.failed_draft, null);
+    assert.ok(!valid.data.preview.requirement.includes(failed.data.draftIssue.message));
+  } finally { for (const finish of heldResponses ?? []) finish(); heldResponses = undefined; }
+});
+
 test('client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call', async () => {
   response = { reply: '待确认方案。', candidate: implementationCandidate() };
   const before = await counts(), beforeRequests = requests;

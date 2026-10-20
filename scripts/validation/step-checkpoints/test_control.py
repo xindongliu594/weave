@@ -16,6 +16,9 @@ class ControlTest(unittest.TestCase):
             self.assertIn('organization:conversation',guard)
             self.assertIn('assertRemainingCall',guard)
             self.assertIn("flag:'wx'",guard)
+            self.assertIn('ACCEPTANCE_PLANNING_BUDGET',guard)
+            self.assertIn("throw new AppError(422",guard)
+            self.assertIn("quotePath+'.rejected.json'",guard)
             self.assertIn('atStepBoundary',result['bootstrap'])
             self.assertNotIn('atAcceptedBoundary',result['bootstrap'])
             for changed in [b'no anchor',originals['apps/api/src/cost-control.ts']*2]:

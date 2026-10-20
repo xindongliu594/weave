@@ -1,0 +1,78 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executable candidate without host mappings is rejected without save or hidden model repair (2873.634ms)
+✔ syntax-only acceptance is rejected at chat and confirmation while independent QA plans remain confirmable (161.3392ms)
+✔ V2 conversation recommends existing employees without changing their department and expires old drafts (136.3719ms)
+✔ out-of-order V2 replies cannot resurrect an older conversation turn or confirm it later (187.4171ms)
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (53.0902ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (112.5238ms)
+✔ V2 correction retains the failed candidate only for the matching conversation and error (202.5466ms)
+✔ V2 failed candidates expire, bind current permissions, and cannot publish out of order (279.7547ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (39.1343ms)
+✔ documented JSON mode preserves receipts and never retries: gpt-4.1-mini (70.6832ms)
+✔ documented JSON mode preserves receipts and never retries: deepseek-v4.1-flash (85.2869ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (74.4157ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (35.9914ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (90.3389ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (76.5785ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (35.9919ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (304.1721ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (140.2462ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (137.5715ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (123.8759ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (180.7082ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (356.1708ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (87.3629ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (44.9853ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (278.361ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (283.6681ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7105.1711
+✔ assembled generation schema excludes forbidden new-department fields without changing existing-team selection (2923.5057ms)
+✔ legacy conversation uses the same restricted generation fields while retaining its old envelope (88.4728ms)
+✔ all seven untouched real failures stay rejected with safe output diagnostics and no hidden retry or saved artifacts (512.2988ms)
+✔ real malformed handoff reports independent contract errors without correcting or saving the candidate (119.2073ms)
+✔ real self-acceptance stays rejected once while a clearly marked local mapping fixture can preview (132.4915ms)
+✔ handoff-only failures remain rejected and oversized diagnostics fit the next-turn contract (163.5408ms)
+✔ assembled terminal routing request distinguishes template preview rework from legacy zero rework (63.5618ms)
+✔ assembled terminal routing request requires independent criteria for every referenced template (65.4978ms)
+✔ assembled non-routing terminal request retains the legacy zero-rework contract without the template catalog (57.583ms)
+✔ pipeline previews and confirms frozen references, but all approval routes are blocked before effects (159.0394ms)
+✔ parallel previews and confirms frozen references, but all approval routes are blocked before effects (107.0191ms)
+✔ router previews and confirms frozen references, but all approval routes are blocked before effects (110.635ms)
+✔ orchestrator_workers previews and confirms frozen references, but all approval routes are blocked before effects (114.2794ms)
+✔ review_repair previews and confirms frozen references, but all approval routes are blocked before effects (107.3305ms)
+✔ map_reduce previews and confirms frozen references, but all approval routes are blocked before effects (108.6407ms)
+✔ proposal_review previews and confirms frozen references, but all approval routes are blocked before effects (111.9083ms)
+✔ bad template id, hash and binding yield explicit draft issues without saving a preview (154.6628ms)
+✔ legacy candidate without a template remains confirmable (76.7367ms)
+✔ archive reads and resource recovery retain frozen orchestration without selecting a current definition (80.6321ms)
+✔ a real preview with a future QA test command is rejected before saving and without hidden repair (66.8105ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6186.9662
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (2444.3496ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (161.9992ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (669.3501ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (617.6433ms)
+✔ active paid manager replies block export and restore before any database replacement (174.8214ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (427.7055ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5190.8394

@@ -1,0 +1,66 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (1362.407511ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (53.630057ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (208.679222ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (212.786821ms)
+✔ active paid manager replies block export and restore before any database replacement (47.34502ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (180.057006ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2440.543924
+✔ gateway discovery, formal execution, versioned plans and deletion preserve history (2928.768283ms)
+✔ organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost (347.092422ms)
+✔ model planning preserves user input scope and refuses to remove an input recipient (237.533543ms)
+✔ dynamic loopback preview can save a gateway through the local proxy (13.805269ms)
+✔ cross-origin mutations, remote host headers, and malformed data fail closed (19.078778ms)
+✔ small trace pages preserve every complete event and do not change the full export (52.885884ms)
+✔ trace verification API persists a run and serves history after recreating the app (311.800914ms)
+✔ one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings (97.044807ms)
+✔ catalog refuses quotes fetched across a concurrent gateway edit (10.29188ms)
+✔ text replies accept null tool calls but reject malformed non-null calls and retain usage (118.821715ms)
+✔ gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes (56.552818ms)
+✔ gateway service checks reject results from a changed connection and diagnose a closed port (13.966356ms)
+✔ official pricing is the default, matches exact models, and does not fetch relay public prices (6.725718ms)
+✔ planning timeouts preserve the saved plan and keep unresolved billing without automatic retries (561.664105ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5096.939286
+✔ confirmation creates a project only, freezes selected sources, and duplicate requests are idempotent (1461.70785ms)
+✔ superseded, edited or archived source drafts cannot create a project (44.574537ms)
+✔ new team uses the same explicit confirmation and V2 cannot enter the legacy department-update endpoint (32.702038ms)
+✔ confirmed verification reuse choices survive the formal execution snapshot (51.744917ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1865.635172
+✔ legacy registration gets native default; OpenShell registration requires Linux and hides credentials (997.272823ms)
+✔ existing device cannot change backend fingerprint, grant or platform or re-enable itself (70.218314ms)
+✔ unbound or changed approved backend cannot enqueue; valid approved identity can (64.496157ms)
+✔ employee permissions and exact per-command approvals still apply to OpenShell (52.086684ms)
+✔ invalid sandbox receipt leaves started operation unresolved; valid receipt is durable and idempotent (195.210612ms)
+✔ lost unstarted claim is re-offered; started unknown outcome is never replayed (138.797736ms)
+✔ withdrawn grant preserves late receipt without completing or reactivating the device (71.744793ms)
+✔ only an approved task opt-in adds the trusted confinement profile to test operations (44.334828ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1975.278498

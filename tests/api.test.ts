@@ -2,7 +2,7 @@ import { before, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { once } from 'node:events';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import pg from 'pg';
@@ -258,6 +258,14 @@ test('small trace pages preserve every complete event and do not change the full
   const exported=await call(`/runs/${archive.id}/export`);assert.deepEqual(exported.data.events,all);
   assert.equal((await call(`/runs/${archive.id}`)).data.events.length,66,'existing API consumers keep the default page size');
   for(const limit of ['0','301','1.5','bad'])assert.equal((await call(`/runs/${archive.id}?limit=${limit}`)).status,422);
+  const {commitStepCheckpoint}=await import('../services/agent-runtime/step-checkpoints.mjs');
+  const workspace=join(archive.dir,'artifacts');await mkdir(workspace);
+  const checkpoint=commitStepCheckpoint({archive,workspace,boundary:{taskId:'qa',attemptId:'fixture-attempt',sessionId:'fixture-session',trigger:'tool-result',eventCursor:66,contractHash:'a'.repeat(64)}});
+  const tiny=await call(`/runs/${archive.id}?limit=1`);
+  assert.equal(tiny.status,200);assert.equal(tiny.data.events.length,1);assert.equal(tiny.data.hasMore,true);
+  assert.equal(tiny.data.events.some((event:any)=>event.type==='step/checkpoint'),false);
+  assert.deepEqual(tiny.data.summaryEvents.map((event:any)=>({type:event.type,id:event.data.id,seq:event.seq})),[{type:'step/checkpoint',id:checkpoint.id,seq:67}]);
+  assert.deepEqual(tiny.data.summaryEvents[0].data.boundary,checkpoint.boundary);
 });
 
  test('trace verification API persists a run and serves history after recreating the app', async () => {

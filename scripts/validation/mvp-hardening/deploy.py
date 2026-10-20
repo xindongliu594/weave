@@ -5,14 +5,15 @@ Run as JJ's user. Do not print or copy runtime credentials outside JJ.
 import hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, time, urllib.request
 os.umask(0o077)
 
-assert sys.argv[1:] in [['--check'],['--apply'],['--final-check'],['--final-apply'],['--runtime-check'],['--runtime-apply']]
-phase='runtime' if sys.argv[1].startswith('--runtime-') else 'final' if sys.argv[1].startswith('--final-') else 'initial'
-apply=sys.argv[1].endswith('apply')
+assert sys.argv[1:] in [['--check'],['--apply'],['--final-check'],['--final-apply'],['--runtime-check'],['--runtime-apply'],['--correction-check'],['--correction-apply'],['--correction-resume'],['--admission-check'],['--admission-apply'],['--snapshot-check'],['--snapshot-apply']]
+phase='snapshot' if sys.argv[1].startswith('--snapshot-') else 'admission' if sys.argv[1].startswith('--admission-') else 'correction' if sys.argv[1].startswith('--correction-') else 'runtime' if sys.argv[1].startswith('--runtime-') else 'final' if sys.argv[1].startswith('--final-') else 'initial'
+resume=sys.argv[1]=='--correction-resume'
+apply=sys.argv[1].endswith('apply') or resume
 ROOT=pathlib.Path('/home/jj/.local/share/weiwu')
-suffix={'initial':'','final':'-final','runtime':'-runtime'}[phase]
+suffix={'initial':'','final':'-final','runtime':'-runtime','correction':'-correction','admission':'-admission','snapshot':'-snapshot'}[phase]
 BASE=ROOT/('validation/mvp-hardening'+suffix+'-20261020')
 RELEASE=ROOT/('releases/weiwu-hardening'+suffix+'-20261020')
-OLD=ROOT/('releases/'+{'initial':'weiwu-step-checkpoints-v2-20261020','final':'weiwu-hardening-20261020','runtime':'weiwu-hardening-final-20261020'}[phase])
+OLD=ROOT/('releases/'+{'initial':'weiwu-step-checkpoints-v2-20261020','final':'weiwu-hardening-20261020','runtime':'weiwu-hardening-final-20261020','correction':'weiwu-hardening-runtime-20261020','admission':'weiwu-hardening-correction-20261020','snapshot':'weiwu-hardening-admission-20261020'}[phase])
 DATA=ROOT/'data/pilot'
 BACKUP=ROOT/('backups/mvp-hardening'+suffix+'-predeploy-20261020')
 UNIT=pathlib.Path('/home/jj/.config/systemd/user/weiwu-jj.service')
@@ -57,7 +58,7 @@ assert command('systemctl','--user','show',SERVICE,'--property=WorkingDirectory'
 original=UNIT.read_text()
 assert original.count('WorkingDirectory='+str(OLD))==1
 for path in [BASE,RELEASE,OLD,DATA,BACKUP]: bounded(path,ROOT)
-assert not RELEASE.exists() and not BACKUP.exists(), 'Release/backup already exists; inspect rather than replay'
+assert not BACKUP.exists() and (RELEASE.is_dir() if resume else not RELEASE.exists()), 'Release/backup state changed; inspect rather than replay'
 assert (OLD/'node_modules').is_dir() and (OLD/'services/agent-runtime/node_modules').is_dir()
 assert shutil.disk_usage(ROOT).free>3*1024**3, 'Need at least 3 GiB free for release and backup'
 package=BASE/'release.tar.gz'
@@ -73,23 +74,27 @@ before=idle_snapshot()
 if not apply:
     print(json.dumps({'preflight':True,'modelCalls':0,'before':before,'packageSha256':expected}));sys.exit(0)
 
-RELEASE.mkdir()
+if not resume:RELEASE.mkdir()
 with tarfile.open(package,'r:gz') as archive:
     for entry in archive:
         target=RELEASE/entry.name
         if entry.isdir(): target.mkdir(parents=True,exist_ok=True)
         else:
+            if resume:
+                assert target.is_file() and not target.is_symlink() and hashlib.sha256(target.read_bytes()).digest()==hashlib.sha256(archive.extractfile(entry).read()).digest(),'Prepared release differs from original package: '+entry.name
+                continue
             target.parent.mkdir(parents=True,exist_ok=True)
             with archive.extractfile(entry) as src,open(target,'xb') as dst: shutil.copyfileobj(src,dst)
             target.chmod(entry.mode & 0o777)
 for relative in ['node_modules','services/agent-runtime/node_modules']:
-    (RELEASE/relative).symlink_to(OLD/relative,target_is_directory=True)
+    if resume:assert (RELEASE/relative).is_symlink() and (RELEASE/relative).resolve()==(OLD/relative).resolve()
+    else:(RELEASE/relative).symlink_to(OLD/relative,target_is_directory=True)
 assert (RELEASE/'dist/web/index.html').is_file()
 assert (RELEASE/'apps/api/src/step-checkpoint-recovery.ts').is_file()
 assert (RELEASE/'apps/desktop/checkpoint-test-profile.cjs').is_file()
 node=ROOT/'runtime/node-v24.19.0-linux-x64/bin/node'
 with (BASE/'linux-tests.txt').open('w') as evidence:
-    subprocess.run([str(node),'--test','services/agent-runtime/supervisor.test.mjs',
+    subprocess.run(([str(node),'--test','services/agent-runtime/model-settlement.test.mjs','services/agent-runtime/responses-compatible.test.mjs'] if phase=='snapshot' else [str(node),'--import','tsx','--test','tests/organization-failed-draft.test.ts','scripts/validation/task-driven-organization/remaining-call-budget.test.mjs'] if phase=='admission' else [str(node),'--test','services/agent-runtime/supervisor.test.mjs',
         'services/agent-runtime/supervisor-persistence.test.mjs','services/agent-runtime/step-checkpoints.test.mjs',
         'services/agent-runtime/inherited-step-evidence.test.mjs','services/agent-runtime/storage-governance.test.mjs',
         'services/agent-runtime/sandbox-checkpoint.test.mjs','services/agent-runtime/step-checkpoint-crash.test.mjs',
@@ -98,11 +103,11 @@ with (BASE/'linux-tests.txt').open('w') as evidence:
         'services/agent-runtime/delivery-settlement.test.mjs','services/agent-runtime/model-settlement.test.mjs',
         'services/agent-runtime/product-tools.test.mjs','services/agent-runtime/task-plan-context.test.mjs',
         'services/agent-runtime/task-output-limit-native.test.mjs','services/agent-runtime/handoff-fixtures.test.mjs',
-        'scripts/validation/step-checkpoints/controlled-step-boundary.test.mjs'],
+        'scripts/validation/step-checkpoints/controlled-step-boundary.test.mjs']),
         cwd=RELEASE,stdout=evidence,stderr=subprocess.STDOUT,check=True,timeout=120,
         env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')})
 with (BASE/'linux-backup.txt').open('w') as evidence:
-    subprocess.run([str(node),'scripts/test-integration.mjs','tests/extensions-backup.test.ts'],
+    subprocess.run([str(node),'scripts/test-integration.mjs','tests/extensions-backup.test.ts',*(['tests/api.test.ts','tests/organization-routing-confirmation.test.ts','tests/openshell-api-admission.test.ts'] if phase=='snapshot' else ['tests/organization-chat.test.ts','tests/orchestration-pattern-integration.test.ts'] if phase in ['correction','admission'] else [])],
         cwd=RELEASE,stdout=evidence,stderr=subprocess.STDOUT,check=True,timeout=180,
         env={**os.environ,'PATH':str(node.parent)+':'+os.environ.get('PATH','')})
 # This is an announced, idle maintenance window, not a concurrent-deployment API.

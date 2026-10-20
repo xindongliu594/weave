@@ -1,0 +1,38 @@
+✔ remaining real planning request is bounded before reserve or dispatch (3.0077ms)
+✖ over-budget rejection exposes bounded quote metadata for the local acceptance controller (1.7214ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 154.727
+
+✖ failing tests:
+
+test at scripts\validation\task-driven-organization\remaining-call-budget.test.mjs:12:1
+✖ over-budget rejection exposes bounded quote metadata for the local acceptance controller (1.7214ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - 'ACCEPTANCE_PLANNING_BUDGET'
+
+      at Object.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/scripts/validation/task-driven-organization/remaining-call-budget.test.mjs:15:10)
+      at expectedException (node:assert:578:17)
+      at expectsError (node:assert:703:21)
+      at strict.throws (node:assert:759:3)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/scripts/validation/task-driven-organization/remaining-call-budget.test.mjs:14:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'ACCEPTANCE_PLANNING_BUDGET',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

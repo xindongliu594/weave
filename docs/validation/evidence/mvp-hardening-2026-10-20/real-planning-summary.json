@@ -1,0 +1,113 @@
+{
+  "snapshotPhase": "Historical snapshot after the third planning call; superseded by real-recovery-summary.json for current totals",
+  "conversationId": "dfbbdb84-030d-49b5-b685-bf5444b21ab1",
+  "money": {
+    "phaseSpent": 0.0155016,
+    "occupied": 3.2359625,
+    "phaseRemaining": 0.1644984
+  },
+  "modelCalls": 3,
+  "calls": [
+    {
+      "id": "9119579c-1f92-429c-a0fb-d9159a2333b0",
+      "requestId": null,
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 11038,
+      "outputTokens": 1602,
+      "cost": 0.0052338,
+      "createdAt": "2026-10-20T00:23:22.339Z",
+      "purpose": "组织需求对话"
+    },
+    {
+      "id": "32b87799-c214-47a8-bcef-9f7bdcc0dfb0",
+      "requestId": null,
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10768,
+      "outputTokens": 1549,
+      "cost": 0.0050891999999999995,
+      "createdAt": "2026-10-20T00:03:23.069Z",
+      "purpose": "组织需求对话"
+    },
+    {
+      "id": "f0995507-1c45-4a71-ad40-ad43247fbda7",
+      "requestId": null,
+      "modelId": "c8a4e6ad-1aaf-43a4-8ba1-d0a6cce59051",
+      "inputTokens": 10518,
+      "outputTokens": 1686,
+      "cost": 0.0051786,
+      "createdAt": "2026-10-20T00:02:26.719Z",
+      "purpose": "组织需求对话"
+    }
+  ],
+  "requests": {
+    "plan": {
+      "status": "returned",
+      "issue": {
+        "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+        "message": "生成草案校验失败：verify: 逐项检查必须恰好覆盖每一条验收标准；已有方案未改变，可以继续讨论修改。"
+      },
+      "httpStatus": null,
+      "outputDiagnostic": {
+        "finishReason": "stop",
+        "originalOutputSHA": "6d6bbdadbcb810ba8019f84659242f56a91a0ebb312a10d4b2dfb95b9fbb945c",
+        "outputBytes": 6558,
+        "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+        "position": null
+      }
+    },
+    "correct": {
+      "status": "returned",
+      "issue": {
+        "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+        "message": "本轮团队方案尚不完整，暂不能保存。待修正字段：orchestration：Invalid input: expected object, received undefined；deliveryCriteria：Invalid input: expected array, received undefined；已有方案未改变，可以继续讨论修改。"
+      },
+      "httpStatus": null,
+      "outputDiagnostic": {
+        "finishReason": "stop",
+        "originalOutputSHA": "a2b016dbff6576c024ce88eb7b65cfb52c191a089aace9af90f147ea5cdf7754",
+        "outputBytes": 5983,
+        "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+        "position": null
+      }
+    },
+    "revised-plan": {
+      "status": "returned",
+      "issue": {
+        "code": "ORGANIZATION_CHAT_PLAN_INVALID",
+        "message": "生成草案校验失败：develop: 语法检查 node --check cli.mjs 只放在 verify 自检中，不得作为 acceptanceChecks 的功能验收证据；由后续独立 QA 提供实际测试；已有方案未改变，可以继续讨论修改。"
+      },
+      "httpStatus": null,
+      "outputDiagnostic": {
+        "finishReason": "stop",
+        "originalOutputSHA": "d400a75795522e14f9fb7847fa441d819fba25da9a18215a3eb06d2182e8cabf",
+        "outputBytes": 6205,
+        "reason": "ORGANIZATION_CHAT_PLAN_INVALID",
+        "position": null
+      }
+    },
+    "revised-correct": {
+      "status": "http_error",
+      "issue": null,
+      "httpStatus": 500,
+      "outputDiagnostic": null
+    }
+  },
+  "projectCreated": false,
+  "runCreated": false,
+  "unknownHoldCount": 7,
+  "lastLocalRejectedQuoteFileExists": false,
+  "controlsRestored": true,
+  "deployment": {
+    "passed": true,
+    "release": "/home/jj/.local/share/weiwu/releases/weiwu-hardening-admission-20261020",
+    "backup": "/home/jj/.local/share/weiwu/backups/mvp-hardening-admission-predeploy-20261020",
+    "packageSha256": "d6353386f82a46562105540a8c37b0ab6342b20601808bd85821d720d97a0c9d",
+    "database": "connected",
+    "stoppedAudit": {
+      "activeRuns": 0,
+      "activeMessages": 0,
+      "pendingCalls": 0,
+      "activeCapabilities": 0
+    }
+  }
+}

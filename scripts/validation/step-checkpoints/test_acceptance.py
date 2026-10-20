@@ -1,13 +1,49 @@
 """Harness tests only; never real employee or model acceptance evidence."""
-import copy, pathlib, sys, unittest
+import copy, pathlib, sys, tempfile, unittest
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'acceptance-loop'))
 from test_driver import fixture
 try:
-    from acceptance import validate_checkpoint_case, totals
+    from acceptance import Acceptance, validate_checkpoint_case, totals
 except ImportError:
     validate_checkpoint_case = totals = None
 
 class CheckpointCaseTest(unittest.TestCase):
+    def test_redistribution_is_explicit_and_a_dispatched_quote_blocks_another_call(self):
+        with tempfile.TemporaryDirectory() as temp:
+            app=Acceptance(temp)
+            app.s={'requests':{}}
+            with self.assertRaises(AssertionError):app.planning_request(final=True)
+            app.s['planningRedistribution']={'approved':True,'planning':0.05,'execution':0.13,'remainingModelCalls':1}
+            app.s['requests']={'revised-plan':{'status':'returned','body':{'messages':[{'role':'user','content':'requirement'}]},'result':{'reply':'draft','draftIssue':{'code':'INVALID','message':'wrong check'}}},'revised-correct':{'status':'http_error','result':{'httpStatus':500}}}
+            (app.root/'controls-v2').mkdir();(app.root/'controls-v2/after-remove.json').write_text('{"restored":true,"usageUnchanged":true,"unknownFeesUnchanged":true}')
+            label,messages,_=app.planning_request(final=True);self.assertEqual(label,'final-plan');self.assertIn('$0.13',messages[-1]['content'])
+            self.assertEqual(sum(app.limits()),__import__('decimal').Decimal('.18'))
+            (app.root/'revised-correct-quote.json').write_text('{}')
+            with self.assertRaises(AssertionError):app.planning_request(final=True)
+
+    def test_continuation_requires_extra_call_approval_and_preserves_prior_history(self):
+        with tempfile.TemporaryDirectory() as temp:
+            app=Acceptance(temp)
+            first={'role':'user','content':'original requirement'}
+            returned={'status':'returned','body':{'messages':[first]},'result':{'reply':'failed','draftIssue':{'code':'INVALID','message':'missing field'}}}
+            app.s={'requests':{'plan':copy.deepcopy(returned),'correct':copy.deepcopy(returned)}}
+            with self.assertRaises(AssertionError):app.planning_request(revised=True)
+            app.s['planningContinuation']={'approved':True,'maxExtraCalls':2,'maxPlanningCost':0.03}
+            with self.assertRaises(AssertionError):app.planning_request(revised=True)
+            (app.root/'after-remove.json').write_text('{}')
+            with self.assertRaises(AssertionError):app.planning_request(revised=True)
+            (app.root/'after-remove.json').write_text('{"restored":true,"usageUnchanged":true,"unknownFeesUnchanged":true}')
+            old=copy.deepcopy(app.s['requests'])
+            label,messages,previous=app.planning_request(revised=True)
+            self.assertEqual(label,'revised-plan');self.assertEqual(messages[0],first)
+            self.assertEqual(previous,returned['result']['draftIssue']);self.assertEqual(app.s['requests'],old)
+            app.s['requests'][label]={'status':'returned','body':{'messages':messages},'result':returned['result']}
+            with self.assertRaises(AssertionError):app.planning_request(revised=True)
+            label,following,_=app.planning_request(correction=True,revised=True)
+            self.assertEqual(label,'revised-correct');self.assertEqual(following[:len(messages)],messages)
+            app.s['requests'][label]=returned
+            with self.assertRaises(AssertionError):app.planning_request(correction=True,revised=True)
+
     def candidate(self):
         plan=fixture()
         plan['tasks'][1]['verificationReuse']='same-workspace'

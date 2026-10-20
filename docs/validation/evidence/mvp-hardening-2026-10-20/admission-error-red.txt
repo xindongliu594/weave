@@ -1,0 +1,46 @@
+✖ local pre-dispatch failure is not reported as a relay connection failure or charged (8.2617ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 874.7782
+
+✖ failing tests:
+
+test at services\agent-runtime\model-settlement.test.mjs:19:1
+✖ local pre-dispatch failure is not reported as a relay connection failure or charged (8.2617ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  LlmError: 无法连接中转站执行模型请求
+      at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:26:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: LlmError: 无法连接中转站执行模型请求
+        at OpenAiCompatibleAdapter.stream (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/openai-compatible.mjs:613:68)
+        at async consume (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:16:68)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:26:5)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+      [cause]: Error: private diagnostic must not be exposed
+          at OpenAiCompatibleAdapter.beforeRequest (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:24:37)
+          at OpenAiCompatibleAdapter.stream (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/openai-compatible.mjs:513:33)
+          at stream.next (<anonymous>)
+          at consume (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:16:68)
+          at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/model-settlement.test.mjs:26:26)
+          at Test.runInAsyncScope (node:async_hooks:227:14)
+          at Test.run (node:internal/test_runner/test:1201:25)
+          at Test.start (node:internal/test_runner/test:1096:17)
+          at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+    },
+    operator: 'rejects',
+    diff: 'simple'
+  }

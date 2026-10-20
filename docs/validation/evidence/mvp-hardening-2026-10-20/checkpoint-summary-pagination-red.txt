@@ -1,0 +1,39 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ small trace pages preserve every complete event and do not change the full export (2903.088ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3526.7366
+
+✖ failing tests:
+
+test at tests\api.test.ts:1:21784
+✖ small trace pages preserve every complete event and do not change the full export (2903.088ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + []
+  - [
+  -   {
+  -     id: 'a9562ff7-12b2-4163-b352-255274631e2c',
+  -     seq: 67,
+  -     type: 'step/checkpoint'
+  -   }
+  - ]
+
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api.test.ts:267:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ { type: 'step/checkpoint', id: 'a9562ff7-12b2-4163-b352-255274631e2c', seq: 67 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

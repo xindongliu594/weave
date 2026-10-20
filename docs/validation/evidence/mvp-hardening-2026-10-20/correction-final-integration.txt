@@ -1,0 +1,12 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ V2 correction retains the failed candidate only for the matching conversation and error (3246.1201ms)
+✔ V2 failed candidates expire, bind current permissions, and cannot publish out of order (231.4604ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4054.2503

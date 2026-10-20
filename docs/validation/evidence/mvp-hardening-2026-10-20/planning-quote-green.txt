@@ -1,0 +1,10 @@
+✔ remaining real planning request is bounded before reserve or dispatch (9.423ms)
+✔ over-budget rejection exposes bounded quote metadata for the local acceptance controller (1.6884ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 456.868
