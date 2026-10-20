@@ -22,6 +22,15 @@ export async function migrateIdentity(db: IdentityQueryExecutor): Promise<void> 
     -- connect-pg-simple's official sid/sess/expire layout (tableName: human_sessions).
     CREATE TABLE IF NOT EXISTS human_sessions (sid varchar NOT NULL PRIMARY KEY, sess json NOT NULL, expire timestamp(6) NOT NULL);
     CREATE INDEX IF NOT EXISTS human_sessions_expire ON human_sessions(expire);
+    -- A SID may only be admitted by trusted issuance. Root rows serialize its whole login lineage.
+    CREATE TABLE IF NOT EXISTS human_session_lifecycles (
+      sid varchar PRIMARY KEY, family_sid varchar NOT NULL, valid_until timestamptz NOT NULL,
+      retain_until timestamptz NOT NULL, revoked_at timestamptz, family_revoked_at timestamptz
+    );
+    CREATE INDEX IF NOT EXISTS human_session_lifecycles_family ON human_session_lifecycles(family_sid);
+    CREATE INDEX IF NOT EXISTS human_session_lifecycles_expire ON human_session_lifecycles(retain_until) WHERE sid=family_sid;
+    -- Pre-lineage sessions cannot safely be adopted: force a new login, without changing users/epochs.
+    DELETE FROM human_sessions WHERE NOT EXISTS (SELECT 1 FROM human_session_lifecycles life WHERE life.sid=human_sessions.sid);
     CREATE TABLE IF NOT EXISTS oidc_login_transactions (
       id text PRIMARY KEY, session_binding_hash text NOT NULL, state_hash text NOT NULL UNIQUE,
       nonce text NOT NULL, verifier text NOT NULL, issuer text NOT NULL, client_id text NOT NULL,
