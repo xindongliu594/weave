@@ -89,6 +89,7 @@ export async function migrateProduct(pool: pg.Pool) {
       PRIMARY KEY(run_id,task_id,attempt_id,generation)
     );
     CREATE UNIQUE INDEX IF NOT EXISTS task_attempt_active_generation ON task_attempt_workspaces(run_id,task_id) WHERE phase='active';
+    ALTER TABLE task_attempt_workspaces ADD COLUMN IF NOT EXISTS accepted_stop jsonb;
   `);
   // Preserve the existing scope on upgrade; do not invent policies for older historical versions.
   const client=await pool.connect();

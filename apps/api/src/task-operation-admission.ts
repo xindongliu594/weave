@@ -6,6 +6,7 @@ import {assertCurrentRunPermissions} from './execution-policy.ts';
 import {readCommittedCanonical} from './task-canonical.ts';
 import {resolveTaskScope} from './task-execution.ts';
 import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
+import {assertTaskAcceptedStopAdmission} from './task-accepted-stop-state.ts';
 
 export const taskOperationDenied=(message:string,code='TASK_SCOPE_DENIED'):never=>{throw new AppError(409,message,code);};
 export function publicTaskScope(scope:TaskExecutionScope){return {profile:scope.profile,key:scope.key,scopeHash:scope.workspace.scopeHash,workRevision:scope.workRevision};}
@@ -28,6 +29,7 @@ export async function admitTaskOperation(db:pg.PoolClient,run:any,traceRoot:stri
   run.status!=='running'||run.cancel_requested||!context||!Number.isSafeInteger(context.generation)||context.generation<1||
   ['agentId','sessionId','taskId','attemptId'].some(k=>typeof context[k]!=='string'||!context[k]))taskOperationDenied('任务执行身份或运行状态无效');
  await assertCurrentRunPermissions(run,db,{requireLocalOnline});
+ await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation});
  await assertNoUnresolvedTaskOperation(db,run.id,exceptId);
  const archived=readRun(traceRoot,run.id);if(!archived||archived.integrity!=='ok')taskOperationDenied('可信任务档案不可用');run.events=archived!.events;
  const task=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active' FOR UPDATE",[run.id,context.taskId,context.attemptId,context.generation])).rows[0];

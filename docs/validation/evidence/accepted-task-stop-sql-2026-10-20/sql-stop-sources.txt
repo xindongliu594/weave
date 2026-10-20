@@ -1,0 +1,7 @@
+51bf01f2ed8eaa06e7c20ae5423c97fdb8173e2791391cd1ac3be60428884a7a  apps/api/src/task-accepted-stop-state.ts
+a1b6a696fc54e028ba3eff90284d7263ef2e798d40ff8a734fa82f09678bd78b  apps/api/src/product-schema.ts
+fa35f5f614013404e2f489549f305a3d6bf4a945079503700735838442f2c77f  apps/api/src/task-execution.ts
+dacfa702578efca5197d2d987ccf03ede27c1b8aec52ffa084785aa9873473c8  apps/api/src/task-operation-admission.ts
+f9d7ae9a0aa4e3b4106c06e4e843b648e3d47ab79f95924c66648d1a560cee6c  tests/task-accepted-stop-state.test.ts
+334bb97f97202fd702694fe8809dee81b664bd8d236eb16510bc76495e06a51a  tests/task-accepted-stop-http.test.ts
+2a6bcd88e1a452378bd72c92cdbaaecdbf8c5a6dbec5b617c301ca0e2a95e2ec  tests/task-execution-scope.test.ts

@@ -1,0 +1,33 @@
+✔ explicit execution mode is independent of identity and task profile stays unavailable (2.4819ms)
+✔ server allocates generation, pins true import ancestry and never imports private files (3256.963ms)
+✔ forged employee rejected before queue (2591.1944ms)
+✔ forged task rejected before queue (2363.0372ms)
+✔ forged attempt rejected before queue (2625.3424ms)
+✔ forged session rejected before queue (2266.0441ms)
+✔ forged assignee rejected before queue (2380.7378ms)
+✔ completed task rejected before queue (2295.9948ms)
+✔ failed task rejected before queue (2072.2432ms)
+✔ model readPaths rejected before queue (2148.6694ms)
+✔ stale rework hash rejected before queue (2197.2656ms)
+✔ expired lease rejected before queue (2555.6257ms)
+✔ missing generation rejected before queue (2197.5671ms)
+✔ import denied rejected before queue (2416.7973ms)
+✔ input changed rejected before queue (2374.6063ms)
+✔ existing output rejected before queue (2444.902ms)
+✔ unaccepted producer rejected before queue (2307.5884ms)
+✔ cross run accepted rejected before queue (2215.9247ms)
+✔ cross run checkpoint rejected before queue (2141.4578ms)
+✔ scope rolls unrelated baseline while original input SHA stays pinned (2145.5686ms)
+✔ own committed input modifications roll twice and preserve original import ancestry (2163.4479ms)
+✔ task profile launch stays closed and unbound execute never reaches shared operation queue (6.2334ms)
+✔ real LocalRunExecutor binds and rechecks trusted archive against isolated SQL before any queue (2838.2565ms)
+✔ trusted rework contract pins original accepted attempt rather than stale snapshot contract (2658.2515ms)
+✔ real multi-output ReworkGate keeps sealed delivery inputs and grants only narrowed writes through later scopes (2364.5182ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 58273.1936

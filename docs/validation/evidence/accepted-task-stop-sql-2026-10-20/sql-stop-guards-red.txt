@@ -1,0 +1,85 @@
+✖ prepared accepted-stop fences same-binding reuse, a first-generation B and scope mutation (3052.2868ms)
+✖ dispatching accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2790.8607ms)
+✖ unknown accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2719.4868ms)
+✖ confirmed stopped A stays sealed while a distinct authorized B binds and resolves normally (2515.7929ms)
+✖ malformed or row-key-swapped SQL stop marker fails closed before B can bind (2834.1355ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17292.5543
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-state.test.ts:3:2383
+✖ prepared accepted-stop fences same-binding reuse, a first-generation B and scope mutation (3052.2868ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:49:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_ACCEPTED_STOP_UNRESOLVED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-state.test.ts:3:2383
+✖ dispatching accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2790.8607ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:49:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_ACCEPTED_STOP_UNRESOLVED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-state.test.ts:3:2383
+✖ unknown accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2719.4868ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:49:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_ACCEPTED_STOP_UNRESOLVED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-state.test.ts:3:3280
+✖ confirmed stopped A stays sealed while a distinct authorized B binds and resolves normally (2515.7929ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:61:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_ACCEPTED_STOP_SEALED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-state.test.ts:3:3928
+✖ malformed or row-key-swapped SQL stop marker fails closed before B can bind (2834.1355ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:74:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_ACCEPTED_STOP_INVALID' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

@@ -7,6 +7,7 @@ import {checkpointContract} from '../../../services/agent-runtime/step-checkpoin
 import {ancestors} from '../../../services/agent-runtime/checkpoint-context.mjs';
 import {AppError} from './provider.ts';
 import {assertNoUnresolvedTaskOperation} from './task-operation-admission.ts';
+import {assertTaskAcceptedStopAdmission} from './task-accepted-stop-state.ts';
 const {createTaskWorkspace,validateTaskExport}=createRequire(import.meta.url)('../../desktop/task-workspace.cjs') as TaskWorkspacePlanner;
 const hash=(value:any)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const bytesHash=(value:Buffer)=>createHash('sha256').update(value).digest('hex');
@@ -59,6 +60,7 @@ export async function bindTrustedAttempt(db:pg.PoolClient,run:any,candidate:Trus
  const hashes=taskCapabilityHashes(run.snapshot,employee);
  const rows=(await db.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 ORDER BY generation DESC FOR UPDATE',[run.id,candidate.taskId])).rows;
  const current=rows.find(r=>r.phase==='active');
+ await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:candidate.taskId,attemptId:candidate.attemptId,generation:candidate.generation??(current?.attempt_id===candidate.attemptId?current.generation:(rows[0]?.generation??0)+1)});
  if(current&&current.attempt_id===candidate.attemptId&&current.runtime_task_id===candidate.runtimeTaskId&&current.session_id===candidate.sessionId&&current.principal===candidate.agentId&&current.contract_hash===candidate.contractHash&&current.permission_hash===hashes.permissionHash&&current.capability_hash===hashes.capabilityHash){
   if(candidate.generation!==undefined&&candidate.generation!==current.generation)denied('任务 generation 过期');
   return {...candidate,generation:current.generation};
@@ -91,6 +93,7 @@ function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:any,revi
 }
 export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:TrustedTaskAssignment,canonical:TaskCanonical,previous:TaskExecutionScope|null):Promise<TaskExecutionScope>{
  identity(assignment,true);const {employee,contract}=activeAssignment(run,assignment);await assertLease(db,run);
+ await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation});
  if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)throw new AppError(422,'任务沙箱恢复尚未接通可信 canonical 与检查点来源，请保留原恢复记录','TASK_RECOVERY_UNAVAILABLE');
  const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active' FOR UPDATE",[run.id,assignment.taskId,assignment.attemptId,assignment.generation])).rows[0];
  const hashes=taskCapabilityHashes(run.snapshot,employee);

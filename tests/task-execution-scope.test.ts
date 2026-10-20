@@ -30,7 +30,7 @@ async function fixture(){
  await sql.exec(`CREATE TABLE projects(id text PRIMARY KEY,version int DEFAULT 1);INSERT INTO projects(id) VALUES('project');
  CREATE TABLE project_runs(id text PRIMARY KEY,status text,lease_owner text,lease_until timestamptz,cancel_requested boolean,project_id text DEFAULT 'project',project_version int DEFAULT 1,snapshot jsonb);
  INSERT INTO project_runs(id,status,lease_owner,lease_until,cancel_requested) VALUES('run','running','owner',now()+interval '1 hour',false);
- CREATE TABLE task_attempt_workspaces(run_id text,task_id text,attempt_id text,generation int,principal text,session_id text,runtime_task_id text,contract_hash text,permission_hash text,capability_hash text,contract jsonb,input_origins jsonb DEFAULT '[]',committed_outputs jsonb DEFAULT '[]',scope jsonb,work_revision text,phase text DEFAULT 'active',PRIMARY KEY(run_id,task_id,attempt_id,generation));
+ CREATE TABLE task_attempt_workspaces(run_id text,task_id text,attempt_id text,generation int,principal text,session_id text,runtime_task_id text,contract_hash text,permission_hash text,capability_hash text,contract jsonb,input_origins jsonb DEFAULT '[]',committed_outputs jsonb DEFAULT '[]',scope jsonb,work_revision text,phase text DEFAULT 'active',accepted_stop jsonb,PRIMARY KEY(run_id,task_id,attempt_id,generation));
  CREATE TABLE local_operations(id text,run_id text,status text,merge_state text,payload jsonb,result jsonb,late_result jsonb,started boolean);`);
  const db={query:async(s:string,p?:any[])=>{const r=await sql.query(s,p);return {...r,rowCount:r.rows.length||r.affectedRows};}} as any;
  const task={id:'task',assignee:'employee',inputs:[{path:'input.txt'}],outputs:[{path:'output.txt'}],inScope:['output.txt'],outOfScope:[],dependencies:[]};

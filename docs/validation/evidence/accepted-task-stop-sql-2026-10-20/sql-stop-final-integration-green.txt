@@ -1,0 +1,75 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ prepared accepted-stop fences same-binding reuse, a first-generation B and scope mutation (3799.4359ms)
+✔ dispatching accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2740.5417ms)
+✔ unknown accepted-stop fences same-binding reuse, a first-generation B and scope mutation (2827.6927ms)
+✔ confirmed stopped A stays sealed while a distinct authorized B binds and resolves normally (2301.172ms)
+✔ malformed or row-key-swapped SQL stop marker fails closed before B can bind (2749.3252ms)
+✔ codec authenticates every immutable field with independent proof and record domains (5.9341ms)
+✔ codec enforces exact nested keys, byte bound, UUID SHA positive sequence and safe generation (17.4778ms)
+✔ codec requires state-specific absence and monotonic canonical ISO dates without resigning transitions (18.595ms)
+✔ canonical ISO timestamps are ordered by time across expanded-year boundaries (0.959ms)
+✔ existing-table product migration adds a nullable marker without changing prior task history (622.6874ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17606.6293
+✔ SQL accepted-stop denies queued poll, claimed replay and start without losing the original claim (3542.7714ms)
+✔ SQL stop fence retains authenticated unknown result once as late evidence and never settles its unknown (842.9647ms)
+✔ committed receipt reread survives a SQL stop fence while pending merge cannot publish a head (1662.5823ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8231.2032
+✔ two consecutive task writes roll scope and preserve original input lineage (2611.74ms)
+✔ file operations preserve canonical arguments and transport only the visible revision (1996.2963ms)
+✔ unrelated task commit rebuilds next scope without rebinding inputs (2955.168ms)
+✔ another task changing a fixed input blocks scope renewal (1711.8843ms)
+✔ approval cannot authorize a renewed scope (2700.3403ms)
+✔ missing generation, widened private scope and cancelled lease are refused before queue (624.5945ms)
+✔ unknown prepare cannot be replayed or bypassed by a new generation (401.4771ms)
+✔ a task cannot accept a successful receipt from another sandbox (754.713ms)
+✔ queued task state is rechecked by poll and start (1364.023ms)
+✔ a late authenticated receipt after withdrawal stays evidence and cannot merge (837.8947ms)
+✔ native dispatch derives effective paths and fixed bundle from the trusted scope (1688.099ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19910.2869
+✔ expired durable intent settles as rejected and no longer fences independent work (992.2773ms)
+✔ committed SQL receipt repairs evidence after plan change without new execution authority (447.3484ms)
+✔ a deterministic second-transaction denial settles intent but damaged archive evidence stays pending (648.8909ms)
+✔ commits full canonical, retains other task file, deduplicates merge and rolls own durable outputs (579.5255ms)
+✔ queued baseline CAS conflict preserves newer complete B and rejects old output (525.5639ms)
+✔ second operation uses durable own output and retains original input ancestry (670.7325ms)
+✔ changed plan and revoked device authority cannot publish a completed receipt (318.6127ms)
+✔ actual result route validates receipts, deduplicates transmission, and preserves plan withdrawal as late evidence (619.0233ms)
+✔ actual result route validates receipts, deduplicates transmission, and preserves backend withdrawal as late evidence (540.3353ms)
+✔ fault intent never publishes a partial set and reconciliation never executes a command (498.5264ms)
+✔ fault blob-fsync never publishes a partial set and reconciliation never executes a command (509.3105ms)
+✔ fault before-sql-commit never publishes a partial set and reconciliation never executes a command (585.3494ms)
+✔ fault after-sql-commit never publishes a partial set and reconciliation never executes a command (473.4197ms)
+✔ fault archive-append never publishes a partial set and reconciliation never executes a command (416.8176ms)
+✔ fault cache-mirror never publishes a partial set and reconciliation never executes a command (457.5168ms)
+✔ missing or corrupt object freezes reads, merge and cache recovery with original files retained (231.4278ms)
+✔ task profile launch stays closed while prepare only initializes canonical (229.8275ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11076.0036

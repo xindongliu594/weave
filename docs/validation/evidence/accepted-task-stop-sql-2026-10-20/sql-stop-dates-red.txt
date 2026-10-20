@@ -1,0 +1,38 @@
+✖ canonical ISO timestamps are ordered by time across expanded-year boundaries (16.8511ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3132.5894
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-state.test.ts:3:8568
+✖ canonical ISO timestamps are ordered by time across expanded-year boundaries (16.8511ms)
+  AssertionError [ERR_ASSERTION]: Got unwanted exception.
+  Actual message: "已验收任务停止记录损坏，必须核对原记录"
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:128:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: Error: 已验收任务停止记录损坏，必须核对原记录
+        at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop-state.ts:33:32)
+        at decodeTaskAcceptedStop (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop-state.ts:46:16)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:128:26)
+        at getActual (node:assert:611:5)
+        at strict.doesNotThrow (node:assert:779:32)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-state.test.ts:128:9)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1201:25)
+        at Test.start (node:internal/test_runner/test:1096:17)
+        at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17),
+    expected: undefined,
+    operator: 'doesNotThrow',
+    diff: 'simple'
+  }

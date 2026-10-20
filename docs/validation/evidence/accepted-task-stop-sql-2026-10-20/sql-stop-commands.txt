@@ -1,0 +1,30 @@
+Accepted-stop isolated SQL slice, 2026-10-20. No Git commit, deployment, paid API or device effects.
+
+RED before implementation:
+node --import tsx --test --test-concurrency=1 tests/task-accepted-stop-state.test.ts
+  sql-stop-guards-red.txt: 5 real missing-rejection failures.
+node --import tsx --test --test-name-pattern=codec tests/task-accepted-stop-state.test.ts
+  sql-stop-codec-red.txt: 3 missing-codec assertions.
+node scripts/test-integration.mjs --test-name-pattern=existing-table tests/task-accepted-stop-state.test.ts
+  sql-stop-migration-red.txt: Windows EACCES, not a functional RED.
+  sql-stop-migration-red-loopback.txt: narrowly escalated self-owned loopback, corrected fixture policy, real missing nullable-column assertion.
+
+Additional date-boundary RED then GREEN:
+node --import tsx --test --test-name-pattern=expanded-year tests/task-accepted-stop-state.test.ts
+  sql-stop-dates-red.txt: valid chronological expanded-year ISO rejected by lexical ordering.
+node --import tsx --test --test-name-pattern='codec|expanded-year' tests/task-accepted-stop-state.test.ts
+  sql-stop-codec-green.txt: 4/4 pass; actual time-value monotonic ordering.
+
+GREEN and relevant regression:
+node --import tsx --test --test-concurrency=1 tests/task-execution-scope.test.ts
+  sql-stop-scope-regressions-green.txt: 25/25 pass, zero skip; only old fixture schema gains nullable accepted_stop.
+node scripts/test-integration.mjs tests/task-accepted-stop-state.test.ts tests/task-accepted-stop-http.test.ts
+  sql-stop-integration-green.txt: 9+3 pass, zero skip, before the additional date case.
+node node_modules/typescript/bin/tsc --noEmit
+  sql-stop-typecheck.txt: exit 0, no diagnostics.
+node scripts/test-integration.mjs tests/task-accepted-stop-state.test.ts tests/task-accepted-stop-http.test.ts tests/task-operation-bridge.test.ts tests/task-canonical.test.ts
+  sql-stop-final-integration-green.txt: final source, per-file separate PGlite, serial; 10+3+11+17 = 41/41 pass, zero skipped, exit 0.
+
+The two integration commands use narrow escalation for self-created Windows loopback SQL/HTTP only. No production DATABASE_URL, external API, dependency download, physical device stop or JJ access.
+New markers are deliberately synthetic guard fixtures; successful prepare/result/merge rows in the HTTP file come from the real API queue/claim/start/result/CAS path. This slice does not authenticate accepted eligibility, mutate lifecycle CAS, deliver stop to a provider, open the task profile, prove native PostgreSQL concurrency or complete the three-task physical capacity gate.
+Source SHA256 list: sql-stop-sources.txt.

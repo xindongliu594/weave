@@ -108,3 +108,17 @@ SQL 子批次已独立复审 PASS 后可实施：使用 `ALTER TABLE ... ADD COL
 - token-free carrier 的原 resultDigest 是可信导出见证的历史事实，不能由投影重算，也不是独立设备认证。导出先对原 SQL raw result 验真，再产生有版本/严格 schema/双摘要的投影；导入信任边界必须明确到原有认证加密 envelope。原摘要不重写、不送回 live merge 验证器。carrier codec/reader/import 仍须按修订合同独立审查。
 
 当前本地已验证结果仅到 e3374fd 的非恢复 foundation，以及后续分批实际测试；本文裁定本身不算恢复成功证据。profile 继续关闭。
+
+## accepted-stop 产品接线冻结裁定
+
+设备基础已独立审查并提交 50826ad；SQL codec/普通 guard 本地完成，仍单独收口。历史 verifier/provider 提案独立审查后唯一必改（旧 work revision 不能用新递归排序 D 计算）已修正并复审 PASS。原 `checkpointDigest`、`checkpointContract`、`checkpointEnvironment` 和 canonical revision 算法不变；新 D 只用于新 stop proof/marker 及 accepted event envelope。
+
+允许窄提取原 committed-operation/merge 正向校验 helper 供 active checkpoint 与历史 completed 共用；允许导出原 task-local acceptedVerificationRevision。历史 verifier 必须分别证明原 exact key/session/native completed、有效合同/权限/能力/lease/provider、accepted→boundary→v2 node CP→后续 native team checkpoint、原 scope/result/claim/committed merge及输出、当前完整 canonical（可为 B）。不得把 completed 加进 active resolver，也不要求 A 旧 partial/head 等于当前 B 的完整 head。
+
+沿既有 project→run→original operations→device→scope 锁与 maintenance queue。NULL→prepared、同身份 prepared→dispatching 必须成功 COMMIT 才产生一次不可序列化 fresh dispatch closure；COMMIT 不明只核对原请求。callback 后仍做同步 archive/provider/本地 journal 复核，不增普通 guard except。真正已发生的 Stopped 用独立窄事实补记事务保存原身份结果，可在 cancel/lease 移交后补记；不授新 effect，也不把通用事务增加 ignorePermission/ignoreLease。停止失败不回滚已持久的 native completion/accepted/CP。
+
+lazy provider 比较 executor 引用和 deviceId/grantId/fingerprint，不能比较新包装对象。只读核对已有 marker 必须在 bindAttempt 的普通 guard 前可达；新停止仅在 prepareTask 确认目标尚无 prepare 后发起。停止前后重新验证目标 context/当前权限/lease与scope，再走原 enqueue。缺维护能力的 task 路径明确拒绝；旧三参数构造和自定义注入保持类型兼容，不以缺 provider 静默跳过 task 保障。
+
+实际验收新增三 distinct task：开发、QA、经理各有真实 task workspace 操作、不同 key/attempt/sandboxId。沿真实 ProductDshRuntime/Host/HTTP claim-start-result/CAS/Handoff 与真实设备 executor/journal/容量检查；CLI transport 及模型选择为 fixture，不 seed 成功 merge/accepted/CP。记录第三槽 pre-fix RED，以及 accepted→durable CP→stop intent→单 stop→原ID Stopped→下一 prepare 的顺序；保持两槽、128 scope及磁盘预留，不删除文件。另验 A 已验收但 B 已提交时可用 A partial 停 A且保 B；SQL/设备应答丢失、撤权/换lease/provider/目标变化、无 intent/absent 和迟到结果分别保留。
+
+这批只接运行中的 accepted-stop，Task5 恢复/维护/carrier 和 Task6 原生PG/物理JJ/真实模型仍单列；profile 继续封闭到全部开放条件满足。
