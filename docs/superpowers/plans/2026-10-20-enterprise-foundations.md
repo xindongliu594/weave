@@ -35,7 +35,7 @@
 | A1 | 真人身份、会话、CSRF、主体隔离的请求缓存 | 研究和协议选择 | 内核/API/网页隔离本地验证与复审通过；原生 PG 身份/TLS 29/29；实际企业 HTTPS 浏览器及 JJ 激活仍未验 |
 | A2 | 全路由资源权限、成员管理、审批 actor、登录网页 | A1 | 资源权限设计和详细计划已独立复审；尚未实现 |
 | B1 | 任务私有工作区、输入清单、可信输出 CAS 合并 | 执行研究 | 规划器、持久完整合并及实际工具本地产品链已验证和复审；消费者/物理环境待 B2 Task5/6 |
-| B2 | OpenShell task attempt 沙箱、DSH guard、checkpoint 接通 | B1 | Task4 已复审；Task5 非恢复 v2/私有 refs/live 消费者已实现和独立复审，71 运行时、32 API 与三例本地产品链通过；恢复/容量维护/task 备份及 Task6 JJ 未完成，profile 关闭 |
+| B2 | OpenShell task attempt 沙箱、DSH guard、checkpoint 接通 | B1 | Task4 已复审；Task5 非恢复 v2/私有 refs/live 消费者及 accepted-stop 设备原语已复审，71 运行时、32 API、三例本地产品链与55项设备回归通过；停止API接线/三任务容量、恢复/维护/task备份及Task6 JJ未完成，profile关闭 |
 | C1 | 统一工具 operation 合同、结果核对与补偿授权 | A1、B1 | 纯格式校验本地验证与复审通过；目录、批准与执行接线待做 |
 | C2 | 步骤/分支/循环 checkpoint、重启一致性、目标与上下文合同 | B2、C1 | 未开始 |
 | D1 | 固定数据集、Promptfoo provider、确定性与真实业务 Eval | 评测研究 | 离线桥及 `8f43c2a` 的 Windows/Linux CI 已验证；API/真实业务待做 |

@@ -1,0 +1,38 @@
+✖ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (302.1106ms)
+✖ accepted stop reconciliation uses only the installed original-ID get syntax without policy-by-ID (234.655ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 697.8106
+
+✖ failing tests:
+
+test at apps\desktop\openshell-executor.test.cjs:145:1
+✖ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (302.1106ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:157:11)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:162:1
+✖ accepted stop reconciliation uses only the installed original-ID get syntax without policy-by-ID (234.655ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:66:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:461:11 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }

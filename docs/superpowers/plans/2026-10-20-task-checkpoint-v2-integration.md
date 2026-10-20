@@ -71,3 +71,40 @@ v2 的 `files` 必须等于 task workManifest，而不是完整 canonical.manife
 恢复 provenance 的实际持久字段/摘要/CAS 同事务协议、checkpoint 来源 variant，须在恢复 codec/初始化编辑前冻结并复审。既有 API/桌面维护 provider 的 accepted-stop 交付与原 sandboxId 复核、journal 丢应答核对协议，须在容量批次前冻结。只读备份 carrier/严格 DTO/可信 reader/claim fence，须在任何 task 备份或 restored-source admission 编辑前冻结。未冻结批次不以空索引、假 receipt 或缓存绕过；core/live reader 工作继续推进。
 
 已先行独立修复旧 restore 的目标保护（不新增 task 备份格式）：在原 restore 事务/锁内、TRUNCATE 和任何文件 swap 前，对身份/会话/bootstrap/审计/outbox/projection 表取得 NOWAIT 的 SHARE ROW EXCLUSIVE 锁，再检查是否已有记录或已变更 bootstrap。繁忙或受保护均明确拒绝；空白 legacy 环境仍可恢复。此保护不是 preserving import，也不认证 task 备份或 restored-source 可执行性。隔离 HTTP 3 项、原扩展备份 6 项和独立原生 PostgreSQL 的并发锁证据分别保存，仍须独立代码审查。
+
+## accepted-stop 设备子批次冻结裁定
+
+基线 e3374fd；独立合同审查指出普通 perform 和 inspectStorage 会重启 stopped 沙箱、现有 get/waitForPhase 按名称查询且 admit 要求 Ready。先完成设备端交付语义，不提前开放 API/产品调用链；SQL 历史验收证明、accepted_stop admission fence 和三任务产品链仍须后续整批接通。
+
+沿用既有 schema-2 task journal、maintenance 串行队列及固定 OpenShell CLI。私有 expected 严格为 `{version:1,stopId,key,sandboxId,workspaceRevision,proofDigest,accepted:true,checkpointResolved:true,operationsResolved:true}`，另必需可信进程内 beforeDispatch 回调；结果为身份六字段加 `{phase:'stopped',replayed:false}`。完整 key/sandboxId 和部分 workRevision 分别核对。调用入队前复制 expected，不能让排队或回调中的对象变动改变停止目标。
+
+在原 admit 后调用 beforeDispatch；回调完成后同步重新读取 journal，要求 key、身份、工作版本、scope/binding、阶段、activeOperation/commandFence 和全部停止前记录与回调前一致，并重查本地 grant/config。中间不再 await，先 fsync `acceptedStop:{identity,stage:'stop_intent',intentAt}` 和 stopping，再派发一次原固定 stop 命令。失败保留 intent/unknown，不清空或重发。严格读取与容量 inventory 识别该记录；未知继续保留 running/scope/disk 占用，只有原对象确认为 Stopped 并落盘才释放 running。
+
+确认和 reconcile 共用只读 mTLS/config/原 sandboxId 查询，校验原 id/name、配置准入及固定有效策略；不能调用要求 Ready 的 admit，也不能通过名称寻找替代对象。reconcile 不发 start/stop/exec/create/delete，不调用会启动沙箱的 storage inspect。缺原 intent、Ready/Stopping、absent/retired/错身份均不算停止成功；重复调用只核对同 stopId，绝不重发 stop。
+
+只要存在 acceptedStop，普通执行、任务导出和 storage inspect 均拒绝，防止已验收对象再次启动；schema-1 行为不变。后续删除有单独目标/版本/审批边界，本子批次不放宽或冒充支持。用实际 executor/journal + 有界 transport fixture 保存 RED/GREEN、应答丢失/重启/坏 journal/错身份/回调变更/冷启动容量证据；物理 OpenShell、原生 PG、真实模型仍单独验收。未完成 API 接线不能声称第三员工产品容量问题已解决。
+
+### accepted-stop SQL 合同冻结候选
+
+在既有 task_attempt_workspaces 仅增加 nullable `accepted_stop jsonb`，旧行 NULL。私有状态 codec 位于 API，不进入网页/模型或恢复执行队列。严格 v1 记录为 `{version:1,identity,proof,state,preparedAt,dispatchedAt?,confirmedAt?,result?,lastError?,digest}`；所有嵌套 exact keys、无 unknown 透传，编码最多 32 KiB。identity 为上述身份六字段（version/stopId/key/sandboxId/workspaceRevision/proofDigest）。proof 严格为 `{accepted:{seq,digest},checkpoint:{id,sha256,seq},originalOperationId,originalMergeDigest,runtimeTaskId,principal,sessionId,contractHash,permissionHash,capabilityHash,deviceId,grantId,fingerprint}`。UUID、完整 key、正 seq、64位 SHA 和非空有界文本沿用现有约束。
+
+令 D 为递归 key 排序 JSON 的 SHA256（array 不改序）；identity.proofDigest = D({kind:'task-accepted-stop-proof',version:1,proof})。外 digest = D({kind:'task-accepted-stop',version:1,identity,proof})，不自引用，也不把可变状态当签名。日期必须为规范 ISO UTC。prepared 仅 preparedAt；dispatching 还必须 dispatchedAt；unknown 可保留 dispatchedAt 和 lastError:{code,message}，不含 result/confirmedAt；stopped 必须 dispatchedAt、confirmedAt 和与 identity 完全一致的 `{...identity,phase:'stopped',replayed:false}`，不可有 lastError。所有存在的时间须单调。codec 仅证明结构，不能证明员工已验收或设备已停止。
+
+普通 guard 单独检查本 run 全部非空 marker 并校验各自 row 完整 key：prepared/dispatching/unknown 拒绝任何普通 bind/scope/operation；stopped 拒绝其自身 key，但其他当前获准任务仍走原权限检查。检查须覆盖 bindTrustedAttempt 的同绑定提前返回和首代插入、resolveTaskScope，以及经 admitTaskOperation 的 enqueue/poll/start/result。无普通 except 参数。未知格式一律 fail closed。原 claim 的回执在失去可执行资格时仍按原 HTTP 逻辑保留 result/late_result，不能丢弃或用停止结果清除 SQL unknown。
+
+后续历史 verifier 只可检查内部选定的同 stopId/key/proof 来更新自己的 prepared→dispatching→stopped，或 prepared/dispatching→unknown→stopped；不是普通操作免检模式。NULL→prepared 与每次状态前进均在原 project→run→scope 锁内 CAS，同一 proof/identity 不变。CLI 不在 SQL 事务内；COMMIT 应答未知不授权新 effect。stopped 结果只接受已选中 provider 的实际只读核对/journal 回执，不能凭调用者 JSON。此 SQL codec/guard 子批次不产生 stop、不新增 API route、不认证 accepted 资格；历史 verifier/provider 接线仍需独立实现和实际产品证据。
+
+恢复/backup carrier 必须包含该列的只读 exact DTO 及其历史原状态；sourceHistoryDigest 与 unresolved 同时纳入非 stopped marker，不能因 phase=active 或 live 表为空就丢掉未知停止。不恢复 live marker/设备 journal，不自动重发停止。缺这些跨合同字段时，恢复与 task 备份继续封闭。
+
+SQL 子批次已独立复审 PASS 后可实施：使用 `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` 升级已有表；sourceHistoryDigest 保留全部 marker（包括 stopped），只有 unresolved 判定过滤非 stopped。`executable` 继续把权限类 4xx 转为 false，使 `/result` 进入原 late_result 分支，不能 route 前抛错丢回执；新派发和 pending merge 必须被 guard 阻断，已 committed 原回执的只读重取不当作新执行。历史 verifier/provider 仍闭合。
+
+## 恢复/carrier 独立审查后的继续门禁
+
+独立审查为 CHANGES_REQUIRED，尚未授权把整份提案直接写入恢复路径。除上述 accepted_stop 跨合同要求外，固定以下裁定：
+
+- 第一批 live-source 只接受非恢复 parent，必须用原 SQL scope、原操作/claim/result/merge 与所选 v2 checkpoint 的完整正向关系证明来源。NULL sourceHistory、空 live 表或裸 null-merge head 不能证明 live；缺证据明确拒绝。历史模式要在 carrier 批次显式定义，不用缺失索引推断。
+- sourceArchiveCursor 增加完整已验证 prefix 的 SHA（固定 seq 以内全部事件的规范编码），末事件 SHA 只作定位。相关 accepted/rework/mapping 不能在末事件未变时被替换。批准/首次初始化都校验，复制对象后、发布前再次核对源 head、SQL 历史和 prefix；现有 child 的 bookkeeping 只走持久 marker/child chain，不覆盖前进后的 head。
+- A 回退后，对每个保留的已完成节点检查它的固定输入与上游 accepted 版本。B 字节保留不代表旧验收自动有效；若 B 依赖被回退的 A 版本，本批拒绝并保留 source/child head NULL，不假装 B 仍通过。完整依赖重算与后代失效策略留在 C2，不能通过吞掉失败缩小总目标。
+- token-free carrier 的原 resultDigest 是可信导出见证的历史事实，不能由投影重算，也不是独立设备认证。导出先对原 SQL raw result 验真，再产生有版本/严格 schema/双摘要的投影；导入信任边界必须明确到原有认证加密 envelope。原摘要不重写、不送回 live merge 验证器。carrier codec/reader/import 仍须按修订合同独立审查。
+
+当前本地已验证结果仅到 e3374fd 的非恢复 foundation，以及后续分批实际测试；本文裁定本身不算恢复成功证据。profile 继续关闭。

@@ -1,0 +1,34 @@
+✖ accepted stop requires exact identity, all proofs and a private callback before any CLI (272.2421ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 467.0726
+
+✖ failing tests:
+
+test at apps\desktop\openshell-executor.test.cjs:90:1
+✖ accepted stop requires exact identity, all proofs and a private callback before any CLI (272.2421ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   code: 'LOCAL_OUTCOME_UNKNOWN'
+  -   code: 'LOCAL_SCOPE_DENIED'
+    }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:94:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: 任务停止结果待核对，禁止重发停止
+        at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:66:48)
+        at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:462:11,
+    expected: { code: 'LOCAL_SCOPE_DENIED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

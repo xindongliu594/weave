@@ -1,0 +1,10 @@
+[
+  {
+    "path": "apps\\desktop\\openshell-executor.cjs",
+    "sha256": "bb51d3c0e03c38b5133eaf9525486e83602962466a6829795d784d0a4f5b643d"
+  },
+  {
+    "path": "apps\\desktop\\openshell-executor.test.cjs",
+    "sha256": "7cc165aef4a86a7b51d1db986312c79d613bb335606ba02837fa6f5f907fae35"
+  }
+]

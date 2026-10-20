@@ -41,6 +41,23 @@ function advanceTaskScope(scope,next){
  scope.scopeHash=next.scopeHash;scope.expectedWorkRevision=next.expectedWorkRevision;scope.readPaths=next.readPaths;scope.inputManifest=next.inputManifest;scope.inputWorkManifest=current;
 }
 function taskFileName(key){return hash(JSON.stringify([key.runId,key.taskId,key.attemptId,key.generation]))+'.json';}
+function acceptedStopIdentity(value,proofs=false){
+ const fields=proofs?'accepted,checkpointResolved,key,operationsResolved,proofDigest,sandboxId,stopId,version,workspaceRevision':'key,proofDigest,sandboxId,stopId,version,workspaceRevision';
+ if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).sort().join(',')!==fields||
+  value.version!==1||!['stopId','sandboxId','workspaceRevision','proofDigest'].every(field=>typeof value[field]==='string')||!uuid.test(value.stopId)||!uuid.test(value.sandboxId)||!digest.test(value.workspaceRevision)||!digest.test(value.proofDigest)||
+  proofs&&(value.accepted!==true||value.checkpointResolved!==true||value.operationsResolved!==true))throw denied('已验收任务停止身份或证明不正确');
+ return {version:1,stopId:value.stopId,key:{...taskKey(value.key)},sandboxId:value.sandboxId,workspaceRevision:value.workspaceRevision,proofDigest:value.proofDigest};
+}
+function acceptedStopResult(identity){return {...identity,phase:'stopped',replayed:false};}
+function checkedAcceptedStop(scope){
+ const record=scope.acceptedStop;
+ if(!record||typeof record!=='object'||Array.isArray(record)||Object.keys(record).sort().join(',')!==(record.stage==='stopped_confirmed'?'identity,intentAt,result,stage':'identity,intentAt,stage')||
+  !['stop_intent','stopped_confirmed'].includes(record.stage)||typeof record.intentAt!=='string'||!Number.isFinite(Date.parse(record.intentAt))||new Date(record.intentAt).toISOString()!==record.intentAt)throw denied('任务停止意图记录不正确');
+ const identity=acceptedStopIdentity(record.identity);
+ if(!isDeepStrictEqual(identity.key,scope.key)||identity.sandboxId!==scope.sandboxId||identity.workspaceRevision!==scope.workspaceRevision||scope.activeOperation||scope.commandFence||scope.retirement||
+  !['stopping','unknown','stopped'].includes(scope.phase)||record.stage==='stop_intent'&&scope.phase==='stopped'||record.stage==='stopped_confirmed'&&(!scope.accepted||scope.phase==='stopping'||!isDeepStrictEqual(record.result,acceptedStopResult(identity))))throw denied('任务停止意图与原沙箱映射不一致');
+ return identity;
+}
 function taskEnvelope(value){const input=JSON.stringify(value);if(Buffer.byteLength(input,'utf8')>MAX_TASK_EXEC_STDIN_BYTES)throw denied('任务执行 stdin envelope 超过 3 MiB','LOCAL_FILE_LIMIT');return input;}
 const POLICY_TEXT='version: 1\nfilesystem_policy:\n  include_workdir: false\n  read_only: [/bin, /usr, /lib, /lib64, /etc, /proc, /dev/urandom, /var/tmp, /sys/fs/cgroup]\n  read_write: [/sandbox, /tmp, /dev/null]\nlandlock:\n  compatibility: hard_requirement\nprocess:\n  run_as_user: "1000"\n  run_as_group: "1000"\nnetwork_policies: {}\nnetwork_middlewares: {}\n';
 const OPENSHELL_CONSTANTS=Object.freeze({version:'0.1.2',gateway:'weiwu-openshell-v012',cliSha256:'f334da80f867776dde9034e0ca3c2406d48ba77b0d0abe64b5aa610490a34fca',image:'docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174',policyHash:hash(POLICY_TEXT),effectivePolicyHash:'27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5',cpu:'1',memory:'512Mi'});
@@ -215,6 +232,7 @@ class OpenShellDeviceExecutor {
    }else if(scope.phase.startsWith('fencing_'))throw denied('任务命令栅栏记录缺失');
    const fenceStages={fencing_stopping:'stop_intent',fencing_stopped:'stopped_confirmed',fencing_starting:'start_intent',fencing_inspecting:'inspect_intent'};
    if(fenceStages[scope.phase]&&(scope.activeOperation!==scope.commandFence.operationId||scope.commandFence.stage!==fenceStages[scope.phase]))throw denied('任务命令栅栏阶段不正确');
+   if(scope.acceptedStop!==undefined)checkedAcceptedStop(scope);
   }
   const phases=['creating','importing','ready','starting','stopping','stopped','unknown','retiring','retired',...(task?['fencing_stopping','fencing_stopped','fencing_starting','fencing_inspecting']:[])];
   if(!task&&scope.schema!==1||!/^wwe-[a-f0-9]{12}$/.test(scope.name)||!phases.includes(scope.phase)||!Array.isArray(scope.completedOperations)||scope.completedOperations.length>4096||scope.completedOperations.some(id=>!uuid.test(id))||new Set(scope.completedOperations).size!==scope.completedOperations.length||scope.activeOperation!=null&&!uuid.test(scope.activeOperation))throw denied('OpenShell 持久映射格式不正确');
@@ -235,9 +253,12 @@ class OpenShellDeviceExecutor {
    await new Promise((resolve,reject)=>{const abort=()=>{clearTimeout(timer);reject(signal.reason);};const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},250);signal?.addEventListener('abort',abort,{once:true});if(signal?.aborted)abort();});
   }
  }
- async admit(scope,signal){
+ async assertGatewayIdentity(signal){
   const status=JSON.parse((await this.cli(['status','--output','json'],signal)).stdout);
   if(status.status!=='connected'||status.version!==this.config.version||status.gateway!==this.config.gateway||status.server!=='https://127.0.0.1:18770'||status.authentication?.status!=='authenticated')throw denied('OpenShell mTLS 网关身份不匹配','OPENSHELL_IDENTITY_MISMATCH');
+ }
+ async admit(scope,signal){
+  await this.assertGatewayIdentity(signal);
   const state=await this.get(scope,signal);
   if(state.phase!=='Ready'||!state.conditions?.some(c=>c.type==='Ready'&&c.status==='True')||state.configuration_admission?.state!=='accepted'||state.configuration_admission.policy_hash!==OPENSHELL_CONSTANTS.effectivePolicyHash)throw denied('OpenShell 沙箱未就绪或策略准入不匹配','OPENSHELL_ADMISSION_DENIED');
   const policy=JSON.parse((await this.cli(['policy','get',scope.name,'--full','--output','json'],signal)).stdout);
@@ -269,6 +290,9 @@ class OpenShellDeviceExecutor {
  async perform(job,signal){
   signal?.throwIfAborted();this.assertGrant(job);
   const args=job.arguments??{};if(!['prepare','filesystem','artifact_write','terminal','terminal_test','native_plugin'].includes(job.name))throw denied('OpenShell 工具未开放');
+  const taskMode=job.executionScope!==undefined;
+  if(taskMode&&(job.executionScope?.key?.runId!==job.runId||job.executionScope?.profile!==taskProfile))throw denied('任务身份与执行 profile 不匹配');
+  if(taskMode&&this.read(taskKey(job.executionScope?.key))?.acceptedStop)throw denied('已验收停止意图已封存，禁止再次执行此任务');
   let bundle;
   if(job.name==='native_plugin'){
    if(!this.loadNativeBundle||!/^[a-f0-9]{64}$/.test(args.pluginId)||!/^plugin__[a-z][a-z0-9_]{0,19}__[a-z][a-z0-9_]{0,31}$/.test(args.toolName))throw denied('原生插件安装或工具绑定不可用','NATIVE_BUNDLE_UNAVAILABLE');
@@ -280,11 +304,10 @@ class OpenShellDeviceExecutor {
   if(['terminal','terminal_test'].includes(job.name)&&(!this.grant.allowCommands||!uuid.test(job.approvalId??'')))throw denied('沙箱命令缺少授权或逐次批准');
   if(job.name==='artifact_write'&&(typeof args.content!=='string'||Buffer.byteLength(args.content)>5*1024*1024))throw denied('写入文件超过限制','LOCAL_FILE_LIMIT');
   if(['terminal','terminal_test'].includes(job.name)&&(typeof args.command!=='string'||!args.command||args.command.length>5000))throw denied('命令格式不正确');
-  const taskMode=job.executionScope!==undefined;
-  if(taskMode&&(job.executionScope?.key?.runId!==job.runId||job.executionScope?.profile!==taskProfile))throw denied('任务身份与执行 profile 不匹配');
   if(taskMode&&job.name==='prepare')taskScope(job.executionScope,job.files??[]);
   else if(taskMode)taskKey(job.executionScope?.key);
   let scope=this.read(taskMode?job.executionScope.key:job.runId),dispatched=false,lifecyclePending=false;
+  if(scope?.acceptedStop)throw denied('已验收停止意图已封存，禁止再次执行此任务');
   if(taskMode&&scope&&job.name!=='prepare')advanceTaskScope(scope,job.executionScope);
   if(taskMode&&job.name!=='prepare'&&!scope)throw denied('任务沙箱尚未初始化');
   if(scope?.phase==='unknown'||scope?.activeOperation)throw unknown('此沙箱存在结果未明操作，禁止自动续跑');
@@ -367,6 +390,7 @@ class OpenShellDeviceExecutor {
  }
  maintenance(fn){if(this.closing||this.closed)return Promise.reject(denied('OpenShell 执行器已关闭'));const task=this.queue.then(fn);this.queue=task.catch(()=>{});return task;}
  async inspectTaskExportNow(scope,operationId,signal){
+  if(scope.acceptedStop)throw denied('已验收停止意图已封存，禁止重新导出');
   await this.admit(scope,signal);
   const nonce=randomBytes(16).toString('hex');
   const request={nonce,name:'task_export_inspect',profile:taskProfile,operationId,readPaths:scope.readPaths,writePaths:scope.writePaths,inputManifest:scope.inputManifest};
@@ -380,22 +404,69 @@ class OpenShellDeviceExecutor {
  inspectTaskExport(key,operationId){return this.maintenance(async()=>{
   taskKey(key);if(!uuid.test(operationId))throw denied('任务操作编号不正确');
   const scope=this.read(key);if(!scope||!scope.sandboxId||scope.lastOperationId!==operationId)throw denied('原任务沙箱或最新操作引用不存在');
+  if(scope.acceptedStop)throw denied('已验收停止意图已封存，禁止重新导出');
   if(scope.activeOperation||scope.commandFence||scope.phase==='unknown'&&(!scope.lastOperationName||['terminal','terminal_test','native_plugin'].includes(scope.lastOperationName))||['terminal','terminal_test','native_plugin'].includes(scope.lastOperationName)&&!scope.completedOperations.includes(operationId))throw unknown('命令生命周期未完成，禁止导出');
   if(!['ready','unknown'].includes(scope.phase))throw denied('原任务沙箱或最新操作引用不存在');
   const result=await this.inspectTaskExportNow(scope,operationId,AbortSignal.timeout(120000));return {key,operationId,sandboxId:scope.sandboxId,...result};
  });}
- stopAcceptedTask(key,expected){return this.maintenance(async()=>{
-  taskKey(key);const scope=this.read(key);
-  if(!scope||scope.phase!=='ready'||scope.activeOperation)throw unknown('任务沙箱状态未核对，不能停止');
-  if(expected?.accepted!==true||expected.checkpointResolved!==true||expected.operationsResolved!==true||expected.workspaceRevision!==scope.workspaceRevision)throw denied('任务尚未完成验收与操作核对');
-  const signal=AbortSignal.timeout(120000);await this.admit(scope,signal);
-  scope.phase='stopping';this.save(scope);
-  try{await this.cli(['sandbox','stop',scope.name],signal,{mutation:true,timeoutMs:90000});await this.waitForPhase(scope,'Stopped',signal);scope.phase='stopped';scope.accepted=true;this.save(scope);return {key,sandboxId:scope.sandboxId,phase:'stopped'};}
-  catch(error){scope.phase='unknown';scope.lastError={code:error.code??'LOCAL_OUTCOME_UNKNOWN',message:'任务停止结果待核对',notExecuted:false};this.save(scope);throw unknown(scope.lastError.message);}
- });}
+ assertAcceptedStopGrant(key){
+  this.assertGrant({id:randomUUID(),runId:key.runId,grantId:this.grant.id});
+  if(canonicalConfigFingerprint(this.config)!==this.backend.fingerprint)throw denied('停止前 OpenShell 固定配置已变化','OPENSHELL_CONFIG_MISMATCH');
+ }
+ async observeAcceptedTaskStop(scope,signal){
+  this.assertAcceptedStopGrant(scope.key);
+  await this.assertGatewayIdentity(signal);
+  const state=JSON.parse((await this.cli(['sandbox','get',scope.sandboxId,'--output','json'],signal)).stdout);
+  if(state.id!==scope.sandboxId||state.name!==scope.name)throw denied('原停止沙箱身份不匹配','OPENSHELL_IDENTITY_MISMATCH');
+  if(state.phase!=='Stopped'||state.configuration_admission?.state!=='accepted'||state.configuration_admission.policy_hash!==OPENSHELL_CONSTANTS.effectivePolicyHash)throw unknown('原沙箱未取得受准入的 Stopped 状态');
+ }
+ async reconcileAcceptedTaskStopNow(key,identity){
+  const scope=this.read(key);
+  if(!scope?.acceptedStop||!isDeepStrictEqual(checkedAcceptedStop(scope),identity))throw denied('没有匹配原请求的停止意图，不能核对');
+  try{
+   await this.observeAcceptedTaskStop(scope,AbortSignal.timeout(120000));
+   this.assertAcceptedStopGrant(key);
+   if(!isDeepStrictEqual(this.read(key),scope))throw denied('核对期间任务停止记录已变化');
+   const result=acceptedStopResult(identity);scope.phase='stopped';scope.accepted=true;scope.acceptedStop={...scope.acceptedStop,stage:'stopped_confirmed',result};this.save(scope);return result;
+  }catch(error){
+   const current=this.read(key);
+   if(isDeepStrictEqual(current,scope)){scope.phase='unknown';scope.lastError={code:error.code??'LOCAL_OUTCOME_UNKNOWN',message:'原任务停止结果待核对',notExecuted:false};this.save(scope);}
+   throw unknown('原任务停止结果待核对，禁止重发停止');
+  }
+ }
+ reconcileAcceptedTaskStop(key,expected){
+  let identity;try{identity=acceptedStopIdentity(expected);if(!isDeepStrictEqual(taskKey(key),identity.key))throw denied('停止核对任务身份不同');}catch(error){return Promise.reject(error);}
+  return this.maintenance(()=>this.reconcileAcceptedTaskStopNow(identity.key,identity));
+ }
+ stopAcceptedTask(key,expected,beforeDispatch){
+  let identity;try{identity=acceptedStopIdentity(expected,true);if(!isDeepStrictEqual(taskKey(key),identity.key)||typeof beforeDispatch!=='function')throw denied('停止任务身份或可信回调缺失');}catch(error){return Promise.reject(error);}
+  return this.maintenance(async()=>{
+   const scope=this.read(identity.key);
+   if(!scope||scope.sandboxId!==identity.sandboxId||scope.workspaceRevision!==identity.workspaceRevision)throw denied('停止目标与原任务沙箱或工作版本不同');
+   if(scope.acceptedStop)return this.reconcileAcceptedTaskStopNow(identity.key,identity);
+   if(scope.phase!=='ready'||scope.activeOperation||scope.commandFence||scope.retirement)throw unknown('任务沙箱状态未核对，不能停止');
+   this.assertAcceptedStopGrant(identity.key);
+   const signal=AbortSignal.timeout(120000);await this.admit(scope,signal);
+   await beforeDispatch();
+   // No await may separate this fresh authority/journal check from the durable
+   // intent and the one external stop dispatch.
+   this.assertAcceptedStopGrant(identity.key);
+   if(!isDeepStrictEqual(this.read(identity.key),scope))throw denied('停止前任务映射或执行记录已变化');
+   scope.phase='stopping';scope.acceptedStop={identity,stage:'stop_intent',intentAt:new Date().toISOString()};this.save(scope);
+   try{
+    await this.cli(['sandbox','stop',scope.name],signal,{mutation:true,timeoutMs:90000});
+    return await this.reconcileAcceptedTaskStopNow(identity.key,identity);
+   }catch(error){
+    const current=this.read(identity.key);
+    if(current?.acceptedStop&&isDeepStrictEqual(current.acceptedStop.identity,identity)&&current.acceptedStop.stage==='stop_intent'){current.phase='unknown';current.lastError={code:error.code??'LOCAL_OUTCOME_UNKNOWN',message:'任务停止结果待核对',notExecuted:false};this.save(current);}
+    throw unknown('任务停止结果待核对，禁止重发停止');
+   }
+  });
+ }
  inspectStorage(runId){return this.maintenance(()=>this.inspectStorageNow(runId));}
  async inspectStorageNow(runId){
   this.assertGrant({id:randomUUID(),runId:typeof runId==='string'?runId:taskKey(runId).runId,grantId:this.grant.id});let scope=this.read(runId);if(!scope||!['ready','stopped'].includes(scope.phase)||scope.activeOperation)throw unknown('沙箱当前状态或操作结果尚未核对');
+  if(scope.acceptedStop)throw denied('已验收停止意图已封存，禁止启动磁盘检查');
   const signal=AbortSignal.timeout(120000);let started=false;
   try{
    if(scope.phase==='stopped'){if(scope.schema===2)this.admitTaskCapacity(false);const state=await this.get(scope,signal);if(state.phase!=='Stopped')throw denied('停止状态已变化','OPENSHELL_IDENTITY_MISMATCH');scope.phase='starting';this.save(scope);started=true;await this.cli(['sandbox','start',scope.name],signal,{timeoutMs:90000,mutation:true});await this.waitForPhase(scope,'Ready',signal);scope.phase='ready';this.save(scope);started=false;}

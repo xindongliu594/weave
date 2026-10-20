@@ -1,0 +1,10 @@
+2026-10-20 UTC, root read-only SSH check; zero model calls or production writes.
+Command: ssh -o BatchMode=yes -o ConnectTimeout=10 jj 'systemctl --user show weiwu-jj.service --property=ActiveState,SubState,MainPID,NRestarts,WorkingDirectory; curl --max-time 5 --fail --silent http://127.0.0.1:4310/api/health'
+Initial managed network attempt: Permission denied; same command under narrow network approval returned exit 0.
+ActiveState=active
+SubState=running
+MainPID=772306
+NRestarts=0
+WorkingDirectory=/home/jj/.local/share/weiwu/releases/weiwu-hardening-coordination-20261020
+Health: database connected; runtime ready=true; version 0.2.0; workspace local/pglite.
+Production release was not changed. This is health evidence, not proof of newly implemented task-profile recovery or isolation.

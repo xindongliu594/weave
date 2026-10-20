@@ -37,18 +37,19 @@ function fixture(){
  let name;const taskSandboxes=new Map();
  const transport=async(_cli,args,options)=>{
   calls.push({args:[...args],input:options.input});options.signal?.throwIfAborted();const command=args.slice(2);
-  if(command[0]==='status')return {exitCode:0,stdout:JSON.stringify({status:'connected',version:'0.1.2',gateway:config.gateway,server:'https://127.0.0.1:18770',authentication:{status:'authenticated'}})};
+  if(command[0]==='status')return {exitCode:0,stdout:JSON.stringify({status:'connected',version:'0.1.2',gateway:config.gateway,server:'https://127.0.0.1:18770',authentication:{status:control.authentication??'authenticated'}})};
   if(command[0]==='policy')return {exitCode:0,stdout:JSON.stringify({hash:control.policyHash,policy:{process:{run_as_user:'1000',run_as_group:'1000'},landlock:{compatibility:'hard_requirement'},network_policies:{},network_middlewares:{}}})};
   if(command[1]==='get'){
    if(control.failStoppedObservation&&control.phase==='Stopped')return {exitCode:1,stdout:'',stderr:'connection reset after stop'};
-   const task=taskSandboxes.get(command[2]);if(task&&command[2]!==name)return {exitCode:0,stdout:JSON.stringify({name:command[2],id:task.id,phase:task.phase??'Ready',conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
+   const found=[...taskSandboxes].find(([taskName,task])=>taskName===command[2]||task.id===command[2]),task=found?.[1];
+   if(task&&found[0]!==name)return {exitCode:0,stdout:JSON.stringify({name:control.observedName??found[0],id:control.observedId??task.id,phase:control.observedPhase??task.phase??'Ready',conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
    if(!task&&command[2]!==name&&command[2]!==id)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
    if(!control.created)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
-   return {exitCode:0,stdout:JSON.stringify({name,id:control.replacedId??id,phase:control.phases?.shift()??control.phase,conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
+   return {exitCode:0,stdout:JSON.stringify({name:control.observedName??name,id:control.observedId??control.replacedId??id,phase:control.observedPhase??control.phases?.shift()??control.phase,conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
   }
   if(command[1]==='delete'){assert.equal(command[2],id);if(!control.deleteStillPresent)control.created=false;if(control.deleteDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after delete'};return {exitCode:0,stdout:'deletion accepted'};}
   if(command[1]==='create'){const next=command[command.indexOf('--name')+1];assert.equal(taskSandboxes.has(next),false);if(!control.created){control.created=true;name=next;taskSandboxes.set(next,{id,root:remote});}else{const root=path.join(base,'remote-'+taskSandboxes.size);fs.mkdirSync(root);taskSandboxes.set(next,{id:randomUUID(),root});}return {exitCode:0,stdout:'{}'};}
-  if(command[1]==='stop'){if(command[2]===name)control.phase='Stopped';else taskSandboxes.get(command[2]).phase='Stopped';if(control.stopDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after stop'};return {exitCode:0,stdout:''};}
+  if(command[1]==='stop'){control.onStop?.();if(command[2]===name)control.phase='Stopped';else taskSandboxes.get(command[2]).phase='Stopped';if(control.stopDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after stop'};return {exitCode:0,stdout:''};}
   if(command[1]==='start'){assert.equal(control.phase,'Stopped');control.phase='Ready';if(control.startDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after start'};return {exitCode:0,stdout:''};}
   if(command[1]==='exec'){
    if(control.disconnect)return {exitCode:1,stdout:'',stderr:'connection reset'};
@@ -64,6 +65,181 @@ function fixture(){
  const job=(name,arguments_={},extra={})=>({id:randomUUID(),runId,grantId:grant.id,name,arguments:arguments_,...extra});
  return {base,grant,config,remote,control,calls,options,executor,runId,job,cleanup(){fs.rmSync(base,{recursive:true,force:true});}};
 }
+
+async function preparedTask(f,taskId='A'){
+ const key={runId:f.runId,taskId,attemptId:'accepted-1',generation:1};
+ const binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+ const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
+ const operation=f.job('prepare',{}, {files:[],executionScope});
+ await f.executor.execute(operation);return {key,executionScope,operation};
+}
+function acceptedStopExpected(scope){return {version:1,stopId:randomUUID(),key:{...scope.key},sandboxId:scope.sandboxId,workspaceRevision:scope.workspaceRevision,proofDigest:'a'.repeat(64),accepted:true,checkpointResolved:true,operationsResolved:true};}
+function stopIdentity({version,stopId,key,sandboxId,workspaceRevision,proofDigest}){return {version,stopId,key,sandboxId,workspaceRevision,proofDigest};}
+const mutationCalls=calls=>calls.filter(call=>['create','stop','start','exec','delete'].includes(call.args[3]));
+
+test('accepted stop rejects a different expected sandbox ID before callback or stop dispatch',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected={...acceptedStopExpected(f.executor.read(key)),sandboxId:randomUUID()};let callbacks=0;
+  const before=f.calls.length;
+  await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{callbacks++;}),{code:'LOCAL_SCOPE_DENIED'});
+  assert.equal(callbacks,0);assert.equal(f.calls.length,before);
+  assert.equal(f.executor.read(key).phase,'ready');
+ }finally{f.cleanup();}
+});
+
+test('accepted stop requires exact identity, all proofs and a private callback before any CLI',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),before=f.calls.length;
+  for(const patch of [{version:2},{stopId:'bad'},{proofDigest:''},{proofDigest:new String('a'.repeat(64))},{accepted:false},{checkpointResolved:false},{operationsResolved:false},{workspaceRevision:'0'.repeat(64)},{key:{...key,generation:2}},{extra:true}])
+   await assert.rejects(f.executor.stopAcceptedTask(key,{...expected,...patch},async()=>{}),{code:'LOCAL_SCOPE_DENIED'});
+  await assert.rejects(f.executor.stopAcceptedTask(key,expected),{code:'LOCAL_SCOPE_DENIED'});
+  assert.equal(f.calls.length,before);assert.equal(f.executor.read(key).acceptedStop,undefined);
+ }finally{f.cleanup();}
+});
+
+test('accepted stop fsyncs an immutable intent before one stop and confirms only original ID',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),identity=stopIdentity(expected);let callbacks=0;
+  f.control.onStop=()=>{const saved=JSON.parse(fs.readFileSync(f.executor.taskStateFile(key),'utf8'));assert.equal(saved.phase,'stopping');assert.equal(saved.acceptedStop.stage,'stop_intent');assert.deepEqual(saved.acceptedStop.identity,identity);};
+  const before=f.calls.length,result=await f.executor.stopAcceptedTask(key,expected,async()=>{callbacks++;});
+  assert.deepEqual(result,{...identity,phase:'stopped',replayed:false});assert.equal(callbacks,1);
+  const saved=f.executor.read(key);assert.equal(saved.phase,'stopped');assert.equal(saved.acceptedStop.stage,'stopped_confirmed');assert.deepEqual(saved.acceptedStop.result,result);
+  const stopIndex=f.calls.findIndex((call,i)=>i>=before&&call.args[3]==='stop');assert.ok(stopIndex>=before);
+  assert.ok(f.calls.slice(stopIndex+1).some(call=>call.args[3]==='get'&&call.args[4]===identity.sandboxId));
+  assert.ok(f.calls.slice(stopIndex+1).every(call=>call.args[3]!=='get'||call.args[4]===identity.sandboxId));
+  const second=f.calls.length;assert.deepEqual(await f.executor.stopAcceptedTask(key,expected,async()=>{callbacks++;}),result);
+  assert.equal(callbacks,1);assert.equal(mutationCalls(f.calls.slice(second)).length,0);
+  assert.deepEqual(await f.executor.reconcileAcceptedTaskStop(key,identity),result);
+  assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);
+ }finally{f.cleanup();}
+});
+
+test('accepted stop response loss survives a cold executor and reserves capacity until read-only reconciliation',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),identity=stopIdentity(expected);
+  await preparedTask(f,'B');f.control.stopDisconnect=true;
+  await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{}),{code:'LOCAL_OUTCOME_UNKNOWN'});
+  const reopened=new OpenShellDeviceExecutor(f.options),before=f.calls.length;
+  assert.equal(reopened.read(key).phase,'unknown');assert.equal(reopened.read(key).acceptedStop.stage,'stop_intent');
+  assert.throws(()=>reopened.admitTaskCapacity(true),{code:'SANDBOX_STORAGE_LIMIT'});assert.equal(f.calls.length,before);
+  const result=await reopened.reconcileAcceptedTaskStop(key,identity);assert.equal(result.phase,'stopped');
+  assert.equal(mutationCalls(f.calls.slice(before)).length,0);assert.ok(f.calls.slice(before).filter(call=>call.args[3]==='get').every(call=>call.args[4]===identity.sandboxId));
+  assert.doesNotThrow(()=>reopened.admitTaskCapacity(true));assert.equal(reopened.storageScopes().filter(row=>row.key).length,2);
+  assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);
+  await assert.rejects(reopened.stopAcceptedTask(key,{...expected,stopId:randomUUID()},async()=>{}),{code:'LOCAL_SCOPE_DENIED'});
+ }finally{f.cleanup();}
+});
+
+test('accepted stop blocks all ordinary execution, export and storage paths without starting retained files',async()=>{
+ const f=fixture();try{
+  const {key,executionScope,operation}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key));
+  await f.executor.stopAcceptedTask(key,expected,async()=>{});const before=f.calls.length,reopened=new OpenShellDeviceExecutor(f.options);
+  for(const [name,args] of [['prepare',{}],['filesystem',{path:'in.txt'}],['artifact_write',{path:'out.txt',content:'x'}],['terminal',{command:'echo denied'}],['terminal_test',{command:'echo denied'}]])
+   await assert.rejects(reopened.execute(f.job(name,args,{files:[],executionScope,approvalId:randomUUID()})),{code:'LOCAL_SCOPE_DENIED'});
+  await assert.rejects(reopened.inspectTaskExport(key,operation.id),{code:'LOCAL_SCOPE_DENIED'});
+  await assert.rejects(reopened.inspectStorage(key),{code:'LOCAL_SCOPE_DENIED'});
+  assert.equal(f.calls.length,before);assert.equal(reopened.read(key).phase,'stopped');
+ }finally{f.cleanup();}
+});
+
+test('accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await',async()=>{
+ for(const alreadyStopped of [true,false]){
+  const f=fixture();try{
+   const {key,executionScope}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key));let loads=0;
+   if(alreadyStopped)await f.executor.stopAcceptedTask(key,expected,async()=>{});
+   f.executor.loadNativeBundle=async()=>{
+    loads++;
+    const saved=f.executor.read(key);saved.phase='unknown';saved.acceptedStop={identity:stopIdentity(expected),stage:'stop_intent',intentAt:new Date().toISOString()};f.executor.save(saved);
+    return {manifest:{tools:[{name:'plugin__demo__run',originalName:'run'}],bundle:{}},compressed:Buffer.alloc(0),metadata:Buffer.alloc(0)};
+   };
+   const before=f.calls.length;
+   await assert.rejects(f.executor.execute(f.job('native_plugin',{pluginId:'e'.repeat(64),toolName:'plugin__demo__run',originalName:'run'},{executionScope})),{code:'LOCAL_SCOPE_DENIED'});
+   assert.equal(loads,alreadyStopped?0:1);assert.equal(f.calls.length,before);
+  }finally{f.cleanup();}
+ }
+});
+
+test('accepted stop reconciliation uses only the installed original-ID get syntax without policy-by-ID',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),transport=f.executor.transport;
+  f.executor.transport=(cli,args,options)=>{assert.ok(!(args[2]==='policy'&&args[3]==='get'&&args[4]===expected.sandboxId),'policy-by-ID is not a verified installed CLI contract');return transport(cli,args,options);};
+  assert.equal((await f.executor.stopAcceptedTask(key,expected,async()=>{})).phase,'stopped');
+  const before=f.calls.length;assert.equal((await f.executor.reconcileAcceptedTaskStop(key,stopIdentity(expected))).phase,'stopped');
+  assert.deepEqual(f.calls.slice(before).map(call=>call.args.slice(2,4)),[['status','--output'],['sandbox','get']]);
+ }finally{f.cleanup();}
+});
+
+test('accepted stop rechecks the entire journal and grant synchronously after its callback',async()=>{
+ for(const change of ['binding','phase','operation','revision','grant','policy','throw']){
+  const f=fixture();try{
+   const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),before=f.calls.length;
+   await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{
+    if(change==='throw')throw Error('SQL confirmation lost');
+    if(change==='grant'){f.executor.grant.id=randomUUID();return;}
+    if(change==='policy'){fs.writeFileSync(f.config.policyPath,'changed');return;}
+    const file=f.executor.taskStateFile(key),saved=JSON.parse(fs.readFileSync(file,'utf8'));
+    if(change==='binding')saved.binding.permissionHash='d'.repeat(64);
+    if(change==='phase')saved.phase='unknown';
+    if(change==='operation')saved.activeOperation=randomUUID();
+    if(change==='revision'){saved.workspaceRevision='0'.repeat(64);}
+    fs.writeFileSync(file,JSON.stringify(saved));
+   }));
+   assert.equal(f.calls.slice(before).filter(call=>call.args[3]==='stop').length,0,change);
+   assert.equal(JSON.parse(fs.readFileSync(f.executor.taskStateFile(key),'utf8')).acceptedStop,undefined,change);
+  }finally{f.cleanup();}
+ }
+});
+
+test('accepted stop clones queued identity and rejects missing or corrupted original intent on restart',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),identity=structuredClone(stopIdentity(expected));
+  let release;f.executor.maintenance(()=>new Promise(done=>{release=done;}));await new Promise(done=>setImmediate(done));
+  const pending=f.executor.stopAcceptedTask(key,expected,async()=>{expected.stopId=randomUUID();expected.key.taskId='changed-in-callback';});
+  expected.sandboxId=randomUUID();key.taskId='changed-in-queue';release();
+  const result=await pending;assert.deepEqual(result,{...identity,phase:'stopped',replayed:false});
+  const originalKey=identity.key,file=f.executor.taskStateFile(originalKey),saved=JSON.parse(fs.readFileSync(file,'utf8'));
+  for(const patch of [undefined,{...saved.acceptedStop,identity:{...identity,proofDigest:'bad'}},{...saved.acceptedStop,result:{...result,stopId:randomUUID()}},{...saved.acceptedStop,stage:'made-up'}]){
+   const damaged={...saved};if(patch===undefined)delete damaged.acceptedStop;else damaged.acceptedStop=patch;
+   fs.writeFileSync(file,JSON.stringify(damaged));const reopened=new OpenShellDeviceExecutor(f.options),before=f.calls.length;
+   await assert.rejects(reopened.reconcileAcceptedTaskStop(originalKey,identity));assert.equal(f.calls.length,before);
+   if(patch!==undefined)assert.equal(reopened.storageScopes().find(row=>row.phase==='unverified')?.phase,'unverified');
+  }
+ }finally{f.cleanup();}
+});
+
+test('accepted stop reconciliation refuses absent, Ready, wrong identity, mTLS and policy without lifecycle mutations',async()=>{
+ for(const change of ['absent','ready','id','name','mtls','policy']){
+  const f=fixture();try{
+   const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key));f.control.stopDisconnect=true;
+   await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{}),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   if(change==='absent')f.control.created=false;
+   if(change==='ready')f.control.observedPhase='Ready';
+   if(change==='id')f.control.observedId=randomUUID();
+   if(change==='name')f.control.observedName='wwe-000000000000';
+   if(change==='mtls')f.control.authentication='not-authenticated';
+   if(change==='policy')f.control.policyHash='0'.repeat(64);
+   const before=f.calls.length,reopened=new OpenShellDeviceExecutor(f.options);
+   await assert.rejects(reopened.reconcileAcceptedTaskStop(key,stopIdentity(expected)),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.equal(reopened.read(key).phase,'unknown',change);assert.equal(mutationCalls(f.calls.slice(before)).length,0,change);
+   assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);
+  }finally{f.cleanup();}
+ }
+});
+
+test('accepted stop journal failures never retry a mutation and preserve intent for later observation',async()=>{
+ for(const stage of ['intent','confirmed']){
+  const f=fixture();try{
+   const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),save=f.executor.save.bind(f.executor);let failed=false;
+   f.executor.save=scope=>{if(!failed&&scope.acceptedStop?.stage===(stage==='intent'?'stop_intent':'stopped_confirmed')){failed=true;throw Error('fixture journal fsync failed');}return save(scope);};
+   await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{}));
+   assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,stage==='intent'?0:1);
+   const reopened=new OpenShellDeviceExecutor(f.options),before=f.calls.length;
+   if(stage==='intent')await assert.rejects(reopened.reconcileAcceptedTaskStop(key,stopIdentity(expected)));
+   else assert.equal((await reopened.reconcileAcceptedTaskStop(key,stopIdentity(expected))).phase,'stopped');
+   assert.equal(mutationCalls(f.calls.slice(before)).length,0);
+  }finally{f.cleanup();}
+ }
+});
 
 test('stdin restores exact source bytes; CAS/revisions/metadata match existing contract, no host workspace writes',async()=>{
  const f=fixture();try{
@@ -421,9 +597,9 @@ test('task-attempt keys isolate sandboxes and persisted scope changes are reject
   const ids=[first.execution.sandboxId];
   ids.push((await f.executor.execute(make(other))).execution.sandboxId);
   await assert.rejects(f.executor.execute(make(attempt)),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:true});
-  await f.executor.stopAcceptedTask(key,{accepted:true,checkpointResolved:true,operationsResolved:true,workspaceRevision:f.executor.read(key).workspaceRevision});
+  await f.executor.stopAcceptedTask(key,acceptedStopExpected(f.executor.read(key)),async()=>{});
   ids.push((await f.executor.execute(make(attempt))).execution.sandboxId);
-  await f.executor.stopAcceptedTask(other,{accepted:true,checkpointResolved:true,operationsResolved:true,workspaceRevision:f.executor.read(other).workspaceRevision});
+  await f.executor.stopAcceptedTask(other,acceptedStopExpected(f.executor.read(other)),async()=>{});
   ids.push((await f.executor.execute(make(generation))).execution.sandboxId);
   assert.equal(new Set(ids).size,4);
   const reopened=new OpenShellDeviceExecutor(f.options);assert.equal(reopened.read(key).sandboxId,first.execution.sandboxId);
@@ -542,7 +718,7 @@ test('task capacity includes retained workspace and temp occupancy in disk admis
   const binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
   const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
   const prepared=await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));
-  await f.executor.stopAcceptedTask(key,{accepted:true,checkpointResolved:true,operationsResolved:true,workspaceRevision:prepared.workspaceRevision});
+  await f.executor.stopAcceptedTask(key,acceptedStopExpected(f.executor.read(key)),async()=>{});
   const file=f.executor.taskStateFile(key),saved=f.executor.read(key);saved.storage={workspace:{bytes:20*1024*1024},temp:{bytes:64*1024*1024}};fs.writeFileSync(file,JSON.stringify(saved));
   const statfs=fs.statfsSync;fs.statfsSync=value=>value===f.config.home?{bavail:256*1024*1024+80*1024*1024,bsize:1}:statfs(value);
   try{const next={...key,taskId:'B'},before=f.calls.length;await assert.rejects(f.executor.execute(f.job('prepare',{}, {files:[],executionScope:{...executionScope,key:next,binding:{...binding,...next}}})),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:true});assert.equal(f.calls.length,before);}finally{fs.statfsSync=statfs;}
