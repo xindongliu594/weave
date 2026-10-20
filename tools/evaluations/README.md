@@ -25,7 +25,11 @@ manifest 绑定评测身份与日期、Git commit/相关源码 dirty、源码内
 
 仓库的 `Offline engineering evaluation` workflow 使用 Node 24.15.0，在 Windows/Linux 单独安装上述依赖并执行原正向和负向 CLI 测试。它不读取模型凭据或数据库，不开启 execute；每个平台有 20 分钟超时，安装后先校验真实 CLI 存在，避免可选测试因缺依赖而跳过。只保留合成案例的 manifest、gate、JUnit 和负向 gate，保留期 7 天，不上传原始报告、HTML、日志、SQLite 或依赖。远程 workflow 的通过状态须以 GitHub 对应 commit 的实际结果为准，不能拿本地旧报告代替。
 
-依赖安装禁用生命周期脚本。本机安装 631 包、`node_modules` 实测 1,304,223,358 字节（约 1.21 GiB；平台可不同）。仅开发/独立评测使用，不复制到 JJ 生产。没有执行 `npm audit`，不声明无漏洞、完成审计或任意插件适配。
+依赖安装禁用生命周期脚本。本机安装 631 包、`node_modules` 实测 1,304,223,358 字节（约 1.21 GiB；平台可不同）。仅开发/独立评测使用，不复制到 JJ 生产。
+
+2026-10-20 对本隔离评测目录执行在线 `npm audit --omit=dev`，记录了 10 个受影响包，归于三项原始公告：[basic-ftp](https://github.com/advisories/GHSA-c475-qrg2-pj4r)、[braces](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) 和 [node-forge](https://github.com/advisories/GHSA-86w9-cpqp-85rv)。固定链路 `promptfoo@0.124.1 → proxy-agent@8.0.2 → pac-proxy-agent@9.1.0 → get-uri@8.0.1 → basic-ftp@5.3.1` 中，`get-uri` 要求 `basic-ftp@^5.3.1`；已发布的修复版 6.2.3 超出该范围，不能只改锁文件，本轮也不采用未经兼容验证的主版本覆盖。另两项的已发布最高版本 `braces@3.0.3`、`node-forge@1.4.0` 仍在公告范围内。本次保留固定依赖，待上游提供兼容修复链路后复核。离线 `npm audit --offline` 返回零条并不代表无漏洞，因为它没有取得新的公告数据。
+
+当前固定 runner 只接受生成的 replay 配置和本地合成数据；`execute` 在网络前拒绝，子进程用预加载模块阻断常用 HTTP、socket、DNS 与 fetch 入口。因此该评测流程没有预期的 FTP、watch、证书导入或不可信模板输入。此结论只限定于已检查的固定流程；未验证任意 Promptfoo 配置、第三方插件或这些依赖的全部调用路径，不能据此宣称漏洞无法利用或依赖安全。
 
 官方依据：
 
