@@ -27,7 +27,7 @@ before(async()=>{
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES($1,$2,1,'completed',$3)",[runId,project,snapshot]);
  await pool.query("INSERT INTO knowledge_spaces(id,name,scope,department_id,agent_ids) VALUES($1,'本部门记录','department',$2,'[]')",[space,department]);
  await pool.query("INSERT INTO knowledge_spaces(id,name,scope,agent_ids) VALUES($1,'公司共享','company','[]')",[otherSpace]);
- const {createApp}=await import('../apps/api/src/app.ts');const app=createApp();shutdown=app.locals.shutdown;await shutdown();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
+ const {createApp}=await import('../apps/api/src/app.ts');const app=createApp();shutdown=app.locals.shutdown;await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
 });
 
 test('accepted work exposes adopted versions only from its sealed attempt, with sources in the reusable document',{skip:!isolated},async()=>{
@@ -61,7 +61,7 @@ test('work knowledge projects sealed test counters without inventing legacy valu
  assert.equal(read.data.nodes[0].commands[0].tests.tests,17);assert.equal(read.data.nodes[0].commands[0].tests.pass,17);
  assert.equal(read.data.nodes[0].commands[1].tests.status,'unknown');assert.equal(read.data.nodes[0].commands[1].tests.tests,undefined);
 });
-after(async()=>{if(!isolated)return;server?.closeAllConnections();if(server)await new Promise<void>(r=>server.close(()=>r()));await pool?.end();assert.ok(resolve(root).startsWith(resolve(tmpdir())+sep+'work-records-'));rmSync(root,{recursive:true,force:true});});
+after(async()=>{if(!isolated)return;server?.closeAllConnections();if(server)await new Promise<void>(r=>server.close(()=>r()));await shutdown?.();await pool?.end();assert.ok(resolve(root).startsWith(resolve(tmpdir())+sep+'work-records-'));rmSync(root,{recursive:true,force:true});});
 
 test('accepted work is discoverable and publishes once through the existing versioned knowledge index', {skip:!isolated},async()=>{
  const listed=await api('/knowledge/work-records');assert.equal(listed.status,200);assert.ok(listed.data.some((record:any)=>record.runId===runId));

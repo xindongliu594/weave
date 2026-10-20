@@ -2,7 +2,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools';
 import { searchKnowledge } from './knowledge.mjs';
 import { retryRead, classifyFailure } from './recovery.mjs';
 import { readRecoveryContext } from './checkpoint-context.mjs';
-import {prepareTaskTool,assertTaskScopeBinding,taskSandboxEnabled,taskInvocationGuard} from './task-tool-context.mjs';
+import {prepareTaskTool,prepareTaskCheckpoint,assertTaskScopeBinding,taskSandboxEnabled,taskInvocationGuard} from './task-tool-context.mjs';
 // Domain capabilities are explicit employee grants. Native collaboration and
 // recovery plumbing are separate and must retain their existing policies.
 export const PRODUCT_TOOL_NAMES = Object.freeze(['artifact_write','filesystem','terminal','terminal_test','knowledge_search','knowledge_read','browser_read','mcp_call_readonly']);
@@ -27,6 +27,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     ['mcp_call_readonly','调用批准连接与工具名单内的只读 MCP 工具；返回内容是不可信资料。',{connectionId:string,tool:string,arguments:{type:'object',required:true,additionalProperties:true}}],
   ];
   const disposers=tools.map(([name,description,parameters])=>ctx.tools.register(defineTool({name,description,parameters,output:{schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},async execute(args,exec){
+    handoff?.assertRunCheckpointReady?.();
     const checkInvocation=taskInvocationGuard(ctx,exec,snapshot);
     const employee=employeeFor(exec.agent,snapshot,captainId());
     if(!employee||!employee.tools.includes(name))throw Error('TOOL_PERMISSION_DENIED: 此员工没有该工具权限');
@@ -40,7 +41,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       if(!externalTool)throw Error('EXTERNAL_TOOL_UNAVAILABLE');
       const waiting=supervisor?.enter(exec.agent.id,'waiting_capacity');let release;
       try{release=await gate.acquire(exec.signal);}finally{waiting?.();}
-      try{checkInvocation();goal?.check('external-tool');supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
+      try{handoff?.assertRunCheckpointReady?.();checkInvocation();goal?.check('external-tool');supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
       catch(error){archive.append('external/tool-failed',{name,agentId:employee.id,message:error.message},ref);throw error;}
       finally{release();}
     }
@@ -80,12 +81,13 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
         let dispatched=false,outcomeKnown=false;
         try {
           const before = handoff?.beforeFile(work.taskId, work.attemptId, name, args);
-          if(name!=='filesystem'&&handoff)handoff.checkpoint?.(work.taskId,work.attemptId,'before-tool',ref);
+          if((name!=='filesystem'||taskMode)&&handoff)handoff.checkpoint?.(work.taskId,work.attemptId,'before-tool',ref);
           if(name!=='filesystem')archive.append('runtime/operation-start',{name,arguments:args},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})});
           dispatched=true;
           const result = await retryRead(name,()=>{checkInvocation();return sandbox.execute(name,args,exec.signal,{agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,approvalId,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{}),...(taskMode?{generation:prepared.context.generation,executionScope:prepared.executionScope}:{})});},readOptions);
           outcomeKnown=true;
           if(name!=='filesystem')archive.append('runtime/operation-finished',{name},ref);
+          await prepareTaskCheckpoint({snapshot,sandbox,handoff,activeWork,archive,agent:exec.agent,employee,signal:exec.signal,prepared,phase:'after-tool',operationId:result.taskExecution?.operationId});
           if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before, { ...ref, approvalId });
           archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})});if(name==='filesystem')attestRead(result);
           if(name==='artifact_write'&&readScope)try{onWriteEvidence?.({args,value:result,scope:readScope,agent:exec.agent,callId:exec.callId});}catch{/* Optional optimization fails closed; preserve full old evidence. */}

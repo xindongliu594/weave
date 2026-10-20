@@ -6,18 +6,20 @@ import {completedTasks,resumeHandoff} from './handoff-checkpoints.ts';
 import {AppError} from './provider.ts';
 import {workEfficiency} from './work-efficiency.ts';
 import {acceptedAdoptions} from '../../../services/agent-runtime/employee-capabilities.mjs';
+import {readLiveCanonical} from './live-canonical-reader.ts';
 
 /** A small index of real work. Raw conversations and employee source files stay in their archives. */
 export async function acceptedWorkEvidence(db:Pick<pg.Pool,'query'>,traceRoot:string,runId:string){
- const row=(await db.query('SELECT r.status,r.snapshot,r.project_id,p.department_id,d.deleted_at FROM project_runs r JOIN projects p ON p.id=r.project_id JOIN departments d ON d.id=p.department_id WHERE r.id=$1',[runId])).rows[0];
+ const row=(await db.query('SELECT r.*,p.department_id,d.deleted_at FROM project_runs r JOIN projects p ON p.id=r.project_id JOIN departments d ON d.id=p.department_id WHERE r.id=$1',[runId])).rows[0];
  const run=readRun(traceRoot,runId);
  if(!row||!run)throw new AppError(404,'工作运行不存在');
  if(row.deleted_at)throw new AppError(409,'部门已归档；工作历史仍保留，恢复部门后可查看');
  const snapshot=run.snapshot as any;
  if(row.status!=='completed'||run.status!=='completed'||run.integrity!=='ok'||snapshot.projectId!==row.project_id||snapshot.planVersion!==row.snapshot.planVersion)
   throw new AppError(409,'只有完整且已完成的正式工作可以登记知识');
+ const canonical=await readLiveCanonical(db,traceRoot,row,run);
  let receipts:any[];
- try{const done=completedTasks(run.events,snapshot);if(!done.size||!snapshot.tasks.every((t:any)=>done.has(t.id)))throw Error('存在未核验节点');receipts=resumeHandoff(snapshot,run.events,done,join(traceRoot,runId,'artifacts'));}
+ try{const done=completedTasks(run.events,snapshot);if(!done.size||!snapshot.tasks.every((t:any)=>done.has(t.id)))throw Error('存在未核验节点');receipts=resumeHandoff(snapshot,run.events,done,join(traceRoot,runId,'artifacts'),canonical?.ref.manifest);}
  catch(error){throw new AppError(409,'交付证据不能核对：'+(error as Error).message);}
  const files=[...new Map(receipts.flatMap(r=>[...(r.inputs??[]),...(r.outputs??[])]).map(f=>[f.path+':'+f.sha256,{path:f.path,sha256:f.sha256,bytes:f.bytes}])).values()];
  const testCounters=(command:any)=>{const counts=command.evidence?.nodeTests;if(counts?.status!=='available')return {status:'unknown',reason:counts?.reason??'LEGACY_TEST_COUNTS_UNAVAILABLE'};return Object.fromEntries(['status','format','tests','suites','pass','fail','cancelled','skipped','todo'].filter(key=>counts[key]!==undefined).map(key=>[key,counts[key]]));};

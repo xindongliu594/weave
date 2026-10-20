@@ -1,6 +1,6 @@
 import { nativeFileAccess, nativeToolBinding } from './native-capabilities.mjs';
 import { employeeFor } from './product-tools.mjs';
-import {prepareTaskTool,taskSandboxEnabled,taskInvocationGuard} from './task-tool-context.mjs';
+import {prepareTaskTool,prepareTaskCheckpoint,taskSandboxEnabled,taskInvocationGuard} from './task-tool-context.mjs';
 
 /** Only definitions cross the Host boundary; native plugin bodies run remotely. */
 export function installNativePluginTools(ctx, {snapshot,archive,sandbox,gate,captainId,handoff,activeWork,supervisor,goal}) {
@@ -10,6 +10,7 @@ export function installNativePluginTools(ctx, {snapshot,archive,sandbox,gate,cap
   disposers.push(ctx.tools.register({name:tool.name,description:tool.description+' 使用工作区相对路径；遵守批准的输入输出合同。',parameters:tool.parameters,
    output:{schema:{type:'object',additionalProperties:true},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},
    async execute(args,exec){
+    handoff?.assertRunCheckpointReady?.();
     const checkInvocation=taskInvocationGuard(ctx,exec,snapshot);
     const employee=exec.agent&&employeeFor(exec.agent,snapshot,captainId());
     if(!employee?.tools.includes(tool.name)||ctx.agents.get(exec.agent.id)!==exec.agent)throw Error('TOOL_PERMISSION_DENIED: 员工未获此原生工具授权');
@@ -34,6 +35,7 @@ export function installNativePluginTools(ctx, {snapshot,archive,sandbox,gate,cap
         {agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,taskId:work.taskId,attemptId:work.attemptId,...(taskMode?{generation:prepared.context.generation,executionScope:prepared.executionScope}:{})});
        known=true;archive.append('runtime/operation-finished',{name:tool.name,pluginId:binding.id},ref);
        if(result.pluginId!==binding.id||result.toolName!==tool.name)throw Error('NATIVE_RECEIPT_MISMATCH');
+       await prepareTaskCheckpoint({snapshot,sandbox,handoff,activeWork,archive,agent:exec.agent,employee,signal:exec.signal,prepared,phase:'after-tool',operationId:result.taskExecution?.operationId});
        handoff.observe(work.taskId,work.attemptId,tool.name,args,result,before,ref);
        archive.append('artifact/updated',{agentId:employee.id,files:result.artifacts},{...ref,taskId:work.taskId,attemptId:work.attemptId});
        archive.append('capability/tool-used',{agentId:employee.id,name:tool.name,pluginId:binding.id,package:binding.manifest.package,version:binding.manifest.version,isError:result.nativeResult.isError},ref);

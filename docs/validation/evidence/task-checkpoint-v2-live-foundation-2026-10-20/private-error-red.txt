@@ -1,0 +1,44 @@
+✖ private canonical validation failures do not reveal another task filename (113.3921ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 298.5623
+
+✖ failing tests:
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:42:1
+✖ private canonical validation failures do not reveal another task filename (113.3921ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   message: 'CHECKPOINT_CONTENT_INVALID: private-b.txt'
+  -   message: 'CHECKPOINT_CONTENT_INVALID'
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:44:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: CHECKPOINT_CONTENT_INVALID: private-b.txt
+        at validateTaskCheckpointRefs (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:63:82)
+        at commitTaskCheckpoint (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:75:2)
+        at commitStepCheckpoint (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:142:34)
+        at assert.throws.message (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:44:20)
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:44:9)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1201:25)
+        at Test.start (node:internal/test_runner/test:1096:17),
+    expected: { message: 'CHECKPOINT_CONTENT_INVALID' },
+    operator: 'throws',
+    diff: 'simple'
+  }

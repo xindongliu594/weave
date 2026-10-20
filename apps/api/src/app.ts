@@ -36,6 +36,7 @@ import { knowledgeRouter } from './knowledge.ts';
 import { productRouter } from './product.ts';
 import { runManagementRouter } from './run-management.ts';
 import { resumeHandoff, completedTasks } from './handoff-checkpoints.ts';
+import {readLiveCanonical} from './live-canonical-reader.ts';
 import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { backupRouter } from './backup.ts';
 import { idempotency } from './idempotency.ts';
@@ -533,7 +534,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.get('/api/runs/:id', async (req, res) => {
     const id = z.uuid().parse(req.params.id);
     const run = readRun(traceRoot, id);
-    const row = (await pool.query('SELECT snapshot,status,error,created_at FROM project_runs WHERE id=$1',[id])).rows[0];
+    const row = (await pool.query('SELECT id,project_id,snapshot,status,error,created_at,canonical_workspace FROM project_runs WHERE id=$1',[id])).rows[0];
     const costReadiness=row?.snapshot.projectId?await projectCostReadiness(pool,row.snapshot.projectId,row.snapshot.policy?.maxBudget):undefined;
     const costBlocked=row&&['failed','interrupted','cancelled'].includes(row.status)&&costReadiness&&(costReadiness.pendingCount||costReadiness.uncertainCount)
       ? '项目有进行中或待核对的模型费用。请先在系统设置核对供应方账单，再恢复；费用和调用上限继续保留。' : undefined;
@@ -544,7 +545,10 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     const events = run.events.filter(e => e.seq > after && (!sessionId || e.sessionId === sessionId)).slice(0, limit);
     const recovery:{unknownOperations:any[];checkpointBlocked?:string;planningBlocked?:string;costBlocked?:string;costReadiness?:ProjectCostReadiness}={unknownOperations:unresolvedOperations(run.events),costBlocked,costReadiness};
     if(hasUnplannedTasks({tasks:row?.snapshot.approvedTasks??run.snapshot.tasks}))recovery.planningBlocked=planningRequiredMessage;
-    if(row&&['failed','interrupted','cancelled'].includes(row.status))try{resumeHandoff({...run.snapshot,tasks:run.snapshot.approvedTasks??run.snapshot.tasks},run.events,completedTasks(run.events,run.snapshot),resolve(traceRoot,id,'artifacts'));}catch(error){recovery.checkpointBlocked=(error as Error).message;}
+    if(row&&['failed','interrupted','cancelled'].includes(row.status))try{
+      const canonical=await readLiveCanonical(pool,traceRoot,row,run);
+      resumeHandoff({...run.snapshot,tasks:run.snapshot.approvedTasks??run.snapshot.tasks},run.events,completedTasks(run.events,run.snapshot),resolve(traceRoot,id,'artifacts'),canonical?.ref.manifest);
+    }catch(error){recovery.checkpointBlocked=(error as Error).message;}
     res.json({ ...run,...(row?{status:row.status,error:row.error}:{}), recovery, events, summaryEvents: run.events.filter(e => e.type.startsWith('quality/') || e.type.startsWith('goal/') || ['runtime/status','runtime/anomaly','runtime/read-retry','runtime/outcome-unknown','team/snapshot','team/checkpoint','step/checkpoint','recovery/restored','run/finished','billing/usage','billing/unconfirmed','knowledge/citation','budget/warning','budget/stopped','handoff/accepted','handoff/blocked'].includes(e.type)), nextCursor: events.at(-1)?.seq ?? after, hasMore: run.events.some(e => e.seq > (events.at(-1)?.seq ?? after) && (!sessionId || e.sessionId === sessionId)) });
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {

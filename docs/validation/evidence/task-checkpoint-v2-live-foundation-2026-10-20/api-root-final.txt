@@ -1,0 +1,58 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ checkpoint refs preserve A work and original merge while canonical advances to independent B (2939.2387ms)
+✔ before-tool checkpoint uses imported task bytes rather than full canonical revision (714.0577ms)
+✔ after-tool checkpoint refuses a missing, other-task, stale or nonexistent operation identity (2939.5454ms)
+✔ SQL unknown blocks checkpoint despite finished events and human acknowledgment (972.5282ms)
+✔ checkpoint refuses missing referenced objects without cache repair (963.7412ms)
+✔ checkpoint refuses corrupt referenced objects without cache repair (1039.3871ms)
+✔ checkpoint refuses changed lease (995.9932ms)
+✔ checkpoint refuses changed authority (1006.6706ms)
+✔ checkpoint refuses changed assignment (1038.9004ms)
+✔ checkpoint refuses changed capability (1067.5857ms)
+✔ checkpoint refuses changed recovery (1020.3464ms)
+✔ checkpoint independently authenticates the task merge record after a newer canonical commit (2043.7119ms)
+✔ checkpoint revalidates lease after asynchronous preparation (1048.2858ms)
+✔ checkpoint revalidates authority after asynchronous preparation (1082.72ms)
+✔ checkpoint revalidates assignment after asynchronous preparation (1049.0071ms)
+✔ checkpoint revalidates object after asynchronous preparation (1112.8783ms)
+✔ checkpoint publication fences assignment at the real COMMIT response (1058.5559ms)
+✔ checkpoint publication fences object at the real COMMIT response (1041.865ms)
+✔ checkpoint publication fences abort at the real COMMIT response (1058.895ms)
+✔ checkpoint publication fences progress at the real COMMIT response (1066.1063ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27404.4549
+✔ artifact list and download use one complete SQL committed head despite partial corrupt cache (1984.1231ms)
+✔ from-run imports exact committed text with partial cache (1448.4344ms)
+✔ parent copies require a selected canonical head for task profile and retain all committed files (1419.0075ms)
+✔ planning context and accepted work evidence use committed seals with partial cache (1433.5256ms)
+✔ missing committed object blocks every consumer even with good cache without mutation (1362.1401ms)
+✔ corrupt committed object blocks every consumer even with good cache without mutation (1351.5403ms)
+✔ unknown profile, SQL/archive profile mismatch, recovery and absent live operation evidence refuse cache fallback (1353.4935ms)
+✔ SQL unknown remains blocked when archive is finished and human acknowledgment is present (1407.7875ms)
+✔ a head cannot certify another or damaged original committed SQL operation (1264.0694ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15233.3977
+✔ legacy encrypted restore remains available for a destination without enterprise history (1973.22ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (92.6155ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (105.1547ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2861.5807

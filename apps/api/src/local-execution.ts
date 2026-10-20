@@ -12,8 +12,9 @@ import {shareCostMaintenance} from './cost-control.ts';
 import {assertRunAuthorization,assertCurrentRunPermissions,assertExecutionProfile} from './execution-policy.ts';
 import {initializeTaskCanonical,readCommittedCanonical,commitTaskResult,validateTaskOperationResult} from './task-canonical.ts';
 import {bindTrustedAttempt,resolveTaskScope} from './task-execution.ts';
+import {prepareTaskCheckpoint,type TaskCheckpointContext,type TaskCheckpointOptions} from './task-checkpoint-state.ts';
 import {admitTaskOperation,assertNoUnresolvedTaskOperation,publicTaskScope,taskDeviceScope,taskOperationDenied} from './task-operation-admission.ts';
-import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope} from '../../../packages/contracts/index.ts';
+import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope,TaskCheckpointRefs} from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
 import {openRunArchive,readRun} from '../../../services/agent-runtime/trace-store.mjs';
 import {executionBackendSchema} from '../../../packages/contracts/index.ts';
@@ -213,6 +214,11 @@ export class LocalRunExecutor {
  /** Trusted in-process Host admission only; not registered as a model tool or HTTP route. */
  async bindAttempt(candidate:TrustedTaskCandidate&{generation?:number},signal:AbortSignal):Promise<TrustedTaskAssignment>{
   return this.taskTransaction(signal,(db,run)=>bindTrustedAttempt(db,run,candidate));
+ }
+ /** Private Host boundary: no model DTO, command dispatch or compatibility-cache read. */
+ async prepareCheckpoint(context:TaskCheckpointContext,signal:AbortSignal,options:TaskCheckpointOptions):Promise<TaskCheckpointRefs>{
+  const publish=await this.taskTransaction(signal,(db,run)=>prepareTaskCheckpoint(db,run,this.service,context,signal,options));
+  return publish();
  }
  async taskScope(context:{agentId:string;sessionId:string;taskId:string;attemptId:string;generation:number},signal:AbortSignal):Promise<TaskExecutionScope>{
   if(!context||!Number.isSafeInteger(context.generation)||context.generation<1||Object.keys(context).some(k=>!['agentId','sessionId','taskId','attemptId','generation'].includes(k)))throw new AppError(409,'任务 scope 身份不完整','TASK_SCOPE_DENIED');

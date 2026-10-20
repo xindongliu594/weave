@@ -4,6 +4,7 @@ import { executeBrowserMcpTool } from './work-tools-browser.ts';
 import { randomUUID } from 'node:crypto';
 import {join} from 'node:path';
 import { prepareImportedWorkspace } from './work-files.ts';
+import {readLiveCanonical} from './live-canonical-reader.ts';
 import {restoreStepWorkspace} from './step-checkpoint-recovery.ts';
 import { pool } from './db.ts';
 import { unseal } from './vault.ts';
@@ -140,7 +141,11 @@ export class RunCoordinator {
       }
       if(this.stopped)throw new AppError(409,'工作进程已关闭，任务未启动','WORKER_STOPPED');
       if(row.snapshot.recovery?.workspaceCheckpoint)restoreStepWorkspace(this.traceRoot,row.snapshot.recovery.workspaceCheckpoint,join(this.traceRoot,row.id,'artifacts'));
-      else prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind);
+      else {
+        const parent=row.parent_run_id&&row.snapshot.approval?.kind!=='retry'?(await pool.query('SELECT * FROM project_runs WHERE id=$1',[row.parent_run_id])).rows[0]:undefined;
+        const canonical=parent?await readLiveCanonical(pool,this.traceRoot,parent,readRun(this.traceRoot,parent.id)):undefined;
+        prepareImportedWorkspace(this.traceRoot,row.id,row.snapshot.importedFiles??[],row.parent_run_id,row.snapshot.approval?.kind,canonical);
+      }
       const started=await this.runtime.start({runId:row.id,approvedSnapshot:row.snapshot,routes});
       const result=await started.completion;
       for(const usage of result.usages)await this.recordUsage(row.id,usage);

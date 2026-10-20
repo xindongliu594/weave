@@ -1,0 +1,31 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ artifact list and download use one complete SQL committed head despite partial corrupt cache (2563.4914ms)
+✔ from-run imports exact committed text with partial cache (2009.018ms)
+✔ parent copies require a selected canonical head for task profile and retain all committed files (1402.9751ms)
+✔ planning context and accepted work evidence use committed seals with partial cache (1412.9898ms)
+✔ missing committed object blocks every consumer even with good cache without mutation (1416.365ms)
+✔ corrupt committed object blocks every consumer even with good cache without mutation (1352.1861ms)
+✔ unknown profile, SQL/archive profile mismatch, recovery and absent live operation evidence refuse cache fallback (1377.886ms)
+✔ SQL unknown remains blocked when archive is finished and human acknowledgment is present (1345.0938ms)
+✔ a head cannot certify another or damaged original committed SQL operation (1270.6121ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16613.3302
+✔ accepted work exposes adopted versions only from its sealed attempt, with sources in the reusable document (3714.9578ms)
+✔ directional workspace imports and legacy private knowledge cannot publish into department knowledge (203.8235ms)
+✔ work knowledge projects sealed test counters without inventing legacy values (44.5449ms)
+✔ accepted work is discoverable and publishes once through the existing versioned knowledge index (163.7231ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5361.5264

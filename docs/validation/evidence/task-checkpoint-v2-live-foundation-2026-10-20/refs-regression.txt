@@ -1,0 +1,89 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ expired durable intent settles as rejected and no longer fences independent work (1041.5826ms)
+✔ committed SQL receipt repairs evidence after plan change without new execution authority (379.21ms)
+✔ a deterministic second-transaction denial settles intent but damaged archive evidence stays pending (452.3888ms)
+✔ commits full canonical, retains other task file, deduplicates merge and rolls own durable outputs (482.335ms)
+✔ queued baseline CAS conflict preserves newer complete B and rejects old output (544.6331ms)
+✔ second operation uses durable own output and retains original input ancestry (774.8235ms)
+✔ changed plan and revoked device authority cannot publish a completed receipt (421.472ms)
+✔ actual result route validates receipts, deduplicates transmission, and preserves plan withdrawal as late evidence (795.2507ms)
+✔ actual result route validates receipts, deduplicates transmission, and preserves backend withdrawal as late evidence (706.2898ms)
+✔ fault intent never publishes a partial set and reconciliation never executes a command (446.6228ms)
+✔ fault blob-fsync never publishes a partial set and reconciliation never executes a command (429.9479ms)
+✔ fault before-sql-commit never publishes a partial set and reconciliation never executes a command (490.4713ms)
+✔ fault after-sql-commit never publishes a partial set and reconciliation never executes a command (416.0282ms)
+✔ fault archive-append never publishes a partial set and reconciliation never executes a command (615.0241ms)
+✔ fault cache-mirror never publishes a partial set and reconciliation never executes a command (808.3588ms)
+✔ missing or corrupt object freezes reads, merge and cache recovery with original files retained (2484.5592ms)
+✔ task profile launch stays closed while prepare only initializes canonical (604.2694ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14670.5075
+✔ two consecutive task writes roll scope and preserve original input lineage (10163.6181ms)
+✔ file operations preserve canonical arguments and transport only the visible revision (4817.1923ms)
+✔ unrelated task commit rebuilds next scope without rebinding inputs (6302.7909ms)
+✔ another task changing a fixed input blocks scope renewal (4585.3329ms)
+✔ approval cannot authorize a renewed scope (4436.2928ms)
+✔ missing generation, widened private scope and cancelled lease are refused before queue (1007.1675ms)
+✔ unknown prepare cannot be replayed or bypassed by a new generation (612.1135ms)
+✔ a task cannot accept a successful receipt from another sandbox (1009.1325ms)
+✔ queued task state is rechecked by poll and start (1455.4615ms)
+✔ a late authenticated receipt after withdrawal stays evidence and cannot merge (884.1355ms)
+✔ native dispatch derives effective paths and fixed bundle from the trusted scope (1561.43ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47412.7641
+✔ independent task receipt validation recomputes manifests and keeps revision domains distinct (3358.5663ms)
+✔ canonical metadata is bounded and validated before any object file is opened (2.3695ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6013.2679
+✔ explicit execution mode is independent of identity and task profile stays unavailable (2.0721ms)
+✔ server allocates generation, pins true import ancestry and never imports private files (3323.5309ms)
+✔ forged employee rejected before queue (2388.6673ms)
+✔ forged task rejected before queue (2487.2778ms)
+✔ forged attempt rejected before queue (2572.0648ms)
+✔ forged session rejected before queue (3196.2014ms)
+✔ forged assignee rejected before queue (2391.7544ms)
+✔ completed task rejected before queue (2043.7919ms)
+✔ failed task rejected before queue (2109.4079ms)
+✔ model readPaths rejected before queue (2193.014ms)
+✔ stale rework hash rejected before queue (2028.049ms)
+✔ expired lease rejected before queue (2084.6503ms)
+✔ missing generation rejected before queue (2071.113ms)
+✔ import denied rejected before queue (2040.8946ms)
+✔ input changed rejected before queue (1925.8702ms)
+✔ existing output rejected before queue (2037.5998ms)
+✔ unaccepted producer rejected before queue (2019.894ms)
+✔ cross run accepted rejected before queue (2065.2585ms)
+✔ cross run checkpoint rejected before queue (1988.3454ms)
+✔ scope rolls unrelated baseline while original input SHA stays pinned (2010.5431ms)
+✔ own committed input modifications roll twice and preserve original import ancestry (1950.7107ms)
+✔ task profile launch stays closed and unbound execute never reaches shared operation queue (4.7551ms)
+✔ real LocalRunExecutor binds and rechecks trusted archive against isolated SQL before any queue (2199.4921ms)
+✔ trusted rework contract pins original accepted attempt rather than stale snapshot contract (2076.2589ms)
+✔ real multi-output ReworkGate keeps sealed delivery inputs and grants only narrowed writes through later scopes (2103.7668ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53699.9241

@@ -21,13 +21,18 @@ import { approvedRecoveryResources, recoveryMinimumProjectBudget, recoveryCallRe
 import { recoveryResourceRouter } from './recovery-resource-router.ts';
 import {selectStepCheckpoint,stepCheckpointError} from './step-checkpoint-recovery.ts';
 import {sourceBudgetEvidence} from '../../../services/agent-runtime/run-evidence.mjs';
+import {readLiveCanonical} from './live-canonical-reader.ts';
 export function runManagementRouter(traceRoot:string){
  const router=Router();
  router.use(recoveryResourceRouter(traceRoot));
  router.get('/approvals',async(req,res)=>res.json((await pool.query('SELECT id,run_id AS "runId",agent_id AS "agentId",tool,arguments,status,created_at AS "createdAt" FROM tool_approvals WHERE ($1::text IS NULL OR run_id=$1) ORDER BY created_at DESC LIMIT 200',[req.query.runId??null])).rows));
  router.post('/approvals/:id',async(req,res)=>{const input=z.object({decision:z.enum(['approved','denied'])}).parse(req.body);const r=await pool.query("UPDATE tool_approvals SET status=$1,decided_at=now() WHERE id=$2 AND status='pending' AND EXISTS(SELECT 1 FROM project_runs WHERE id=tool_approvals.run_id AND status='running' AND NOT cancel_requested) RETURNING run_id,agent_id",[input.decision,req.params.id]);if(!r.rowCount)throw new AppError(409,'审批已处理或运行已停止');openRunArchive(traceRoot,r.rows[0].run_id).append('approval/decided',{id:req.params.id,decision:input.decision,agentId:r.rows[0].agent_id});res.json({ok:true});});
- router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');res.json(listArtifacts(join(traceRoot,id,'artifacts')));});
- router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path);if(!readRun(traceRoot,id))throw new AppError(404,'运行不存在');try{const file=artifactFile(join(traceRoot,id,'artifacts'),path);res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.setHeader('X-Content-Type-Options','nosniff');res.type('application/octet-stream');res.attachment(path.split('/').at(-1));res.sendFile(file,{dotfiles:'allow'});}catch{throw new AppError(404,'交付物不存在或路径不允许');}});
+ router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id),archive=readRun(traceRoot,id);if(!archive)throw new AppError(404,'运行不存在');const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0],canonical=await readLiveCanonical(pool,traceRoot,row,archive);res.json(canonical?canonical.ref.manifest:listArtifacts(join(traceRoot,id,'artifacts')));});
+ router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path),archive=readRun(traceRoot,id);if(!archive)throw new AppError(404,'运行不存在');const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0],canonical=await readLiveCanonical(pool,traceRoot,row,archive);let file:string|undefined,bytes:Buffer|undefined;
+  if(canonical){const found=canonical.files.find(file=>file.path===path);if(!found)throw new AppError(404,'交付物不存在或路径不允许');bytes=Buffer.from(found.content,'base64');}
+  else try{file=artifactFile(join(traceRoot,id,'artifacts'),path);}catch{throw new AppError(404,'交付物不存在或路径不允许');}
+  res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.setHeader('X-Content-Type-Options','nosniff');res.type('application/octet-stream');res.attachment(path.split('/').at(-1));if(bytes)res.send(bytes);else res.sendFile(file!,{dotfiles:'allow'});
+ });
  router.get('/runs/:id/export',async(req,res)=>{const run=readRun(traceRoot,z.uuid().parse(req.params.id));if(!run)throw new AppError(404,'运行不存在');res.attachment('run-'+run.id+'.json').json(run);});
  router.get('/runs/:id/citations/:chunkId',async(req,res)=>{
   const run=readRun(traceRoot,z.uuid().parse(req.params.id));

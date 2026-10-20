@@ -81,7 +81,7 @@ export class ProductDshRuntime {
         if(snapshot.executionTarget?.kind!=='local'||snapshot.executionTarget.backend?.kind!=='openshell'||typeof this.createExecutor!=='function')throw Error('TASK_EXECUTION_REQUIRED: 任务执行只能使用已配置的 OpenShell 任务执行器');
         if(snapshot.recovery)throw Error('TASK_RECOVERY_UNAVAILABLE: 任务检查点恢复链路尚未完成');
         sandbox=this.createExecutor(archive,snapshot);
-        if(!sandbox||['prepare','prepareTask','bindAttempt','execute','close'].some(name=>typeof sandbox[name]!=='function'))throw Error('TASK_EXECUTION_REQUIRED: 任务执行器缺少可信接口');
+        if(!sandbox||['prepare','prepareTask','prepareCheckpoint','bindAttempt','execute','close'].some(name=>typeof sandbox[name]!=='function'))throw Error('TASK_EXECUTION_REQUIRED: 任务执行器缺少可信接口');
         // The root is a compatibility cache, never the publication authority.
         // Rebuild it from the committed head before supervisor/Handoff reads.
         await sandbox.prepare(job.controller.signal);job.controller.signal.throwIfAborted();

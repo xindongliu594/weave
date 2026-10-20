@@ -1,0 +1,118 @@
+[
+  {
+    "path": "apps/api/src/app.ts",
+    "sha256": "c76fc60731c2b86b24ff0ce167dc5748612572b2ac4920908b9966e11c7b0fe7"
+  },
+  {
+    "path": "apps/api/src/handoff-checkpoints.ts",
+    "sha256": "cd22a63687c0e5fec03c3792bf6d9a521eec3672a0df4c800e598e7f8aee080a"
+  },
+  {
+    "path": "apps/api/src/local-execution.ts",
+    "sha256": "066aa90a34695f28048f7065d55a3bbb0c19da1eb68695213e6cc1d390445ec7"
+  },
+  {
+    "path": "apps/api/src/planning-execution-context.ts",
+    "sha256": "5643e215915f256546fa3e52b6370824f3bae495c5974c41be3ade45a1ebf1d2"
+  },
+  {
+    "path": "apps/api/src/run-coordinator.ts",
+    "sha256": "169106e284da882feffcecb18f4fb3d28029d9a978795300ea845d0142e9b9d8"
+  },
+  {
+    "path": "apps/api/src/run-management.ts",
+    "sha256": "55d9cbd6be16bdf0eddba86fefb45392e05ec22724a143c95ac71997ae878b2d"
+  },
+  {
+    "path": "apps/api/src/task-canonical.ts",
+    "sha256": "af516335c002d7ea8db0d56daf59ecf47ac2fc0a2ce0d1303ee682fc9f530653"
+  },
+  {
+    "path": "apps/api/src/work-files.ts",
+    "sha256": "6821a7b12d5e8a024405c250d75fdd2090a1fd968968191b2bc96ddbd511805e"
+  },
+  {
+    "path": "apps/api/src/work-records.ts",
+    "sha256": "95c94c3eb7c4e088c9768033fb1005aa816e2eeb7fffc1e05258c36114b3a50e"
+  },
+  {
+    "path": "apps/api/src/task-checkpoint-state.ts",
+    "sha256": "21755cc4305456cc6fe088600e9eafdd8fabb4af598757f94fa52e62db8f4a51"
+  },
+  {
+    "path": "apps/api/src/live-canonical-reader.ts",
+    "sha256": "43a6993f6cfaff154b5d8b94b53609fedf0db517f767a870ec78eac7216fb660"
+  },
+  {
+    "path": "packages/contracts/task-execution.ts",
+    "sha256": "8bd751eaf851f1aef2ca0a95eb7e52edd76f2752aee1ec26d7a275d87bc0f02f"
+  },
+  {
+    "path": "services/agent-runtime/handoff.d.mts",
+    "sha256": "6743578e425b25c5ca9146e5591091856052990c29b9c81f2d50fdee33a3ee33"
+  },
+  {
+    "path": "services/agent-runtime/handoff.mjs",
+    "sha256": "706728944cbd2de53bb48a140d8003246caacfcc03b2110db620ccc184522496"
+  },
+  {
+    "path": "services/agent-runtime/host.mjs",
+    "sha256": "1da4cec16357f3f572cef2f048c064af9f7dc88352b55149cacf659e5ed9285d"
+  },
+  {
+    "path": "services/agent-runtime/native-plugin-tools.mjs",
+    "sha256": "0ce93dcb1a7b6598ca83914cdae42f553fff4fb19d12a160d106389599e0076d"
+  },
+  {
+    "path": "services/agent-runtime/product-runtime.mjs",
+    "sha256": "2b98806546e803186662494125f4f90a51118b212195ebaa09d17999476595f1"
+  },
+  {
+    "path": "services/agent-runtime/product-tools.mjs",
+    "sha256": "7d88acd5945bc3e10e6e84bf1cdd0fc6e0eb34a59be8e58874dd3dec616fd9f1"
+  },
+  {
+    "path": "services/agent-runtime/step-checkpoints.d.mts",
+    "sha256": "59024be562120c654f3bbe587bed18c0156507110dd88b9e27f5c9d237e7113d"
+  },
+  {
+    "path": "services/agent-runtime/step-checkpoints.mjs",
+    "sha256": "910db4a518bc450bb87512ecb1687e8becbd234b1e3ec147ff61a039f0244e39"
+  },
+  {
+    "path": "services/agent-runtime/task-readonly-handoff.test.mjs",
+    "sha256": "d02bfc39a2e8fd2370a406d1089fff599b827bc8a29a4e8af469b16b02b08130"
+  },
+  {
+    "path": "services/agent-runtime/task-sandbox-flow.test.mjs",
+    "sha256": "75c3a947d11b6d2db03e3edfb4d5b5da51301a31762dd12f12c12be12614b286"
+  },
+  {
+    "path": "services/agent-runtime/task-tool-context.mjs",
+    "sha256": "07f1f97c5222175bb0c021c030862c89655630b9486f05d1224523e182262549"
+  },
+  {
+    "path": "services/agent-runtime/task-checkpoint-v2.test.mjs",
+    "sha256": "11062870372cbcc9aa346e3d36560c27704061b60fa7fb4b55acedea62e7ed7d"
+  },
+  {
+    "path": "tests/handoff-checkpoints.test.ts",
+    "sha256": "052f72ad3a0df88ab9fb12f5869507432b814765e95a6e0b7ae0338fc812e445"
+  },
+  {
+    "path": "tests/task-sandbox-flow.test.ts",
+    "sha256": "5a9069796926a4c5a9d55d79046431f8472c8d4cfb33b9d0d41927b1b7b21e48"
+  },
+  {
+    "path": "tests/work-records.test.ts",
+    "sha256": "77dd940d8a76214fdcce698ea4139b05d484a870950e64a9a4c61e91bd31ab62"
+  },
+  {
+    "path": "tests/task-checkpoint-state.test.ts",
+    "sha256": "e28cc9fa9935969e8d787c83ed7b1b86e6d0c92344283ac8834d5d842ffab006"
+  },
+  {
+    "path": "tests/task-canonical-readers.test.ts",
+    "sha256": "9b2fcdac5bedc64f13a69bf9b2e548f0494232b4c5cfabf8840b7b78d8f0098a"
+  }
+]

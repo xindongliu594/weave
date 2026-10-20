@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ checkpoint refs preserve A work and original merge while canonical advances to independent B (2844.6169ms)
+✔ before-tool checkpoint uses imported task bytes rather than full canonical revision (838.0465ms)
+✔ after-tool checkpoint refuses a missing, other-task, stale or nonexistent operation identity (2845.0288ms)
+✔ SQL unknown blocks checkpoint despite finished events and human acknowledgment (978.0234ms)
+✔ checkpoint refuses missing referenced objects without cache repair (928.2329ms)
+✔ checkpoint refuses corrupt referenced objects without cache repair (1069.4969ms)
+✔ checkpoint refuses changed lease (978.9702ms)
+✔ checkpoint refuses changed authority (1194.4422ms)
+✔ checkpoint refuses changed assignment (1045.2114ms)
+✔ checkpoint refuses changed capability (981.569ms)
+✔ checkpoint refuses changed recovery (1061.7163ms)
+✔ checkpoint independently authenticates the task merge record after a newer canonical commit (2029.1322ms)
+✔ checkpoint revalidates lease after asynchronous preparation (1111.0089ms)
+✔ checkpoint revalidates authority after asynchronous preparation (1116.393ms)
+✔ checkpoint revalidates assignment after asynchronous preparation (1012.7494ms)
+✔ checkpoint revalidates object after asynchronous preparation (997.5542ms)
+✔ checkpoint publication fences assignment at the real COMMIT response (998.1843ms)
+✔ checkpoint publication fences object at the real COMMIT response (1146.5112ms)
+✔ checkpoint publication fences abort at the real COMMIT response (999.5791ms)
+✔ checkpoint publication fences progress at the real COMMIT response (1063.6238ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27407.1831

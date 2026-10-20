@@ -1,0 +1,98 @@
+✖ v2 uses private immutable work refs while full canonical cache is absent (74.8523ms)
+✖ v2 rejects malformed identity, origins, hashes and receipts before publication (65.64ms)
+✖ v2 authenticates private canonical objects and refuses corrupt or hardlinked refs (60.9153ms)
+✖ v2 latest canonical and own last merge are independent but own work must match receipt (60.1797ms)
+✖ task preparation holds and rejects a private checkpoint barrier before returning dispatch context (10.0476ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 438.8057
+
+✖ failing tests:
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:24:1
+✖ v2 uses private immutable work refs while full canonical cache is absent (74.8523ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\sandbox.{249667bb-1797-4870-ac82-3f557593f25e}\AC\Temp\checkpoint-v2-Cljrpi\absent-cache'
+      at lstatSync (node:fs:1702:25)
+      at assertArchivePlain (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-objects.mjs:11:28)
+      at assertPlain (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:15:14)
+      at checkpointFiles (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:53:3)
+      at commitStepCheckpoint (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:75:15)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:25:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{249667bb-1797-4870-ac82-3f557593f25e}\\AC\\Temp\\checkpoint-v2-Cljrpi\\absent-cache'
+  }
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:29:1
+✖ v2 rejects malformed identity, origins, hashes and receipts before publication (65.64ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:32:58)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /CHECKPOINT/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:35:1
+✖ v2 authenticates private canonical objects and refuses corrupt or hardlinked refs (60.9153ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:37:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /CHECKPOINT_CONTENT/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:41:1
+✖ v2 latest canonical and own last merge are independent but own work must match receipt (60.1797ms)
+  TypeError: Cannot read properties of undefined (reading 'operationId')
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:43:101)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at services\agent-runtime\task-checkpoint-v2.test.mjs:46:1
+✖ task preparation holds and rejects a private checkpoint barrier before returning dispatch context (10.0476ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-checkpoint-v2.test.mjs:50:111)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

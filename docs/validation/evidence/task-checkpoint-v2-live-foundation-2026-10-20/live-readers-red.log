@@ -1,0 +1,169 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ artifact list and download use one complete SQL committed head despite partial corrupt cache (1882.9228ms)
+✖ from-run imports exact committed text with partial cache (1145.4219ms)
+✖ parent copies require a selected canonical head for task profile and retain all committed files (1163.8799ms)
+✖ planning context and accepted work evidence use committed seals with partial cache (1223.104ms)
+✖ missing committed object blocks every consumer even with good cache without mutation (1727.017ms)
+✖ corrupt committed object blocks every consumer even with good cache without mutation (1142.5108ms)
+✖ unknown profile, SQL/archive profile mismatch, recovery and absent live operation evidence refuse cache fallback (1301.0891ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11929.0277
+
+✖ failing tests:
+
+test at tests\task-canonical-readers.test.ts:1:9586
+✖ artifact list and download use one complete SQL committed head despite partial corrupt cache (1882.9228ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      {
+        path: 'in.txt',
+        sha256: 'c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20',
+        size: 5
+  ...
+        path: 'out.txt',
+  +     sha256: '0d041b3b8c7b0f450f5fd8b64d7984945b77d235c46eca7a3e4b60e8b70d5a18',
+  +     size: 19
+  -     sha256: 'd0a3595c21667a5280d184468d0fb4f00027ce75aefa1745f932efe4ec631ffd',
+  -     size: 16
+      },
+      {
+  +     path: 'rogue.txt',
+  +     sha256: '0cb4c09f17069379605eaf8c00110bdcd3690cd74cce574b49f9f6d119fa0156',
+  +     size: 13
+  -     path: 'report.docx',
+  -     sha256: 'ea7193630b41cfe3b78e651a2c4f6fe7f11f84aaa5f39786f4281e0a6f70d3da',
+  -     size: 1016
+      }
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:66:106)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { path: 'in.txt', size: 5, sha256: 'c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20' }, { path: 'out.txt', size: 19, sha256: '0d041b3b8c7b0f450f5fd8b64d7984945b77d235c46eca7a3e4b60e8b70d5a18' }, { path: 'rogue.txt', size: 13, sha256: '0cb4c09f17069379605eaf8c00110bdcd3690cd74cce574b49f9f6d119fa0156' } ],
+    expected: [ { path: 'in.txt', size: 5, sha256: 'c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20' }, { path: 'out.txt', size: 16, sha256: 'd0a3595c21667a5280d184468d0fb4f00027ce75aefa1745f932efe4ec631ffd' }, { path: 'report.docx', size: 1016, sha256: 'ea7193630b41cfe3b78e651a2c4f6fe7f11f84aaa5f39786f4281e0a6f70d3da' } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-canonical-readers.test.ts:1:10330
+✖ from-run imports exact committed text with partial cache (1145.4219ms)
+  AssertionError [ERR_ASSERTION]: {"code":"REQUEST_FAILED","message":"来源交接不能核对：产物 out.txt 已变化，不能沿用原验收版本"}
+  
+  409 !== 201
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:69:105)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-canonical-readers.test.ts:1:10768
+✖ parent copies require a selected canonical head for task profile and retain all committed files (1163.8799ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:72:49)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /canonical|来源|任务/,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\task-canonical-readers.test.ts:1:11396
+✖ planning context and accepted work evidence use committed seals with partial cache (1223.104ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   'task'
+  - ]
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:75:92)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ 'task' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-canonical-readers.test.ts:1:11931
+✖ missing committed object blocks every consumer even with good cache without mutation (1727.017ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 409
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:79:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 409,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-canonical-readers.test.ts:1:11931
+✖ corrupt committed object blocks every consumer even with good cache without mutation (1142.5108ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 409
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:79:9)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 409,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-canonical-readers.test.ts:1:13111
+✖ unknown profile, SQL/archive profile mismatch, recovery and absent live operation evidence refuse cache fallback (1301.0891ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 409
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-canonical-readers.test.ts:82:273)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 409,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

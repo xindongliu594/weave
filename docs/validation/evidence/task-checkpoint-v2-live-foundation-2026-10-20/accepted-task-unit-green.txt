@@ -1,0 +1,13 @@
+✔ task acceptance consumes its own sandbox revision and rejects another task binding (19.9095ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (18.1613ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (9.1782ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (14.8093ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (11.7781ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 876.5259

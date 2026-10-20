@@ -61,7 +61,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const executionBindings=new Map();
   let productDispose, captainId, locked = false;
   const internalStatusPolls = new Set();
-  const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive }) : undefined;
+  const handoff = product?.snapshot.tasks ? new HandoffGate({ snapshot: product.snapshot, sandbox: product.sandbox, archive, onCheckpointFailure:error=>{product.onHandoffBlocked?.(error);product.supervisor?.stop(error);adapter.stopAdmission?.(error);} }) : undefined;
   if (handoff && product.goal?.expected) {
     for (const method of ['beforeFile','observe']) {
       const original = handoff[method].bind(handoff);
@@ -131,6 +131,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     return { taskId: id, attemptId: task.attemptId, task, executionBinding:executionBindings.get(task.id) };
   }
   async function bindActiveWork(agent,signal) {
+    handoff?.assertRunCheckpointReady();
     if(product.snapshot.executionProfile!=='task-attempt-openshell-v1'||agent.id===captainId)return;
     const work=activeWork(agent),employee=employeeFor(agent,product.snapshot,captainId),state=teamState();
     const candidate=trustedTaskCandidate({runId:archive.id,agentId:employee.id,sessionId:agent.id,taskId:work.taskId,runtimeTaskId:work.task.id,state,snapshot:product.snapshot,contract:rework.contractFor(work.task.id)});
@@ -270,6 +271,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       const disposeNative = installNativePluginTools(ctx, { ...product, archive, handoff, activeWork, captainId: () => captainId });
       productDispose = () => { disposeNative(); disposeProduct(); };
       ctx.on('llm/stream', async function* (options, next) {
+        handoff?.assertRunCheckpointReady();
         product.goal?.check('model');
         product.supervisor?.check();
         const employee=employeeFor(ctx.agents.get(options.sessionId),product.snapshot,captainId);
@@ -289,9 +291,10 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         const stopWaiting=product.supervisor?.enter(options.sessionId,'waiting_capacity');
         let release;
         try{release=await product.gate.acquire(options.signal);}finally{stopWaiting?.();}
-        try { product.supervisor?.check(); yield* next(); } finally { release(); }
+        try { handoff?.assertRunCheckpointReady();product.supervisor?.check(); yield* next(); } finally { release(); }
       });
       ctx.on('tools/pre-execute', async (exec,next) => {
+        handoff?.assertRunCheckpointReady();
         product.goal?.check('tool');
         product.supervisor?.check();
         if(product.snapshot.executionProfile==='task-attempt-openshell-v1'){
@@ -330,7 +333,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
             if(taskBoundary){
               const current=activeWork(exec.agent,args.task_id);
               if(current.taskId!==work.taskId||current.attemptId!==work.attemptId||current.attemptId!==args.attempt_id)throw Error('STALE_ATTEMPT: 等待期间交接任务已变化');
-              const prepared=await prepareTaskTool({snapshot:product.snapshot,sandbox:product.sandbox,handoff,activeWork,archive,agent:exec.agent,employee:employeeFor(exec.agent,product.snapshot,captainId),signal:exec.signal});
+              const prepared=await prepareTaskTool({snapshot:product.snapshot,sandbox:product.sandbox,handoff,activeWork,archive,agent:exec.agent,employee:employeeFor(exec.agent,product.snapshot,captainId),signal:exec.signal,checkpointPhase:'boundary'});
               if(prepared.work.taskId!==work.taskId||prepared.work.attemptId!==work.attemptId)throw Error('STALE_ATTEMPT: 准备期间交接任务已变化');
             }
             record = handoff.prepare(work.taskId, work.attemptId, args);
@@ -411,13 +414,17 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       } : undefined,
       protectedContext: product ? protectedContext : undefined,
       waitForProtectedContext: handoff ? async (agent, signal) => {
+        handoff.assertRunCheckpointReady();
         if(agent.id===captainId)return;
         await agent.ctx.sessions.flush(agent.session);
-        await handoff.exclusive(signal,()=>{
+        await handoff.exclusive(signal,async()=>{
           product?.supervisor?.check();
           let work;try{work=activeWork(agent);}catch(error){if(error.message.startsWith('TASK_NOT_ACTIVE:'))return;throw error;}
           const events=agent.session.snapshotEvents();
-          if(events.some(event=>event.type==='assistant/message'))handoff.checkpoint(work.taskId,work.attemptId,'cycle-complete',{sessionId:agent.id,sessionCursor:events.at(-1)?.seq});
+          if(events.some(event=>event.type==='assistant/message')){
+            await prepareTaskTool({snapshot:product.snapshot,sandbox:product.sandbox,handoff,activeWork,archive,agent,employee:employeeFor(agent,product.snapshot,captainId),signal,checkpointPhase:'boundary'});
+            handoff.checkpoint(work.taskId,work.attemptId,'cycle-complete',{sessionId:agent.id,sessionCursor:events.at(-1)?.seq});
+          }
         });
       } : undefined,
       identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,

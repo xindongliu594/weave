@@ -1,0 +1,87 @@
+✔ official policy belongs to the session Host; bare coordinator mounting rejects foreign sessions (274.0566ms)
+✔ model adapter waits for request-prefix flush and observes persisted JSONL before dispatch (197.1527ms)
+✔ request-prefix flush rejection prevents all model adapter dispatch (109.9057ms)
+✔ model-generated top-level tool call waits for flush and sees its persisted call before body (176.9987ms)
+✔ top-level tool checkpoint rejection prevents tool side effects (91.217ms)
+✔ cancellation while a tool checkpoint is pending releases without dispatch or unknown side effects (92.646ms)
+✔ Host close drains a pending model checkpoint and never dispatches its cancelled request (114.4571ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (26.9511ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (18.3706ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (36.0526ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (35.6786ms)
+✔ restored outputs are not current-attempt changes and mismatches report the exact observed paths (28.1544ms)
+✔ host file checks reject linked directories before reading their contents (7.811ms)
+✔ host file checks reject binary content declared as text (6.9934ms)
+✔ optimistic writes reject a second editor using the same observed hash (15.6464ms)
+✔ an unfinished node resumes with inherited evidence and never relabels the original execution (128.5896ms)
+✔ changed files and revoked reuse permission require fresh verification (133.6561ms)
+✔ new environment, changed tool grants, or unknown effects after the checkpoint block reuse (119.2525ms)
+✔ ordinary plans and native host commands do not opt into verification inheritance (94.4925ms)
+✔ a later failed or unconfined result cannot be hidden by an earlier passing receipt (294.0141ms)
+✔ a late unknown operation in the original receipt ancestor blocks another generation of reuse (189.0696ms)
+✔ a parent without a new checkpoint cannot be skipped when it has an unknown operation (134.0273ms)
+✔ task profile rejects late coordinator and scoped shadow tool bodies in the actual Host (318.2911ms)
+✔ a queued external tool rechecks a goal pause after capacity is released (150.5563ms)
+✔ execution and summary requests cannot select a model outside the employee approval (84.1325ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (171ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (230.9394ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (190.9861ms)
+✔ native developer → QA → manager sees real command hashes/counts with no private knowledge or extra tools (4643.4067ms)
+✔ native resumed QA/manager inherit source budget and exact developer seal without repeating completed developer execution (4572.7437ms)
+✔ hard process termination after a real test resumes evidence with one total command execution (554.1955ms)
+ℹ {"sourceRunId":"70e9160f-b1ec-48e9-b9c4-c85ce392bc54","resumedRunId":"634bf62a-3747-4d31-9331-f239b98bb033","checkpointId":"183a2e86-364b-402f-92ae-d5912460157e","checkpointMs":44.13500000000005,"resumeMs":30.744300000000067,"archiveBytes":5205,"commandExecutions":1,"modelCalls":0}
+✔ committed checkpoints retain exact file versions and deduplicate unchanged content (112.7327ms)
+✔ partial writes are not checkpoints and corrupt objects fail closed (64.4173ms)
+✔ oversized and excessive workspaces are rejected rather than silently truncated (219.4621ms)
+✔ failed archive commit never publishes a restorable checkpoint (37.2982ms)
+✔ hardlinked workspace files cannot enter a checkpoint (24.0228ms)
+✔ hardlinked stored objects are refused on restore and reuse (55.2762ms)
+✔ v2 uses private immutable work refs while full canonical cache is absent (70.7807ms)
+✔ v2 rejects malformed identity, origins, hashes and receipts before publication (53.6685ms)
+✔ v2 authenticates private canonical objects and refuses corrupt or hardlinked refs (50.3357ms)
+✔ v2 latest canonical and own last merge are independent but own work must match receipt (45.9944ms)
+✔ task preparation holds and rejects a private checkpoint barrier before returning dispatch context (10.7277ms)
+✔ v2 reader rejects forged work alias, origin identity and missing private canonical objects (79.3068ms)
+✔ v2 failed append never publishes refs and unfinished evidence is always fresh (40.2077ms)
+✔ v2 source identity and capabilities change contract and environment digests (32.825ms)
+✔ task Host private checkpoint barrier success (1084.5801ms)
+✔ task Host private checkpoint barrier cycle-hold (682.8671ms)
+✔ task Host private checkpoint barrier cycle-reject (623.8746ms)
+✔ task Host private checkpoint barrier accepted-hold (960.468ms)
+✖ task Host private checkpoint barrier accepted-reject (946.3106ms)
+✔ task tool preparation uses registered generation and rejects an assignment changed while waiting (4.8316ms)
+✔ task command proof survives another task commit but never its own changed output (94.9462ms)
+✔ task handoff rejects a raw device success without a committed matching merge (24.3291ms)
+✔ a renewed task generation cannot reuse the previous generation command proof (31.8926ms)
+✔ actual product tool body binds prepared generation and exact scope before transport (32.9428ms)
+✔ waiting approval cannot authorize a renewed scope and missing registration dispatches nothing (12.568ms)
+✔ task runtime refuses shared fallback and initializes committed cache before any cache read (33.3105ms)
+✔ product checkpoint holds tool body before dispatch and exact-operation observation after dispatch (18.2239ms)
+✔ rejected before-tool checkpoint prevents transport and rejected result checkpoint prevents observation (8.7182ms)
+ℹ tests 59
+ℹ suites 0
+ℹ pass 58
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27173.9124
+
+✖ failing tests:
+
+test at services\agent-runtime\task-readonly-handoff.test.mjs:17:93
+✖ task Host private checkpoint barrier accepted-reject (946.3106ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 3
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-readonly-handoff.test.mjs:51:144)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

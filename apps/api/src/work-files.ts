@@ -11,6 +11,7 @@ import { isArtifactPath } from '../../../packages/contracts/task-contracts.mjs';
 import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
 import { artifactFile } from '../../../services/agent-runtime/sandbox.mjs';
 import { completedTasks, resumeHandoff } from './handoff-checkpoints.ts';
+import {readLiveCanonical,type LiveCanonical} from './live-canonical-reader.ts';
 
 type Database = Pick<pg.PoolClient,'query'>;
 export const workFileLimits={files:100,fileBytes:2*1024*1024,totalBytes:8*1024*1024,textCharacters:250000};
@@ -87,11 +88,16 @@ function directoryChain(path:string,create=false){
   }return true;
 }
 /** Resume keeps parent artifacts; a full retry starts from the original approved imported files. */
-export function prepareImportedWorkspace(traceRoot:string,runId:string,files:ImportedFile[]=[],parentRunId?:string|null,recoveryKind?:string){
+export function prepareImportedWorkspace(traceRoot:string,runId:string,files:ImportedFile[]=[],parentRunId?:string|null,recoveryKind?:string,parentCanonical?:LiveCanonical|null){
   if(!/^[a-f0-9-]{36}$/i.test(runId)||parentRunId&&!/^[a-f0-9-]{36}$/i.test(parentRunId))throw new AppError(422,'运行目录 ID 无效。');
   if(!Array.isArray(files)||files.length>100)throw new AppError(422,'导入文件清单无效。');
   const targetRoot=resolve(traceRoot,runId,'artifacts'),copies:{path:string;bytes:Buffer}[]=[];
   if(parentRunId&&recoveryKind!=='retry'){
+    const parent=readRun(traceRoot,parentRunId),profile=(parent?.snapshot as any)?.executionProfile;
+    if(profile!==undefined&&profile!=='legacy-run-v1'&&profile!=='task-attempt-openshell-v1')throw new AppError(409,'未知父运行 profile');
+    if(profile==='task-attempt-openshell-v1'&&!parentCanonical)throw new AppError(409,'任务父素材需要可信 SQL canonical 来源');
+    if(parentCanonical){for(const file of parentCanonical.files)copies.push({path:file.path,bytes:Buffer.from(file.content,'base64')});}
+    else {
     const sourceRoot=resolve(traceRoot,parentRunId,'artifacts');
     if(!directoryChain(sourceRoot)){
       if(files.length)throw new AppError(409,'父运行的文件档案缺失，请恢复该档案后再继续；不会用原始素材覆盖恢复状态。');
@@ -105,6 +111,7 @@ export function prepareImportedWorkspace(traceRoot:string,runId:string,files:Imp
       if(!stat.isFile()||stat.size>5*1024*1024||copies.length>=128)throw new AppError(422,'父运行的文件档案超出可恢复范围。');
       const bytes=readFileSync(source);total+=bytes.length;if(bytes.length>5*1024*1024||total>20*1024*1024)throw new AppError(422,'父运行的文件档案超过 20 MiB 限额。');copies.push({path,bytes});
     }};walk(sourceRoot);
+    }
   }else{
     let total=0;
     for(const file of files){
@@ -143,17 +150,18 @@ export function workFilesRouter(db:Pick<pg.Pool,'query'|'connect'>=pool,traceRoo
   router.post('/work-files',async(req,res)=>res.status(201).json(await store(req.body)));
   router.post('/work-files/from-run',async(req,res)=>{
     const input=z.object({runId:z.uuid(),paths:z.array(z.string().min(1).max(240)).min(1).max(100),name:z.string().trim().min(1).max(100).optional()}).strict().parse(req.body);
-    const row=(await db.query('SELECT status,snapshot FROM project_runs WHERE id=$1',[input.runId])).rows[0];
+    const row=(await db.query('SELECT * FROM project_runs WHERE id=$1',[input.runId])).rows[0];
     const run=readRun(traceRoot,input.runId);
     if(!row||!run)throw new AppError(404,'来源运行不存在。');
     const sourceProjectId=(run.snapshot as {projectId?:unknown}).projectId;
     if(row.status!=='completed'||run.status!=='completed'||run.integrity!=='ok'||typeof sourceProjectId!=='string'||row.snapshot.projectId!==sourceProjectId||row.snapshot.planVersion!==run.snapshot.planVersion)throw new AppError(409,'只能复用完整且已完成的正式运行。');
     const root=join(traceRoot,input.runId,'artifacts');
+    const canonical=await readLiveCanonical(db,traceRoot,row,run);
     let receipts:any[];
-    try{const done=completedTasks(run.events,run.snapshot);if(!done.size||!run.snapshot.tasks.every((task:any)=>done.has(task.id)))throw Error('任务尚未全部核验完成');receipts=resumeHandoff(run.snapshot,run.events,done,root);}catch(error){throw new AppError(409,'来源交接不能核对：'+(error as Error).message);}
+    try{const done=completedTasks(run.events,run.snapshot);if(!done.size||!run.snapshot.tasks.every((task:any)=>done.has(task.id)))throw Error('任务尚未全部核验完成');receipts=resumeHandoff(run.snapshot,run.events,done,root,canonical?.ref.manifest);}catch(error){throw new AppError(409,'来源交接不能核对：'+(error as Error).message);}
     const sealed=receipts.flatMap(record=>[...(record.inputs??[]),...(record.outputs??[])]);
     const files=input.paths.map(path=>{
-      validateWorkFilePath(path);let raw:Buffer;try{raw=readFileSync(artifactFile(root,path));}catch{throw new AppError(422,'来源文件不存在或路径不允许：'+path);}
+      validateWorkFilePath(path);let raw:Buffer;try{if(canonical){const file=canonical.files.find(file=>file.path===path);if(!file)throw Error('missing');raw=Buffer.from(file.content,'base64');}else raw=readFileSync(artifactFile(root,path));}catch{throw new AppError(422,'来源文件不存在或路径不允许：'+path);}
       const sha256=createHash('sha256').update(raw).digest('hex');
       if(!sealed.some(file=>file.path===path&&file.sha256===sha256))throw new AppError(409,'文件未绑定已核验交接，或版本已变化：'+path);
       return {path,base64:raw.toString('base64')};

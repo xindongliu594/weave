@@ -1,0 +1,28 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ two consecutive task writes roll scope and preserve original input lineage (29058.0633ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31533.108
+
+✖ failing tests:
+
+test at tests\task-sandbox-flow.test.ts:1:22702
+✖ two consecutive task writes roll scope and preserve original input lineage (29058.0633ms)
+  Error: 交付证据不能核对：ACCEPTANCE_CHECK_FAILED: 验收项 1：执行后文件版本已变化
+      at acceptedWorkEvidence (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\work-records.ts:23:21)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async runFixture (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-sandbox-flow.test.ts:216:18)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-sandbox-flow.test.ts:225:47)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'REQUEST_FAILED',
+    upstreamStatus: undefined
+  }

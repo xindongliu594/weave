@@ -7,6 +7,7 @@ import { inspectArtifact } from '../../../services/agent-runtime/handoff.mjs';
 import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { completedTasks, resumeHandoff } from './handoff-checkpoints.ts';
 import { durableCallHistory } from './budget-history.ts';
+import {readLiveCanonical,type LiveCanonical} from './live-canonical-reader.ts';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type ProjectRow = { id: string; version: number; requirement: string; plan: { tasks: any[]; agents: any[] }; policy?: unknown };
@@ -88,7 +89,7 @@ export async function buildPlanningExecutionContext(db: Database, traceRoot: str
   };
 
   let latest: any;
-  try { latest = (await db.query('SELECT id,project_id,project_version,status,started_at FROM project_runs WHERE project_id=$1 ORDER BY created_at DESC,attempt DESC,id DESC LIMIT 1', [project.id])).rows[0]; }
+  try { latest = (await db.query('SELECT * FROM project_runs WHERE project_id=$1 ORDER BY created_at DESC,attempt DESC,id DESC LIMIT 1', [project.id])).rows[0]; }
   catch { issue('PLANNING_HISTORY_UNAVAILABLE', '无法只读核对历史运行；不推断没有执行记录。'); return result; }
 
   // Share recovery's current-version admission/wire counts without adding
@@ -115,6 +116,9 @@ export async function buildPlanningExecutionContext(db: Database, traceRoot: str
   catch (error) { result.sourceRun.integrity = (error as any)?.integrity ?? 'invalid'; issue('PLANNING_ARCHIVE_UNAVAILABLE', '最近运行档案缺失、不完整或不属于此项目；已有成果不会被推定为完成。'); return result; }
   result.sourceRun.integrity = archive.integrity; result.sourceRun.archiveStatus = status(archive.status); result.available = true;
   const snapshot = archive.snapshot, root = join(traceRoot, latest.id, 'artifacts');
+  let canonical:LiveCanonical|null;
+  try{canonical=await readLiveCanonical(db,traceRoot,latest,archive);}
+  catch(error){result.available=false;issue('TASK_CANONICAL_UNAVAILABLE',(error as Error).message);return result;}
   const taskShape = (entry: any) => object(entry) && identifier(entry.id) && ['inputs', 'outputs', 'dependencies'].every(key => entry[key] === undefined || Array.isArray(entry[key])) &&
     [...(entry.inputs ?? []), ...(entry.outputs ?? [])].every(file => object(file) && identifier(file.path));
   if (!Array.isArray(snapshot.tasks) || !snapshot.tasks.every(taskShape) || !Array.isArray(snapshot.agents) || snapshot.agents.some((entry: any) => !object(entry) || !identifier(entry.id)) ||
@@ -130,7 +134,7 @@ export async function buildPlanningExecutionContext(db: Database, traceRoot: str
   let checkpoints: any[] = [];
   try {
     const done = completedTasks(archive.events, snapshot);
-    checkpoints = resumeHandoff(snapshot, archive.events, done, root);
+    checkpoints = resumeHandoff(snapshot, archive.events, done, root,canonical?.ref.manifest);
     if (result.sourceRun.currentVersion && currentPlanMatches) result.completedTaskIds = [...done.keys()];
   } catch { issue('CHECKPOINT_UNVERIFIED', '完成节点、验收记录或实际输入文件版本未通过宿主核对；不声明可跳过。'); }
   const declared = new Map<string, any>();
@@ -138,7 +142,8 @@ export async function buildPlanningExecutionContext(db: Database, traceRoot: str
   for (const record of checkpoints) for (const file of record.outputs ?? []) if (!declared.has(file.path)) declared.set(file.path, file);
   for (const declaration of declared.values()) {
     try {
-      const seal = inspectArtifact(root, { path: declaration.path });
+      const seal = canonical?canonical.ref.manifest.find(file=>file.path===declaration.path):inspectArtifact(root, { path: declaration.path });
+      if(!seal)throw Error('Declared file missing from committed canonical');
       const producer = [...checkpoints].reverse().find(record => record.outputs?.some((file: any) => file.path === seal.path && file.sha256 === seal.sha256));
       const fixed = (snapshot.tasks ?? []).some((entry: any) => entry.inputs?.some((file: any) => !file.producerTaskId && file.path === seal.path && file.sha256 === seal.sha256));
       result.files.push({ ...seal, state: producer ? 'accepted' : fixed ? 'fixed_input' : 'unverified',

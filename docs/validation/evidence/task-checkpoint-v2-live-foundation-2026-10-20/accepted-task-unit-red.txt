@@ -1,0 +1,26 @@
+✖ task acceptance consumes its own sandbox revision and rejects another task binding (3.1883ms)
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (25.1291ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (11.3302ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (15.6814ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (19.4999ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 869.2738
+
+✖ failing tests:
+
+test at tests\handoff-checkpoints.test.ts:1:467
+✖ task acceptance consumes its own sandbox revision and rejects another task binding (3.1883ms)
+  Error: ACCEPTANCE_CHECK_FAILED: 验收项 1：执行后文件版本已变化
+      at assertAcceptanceChecks (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/acceptance-checks.mjs:48:23)
+      at resumeHandoff (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\handoff-checkpoints.ts:41:22)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\handoff-checkpoints.test.ts:18:15)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)

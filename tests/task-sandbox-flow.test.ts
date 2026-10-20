@@ -11,11 +11,14 @@ import express from 'express';
 import {ProductDshRuntime} from '../services/agent-runtime/product-runtime.mjs';
 import {RunSandbox} from '../services/agent-runtime/sandbox.mjs';
 import {readRun} from '../services/agent-runtime/trace-store.mjs';
+import {readStepCheckpoint} from '../services/agent-runtime/step-checkpoints.mjs';
 import {nativeManifestId} from '../services/agent-runtime/native-capabilities.mjs';
 import {setNativeCapability} from '../apps/api/src/native-capabilities.ts';
 import {LocalOperationService,LocalRunExecutor,localDeviceRouter} from '../apps/api/src/local-execution.ts';
 import {readCommittedCanonical} from '../apps/api/src/task-canonical.ts';
 import {assertExecutionProfile} from '../apps/api/src/execution-policy.ts';
+import {finishRun} from '../apps/api/src/run-state.ts';
+import {acceptedWorkEvidence} from '../apps/api/src/work-records.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
 import {fixtureTaskContext} from './model-fixture.ts';
 
@@ -73,14 +76,14 @@ async function fixture(mode:Mode){
  ];
  const common={kind:'work',maxModelCalls:20,maxBudget:.4,maxOutputTokens:1024,outOfScope:[],acceptanceCriteria:['Fixture files and observed command are correct.']};
  const tasks=[
-  {...common,id:'a',kind:mode==='accepted-dependency'?'implementation':'work',subject:'Engineering task A',objective:'Create two outputs, revise one, and verify.',assignee:'producer',assigneeId:'producer',dependencies:[],inputs:[{path:'in.txt',sha256:hash('input')}],outputs:[{path:'a.txt',format:'text'},{path:'a-extra.txt',format:'text'}],inScope:['a.txt','a-extra.txt'],verify:['check-a']},
-  {...common,id:'b',kind:mode==='accepted-dependency'?'review':'work',...(mode==='accepted-dependency'?{reviewedTaskId:'a'}:{}),subject:'Engineering task B',objective:'Use the exact authorized input and produce B.',assignee:'consumer',assigneeId:'consumer',dependencies:mode==='accepted-dependency'?['a']:[],inputs:mode==='accepted-dependency'?[{path:'a.txt',producerTaskId:'a'}]:[{path:'in.txt',sha256:hash('input')}],outputs:[{path:'b.txt',format:'text'}],inScope:['b.txt'],verify:['check-b']},
+  {...common,id:'a',kind:mode==='accepted-dependency'?'implementation':'work',subject:'Engineering task A',objective:'Create two outputs, revise one, and verify.',assignee:'producer',assigneeId:'producer',dependencies:[],inputs:[{path:'in.txt',sha256:hash('input')}],outputs:[{path:'a.txt',format:'text'},{path:'a-extra.txt',format:'text'}],inScope:['a.txt','a-extra.txt'],verify:['check-a'],acceptanceChecks:[{criterionIndex:0,command:'check-a',expectedOutput:'engineering fixture file oracle passed'}]},
+  {...common,id:'b',kind:mode==='accepted-dependency'?'review':'work',...(mode==='accepted-dependency'?{reviewedTaskId:'a'}:{}),subject:'Engineering task B',objective:'Use the exact authorized input and produce B.',assignee:'consumer',assigneeId:'consumer',dependencies:mode==='accepted-dependency'?['a']:[],inputs:mode==='accepted-dependency'?[{path:'a.txt',producerTaskId:'a'}]:[{path:'in.txt',sha256:hash('input')}],outputs:[{path:'b.txt',format:'text'}],inScope:['b.txt'],verify:['check-b'],acceptanceChecks:[{criterionIndex:0,command:'check-b',expectedOutput:'engineering fixture file oracle passed'}]},
  ];
  const code=Buffer.from('engineering device fixture; no native host execution'),compressed=gzipSync(code),metadata=Buffer.from('{}');
  const native={format:'dsh-native-tools-v1',namespace:'office',package:'@company/office',version:'1.0.0',source:{kind:'company',reference:'isolated engineering fixture'},dshVersion:'0.1.5-rc.1',config:{},lockSha256:hash('lock'),bundle:{sha256:hash(compressed),codeSha256:hash(code),metadataSha256:hash(metadata),bytes:compressed.length},tools:[{name:nativeName,originalName:'write',description:'Write the fixture output through the device transport.',parameters:{type:'object',properties:{path:{type:'string'},content:{type:'string'}},required:['path','content']},files:{read:[],write:['path']}}]};
  const pluginId=nativeManifestId(native),nativeRoot=join(directory,'native-plugins',pluginId);mkdirSync(nativeRoot,{recursive:true});
  writeFileSync(join(nativeRoot,'manifest.json'),JSON.stringify(native));writeFileSync(join(nativeRoot,'bundle.gz'),compressed);writeFileSync(join(nativeRoot,'package.json'),metadata);await setNativeCapability(pluginId,true,pool);
- const target={kind:'local',deviceId,grantId,backend},policy={maxBudget:1,maxAgents:3,maxConcurrentAgents:3,maxModelCalls:70,maxTaskModelCalls:25,deadlineSeconds:50,contextManagement:'prune',contextBytes:250000,executionTarget:target};
+ const target={kind:'local',deviceId,grantId,backend},policy={maxBudget:1,maxAgents:3,maxConcurrentAgents:3,maxModelCalls:70,maxTaskModelCalls:25,deadlineSeconds:90,contextManagement:'prune',contextBytes:250000,executionTarget:target};
  let snapshot:any={projectId,planVersion:1,departmentId:'department',title:'Task sandbox full engineering flow',requirement:'Verify actual runtime, device operation and Handoff integration using local scripted responses.',executionProfile:'task-attempt-openshell-v1',executionBudget:1,approval:{kind:'project',projectVersion:1},policy,agents,tasks,nativeCapabilities:[{id:pluginId,manifest:native}],executionTarget:{...target,platform:'linux',allowCommands:true},importedFiles:[{path:'in.txt',content:'input',snapshotId:'input-snapshot',sha256:hash('input'),agentIds:['producer','consumer']}]};
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'Fixture',agents}]);
  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$3,$4,$5,$3)',[projectId,'department','fixture',policy,{agents,tasks}]);
@@ -102,7 +105,7 @@ async function fixture(mode:Mode){
    if(context){
     const id=context.task.id,key=context.runtimeTaskId+':'+context.attemptId,step=steps.get(key)??0;
     assert.ok(['a','b'].includes(id),'the real host must supply the approved task context');
-    if(id==='a'&&step===3&&mode==='interleave')await until(()=>accepted('b'),Boolean,'B accepts while A provider request waits');
+    if(id==='a'&&step===3&&mode==='interleave')await until(()=>accepted('b'),Boolean,'B accepts while A provider request waits',40000);
     if(id==='b'&&step===2&&mode!=='accepted-dependency')await until(()=>mode==='approval'?approvalEntered:aCommitted,Boolean,'B waits for the intended A boundary');
     const seen=values(body.messages),prior=(path:string)=>seen.findLast((value:any)=>value?.path===path&&value.sha256)?.sha256;
     const update=(status:string,more:any={})=>['agent_teams_update_task',{task_id:context.runtimeTaskId,attempt_id:context.attemptId,status,...more}];
@@ -129,7 +132,7 @@ async function fixture(mode:Mode){
   requestApproval:async(input:any)=>{
    const id=randomUUID();await pool.query("INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments,status) VALUES($1,$2,$3,$4,$5,'approved')",[id,runId,input.agentId,input.tool,input.arguments]);
    approvals.push({id,...input});
-   if(mode==='approval'&&input.agentId==='producer'&&!approvalEntered){approvalEntered=true;await until(()=>accepted('b'),Boolean,'B commits after the old A approval is approved');}
+   if(mode==='approval'&&input.agentId==='producer'&&!approvalEntered){approvalEntered=true;await until(()=>accepted('b'),Boolean,'B commits after the old A approval is approved',40000);}
    return id;
   },
  });
@@ -186,26 +189,39 @@ async function runFixture(f:Fixture){
  const started=await f.runtime.start({runId:f.runId,approvedSnapshot:f.snapshot,routes:[{id:'fixture',name:'local engineering fixture',wireModel:'fixture',baseUrl:'http://127.0.0.1:'+(f.provider.address() as any).port+'/v1',apiKey:'local-engineering-fixture',inputRate:0,outputRate:0,maxOutputTokens:1024,contextWindowTokens:100000}]});
  let finished=false,result:any;started.completion.then(value=>{finished=true;result=value;});
  try{
-  const deadline=Date.now()+55000;
+  const deadline=Date.now()+95000;
   while(!finished&&Date.now()<deadline){const polled=await protocol(f,'/poll',{});if(polled.job)await deliver(f,polled.job);else await pause();}
   assert.ok(finished,'full runtime settles before its deadline');
   assert.equal(result.status,'completed',JSON.stringify({message:result.message,events:f.events().filter(event=>/failed|error|blocked/.test(event.type)||event.type==='run/finished').slice(-8),tasks:f.events().findLast(event=>event.type==='team/checkpoint')?.data.tasks.map((task:any)=>({id:task.id,status:task.status,output:task.output})),requests:f.requests.length,steps:[...f.steps]}));
   assert.deepEqual(f.events().filter(event=>event.type==='handoff/accepted').map(event=>event.data.taskId).sort(),['a','b']);
   assert.equal(f.jobs.filter(job=>job.name==='prepare').length,2,'no run-wide or repeated prepare occurs');
   assert.equal(sharedFallbacks,0,'no host/shared-run execution fallback occurs');
+  for(const accepted of f.events().filter(event=>event.type==='handoff/accepted')){
+   const event=f.events().find(item=>item.type==='step/checkpoint'&&item.data.boundary.trigger==='node-accepted'&&item.data.boundary.taskId===accepted.data.taskId&&item.data.boundary.attemptId===accepted.data.attemptId);
+   assert.ok(event,'every accepted task has a durable checkpoint');
+   const checkpoint=readStepCheckpoint({root:directory,runId:f.runId,checkpointId:event.data.id});
+   assert.equal(checkpoint.version,2);assert.deepEqual(checkpoint.key,accepted.data.taskExecution.key);
+   assert.deepEqual(checkpoint.files,checkpoint.workManifest);assert.equal(hash(JSON.stringify(checkpoint.files)),accepted.data.sandboxWorkRevision);
+   assert.ok(checkpoint.canonical.manifest.some((entry:any)=>entry.path==='private.txt'));
+   assert.equal(checkpoint.workManifest.some((entry:any)=>entry.path==='private.txt'),false);
+  }
   for(const body of f.requests)for(const message of body.messages.filter((value:any)=>value.role==='tool')){
    assert.equal(String(message.content).includes('private.txt'),false,'an employee result never reveals other canonical filenames');
+   assert.equal(/"(?:workManifest|inputOrigins|canonical)"\s*:/.test(String(message.content)),false,'private checkpoint references never become tool results');
    if(fixtureTaskContext(body.messages)?.task.id==='b'&&f.mode==='accepted-dependency')assert.equal(String(message.content).includes('a-extra.txt'),false,'B result never reveals the other A output');
   }
   const operations=(await pool.query('SELECT * FROM local_operations WHERE run_id=$1',[f.runId])).rows;
   assert.equal(operations.length,f.jobs.length);assert.ok(operations.every(row=>row.started&&row.status==='completed'&&row.merge_state==='committed'));
+  assert.equal(await finishRun(f.runId,f.service.owner,'completed'),true,'the real coordinator finalization makes work evidence eligible');
+  const evidence=await acceptedWorkEvidence(pool,directory,f.runId);
+  assert.equal(evidence.receipts.length,2,'both accepted task-local command proofs remain usable by the work/knowledge consumer');
   return result;
  }finally{
   await f.runtime.cancel(f.runId);await started.completion;f.provider.closeAllConnections();await new Promise<void>(done=>f.provider.close(()=>done()));
  }
 }
 
-test('two consecutive task writes roll scope and preserve original input lineage',{skip:!isolated,timeout:65000},async t=>{
+test('two consecutive task writes roll scope and preserve original input lineage',{skip:!isolated,timeout:110000},async t=>{
  const f=await fixture('accepted-dependency');await runFixture(f);
  const writes=f.canonicalChecks.filter(value=>f.jobs.find(job=>job.id===value.operationId)?.name!=='prepare'&&value.scope.key.taskId==='b'&&['native_plugin','artifact_write'].includes(f.jobs.find(job=>job.id===value.operationId).name));
  assert.equal(writes.length,2);const [one,two]=writes;
@@ -222,7 +238,7 @@ test('two consecutive task writes roll scope and preserve original input lineage
  t.diagnostic(JSON.stringify(evidence(f)));
 });
 
-test('unrelated task commit rebuilds next scope without rebinding inputs',{skip:!isolated,timeout:65000},async t=>{
+test('unrelated task commit rebuilds next scope without rebinding inputs',{skip:!isolated,timeout:110000},async t=>{
  const f=await fixture('interleave');await runFixture(f);
  const writes=f.canonicalChecks.filter(value=>value.scope.key.taskId==='a'&&f.jobs.find(job=>job.id===value.operationId)?.name==='artifact_write');
  assert.equal(writes.length,3);assert.deepEqual(writes[0].scope.inputOrigins,writes[1].scope.inputOrigins);assert.notEqual(writes[0].scope.workspace.scopeHash,writes[1].scope.workspace.scopeHash);
@@ -234,7 +250,7 @@ test('unrelated task commit rebuilds next scope without rebinding inputs',{skip:
  t.diagnostic(JSON.stringify(evidence(f)));
 });
 
-test('approval cannot authorize a renewed scope',{skip:!isolated,timeout:65000},async t=>{
+test('approval cannot authorize a renewed scope',{skip:!isolated,timeout:110000},async t=>{
  const f=await fixture('approval');await runFixture(f);
  const approvals=f.approvals.filter(value=>value.agentId==='producer');assert.equal(approvals.length,2);
  assert.notEqual(approvals[0].arguments.executionScope.scopeHash,approvals[1].arguments.executionScope.scopeHash);assert.notEqual(approvals[0].arguments.expectedWorkspaceRevision,approvals[1].arguments.expectedWorkspaceRevision);

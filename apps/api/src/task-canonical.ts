@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {isDeepStrictEqual} from 'node:util';
 import {join} from 'node:path';
 import type pg from 'pg';
-import type {TaskWorkspaceFile,TaskWorkspaceManifestEntry,TaskAttemptKey,TaskExecutionScope,TaskWorkspacePlanner} from '../../../packages/contracts/index.ts';
+import type {TaskWorkspaceFile,TaskExecutionScope,TaskWorkspacePlanner,CanonicalRef,TaskMergeReceipt} from '../../../packages/contracts/index.ts';
 import type {LocalOperationService} from './local-execution.ts';
 import {pool} from './db.ts';
 import {AppError} from './provider.ts';
@@ -18,8 +18,7 @@ const {validateTaskExport,planTaskMerge}=createRequire(import.meta.url)('../../d
 const ordered=(v:any):any=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().filter(k=>v[k]!==undefined).map(k=>[k,ordered(v[k])])):v;
 const digest=(v:any)=>createHash('sha256').update(JSON.stringify(ordered(v))).digest('hex');
 const denied=(message:string,code='TASK_MERGE_DENIED'):never=>{throw new AppError(409,message,code);};
-export type CanonicalRef={revision:string;manifest:TaskWorkspaceManifestEntry[];mergeId:string|null};
-export type TaskMergeReceipt={mergeId:string;operationId:string;key:TaskAttemptKey;scopeHash:string;beforeRevision:string;afterRevision:string;workRevision:string;status:'committed'|'rejected'};
+export type {CanonicalRef,TaskMergeReceipt} from '../../../packages/contracts/index.ts';
 export type TaskMergeFault=(point:'intent'|'blob-fsync'|'before-sql-commit'|'after-sql-commit'|'archive-append'|'cache-mirror')=>void;
 function scopeOf(row:any):TaskExecutionScope{
  const scope=row.payload?.taskScope;

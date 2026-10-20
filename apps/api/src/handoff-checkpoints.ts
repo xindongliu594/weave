@@ -5,6 +5,17 @@ import { assertAcceptanceChecks } from '../../../services/agent-runtime/acceptan
 import { canonicalEvidence } from '../../../packages/contracts/run-lineage-evidence.ts';
 import { assertHandoffReport, handoffContractDigest, reportTaskFor } from '../../../packages/contracts/handoff-report.mjs';
 
+function verificationRevision(snapshot:any,record:any,taskId:string,attemptId:string){
+  if(snapshot.executionProfile!=='task-attempt-openshell-v1')return record.workspaceRevision;
+  const proof=record.taskExecution,key=proof?.key,sha=(value:unknown)=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+  if(!snapshot.id||record.runId!==snapshot.id||proof?.profile!==snapshot.executionProfile||key?.runId!==record.runId||key.taskId!==taskId||key.attemptId!==attemptId||!Number.isSafeInteger(key.generation)||key.generation<1||!sha(proof.capabilityHash)||!sha(record.sandboxWorkRevision)||!sha(record.workspaceRevision)||!Array.isArray(record.commands))throw Error('TASK_ACCEPTANCE_INVALID: 任务验收缺少准确来源与工作版本');
+  for(const command of record.commands){
+    const receipt=command.taskExecution;
+    if(receipt?.profile!==snapshot.executionProfile||canonicalEvidence(receipt.key)!==canonicalEvidence(key)||!receipt.operationId||receipt.operationId!==command.mergeId||!sha(receipt.scopeHash)||!sha(receipt.beforeWorkRevision)||!sha(receipt.afterWorkRevision)||receipt.afterWorkRevision!==command.workspaceRevision)throw Error('TASK_ACCEPTANCE_INVALID: 命令回执来自不同任务、尝试或工作版本');
+  }
+  return record.sandboxWorkRevision;
+}
+
 /** Retain only host seals belonging to the exact completed attempt in the archive. */
 export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,any>, root:string, files?:any[]) {
   const inspect=(file:any)=>{if(!files)return inspectArtifact(root,file);const found=files.find(row=>row.path===file.path);if(!found)throw Error(`产物 ${file.path} 不在所选检查点中`);return found;};
@@ -36,9 +47,10 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
     const accepted = events.findLast(event=>event.type==='handoff/accepted'&&event.data.taskId===id&&event.data.attemptId===attemptId)?.data
       ?? snapshot.handoffCheckpoints?.find((record:any)=>record.taskId===id&&record.attemptId===attemptId);
     if ((contract?.outputs?.length || ['implementation','repair','review','requirements'].includes(contract?.kind)) && !accepted) throw Error(`任务 ${id} 缺少宿主交付物验收记录，不能跳过，请完整重试`);
+    const checkedRevision=accepted?verificationRevision(snapshot,accepted,id,attemptId):undefined;
     if (contract.acceptanceChecks !== undefined) {
       if (!accepted) throw Error(`任务 ${id} 缺少逐项验收凭据，不能跳过`);
-      const checks = assertAcceptanceChecks(contract, accepted.commands ?? [], accepted.workspaceRevision);
+      const checks = assertAcceptanceChecks(contract, accepted.commands ?? [], checkedRevision);
       if (canonicalEvidence(checks) !== canonicalEvidence(accepted.acceptanceChecks)) throw Error(`任务 ${id} 的逐项验收凭据已变化`);
     }
     if (accepted) records.set(id,accepted);

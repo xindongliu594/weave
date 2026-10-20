@@ -1,0 +1,145 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ checkpoint refs preserve A work and original merge while canonical advances to independent B (2571.7552ms)
+✖ before-tool checkpoint uses imported task bytes rather than full canonical revision (577.5879ms)
+✖ after-tool checkpoint refuses a missing, other-task, stale or nonexistent operation identity (2625.5515ms)
+✖ SQL unknown blocks checkpoint despite finished events and human acknowledgment (944.0921ms)
+✖ checkpoint refuses missing referenced objects without cache repair (933.1488ms)
+✖ checkpoint refuses corrupt referenced objects without cache repair (908.3424ms)
+✖ checkpoint refuses changed lease (896.9389ms)
+✖ checkpoint refuses changed authority (899.4835ms)
+✖ checkpoint refuses changed assignment (883.8128ms)
+✖ checkpoint refuses changed capability (916.4016ms)
+✖ checkpoint refuses changed recovery (968.5989ms)
+✖ checkpoint independently authenticates the task merge record after a newer canonical commit (1774.5518ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 0
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16970.1468
+
+✖ failing tests:
+
+test at tests\task-checkpoint-state.test.ts:1:8993
+✖ checkpoint refs preserve A work and original merge while canonical advances to independent B (2571.7552ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:101:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+
+test at tests\task-checkpoint-state.test.ts:1:11018
+✖ before-tool checkpoint uses imported task bytes rather than full canonical revision (577.5879ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:120:74)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:11584
+✖ after-tool checkpoint refuses a missing, other-task, stale or nonexistent operation identity (2625.5515ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:129:205)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:129:182)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:12362
+✖ SQL unknown blocks checkpoint despite finished events and human acknowledgment (944.0921ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:138:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:138:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:12951
+✖ checkpoint refuses missing referenced objects without cache repair (933.1488ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:146:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:146:16)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:12951
+✖ checkpoint refuses corrupt referenced objects without cache repair (908.3424ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:146:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:146:16)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:13541
+✖ checkpoint refuses changed lease (896.9389ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:13541
+✖ checkpoint refuses changed authority (899.4835ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:13541
+✖ checkpoint refuses changed assignment (883.8128ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:16)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:13541
+✖ checkpoint refuses changed capability (916.4016ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:13541
+✖ checkpoint refuses changed recovery (968.5989ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:159:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-checkpoint-state.test.ts:1:14467
+✖ checkpoint independently authenticates the task merge record after a newer canonical commit (1774.5518ms)
+  TypeError: f.executor.prepareCheckpoint is not a function
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:167:39)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-checkpoint-state.test.ts:167:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)

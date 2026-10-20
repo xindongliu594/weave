@@ -1,5 +1,6 @@
 import { readdirSync, lstatSync, readFileSync, mkdirSync, existsSync, openSync, writeSync, fsyncSync, closeSync } from 'node:fs';
 import { join } from 'node:path';
+import {isDeepStrictEqual} from 'node:util';
 import { randomUUID, createHash } from 'node:crypto';
 import { readRun, redact } from './trace-store.mjs';
 import { validArtifactPath } from './sandbox.mjs';
@@ -16,12 +17,78 @@ function assertPlain(path,kind){
   catch(error){if(error.code==='ARCHIVE_PATH_UNSAFE')throw Error('CHECKPOINT_PATH_UNSAFE');throw error;}
 }
 export const checkpointDigest=value=>hash(JSON.stringify(value));
-export function checkpointContract(snapshot,task) {
+
+const exact=(value,keys)=>value&&typeof value==='object'&&!Array.isArray(value)&&isDeepStrictEqual(Object.keys(value).sort(),[...keys].sort());
+const identity=value=>exact(value,['runId','taskId','attemptId','generation'])&&[value.runId,value.taskId,value.attemptId].every(v=>typeof v==='string'&&v.length>0&&v.length<=256)&&Number.isSafeInteger(value.generation)&&value.generation>0;
+function validateManifest(files,origins=false){
+  if(!Array.isArray(files)||files.length>128)throw Error('CHECKPOINT_MANIFEST_INVALID');
+  const seen=new Set();let bytes=0;
+  for(const file of files){
+    if(!exact(file,origins?['path','size','sha256','origin']:['path','size','sha256'])||!sha.test(file.sha256??'')||!Number.isSafeInteger(file.size)||file.size<0||file.size>5*1024*1024||(bytes+=file.size)>20*1024*1024||seen.has(file.path))throw Error('CHECKPOINT_MANIFEST_INVALID');
+    validArtifactPath(file.path);seen.add(file.path);
+  }
+  if(!isDeepStrictEqual(canonicalManifest(files),manifest(files)))throw Error('CHECKPOINT_MANIFEST_INVALID');
+}
+function validateOrigin(origin,path){
+ if(!exact(origin,['path','runId','taskId','attemptId','acceptedRevision'])||origin.path!==path||![origin.runId,origin.taskId,origin.attemptId].every(v=>typeof v==='string'&&v.length>0)||!sha.test(origin.acceptedRevision??''))throw Error('CHECKPOINT_ORIGIN_INVALID');
+}
+/** Verify metadata and every immutable referenced object without scanning a compatibility cache. */
+export function validateTaskCheckpointRefs(refs,{runId,taskId,attemptId,archiveDir,checkedObjects=new Set()}={}){
+ const invalid=()=>{throw Error('CHECKPOINT_REFS_INVALID');};
+ if(!isDeepStrictEqual(refs,redact(refs)))throw Error('CHECKPOINT_METADATA_UNSAFE');
+ if(!exact(refs,['profile','key','inputManifest','inputOrigins','workManifest','canonical','lastMerge','scopeHash','capabilityHash'])||refs.profile!=='task-attempt-openshell-v1'||!identity(refs.key)||!uuid.test(refs.key.runId)||runId&&refs.key.runId!==runId||taskId&&refs.key.taskId!==taskId||attemptId&&refs.key.attemptId!==attemptId||!sha.test(refs.scopeHash??'')||!sha.test(refs.capabilityHash??''))invalid();
+ validateManifest(refs.workManifest);validateManifest(refs.inputManifest,true);
+ for(const row of refs.inputManifest)validateOrigin(row.origin,row.path);
+ if(!Array.isArray(refs.inputOrigins)||refs.inputOrigins.length>128)invalid();
+ const seen=new Set();
+ for(const row of refs.inputOrigins){
+  if(!exact(row,['path','sha256','origin','source'])||seen.has(row.path)||!sha.test(row.sha256??''))invalid();seen.add(row.path);validArtifactPath(row.path);validateOrigin(row.origin,row.path);if(row.origin.runId!==refs.key.runId)invalid();
+  const source=row.source,input=refs.inputManifest.find(f=>f.path===row.path);
+  if(!input||input.sha256!==row.sha256||!isDeepStrictEqual(input.origin,row.origin))invalid();
+  if(source?.kind==='import'){
+   if(!exact(source,['kind','snapshotId','sha256','agentIds'])||typeof source.snapshotId!=='string'||!source.snapshotId||source.sha256!==row.sha256||!Array.isArray(source.agentIds)||!source.agentIds.length||source.agentIds.some(id=>typeof id!=='string'||!id)||new Set(source.agentIds).size!==source.agentIds.length)invalid();
+  }else if(source?.kind==='accepted'){
+   if(!exact(source,['kind','runId','taskId','attemptId','revision'])||source.runId!==row.origin.runId||source.taskId!==row.origin.taskId||source.attemptId!==row.origin.attemptId||source.revision!==row.origin.acceptedRevision)invalid();
+  }else invalid();
+ }
+ for(const row of refs.inputManifest)if(!seen.has(row.path)&&(row.origin.runId!==refs.key.runId||row.origin.taskId!==refs.key.taskId||row.origin.attemptId!==refs.key.attemptId||refs.lastMerge===null))invalid();
+ const c=refs.canonical;
+ if(!exact(c,['revision','manifest','mergeId'])||!(c.mergeId===null||typeof c.mergeId==='string'&&c.mergeId.length>0))invalid();
+ validateManifest(c.manifest);if(checkpointDigest(c.manifest)!==c.revision)invalid();
+ const merge=refs.lastMerge;
+ if(merge!==null&&(!exact(merge,['mergeId','operationId','key','scopeHash','beforeRevision','afterRevision','workRevision','status'])||merge.status!=='committed'||!merge.operationId||merge.mergeId!==merge.operationId||!identity(merge.key)||!isDeepStrictEqual(merge.key,refs.key)||![merge.scopeHash,merge.beforeRevision,merge.afterRevision,merge.workRevision].every(v=>sha.test(v??''))||merge.workRevision!==checkpointDigest(refs.workManifest)))invalid();
+ for(const file of [...refs.inputManifest,...refs.workManifest]){const current=c.manifest.find(row=>row.path===file.path);if(!current||current.sha256!==file.sha256||current.size!==file.size)invalid();}
+ if(archiveDir)for(const file of [...refs.inputManifest,...refs.workManifest,...c.manifest]){
+  const key=file.sha256+':'+file.size;if(checkedObjects.has(key))continue;
+  try{readArchiveObject(join(archiveDir,'checkpoint-objects'),file);}catch{throw Error('CHECKPOINT_CONTENT_INVALID');}checkedObjects.add(key);
+ }
+ return refs;
+}
+function validateV2Boundary(boundary){
+ if(!boundary||![boundary.taskId,boundary.attemptId,boundary.sessionId,boundary.trigger].every(v=>typeof v==='string'&&v.length>0)||!sha.test(boundary.contractHash??'')||!Number.isSafeInteger(boundary.eventCursor)||boundary.eventCursor<1||boundary.environment!==undefined&&boundary.environment!==null&&!sha.test(boundary.environment)||boundary.sessionCursor!==undefined&&(!Number.isSafeInteger(boundary.sessionCursor)||boundary.sessionCursor<0))throw Error('CHECKPOINT_BOUNDARY_INVALID');
+}
+function validateV2Receipts(receipts,key){
+ if(!Array.isArray(receipts)||receipts.length>1024||receipts.some(row=>!row||row.inheritedFrom||row.taskExecution&&(!isDeepStrictEqual(row.taskExecution.key,key)||row.taskExecution.profile!=='task-attempt-openshell-v1')))throw Error('CHECKPOINT_RECEIPTS_INVALID');
+}
+function commitTaskCheckpoint({archive,boundary,receipts,taskRefs}){
+ validateV2Boundary(boundary);validateV2Receipts(receipts,taskRefs?.key);
+ validateTaskCheckpointRefs(taskRefs,{runId:archive.id,taskId:boundary.taskId,attemptId:boundary.attemptId,archiveDir:archive.dir});
+ const metadata={id:randomUUID(),version:2,runId:archive.id,boundary,receipts,files:taskRefs.workManifest,...taskRefs};
+ if(!isDeepStrictEqual(metadata,redact(metadata)))throw Error('CHECKPOINT_METADATA_UNSAFE');
+ const bytes=Buffer.byteLength(JSON.stringify(metadata));if(bytes>512*1024||archiveStorageUsage(archive.dir).bytes+bytes+1024>RUN_ARCHIVE_LIMIT_BYTES)throw Error('CHECKPOINT_STORAGE_LIMIT');
+ const record={...metadata,sha256:checkpointDigest(metadata)},expected=structuredClone(record),event=archive.append('step/checkpoint',record,{taskId:boundary.taskId,attemptId:boundary.attemptId,sessionId:boundary.sessionId});
+ if(!isDeepStrictEqual(event?.data,expected))throw Error('CHECKPOINT_METADATA_UNSAFE');
+ return {...record,seq:event.seq,at:event.at};
+}
+
+export function checkpointContract(snapshot,task,taskRefs) {
+  if(taskRefs){const {profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}=taskRefs;return checkpointDigest({legacy:checkpointContract(snapshot,task),profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash});}
   const {maxBudget,maxModelCalls,maxOutputTokens,estimatedInputTokens,estimatedOutputTokens,...contract}=task;
   const employee=snapshot.agents?.find(agent=>agent.id===task.assignee);
   return checkpointDigest({contract,principal:employee&&{id:employee.id,tools:[...employee.tools].sort()},knowledge:snapshot.knowledge??null,executionTarget:snapshot.executionTarget??null});
 }
-export function checkpointEnvironment(snapshot,proof) {
+export function checkpointEnvironment(snapshot,proof,taskRefs) {
+  if(taskRefs){const legacy=checkpointEnvironment(snapshot,proof),{profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}=taskRefs;return legacy?checkpointDigest({legacy,profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}):null;}
   const expected=snapshot.executionTarget?.backend;
   if(expected?.kind!=='openshell'||!proof||Object.entries(expected).some(([key,value])=>proof[key]!==value)||
       !/@sha256:[a-f0-9]{64}$/.test(proof.image??'')||!proof.node||!proof.effectivePolicyHash||proof.uid!==1000||proof.gid!==1000)return null;
@@ -68,10 +135,11 @@ export function checkpointFiles(workspace) {
 }
 const manifest=files=>files.map(({path,size,sha256})=>({path,size,sha256}));
 /** Caller holds the workspace write fence. The journal commit is published last. */
-export function commitStepCheckpoint({archive,workspace,boundary,receipts=[]}) {
+export function commitStepCheckpoint({archive,workspace,boundary,receipts=[],taskRefs}) {
   if(!uuid.test(archive?.id)||!boundary?.taskId||!boundary.attemptId||!boundary.sessionId||!sha.test(boundary.contractHash??'')||
     !Number.isSafeInteger(boundary.eventCursor)||boundary.eventCursor<1)throw Error('CHECKPOINT_BOUNDARY_INVALID');
   assertPlain(archive.dir,'directory');assertArchiveCapacity(archive.dir);
+  if(taskRefs!==undefined)return commitTaskCheckpoint({archive,boundary,receipts,taskRefs});
   const files=checkpointFiles(workspace),objects=join(archive.dir,'checkpoint-objects');
   if(!existsSync(objects))mkdirSync(objects,{mode:0o700});assertPlain(objects,'directory');
   const fresh=files.filter(file=>!existsSync(join(objects,file.sha256)));
@@ -109,7 +177,13 @@ export function readStepCheckpoints({root,runId}) {
 }
 function validateCheckpointEvent(root,runId,event,checkedObjects=new Set()) {
   const {sha256,...data}=event.data;
-  if(data.version!==1||data.runId!==runId||checkpointDigest(data)!==sha256||!Array.isArray(data.files)||data.files.length>128)throw Error('CHECKPOINT_MANIFEST_INVALID');
+  if(![1,2].includes(data.version)||data.runId!==runId||checkpointDigest(data)!==sha256||!Array.isArray(data.files)||data.files.length>128)throw Error('CHECKPOINT_MANIFEST_INVALID');
+  if(data.version===2){
+    const {id,version,runId:owner,boundary,files,receipts,...refs}=data;
+    if(!uuid.test(id??'')||!boundary||!isDeepStrictEqual(files,refs.workManifest))throw Error('CHECKPOINT_MANIFEST_INVALID');
+    validateV2Boundary(boundary);validateV2Receipts(receipts,refs.key);
+    validateTaskCheckpointRefs(refs,{runId,taskId:boundary.taskId,attemptId:boundary.attemptId,archiveDir:join(root,runId),checkedObjects});
+  }
   const objects=join(root,runId,'checkpoint-objects');
   // The portable backup contains files, not empty directories.
   if(data.files.length||existsSync(objects))assertPlain(objects,'directory');
@@ -129,6 +203,7 @@ function validateCheckpointEvent(root,runId,event,checkedObjects=new Set()) {
 /** Only opt-in, authenticated, fixed-environment local verification is reusable. */
 export function validateInheritedEvidence({root,reference,snapshot,task,workspace,environment}) {
   const refused=reason=>({reusable:false,reasons:[reason],evidenceRefs:[]});
+  if(snapshot.executionProfile==='task-attempt-openshell-v1')return refused('TASK_REQUIRES_FRESH_VERIFICATION');
   if(task.verificationReuse!=='same-workspace')return refused('TASK_REQUIRES_FRESH_VERIFICATION');
   if(!environment)return refused('CURRENT_SANDBOX_NOT_ATTESTED');
   if(!reference)return refused('NO_STEP_CHECKPOINT');

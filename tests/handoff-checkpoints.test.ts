@@ -3,8 +3,23 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import {randomUUID} from 'node:crypto';
 import { inspectArtifact } from '../services/agent-runtime/handoff.mjs';
 import { resumeHandoff, completedTasks } from '../apps/api/src/handoff-checkpoints.ts';
+import {observeAcceptanceChecks,assertAcceptanceChecks} from '../services/agent-runtime/acceptance-checks.mjs';
+
+test('task acceptance consumes its own sandbox revision and rejects another task binding',()=>{
+ const id=randomUUID(),key={runId:id,taskId:'check',attemptId:'attempt',generation:1},operationId=randomUUID(),partial='1'.repeat(64),complete='2'.repeat(64);
+ const task={id:'check',assignee:'tester',kind:'work',dependencies:[],inputs:[],outputs:[],verify:['check'],acceptanceCriteria:['Check is successful'],acceptanceChecks:[{criterionIndex:0,command:'check',expectedExitCode:0}]};
+ const command={command:'check',exitCode:0,workspaceRevision:partial,mergeId:operationId,taskExecution:{profile:'task-attempt-openshell-v1',key,scopeHash:'3'.repeat(64),operationId,beforeWorkRevision:partial,afterWorkRevision:partial},acceptanceChecks:observeAcceptanceChecks(task,'check',{exitCode:0,output:''})};
+ const accepted={runId:id,taskId:'check',attemptId:'attempt',workspaceRevision:complete,sandboxWorkRevision:partial,taskExecution:{profile:'task-attempt-openshell-v1',key,capabilityHash:'4'.repeat(64)},inputs:[],outputs:[],commands:[command],acceptanceChecks:assertAcceptanceChecks(task,[command],partial)};
+ const snapshot={id,executionProfile:'task-attempt-openshell-v1',agents:[],tasks:[task]},completed=new Map([['check',{attemptId:'attempt'}]]);
+ const events=[{type:'handoff/accepted',data:accepted}];
+ assert.equal(resumeHandoff(snapshot,events,completed,'unused')[0].sandboxWorkRevision,partial);
+ for(const change of [{...accepted,taskExecution:{...accepted.taskExecution,key:{...key,runId:randomUUID()}}},{...accepted,sandboxWorkRevision:complete},{...accepted,commands:[{...command,taskExecution:{...command.taskExecution,key:{...key,generation:2}}}]}]){
+  assert.throws(()=>resumeHandoff(snapshot,[{type:'handoff/accepted',data:change}],completed,'unused'),/TASK_ACCEPTANCE|ACCEPTANCE_CHECK/);
+ }
+});
 test('resume uses exact accepted attempt and rejects missing evidence or a changed restored file',async()=>{
   const root=await mkdtemp(join(tmpdir(),'resume-handoff-'));
   try {

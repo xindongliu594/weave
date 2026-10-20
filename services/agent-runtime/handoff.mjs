@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname } from 'node:path';
 import { readRun } from './trace-store.mjs';
-import { commitStepCheckpoint, checkpointContract, checkpointEnvironment, validateInheritedEvidence } from './step-checkpoints.mjs';
+import { commitStepCheckpoint, checkpointContract, checkpointEnvironment, validateInheritedEvidence, validateTaskCheckpointRefs, checkpointDigest } from './step-checkpoints.mjs';
 import { artifactFile, listArtifacts } from './sandbox.mjs';
 import { Semaphore } from './limits.mjs';
 import { commandEvidence } from './run-evidence.mjs';
@@ -41,8 +41,8 @@ const scoped = (path, patterns = []) => patterns.some(pattern => path === patter
 
 /** Host-owned seals and observed command results; never trust a model's file manifest. */
 export class HandoffGate {
-  constructor({ snapshot, sandbox, archive }) {
-    this.snapshot = snapshot; this.sandbox = sandbox; this.archive = archive;
+  constructor({ snapshot, sandbox, archive, onCheckpointFailure }) {
+    this.snapshot = snapshot; this.sandbox = sandbox; this.archive = archive;this.onCheckpointFailure=onCheckpointFailure;
     this.tasks = new Map((snapshot.tasks ?? []).map(t => [t.id, t]));
     this.accepted = new Map((snapshot.handoffCheckpoints ?? []).map(t => [t.taskId, t]));
     // Provisional seals unblock native scheduling behind the mutex, but they
@@ -50,9 +50,10 @@ export class HandoffGate {
     this.committed = new Map(this.accepted);
     this.bindings = new Map(); this.commands = new Map(); this.writes = new Map(); this.blocked = new Map(); this.scopeViolations = new Map();
     this.mutex = new Semaphore(1);
-    this.executionScopes=new Map();
+    this.executionScopes=new Map();this.checkpointRefs=new Map();this.checkpointFailures=new Map();
     this.stepStatus=new Map();this.stepSessions=new Map();this.inheritanceChecked=new Set();
-    this.environment=archive?.dir?checkpointEnvironment(snapshot,readRun(dirname(archive.dir),archive.id)?.events.findLast(event=>event.type==='local/device-bound')?.data.execution):null;
+    this.environmentProof=archive?.dir?readRun(dirname(archive.dir),archive.id)?.events.findLast(event=>event.type==='local/device-bound')?.data.execution:null;
+    this.environment=checkpointEnvironment(snapshot,this.environmentProof);
     // Archived approvals may pin both fields. Keep their exact SHA checks in
     // begin/sameVersion; new approvals reject the ambiguous contract in validatePlan.
     const errors = taskContractErrors(snapshot.tasks ?? [], snapshot.agents, snapshot.handoffCheckpoints, { allowHistoricalPinnedProducerInputs: true });
@@ -61,7 +62,7 @@ export class HandoffGate {
   }
   async exclusive(signal, work) {
     const release = await this.mutex.acquire(signal);
-    try { return await work(); } finally { release(); }
+    try { this.assertRunCheckpointReady();return await work(); } finally { release(); }
   }
   block(taskId, attemptId, error) {
     const message = String(error.message ?? error), old = this.blocked.get(taskId);
@@ -85,16 +86,43 @@ export class HandoffGate {
     if(result.reusable){this.commands.set(key,[...result.evidenceRefs,...(this.commands.get(key)??[])]);this.archive.append('step/evidence-inherited',{taskId,attemptId,commands:result.evidenceRefs},{taskId,attemptId});}
     else if(this.snapshot.recovery?.nodes?.[taskId]?.stepCheckpoint)this.archive.append('step/evidence-rejected',{taskId,attemptId,reasons:result.reasons},{taskId,attemptId});
   }
+  assertRunCheckpointReady(){if(this.snapshot.executionProfile==='task-attempt-openshell-v1'&&this.checkpointPublicationFailure)throw this.checkpointPublicationFailure;}
+  failCheckpointPublication(error){
+    if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')return error;
+    if(!this.checkpointPublicationFailure){
+      this.checkpointPublicationFailure=Object.assign(Error('TASK_CHECKPOINT_PUBLICATION_FAILED: '+String(error.message??error),{cause:error}),{code:'TASK_CHECKPOINT_PUBLICATION_FAILED'});
+      this.onCheckpointFailure?.(this.checkpointPublicationFailure);
+    }
+    return this.checkpointPublicationFailure;
+  }
+  failCheckpoint(taskId,attemptId,generation,error){this.checkpointFailures.set(this.key(taskId,attemptId),{generation,error});}
+  assertCheckpointReady(taskId,attemptId,generation){this.assertRunCheckpointReady();const failure=this.checkpointFailures.get(this.key(taskId,attemptId));if(failure?.generation===generation)throw failure.error;}
+  bindCheckpoint(taskId,attemptId,refs,context={}){
+    this.assertRunCheckpointReady();
+    const scope=this.executionScopes.get(this.key(taskId,attemptId));
+    validateTaskCheckpointRefs(refs,{runId:this.archive.id,taskId,attemptId,archiveDir:this.archive.dir});
+    if(!scope||!isDeepStrictEqual(scope.key,refs.key)||scope.capabilityHash!==refs.capabilityHash)throw Error('CHECKPOINT_SCOPE_CHANGED');
+    const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
+    if(context.sessionId!==undefined&&(typeof context.sessionId!=='string'||!context.sessionId))throw Error('CHECKPOINT_SESSION_INVALID');
+    this.checkpointRefs.set(this.key(taskId,attemptId),freeze(structuredClone(refs)));
+    if(context.sessionId)this.stepSessions.set(this.key(taskId,attemptId),context.sessionId);
+  }
   checkpoint(taskId,attemptId,trigger,context={}) {
-    if(!this.archive?.dir)return;
-    const sessionId=context.sessionId??this.stepSessions.get(this.key(taskId,attemptId));if(!sessionId)return;
-    const task=this.tasks.get(taskId);if(!task)return;
+    this.assertRunCheckpointReady();
+    if(!this.archive?.dir){if(this.snapshot.executionProfile==='task-attempt-openshell-v1')throw Error('TASK_CHECKPOINT_REQUIRED');return;}
+    const taskRefs=this.snapshot.executionProfile==='task-attempt-openshell-v1'?this.checkpointRefs.get(this.key(taskId,attemptId)):undefined;
+    if(this.snapshot.executionProfile==='task-attempt-openshell-v1'&&!taskRefs)throw Error('TASK_CHECKPOINT_REQUIRED');
+    const sessionId=context.sessionId??this.stepSessions.get(this.key(taskId,attemptId));if(!sessionId){if(taskRefs)throw Error('TASK_CHECKPOINT_REQUIRED: checkpoint session is missing');return;}
+    const task=this.tasks.get(taskId);if(!task){if(taskRefs)throw Error('TASK_CHECKPOINT_REQUIRED: checkpoint task is missing');return;}
+    try{
     const boundaryEvent=this.archive.append('step/boundary',{taskId,attemptId,trigger},{taskId,attemptId,sessionId});
-    return commitStepCheckpoint({archive:this.archive,workspace:this.sandbox.root,
-      boundary:{taskId,attemptId,sessionId,trigger,eventCursor:boundaryEvent.seq,contractHash:checkpointContract(this.snapshot,task),environment:this.environment,
+    return commitStepCheckpoint({archive:this.archive,...(taskRefs?{taskRefs}:{workspace:this.sandbox.root}),
+      boundary:{taskId,attemptId,sessionId,trigger,eventCursor:boundaryEvent.seq,contractHash:checkpointContract(this.snapshot,task,taskRefs),environment:taskRefs?checkpointEnvironment(this.snapshot,this.environmentProof,taskRefs):this.environment,
         ...(context.sessionCursor===undefined?{}:{sessionCursor:context.sessionCursor})},receipts:this.commands.get(this.key(taskId,attemptId))??[]});
+    }catch(error){if(taskRefs){this.failCheckpoint(taskId,attemptId,taskRefs.key.generation,error);throw this.failCheckpointPublication(error);}throw error;}
   }
   begin(taskId, attemptId) {
+    this.assertRunCheckpointReady();
     const task = this.tasks.get(taskId);
     if (!task) throw Error('UNAPPROVED_TASK: ' + taskId);
     const key = this.key(taskId, attemptId);
@@ -129,11 +157,12 @@ export class HandoffGate {
     return listArtifacts(this.sandbox.root);
   }
   bindExecutionScope(taskId,attemptId,scope){
+    this.assertRunCheckpointReady();
     const task=this.tasks.get(taskId),key=scope?.key;
     if(this.snapshot.executionProfile!=='task-attempt-openshell-v1'||scope?.profile!==this.snapshot.executionProfile||key?.runId!==this.archive.id||key.taskId!==taskId||key.attemptId!==attemptId||!Number.isSafeInteger(key.generation)||key.generation<1||!task||scope.workspace?.binding?.assigneeId!==task.assignee||scope.workRevision!==workspaceRevision(this.sandbox.root))throw Error('TASK_SCOPE_REQUIRED: 无法核对当前任务工作区');
     const previous=this.executionScopes.get(this.key(taskId,attemptId));
     if(previous&&(!isDeepStrictEqual(previous.key,scope.key)||!isDeepStrictEqual(previous.workspace.binding,scope.workspace.binding)||previous.capabilityHash!==scope.capabilityHash))this.invalidateCommands(taskId,attemptId);
-    this.executionScopes.set(this.key(taskId,attemptId),scope);
+    this.executionScopes.set(this.key(taskId,attemptId),scope);this.checkpointRefs.delete(this.key(taskId,attemptId));
   }
   taskWorkRevision(taskId,attemptId){
     const scope=this.executionScopes.get(this.key(taskId,attemptId));if(!scope)throw Error('TASK_SCOPE_REQUIRED: 缺少任务工作版本');
@@ -141,14 +170,17 @@ export class HandoffGate {
     return hash(JSON.stringify(canonicalManifest(listArtifacts(this.sandbox.root).filter(file=>paths.has(file.path)))));
   }
   observe(taskId, attemptId, name, args, result, before, context = {}) {
+    this.assertRunCheckpointReady();
     const task = this.tasks.get(taskId), key = this.key(taskId, attemptId);
     const taskMode=this.snapshot.executionProfile==='task-attempt-openshell-v1',scope=this.executionScopes.get(key);
     if(taskMode){
+      const refs=this.checkpointRefs.get(key);
+      if(!refs||refs.lastMerge?.operationId!==result.taskExecution?.operationId||checkpointDigest(refs.workManifest)!==result.taskExecution?.afterWorkRevision)throw Error('TASK_CHECKPOINT_REQUIRED');
       const receipt=result.taskExecution,merge=result.merge;
       if(!scope||receipt?.profile!==scope.profile||!isDeepStrictEqual(receipt.key,scope.key)||receipt.scopeHash!==scope.workspace.scopeHash||!receipt.operationId||receipt.beforeWorkRevision!==filesRevision(scope.workspace.importedFiles)||merge?.status!=='committed'||merge.operationId!==receipt.operationId||merge.mergeId!==receipt.operationId||!isDeepStrictEqual(merge.key,scope.key)||merge.scopeHash!==receipt.scopeHash||merge.beforeRevision!==scope.workRevision||merge.afterRevision!==workspaceRevision(this.sandbox.root)||merge.workRevision!==receipt.afterWorkRevision||receipt.afterWorkRevision!==this.taskWorkRevision(taskId,attemptId)||result.workspaceRevision!==undefined&&result.workspaceRevision!==receipt.afterWorkRevision)throw Error('TASK_MERGE_REQUIRED: 任务结果缺少已提交且匹配的成果证明');
     }
     if(context.sessionId)this.stepSessions.set(key,context.sessionId);
-    if(result.execution)this.environment=checkpointEnvironment(this.snapshot,result.execution);
+    if(result.execution){this.environmentProof=result.execution;this.environment=checkpointEnvironment(this.snapshot,result.execution);}
     const previous = new Map(before.map(f => [f.path, f.sha256]));
     const current = new Map(listArtifacts(this.sandbox.root).map(f => [f.path, f.sha256]));
     const changed = [...new Set([...previous.keys(), ...current.keys()])].filter(path => previous.get(path) !== current.get(path));
@@ -174,7 +206,7 @@ export class HandoffGate {
       if (Number.isSafeInteger(event?.seq)) observation.observationSeq = event.seq;
     }
     this.assertInputs(taskId, attemptId);
-    if(name!=='filesystem')this.checkpoint(taskId,attemptId,'tool-result',context);
+    if(name!=='filesystem'||taskMode)this.checkpoint(taskId,attemptId,'tool-result',context);
   }
   prepare(taskId, attemptId, update) {
     const task = this.begin(taskId, attemptId), key = this.key(taskId, attemptId);
@@ -201,12 +233,24 @@ export class HandoffGate {
   stage(record) { this.accepted.set(record.taskId, record); }
   invalidateCommands(taskId, attemptId) { const key=this.key(taskId,attemptId);this.commands.delete(key);this.inheritanceChecked.add(key);this.stepStatus.set(key,{reusable:false,reasons:['OPERATION_INVALIDATED'],evidenceRefs:[]}); }
   commit(record) {
+    this.assertRunCheckpointReady();
+    if(this.snapshot.executionProfile==='task-attempt-openshell-v1'){
+      try{
+        // Native completion is already durable. Preserve its history, but only
+        // publish the usable seal once the required checkpoint is durable too.
+        this.archive.append('handoff/accepted',record);
+        this.checkpoint(record.taskId,record.attemptId,'node-accepted');
+        this.accepted.set(record.taskId,record);this.blocked.delete(record.taskId);this.committed.set(record.taskId,record);
+        return;
+      }catch(error){throw this.failCheckpointPublication(error);}
+    }
     this.accepted.set(record.taskId, record); this.blocked.delete(record.taskId);
     this.archive.append('handoff/accepted', record);
     this.committed.set(record.taskId, record);
     this.checkpoint(record.taskId,record.attemptId,'node-accepted');
   }
   rollback(record, previous) {
+    if(this.checkpointPublicationFailure)return;
     if (previous) this.accepted.set(record.taskId, previous); else this.accepted.delete(record.taskId);
   }
   summary() { return [...this.blocked.values()]; }
