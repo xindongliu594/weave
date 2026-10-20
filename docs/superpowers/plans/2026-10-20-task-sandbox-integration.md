@@ -96,12 +96,12 @@ resolveTaskScope(db:pg.PoolClient, run:any, assignment:TrustedTaskAssignment,
 
 ## Task 2: OpenShell task-attempt 生命周期与有界导入/导出
 
-**Files:** 修改 `apps/desktop/openshell-executor.cjs`, `apps/desktop/local-client.cjs`；新增 `apps/desktop/task-execution.test.cjs`；扩展 `apps/desktop/openshell-executor.test.cjs`, `local-client.test.cjs`；新增 `scripts/validation/task-sandbox-transport.cjs`。
+**Files:** 修改 `apps/desktop/openshell-executor.cjs`, `apps/desktop/local-client.cjs`；新增 `apps/desktop/task-execution.test.cjs`；扩展 `apps/desktop/openshell-executor.test.cjs`, `apps/desktop/local-executor.test.cjs`（现有 LocalDeviceClient 回归所在文件）；新增 `scripts/validation/task-sandbox-transport.cjs`。
 
 **Interfaces:** 消费 Task 1 key/receipt。新增设备 job `executionScope` 只含 `{profile,key,binding,scopeHash,readPaths,writePaths,inputManifest,expectedWorkRevision}`，prepare 的 `files` 仅授权输入。现有 `execute(job,signal)` 返回 `{...现有result,taskExecution:TaskExecutionReceipt}`。新增 `inspectTaskExport(key:TaskAttemptKey, operationId:string):Promise<any>` 只查询原工作区和原操作引用；不能执行原命令。原 `read/stateFile/inspectStorage/retireStorage/reconcileStorage` 接受 `string | TaskAttemptKey`，string 仅旧 run 映射。
 
 - [ ] 失败测试：同一 run 的 A/B/new-attempt/new-generation 对应不同 sandboxId；同 key 重开仍同对象；篡改 scope/profile/binding/expected revision 拒绝；旧 run state schema 1 仍可读；task key 不能落入 legacy stateFile；prepare 非空/重复、已完成 operation、未知 create/start/stop/delete 均不重放。
-- [ ] 运行 `node --test apps/desktop/task-execution.test.cjs apps/desktop/openshell-executor.test.cjs apps/desktop/local-client.test.cjs`，确认红灯。
+- [ ] 运行 `node --test apps/desktop/task-execution.test.cjs apps/desktop/openshell-executor.test.cjs apps/desktop/local-executor.test.cjs`，确认红灯。
 - [ ] 继续使用当前 `perform/admit/get/cli/REMOTE_SCRIPT`，新映射 schema 2 放 `openshell-task-scopes/<sha256(JSON.stringify([runId,taskId,attemptId,generation]))>.json`；文件内容保存完整 key 并复核，不能仅信文件名。persist intent 后单次 lifecycle dispatch，pre/post admission、nonce、UID/resource/policy 验证保留。维护列表同时枚举旧/新目录，返回完整 key；未知条目不跳过容量计算。
 - [ ] 统一新 profile 的 stdin 预检：`MAX_TASK_EXEC_STDIN_BYTES=3*1024*1024`，按最终 UTF-8 JSON（含 nonce、base64、bundle、参数）计数，须在 create/exec 变更派发前完成可完成的预检；remote parser 用相同上限，超过即拒绝。首版采用受限单 envelope，不实现分块。文件数量/单文件/总量仍受原 128 / 5 MiB / 20 MiB 限制，但能传输的输入还受 3 MiB envelope 限制；5 MiB bundle/输入不得宣称可用。导出 stdout 使用现有最大 32 MiB 并验证完整 envelope，溢出是 unknown、保留现场；不能拿 stdin 4 MiB 推断 stdout 上限。
 - [ ] `REMOTE_SCRIPT` 新 readonly `task_export_inspect` 分支导出原 scope 与原 operation 的现有文件；所有导出执行 lstat、普通文件/nlink=1、路径/大小写/前缀/SHA/数量/总量检查。不能以 shell stdout 中的 JSON 冒充 receipt；子进程收尾后确认进程组终止，后台写仍存在则阻止导出提交。设备 journal 保存 key、scopeHash、工作版本和 operationId，重启仅递交旧 receipt，不新建 generation 来清除 unknown。

@@ -1,6 +1,6 @@
 # 为伍离线工程评测
 
-使用独立安装的 **Promptfoo 0.124.1（MIT）**，不进入生产依赖。`package-lock.json` 固定版本和 npm 完整性摘要。它需要 **Node >=22.22.0**；项目既有 CI 的 Node 22.19 不能运行此工具。请单独使用 Node 24；本次实际验证为 Node 24.15.0 / npm 11.12.1。脚本启动前明确检查运行时，不修改根项目 engine 或 CI。
+使用独立安装的 **Promptfoo 0.124.1（MIT）**，不进入生产依赖。`package-lock.json` 固定版本和 npm 完整性摘要。它需要 **Node >=22.22.0**；项目既有 Core CI 的 Node 22.19 不能运行此工具。请单独使用 Node 24；本次实际验证为 Node 24.15.0 / npm 11.12.1。脚本启动前明确检查运行时，不修改根项目 engine。
 
 ```powershell
 cd tools/evaluations
@@ -21,7 +21,9 @@ node --test tests/evaluation-bridge.test.mjs tests/evaluation-release-gate.test.
 
 manifest 绑定评测身份与日期、Git commit/相关源码 dirty、源码内容摘要、runtime 摘要、工具 lock 摘要、数据集版本/摘要/案例集、规则版本/代码摘要、Promptfoo 版本及原始结果摘要。`source-inputs.json` 明确列出应用/runtime/合约/构建配置/测试/评测实现及版本数据的目录、扩展名和根配置文件；同时包含这些范围内未提交的新源码。读取前排除私有目录、历史验收文档、验证产物和依赖/输出；普通文档不会改变源码内容摘要，相关源码改动会改变摘要，相关输入删除也记录在摘要中。读取受大小限制，符号链接目标必须仍在源码白名单内。摘要提供一致性，不是数字签名或防恶意本地管理员篡改机制。
 
-`--require-live` 总是失败并返回 `live-evidence-required`；fixture 始终 `executionKind=fixture`、`modelExecuted=false`、`fresh=false`，合成 receipt 和零费用不能计为真实业务运行或质量验收。第一阶段没有接服务端授权、预算、新真实运行、模型质量、生产/CI/API 或网页入口。
+`--require-live` 总是失败并返回 `live-evidence-required`；fixture 始终 `executionKind=fixture`、`modelExecuted=false`、`fresh=false`，合成 receipt 和零费用不能计为真实业务运行或质量验收。目前没有接服务端授权、预算、新真实运行、模型质量、生产 API 或网页入口。
+
+仓库的 `Offline engineering evaluation` workflow 使用 Node 24.15.0，在 Windows/Linux 单独安装上述依赖并执行原正向和负向 CLI 测试。它不读取模型凭据或数据库，不开启 execute；每个平台有 20 分钟超时，安装后先校验真实 CLI 存在，避免可选测试因缺依赖而跳过。只保留合成案例的 manifest、gate、JUnit 和负向 gate，保留期 7 天，不上传原始报告、HTML、日志、SQLite 或依赖。远程 workflow 的通过状态须以 GitHub 对应 commit 的实际结果为准，不能拿本地旧报告代替。
 
 依赖安装禁用生命周期脚本。本机安装 631 包、`node_modules` 实测 1,304,223,358 字节（约 1.21 GiB；平台可不同）。仅开发/独立评测使用，不复制到 JJ 生产。没有执行 `npm audit`，不声明无漏洞、完成审计或任意插件适配。
 
