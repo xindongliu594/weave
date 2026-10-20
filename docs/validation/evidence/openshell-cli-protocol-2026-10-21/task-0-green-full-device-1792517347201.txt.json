@@ -1,0 +1,6 @@
+{
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-green-full-device-1792517347201.txt",
+  "command": "node --test --test-concurrency=1 apps/desktop/*.test.cjs",
+  "durationMs": 70321,
+  "exit": 1
+}

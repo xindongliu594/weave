@@ -1,0 +1,6 @@
+{
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-red-allow-missing-1792517693040.txt",
+  "durationMs": 549,
+  "exit": 1,
+  "command": "node --test --test-name-pattern='CLI fixture' apps/desktop/openshell-executor.test.cjs"
+}

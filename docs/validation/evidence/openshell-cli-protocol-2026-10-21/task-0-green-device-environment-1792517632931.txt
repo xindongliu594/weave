@@ -1,0 +1,22 @@
+✔ native workspace preserves file versions and rejects traversal, Windows aliases and links (49.8062ms)
+✔ native commands require capability, matching approval and current workspace version (2535.6526ms)
+✔ a command that changes files but exceeds receipt limits remains an executed mutation (2289.284ms)
+✔ command completion and cancellation clean ordinary background descendants (5808.7179ms)
+✔ lost operation receipt and process restart resend the receipt without replaying a mutation (110.5546ms)
+✔ transient Windows receipt rename failures do not repeat the underlying operation (109.4926ms)
+✔ persistent receipt failure retains an unknown executed outcome and never replays on reopen (387.1533ms)
+✔ device journal binds a task operation to its original key and scope through completed receipt (20.7539ms)
+✔ orphan recovery retains the original task key and work revision without replay (12.5819ms)
+✔ real directory storage counts bytes and free filesystem without reading file contents (11.8101ms)
+✔ temporary file growth stops admission independently of workspace exports (6.7943ms)
+✔ bounded enumeration and directory links fail closed without traversing targets (408.2494ms)
+✔ concurrent temporary deletion triggers a bounded rescan rather than an admission failure (6.9225ms)
+✔ persistent directory churn is bounded and permission errors are never swallowed (8.1199ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12022.6862

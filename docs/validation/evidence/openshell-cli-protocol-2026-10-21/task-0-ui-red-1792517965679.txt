@@ -1,0 +1,84 @@
+✔ inventory marks incomplete scans and gives a settings action instead of claiming all data was counted (11.6845ms)
+✔ preview makes clear exactly which copies are removed and preserves recovery evidence (1.8625ms)
+✔ expired, empty and started previews never enable a deletion confirmation (0.3291ms)
+✔ interrupted history has a reconcile action and does not offer automatic replay (26.5565ms)
+✔ sandbox panel exposes measured writable directories and labels application limits honestly (1.5899ms)
+✔ journal and sandbox confirmations never reuse the workspace deletion label (1.4277ms)
+✔ legacy interrupted records with unresolved results retain read-only reconciliation (1.0571ms)
+✔ retention panel makes recommendations explicit and retains preview before confirmation (1.0165ms)
+✖ fixed protocol disables sandbox confirmations while workspace and journal remain available (3.749ms)
+✖ all sandbox preview callers are disabled without disabling capacity inspection or other retention actions (1.6309ms)
+✖ historical completed sandbox receipts are pending physical re-verification without rewriting history (6.0335ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 8
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 990.9624
+
+✖ failing tests:
+
+test at tests\storage-center.test.ts:1:5502
+✖ fixed protocol disables sandbox confirmations while workspace and journal remain available (3.749ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\storage-center.test.ts:46:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\storage-center.test.ts:1:6515
+✖ all sandbox preview callers are disabled without disabling capacity inspection or other retention actions (1.6309ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /<button disabled="">预览回收<\/button>/. Input:
+  
+  '<details class="lower"><summary>OpenShell 沙箱可写目录</summary><p class="subcopy">应用层容量监管：/sandbox 20 MiB、/tmp 64 MiB；不构成硬磁盘配额。镜像层和 Docker 日志另计。旧运行沙箱的容量核对会启动原工作负载，只检查文件，不调用模型。任务停止核对只观察原请求，文件与磁盘资料保留。</p><div class="lower"><p><a href="#run/run">run</a> · 已停止 · </p><p>/sandbox 17 B · /tmp 5 B · 上次核对 2026/10/21 01:39:26</p><button>核对容量与文件版本</button> <button>预览回收</button></div></details>'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\storage-center.test.ts:57:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<details class="lower"><summary>OpenShell 沙箱可写目录</summary><p class="subcopy">应用层容量监管：/sandbox 20 MiB、/tmp 64 MiB；不构成硬磁盘配额。镜像层和 Docker 日志另计。旧运行沙箱的容量核对会启动原工作负载，只检查文件，不调用模型。任务停止核对只观察原请求，文件与磁盘资料保留。</p><div class="lower"><p><a href="#run/run">run</a> · 已停止 · </p><p>/sandbox 17 B · /tmp 5 B · 上次核对 2026/10/21 01:39:26</p><button>核对容量与文件版本</button> <button>预览回收</button></div></details>',
+    expected: /<button disabled="">预览回收<\/button>/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\storage-center.test.ts:1:7808
+✖ historical completed sandbox receipts are pending physical re-verification without rewriting history (6.0335ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(html.includes('待物理复核'))
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\storage-center.test.ts:66:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

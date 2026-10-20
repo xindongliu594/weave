@@ -1,0 +1,312 @@
+✔ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (39.8629ms)
+✔ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (27.4475ms)
+✔ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (27.532ms)
+✔ accepted stop shared deadline expires in queue with no callback intent or later stop (148.7381ms)
+✔ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (284.8337ms)
+✖ accepted stop shared deadline passes one signal through admission stop and original ID observation (232.3865ms)
+✖ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (237.4408ms)
+✖ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (421.4036ms)
+✔ accepted stop shared deadline rejects late transport success before journal confirmation (489.7068ms)
+✔ accepted stop capabilities advertise exact shared abort contract with a stable method reference (25.9463ms)
+✔ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (14.9488ms)
+✔ CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn (2.1098ms)
+✔ CLI abort settlement real local transport terminates its original child before returning unknown (154.9009ms)
+✔ accepted stop rejects a different expected sandbox ID before callback or stop dispatch (136.0749ms)
+✔ accepted stop requires exact identity, all proofs and a private callback before any CLI (131.1531ms)
+✖ accepted stop fsyncs an immutable intent before one stop and confirms only original ID (252.4767ms)
+✖ accepted stop response loss survives a cold executor and reserves capacity until read-only reconciliation (498.1854ms)
+✖ accepted stop blocks all ordinary execution, export and storage paths without starting retained files (329.0627ms)
+✖ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (344.5108ms)
+✖ accepted stop reconciliation uses name-only get with independent original ID validation (338.3938ms)
+✔ accepted stop rechecks the entire journal and grant synchronously after its callback (1597.7093ms)
+✖ accepted stop clones queued identity and rejects missing or corrupted original intent on restart (335.1008ms)
+✔ accepted stop reconciliation refuses absent, Ready, wrong identity, mTLS and policy without lifecycle mutations (2272.8902ms)
+✖ accepted stop journal failures never retry a mutation and preserve intent for later observation (685.9426ms)
+✔ stdin restores exact source bytes; CAS/revisions/metadata match existing contract, no host workspace writes (500.9633ms)
+✔ grant, approval, hidden paths and file limits deny before any CLI dispatch (188.9351ms)
+✔ large contents stay out of argv; duplicate completed jobs and cold mapping never repeat create/exec (360.4515ms)
+✔ connection loss persists unknown across reopen; no repeated external operation and no host fallback (227.6307ms)
+✔ changed effective policy blocks before employee operation; clean close stops same scope once (213.4414ms)
+✔ configuration fingerprint is field-order invariant and every fixed field changes its identity (32.8633ms)
+✔ approved remote command nonzero exit is a known result; child output cannot forge transport receipt (205.6155ms)
+✔ remote workspace governance files and hard links are refused before returning any artifacts (279.2422ms)
+✔ clean shutdown and cold reopen start the same sandbox once, retain files and never replay completed operations (451.1143ms)
+✔ cold recovery checks saved revision before a new write even without caller-supplied workspace revision (293.8707ms)
+✔ ambiguous start or stop is retained across reopen and never repeated (703.9343ms)
+✔ service shutdown refuses new work immediately and concurrent close stops the sandbox only once (190.3772ms)
+✔ cancellation or truncated receipt after a remote write preserves the unknown outcome without replay (544.086ms)
+✔ actual helper checks UID, GID, Node and cgroup values before an employee write (918.7331ms)
+✔ sandbox ID replacement blocks cold start before any new external mutation (228.2636ms)
+✔ prepare accepts an exact 5 MiB file and 20 MiB workspace through stdin (2036.3746ms)
+✔ damaged persistent mappings cannot omit recovery versions or redirect a sandbox name (617.6719ms)
+✔ real local transport forwards large stdin, bounds output, and classifies cancellation after spawn as unknown (528.244ms)
+✖ fixed protocol retirement denies fresh, stale-version and cached requests without CLI or journal writes (403.2744ms)
+✔ CLI fixture rejects UUID-as-name for get and delete without changing the original sandbox (129.3585ms)
+✖ historical retirement reconciliation observes exact name and ID without trusting or rewriting results (214.8235ms)
+✖ historical retirement NotFound, permission denial, malformed, transport and changed identity stay unknown (194.679ms)
+✖ retirement reconciliation rejects missing or mismatched original intent before any query (275.6221ms)
+✖ retirement reconciliation rechecks grant, config, deadline and the entire original journal after observation (209.1232ms)
+✖ historical retired rows stay unverified and reserve task running, retained and full disk capacity (328.0486ms)
+✔ running command is killed when temporary storage exceeds limits before its normal exit (500.6909ms)
+✔ task export remains unknown when a command background process survives group kill (398.27ms)
+✔ task command exports only after confirmed stop, restart and read-only inspect (353.5458ms)
+✔ task command stop, start or export uncertainty retains the original operation without replay (1533.0048ms)
+✔ task command transport loss before receipt cannot be inspected as a safe export (244.9537ms)
+✔ cold pre-receipt command dispatch snapshot cannot export, including snapshots without operation kind (528.3481ms)
+✔ cold fence-stage snapshots retain identity and capacity but cannot execute or export (1073.0852ms)
+✖ task-attempt keys isolate sandboxes and persisted scope changes are rejected (1143.6431ms)
+✔ unrelated canonical commit renews task scope without changing its sandbox work revision (422.392ms)
+✔ same attempt reads its newly committed output after a bounded scope advance (717.1521ms)
+✔ original readable output retains ancestry and permits write, cold reopen, then write again (642.025ms)
+✔ task prepare rejects a full envelope above 3 MiB before create (237.7268ms)
+✔ unknown task scopes retain resource slots and stopped scopes count toward the 128 scope limit (12464.6555ms)
+✖ task capacity includes retained workspace and temp occupancy in disk admission (324.6609ms)
+ℹ tests 63
+ℹ suites 0
+ℹ pass 45
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40141.3432
+
+✖ failing tests:
+
+test at apps\desktop\openshell-executor.test.cjs:157:1
+✖ accepted stop shared deadline passes one signal through admission stop and original ID observation (232.3865ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:170:1
+✖ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (237.4408ms)
+  TypeError: Cannot read properties of undefined (reading 'phase')
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:178:46)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at apps\desktop\openshell-executor.test.cjs:183:1
+✖ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (421.4036ms)
+  Error: 原任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at OpenShellDeviceExecutor.reconcileAcceptedTaskStopNow (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:459:10)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:268:1
+✖ accepted stop fsyncs an immutable intent before one stop and confirms only original ID (252.4767ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:285:1
+✖ accepted stop response loss survives a cold executor and reserves capacity until read-only reconciliation (498.1854ms)
+  Error: 原任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at OpenShellDeviceExecutor.reconcileAcceptedTaskStopNow (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:459:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:301:1
+✖ accepted stop blocks all ordinary execution, export and storage paths without starting retained files (329.0627ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:313:1
+✖ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (344.5108ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:330:1
+✖ accepted stop reconciliation uses name-only get with independent original ID validation (338.3938ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:361:1
+✖ accepted stop clones queued identity and rejects missing or corrupted original intent on restart (335.1008ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:397:1
+✖ accepted stop journal failures never retry a mutation and preserve intent for later observation (685.9426ms)
+  Error: 原任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at OpenShellDeviceExecutor.reconcileAcceptedTaskStopNow (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:459:10)
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:613:1
+✖ fixed protocol retirement denies fresh, stale-version and cached requests without CLI or journal writes (403.2744ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   code: 'LOCAL_OUTCOME_UNKNOWN',
+  +   notExecuted: false
+  -   code: 'OPENSHELL_RETIREMENT_UNSUPPORTED',
+  -   notExecuted: true
+    }
+  
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:621:76)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: 回收已发出但未取得最终回执，请只核对原沙箱
+        at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+        at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:520:140
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5),
+    expected: { code: 'OPENSHELL_RETIREMENT_UNSUPPORTED', notExecuted: true },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:635:1
+✖ historical retirement reconciliation observes exact name and ID without trusting or rewriting results (214.8235ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      replayed: false,
+      runId: '1c2d7b52-df15-4851-8edb-3ffd33045247',
+      sandboxId: '8e269cf0-e960-4775-bd8b-d39ff24059dd',
+  +   state: 'retired'
+  -   state: 'present'
+    }
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:641:11)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { runId: '1c2d7b52-df15-4851-8edb-3ffd33045247', sandboxId: '8e269cf0-e960-4775-bd8b-d39ff24059dd', state: 'retired', replayed: false },
+    expected: { runId: '1c2d7b52-df15-4851-8edb-3ffd33045247', sandboxId: '8e269cf0-e960-4775-bd8b-d39ff24059dd', state: 'present', replayed: false },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:647:1
+✖ historical retirement NotFound, permission denial, malformed, transport and changed identity stay unknown (194.679ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:655:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'LOCAL_OUTCOME_UNKNOWN' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:661:1
+✖ retirement reconciliation rejects missing or mismatched original intent before any query (275.6221ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:666:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:671:1
+✖ retirement reconciliation rechecks grant, config, deadline and the entire original journal after observation (209.1232ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:685:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'LOCAL_OUTCOME_UNKNOWN' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:690:1
+✖ historical retired rows stay unverified and reserve task running, retained and full disk capacity (328.0486ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'retired'
+  - 'unverified'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:694:99)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'retired',
+    expected: 'unverified',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:812:1
+✖ task-attempt keys isolate sandboxes and persisted scope changes are rejected (1143.6431ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:950:1
+✖ task capacity includes retained workspace and temp occupancy in disk admission (324.6609ms)
+  Error: 任务停止结果待核对，禁止重发停止
+      at unknown (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:67:48)
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:490:11
+      at async C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.cjs:407:45 {
+    code: 'LOCAL_OUTCOME_UNKNOWN',
+    notExecuted: false
+  }

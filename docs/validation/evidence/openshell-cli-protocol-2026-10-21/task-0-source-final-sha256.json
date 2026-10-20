@@ -1,0 +1,7 @@
+{
+  "apps/desktop/openshell-executor.cjs": "73b7eab0beff67162bce660b1b0011a17b7342c21f77f2b471329db0e2aee688",
+  "apps/desktop/openshell-executor.test.cjs": "d1c571e2b7d2d5bc69990b30c23d96ac20b23d48ac921503c93a03ed7e149abc",
+  "tests/helpers/task-openshell-product-fixture.cjs": "8652725a8fd5340bc1e00340b093a3ade64ca3465cf34a68bf3505a4778c8cb4",
+  "tests/task-accepted-stop-product-flow.test.ts": "632d91c97a50c748025f94dff34bb9dcc147cb7041d51f8e3ae9af20d456fec1",
+  ".superpowers/sdd/2026-10-21-task-retirement/product-protocol-runner.mjs": "cef3ef31e510e4625a037b5520839cf3d42fb0de5a550a00e095ef0c20447e86"
+}

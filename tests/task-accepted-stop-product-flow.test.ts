@@ -167,7 +167,7 @@ async function assertSuccessful(f:Fixture,result:any){
    const finalTeam=f.events().findLast(event=>event.type==='team/checkpoint'&&event.seq<=prepared.eventSeq),finished=f.events().findLast(event=>event.type==='run/finished');
    assert.ok(finalTeam&&finalTeam.seq>cpEvent.seq&&finalTeam.data.tasks.every((task:any)=>task.status==='completed'),'the last durable completed team checkpoint precedes terminal C stop');assert.ok(finished&&finished.seq>stop.eventSeq);
   }else assert.ok(next&&next.call>stop.call);
-  const originalGets=f.device.calls.slice(stop.call+1,next?.call).filter((call:any)=>call.args[3]==='get');assert.ok(originalGets.some((call:any)=>call.args[4]===stop.sql.identity.sandboxId));
+  const originalGets=f.device.calls.slice(stop.call+1,next?.call).filter((call:any)=>call.args[3]==='get');assert.ok(originalGets.some((call:any)=>call.args[4]===stop.journal.name));
   const row=(await pool.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2',[f.runId,id])).rows[0];assert.equal(row.accepted_stop.state,'stopped');assert.equal(hash(JSON.stringify(taskFacts(row))),stop.sqlFactsSha256,'stopping preserves SQL scope, outputs, binding and sandbox mapping');
   const retained=f.device.executor.read(stop.key);assert.equal(retained.acceptedStop.stage,'stopped_confirmed');assert.deepEqual(retained.workManifest,stop.journal.workManifest);assert.deepEqual(retained.storage,stop.journal.storage);
  }
@@ -240,7 +240,7 @@ test('lost accepted stop response cold API bind only observes original ID and ne
  await assert.rejects(cold.bindAttempt({...context,runId:f.runId,runtimeTaskId:target.runtime_task_id,contractHash:target.contract_hash},new AbortController().signal),{code:'TASK_SCOPE_DENIED'});
  const saved=(await pool.query("SELECT accepted_stop FROM task_attempt_workspaces WHERE run_id=$1 AND task_id='a'",[f.runId])).rows[0].accepted_stop;
  assert.equal(saved.state,'stopped');assert.deepEqual(saved.identity,marker.identity);assert.equal(coldDevice.read(marker.identity.key).phase,'stopped');
- const observed=f.device.calls.slice(before);assert.ok(observed.some((call:any)=>call.args[3]==='get'));assert.ok(observed.every((call:any)=>!['stop','start','create','exec','delete'].includes(call.args[3])));assert.ok(observed.filter((call:any)=>call.args[3]==='get').every((call:any)=>call.args[4]===marker.identity.sandboxId));
+ const observed=f.device.calls.slice(before);assert.ok(observed.some((call:any)=>call.args[3]==='get'));assert.ok(observed.every((call:any)=>!['stop','start','create','exec','delete'].includes(call.args[3])));assert.ok(observed.filter((call:any)=>call.args[3]==='get').every((call:any)=>call.args[4]===f.device.executor.read(marker.identity.key).name));
  assert.equal(f.device.observations.filter((row:any)=>row.kind==='accepted-stop').length,1);assert.equal(f.jobs.filter(job=>job.name==='prepare').length,1,'unknown stop never dispatches the next prepare');
  t.diagnostic(saveEvidence(f,'response-loss',{reconciliation:{firstCall:before,identity:saved.identity,state:saved.state,onlyObservation:true}}));
 });

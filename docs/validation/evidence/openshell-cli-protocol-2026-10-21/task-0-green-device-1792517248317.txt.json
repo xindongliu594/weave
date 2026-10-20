@@ -1,0 +1,6 @@
+{
+  "durationMs": 59724,
+  "exit": 1,
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-green-device-1792517248317.txt",
+  "command": "node --test --test-concurrency=1 apps/desktop/openshell-executor.test.cjs"
+}

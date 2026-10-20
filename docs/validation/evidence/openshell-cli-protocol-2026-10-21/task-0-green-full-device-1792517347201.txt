@@ -1,0 +1,206 @@
+✔ desktop connections require secure remote origins and stay inside configured workspace (1.857ms)
+✖ native workspace preserves file versions and rejects traversal, Windows aliases and links (16.8709ms)
+✔ native commands require capability, matching approval and current workspace version (3387.2343ms)
+✔ a command that changes files but exceeds receipt limits remains an executed mutation (2289.4274ms)
+✔ command completion and cancellation clean ordinary background descendants (6000.2814ms)
+✖ lost operation receipt and process restart resend the receipt without replaying a mutation (3162.1066ms)
+✖ transient Windows receipt rename failures do not repeat the underlying operation (735.5292ms)
+✖ persistent receipt failure retains an unknown executed outcome and never replays on reopen (728.6768ms)
+✖ device journal binds a task operation to its original key and scope through completed receipt (693.5087ms)
+✖ orphan recovery retains the original task key and work revision without replay (357.6839ms)
+✔ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (78.2969ms)
+✔ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (30.3058ms)
+✔ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (28.9107ms)
+✔ accepted stop shared deadline expires in queue with no callback intent or later stop (157.7066ms)
+✔ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (304.1448ms)
+✔ accepted stop shared deadline passes one signal through admission stop and original ID observation (369.6261ms)
+✔ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (291.2779ms)
+✔ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (483.0072ms)
+✔ accepted stop shared deadline rejects late transport success before journal confirmation (604.6417ms)
+✔ accepted stop capabilities advertise exact shared abort contract with a stable method reference (28.1959ms)
+✔ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (15.2031ms)
+✔ CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn (2.1411ms)
+✔ CLI abort settlement real local transport terminates its original child before returning unknown (141.4394ms)
+✔ accepted stop rejects a different expected sandbox ID before callback or stop dispatch (143.006ms)
+✔ accepted stop requires exact identity, all proofs and a private callback before any CLI (146.166ms)
+✔ accepted stop fsyncs an immutable intent before one stop and confirms only original ID (555.1622ms)
+✔ accepted stop response loss survives a cold executor and reserves capacity until read-only reconciliation (832.5671ms)
+✔ accepted stop blocks all ordinary execution, export and storage paths without starting retained files (592.2827ms)
+✔ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (583.8699ms)
+✔ accepted stop reconciliation uses name-only get with independent original ID validation (385.47ms)
+✔ accepted stop rechecks the entire journal and grant synchronously after its callback (1601.0072ms)
+✔ accepted stop clones queued identity and rejects missing or corrupted original intent on restart (655.2724ms)
+✔ accepted stop reconciliation refuses absent, Ready, wrong identity, mTLS and policy without lifecycle mutations (2838.5657ms)
+✔ accepted stop journal failures never retry a mutation and preserve intent for later observation (786.6367ms)
+✔ stdin restores exact source bytes; CAS/revisions/metadata match existing contract, no host workspace writes (519.892ms)
+✔ grant, approval, hidden paths and file limits deny before any CLI dispatch (190.1701ms)
+✔ large contents stay out of argv; duplicate completed jobs and cold mapping never repeat create/exec (383.263ms)
+✔ connection loss persists unknown across reopen; no repeated external operation and no host fallback (225.9514ms)
+✔ changed effective policy blocks before employee operation; clean close stops same scope once (208.2598ms)
+✔ configuration fingerprint is field-order invariant and every fixed field changes its identity (35.915ms)
+✔ approved remote command nonzero exit is a known result; child output cannot forge transport receipt (190.6977ms)
+✔ remote workspace governance files and hard links are refused before returning any artifacts (279.28ms)
+✔ clean shutdown and cold reopen start the same sandbox once, retain files and never replay completed operations (466.676ms)
+✔ cold recovery checks saved revision before a new write even without caller-supplied workspace revision (289.4221ms)
+✔ ambiguous start or stop is retained across reopen and never repeated (506.7023ms)
+✔ service shutdown refuses new work immediately and concurrent close stops the sandbox only once (136.9202ms)
+✔ cancellation or truncated receipt after a remote write preserves the unknown outcome without replay (537.4266ms)
+✔ actual helper checks UID, GID, Node and cgroup values before an employee write (964.7117ms)
+✔ sandbox ID replacement blocks cold start before any new external mutation (227.1306ms)
+✔ prepare accepts an exact 5 MiB file and 20 MiB workspace through stdin (2088.9253ms)
+✔ damaged persistent mappings cannot omit recovery versions or redirect a sandbox name (586.9935ms)
+✔ real local transport forwards large stdin, bounds output, and classifies cancellation after spawn as unknown (518.7217ms)
+✔ fixed protocol retirement denies fresh, stale-version and cached requests without CLI or journal writes (369.2171ms)
+✔ CLI fixture rejects UUID-as-name for get and delete without changing the original sandbox (134.4784ms)
+✔ Product CLI fixture accepts names and rejects UUID get/delete selectors independently (107.0766ms)
+✔ historical retirement reconciliation observes exact name and ID without trusting or rewriting results (415.2403ms)
+✔ historical retirement NotFound, permission denial, malformed, transport and changed identity stay unknown (1450.3284ms)
+✔ retirement reconciliation rejects missing or mismatched original intent before any query (481.0702ms)
+✔ retirement reconciliation rechecks grant, config, deadline and the entire original journal after observation (1299.037ms)
+✔ historical retired rows stay unverified and reserve task running, retained and full disk capacity (5406.1434ms)
+✔ running command is killed when temporary storage exceeds limits before its normal exit (511.623ms)
+✔ task export remains unknown when a command background process survives group kill (387.5982ms)
+✔ task command exports only after confirmed stop, restart and read-only inspect (370.3046ms)
+✔ task command stop, start or export uncertainty retains the original operation without replay (2049.606ms)
+✔ task command transport loss before receipt cannot be inspected as a safe export (454.5154ms)
+✔ cold pre-receipt command dispatch snapshot cannot export, including snapshots without operation kind (597.2587ms)
+✔ cold fence-stage snapshots retain identity and capacity but cannot execute or export (1071.7005ms)
+✔ task-attempt keys isolate sandboxes and persisted scope changes are rejected (1939.3993ms)
+✔ unrelated canonical commit renews task scope without changing its sandbox work revision (412.0628ms)
+✔ same attempt reads its newly committed output after a bounded scope advance (707.3789ms)
+✔ original readable output retains ancestry and permits write, cold reopen, then write again (647.1322ms)
+✔ task prepare rejects a full envelope above 3 MiB before create (239.5499ms)
+✔ unknown task scopes retain resource slots and stopped scopes count toward the 128 scope limit (12386.5045ms)
+✔ task capacity includes retained workspace and temp occupancy in disk admission (382.6952ms)
+✔ real directory storage counts bytes and free filesystem without reading file contents (17.8895ms)
+✔ temporary file growth stops admission independently of workspace exports (10.975ms)
+✖ bounded enumeration and directory links fail closed without traversing targets (6.6942ms)
+✔ concurrent temporary deletion triggers a bounded rescan rather than an admission failure (12.098ms)
+✔ persistent directory churn is bounded and permission errors are never swallowed (17.6338ms)
+✔ readonly task export inspects the original operation and rejects undeclared files (52.6459ms)
+✔ remote task parser rejects 3 MiB plus one byte before any task mutation (19.3356ms)
+✔ serialized task envelope counts UTF-8 bytes at the exact transport limit (32.8695ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 75
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 70179.4945
+
+✖ failing tests:
+
+test at apps\desktop\local-executor.test.cjs:11:1
+✖ native workspace preserves file versions and rejects traversal, Windows aliases and links (16.8709ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\JJ\AppData\Local\Packages\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\AC\Temp\department-local-test-DMIWYZ\522d9ad3-6c35-4631-8de7-e75821574709\out\.agent-write-dc630b96-cc4b-4ec3-b3db-9434c1625e73' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\AC\Temp\department-local-test-DMIWYZ\522d9ad3-6c35-4631-8de7-e75821574709\out\report.txt'
+      at Object.renameSync (node:fs:1013:11)
+      at writeVersion (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.cjs:64:6)
+      at LocalExecutor.execute (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.cjs:148:5)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.test.cjs:15:34)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\\AC\\Temp\\department-local-test-DMIWYZ\\522d9ad3-6c35-4631-8de7-e75821574709\\out\\.agent-write-dc630b96-cc4b-4ec3-b3db-9434c1625e73',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\\AC\\Temp\\department-local-test-DMIWYZ\\522d9ad3-6c35-4631-8de7-e75821574709\\out\\report.txt'
+  }
+
+test at apps\desktop\local-executor.test.cjs:66:1
+✖ lost operation receipt and process restart resend the receipt without replaying a mutation (3162.1066ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(received>0)
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.test.cjs:82:120)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at apps\desktop\local-executor.test.cjs:87:1
+✖ transient Windows receipt rename failures do not repeat the underlying operation (735.5292ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.test.cjs:94:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\local-executor.test.cjs:99:1
+✖ persistent receipt failure retains an unknown executed outcome and never replays on reopen (728.6768ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.test.cjs:105:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\local-executor.test.cjs:111:1
+✖ device journal binds a task operation to its original key and scope through completed receipt (693.5087ms)
+  AssertionError [ERR_ASSERTION]: {"state":{"status":"offline","message":"本机回执无法持久保存：EPERM: operation not permitted, rename 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\\AC\\Temp\\department-local-test-tG91We\\journal\\39a61529-77c2-4c35-94d0-b3ded332eccf.json.ead949fd-ddad-497f-a2ec-8032e04a44fe' -> 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\\AC\\Temp\\department-local-test-tG91We\\journal\\39a61529-77c2-4c35-94d0-b3ded332eccf.json'"},"stopped":true,"files":[]}
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.test.cjs:117:67)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at apps\desktop\local-executor.test.cjs:123:1
+✖ orphan recovery retains the original task key and work revision without replay (357.6839ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\JJ\AppData\Local\Packages\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\AC\Temp\department-local-test-qoUMXE\journal\b321bd8a-7409-416a-ad05-62c7ac09fb0f.json.f728a73f-0592-445b-a638-675bea1f66e9' -> 'C:\Users\JJ\AppData\Local\Packages\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\AC\Temp\department-local-test-qoUMXE\journal\b321bd8a-7409-416a-ad05-62c7ac09fb0f.json'
+      at async Object.rename (node:internal/fs/promises:785:10)
+      at async LocalDeviceClient.record (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-client.cjs:22:9)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\local-executor.test.cjs:128:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\\AC\\Temp\\department-local-test-qoUMXE\\journal\\b321bd8a-7409-416a-ad05-62c7ac09fb0f.json.f728a73f-0592-445b-a638-675bea1f66e9',
+    dest: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\sandbox.{e2ffeacd-4668-43f7-bae0-55decbcec5bc}\\AC\\Temp\\department-local-test-qoUMXE\\journal\\b321bd8a-7409-416a-ad05-62c7ac09fb0f.json'
+  }
+
+test at apps\desktop\sandbox-storage.test.cjs:6:1
+✖ bounded enumeration and directory links fail closed without traversing targets (6.6942ms)
+  Error: EPERM: operation not permitted, symlink 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\.sandbox-storage-4f4d0b7e-5132-4147-b704-6f5b67bcec49\work' -> 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\.sandbox-storage-4f4d0b7e-5132-4147-b704-6f5b67bcec49\temp\link'
+      at Object.symlinkSync (node:fs:1869:11)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\sandbox-storage.test.cjs:6:175)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'symlink',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-4f4d0b7e-5132-4147-b704-6f5b67bcec49\\work',
+    dest: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-4f4d0b7e-5132-4147-b704-6f5b67bcec49\\temp\\link'
+  }

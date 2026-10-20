@@ -1,0 +1,10 @@
+✔ CLI fixture treats UUID-as-name get as missing and delete as a successful no-op (152.2862ms)
+✔ Product CLI fixture uses names, with missing UUID get and successful no-op UUID delete (88.9746ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 439.5575

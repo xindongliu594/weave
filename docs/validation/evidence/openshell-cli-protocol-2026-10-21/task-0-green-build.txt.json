@@ -1,0 +1,7 @@
+{
+  "command": "npm run build",
+  "exit": 0,
+  "startedAt": "2026-10-20T17:41:01.9982753+00:00",
+  "durationMs": 27833.0416,
+  "log": ".superpowers/sdd/2026-10-21-task-retirement/task-0-green-build.txt"
+}

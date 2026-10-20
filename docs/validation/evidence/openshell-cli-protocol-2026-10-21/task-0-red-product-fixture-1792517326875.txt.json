@@ -1,0 +1,6 @@
+{
+  "exit": 1,
+  "durationMs": 399,
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-red-product-fixture-1792517326875.txt",
+  "command": "node --test --test-name-pattern=Product CLI fixture apps/desktop/openshell-executor.test.cjs"
+}

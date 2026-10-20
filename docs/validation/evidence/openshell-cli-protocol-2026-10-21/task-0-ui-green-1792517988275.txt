@@ -1,0 +1,24 @@
+✔ inventory marks incomplete scans and gives a settings action instead of claiming all data was counted (11.2994ms)
+✔ preview makes clear exactly which copies are removed and preserves recovery evidence (3.2082ms)
+✔ expired, empty and started previews never enable a deletion confirmation (0.2455ms)
+✔ interrupted history has a reconcile action and does not offer automatic replay (26.1389ms)
+✔ sandbox panel exposes measured writable directories and labels application limits honestly (1.5454ms)
+✔ journal and sandbox confirmations never reuse the workspace deletion label (1.3994ms)
+✔ legacy interrupted records with unresolved results retain read-only reconciliation (1.0769ms)
+✔ retention panel makes recommendations explicit and retains preview before confirmation (1.0475ms)
+✔ fixed protocol disables sandbox confirmations while workspace and journal remain available (2.1916ms)
+✔ all sandbox preview callers are disabled without disabling capacity inspection or other retention actions (1.6124ms)
+✔ historical completed sandbox receipts are pending physical re-verification without rewriting history (1.2902ms)
+✔ storage joins full task attempt identity and reads each run once (6.8373ms)
+✔ matching run alone cannot borrow another sandbox, revision or attempt stop (1.3262ms)
+✔ absent, malformed and ambiguous projections are protected without invented stop identity (3.8431ms)
+✔ legacy rows retain existing behavior and invalid task keys cannot enter the SQL reader (0.6786ms)
+✔ duplicate device keys and over-limit task inventories cannot expose a reconciliation action (5.647ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1659.1006

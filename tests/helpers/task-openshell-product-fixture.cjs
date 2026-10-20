@@ -34,8 +34,9 @@ function createProductDeviceFixture(base,grantId){
   const command=args.slice(2),call={index:calls.length,args:[...args],request:options.input?JSON.parse(options.input):undefined,time:new Date().toISOString()};calls.push(call);options.signal?.throwIfAborted();
   if(command[0]==='status'){if(control.onStatus)await control.onStatus(call);return {exitCode:0,stdout:JSON.stringify({status:'connected',version:'0.1.2',gateway:config.gateway,server:'https://127.0.0.1:18770',authentication:{status:'authenticated'}})};}
   if(command[0]==='policy')return {exitCode:0,stdout:JSON.stringify({hash:OPENSHELL_CONSTANTS.effectivePolicyHash,policy:{process:{run_as_user:'1000',run_as_group:'1000'},landlock:{compatibility:'hard_requirement'},network_policies:{},network_middlewares:{}}})};
-  const found=[...sandboxes].find(([name,row])=>name===command[2]||row.id===command[2]),row=found?.[1];
+  const found=[...sandboxes].find(([name])=>name===command[2]),row=found?.[1];
   if(command[1]==='get')return row?{exitCode:0,stdout:JSON.stringify({name:found[0],id:row.id,phase:row.phase,conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:OPENSHELL_CONSTANTS.effectivePolicyHash}})}:{exitCode:1,stdout:'',stderr:'sandbox not found'};
+  if(command[1]==='delete'){if(!row)return {exitCode:0,stdout:''};sandboxes.delete(found[0]);return {exitCode:0,stdout:''};}
   if(command[1]==='create'){
    const name=command[command.indexOf('--name')+1];if(sandboxes.has(name))throw Error('duplicate create');
    const root=path.join(base,'remote-'+sandboxes.size);fs.mkdirSync(root);sandboxes.set(name,{id:randomUUID(),root,phase:'Ready'});

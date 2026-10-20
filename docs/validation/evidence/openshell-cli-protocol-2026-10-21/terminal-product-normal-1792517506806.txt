@@ -1,0 +1,20 @@
+Engineering fixtures: models/CLI/UID/cgroup/mTLS; real Product/Host/Handoff/HTTP/CAS/executor/journal/REMOTE_SCRIPT/Node files. Zero paid API.
+TAP version 13
+# Subtest: three distinct product tasks stop accepted scopes through maintenance provider
+ok 1 - three distinct product tasks stop accepted scopes through maintenance provider
+  ---
+  duration_ms: 86411.6918
+  type: 'test'
+  ...
+# C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-terminal-stop-green-aa25d5f1-05a3-4ca8-acbd-0b6c38ef0d0b-summary.json
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89021.2344
+
+PROCESS {"code":0,"signal":null,"elapsedMs":91511,"timedOut":false,"sourceStable":true}

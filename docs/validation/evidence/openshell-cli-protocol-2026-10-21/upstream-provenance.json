@@ -1,0 +1,30 @@
+{
+  "purpose": "fixed-version protocol research; downloaded text never executed",
+  "tag": "v0.1.2",
+  "sources": [
+    {
+      "path": "openshell.proto",
+      "url": "https://raw.githubusercontent.com/NVIDIA/OpenShell/v0.1.2/proto/openshell.proto",
+      "sha256": "2e31d0faca652b91729f88bd4053447e5d162e74de7dbacdcc06327ed82e5b95",
+      "bytes": 139253
+    },
+    {
+      "path": "cli-run.rs",
+      "url": "https://raw.githubusercontent.com/NVIDIA/OpenShell/v0.1.2/crates/openshell-cli/src/run.rs",
+      "sha256": "40898472c19bce5e621b39627810d00b031290ab84b4191514ee08c95d70c4a3",
+      "bytes": 273380
+    },
+    {
+      "path": "cli-output.rs",
+      "url": "https://raw.githubusercontent.com/NVIDIA/OpenShell/v0.1.2/crates/openshell-cli/src/output.rs",
+      "sha256": "93c10ebfd0637392c4d3822f43a616694286fe3033da241edee06d2d4005dfe6",
+      "bytes": 19961
+    },
+    {
+      "path": "server-sandbox.rs",
+      "url": "https://raw.githubusercontent.com/NVIDIA/OpenShell/v0.1.2/crates/openshell-server/src/grpc/sandbox.rs",
+      "sha256": "225db22472ce173eb179e11494a0eb09fe76a73068dcbaa28b5d0ce62ec2171f",
+      "bytes": 346251
+    }
+  ]
+}

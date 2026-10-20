@@ -1,0 +1,20 @@
+✖ Product CLI fixture accepts names and rejects UUID get/delete selectors independently (97.7176ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 266.7256
+
+✖ failing tests:
+
+test at apps\desktop\openshell-executor.test.cjs:636:1
+✖ Product CLI fixture accepts names and rejects UUID get/delete selectors independently (97.7176ms)
+  Error: Unexpected fixture CLI ["sandbox","delete","ef9dbc64-cce1-4956-a373-1d940d70fb30"]
+      at Object.transport (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\task-openshell-product-fixture.cjs:60:9)
+      at cli (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:639:37)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:641:61)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)

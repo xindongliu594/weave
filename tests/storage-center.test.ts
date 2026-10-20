@@ -39,3 +39,32 @@ test('retention panel makes recommendations explicit and retains preview before 
  assert.equal(typeof ui.RetentionReport,'function');const html=renderToStaticMarkup(createElement(ui.RetentionReport,{data:{mode:'suggestion-only',policy:{hotJournalHours:24,completedCopiesDays:7,releaseKeepLatest:3,backupDays:30,backupKeepLatest:3},recommendations:[{runId:'run',kind:'journal',ageDays:2}]},busy:false,onPreview:()=>{}}));
  for(const text of ['保留与维护建议','不自动删除','7 天','24 小时','预览日志归档','共享依赖','30 天'])assert.ok(html.includes(text),text);assert.ok(!html.includes('确认删除全部'));
 });
+
+
+test('fixed protocol disables sandbox confirmations while workspace and journal remain available',()=>{
+ const sandbox={...preview,preview:{...preview.preview,kind:'sandbox'}};
+ assert.equal(ui.cleanupCanConfirm(sandbox,false),false);
+ const html=renderToStaticMarkup(createElement(ui.CleanupPreview,{row:sandbox,busy:false,onConfirm:()=>{}}));
+ assert.match(html,/<button disabled="">确认回收沙箱<\/button>/);assert.ok(html.includes('当前自动沙箱回收尚未开放'));assert.ok(html.includes('正式交付保留'));assert.ok(!html.includes('确认后调用官方删除原沙箱'));
+ for(const kind of ['workspace','journal']){
+  const row={...preview,preview:{...preview.preview,kind}};assert.equal(ui.cleanupCanConfirm(row,false),true);
+  const enabled=renderToStaticMarkup(createElement(ui.CleanupPreview,{row,busy:false,onConfirm:()=>{}}));assert.ok(!enabled.includes('<button disabled="">'));
+ }
+});
+
+test('all sandbox preview callers are disabled without disabling capacity inspection or other retention actions',()=>{
+ const panel=renderToStaticMarkup(createElement(ui.SandboxStorageReport,{data:{available:true,scopes:[{runId:'run',phase:'stopped',storage:{workspace:{bytes:17},temp:{bytes:5},checkedAt:new Date().toISOString()}}]},busy:false,onInspect:()=>{},onPreview:()=>{}}));
+ assert.match(panel,/<button disabled="">预览回收<\/button>/);assert.match(panel,/<button>核对容量与文件版本<\/button>/);assert.ok(panel.includes('当前自动沙箱回收尚未开放'));assert.ok(panel.includes('正式交付保留'));
+ const retention=renderToStaticMarkup(createElement(ui.RetentionReport,{data:{policy:{hotJournalHours:24,completedCopiesDays:7,releaseKeepLatest:3,backupDays:30,backupKeepLatest:3},recommendations:['sandbox','workspace','journal'].map(kind=>({runId:kind,kind,ageDays:8}))},busy:false,onPreview:()=>{}}));
+ assert.match(retention,/<button disabled="">预览沙箱回收<\/button>/);assert.match(retention,/<button>预览全部本机副本<\/button>/);assert.match(retention,/<button>预览日志归档<\/button>/);assert.ok(retention.includes('当前自动沙箱回收尚未开放'));
+});
+
+test('historical completed sandbox receipts are pending physical re-verification without rewriting history',()=>{
+ for(const result of [{state:'retired',bytes:99,message:'原沙箱已不存在'},{bytes:99}]){
+  const row={...preview,status:'completed',preview:{...preview.preview,kind:'sandbox'},result},before=JSON.stringify(row);
+  const html=renderToStaticMarkup(createElement(ui.CleanupHistory,{rows:[row],busy:false,onReconcile:()=>{}}));
+  assert.ok(html.includes('待物理复核'));assert.ok(!html.includes('清理完成'));assert.ok(!html.includes('原沙箱已不存在'));assert.ok(!html.includes('已记录回收'));assert.equal(JSON.stringify(row),before);
+ }
+ const html=renderToStaticMarkup(createElement(ui.CleanupHistory,{rows:[{...preview,status:'completed',preview:{...preview.preview,kind:'journal'},result:{state:'archived',savedBytes:4}}],busy:false,onReconcile:()=>{}}));
+ assert.ok(html.includes('清理完成'));assert.ok(html.includes('原事件已核对归档'));assert.ok(html.includes('压缩节省'));
+});

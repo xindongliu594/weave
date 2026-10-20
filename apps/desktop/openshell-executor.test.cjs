@@ -41,13 +41,14 @@ function fixture(){
   if(command[0]==='policy')return {exitCode:0,stdout:JSON.stringify({hash:control.policyHash,policy:{process:{run_as_user:'1000',run_as_group:'1000'},landlock:{compatibility:'hard_requirement'},network_policies:{},network_middlewares:{}}})};
   if(command[1]==='get'){
    if(control.failStoppedObservation&&control.phase==='Stopped')return {exitCode:1,stdout:'',stderr:'connection reset after stop'};
-   const found=[...taskSandboxes].find(([taskName,task])=>taskName===command[2]||task.id===command[2]),task=found?.[1];
+   if(control.getFailure)return control.getFailure;
+   const found=[...taskSandboxes].find(([taskName])=>taskName===command[2]),task=found?.[1];
    if(task&&found[0]!==name)return {exitCode:0,stdout:JSON.stringify({name:control.observedName??found[0],id:control.observedId??task.id,phase:control.observedPhase??task.phase??'Ready',conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
-   if(!task&&command[2]!==name&&command[2]!==id)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
+   if(!task&&command[2]!==name)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
    if(!control.created)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
    return {exitCode:0,stdout:JSON.stringify({name:control.observedName??name,id:control.observedId??control.replacedId??id,phase:control.observedPhase??control.phases?.shift()??control.phase,conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
   }
-  if(command[1]==='delete'){assert.equal(command[2],id);if(!control.deleteStillPresent)control.created=false;if(control.deleteDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after delete'};return {exitCode:0,stdout:'deletion accepted'};}
+  if(command[1]==='delete'){if(command[2]!==name)return {exitCode:0,stdout:''};if(!control.deleteStillPresent)control.created=false;if(control.deleteDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after delete'};return {exitCode:0,stdout:'deletion accepted'};}
   if(command[1]==='create'){const next=command[command.indexOf('--name')+1];assert.equal(taskSandboxes.has(next),false);if(!control.created){control.created=true;name=next;taskSandboxes.set(next,{id,root:remote});}else{const root=path.join(base,'remote-'+taskSandboxes.size);fs.mkdirSync(root);taskSandboxes.set(next,{id:randomUUID(),root});}return {exitCode:0,stdout:'{}'};}
   if(command[1]==='stop'){control.onStop?.();if(command[2]===name)control.phase='Stopped';else taskSandboxes.get(command[2]).phase='Stopped';if(control.stopDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after stop'};return {exitCode:0,stdout:''};}
   if(command[1]==='start'){assert.equal(control.phase,'Stopped');control.phase='Ready';if(control.startDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after start'};return {exitCode:0,stdout:''};}
@@ -200,7 +201,7 @@ test('accepted stop shared deadline rejects late transport success before journa
  for(const stage of ['stop','observation']){
   const f=fixture();try{
    const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),control=new AbortController(),transport=f.executor.transport;
-   f.executor.transport=async(cli,args,options)=>{const result=await transport(cli,args,options);if(stage==='stop'&&args[3]==='stop'||stage==='observation'&&args[3]==='get'&&args[4]===expected.sandboxId)control.abort(Error('fixture late success'));return result;};
+   f.executor.transport=async(cli,args,options)=>{const result=await transport(cli,args,options);if(stage==='stop'&&args[3]==='stop'||stage==='observation'&&args[3]==='get'&&args[4]===f.executor.read(key).name&&f.executor.read(key).acceptedStop?.stage==='stop_intent')control.abort(Error('fixture late success'));return result;};
    await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{},control.signal),{code:'LOCAL_OUTCOME_UNKNOWN'});
    assert.equal(f.executor.read(key).phase,'unknown');assert.equal(f.executor.read(key).acceptedStop.stage,'stop_intent');assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);
   }finally{f.cleanup();}
@@ -272,8 +273,8 @@ test('accepted stop fsyncs an immutable intent before one stop and confirms only
   assert.deepEqual(result,{...identity,phase:'stopped',replayed:false});assert.equal(callbacks,1);
   const saved=f.executor.read(key);assert.equal(saved.phase,'stopped');assert.equal(saved.acceptedStop.stage,'stopped_confirmed');assert.deepEqual(saved.acceptedStop.result,result);
   const stopIndex=f.calls.findIndex((call,i)=>i>=before&&call.args[3]==='stop');assert.ok(stopIndex>=before);
-  assert.ok(f.calls.slice(stopIndex+1).some(call=>call.args[3]==='get'&&call.args[4]===identity.sandboxId));
-  assert.ok(f.calls.slice(stopIndex+1).every(call=>call.args[3]!=='get'||call.args[4]===identity.sandboxId));
+  assert.ok(f.calls.slice(stopIndex+1).some(call=>call.args[3]==='get'&&call.args[4]===f.executor.read(key).name));
+  assert.ok(f.calls.slice(stopIndex+1).every(call=>call.args[3]!=='get'||call.args[4]===f.executor.read(key).name));
   const second=f.calls.length;assert.deepEqual(await f.executor.stopAcceptedTask(key,expected,async()=>{callbacks++;}),result);
   assert.equal(callbacks,1);assert.equal(mutationCalls(f.calls.slice(second)).length,0);
   assert.deepEqual(await f.executor.reconcileAcceptedTaskStop(key,identity),result);
@@ -290,7 +291,7 @@ test('accepted stop response loss survives a cold executor and reserves capacity
   assert.equal(reopened.read(key).phase,'unknown');assert.equal(reopened.read(key).acceptedStop.stage,'stop_intent');
   assert.throws(()=>reopened.admitTaskCapacity(true),{code:'SANDBOX_STORAGE_LIMIT'});assert.equal(f.calls.length,before);
   const result=await reopened.reconcileAcceptedTaskStop(key,identity);assert.equal(result.phase,'stopped');
-  assert.equal(mutationCalls(f.calls.slice(before)).length,0);assert.ok(f.calls.slice(before).filter(call=>call.args[3]==='get').every(call=>call.args[4]===identity.sandboxId));
+  assert.equal(mutationCalls(f.calls.slice(before)).length,0);assert.ok(f.calls.slice(before).filter(call=>call.args[3]==='get').every(call=>call.args[4]===f.executor.read(key).name));
   assert.doesNotThrow(()=>reopened.admitTaskCapacity(true));assert.equal(reopened.storageScopes().filter(row=>row.key).length,2);
   assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);
   await assert.rejects(reopened.stopAcceptedTask(key,{...expected,stopId:randomUUID()},async()=>{}),{code:'LOCAL_SCOPE_DENIED'});
@@ -326,7 +327,7 @@ test('accepted stop rejects native plugin work before loading its bundle and rec
  }
 });
 
-test('accepted stop reconciliation uses only the installed original-ID get syntax without policy-by-ID',async()=>{
+test('accepted stop reconciliation uses name-only get with independent original ID validation',async()=>{
  const f=fixture();try{
   const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),transport=f.executor.transport;
   f.executor.transport=(cli,args,options)=>{assert.ok(!(args[2]==='policy'&&args[3]==='get'&&args[4]===expected.sandboxId),'policy-by-ID is not a verified installed CLI contract');return transport(cli,args,options);};
@@ -375,11 +376,12 @@ test('accepted stop clones queued identity and rejects missing or corrupted orig
 });
 
 test('accepted stop reconciliation refuses absent, Ready, wrong identity, mTLS and policy without lifecycle mutations',async()=>{
- for(const change of ['absent','ready','id','name','mtls','policy']){
+ for(const change of ['absent','permission','ready','id','name','mtls','policy']){
   const f=fixture();try{
    const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key));f.control.stopDisconnect=true;
    await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{}),{code:'LOCAL_OUTCOME_UNKNOWN'});
    if(change==='absent')f.control.created=false;
+   if(change==='permission')f.control.getFailure={exitCode:1,stdout:'',stderr:'sandbox not found'};
    if(change==='ready')f.control.observedPhase='Ready';
    if(change==='id')f.control.observedId=randomUUID();
    if(change==='name')f.control.observedName='wwe-000000000000';
@@ -609,29 +611,107 @@ test('real local transport forwards large stdin, bounds output, and classifies c
  await assert.rejects(cliTransport(process.execPath,['-e',"process.stdout.write('x'.repeat(10000))"],{timeoutMs:5000,maxOutput:128}),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:false});
 });
 
-test('maintenance inspects exact bytes then retires only the matching sandbox once',async()=>{
- const f=fixture();try{assert.equal(typeof f.executor.inspectStorage,'function');const original=await f.executor.execute(f.job('prepare',{}, {files:[{path:'delivery.txt',content:Buffer.from('employee delivery').toString('base64')}]}));
- const inspected=await f.executor.inspectStorage(f.runId);assert.equal(inspected.storage.workspace.bytes,17);assert.equal(inspected.workspaceRevision,original.workspaceRevision);
- const result=await f.executor.retireStorage(f.runId,{sandboxId:original.execution.sandboxId,workspaceRevision:original.workspaceRevision});assert.equal(result.state,'retired');
- const again=await f.executor.retireStorage(f.runId,{sandboxId:original.execution.sandboxId,workspaceRevision:original.workspaceRevision});assert.deepEqual(again,result);assert.equal(f.calls.filter(c=>c.args[3]==='delete').length,1);
- }finally{f.cleanup();}
-});
-test('maintenance refuses changed versions and does not send delete',async()=>{
- const f=fixture();try{assert.equal(typeof f.executor.retireStorage,'function');const original=await f.executor.execute(f.job('prepare'));
- await assert.rejects(f.executor.retireStorage(f.runId,{sandboxId:original.execution.sandboxId,workspaceRevision:'0'.repeat(64)}),{code:'WORKSPACE_VERSION_CONFLICT'});assert.equal(f.calls.filter(c=>c.args[3]==='delete').length,0);
- }finally{f.cleanup();}
-});
-test('delete disconnect survives executor recreation and reconciles absence without replay',async()=>{
- const f=fixture();try{assert.equal(typeof f.executor.reconcileStorage,'function');const original=await f.executor.execute(f.job('prepare'));f.control.deleteDisconnect=true;
- await assert.rejects(f.executor.retireStorage(f.runId,{sandboxId:original.execution.sandboxId,workspaceRevision:original.workspaceRevision}),{code:'LOCAL_OUTCOME_UNKNOWN'});
- const reopened=new OpenShellDeviceExecutor(f.options);await assert.rejects(reopened.retireStorage(f.runId,{sandboxId:original.execution.sandboxId,workspaceRevision:original.workspaceRevision}),{code:'LOCAL_OUTCOME_UNKNOWN'});
- const checked=await reopened.reconcileStorage(f.runId);assert.equal(checked.state,'retired');assert.equal(f.calls.filter(c=>c.args[3]==='delete').length,1);
+test('fixed protocol retirement denies fresh, stale-version and cached requests without CLI or journal writes',async()=>{
+ const f=fixture();try{
+  const original=await f.executor.execute(f.job('prepare',{}, {files:[{path:'delivery.txt',content:Buffer.from('employee delivery').toString('base64')}]}));
+  const inspected=await f.executor.inspectStorage(f.runId);assert.equal(inspected.storage.workspace.bytes,17);assert.equal(inspected.workspaceRevision,original.workspaceRevision);
+  const file=f.executor.stateFile(f.runId),saved=f.executor.read(f.runId);
+  for(const phase of ['ready','unknown','retiring','retired']){
+   fs.writeFileSync(file,JSON.stringify({...saved,phase,retirement:{id:randomUUID(),sandboxId:saved.sandboxId,workspaceRevision:saved.workspaceRevision,result:{state:'retired'}}}));
+   const bytes=fs.readFileSync(file),before=f.calls.length,reopened=new OpenShellDeviceExecutor(f.options);
+   for(const workspaceRevision of [saved.workspaceRevision,'0'.repeat(64)])await assert.rejects(reopened.retireStorage(f.runId,{sandboxId:saved.sandboxId,workspaceRevision}),{code:'OPENSHELL_RETIREMENT_UNSUPPORTED',notExecuted:true});
+   assert.equal(f.calls.length,before);assert.deepEqual(fs.readFileSync(file),bytes);
+  }
  }finally{f.cleanup();}
 });
 
-test('deletion accepted with a still-present sandbox is not reported as reclaimed',async()=>{
- const f=fixture();try{const prepared=await f.executor.execute(f.job('prepare'));f.control.deleteStillPresent=true;await assert.rejects(f.executor.retireStorage(f.runId,{sandboxId:prepared.execution.sandboxId,workspaceRevision:prepared.workspaceRevision}),{code:'LOCAL_OUTCOME_UNKNOWN'});assert.equal(f.executor.read(f.runId).phase,'unknown');}finally{f.cleanup();}
+test('CLI fixture treats UUID-as-name get as missing and delete as a successful no-op',async()=>{
+ const f=fixture();try{
+  await f.executor.execute(f.job('prepare'));const scope=f.executor.read(f.runId);
+  for(const command of ['get','delete']){const response=await f.options.transport(f.config.cliPath,['--gateway',f.config.gateway,'sandbox',command,scope.sandboxId],{});assert.equal(response.exitCode,command==='get'?1:0);if(command==='get')assert.equal(response.stderr,'sandbox not found');}
+  assert.equal((await f.executor.get(scope)).id,scope.sandboxId);
+ }finally{f.cleanup();}
 });
+
+test('Product CLI fixture uses names, with missing UUID get and successful no-op UUID delete',async()=>{
+ const f=fixture();try{
+  const {createProductDeviceFixture}=require('../../tests/helpers/task-openshell-product-fixture.cjs'),device=createProductDeviceFixture(path.join(f.base,'product'),randomUUID()),name='wwe-000000000001';
+  const cli=command=>device.options.transport(device.config.cliPath,['--gateway',device.config.gateway,'sandbox',...command],{});
+  await cli(['create','--name',name]);const original=JSON.parse((await cli(['get',name])).stdout);assert.equal(original.name,name);
+  for(const command of ['get','delete']){const result=await cli([command,original.id]);assert.equal(result.exitCode,command==='get'?1:0);if(command==='get')assert.equal(result.stderr,'sandbox not found');}
+  assert.equal(JSON.parse((await cli(['get',name])).stdout).id,original.id);
+  assert.equal((await cli(['delete',name])).exitCode,0);assert.equal((await cli(['get',name])).exitCode,1);
+ }finally{f.cleanup();}
+});
+
+test('historical retirement reconciliation observes exact name and ID without trusting or rewriting results',async()=>{
+ const f=fixture();try{
+  await f.executor.execute(f.job('prepare'));const saved=f.executor.read(f.runId),file=f.executor.stateFile(f.runId);
+  for(const phase of ['retiring','unknown','retired']){
+   fs.writeFileSync(file,JSON.stringify({...saved,phase,retirement:{id:randomUUID(),sandboxId:saved.sandboxId,workspaceRevision:saved.workspaceRevision,result:{state:'retired',replayed:true}}}));
+   const bytes=fs.readFileSync(file),before=f.calls.length,reopened=new OpenShellDeviceExecutor(f.options);
+   assert.deepEqual(await reopened.reconcileStorage(f.runId),{runId:f.runId,sandboxId:saved.sandboxId,state:'present',replayed:false});
+   assert.ok(f.calls.slice(before).some(call=>call.args[3]==='get'&&call.args[4]===saved.name));assert.equal(mutationCalls(f.calls.slice(before)).length,0);assert.deepEqual(fs.readFileSync(file),bytes);
+  }
+ }finally{f.cleanup();}
+});
+
+test('historical retirement NotFound, permission denial, malformed, transport and changed identity stay unknown',async()=>{
+ for(const failure of ['missing','permission','wrapped-permission','transport','malformed','id','name']){
+  const f=fixture();try{
+   await f.executor.execute(f.job('prepare'));const saved=f.executor.read(f.runId),file=f.executor.stateFile(f.runId);
+   fs.writeFileSync(file,JSON.stringify({...saved,phase:'retired',retirement:{id:randomUUID(),sandboxId:saved.sandboxId,workspaceRevision:saved.workspaceRevision,result:{state:'retired'}}}));
+   if(failure==='id')f.control.observedId=randomUUID();else if(failure==='name')f.control.observedName='wwe-000000000000';
+   else f.control.getFailure=failure==='malformed'?{exitCode:0,stdout:'{'}:{exitCode:1,stdout:'',stderr:failure==='transport'?'connection reset':failure==='wrapped-permission'?'permission denied: sandbox not found':'sandbox not found'};
+   const bytes=fs.readFileSync(file),before=f.calls.length;
+   await assert.rejects(new OpenShellDeviceExecutor(f.options).reconcileStorage(f.runId),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.deepEqual(fs.readFileSync(file),bytes);assert.equal(mutationCalls(f.calls.slice(before)).length,0);
+  }finally{f.cleanup();}
+ }
+});
+
+test('retirement reconciliation rejects missing or mismatched original intent before any query',async()=>{
+ const f=fixture();try{
+  await f.executor.execute(f.job('prepare'));const saved=f.executor.read(f.runId),file=f.executor.stateFile(f.runId),intent={id:randomUUID(),sandboxId:saved.sandboxId,workspaceRevision:saved.workspaceRevision};
+  for(const retirement of [undefined,{...intent,sandboxId:randomUUID()},{...intent,workspaceRevision:'0'.repeat(64)},{...intent,sandboxId:'bad'},{...intent,workspaceRevision:'bad'}]){
+   fs.writeFileSync(file,JSON.stringify({...saved,phase:'unknown',retirement}));const bytes=fs.readFileSync(file),before=f.calls.length;
+   await assert.rejects(new OpenShellDeviceExecutor(f.options).reconcileStorage(f.runId));assert.equal(f.calls.length,before);assert.deepEqual(fs.readFileSync(file),bytes);
+  }
+ }finally{f.cleanup();}
+});
+
+test('retirement reconciliation rechecks grant, config, deadline and the entire original journal after observation',async()=>{
+ for(const change of ['grant','config','policy','journal','abort']){
+  const f=fixture();try{
+   await f.executor.execute(f.job('prepare'));const saved=f.executor.read(f.runId),file=f.executor.stateFile(f.runId);
+   fs.writeFileSync(file,JSON.stringify({...saved,phase:'retiring',retirement:{id:randomUUID(),sandboxId:saved.sandboxId,workspaceRevision:saved.workspaceRevision}}));
+   const before=f.calls.length,transport=f.options.transport,reopened=new OpenShellDeviceExecutor(f.options);let expectedBytes=fs.readFileSync(file),observed=false;
+   reopened.transport=async(cli,args,options)=>{const response=await transport(cli,args,options);if(args[3]==='get'){
+    observed=true;
+    if(change==='grant')reopened.grant.id=randomUUID();
+    if(change==='config')reopened.config.gateway='changed';
+    if(change==='policy')fs.writeFileSync(f.config.policyPath,'changed');
+    if(change==='journal'){const current=JSON.parse(expectedBytes);current.retirement.id=randomUUID();fs.writeFileSync(file,JSON.stringify(current));expectedBytes=fs.readFileSync(file);}
+    if(change==='abort')options.signal.throwIfAborted=()=>{throw Error('expired fixture deadline');};
+   }return response;};
+   await assert.rejects(reopened.reconcileStorage(f.runId),{code:'LOCAL_OUTCOME_UNKNOWN'});assert.equal(observed,true);assert.deepEqual(fs.readFileSync(file),expectedBytes);assert.equal(mutationCalls(f.calls.slice(before)).length,0);
+  }finally{f.cleanup();}
+ }
+});
+
+test('historical retired rows stay unverified and reserve task running, retained and full disk capacity',async()=>{
+ const f=fixture();try{
+  await f.executor.execute(f.job('prepare'));const legacy=f.executor.read(f.runId),legacyFile=f.executor.stateFile(f.runId);legacy.phase='retired';legacy.storage={workspace:{bytes:0},temp:{bytes:0}};fs.writeFileSync(legacyFile,JSON.stringify(legacy));
+  const {key}=await preparedTask(f),original=f.executor.read(key),file=f.executor.taskStateFile(key);original.phase='retired';original.storage={workspace:{bytes:0},temp:{bytes:0}};original.retirement={result:{state:'retired'}};fs.writeFileSync(file,JSON.stringify(original));const bytes=fs.readFileSync(file),legacyBytes=fs.readFileSync(legacyFile);
+  const rows=f.executor.storageScopes();assert.equal(rows.length,2);for(const row of rows){assert.equal(row.phase,'unverified');assert.equal(row.storage,undefined);}
+  const statfs=fs.statfsSync;fs.statfsSync=value=>value===f.config.home?{bavail:256*1024*1024+64*1024*1024,bsize:1}:statfs(value);
+  try{assert.throws(()=>f.executor.admitTaskCapacity(true),{code:'SANDBOX_STORAGE_LIMIT'});}finally{fs.statfsSync=statfs;}
+  const second={...key,taskId:'B'};fs.writeFileSync(f.executor.taskStateFile(second),JSON.stringify({...original,key:second,binding:{...original.binding,...second}}));assert.throws(()=>f.executor.admitTaskCapacity(false),{code:'SANDBOX_STORAGE_LIMIT'});
+  for(let i=2;i<128;i++){const next={...key,taskId:'retired-'+i};fs.writeFileSync(f.executor.taskStateFile(next),JSON.stringify({...original,key:next,binding:{...original.binding,...next}}));}
+  assert.throws(()=>f.executor.admitTaskCapacity(true),error=>error.code==='SANDBOX_STORAGE_LIMIT'&&/128/.test(error.message));assert.deepEqual(fs.readFileSync(file),bytes);assert.deepEqual(fs.readFileSync(legacyFile),legacyBytes);
+ }finally{f.cleanup();}
+});
+
 test('running command is killed when temporary storage exceeds limits before its normal exit',async()=>{
  const f=fixture();try{await f.executor.execute(f.job('prepare'));f.control.commandTempGrowth=true;await assert.rejects(f.executor.execute(f.job('terminal_test',{command:'fixture grows temp'},{approvalId:randomUUID()})),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:false});assert.equal(f.control.closedOn,'kill');assert.equal(f.executor.read(f.runId).phase,'unknown');}finally{f.cleanup();}
 });

@@ -1,0 +1,6 @@
+{
+  "durationMs": 40345,
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-red-1792517180382.txt",
+  "command": "node --test --test-concurrency=1 apps/desktop/openshell-executor.test.cjs",
+  "exit": 1
+}

@@ -1,0 +1,6 @@
+{
+  "command": "node --test --test-name-pattern='CLI fixture' apps/desktop/openshell-executor.test.cjs",
+  "durationMs": 573,
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-green-allow-missing-1792517708422.txt",
+  "exit": 0
+}

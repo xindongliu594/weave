@@ -1,0 +1,87 @@
+✔ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (55.8756ms)
+✔ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (27.2998ms)
+✔ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (29.363ms)
+✔ accepted stop shared deadline expires in queue with no callback intent or later stop (155.7035ms)
+✔ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (289.3659ms)
+✔ accepted stop shared deadline passes one signal through admission stop and original ID observation (368.4075ms)
+✔ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (284.5857ms)
+✔ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (475.7122ms)
+✖ accepted stop shared deadline rejects late transport success before journal confirmation (441.5061ms)
+✔ accepted stop capabilities advertise exact shared abort contract with a stable method reference (25.5574ms)
+✔ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (15.7111ms)
+✔ CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn (2.1195ms)
+✔ CLI abort settlement real local transport terminates its original child before returning unknown (167.525ms)
+✔ accepted stop rejects a different expected sandbox ID before callback or stop dispatch (161.1319ms)
+✔ accepted stop requires exact identity, all proofs and a private callback before any CLI (159.2741ms)
+✔ accepted stop fsyncs an immutable intent before one stop and confirms only original ID (527.1543ms)
+✔ accepted stop response loss survives a cold executor and reserves capacity until read-only reconciliation (799.7851ms)
+✔ accepted stop blocks all ordinary execution, export and storage paths without starting retained files (557.2166ms)
+✔ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (622.2701ms)
+✔ accepted stop reconciliation uses name-only get with independent original ID validation (400.1864ms)
+✔ accepted stop rechecks the entire journal and grant synchronously after its callback (1609.1923ms)
+✔ accepted stop clones queued identity and rejects missing or corrupted original intent on restart (625.0915ms)
+✔ accepted stop reconciliation refuses absent, Ready, wrong identity, mTLS and policy without lifecycle mutations (2280.3681ms)
+✔ accepted stop journal failures never retry a mutation and preserve intent for later observation (746.4844ms)
+✔ stdin restores exact source bytes; CAS/revisions/metadata match existing contract, no host workspace writes (489.3406ms)
+✔ grant, approval, hidden paths and file limits deny before any CLI dispatch (181.9691ms)
+✔ large contents stay out of argv; duplicate completed jobs and cold mapping never repeat create/exec (379.4561ms)
+✔ connection loss persists unknown across reopen; no repeated external operation and no host fallback (235.2228ms)
+✔ changed effective policy blocks before employee operation; clean close stops same scope once (213.0152ms)
+✔ configuration fingerprint is field-order invariant and every fixed field changes its identity (34.794ms)
+✔ approved remote command nonzero exit is a known result; child output cannot forge transport receipt (196.2392ms)
+✔ remote workspace governance files and hard links are refused before returning any artifacts (321.2772ms)
+✔ clean shutdown and cold reopen start the same sandbox once, retain files and never replay completed operations (450.4883ms)
+✔ cold recovery checks saved revision before a new write even without caller-supplied workspace revision (281.6777ms)
+✔ ambiguous start or stop is retained across reopen and never repeated (525.3271ms)
+✔ service shutdown refuses new work immediately and concurrent close stops the sandbox only once (233.1533ms)
+✔ cancellation or truncated receipt after a remote write preserves the unknown outcome without replay (814.3127ms)
+✔ actual helper checks UID, GID, Node and cgroup values before an employee write (1197.1516ms)
+✔ sandbox ID replacement blocks cold start before any new external mutation (320.2346ms)
+✔ prepare accepts an exact 5 MiB file and 20 MiB workspace through stdin (2462.9729ms)
+✔ damaged persistent mappings cannot omit recovery versions or redirect a sandbox name (637.0174ms)
+✔ real local transport forwards large stdin, bounds output, and classifies cancellation after spawn as unknown (573.3059ms)
+✔ fixed protocol retirement denies fresh, stale-version and cached requests without CLI or journal writes (435.8719ms)
+✔ CLI fixture rejects UUID-as-name for get and delete without changing the original sandbox (121.6436ms)
+✔ historical retirement reconciliation observes exact name and ID without trusting or rewriting results (402.114ms)
+✔ historical retirement NotFound, permission denial, malformed, transport and changed identity stay unknown (1548.4461ms)
+✔ retirement reconciliation rejects missing or mismatched original intent before any query (455.3661ms)
+✔ retirement reconciliation rechecks grant, config, deadline and the entire original journal after observation (1497.899ms)
+✔ historical retired rows stay unverified and reserve task running, retained and full disk capacity (7642.6659ms)
+✔ running command is killed when temporary storage exceeds limits before its normal exit (491.0954ms)
+✔ task export remains unknown when a command background process survives group kill (423.0333ms)
+✔ task command exports only after confirmed stop, restart and read-only inspect (454.513ms)
+✔ task command stop, start or export uncertainty retains the original operation without replay (2096.7688ms)
+✔ task command transport loss before receipt cannot be inspected as a safe export (436.1422ms)
+✔ cold pre-receipt command dispatch snapshot cannot export, including snapshots without operation kind (815.779ms)
+✔ cold fence-stage snapshots retain identity and capacity but cannot execute or export (1337.1371ms)
+✔ task-attempt keys isolate sandboxes and persisted scope changes are rejected (2666.2888ms)
+✔ unrelated canonical commit renews task scope without changing its sandbox work revision (440.3555ms)
+✔ same attempt reads its newly committed output after a bounded scope advance (833.0362ms)
+✔ original readable output retains ancestry and permits write, cold reopen, then write again (911.7686ms)
+✔ task prepare rejects a full envelope above 3 MiB before create (302.3785ms)
+✔ unknown task scopes retain resource slots and stopped scopes count toward the 128 scope limit (15191.0341ms)
+✔ task capacity includes retained workspace and temp occupancy in disk admission (436.7111ms)
+ℹ tests 63
+ℹ suites 0
+ℹ pass 62
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59585.2594
+
+✖ failing tests:
+
+test at apps\desktop\openshell-executor.test.cjs:200:1
+✖ accepted stop shared deadline rejects late transport success before journal confirmation (441.5061ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\desktop\openshell-executor.test.cjs:205:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'LOCAL_OUTCOME_UNKNOWN' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

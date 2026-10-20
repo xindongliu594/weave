@@ -1,0 +1,6 @@
+{
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-ui-green-1792517988275.txt",
+  "command": "node --import tsx --test --test-concurrency=1 tests/storage-center.test.ts tests/task-stop-storage.test.ts",
+  "exit": 0,
+  "durationMs": 1791
+}

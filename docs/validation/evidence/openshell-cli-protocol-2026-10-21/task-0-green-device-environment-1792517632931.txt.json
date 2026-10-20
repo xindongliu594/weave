@@ -1,0 +1,7 @@
+{
+  "log": ".superpowers\\sdd\\2026-10-21-task-retirement\\task-0-green-device-environment-1792517632931.txt",
+  "execution": "require_escalated",
+  "command": "node --test --test-concurrency=1 apps/desktop/local-executor.test.cjs apps/desktop/sandbox-storage.test.cjs",
+  "durationMs": 12169,
+  "exit": 0
+}

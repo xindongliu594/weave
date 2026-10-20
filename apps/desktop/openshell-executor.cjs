@@ -279,7 +279,7 @@ class OpenShellDeviceExecutor {
    if(!/^[a-f0-9]{64}\.json$/.test(entry.name)){rows.push({phase:'unverified',error:'未知任务映射条目保留容量'});continue;}
    try{const file=path.join(this.taskStateRoot,entry.name);canonicalPath(file);if(fs.statSync(file).size>1024*1024)throw denied('映射过大');
     const raw=JSON.parse(fs.readFileSync(file,'utf8'));if(taskFileName(taskKey(raw.key))!==entry.name)throw denied('映射文件身份不匹配');
-    const scope=this.read(raw.key);rows.push({key:scope.key,runId:scope.runId,sandboxId:scope.sandboxId,name:scope.name,phase:scope.phase,workspaceRevision:scope.workspaceRevision,storage:scope.storage,retirement:scope.retirement});
+    const scope=this.read(raw.key);rows.push({key:scope.key,runId:scope.runId,sandboxId:scope.sandboxId,name:scope.name,phase:scope.phase==='retired'?'unverified':scope.phase,workspaceRevision:scope.workspaceRevision,...(scope.phase==='retired'?{error:'旧回收回执未证明资源不存在，继续保留容量'}:{storage:scope.storage}),retirement:scope.retirement});
    }catch{rows.push({phase:'unverified',error:'任务映射授权或格式未核对'});}
   }
   return rows;
@@ -390,7 +390,7 @@ class OpenShellDeviceExecutor {
  storageScopes(){
   if(!fs.existsSync(this.stateRoot))return this.taskScopeRows();canonicalPath(this.stateRoot,{directory:true});const rows=[],dir=fs.opendirSync(this.stateRoot);let entries=0;
   try{let entry;while((entry=dir.readSync())){if(++entries>1000){rows.push({phase:'unverified',error:'映射条目超过 1000，剩余保留'});break;}if(!/^[a-f0-9-]{36}\.json$/.test(entry.name))continue;
-   const runId=entry.name.slice(0,-5);try{const scope=this.read(runId);rows.push({runId,sandboxId:scope.sandboxId,name:scope.name,phase:scope.phase,workspaceRevision:scope.workspaceRevision,storage:scope.storage,retirement:scope.retirement});}catch{rows.push({runId,phase:'unverified',error:'映射授权或格式未核对'});}
+   const runId=entry.name.slice(0,-5);try{const scope=this.read(runId);rows.push({runId,sandboxId:scope.sandboxId,name:scope.name,phase:scope.phase==='retired'?'unverified':scope.phase,workspaceRevision:scope.workspaceRevision,...(scope.phase==='retired'?{error:'旧回收回执未证明资源不存在，继续保留容量'}:{storage:scope.storage}),retirement:scope.retirement});}catch{rows.push({runId,phase:'unverified',error:'映射授权或格式未核对'});}
   }}finally{dir.closeSync();}return [...rows,...this.taskScopeRows()];
  }
  maintenance(fn,signal){
@@ -437,7 +437,7 @@ class OpenShellDeviceExecutor {
   this.assertAcceptedStopGrant(scope.key);
   await this.assertGatewayIdentity(signal);
   signal.throwIfAborted();
-  const state=JSON.parse((await this.cli(['sandbox','get',scope.sandboxId,'--output','json'],signal)).stdout);
+  const state=await this.get(scope,signal);
   signal.throwIfAborted();
   if(state.id!==scope.sandboxId||state.name!==scope.name)throw denied('原停止沙箱身份不匹配','OPENSHELL_IDENTITY_MISMATCH');
   if(state.phase!=='Stopped'||state.configuration_admission?.state!=='accepted'||state.configuration_admission.policy_hash!==OPENSHELL_CONSTANTS.effectivePolicyHash)throw unknown('原沙箱未取得受准入的 Stopped 状态');
@@ -510,27 +510,21 @@ class OpenShellDeviceExecutor {
    await this.admit(scope,signal);scope.storage=result.storage;this.save(scope);return {runId:scope.runId,...(scope.schema===2?{key:scope.key}:{}),sandboxId:scope.sandboxId,workspaceRevision:scope.workspaceRevision,storage:result.storage};
   }catch(error){if(started){scope.phase='unknown';scope.lastError={code:error.code??'LOCAL_OUTCOME_UNKNOWN',message:'启动核对中断，禁止自动重放'};this.save(scope);throw unknown(scope.lastError.message);}throw error;}
  }
- retireStorage(runId,expected){return this.maintenance(async()=>{
-  this.assertGrant({id:randomUUID(),runId:typeof runId==='string'?runId:taskKey(runId).runId,grantId:this.grant.id});let scope=this.read(runId);if(scope?.phase==='retired')return scope.retirement.result;
-  if(!scope||scope.phase==='retiring'||scope.phase==='unknown'||scope.activeOperation)throw unknown('原回收结果未核对，禁止重发删除');
-  if(expected?.sandboxId!==scope.sandboxId||expected?.workspaceRevision!==scope.workspaceRevision)throw denied('回收预览与沙箱版本不同','WORKSPACE_VERSION_CONFLICT');
-  await this.inspectStorageNow(runId);scope=this.read(runId);const signal=AbortSignal.timeout(60000);
-  scope.phase='retiring';scope.retirement={id:randomUUID(),sandboxId:scope.sandboxId,workspaceRevision:scope.workspaceRevision,startedAt:new Date().toISOString()};this.save(scope);
-  try{await this.cli(['sandbox','delete',scope.sandboxId],signal,{mutation:true});const result=await this.confirmAbsent(scope,signal);if(result.state!=='retired')throw unknown('删除已受理但资源仍在');scope.phase='retired';scope.retirement.result=result;this.save(scope);return result;}
-  catch(error){scope.phase='unknown';scope.lastError={code:'LOCAL_OUTCOME_UNKNOWN',message:'回收已发出但未取得最终回执，请只核对原沙箱'};this.save(scope);throw unknown(scope.lastError.message);}
- });}
- async confirmAbsent(scope,signal){
-  for(let attempts=0;attempts<20;attempts++){const response=await this.transport(this.config.cliPath,['--gateway',this.config.gateway,'sandbox','get',scope.sandboxId,'--output','json'],{env:this.env,signal,timeoutMs:30000});
-   if(response.exitCode===1&&response.stderr?.toLowerCase().includes('sandbox not found'))return {runId:scope.runId,...(scope.schema===2?{key:scope.key}:{}),sandboxId:scope.sandboxId,state:'retired',replayed:false};
-   if(response.exitCode!==0)throw unknown('回收状态查询没有确定回执');const actual=JSON.parse(response.stdout);if(actual.id!==scope.sandboxId)throw unknown('回收沙箱 ID 不匹配');
-   if(actual.phase!=='Deleting')return {runId:scope.runId,...(scope.schema===2?{key:scope.key}:{}),sandboxId:scope.sandboxId,state:'present',replayed:false};
-   await new Promise(resolve=>setTimeout(resolve,250));
-  }throw unknown('OpenShell 仍在处理回收，须稍后核对');
- }
+ retireStorage(runId,expected){return Promise.reject(denied('固定 OpenShell 协议无法按原沙箱 ID 和文件版本限定删除，暂不支持回收','OPENSHELL_RETIREMENT_UNSUPPORTED'));}
  reconcileStorage(runId){return this.maintenance(async()=>{
-  this.assertGrant({id:randomUUID(),runId:typeof runId==='string'?runId:taskKey(runId).runId,grantId:this.grant.id});const scope=this.read(runId);if(!scope?.retirement)throw denied('没有原回收意图，不能核对');
-  if(scope.phase==='retired')return scope.retirement.result;const result=await this.confirmAbsent(scope,AbortSignal.timeout(60000));
-  if(result.state==='retired'){scope.phase='retired';scope.retirement.result=result;this.save(scope);}return result;
+  const assertCurrent=()=>{
+   this.assertGrant({id:randomUUID(),runId:typeof runId==='string'?runId:taskKey(runId).runId,grantId:this.grant.id});
+   if(canonicalConfigFingerprint(this.config)!==this.backend.fingerprint)throw denied('核对前 OpenShell 固定配置已变化','OPENSHELL_CONFIG_MISMATCH');
+  };
+  assertCurrent();const scope=this.read(runId),intent=scope?.retirement;
+  if(!intent||!uuid.test(scope.sandboxId)||!digest.test(scope.workspaceRevision)||intent.sandboxId!==scope.sandboxId||intent.workspaceRevision!==scope.workspaceRevision)throw denied('没有匹配原沙箱及文件版本的回收意图，不能核对');
+  const signal=AbortSignal.timeout(60000);
+  try{
+   signal.throwIfAborted();await this.assertGatewayIdentity(signal);await this.get(scope,signal);
+   signal.throwIfAborted();assertCurrent();
+   if(!isDeepStrictEqual(this.read(runId),scope))throw denied('核对期间原回收记录已变化');
+   return {runId:scope.runId,...(scope.schema===2?{key:scope.key}:{}),sandboxId:scope.sandboxId,state:'present',replayed:false};
+  }catch{throw unknown('原沙箱回收状态无法确认，查询失败或 NotFound 均不能证明资源已不存在');}
  });}
  close(){return this.closing??=(async()=>{
   await this.queue;this.closed=true;const signal=AbortSignal.timeout(60000);

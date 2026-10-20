@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "baseline": "076fb82",
+  "modelCalls": 0,
+  "productionMutations": 0,
+  "boundaries": "Device/Product/model/UID/cgroup/mTLS use fixtures. JJ evidence is a read-only installed CLI selector probe. No complete inventory or deletion acceptance.",
+  "files": [
+    {
+      "file": "jj-cli-protocol-readonly.json",
+      "bytes": 541,
+      "sha256": "5d40478c80824c5fb8601519c776df1bff8c0054dbbe4804038842ab8a04ec58"
+    },
+    {
+      "file": "product-terminal-stop-green-aa25d5f1-05a3-4ca8-acbd-0b6c38ef0d0b-summary.json",
+      "bytes": 75134,
+      "sha256": "21b14f47f9090a2e71a5c9ca7d50d8862efb34b04e80e406fcdd63547e5703e8"
+    },
+    {
+      "file": "task-0-green-allow-missing-1792517708422.txt",
+      "bytes": 323,
+      "sha256": "c0dec3063b1ae5a3944516493bec1ee20227d127d8e35dfcd72b63d9984bd2f9"
+    },
+    {
+      "file": "task-0-green-allow-missing-1792517708422.txt.json",
+      "bytes": 250,
+      "sha256": "58100b1027404680aaf4859abf04f293a8b759ca0758ae6d7b29f201ec78abf4"
+    },
+    {
+      "file": "task-0-green-build.txt",
+      "bytes": 794,
+      "sha256": "ed8d65991935a4b0870569baf3f969f4aec0fe2f4f168294906c47e716f8d6dc"
+    },
+    {
+      "file": "task-0-green-build.txt.json",
+      "bytes": 212,
+      "sha256": "f97ca164343fd4fc074c92f56bfaba17c135d133340d7cdd3b973b9acf59be07"
+    },
+    {
+      "file": "task-0-green-device-1792517248317.txt",
+      "bytes": 7804,
+      "sha256": "e07fbd6b030108653edaa3913ee78b5c5413cb6f354e666f091773b798c8bce2"
+    },
+    {
+      "file": "task-0-green-device-1792517248317.txt.json",
+      "bytes": 232,
+      "sha256": "de715383641ae39f9e8dc6f61307634664ccba717a960b5708075ca2f7f4df9d"
+    },
+    {
+      "file": "task-0-green-device-environment-1792517632931.txt",
+      "bytes": 1545,
+      "sha256": "f827099050853f89e7bacefebda062080b5a4082db81f69f417686576977c38d"
+    },
+    {
+      "file": "task-0-green-device-environment-1792517632931.txt.json",
+      "bytes": 315,
+      "sha256": "e46ef9119b47f502f74f44ecfce8e80af87cdf66eaea978cdce6956ebb7136c2"
+    },
+    {
+      "file": "task-0-green-full-device-1792517347201.txt",
+      "bytes": 16847,
+      "sha256": "9ada30592d87580a6f609a01cf0e0df8ee34bbd08e9cb84437e9a51a92469219"
+    },
+    {
+      "file": "task-0-green-full-device-1792517347201.txt.json",
+      "bytes": 220,
+      "sha256": "342ab555906caa1ce098f6fb76fe3e7b352d18ff172482f533c9ffcbfe4d5ea1"
+    },
+    {
+      "file": "task-0-red-1792517180382.txt",
+      "bytes": 20999,
+      "sha256": "9a3686428a38390db86e38e5a0e617c7305e986af95dde3b3a740f8023c57af9"
+    },
+    {
+      "file": "task-0-red-1792517180382.txt.json",
+      "bytes": 223,
+      "sha256": "7474112f41863bd435ab54fccd71b7b73849c5ef01fd91f4904aedef09579975"
+    },
+    {
+      "file": "task-0-red-allow-missing-1792517693040.txt",
+      "bytes": 1712,
+      "sha256": "f255ff596f5be6de4a4a8770f8d053a1fc87a73effc383113c92d7b36b4fe162"
+    },
+    {
+      "file": "task-0-red-allow-missing-1792517693040.txt.json",
+      "bytes": 248,
+      "sha256": "885b4150e37277074908a929d1e7bba59cc8de446a959ef7db5599a242e11dfd"
+    },
+    {
+      "file": "task-0-red-product-fixture-1792517326875.txt",
+      "bytes": 1034,
+      "sha256": "0347e990f5167f561551878a40e3526ed6f72f3f7ceea76378c26418f9dad93a"
+    },
+    {
+      "file": "task-0-red-product-fixture-1792517326875.txt.json",
+      "bytes": 256,
+      "sha256": "6ba226b9bcbf4098752e52c4adfcfc2c15ca6d04cf8f5064a77c26ed3d9f5c05"
+    },
+    {
+      "file": "task-0-source-final-sha256.json",
+      "bytes": 619,
+      "sha256": "77d246a448b6b0f1839d41645393e0c5ae788631b6930db37a1e3ccdfef95ee0"
+    },
+    {
+      "file": "task-0-source-ui-final-sha256.json",
+      "bytes": 827,
+      "sha256": "246ab34ba0e0923f9a08e7f211dac89a2366bef4f2b9bb42ea5d235216368d17"
+    },
+    {
+      "file": "task-0-ui-green-1792517988275.txt",
+      "bytes": 1762,
+      "sha256": "90ac366522305a2cb5c7acd5c0862ac5555bbcb51ee69c0d76afb1be1615a955"
+    },
+    {
+      "file": "task-0-ui-green-1792517988275.txt.json",
+      "bytes": 260,
+      "sha256": "226e13fde2ab67a9920778dcc22bba7330b14e35cec5165f6d25d7406ed54208"
+    },
+    {
+      "file": "task-0-ui-red-1792517965679.txt",
+      "bytes": 5420,
+      "sha256": "6e120362ef26a70ddd646919830c7b6291ad0fad0a7c40868123440ea38b86bb"
+    },
+    {
+      "file": "task-0-ui-red-1792517965679.txt.json",
+      "bytes": 226,
+      "sha256": "658d0b8f5e4956740ae4388bc7c8b475a8218b96ddddda7c184eb1624bcf6756"
+    },
+    {
+      "file": "terminal-product-normal-1792517448485-process.json",
+      "bytes": 5058,
+      "sha256": "4e949f0db141beaf28a883408c98be31ab8a43254cc75a62aed5ba7401678f61"
+    },
+    {
+      "file": "terminal-product-normal-1792517448485.txt",
+      "bytes": 1272,
+      "sha256": "c781cd43aae7983c1e1a714e1b18d3bb5c9b42875d6cdb4bf6c799ea34e743a3"
+    },
+    {
+      "file": "terminal-product-normal-1792517506806-process.json",
+      "bytes": 5059,
+      "sha256": "bc579cb99aed396c695cc5b8ab6cb8527a91d08c0130141bc54af917424bbf8f"
+    },
+    {
+      "file": "terminal-product-normal-1792517506806.txt",
+      "bytes": 780,
+      "sha256": "9e59355f35f687c5eda34f11e1eeef4918cc8ea057d7598d5c52fa551e2c0c3f"
+    },
+    {
+      "file": "upstream-provenance.json",
+      "bytes": 1182,
+      "sha256": "8a35d44bd4f51eec4f62f25e6a65d62e2df8a2f79006d4e3b459510b14acad45"
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/desktop/openshell-executor.cjs",
+      "sha256": "73b7eab0beff67162bce660b1b0011a17b7342c21f77f2b471329db0e2aee688",
+      "sha256Lf": "9d4de13113d9cd67db8316add2431fe2a423fe7eab309487de6a7b324c7fe3e7"
+    },
+    {
+      "path": "apps/desktop/openshell-executor.test.cjs",
+      "sha256": "d1c571e2b7d2d5bc69990b30c23d96ac20b23d48ac921503c93a03ed7e149abc",
+      "sha256Lf": "d8da9cabb0ee19bfb32d9b9cd57301282a65edc6f675b7c6d1c7e63e5aa658b6"
+    },
+    {
+      "path": "tests/helpers/task-openshell-product-fixture.cjs",
+      "sha256": "8652725a8fd5340bc1e00340b093a3ade64ca3465cf34a68bf3505a4778c8cb4",
+      "sha256Lf": "f2683f9e28a11c47e78bd884c2766b1264849ac0f657e37b41727dfbb0b032c2"
+    },
+    {
+      "path": "tests/task-accepted-stop-product-flow.test.ts",
+      "sha256": "632d91c97a50c748025f94dff34bb9dcc147cb7041d51f8e3ae9af20d456fec1",
+      "sha256Lf": "852520db1fe1691b6a545412654c41f29d7be4a2f98da8743546e40c0a3c710b"
+    },
+    {
+      "path": "apps/web/src/StorageCenter.tsx",
+      "sha256": "e8fea554dc05d1514901b93af7090cf8e5934cfbd1392c95d05b99a780d65b6a",
+      "sha256Lf": "0171bdafeb7ee98c142dfddf62e7e09b64ef7eea37346b156e855ba77293f796"
+    },
+    {
+      "path": "tests/storage-center.test.ts",
+      "sha256": "1be612922a7563b57e8e2f1e6e999bad26e39ab9e874045699ed1abf0e66d146",
+      "sha256Lf": "fb354fb301eddc696b1167fde50a1e02c27659fd6ae86a7e92878699de626cf8"
+    }
+  ]
+}
