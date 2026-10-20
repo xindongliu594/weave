@@ -1,0 +1,214 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ terminal review SQL begin reply hold obeys shared abort and discards client (7705.2692ms)
+✖ terminal review SQL set reply hold obeys shared abort and discards client (6350.951ms)
+✖ terminal review SQL query reply hold obeys shared abort and discards client (5037.6253ms)
+✖ terminal review SQL commit reply hold obeys shared abort and discards client (7299.5725ms)
+✖ terminal review SQL rollback reply hold obeys shared abort and discards client (6893.6309ms)
+✖ terminal review SQL begin reply hold obeys shared deadline and discards client (8032.263ms)
+✖ terminal review SQL set reply hold obeys shared deadline and discards client (5389.6977ms)
+✖ terminal review SQL query reply hold obeys shared deadline and discards client (4652.0349ms)
+✖ terminal review SQL commit reply hold obeys shared deadline and discards client (6823.7929ms)
+✖ terminal review SQL rollback reply hold obeys shared deadline and discards client (4799.2456ms)
+✖ terminal review stopped duplicate observes original ID without fresh stop (3680.8264ms)
+✖ terminal review stopped duplicate refuses replaced grant root (8568.9785ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 0
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 78194.7238
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL begin reply hold obeys shared abort and discards client (7705.2692ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL set reply hold obeys shared abort and discards client (6350.951ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL query reply hold obeys shared abort and discards client (5037.6253ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL commit reply hold obeys shared abort and discards client (7299.5725ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL rollback reply hold obeys shared abort and discards client (6893.6309ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL begin reply hold obeys shared deadline and discards client (8032.263ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL set reply hold obeys shared deadline and discards client (5389.6977ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL query reply hold obeys shared deadline and discards client (4652.0349ms)
+  Error: Connection terminated
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg\lib\client.js:545:17
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Client.bounded.query (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:90:41)
+      at async TaskAcceptedStopLifecycle.transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:95:20)
+      at async TaskAcceptedStopLifecycle.reconcileExisting (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:402:17)
+      at async TaskAcceptedStopLifecycle.beforeNewTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:409:34)
+      at async LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:255:48)
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL commit reply hold obeys shared deadline and discards client (6823.7929ms)
+  AssertionError [ERR_ASSERTION]: SQL reply wait must settle on the shared signal before the reply is released
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:40071
+✖ terminal review SQL rollback reply hold obeys shared deadline and discards client (4799.2456ms)
+  AssertionError [ERR_ASSERTION]: uncertain or aborted client must be discarded
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:451:194)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:42899
+✖ terminal review stopped duplicate observes original ID without fresh stop (3680.8264ms)
+  Error: Connection terminated
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg\lib\client.js:545:17
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Client.bounded.query (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:89:4)
+      at async assertNoUnresolvedTaskOperation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-operation-admission.ts:16:16)
+      at async readLiveCanonical (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\live-canonical-reader.ts:28:2)
+      at async TaskAcceptedStopLifecycle.verify (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:207:3)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:417:44)
+      at async TaskAcceptedStopLifecycle.transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:99:17)
+      at async TaskAcceptedStopLifecycle.beforeNewTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:416:19)
+      at async LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:255:48)
+
+test at tests\task-accepted-stop-delivery.test.ts:1:42899
+✖ terminal review stopped duplicate refuses replaced grant root (8568.9785ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:465:15)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_ACCEPTED_STOP_UNRESOLVED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "date": "2026-10-21",
+  "scope": "frozen source-only terminal API effect and trusted exact-key original-ID observer",
+  "sources": [
+    {
+      "path": "apps/api/src/task-accepted-stop.ts",
+      "sha256": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "API lifecycle source-only finalizer/exact observer/shared SQL deadline and discard",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256": "55d0d5343371b5b42f6f442159e5be3e0aa4047902d7580504690d62ce171947",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "LocalRunExecutor finalizeAccepted and task preflight",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "apps/api/src/storage-lifecycle.ts",
+      "sha256": "18c2f2e57a0a119a3e1ec4c2a55a005a3fc989b679849710f39f46b5f01aca16",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "narrow SandboxMaintenance capability/signal types",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "tests/task-accepted-stop-delivery.test.ts",
+      "sha256": "cb9cd5f9340f36f24fa9f194df5f2b05de71f58e3d626955f3594267b3a67cc0",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "owned delivery terminal/review behavior tests and official pg config mock normalization",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "tests/helpers/task-accepted-stop-api-fixture.ts",
+      "sha256": "5ed337120df8620cce01ec72e053938115299f2c029d3a580f7775f021a43698",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "existing real HTTP/CAS/Handoff fixture caps/signals and temporary grant inode check",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "tests/helpers/task-stop-maintenance.ts",
+      "sha256": "47441f540dec103feb2d3a62a0c4e0b2a35e1230284ca4e637de93dae4aa5ed9",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "existing in-progress-only fixture explicit exact caps; any stop still fails",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "tests/task-sandbox-flow.test.ts",
+      "sha256": "afc274d25024c03abd4144c602e5acd42d10b1658b4b79b06fe9da6b15989e96",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "existing legacy HTTP fixture explicit exact caps/signals only; assertions/business unchanged",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    },
+    {
+      "path": "tests/task-execution-scope.test.ts",
+      "sha256": "76781ce383d9e32256b4aadd8a963301ee183fba40c8a04bee40fe0e0de6cda1",
+      "owner": "accepted_stop_api_delivery",
+      "contribution": "existing in-memory SQL fixture official pg config normalization only; assertions unchanged",
+      "commitBy": "root",
+      "status": "owned changes left for root integration; no agent Git operation"
+    }
+  ],
+  "matching": {
+    "totalPassed": 104,
+    "checks": [
+      {
+        "name": "review12",
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 78.2955,
+        "exitCode": 0,
+        "log": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-review12.txt",
+          "sha256": "17f49ddc1d3762a4cba12e6b129828bb0349f57b9e2b3c15e334e43ce1a32bee"
+        },
+        "exit": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-review12.txt.exit.txt",
+          "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+        }
+      },
+      {
+        "name": "terminal28",
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 126.2326,
+        "exitCode": 0,
+        "log": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-terminal28.txt",
+          "sha256": "a7e81a31835da544939ff6b4d29d54da0c5cef118e809a6f5702c3aded3b8862"
+        },
+        "exit": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-terminal28.txt.exit.txt",
+          "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+        }
+      },
+      {
+        "name": "legacy39",
+        "passed": 39,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 75.9569,
+        "exitCode": 0,
+        "log": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-legacy39.txt",
+          "sha256": "e59a0e1f841f9bbac003ae8f7ccf0a6fe9fecc661737d208b7120ce757511165"
+        },
+        "exit": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-legacy39.txt.exit.txt",
+          "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+        }
+      },
+      {
+        "name": "scope25",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "seconds": 67.2363,
+        "exitCode": 0,
+        "log": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-scope25.txt",
+          "sha256": "b4fc3328ab73464306bf6c0cb9e5e54e276d9f64677601e5394cf8d4aaef8d4c"
+        },
+        "exit": {
+          "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-matching-scope25.exit.txt",
+          "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+        }
+      }
+    ],
+    "sourceStable": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-source-stable.json",
+      "sha256": "1444091936d74e63423174ebbb69534d0fb2155abafdd249e5bd511d5da2c734"
+    },
+    "startSha": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-final-start-sha.json",
+      "sha256": "fa3ab96ce31bf063bc75fa0b9ea4bf9f6a8f63a98d2b94253367deafc4cd5905"
+    },
+    "endSha": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-final-source-sha.json",
+      "sha256": "fa3ab96ce31bf063bc75fa0b9ea4bf9f6a8f63a98d2b94253367deafc4cd5905"
+    }
+  },
+  "red": [
+    {
+      "evidence": {
+        "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-red.txt",
+        "sha256": "a87159309185caa388e58f9edd9872833ac30521632469ef160f171872bce459"
+      },
+      "exit": {
+        "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-red.exit.txt",
+        "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+      },
+      "exitCode": 1,
+      "note": "10 real pg held-response cases fail plus stopped cases; combined stopped positive had preceding unsafe connection interference, not counted as its intended RED"
+    },
+    {
+      "evidence": {
+        "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-stopped-red.txt",
+        "sha256": "c68a4391d45d0828496873cf6da503c7a71eb23a7f45005c2810996e9d1a60e4"
+      },
+      "exit": {
+        "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-stopped-red.exit.txt",
+        "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+      },
+      "exitCode": 1,
+      "note": "2 independent intended REDs: duplicate performs zero original get; real temporary grant-root inode replacement not refused"
+    }
+  ],
+  "independentReview": {
+    "status": "PASS for prior P1/P2, no remaining P0-P2 in scoped fixes",
+    "requested": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-independent-review.md",
+      "sha256": "2bd6de4d11488f0d5f19a5e3517bba2d9dc4558be92ef370f5e73d3a9f55b49a"
+    },
+    "final": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-independent-review-final.md",
+      "sha256": "7bd3e1985bdaf07e83117ae860342dbd65e5611380dd3d6b8875f7e5c990355d"
+    }
+  },
+  "type": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "status": "PASS",
+    "exitCode": 0,
+    "log": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-final-type.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exit": {
+      "path": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-api-review-final-type.exit.txt",
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    }
+  },
+  "processes": "All owned test/type sessions ended. PG heavy window released to root. No new heavy tests scheduled.",
+  "limits": [
+    "Real installed pg/socket path with isolated PGlite and synthetic physical device/model behavior; no native PostgreSQL lock-contention certification.",
+    "No physical JJ/OpenShell, paid/model, deployment, install, Git/JJ mutation or child agents.",
+    "Source-only scope; runtime/projection/router/web integration and later three-project/rework/retirement/recovery/carrier/profile gates remain separately owned."
+  ]
+}

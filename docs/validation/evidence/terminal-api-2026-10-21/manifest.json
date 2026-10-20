@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "date": "2026-10-21",
+  "sources": [
+    {
+      "path": "apps/api/src/task-accepted-stop.ts",
+      "sha256": "928fcb46e1e6007823e814c4818d1efb27c0fff8bdd847a2e508a9d9731adb7d"
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256": "55d0d5343371b5b42f6f442159e5be3e0aa4047902d7580504690d62ce171947"
+    },
+    {
+      "path": "apps/api/src/storage-lifecycle.ts",
+      "sha256": "18c2f2e57a0a119a3e1ec4c2a55a005a3fc989b679849710f39f46b5f01aca16"
+    },
+    {
+      "path": "tests/task-accepted-stop-delivery.test.ts",
+      "sha256": "cb9cd5f9340f36f24fa9f194df5f2b05de71f58e3d626955f3594267b3a67cc0"
+    },
+    {
+      "path": "tests/helpers/task-accepted-stop-api-fixture.ts",
+      "sha256": "5ed337120df8620cce01ec72e053938115299f2c029d3a580f7775f021a43698"
+    },
+    {
+      "path": "tests/helpers/task-stop-maintenance.ts",
+      "sha256": "47441f540dec103feb2d3a62a0c4e0b2a35e1230284ca4e637de93dae4aa5ed9"
+    },
+    {
+      "path": "tests/task-sandbox-flow.test.ts",
+      "sha256": "afc274d25024c03abd4144c602e5acd42d10b1658b4b79b06fe9da6b15989e96"
+    },
+    {
+      "path": "tests/task-execution-scope.test.ts",
+      "sha256": "76781ce383d9e32256b4aadd8a963301ee183fba40c8a04bee40fe0e0de6cda1"
+    }
+  ],
+  "verifiedSourceAndEvidenceHashes": 27,
+  "passed": 104,
+  "paidCalls": 0,
+  "physicalDevice": false,
+  "files": [
+    {
+      "path": "terminal-api-matching-review12.txt",
+      "bytes": 1509,
+      "sha256": "17f49ddc1d3762a4cba12e6b129828bb0349f57b9e2b3c15e334e43ce1a32bee"
+    },
+    {
+      "path": "terminal-api-matching-review12.txt.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "terminal-api-matching-terminal28.txt",
+      "bytes": 2995,
+      "sha256": "a7e81a31835da544939ff6b4d29d54da0c5cef118e809a6f5702c3aded3b8862"
+    },
+    {
+      "path": "terminal-api-matching-terminal28.txt.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "terminal-api-matching-legacy39.txt",
+      "bytes": 3947,
+      "sha256": "e59a0e1f841f9bbac003ae8f7ccf0a6fe9fecc661737d208b7120ce757511165"
+    },
+    {
+      "path": "terminal-api-matching-legacy39.txt.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "terminal-api-matching-scope25.txt",
+      "bytes": 1949,
+      "sha256": "b4fc3328ab73464306bf6c0cb9e5e54e276d9f64677601e5394cf8d4aaef8d4c"
+    },
+    {
+      "path": "terminal-api-matching-scope25.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "terminal-api-review-source-stable.json",
+      "bytes": 70,
+      "sha256": "1444091936d74e63423174ebbb69534d0fb2155abafdd249e5bd511d5da2c734"
+    },
+    {
+      "path": "terminal-api-review-final-start-sha.json",
+      "bytes": 1174,
+      "sha256": "fa3ab96ce31bf063bc75fa0b9ea4bf9f6a8f63a98d2b94253367deafc4cd5905"
+    },
+    {
+      "path": "terminal-api-review-final-source-sha.json",
+      "bytes": 1174,
+      "sha256": "fa3ab96ce31bf063bc75fa0b9ea4bf9f6a8f63a98d2b94253367deafc4cd5905"
+    },
+    {
+      "path": "terminal-api-review-red.txt",
+      "bytes": 11442,
+      "sha256": "a87159309185caa388e58f9edd9872833ac30521632469ef160f171872bce459"
+    },
+    {
+      "path": "terminal-api-review-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "terminal-api-review-stopped-red.txt",
+      "bytes": 2131,
+      "sha256": "c68a4391d45d0828496873cf6da503c7a71eb23a7f45005c2810996e9d1a60e4"
+    },
+    {
+      "path": "terminal-api-review-stopped-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "terminal-api-independent-review.md",
+      "bytes": 6876,
+      "sha256": "2bd6de4d11488f0d5f19a5e3517bba2d9dc4558be92ef370f5e73d3a9f55b49a"
+    },
+    {
+      "path": "terminal-api-independent-review-final.md",
+      "bytes": 5795,
+      "sha256": "7bd3e1985bdaf07e83117ae860342dbd65e5611380dd3d6b8875f7e5c990355d"
+    },
+    {
+      "path": "terminal-api-review-final-type.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "terminal-api-review-final-type.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "terminal-api-final-manifest.json",
+      "bytes": 9832,
+      "sha256": "594489a390570f8a6fddb294daaac4d757c97740a3290653f7e6e2cf92e1297d"
+    },
+    {
+      "path": "terminal-api-review-fix-summary.md",
+      "bytes": 5046,
+      "sha256": "091b466b2cb5eea0d4ef324fe42cbae2fb9f23109f8758dd462185184f056176"
+    },
+    {
+      "path": "terminal-api-red.txt",
+      "bytes": 1576,
+      "sha256": "248aba163fd75a9ec891114ac11e2677e5c58fc793ecbc0b3354b90bd14e1b7a"
+    },
+    {
+      "path": "terminal-api-red.exit.txt",
+      "bytes": 5,
+      "sha256": "4a30efff1e51f55cb5d9158fd1307180f3d0795821c35a79ab9c523e41a6241f"
+    },
+    {
+      "path": "terminal-api-red-corrected-final.txt",
+      "bytes": 323,
+      "sha256": "77f92bf5bcb7c16870e89a8962aeac08a018ff9d7539622db76a31fc5cd58dc1"
+    },
+    {
+      "path": "terminal-api-red-corrected-final.exit.txt",
+      "bytes": 5,
+      "sha256": "4a30efff1e51f55cb5d9158fd1307180f3d0795821c35a79ab9c523e41a6241f"
+    },
+    {
+      "path": "terminal-api-preflight-red.txt",
+      "bytes": 2172,
+      "sha256": "d0bd679f37e2d28f1ba0d71b9b5b5bf8951c246b5bd566f5d1a6e164521b14c6"
+    },
+    {
+      "path": "terminal-api-preflight-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    },
+    {
+      "path": "terminal-api-prepare-red.txt",
+      "bytes": 8112,
+      "sha256": "037e71d7e524e9bab0a9200272c56b635ea24f5479596cc4f79e885ccfac6e0d"
+    },
+    {
+      "path": "terminal-api-prepare-red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04"
+    }
+  ]
+}

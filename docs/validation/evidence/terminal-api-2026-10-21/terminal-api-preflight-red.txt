@@ -1,0 +1,42 @@
+✖ terminal task preflight rejects providers without exact shared-deadline capability before SQL (36.6773ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3966.9754
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-delivery.test.ts:1:34928
+✖ terminal task preflight rejects providers without exact shared-deadline capability before SQL (36.6773ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'TASK_STOP_UNAVAILABLE'
+  - }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:388:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: UNEXPECTED_POOL_ACCESS
+        at BoundPool.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:387:48)
+        at Object.apply (node:internal/test_runner/mock/mock:756:20)
+        at TaskAcceptedStopLifecycle.transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:84:17)
+        at TaskAcceptedStopLifecycle.reconcileExisting (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:292:28)
+        at LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:242:28)
+        at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:388:37)
+        at waitForActual (node:assert:632:21)
+        at strict.rejects (node:assert:769:31)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:388:16)
+        at Test.runInAsyncScope (node:async_hooks:227:14),
+    expected: { code: 'TASK_STOP_UNAVAILABLE' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

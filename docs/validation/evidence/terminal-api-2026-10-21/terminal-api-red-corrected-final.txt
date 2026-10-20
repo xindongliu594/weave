@@ -1,0 +1,3 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+Integration file tests/task-accepted-stop-delivery.test.ts exceeded 180 seconds

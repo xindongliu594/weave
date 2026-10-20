@@ -1,0 +1,22 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ terminal review SQL begin reply hold obeys shared abort and discards client (7159.6167ms)
+✔ terminal review SQL set reply hold obeys shared abort and discards client (6779.6517ms)
+✔ terminal review SQL query reply hold obeys shared abort and discards client (6253.0931ms)
+✔ terminal review SQL commit reply hold obeys shared abort and discards client (7175.7724ms)
+✔ terminal review SQL rollback reply hold obeys shared abort and discards client (4672.663ms)
+✔ terminal review SQL begin reply hold obeys shared deadline and discards client (4978.7472ms)
+✔ terminal review SQL set reply hold obeys shared deadline and discards client (4817.2381ms)
+✔ terminal review SQL query reply hold obeys shared deadline and discards client (5478.9378ms)
+✔ terminal review SQL commit reply hold obeys shared deadline and discards client (6778.6037ms)
+✔ terminal review SQL rollback reply hold obeys shared deadline and discards client (5156.6696ms)
+✔ terminal review stopped duplicate observes original ID without fresh stop (7775.5204ms)
+✔ terminal review stopped duplicate refuses replaced grant root (8575.0331ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 78295.5075

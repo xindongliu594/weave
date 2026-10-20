@@ -96,17 +96,19 @@ async function fixture(mode:Mode){
  // Legacy HTTP fixture only: the sibling accepted-stop product test owns the
  // real OpenShell executor/journal/capacity evidence. Keep this adapter explicit.
  const legacyMaintenance={
+  acceptedStopCapabilities:()=>({version:1 as const,deadline:'shared-abort-v1' as const}),
   storageScopes:()=>[...workspaces].map(([serialized,work])=>({runId,key:JSON.parse(serialized),sandboxId:work.sandboxId,phase:work.phase??'ready',workspaceRevision:revision(work.files)})),
   inspectStorage:async()=>{throw Error('UNEXPECTED_LEGACY_STORAGE_INSPECTION');},
   retireStorage:async()=>{throw Error('UNEXPECTED_LEGACY_STORAGE_RETIREMENT');},
   reconcileStorage:async()=>{throw Error('UNEXPECTED_LEGACY_STORAGE_RECONCILIATION');},
-  stopAcceptedTask:async(key:any,expected:any,beforeDispatch:()=>Promise<void>)=>{
+  stopAcceptedTask:async(key:any,expected:any,beforeDispatch:()=>Promise<void>,signal?:AbortSignal)=>{
+   signal?.throwIfAborted();
    const work=workspaces.get(JSON.stringify(key));assert.ok(work);assert.equal(work.sandboxId,expected.sandboxId);assert.equal(revision(work.files),expected.workspaceRevision);
    const {accepted,checkpointResolved,operationsResolved,...identity}=expected;assert.deepEqual([accepted,checkpointResolved,operationsResolved],[true,true,true]);
    if(work.acceptedStop){assert.deepEqual(work.acceptedStop.identity,identity);return work.acceptedStop.result;}
-   await beforeDispatch();work.phase='stopped';const result={...identity,phase:'stopped',replayed:false};work.acceptedStop={identity,result};return result;
+   await beforeDispatch();signal?.throwIfAborted();work.phase='stopped';const result={...identity,phase:'stopped',replayed:false};work.acceptedStop={identity,result};return result;
   },
-  reconcileAcceptedTaskStop:async(key:any,identity:any)=>{const work=workspaces.get(JSON.stringify(key));assert.ok(work?.acceptedStop);assert.deepEqual(work.acceptedStop.identity,identity);return work.acceptedStop.result;},
+  reconcileAcceptedTaskStop:async(key:any,identity:any,signal?:AbortSignal)=>{signal?.throwIfAborted();const work=workspaces.get(JSON.stringify(key));assert.ok(work?.acceptedStop);assert.deepEqual(work.acceptedStop.identity,identity);return work.acceptedStop.result;},
  };
  let archive:any,executor:LocalRunExecutor,aCommitted=false,approvalEntered=false;
  const events=()=>readRun(directory,runId)?.events??[];

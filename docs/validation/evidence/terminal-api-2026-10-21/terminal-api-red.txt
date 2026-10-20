@@ -1,0 +1,17 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ terminal source-only stops the last accepted scope without an active target (5688.5531ms)
+✖ terminal all-approved proof refuses incomplete-node before any fresh effect (1446.1727ms)
+✖ terminal all-approved proof refuses missing-row before any fresh effect (4681.4344ms)
+✖ terminal all-approved proof refuses null-provenance before any fresh effect (4681.5918ms)
+✖ terminal all-approved proof refuses missing-cp before any fresh effect (4876.7873ms)
+✖ terminal fresh-stop bound handles 2 real accepted scopes (5862.2416ms)
+✖ terminal fresh-stop bound handles 3 real accepted scopes (5761.2679ms)
+✖ terminal dispatch rechecks cap-method after provider queue wait (4421.4644ms)
+✖ terminal dispatch rechecks cap-response after provider queue wait (4471.995ms)
+✖ terminal dispatch rechecks related-node after provider queue wait (4570.2538ms)
+✖ terminal dispatch rechecks unrelated-progress after provider queue wait (4662.258ms)
+✖ terminal confirmed fact survives SQL cancellation and lease transfer (4806.6124ms)
+✖ terminal aborted bookkeeping retains original marker and exact observer only reads original ID (4419.2687ms)
+✖ terminal pool acquisition abort releases late client before BEGIN or fn (5487.6995ms)
+Integration file tests/task-accepted-stop-delivery.test.ts exceeded 180 seconds

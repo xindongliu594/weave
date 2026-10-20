@@ -1,0 +1,38 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ terminal source-only stops the last accepted scope without an active target (10035.9142ms)
+✔ terminal all-approved proof refuses incomplete-node before any fresh effect (1849.1546ms)
+✔ terminal all-approved proof refuses missing-row before any fresh effect (5748.6829ms)
+✔ terminal all-approved proof refuses null-provenance before any fresh effect (6510.1912ms)
+✔ terminal all-approved proof refuses missing-cp before any fresh effect (6961.2529ms)
+✔ terminal all-approved proof refuses retired-row before any fresh effect (6448.7243ms)
+✔ terminal prepare refuses capability mutation during initialization before any device prepare (153.599ms)
+✔ terminal fresh-stop bound handles 2 real accepted scopes (10444.9061ms)
+✔ terminal fresh-stop bound handles 3 real accepted scopes (6438.0312ms)
+✔ terminal dispatch rechecks cap-method after provider queue wait (6205.2198ms)
+✔ terminal dispatch rechecks cap-response after provider queue wait (6171.7143ms)
+✔ terminal dispatch rechecks related-node after provider queue wait (6514.5734ms)
+✔ terminal dispatch rechecks unrelated-progress after provider queue wait (6770.4425ms)
+✔ terminal confirmed fact survives SQL cancellation and lease transfer (7121.7924ms)
+✔ terminal aborted bookkeeping retains original marker and exact observer only reads original ID (7712.3744ms)
+✔ terminal pool acquisition abort releases late client before BEGIN or fn (6678.3637ms)
+✔ terminal dispatching COMMIT loss preserves original ID with no fresh device effect (6612.6118ms)
+✔ terminal rechecks another approved slot accepted proof after dispatching COMMIT (7274.4298ms)
+✔ terminal shared 120-second deadline begins before pool acquisition (49.9084ms)
+✔ terminal exact observer rejects extra identity fields and class-run mismatch (7436.3378ms)
+✔ terminal prepareTask preflight rejects missing shared-deadline capability before SQL (51.0839ms)
+✔ terminal prepareTask preflight rejects extra shared-deadline capability before SQL (50.6034ms)
+✔ terminal prepareTask preflight rejects wrong shared-deadline capability before SQL (49.9708ms)
+✔ terminal prepareTask preflight rejects async shared-deadline capability before SQL (46.6548ms)
+✔ terminal prepare preflight rejects missing shared-deadline capability before SQL (41.5078ms)
+✔ terminal prepare preflight rejects extra shared-deadline capability before SQL (41.1235ms)
+✔ terminal prepare preflight rejects wrong shared-deadline capability before SQL (79.1908ms)
+✔ terminal prepare preflight rejects async shared-deadline capability before SQL (43.1677ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 126232.6229

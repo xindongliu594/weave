@@ -196,6 +196,8 @@ export class LocalRunExecutor {
  root:string;preparing?:Promise<void>;private acceptedStops:TaskAcceptedStopLifecycle;
  constructor(public archive:any,public snapshot:any,public service:LocalOperationService,private maintenance:{sandboxMaintenance?:()=>SandboxMaintenance|undefined}={}){this.root=join(archive.dir,'artifacts');mkdirSync(this.root,{recursive:true,mode:0o700});this.acceptedStops=new TaskAcceptedStopLifecycle(archive.id,service,maintenance.sandboxMaintenance);}
  revision(){return revision(exportFiles(this.root));}
+ /** Source-only trusted terminal boundary; never registered as an employee tool. */
+ async finalizeAccepted(signal:AbortSignal){return this.acceptedStops.finalizeAccepted(signal);}
  private async taskTransaction<T>(signal:AbortSignal,fn:(db:pg.PoolClient,run:any)=>Promise<T>):Promise<T>{
   if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')throw new AppError(409,'旧执行器没有可信任务上下文','TASK_SCOPE_DENIED');
   const db=await pool.connect();
@@ -273,10 +275,12 @@ export class LocalRunExecutor {
   return scope;
  }
  async prepare(signal:AbortSignal){
-  if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')assertExecutionProfile(this.snapshot);
+  const selected=this.snapshot.executionProfile==='task-attempt-openshell-v1'?requireTaskStopProvider(this.maintenance.sandboxMaintenance):undefined;
+  if(!selected)assertExecutionProfile(this.snapshot);
   return this.preparing??=(async()=>{
    if(this.snapshot.executionProfile==='task-attempt-openshell-v1'){
-    await initializeTaskCanonical(this.service,this.archive.id,signal);return;
+    await initializeTaskCanonical(this.service,this.archive.id,signal);
+    if(!isDeepStrictEqual(selected,requireTaskStopProvider(this.maintenance.sandboxMaintenance)))throw new AppError(409,'任务准备期间可信停止维护已变化','TASK_STOP_UNAVAILABLE');return;
    }
    const callId='local-prepare-'+this.archive.id,ref={callId};
    this.archive.append('runtime/operation-start',{name:'local_workspace',arguments:{deviceId:this.snapshot.executionTarget.deviceId}},ref);

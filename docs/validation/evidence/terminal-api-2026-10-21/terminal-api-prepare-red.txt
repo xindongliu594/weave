@@ -1,0 +1,138 @@
+✖ terminal prepare preflight rejects missing shared-deadline capability before SQL (13.4096ms)
+✖ terminal prepare preflight rejects extra shared-deadline capability before SQL (3.7005ms)
+✖ terminal prepare preflight rejects wrong shared-deadline capability before SQL (3.4494ms)
+✖ terminal prepare preflight rejects async shared-deadline capability before SQL (3.1127ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3121.3192
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-delivery.test.ts:1:37492
+✖ terminal prepare preflight rejects missing shared-deadline capability before SQL (13.4096ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'TASK_STOP_UNAVAILABLE'
+  - }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: UNEXPECTED_POOL_ACCESS
+        at BoundPool.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:416:48)
+        at Object.apply (node:internal/test_runner/mock/mock:756:20)
+        at transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:74:22)
+        at initializeTaskCanonical (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:91:9)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:281:11)
+        at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:287:3)
+        at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:56)
+        at waitForActual (node:assert:632:21)
+        at strict.rejects (node:assert:769:31)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:16),
+    expected: { code: 'TASK_STOP_UNAVAILABLE' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:37492
+✖ terminal prepare preflight rejects extra shared-deadline capability before SQL (3.7005ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'TASK_STOP_UNAVAILABLE'
+  - }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: UNEXPECTED_POOL_ACCESS
+        at BoundPool.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:416:48)
+        at Object.apply (node:internal/test_runner/mock/mock:756:20)
+        at transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:74:22)
+        at initializeTaskCanonical (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:91:9)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:281:11)
+        at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:287:3)
+        at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:56)
+        at waitForActual (node:assert:632:21)
+        at strict.rejects (node:assert:769:31)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:16),
+    expected: { code: 'TASK_STOP_UNAVAILABLE' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:37492
+✖ terminal prepare preflight rejects wrong shared-deadline capability before SQL (3.4494ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'TASK_STOP_UNAVAILABLE'
+  - }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: UNEXPECTED_POOL_ACCESS
+        at BoundPool.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:416:48)
+        at Object.apply (node:internal/test_runner/mock/mock:756:20)
+        at transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:74:22)
+        at initializeTaskCanonical (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:91:9)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:281:11)
+        at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:287:3)
+        at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:56)
+        at waitForActual (node:assert:632:21)
+        at strict.rejects (node:assert:769:31)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:16),
+    expected: { code: 'TASK_STOP_UNAVAILABLE' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:37492
+✖ terminal prepare preflight rejects async shared-deadline capability before SQL (3.1127ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'TASK_STOP_UNAVAILABLE'
+  - }
+  
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: UNEXPECTED_POOL_ACCESS
+        at BoundPool.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:416:48)
+        at Object.apply (node:internal/test_runner/mock/mock:756:20)
+        at transaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:74:22)
+        at initializeTaskCanonical (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-canonical.ts:91:9)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:281:11)
+        at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:287:3)
+        at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:56)
+        at waitForActual (node:assert:632:21)
+        at strict.rejects (node:assert:769:31)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-delivery.test.ts:417:16),
+    expected: { code: 'TASK_STOP_UNAVAILABLE' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
