@@ -19,10 +19,12 @@ test('native workspace preserves file versions and rejects traversal, Windows al
   for(const name of ['../outside','C:/outside','a:stream','a\\b','CON.txt','COM¹.txt','LPT²','out/file?','out/file.','out/dir /file','/outside','.Agent-private'])assert.throws(()=>validPath(name));
   for(const paths of [['Report.txt','report.txt'],['Report','report/file.txt']])assert.throws(()=>decodeFiles(paths.map(path=>({path,content:''}))),/格式/);
   await assert.rejects(f.executor.execute({...job,grantId:randomUUID(),name:'filesystem',arguments:{path:'out/report.txt'}}),/授权已经变化/);
-  const outside=path.join(f.root,'outside.txt');fs.writeFileSync(outside,'outside');fs.linkSync(outside,path.join(f.root,f.runId,'hardlink.txt'));
-  await assert.rejects(f.executor.execute({...job,name:'filesystem',arguments:{path:'hardlink.txt'}}),/链接/);fs.unlinkSync(path.join(f.root,f.runId,'hardlink.txt'));
-  const outsideDir=path.join(f.root,'outside-dir');fs.mkdirSync(outsideDir);fs.symlinkSync(outsideDir,path.join(f.root,f.runId,'link-dir'),process.platform==='win32'?'junction':'dir');
-  await assert.rejects(f.executor.execute({...job,name:'artifact_write',arguments:{path:'link-dir/escape.txt',content:'escape'}}),/链接/);assert.equal(fs.existsSync(path.join(outsideDir,'escape.txt')),false);
+  const outside=path.join(f.root,'outside.txt'),linked=path.join(f.root,f.runId,'hardlink.txt');fs.writeFileSync(outside,'outside');
+  let lstat=fs.lstatSync,simulated=false;try{fs.linkSync(outside,linked);}catch(error){if(error.code!=='EPERM')throw error;simulated=true;fs.copyFileSync(outside,linked);fs.lstatSync=(value,...args)=>{const stat=lstat(value,...args);if(value===linked)stat.nlink=2;return stat;};}
+  try{await assert.rejects(f.executor.execute({...job,name:'filesystem',arguments:{path:'hardlink.txt'}}),/链接/);}finally{if(simulated)fs.lstatSync=lstat;fs.unlinkSync(linked);}
+  const outsideDir=path.join(f.root,'outside-dir'),linkDir=path.join(f.root,f.runId,'link-dir');fs.mkdirSync(outsideDir);
+  lstat=fs.lstatSync;simulated=false;try{fs.symlinkSync(outsideDir,linkDir,process.platform==='win32'?'junction':'dir');}catch(error){if(error.code!=='EPERM')throw error;simulated=true;fs.mkdirSync(linkDir);fs.lstatSync=(value,...args)=>{const stat=lstat(value,...args);if(value===linkDir)stat.isSymbolicLink=()=>true;return stat;};}
+  try{await assert.rejects(f.executor.execute({...job,name:'artifact_write',arguments:{path:'link-dir/escape.txt',content:'escape'}}),/链接/);assert.equal(fs.existsSync(path.join(outsideDir,'escape.txt')),false);}finally{if(simulated)fs.lstatSync=lstat;}
  }finally{f.cleanup();}
 });
 test('native commands require capability, matching approval and current workspace version',async()=>{
@@ -104,4 +106,29 @@ test('persistent receipt failure retains an unknown executed outcome and never r
   fs.promises.rename=rename;const reopened=new LocalDeviceClient(options);reopened.executor.execute=async()=>{writes++;};
   reopened.run(job);assert.equal(reopened.pending.get(id).error.code,'LOCAL_OUTCOME_UNKNOWN');assert.equal(reopened.pending.get(id).error.notExecuted,false);assert.equal(writes,1);await reopened.close();
  }finally{fs.promises.rename=rename;await client.close();f.cleanup();}
+});
+
+test('device journal binds a task operation to its original key and scope through completed receipt',async()=>{
+ const f=fixture(),id=randomUUID(),key={runId:f.runId,taskId:'task-A',attemptId:'first',generation:1};
+ let state;const client=new LocalDeviceClient({connection:{server:'http://127.0.0.1:12345/'},device:{id:randomUUID(),token:randomBytes(32).toString('hex'),grant:f.grant},journalRoot:path.join(f.root,'journal'),onState:value=>state=value,executor:{execute:async()=>({taskExecution:{profile:'task-attempt-openshell-v1',key,scopeHash:'a'.repeat(64),operationId:id,beforeWorkRevision:'b'.repeat(64),afterWorkRevision:'c'.repeat(64)}})}});
+ client.api=async()=>({ok:true});
+ try{
+  client.run({id,runId:f.runId,claimToken:randomUUID(),executionScope:{profile:'task-attempt-openshell-v1',key,scopeHash:'a'.repeat(64),expectedWorkRevision:'b'.repeat(64)}});
+  await client.active.promise;const record=client.read(id);assert.ok(record,JSON.stringify({state,stopped:client.stopped,files:fs.readdirSync(client.journalRoot)}));
+  assert.deepEqual(record.taskExecution,{key,scopeHash:'a'.repeat(64),expectedWorkRevision:'b'.repeat(64),operationId:id});
+  assert.deepEqual(record.receipt.result.taskExecution.key,key);
+ }finally{await client.close();f.cleanup();}
+});
+
+test('orphan recovery retains the original task key and work revision without replay',async()=>{
+ const f=fixture(),id=randomUUID(),claimToken=randomUUID(),key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1};let executions=0;
+ const client=new LocalDeviceClient({connection:{server:'http://127.0.0.1:12345/'},device:{id:randomUUID(),token:randomBytes(32).toString('hex'),grant:f.grant},journalRoot:path.join(f.root,'journal'),executor:{execute:async()=>{executions++;}}});
+ const taskExecution={key,scopeHash:'a'.repeat(64),expectedWorkRevision:'b'.repeat(64),operationId:id};
+ try{
+  await client.record(id,{phase:'executing',claimToken,runId:f.runId,taskExecution});
+  client.api=async()=>{client.stopped=true;return {orphan:{id,claimToken,started:true}};};
+  await client.poll();const recovered=client.read(id);
+  assert.equal(recovered.phase,'completed');assert.deepEqual(recovered.taskExecution,taskExecution);assert.equal(recovered.runId,f.runId);
+  assert.equal(recovered.receipt.error.code,'LOCAL_OUTCOME_UNKNOWN');assert.equal(executions,0);
+ }finally{await client.close();f.cleanup();}
 });

@@ -176,3 +176,11 @@ task A 的回退不得回退 B 已提交成果、预算、费用、授权、外�
 已验证：固定源码的现有执行链、DSH 版本/guard/checkpoint 接口、官方 v0.1.2 CLI/SDK 能力及策略静态限制、任务导出与 `mirrorFiles` 的兼容风险。文档提出的接口、schema 和状态均为后续实现建议。
 
 未验证：真实 task-attempt 沙箱间隔离、传输极限、资源/延迟、后台进程清理、跨文件提交崩溃恢复、对外业务核对和补偿。当前 512 MiB/1 CPU 是**每个沙箱**，任务并发必须纳入全局容量与保留上限；不能因为每个容器有限额就认为总量已受控。原项目仍需按后续实现及真实验收，才能获得本报告描述的新增保证。
+
+## 10. 实施复审补充：后台写入的收尾边界
+
+Task 2 独立审查发现，对原命令的 Unix 进程组发送信号并探测其消失，不能覆盖新建会话/脱离进程组的后台子进程。该问题由实现路径静态确认，尚未称为 JJ 实机复现；原模拟协议测试通过不能消除这个缺口。
+
+再次核对固定 [v0.1.2 Docker driver README](https://raw.githubusercontent.com/NVIDIA/OpenShell/v0.1.2/crates/openshell-driver-docker/README.md) 的 Stop/Start 语义：停止会结束 supervisor 并停止 workload container，保留其可写层和卷；启动重建 supervisor 并重新启动保留的 workload。另见固定 [compute runtimes 设计](https://raw.githubusercontent.com/NVIDIA/OpenShell/v0.1.2/architecture/compute-runtimes.md)。据此优先复用完整沙箱生命周期作为导出前的进程停止边界，不另写进程隔离引擎。
+
+修正方案：新 task profile 的命令/原生插件先持久保存原操作结果；经过已确认的 stop→start 和重新准入后，按原 operation ID 只读导出文件。任一步不确定都保留现场、拒绝成功提交，不能重跑原命令。该方案新增两次生命周期转换，需要测量开销。固定 Docker driver 的实际适用性、工作区保留及 detached writer 停止仍须 JJ canary 验证；未通过前 profile 保持关闭。其他 driver 或 stop 只冻结进程的实现不能套用此结论。

@@ -87,3 +87,13 @@ Promptfoo 0.124.1 独立锁定安装，开发依赖实测约 1.21 GiB，不进�
 父任务在 Windows 实际加载 sharp 0.35.5 / libvips 8.18.7，用合成 2×2 RGB 像素生成 98 字节 PNG，再解码核对逐字节一致。更新后在线生产依赖 audit 返回 0 项，类型检查及构建退出 0，保留既有大 chunk 提示。没有加载嵌入模型，没有模型调用或生产部署。Linux/JJ 二进制兼容性仍待隔离验证；零公告不等同于全面安全审计。
 
 隔离 Promptfoo 目录的在线 audit 有 10 个受影响包，归于 basic-ftp、braces、node-forge 三项原始公告。现有父包约束内没有已验证兼容补丁，本轮保持该锁文件不变，明确记录在 `tools/evaluations/README.md`。固定离线 runner 不开放任意配置、FTP 或证书导入；该限制不能证明依赖漏洞不可利用。详见 `docs/superpowers/plans/2026-10-20-dependency-security-maintenance.md` 的依据和后续门禁。
+
+## 任务沙箱设备适配：本地实现与硬退出回归
+
+2026-10-20，B2 Task 2 按 run/task/attempt/generation 持久区分沙箱；仅传任务授权文件与身份，保留原输入来源、每次操作基线和当前文件清单。命令和原生插件返回后先保存原操作回执，再通过固定 OpenShell Docker 驱动的 stop→确认 Stopped→start→Ready/重新准入→只读检查取得导出。独立公开检查不能绕过未完成操作的屏障。
+
+独立审查先后发现并修复：可读写同一文件后基线与当前清单混淆；仅杀原进程组无法证明后台子进程结束；命令发出、回执保存前硬退出可绕过检查；四个持久中间状态在冷启动时不可读。新增测试捕获执行器实际写出的 JSON，在新执行器中恢复原快照，覆盖未经过 catch/finally 的硬退出状态。未完成状态保留任务、沙箱、原 operation ID 和容量占用，拒绝自动重放或导出。设备的完成、确认和孤儿回执保留 task scope 元数据。
+
+父任务实际执行 `node --test apps/desktop/task-execution.test.cjs apps/desktop/openshell-executor.test.cjs apps/desktop/local-executor.test.cjs tests/local-base64-limits.test.cjs`：**50/50，0 failed，0 skipped，21.125 秒**。独立收口复审实际复跑 7 个针对性测试，通过；早期 48/48 通过后仍发现硬退出缺陷，因此不以测试数量替代边界审查。传输检查另验证最终 JSON 3 MiB 正好可传，超 1 字节在适配器调用前拒绝，属于模拟协议证据。
+
+本地测试证明控制流、持久记录和拒绝重放行为，**不证明 JJ 的物理沙箱边界**。真实固定版本 Docker 停启、脱离进程组的写入进程终止、文件保留和重新准入仍待 JJ canary；完整 canonical 提交、工具接线、checkpoint/维护消费者也尚未接通。新企业任务 profile 继续关闭。此阶段没有付费模型调用或 JJ 生产操作。

@@ -41,7 +41,7 @@ class LocalDeviceClient {
  }
  async deliver(id,receipt){
   await this.api(this.device.id+'/operations/'+id+'/result',receipt);
-  await this.record(id,{phase:'acknowledged',claimToken:receipt.claimToken});this.pending.delete(id);
+  const previous=this.read(id);await this.record(id,{phase:'acknowledged',claimToken:receipt.claimToken,...(previous?.runId?{runId:previous.runId}:{}),...(previous?.taskExecution?{taskExecution:previous.taskExecution}:{}),receipt});this.pending.delete(id);
  }
  run(job){
   const previous=this.read(job.id);
@@ -49,16 +49,18 @@ class LocalDeviceClient {
   if(previous){this.pending.set(job.id,previous.receipt??{claimToken:job.claimToken,ok:false,error:{code:'LOCAL_OUTCOME_UNKNOWN',message:'本机已有此操作记录，拒绝重复执行',notExecuted:previous.phase==='claimed'}});return;}
   const controller=new AbortController(),signal=AbortSignal.any([this.controller.signal,controller.signal]);
   const active={id:job.id,claimToken:job.claimToken,controller};this.active=active;
+  const taskExecution=job.executionScope?.profile==='task-attempt-openshell-v1'?{key:job.executionScope.key,scopeHash:job.executionScope.scopeHash,expectedWorkRevision:job.executionScope.expectedWorkRevision,operationId:job.id}:undefined;
+  const journal={claimToken:job.claimToken,runId:job.runId,...(taskExecution?{taskExecution}:{})};
   active.promise=(async()=>{
    let executing=false,receipt;
    try{
-    await this.record(job.id,{phase:'claimed',claimToken:job.claimToken,runId:job.runId});
-    await this.record(job.id,{phase:'starting',claimToken:job.claimToken,runId:job.runId});
+    await this.record(job.id,{phase:'claimed',...journal});
+    await this.record(job.id,{phase:'starting',...journal});
     await this.api(this.device.id+'/operations/'+job.id+'/start',{claimToken:job.claimToken});signal.throwIfAborted();
-    await this.record(job.id,{phase:'executing',claimToken:job.claimToken,runId:job.runId});executing=true;
+    await this.record(job.id,{phase:'executing',...journal});executing=true;
     const result=await this.executor.execute(job,signal);receipt={claimToken:job.claimToken,ok:true,result};
    }catch(error){receipt={claimToken:job.claimToken,ok:false,error:{code:error.code??'LOCAL_OPERATION_FAILED',message:String(error.message).slice(0,500),notExecuted:!executing||!!error.notExecuted}};}
-   await this.record(job.id,{phase:'completed',claimToken:job.claimToken,runId:job.runId,receipt});this.pending.set(job.id,receipt);
+   await this.record(job.id,{phase:'completed',...journal,receipt});this.pending.set(job.id,receipt);
    try{if(!this.stopped)await this.deliver(job.id,receipt);}catch{}
   })().catch(error=>{this.stopped=true;this.controller.abort(error);this.onState({status:'offline',message:'本机回执无法持久保存：'+error.message});}).finally(()=>{if(this.active===active)this.active=null;});
  }
@@ -70,7 +72,7 @@ class LocalDeviceClient {
     if(reply.cancel)this.active?.controller.abort(Error('服务端取消或设备授权失效'));
     if(reply.orphan&&!this.active){
      const previous=this.read(reply.orphan.id),receipt=previous?.receipt??{claimToken:reply.orphan.claimToken,ok:false,error:{code:'LOCAL_OUTCOME_UNKNOWN',message:'桌面进程中断，操作不自动重放，请核对本机工作区',notExecuted:!reply.orphan.started&&(!previous||previous.phase==='claimed')}};
-     await this.record(reply.orphan.id,{phase:'completed',receipt});this.pending.set(reply.orphan.id,receipt);
+     await this.record(reply.orphan.id,{...previous,phase:'completed',receipt});this.pending.set(reply.orphan.id,receipt);
     }
     if(reply.job&&!this.active)this.run(reply.job);
     this.onState({status:this.active?'running':'connected',operationId:this.active?.id});

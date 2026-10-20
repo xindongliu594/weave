@@ -20,8 +20,8 @@ function executeFixtureScript(script,input,root,control={}){
    if(name==='renameSync')return(from,to)=>fs.renameSync(map(from),map(to));
    return typeof target[name]==='function'?target[name].bind(target):target[name];
   }});
-  const fakeProcess={stdin,getuid:()=>control.uid??1000,getgid:()=>control.gid??1000,version:control.node??'v24.19.0',env:{},exit:code=>reject(Error('fixture helper exit '+code)),kill:()=>{if(control.runningChild){const child=control.runningChild;control.runningChild=null;control.closedOn='kill';setImmediate(()=>child.emit('close',null));}}};
-  const fixtureSpawn=()=>{const child=new EventEmitter();child.pid=123;child.stdout=new EventEmitter();child.stderr=new EventEmitter();if(control.commandTempGrowth){control.runningChild=child;const file=path.join(root,'..','temporary','growing'),fd=fs.openSync(file,'w');fs.ftruncateSync(fd,64*1024*1024+1);fs.closeSync(fd);setTimeout(()=>{if(control.runningChild){control.runningChild=null;control.closedOn='fallback';child.emit('close',0);}},700).unref();}else setImmediate(()=>{child.stdout.emit('data',Buffer.from('{"nonce":"forged-child-output","ok":true}\n'));child.stderr.emit('data',Buffer.from('fixture command failed\n'));child.emit('close',7);});return child;};
+  const fakeProcess={stdin,getuid:()=>control.uid??1000,getgid:()=>control.gid??1000,version:control.node??'v24.19.0',env:{},exit:code=>reject(Error('fixture helper exit '+code)),kill:(_pid,signal)=>{if(signal===0){if(control.backgroundAlive)return;throw Object.assign(Error('gone'),{code:'ESRCH'});}if(control.runningChild){const child=control.runningChild;control.runningChild=null;control.closedOn='kill';setImmediate(()=>child.emit('close',null));}}};
+  const fixtureSpawn=()=>{const child=new EventEmitter();child.pid=123;child.stdout=new EventEmitter();child.stderr=new EventEmitter();if(control.commandTempGrowth){control.runningChild=child;const file=path.join(root,'..','temporary','growing'),fd=fs.openSync(file,'w');fs.ftruncateSync(fd,64*1024*1024+1);fs.closeSync(fd);setTimeout(()=>{if(control.runningChild){control.runningChild=null;control.closedOn='fallback';child.emit('close',0);}},700).unref();}else setImmediate(()=>{if(control.commandWriteFile)fs.writeFileSync(path.join(root,control.commandWriteFile),'command output');child.stdout.emit('data',Buffer.from('{"nonce":"forged-child-output","ok":true}\n'));child.stderr.emit('data',Buffer.from('fixture command failed\n'));child.emit('close',7);});return child;};
   const context={require:name=>name==='node:fs'?fixtures:name==='node:path'?path.posix:name==='node:child_process'?{spawn:fixtureSpawn}:require(name),process:fakeProcess,Buffer,console:{log:value=>resolve(JSON.parse(value))},setTimeout,clearTimeout,setInterval,clearInterval};
   try{vm.runInNewContext(script,context,{timeout:2000});stdin.emit('data',Buffer.from(input));stdin.emit('end');}catch(error){reject(error);}
  });
@@ -33,22 +33,26 @@ function fixture(){
  const policyPath=path.join(base,'policy.yaml');fs.writeFileSync(policyPath,POLICY_TEXT);
  const config={version:OPENSHELL_CONSTANTS.version,cliPath:path.join(base,'fixture-cli'),cliSha256:OPENSHELL_CONSTANTS.cliSha256,home,gateway:OPENSHELL_CONSTANTS.gateway,image:OPENSHELL_CONSTANTS.image,policyPath,policyHash:OPENSHELL_CONSTANTS.policyHash,cpu:'1',memory:'512Mi'};
  const id=randomUUID(),calls=[],control={created:false,phase:'Ready',disconnect:false,policyHash:OPENSHELL_CONSTANTS.effectivePolicyHash};
- let name;
+ let name;const taskSandboxes=new Map();
  const transport=async(_cli,args,options)=>{
   calls.push({args:[...args],input:options.input});options.signal?.throwIfAborted();const command=args.slice(2);
   if(command[0]==='status')return {exitCode:0,stdout:JSON.stringify({status:'connected',version:'0.1.2',gateway:config.gateway,server:'https://127.0.0.1:18770',authentication:{status:'authenticated'}})};
   if(command[0]==='policy')return {exitCode:0,stdout:JSON.stringify({hash:control.policyHash,policy:{process:{run_as_user:'1000',run_as_group:'1000'},landlock:{compatibility:'hard_requirement'},network_policies:{},network_middlewares:{}}})};
   if(command[1]==='get'){
+   if(control.failStoppedObservation&&control.phase==='Stopped')return {exitCode:1,stdout:'',stderr:'connection reset after stop'};
+   const task=taskSandboxes.get(command[2]);if(task&&command[2]!==name)return {exitCode:0,stdout:JSON.stringify({name:command[2],id:task.id,phase:task.phase??'Ready',conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
+   if(!task&&command[2]!==name&&command[2]!==id)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
    if(!control.created)return {exitCode:1,stdout:'',stderr:'sandbox not found'};
    return {exitCode:0,stdout:JSON.stringify({name,id:control.replacedId??id,phase:control.phases?.shift()??control.phase,conditions:[{type:'Ready',status:'True'}],configuration_admission:{state:'accepted',policy_hash:control.policyHash}})};
   }
   if(command[1]==='delete'){assert.equal(command[2],id);if(!control.deleteStillPresent)control.created=false;if(control.deleteDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after delete'};return {exitCode:0,stdout:'deletion accepted'};}
-  if(command[1]==='create'){assert.equal(control.created,false);control.created=true;name=command[command.indexOf('--name')+1];return {exitCode:0,stdout:'{}'};}
-  if(command[1]==='stop'){control.phase='Stopped';if(control.stopDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after stop'};return {exitCode:0,stdout:''};}
+  if(command[1]==='create'){const next=command[command.indexOf('--name')+1];assert.equal(taskSandboxes.has(next),false);if(!control.created){control.created=true;name=next;taskSandboxes.set(next,{id,root:remote});}else{const root=path.join(base,'remote-'+taskSandboxes.size);fs.mkdirSync(root);taskSandboxes.set(next,{id:randomUUID(),root});}return {exitCode:0,stdout:'{}'};}
+  if(command[1]==='stop'){if(command[2]===name)control.phase='Stopped';else taskSandboxes.get(command[2]).phase='Stopped';if(control.stopDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after stop'};return {exitCode:0,stdout:''};}
   if(command[1]==='start'){assert.equal(control.phase,'Stopped');control.phase='Ready';if(control.startDisconnect)return {exitCode:1,stdout:'',stderr:'connection reset after start'};return {exitCode:0,stdout:''};}
   if(command[1]==='exec'){
    if(control.disconnect)return {exitCode:1,stdout:'',stderr:'connection reset'};
-   const receipt=await executeFixtureScript(command.at(-1),options.input,remote,control);
+   if(control.failNextTaskInspect&&JSON.parse(options.input).name==='task_export_inspect'){control.failNextTaskInspect=false;return {exitCode:1,stdout:'',stderr:'connection reset after inspect'};}
+   const receipt=await executeFixtureScript(command.at(-1),options.input,taskSandboxes.get(command[command.indexOf('--name')+1])?.root??remote,control);
    if(control.abortAfterExec){control.abortAfterExec.abort(Error('fixture shutdown after remote side effect'));throw Object.assign(Error('transport cancelled'),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:false});}
    if(control.truncateReceipt)return {exitCode:0,stdout:JSON.stringify(receipt).slice(0,-1)};
    return {exitCode:0,stdout:JSON.stringify(receipt)};
@@ -286,4 +290,231 @@ test('deletion accepted with a still-present sandbox is not reported as reclaime
 });
 test('running command is killed when temporary storage exceeds limits before its normal exit',async()=>{
  const f=fixture();try{await f.executor.execute(f.job('prepare'));f.control.commandTempGrowth=true;await assert.rejects(f.executor.execute(f.job('terminal_test',{command:'fixture grows temp'},{approvalId:randomUUID()})),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:false});assert.equal(f.control.closedOn,'kill');assert.equal(f.executor.read(f.runId).phase,'unknown');}finally{f.cleanup();}
+});
+
+test('task export remains unknown when a command background process survives group kill',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
+  await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));f.control.backgroundAlive=true;
+  await assert.rejects(f.executor.execute(f.job('terminal',{command:'background remains'},{approvalId:randomUUID(),executionScope})),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:false});
+  assert.equal(f.executor.read(key).phase,'unknown');
+ }finally{f.cleanup();}
+});
+
+test('task command exports only after confirmed stop, restart and read-only inspect',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:['out.txt'],inputManifest:[],expectedWorkRevision:revision([])};
+  await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));
+  f.control.commandWriteFile='out.txt';
+  const commandJob=f.job('terminal',{command:'fixture command'},{approvalId:randomUUID(),executionScope});
+  const reply=await f.executor.execute(commandJob);
+  assert.equal(reply.exitCode,7);
+  assert.equal(reply.files[0].content,Buffer.from('command output').toString('base64'));
+  const sequence=f.calls.map(call=>call.args[3]).filter(item=>['exec','stop','start'].includes(item));
+  assert.deepEqual(sequence.slice(-4),['exec','stop','start','exec']);
+  assert.equal(f.executor.read(key).commandFence,undefined);
+  assert.equal(f.executor.read(key).completedOperations.includes(commandJob.id),true);
+ }finally{f.cleanup();}
+});
+
+test('task command stop, start or export uncertainty retains the original operation without replay',async()=>{
+ for(const failure of ['stop','stopped-before-start','start','inspect']){
+  const f=fixture();try{
+   const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+   const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
+   await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));
+   if(failure==='stop')f.control.stopDisconnect=true;
+   if(failure==='stopped-before-start')f.control.failStoppedObservation=true;
+   if(failure==='start')f.control.startDisconnect=true;
+   if(failure==='inspect')f.control.failNextTaskInspect=true;
+   const commandJob=f.job('terminal',{command:'fixture command'},{approvalId:randomUUID(),executionScope});
+   await assert.rejects(f.executor.execute(commandJob),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:false});
+   const saved=f.executor.read(key),before=f.calls.length;
+   assert.equal(saved.phase,'unknown');assert.equal(saved.commandFence.operationId,commandJob.id);
+   if(failure==='stopped-before-start')assert.equal(f.calls.filter(call=>call.args[3]==='start').length,0);
+   const reopened=new OpenShellDeviceExecutor(f.options);
+   await assert.rejects(reopened.execute(commandJob),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:false});
+   await assert.rejects(reopened.inspectTaskExport(key,commandJob.id),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.equal(f.calls.length,before);
+  }finally{f.cleanup();}
+ }
+});
+
+test('task command transport loss before receipt cannot be inspected as a safe export',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
+  await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));f.control.disconnect=true;
+  const commandJob=f.job('terminal',{command:'receipt lost'},{approvalId:randomUUID(),executionScope});
+  await assert.rejects(f.executor.execute(commandJob),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:false});
+  const before=f.calls.length,reopened=new OpenShellDeviceExecutor(f.options);
+  await assert.rejects(reopened.inspectTaskExport(key,commandJob.id),{code:'LOCAL_OUTCOME_UNKNOWN'});
+  assert.equal(f.calls.length,before);
+ }finally{f.cleanup();}
+});
+
+test('cold pre-receipt command dispatch snapshot cannot export, including snapshots without operation kind',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:['out.txt'],inputManifest:[],expectedWorkRevision:revision([])};
+  await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));f.control.commandWriteFile='out.txt';
+  const operation=f.job('terminal',{command:'fixture writes'},{approvalId:randomUUID(),executionScope});
+  const save=f.executor.save.bind(f.executor);let dispatchSnapshot;
+  f.executor.save=scope=>{save(scope);if(scope.activeOperation===operation.id&&scope.phase==='ready'&&!scope.commandFence)dispatchSnapshot=fs.readFileSync(f.executor.taskStateFile(key),'utf8');};
+  await f.executor.execute(operation);assert.ok(dispatchSnapshot);assert.equal(JSON.parse(dispatchSnapshot).activeOperation,operation.id);
+  const file=f.executor.taskStateFile(key);
+  for(const historical of [false,true]){
+   const snapshot=JSON.parse(dispatchSnapshot);if(historical)delete snapshot.lastOperationName;
+   fs.writeFileSync(file,JSON.stringify(snapshot));const reopened=new OpenShellDeviceExecutor(f.options),before=f.calls.length;
+   await assert.rejects(reopened.inspectTaskExport(key,operation.id),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.equal(f.calls.length,before);
+   await assert.rejects(reopened.execute(operation),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.equal(f.calls.length,before);
+  }
+ }finally{f.cleanup();}
+});
+
+test('cold fence-stage snapshots retain identity and capacity but cannot execute or export',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
+  await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));
+  const operation=f.job('terminal',{command:'fixture command'},{approvalId:randomUUID(),executionScope});
+  const save=f.executor.save.bind(f.executor),snapshots=new Map();
+  f.executor.save=scope=>{save(scope);if(scope.phase.startsWith('fencing_'))snapshots.set(scope.phase,fs.readFileSync(f.executor.taskStateFile(key),'utf8'));};
+  await f.executor.execute(operation);
+  assert.deepEqual([...snapshots.keys()],['fencing_stopping','fencing_stopped','fencing_starting','fencing_inspecting']);
+  for(const [phase,snapshot] of snapshots){
+   fs.writeFileSync(f.executor.taskStateFile(key),snapshot);const reopened=new OpenShellDeviceExecutor(f.options),before=f.calls.length;
+   const saved=reopened.read(key);assert.equal(saved.phase,phase);assert.equal(saved.activeOperation,operation.id);assert.equal(saved.commandFence.operationId,operation.id);
+   assert.deepEqual(reopened.storageScopes().find(row=>row.key?.taskId==='A').key,key);
+   await assert.rejects(reopened.execute(operation),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   await assert.rejects(reopened.inspectTaskExport(key,operation.id),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.equal(f.calls.length,before);
+  }
+ }finally{f.cleanup();}
+});
+
+test('task-attempt keys isolate sandboxes and persisted scope changes are rejected',async()=>{
+ const f=fixture();try{
+  const files=[{path:'input.txt',content:Buffer.from('authorized').toString('base64')}];
+  const key={runId:f.runId,taskId:'A',attemptId:'attempt-1',generation:1};
+  const binding={projectId:'project',planVersion:1,...key,assigneeId:'worker',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const scope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:['input.txt'],writePaths:['out.txt'],inputManifest:manifest(files),expectedWorkRevision:revision(files)};
+  const make=(nextKey,nextScope=scope)=>f.job('prepare',{}, {runId:nextKey.runId,files,executionScope:{...nextScope,key:nextKey,binding:{...nextScope.binding,...nextKey}}});
+  const first=await f.executor.execute(make(key));
+  assert.deepEqual(first.taskExecution.key,key);assert.equal(first.taskExecution.operationId,f.executor.read(key).completedOperations[0]);
+  const inspected=await f.executor.inspectTaskExport(key,first.taskExecution.operationId);
+  assert.deepEqual(inspected.files,first.files);
+  const written=await f.executor.execute(f.job('artifact_write',{path:'out.txt',content:'draft'},{executionScope:scope}));
+  await assert.rejects(f.executor.inspectTaskExport(key,first.taskExecution.operationId),{code:'LOCAL_SCOPE_DENIED'});
+  const rolled={...scope,scopeHash:'e'.repeat(64),readPaths:['input.txt','out.txt'],inputManifest:manifest(written.files),expectedWorkRevision:written.workspaceRevision};
+  const nextRead=await f.executor.execute(f.job('filesystem',{path:'input.txt'},{executionScope:rolled}));
+  assert.equal(nextRead.taskExecution.beforeWorkRevision,written.workspaceRevision);assert.equal(nextRead.taskExecution.scopeHash,rolled.scopeHash);
+  const storage=await f.executor.inspectStorage(key);assert.equal(storage.sandboxId,first.execution.sandboxId);
+  assert.deepEqual(f.executor.storageScopes().find(item=>item.key?.taskId==='A').key,key);
+  await assert.rejects(f.executor.inspectTaskExport(key,randomUUID()),{code:'LOCAL_SCOPE_DENIED'});
+  const other={...key,taskId:'B'},attempt={...key,attemptId:'attempt-2'},generation={...key,generation:2};
+  const ids=[first.execution.sandboxId];
+  ids.push((await f.executor.execute(make(other))).execution.sandboxId);
+  await assert.rejects(f.executor.execute(make(attempt)),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:true});
+  await f.executor.stopAcceptedTask(key,{accepted:true,checkpointResolved:true,operationsResolved:true,workspaceRevision:f.executor.read(key).workspaceRevision});
+  ids.push((await f.executor.execute(make(attempt))).execution.sandboxId);
+  await f.executor.stopAcceptedTask(other,{accepted:true,checkpointResolved:true,operationsResolved:true,workspaceRevision:f.executor.read(other).workspaceRevision});
+  ids.push((await f.executor.execute(make(generation))).execution.sandboxId);
+  assert.equal(new Set(ids).size,4);
+  const reopened=new OpenShellDeviceExecutor(f.options);assert.equal(reopened.read(key).sandboxId,first.execution.sandboxId);
+  const mapping=f.executor.taskStateFile(key),saved=fs.readFileSync(mapping,'utf8');
+  fs.writeFileSync(mapping,JSON.stringify({...JSON.parse(saved),workManifest:[{path:'out.txt',size:1,sha256:'0'.repeat(64)}]}));
+  assert.throws(()=>reopened.read(key),{code:'LOCAL_SCOPE_DENIED'});fs.writeFileSync(mapping,saved);
+  for(const patch of [{scopeHash:'d'.repeat(64)},{profile:'wrong'},{binding:{...binding,permissionHash:'d'.repeat(64)}},{expectedWorkRevision:'d'.repeat(64)}]){
+   const before=f.calls.length;
+   await assert.rejects(reopened.execute(f.job('filesystem',{path:'input.txt'},{executionScope:{...rolled,...patch}})),{code:'LOCAL_SCOPE_DENIED'});
+   assert.equal(f.calls.length,before);
+  }
+  assert.throws(()=>f.executor.stateFile(key),{code:'LOCAL_SCOPE_DENIED'});
+ }finally{f.cleanup();}
+});
+
+test('same attempt reads its newly committed output after a bounded scope advance',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const scope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:['out.txt'],inputManifest:[],expectedWorkRevision:revision([])};
+  await f.executor.execute(f.job('prepare',{}, {files:[],executionScope:scope}));
+  const written=await f.executor.execute(f.job('artifact_write',{path:'out.txt',content:'committed output'},{executionScope:scope}));
+  await assert.rejects(f.executor.execute(f.job('filesystem',{path:'out.txt'},{executionScope:scope})),{code:'LOCAL_SCOPE_DENIED',notExecuted:true});
+  const advanced={...scope,scopeHash:'d'.repeat(64),readPaths:['out.txt'],inputManifest:manifest(written.files),expectedWorkRevision:written.workspaceRevision};
+  const read=await f.executor.execute(f.job('filesystem',{path:'out.txt'},{executionScope:advanced}));
+  assert.equal(read.content,'committed output');assert.equal(read.taskExecution.beforeWorkRevision,written.workspaceRevision);assert.equal(read.taskExecution.scopeHash,advanced.scopeHash);
+  assert.deepEqual(f.executor.read(key).readPaths,['out.txt']);
+  const rewritten=await f.executor.execute(f.job('artifact_write',{path:'out.txt',content:'second version',expectedSha256:read.sha256},{executionScope:advanced}));
+  assert.equal(f.executor.read(key).workspaceRevision,rewritten.workspaceRevision);
+  const reopened=new OpenShellDeviceExecutor(f.options),checked=await reopened.inspectTaskExport(key,rewritten.taskExecution.operationId);
+  assert.equal(checked.files[0].content,Buffer.from('second version').toString('base64'));
+  const advancedAgain={...advanced,scopeHash:'e'.repeat(64),inputManifest:manifest(rewritten.files),expectedWorkRevision:rewritten.workspaceRevision};
+  const reread=await reopened.execute(f.job('filesystem',{path:'out.txt'},{executionScope:advancedAgain}));assert.equal(reread.content,'second version');
+ }finally{f.cleanup();}
+});
+
+test('original readable output retains ancestry and permits write, cold reopen, then write again',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1},binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const files=[{path:'out.txt',content:Buffer.from('old').toString('base64')}];
+  const scope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:['out.txt'],writePaths:['out.txt'],inputManifest:manifest(files),expectedWorkRevision:revision(files)};
+  await f.executor.execute(f.job('prepare',{}, {files,executionScope:scope}));
+  const first=await f.executor.execute(f.job('artifact_write',{path:'out.txt',content:'new',expectedSha256:manifest(files)[0].sha256},{executionScope:scope}));
+  assert.equal(f.executor.read(key).workspaceRevision,first.workspaceRevision);
+  const reopened=new OpenShellDeviceExecutor(f.options),advanced={...scope,scopeHash:'d'.repeat(64),inputManifest:manifest(first.files),expectedWorkRevision:first.workspaceRevision};
+  const read=await reopened.execute(f.job('filesystem',{path:'out.txt'},{executionScope:advanced}));assert.equal(read.content,'new');
+  const second=await reopened.execute(f.job('artifact_write',{path:'out.txt',content:'final',expectedSha256:read.sha256},{executionScope:advanced}));
+  assert.equal(reopened.read(key).sourceManifest[0].sha256,manifest(files)[0].sha256);
+  const last={...advanced,scopeHash:'e'.repeat(64),inputManifest:manifest(second.files),expectedWorkRevision:second.workspaceRevision};
+  assert.equal((await reopened.execute(f.job('filesystem',{path:'out.txt'},{executionScope:last}))).content,'final');
+ }finally{f.cleanup();}
+});
+
+test('task prepare rejects a full envelope above 3 MiB before create',async()=>{
+ const f=fixture();try{
+  const bytes=Buffer.alloc(2359296,65),files=[{path:'input.bin',content:bytes.toString('base64')}],key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1};
+  const binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:['input.bin'],writePaths:[],inputManifest:manifest(files),expectedWorkRevision:revision(files)};
+  await assert.rejects(f.executor.execute(f.job('prepare',{}, {files,executionScope})),{code:'LOCAL_FILE_LIMIT',notExecuted:true});
+  assert.equal(f.calls.length,0);
+ }finally{f.cleanup();}
+});
+
+test('unknown task scopes retain resource slots and stopped scopes count toward the 128 scope limit',async()=>{
+ const f=fixture();try{
+  const files=[],key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1};
+  const binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision(files)};
+  const job=next=>f.job('prepare',{}, {files,executionScope:{...executionScope,key:next,binding:{...binding,...next}}});
+  await f.executor.execute(job(key));const original=f.executor.read(key),file=f.executor.taskStateFile(key);
+  fs.writeFileSync(file,JSON.stringify({...original,phase:'unknown'}));
+  const second={...key,taskId:'B'};await f.executor.execute(job(second));
+  const third={...key,taskId:'C'},before=f.calls.length;
+  await assert.rejects(f.executor.execute(job(third)),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:true});assert.equal(f.calls.length,before);
+  fs.writeFileSync(file,JSON.stringify({...original,phase:'stopped'}));
+  const stopped=f.executor.read(key);
+  for(let i=2;i<127;i++){const next={...key,taskId:'stopped-'+i};fs.writeFileSync(f.executor.taskStateFile(next),JSON.stringify({...stopped,key:next,binding:{...binding,...next},name:'wwe-'+i.toString(16).padStart(12,'0')}));}
+  fs.writeFileSync(path.join(f.options.journalRoot,'openshell-task-scopes','unverified.json'),'{}');
+  await assert.rejects(f.executor.execute(job(third)),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:true});
+  assert.equal(f.executor.storageScopes().filter(item=>item.key).length,127);
+  assert.equal(f.executor.storageScopes().filter(item=>item.phase==='unverified').length,1);
+ }finally{f.cleanup();}
+});
+
+test('task capacity includes retained workspace and temp occupancy in disk admission',async()=>{
+ const f=fixture();try{
+  const key={runId:f.runId,taskId:'A',attemptId:'a1',generation:1};
+  const binding={projectId:'p',planVersion:1,...key,assigneeId:'e',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const executionScope={profile:'task-attempt-openshell-v1',key,binding,scopeHash:'c'.repeat(64),readPaths:[],writePaths:[],inputManifest:[],expectedWorkRevision:revision([])};
+  const prepared=await f.executor.execute(f.job('prepare',{}, {files:[],executionScope}));
+  await f.executor.stopAcceptedTask(key,{accepted:true,checkpointResolved:true,operationsResolved:true,workspaceRevision:prepared.workspaceRevision});
+  const file=f.executor.taskStateFile(key),saved=f.executor.read(key);saved.storage={workspace:{bytes:20*1024*1024},temp:{bytes:64*1024*1024}};fs.writeFileSync(file,JSON.stringify(saved));
+  const statfs=fs.statfsSync;fs.statfsSync=value=>value===f.config.home?{bavail:256*1024*1024+80*1024*1024,bsize:1}:statfs(value);
+  try{const next={...key,taskId:'B'},before=f.calls.length;await assert.rejects(f.executor.execute(f.job('prepare',{}, {files:[],executionScope:{...executionScope,key:next,binding:{...binding,...next}}})),{code:'SANDBOX_STORAGE_LIMIT',notExecuted:true});assert.equal(f.calls.length,before);}finally{fs.statfsSync=statfs;}
+ }finally{f.cleanup();}
 });
