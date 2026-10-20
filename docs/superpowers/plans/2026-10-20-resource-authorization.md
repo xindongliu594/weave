@@ -17,7 +17,7 @@
 - 真人 actor 只取 `identity.authenticate(req)` 后由 `apiAccess` 写入的 `res.locals.principal`。body、query、headers、模型输出、运行快照不得声明或覆盖 actor；device/system 只由现有受信机器/内部入口构造。审计也记录 `local-owner`，但不把旧行为改写成新的人名。
 - 成员权限只取当前 `human_users` active/epoch 与 `department_memberships`；长运行还须将当前 epoch 与批准时持久 `authorized_epoch` 比较，自然 session TTL 到期不等于 epoch 撤权。审批要求每个参与部门 `operator|manager` 且各自 `can_approve=true`。预算上调、挪用未分配额度、未知费用处置、网关/凭据/插件管理、备份/清理初期仅 admin。`auditor` 无业务资源读权。
 - 读权不含再分发权。来源条件取并集、目标参与部门必须包含全部来源所需部门，`admin_only/private` 严格性不能消失；持久来源版本/哈希可追溯。管理员普通复制仍带来源条件。无法捕获或传递来源的在应用内派生路径禁向成员开放，不能以模型改写或改名消除来源限制。
-- 授权和 CSRF 在幂等 lookup 前；列表/搜索/计数在 SQL `LIMIT` 前过滤；有副作用的成功审计与业务变化同事务，失败/拒绝审计在回滚后独立写入，外部 JSONL 经 outbox 投影。后台无浏览器 session，不能用历史快照绕过当前撤权。
+- 授权和 CSRF 在幂等 lookup 前；列表/搜索/计数在 SQL `LIMIT` 前过滤；有副作用的成功审计与业务变化同事务，失败/拒绝审计在回滚后独立写入。outbox 只投影到受限 DB 运行索引，不由第二个 worker 写活动 JSONL。后台无浏览器 session，不能用历史快照绕过当前撤权。
 - 保留数据、费用与未知结果；隔离 DB/临时目录测试，无生产/JJ、真实模型或付费调用。每任务定向红绿测试通过后才做下一任务；最终再做跨端集成验收。
 - 需要 SQL 的新 `tests/resource-*.test.ts`、`tests/identity-management.test.ts` 必须像 `tests/api-idempotency.test.ts` 一样确认受信隔离 runner 和 loopback 测试 URL：一般测试断言 `SIMULATED_INTEGRATION==='pglite'`；Task 7/8 的独立后端并发测试额外接受 `resource-postgres`，仅由 Task 7 新 runner 注入。用现有 `node scripts/test-integration.mjs <测试文件...>`：它为**每文件**创建新 PGlite + pgvector、注入临时 `DATABASE_URL` 并关闭，绝不直接执行 `tsx --test` 继承 ambient `DATABASE_URL`。无 DB 的纯函数测试可直接 tsx。PGlite 单 backend 不能证明真实 PostgreSQL 行锁并发；Task 7/10 另用显式隔离 PG 验收。
 
@@ -108,9 +108,11 @@
 
 **Files:** create `apps/api/src/human-audit.ts`, `tests/resource-approval-audit.test.ts`, `scripts/test-resource-postgres.mjs`; modify `apps/api/src/run-management.ts`, `identity-store.ts`, `identity-schema.ts`, `cost-router.ts`, `app.ts`, `api-route-policies.ts`。Task 6 后顺序接手。
 
-**Interfaces:** `appendBusinessAudit(db,event)` 只接受受限 action/resource/outcome/变更摘要；`recordDeniedAudit(pool,event)` 在失败事务回滚后独立写入（失败不得吞掉且不得把拒绝变成功）；`publishAuditOutbox(pool,traceRoot,limit)` 按 event ID 去重写 run JSONL。审批从 `res.locals.principal` 取 actor，绝不读 body 的 identity 字段。
+**Prerequisite:** D2 观测计划 Tasks 1–2 先提供共享 append/outbox 合同；D2 Task 3 再消费本任务的业务接线。不是全部 A2 完成后才开始 D2，也不是 A2 另建审计队列。
 
-- [ ] 写失败测试：A O+approval/B O 无 approval 拒绝；B viewer+flag 拒绝；A/B O/M+flag 才可批；并发撤 B/双决定最多一个提交；audit INSERT 故障使批准回滚；JSONL 故障仍有 outbox，可重试一次且不重批；历史审批决定人 NULL 不伪填；body 假 actor 忽略/拒绝。运行 `node scripts/test-integration.mjs tests/resource-approval-audit.test.ts`，预期非并发部分失败；真实行锁竞态须由本任务新隔离 PG runner 复测，不能因 PGlite 绿而称通过。
+**Interfaces:** `appendBusinessAudit(db,event)`、`recordDeniedAudit(pool,event)` 是 D2 `appendAudit`/`recordAuditFailure` 的薄适配，使用同一审计表、action/resource/outcome 白名单及当前授权证据。拒绝在业务事务回滚后独立写入，失败不能把拒绝变成功。共享 `projectAuditOutbox(pool,{limit,now})` 在短 DB 事务中按 event ID 幂等写 `audit_run_projection` 并更新 outbox；`published_at` 仅表示这次 DB 投影已提交，不表示 JSONL 或 OTLP 已送达。审批从 `res.locals.principal` 取 actor，绝不读 body 的 identity 字段。
+
+- [ ] 写失败测试：A O+approval/B O 无 approval 拒绝；B viewer+flag 拒绝；A/B O/M+flag 才可批；并发撤 B/双决定最多一个提交；audit INSERT 故障使批准回滚；DB 投影故障仍有 outbox，重试不重批；活动 JSONL 不因投影出现第二写者；历史审批决定人 NULL 不伪填；body 假 actor 忽略/拒绝。运行 `node scripts/test-integration.mjs tests/resource-approval-audit.test.ts`，预期非并发部分失败；真实行锁竞态须由本任务新隔离 PG runner 复测，不能因 PGlite 绿而称通过。
 - [ ] additive 扩 `tool_approvals` 历史可空 actor/request/reason 字段；`POST /approvals/:id` 先**无锁只读** approval 的 `run_id` 与 run 的 `project_id` 用于定位；进入事务后按既有协调器顺序锁 `project FOR UPDATE → run FOR UPDATE → approval FOR UPDATE → actor human_users FOR UPDATE → 按 department ID 排序的 actor memberships FOR UPDATE`，重读外键并确认仍是同一链，否则回滚重试/拒绝。检查 pending/running/not-cancelled、active/epoch 和每部门当前 O/M+flag，同事务更新决定、append audit/outbox；提交后投影。人员管理事务按 Task 1 的 user→membership 顺序，不在其后请求 project/run/approval 锁，撤权与审批在共有 user/membership 锁上序列化。拒绝/失败由外层独立结构化审计且无秘密 arguments。运行 JSONL 不当 DB 事务凭证。
 - [ ] 关键项目/运行/人员/插件/预算/备份/清理动作逐项接同事务 success audit；跨文件/外部效果用 operation/outbox 关联，失败/拒绝独立记录。`GET /costs` 对成员只回 `{timezone,departments:[{id,spent,retained,limit}]}` 中明确归属部门的脱敏汇总，不含全局总数、calls/recent、费率或上游 request；run/project/department 冗余链冲突或 NULL 仅 A，`query-provider`/`reconcile` A-only。运行 `node scripts/test-integration.mjs tests/resource-approval-audit.test.ts tests/cost.test.ts tests/api-access.test.ts` 与 `./node_modules/.bin/tsc.cmd --noEmit`，预期绿。
 - [ ] `scripts/test-resource-postgres.mjs` 必须要求显式 `RESOURCE_TEST_DATABASE_URL`（仅 loopback、数据库名以 `weiwu_resource_test_` 开头），拒绝使用 ambient `DATABASE_URL`；创建随机隔离 schema，给子进程设置该 schema 和 `SIMULATED_INTEGRATION=resource-postgres`，运行选定测试后清理。runner 支持 `tests/identity-management.test.ts`、`tests/resource-approval-audit.test.ts`、`tests/run-current-authority.test.ts`；用 `node scripts/test-resource-postgres.mjs tests/identity-management.test.ts tests/resource-approval-audit.test.ts tests/run-current-authority.test.ts` 在一次性 PostgreSQL 测试库中证明两管理员并发降级/停用、审批与撤权及 epoch 增加与新效果接纳的两个独立连接竞态；缺显式 URL 或库不可用时标记此门禁受阻，不退回 PGlite 假绿。
@@ -145,6 +147,6 @@
 
 ## 自审与未开放功能
 
-- 设计的资源族覆盖 Task 1 人、Task 2 锚点、Task 3 来源、Task 4 部门/项目/运行、Task 5 文件、Task 6 知识/候选、Task 7 审批/费用/审计、Task 8 恢复/工具、Task 9 UI/全路由；前后接口同名。成功审计与 DB 同事务、拒绝/失败独立写、JSONL 经 outbox，已分别落 Task 7。
+- 设计的资源族覆盖 Task 1 人、Task 2 锚点、Task 3 来源、Task 4 部门/项目/运行、Task 5 文件、Task 6 知识/候选、Task 7 审批/费用/审计、Task 8 恢复/工具、Task 9 UI/全路由；前后接口同名。成功审计与 DB 同事务、拒绝/失败独立写、outbox 有界 DB 投影，已分别落 Task 7。2026-10-20 接线裁决：现有 JSONL 游标/去重仅进程内共享，新增 worker 不能安全追加活动档案，故替换原 JSONL 投影设想；原档案和恢复语义保留，外发观测另走 D2 受限摘要。
 - 首版 company 知识无公开标志、employee 私有正文、无归属文件/费用/trace、全局自动化/MCP/browser 连接、预算上调与旧无授权人运行均继续 admin-only 或暂停。公司范围的“全员可读”发布、员工私有真人直读、来源授权降密、无归属历史归并需要后续单独设计/证据；不以 A2 计划声称这些路径已完成。
 - 外部手动复制粘贴或外部文件导入若无法证明来源，应用无法凭正文推断原约束；此类入口不授予成员跨资源发布权。应用内显式来源与派生链按上述持久绑定强制执行。
