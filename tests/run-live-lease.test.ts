@@ -42,13 +42,23 @@ const expire=async(id:string)=>pool.query("UPDATE project_runs SET lease_until=c
 test('own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged',{skip:!isolated},async()=>{
  const f=await fixture();worker.active.set(f.runId,{projectId:f.projectId,writer:await worker.writers.acquireOwner([f.runId])});
  await pool.query("INSERT INTO model_reservations(id,model_id,project_id,run_id,purpose,amount,input_rate,output_rate,status,context) VALUES('lease-unknown','recovery-model',$1,$2,'fixture',.096526,0,0,'uncertain','{}')",[f.projectId,f.runId]);const receipt=(await pool.query("SELECT * FROM model_reservations WHERE id='lease-unknown'")).rows[0];
- const native=pool.query.bind(pool);let injected=false,heartbeatCount=0;
+ const native=pool.query.bind(pool),connect=pool.connect;let injected=false,heartbeatCount=0;
  (pool as any).query=async(text:any,...args:any[])=>{
   if(typeof text==='string'&&/UPDATE project_runs SET lease_until=/.test(text))heartbeatCount++;
-  if(!injected&&typeof text==='string'&&text.startsWith('UPDATE model_capability_tests')){injected=true;await native("UPDATE project_runs SET lease_until=clock_timestamp()-interval '1 second' WHERE id=$1",[f.runId]);await worker.tick();}
   return (native as any)(text,...args);
  };
- try{await worker.tick();}finally{(pool as any).query=native;}
+ (pool as any).connect=function(callback?:unknown){
+  if(typeof callback==='function')return (connect as any).call(pool,callback);
+  return (connect as ()=>Promise<pg.PoolClient>).call(pool).then(client=>{
+   const query=client.query,release=client.release;
+   (client as any).query=async function(text:any,...args:any[]){
+    if(!injected&&typeof text==='string'&&text.startsWith('UPDATE model_capability_tests')){injected=true;await (query as any).call(client,"UPDATE project_runs SET lease_until=clock_timestamp()-interval '1 second' WHERE id=$1",[f.runId]);await worker.tick();}
+    return (query as any).call(client,text,...args);
+   };
+   client.release=function(error?:Error|boolean){client.query=query;client.release=release;release.call(client,error);};return client;
+  });
+ };
+ try{await worker.tick();}finally{(pool as any).query=native;pool.connect=connect;}
  assert.equal(injected,true);assert.equal(heartbeatCount,1,'nested scheduler tick is busy; its heartbeat cannot repair the injected gap');assert.equal((await stored(f.runId)).status,'running','a live own-active run must not be adopted as a dead worker');assert.equal((await stored(f.runId)).lease_owner,worker.owner);assert.ok(worker.active.has(f.runId));assert.ok(!readRun(join(root,'runs'),f.runId)!.events.some(event=>event.type==='run/finished'));
  assert.deepEqual((await pool.query("SELECT * FROM model_reservations WHERE id='lease-unknown'")).rows[0],receipt);assert.equal(modelCalls,0);
 });

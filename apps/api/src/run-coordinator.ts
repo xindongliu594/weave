@@ -226,13 +226,15 @@ export class RunCoordinator {
     }
   }
   async cancel(id:string){
-    return this.writers.withWriter([id],()=>this.cancelRequest(id));
+    const denial=await this.writers.withWriter([id],()=>this.cancelRequest(id));
+    if(denial)throw denial.denied;
   }
   private async cancelRequest(id:string){
     const client=await pool.connect();
-    try{await client.query('BEGIN');const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
+    const deny=async(denied:AppError)=>{await client.query('ROLLBACK');return {denied};};
+    try{await client.query('BEGIN');const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)return await deny(new AppError(404,'运行不存在'));
       await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
-      const row=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!row)throw new AppError(404,'运行不存在');if(!['running','queued'].includes(row.status))throw new AppError(409,'运行已结束');
+      const row=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!row)return await deny(new AppError(404,'运行不存在'));if(!['running','queued'].includes(row.status))return await deny(new AppError(409,'运行已结束'));
       if(row.status==='queued'){await client.query("UPDATE project_runs SET status='cancelled',cancel_requested=true,finished_at=now() WHERE id=$1",[id]);await client.query("UPDATE projects SET status='CANCELLED' WHERE id=$1 AND version=$2",[row.project_id,row.project_version]);}
       else await client.query('UPDATE project_runs SET cancel_requested=true WHERE id=$1',[id]);await client.query('COMMIT');
     }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}

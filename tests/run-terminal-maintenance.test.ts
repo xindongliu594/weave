@@ -5,6 +5,9 @@ import {existsSync,readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve,relative,isAbsolute} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {fileURLToPath} from 'node:url';
 import type pg from 'pg';
 import {recoveryModel} from './model-fixture.ts';
 import {createRunArchive,readRun} from '../services/agent-runtime/trace-store.mjs';
@@ -120,6 +123,86 @@ async function fixture(status:'queued'|'running'='running',imported=true){
  return {row,id,projectId,snapshot,file,path:join(traceRoot,id,'artifacts',file.path)};
 }
 const stored=async(id:string)=>(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0];
+// Real native source in another process; its first attempt must be blocked,
+// then the second attempt reports actual acquisition after the writer drains.
+async function sourceProbe(id:string){
+ const child=spawn(process.execPath,[fileURLToPath(new URL('../services/agent-runtime/test-helpers/archive-writer-source-child.mjs',import.meta.url))],{
+  windowsHide:true,stdio:['ignore','inherit','inherit','ipc'],env:{...process.env,ARCHIVE_WRITER_TEST:JSON.stringify({traceRoot,lockRoot:join(root,'.archive-write-locks'),runId:id})}});
+ const exited=once(child,'exit');
+ async function message(){let timer:NodeJS.Timeout|undefined;
+  try{return await Promise.race([once(child,'message').then(([value])=>value),exited.then(([code,signal])=>{throw Error('Source probe exited: '+code+'/'+signal);}),new Promise<never>((_yes,no)=>{timer=setTimeout(()=>no(Error('Source probe deadline')),10000);})]);}
+  finally{clearTimeout(timer);}
+ }
+ const first=message();
+ const stop=async()=>{if(child.exitCode===null&&child.signalCode===null)child.kill();await exited;};
+ try{assert.deepEqual(await first,{blocked:true});}catch(error){await stop();throw error;}
+ return {stop,async acquire(){const acquired=message();child.send('retry');assert.deepEqual(await acquired,{acquired:true});assert.deepEqual(await exited,[0,null]);}};
+}
+for(const denied of ['missing','missing-locked','completed','failed','cancelled','interrupted'])test('known cancellation denial drains before outward error: '+denied,{skip:!isolated,timeout:15000},async()=>{
+ const f=denied==='missing'?{id:randomUUID()}:await fixture();
+ if(!denied.startsWith('missing'))await pool.query('UPDATE project_runs SET status=$1 WHERE id=$2',[denied,f.id]);
+ const temporary=await worker.writers.acquireOwner([f.id]),probe=await sourceProbe(f.id);
+ temporary.finish();await temporary.writerDrained;
+ const connect=pool.connect;let rollbacks=0;
+ (pool as any).connect=function(callback?:unknown){
+  if(typeof callback==='function')return (connect as any).call(pool,callback);
+  return (connect as ()=>Promise<pg.PoolClient>).call(pool).then(client=>{const query=client.query,release=client.release;
+  (client as any).query=async function(text:any,...args:any[]){
+   if(denied==='missing-locked'&&text==='SELECT * FROM project_runs WHERE id=$1 FOR UPDATE')await (query as any).call(client,'DELETE FROM project_runs WHERE id=$1',[f.id]);
+   const result=await (query as any).call(client,text,...args);if(text==='ROLLBACK')rollbacks++;return result;
+  };
+  client.release=function(error?:Error|boolean){client.query=query;client.release=release;release.call(client,error);};return client;
+  });
+ };
+ try{
+  await assert.rejects(worker.cancel(f.id),(error:any)=>{assert.equal(rollbacks,1,'original transaction rollback acknowledged');assert.equal(error.status,denied.startsWith('missing')?404:409);assert.equal(error.message,denied.startsWith('missing')?'运行不存在':'运行已结束');assert.equal(error.code,'REQUEST_FAILED');return true;});
+  pool.connect=connect;
+  await probe.acquire();
+  if(denied!=='missing')assert.equal((await stored(f.id)).status,denied==='missing-locked'?'running':denied);
+ }finally{pool.connect=connect;await probe.stop();}
+});
+for(const failure of ['sql-4xx','rollback-before','rollback-after','commit-before','commit-after'])test('uncertain cancellation keeps source blocked: '+failure,{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),rollback=failure.startsWith('rollback');
+ if(rollback)await pool.query("UPDATE project_runs SET status='completed' WHERE id=$1",[f.id]);
+ const {AppError}=await import('../apps/api/src/provider.ts'),original=new AppError(409,'injected cancellation '+failure),connect=pool.connect;let injected=0;
+ (pool as any).connect=function(callback?:unknown){
+  if(typeof callback==='function')return (connect as any).call(pool,callback);
+  return (connect as ()=>Promise<pg.PoolClient>).call(pool).then(client=>{const query=client.query,release=client.release;
+  (client as any).query=async function(text:any,...args:any[]){
+   const target=failure==='sql-4xx'?'SELECT project_id FROM project_runs WHERE id=$1':rollback?'ROLLBACK':'COMMIT';
+   if(text===target&&injected===0){injected++;if(failure.endsWith('after'))await (query as any).call(client,text,...args);throw original;}
+   return (query as any).call(client,text,...args);
+  };
+  client.release=function(error?:Error|boolean){client.query=query;client.release=release;release.call(client,error);};return client;
+  });
+ };
+ try{await assert.rejects(worker.cancel(f.id),error=>error===original);}finally{pool.connect=connect;}
+ assert.equal(injected,1);const probe=await sourceProbe(f.id);await probe.stop();
+ const row=await stored(f.id);assert.equal(row.status,rollback?'completed':'running');assert.equal(row.cancel_requested,failure==='commit-after');
+});
+test('queued cancellation commits and drains its independent HTTP writer',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture('queued'),temporary=await worker.writers.acquireOwner([f.id]),probe=await sourceProbe(f.id);
+ temporary.finish();await temporary.writerDrained;
+ try{await worker.cancel(f.id);await probe.acquire();const row=await stored(f.id);assert.equal(row.status,'cancelled');assert.equal(row.cancel_requested,true);assert.ok(row.finished_at);assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[f.projectId])).rows[0].status,'CANCELLED');}
+ finally{await probe.stop();}
+});
+for(const fail of [false,true])test('running cancellation preserves the original producer and HTTP owner: '+fail,{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),owner=await worker.writers.acquireOwner([f.id]);worker.active.set(f.id,{projectId:f.projectId,writer:owner});
+ let release!:()=>void,entered!:()=>void,cancels=0;
+ const gate=new Promise<void>(yes=>{release=yes;}),started=new Promise<void>(yes=>{entered=yes;});
+ const {AppError}=await import('../apps/api/src/provider.ts'),original=new AppError(409,'injected original runtime.cancel failure');
+ // Explicit runtime double: no Host, model, device or repeated cancellation.
+ const r=runtime();r.fixture.cancel=async()=>{worker.writers.assertWriter(f.id);cancels++;entered();await gate;if(fail)throw original;return true;};
+ const cancelling=worker.cancel(f.id),observed=cancelling.catch(error=>error);await started;
+ owner.finish();let drained=false;owner.writerDrained.then(()=>{drained=true;},()=>{});
+ const probe=await sourceProbe(f.id);
+ try{
+  assert.equal(drained,false,'retained original cancellation producer survives owner finish');release();
+  if(fail){assert.equal(await observed,original);await assert.rejects(owner.writerDrained,error=>error===original);const fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')});await assert.rejects(fence.acquireSource(f.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});}
+  else{assert.equal(await observed,undefined);await owner.writerDrained;await probe.acquire();}
+  const row=await stored(f.id);assert.equal(row.status,'running');assert.equal(row.cancel_requested,true);assert.equal(cancels,1);
+ }finally{release();await observed;worker.active.delete(f.id);await probe.stop();}
+});
 test('tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts',{skip:!isolated,timeout:20000},async()=>{
  for(const changed of ['cancel','version','department']){
   const f=await fixture('queued'),fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}),source=await fence.acquireSource(f.id);
