@@ -1,0 +1,32 @@
+{
+  "caseId": "unknown-operation",
+  "datasetVersion": "1",
+  "executionKind": "fixture",
+  "modelExecuted": false,
+  "fresh": false,
+  "runId": "synthetic:unknown-operation",
+  "receipt": {
+    "id": "synthetic-receipt:unknown-operation",
+    "kind": "fixture"
+  },
+  "cost": {
+    "status": "known",
+    "amount": 0,
+    "currency": "USD"
+  },
+  "artifact": {
+    "id": "synthetic-artifact:unknown-operation",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expectedDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "qa": {
+    "status": "passed",
+    "artifactDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "operations": [
+    {
+      "actionId": "synthetic-action:unknown-operation",
+      "kind": "unknown"
+    }
+  ]
+}

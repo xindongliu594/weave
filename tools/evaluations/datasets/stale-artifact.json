@@ -1,0 +1,32 @@
+{
+  "caseId": "stale-artifact",
+  "datasetVersion": "1",
+  "executionKind": "fixture",
+  "modelExecuted": false,
+  "fresh": false,
+  "runId": "synthetic:stale-artifact",
+  "receipt": {
+    "id": "synthetic-receipt:stale-artifact",
+    "kind": "fixture"
+  },
+  "cost": {
+    "status": "known",
+    "amount": 0,
+    "currency": "USD"
+  },
+  "artifact": {
+    "id": "synthetic-artifact:stale-artifact",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expectedDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "qa": {
+    "status": "passed",
+    "artifactDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "operations": [
+    {
+      "actionId": "synthetic-action:stale-artifact",
+      "kind": "deliver"
+    }
+  ]
+}

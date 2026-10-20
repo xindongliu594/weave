@@ -1,0 +1,29 @@
+{
+  "caseId": "missing-qa",
+  "datasetVersion": "1",
+  "executionKind": "fixture",
+  "modelExecuted": false,
+  "fresh": false,
+  "runId": "synthetic:missing-qa",
+  "receipt": {
+    "id": "synthetic-receipt:missing-qa",
+    "kind": "fixture"
+  },
+  "cost": {
+    "status": "known",
+    "amount": 0,
+    "currency": "USD"
+  },
+  "artifact": {
+    "id": "synthetic-artifact:missing-qa",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expectedDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "qa": null,
+  "operations": [
+    {
+      "actionId": "synthetic-action:missing-qa",
+      "kind": "deliver"
+    }
+  ]
+}

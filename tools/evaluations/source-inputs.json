@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "roots": ["apps", "packages", "services", "infra", "scripts", ".github/workflows", "tests", "tools/evaluations"],
+  "rootFiles": ["package.json", "package-lock.json", "tsconfig.json", "vite.config.ts", ".env.example", ".gitignore", ".gitattributes", "start-demo.cmd", "start-local-production.cmd", "start-local.cmd", "start.command"],
+  "extensions": [".js", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts", ".json", ".css", ".html", ".yaml", ".yml", ".toml", ".conf", ".service", ".sql", ".py", ".sh", ".ps1", ".cmd", ".command", ".txt", ".svg", ".png", ".jpg", ".jpeg", ".ico", ".woff", ".woff2"],
+  "basenames": ["Dockerfile", "Makefile", "SKILL.md", ".gitignore"],
+  "excludedPrefixes": ["scripts/validation/"],
+  "excludedSegments": [".private", ".data", ".git", "node_modules", "dist", "output", ".npm-cache", "__pycache__", "coverage", "logs"]
+}

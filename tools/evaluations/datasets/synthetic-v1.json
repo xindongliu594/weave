@@ -1,0 +1,60 @@
+{
+  "id": "weiwu-engineering-synthetic",
+  "version": "1",
+  "executionKind": "fixture",
+  "cases": [
+    {
+      "id": "delivery-success",
+      "fixture": "delivery-success.json",
+      "digest": "6d2859bf2a56db61d441e51c11f0b3d1c3dd2242be4f759508ec8b21b7e96f7a",
+      "expected": {
+        "accepted": true,
+        "reasons": []
+      }
+    },
+    {
+      "id": "missing-qa",
+      "fixture": "missing-qa.json",
+      "digest": "24439684a67a2ad172e00cb3cd657cf9dbbf20f2cf255c5ed58f61bef7bd6874",
+      "expected": {
+        "accepted": false,
+        "reasons": [
+          "missing-qa"
+        ]
+      }
+    },
+    {
+      "id": "stale-artifact",
+      "fixture": "stale-artifact.json",
+      "digest": "9ba1be589e8a29253f80d6b3b301bdd31432180a7aa921c09881bbf8558c1712",
+      "expected": {
+        "accepted": false,
+        "reasons": [
+          "stale-artifact"
+        ]
+      }
+    },
+    {
+      "id": "unknown-operation",
+      "fixture": "unknown-operation.json",
+      "digest": "6eadcec1f6d5ad889c744857d109eb9ad9a5f471235a5e343edba225f28352d5",
+      "expected": {
+        "accepted": false,
+        "reasons": [
+          "unknown-operation"
+        ]
+      }
+    },
+    {
+      "id": "recovered-duplicate-action",
+      "fixture": "recovered-duplicate-action.json",
+      "digest": "a54fb62332a60eea2099b9d00107d06f5fa44811ecd8812515026a7b7cedd622",
+      "expected": {
+        "accepted": false,
+        "reasons": [
+          "duplicate-action"
+        ]
+      }
+    }
+  ]
+}

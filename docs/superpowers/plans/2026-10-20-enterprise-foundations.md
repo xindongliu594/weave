@@ -38,7 +38,7 @@
 | B2 | OpenShell task attempt 沙箱、DSH guard、checkpoint 接通 | B1 | 未开始 |
 | C1 | 统一工具 operation 合同、结果核对与补偿授权 | A1、B1 | 未开始 |
 | C2 | 步骤/分支/循环 checkpoint、重启一致性、目标与上下文合同 | B2、C1 | 未开始 |
-| D1 | 固定数据集、Promptfoo provider、确定性与真实业务 Eval | 评测研究 | 离线桥修复复审中；真实业务待做 |
+| D1 | 固定数据集、Promptfoo provider、确定性与真实业务 Eval | 评测研究 | 离线桥本地已验证；CI/API/真实业务待做 |
 | D2 | 可归责审计、关联 trace、脱敏 OTLP、容量与卡住告警 | A2、C1 | 未开始 |
 | E1 | 持久唤醒、退避、自动安全恢复、排空和并发竞争 | C2、D2 | 未开始 |
 | E2 | 知识撤回/替代、经验审核、复用量化及工具发布 | A2、D1 | 未开始 |

@@ -1,0 +1,32 @@
+{
+  "caseId": "delivery-success",
+  "datasetVersion": "1",
+  "executionKind": "fixture",
+  "modelExecuted": false,
+  "fresh": false,
+  "runId": "synthetic:delivery-success",
+  "receipt": {
+    "id": "synthetic-receipt:delivery-success",
+    "kind": "fixture"
+  },
+  "cost": {
+    "status": "known",
+    "amount": 0,
+    "currency": "USD"
+  },
+  "artifact": {
+    "id": "synthetic-artifact:delivery-success",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expectedDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "qa": {
+    "status": "passed",
+    "artifactDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "operations": [
+    {
+      "actionId": "synthetic-action:delivery-success",
+      "kind": "deliver"
+    }
+  ]
+}

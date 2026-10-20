@@ -1,0 +1,37 @@
+{
+  "caseId": "recovered-duplicate-action",
+  "datasetVersion": "1",
+  "executionKind": "fixture",
+  "modelExecuted": false,
+  "fresh": false,
+  "runId": "synthetic:recovered-duplicate-action",
+  "receipt": {
+    "id": "synthetic-receipt:recovered-duplicate-action",
+    "kind": "fixture"
+  },
+  "cost": {
+    "status": "known",
+    "amount": 0,
+    "currency": "USD"
+  },
+  "artifact": {
+    "id": "synthetic-artifact:recovered-duplicate-action",
+    "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expectedDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "qa": {
+    "status": "passed",
+    "artifactDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "operations": [
+    {
+      "actionId": "synthetic-action:recovered-duplicate-action",
+      "kind": "deliver"
+    },
+    {
+      "actionId": "synthetic-action:recovered-duplicate-action",
+      "kind": "deliver"
+    }
+  ],
+  "recovered": true
+}

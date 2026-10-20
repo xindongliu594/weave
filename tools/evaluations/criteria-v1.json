@@ -1,0 +1,6 @@
+{
+  "id": "weiwu-engineering-evidence",
+  "version": "1",
+  "description": "Synthetic evidence checks only; no model or live execution acceptance.",
+  "required": ["qa bound to current artifact", "current artifact digest", "known operation", "unique recovered action", "synthetic receipt with known zero cost"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "weiwu-private-evaluations",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22.22.0" },
+  "scripts": { "eval": "node run.mjs --output output/local", "gate": "node release-gate.mjs" },
+  "dependencies": { "promptfoo": "0.124.1" }
+}
