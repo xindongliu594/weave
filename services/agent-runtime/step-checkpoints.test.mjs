@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync, linkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createRunArchive } from './trace-store.mjs';
@@ -45,4 +45,22 @@ test('failed archive commit never publishes a restorable checkpoint',async t=>{
   const broken={...f.archive,append(type,data){captured=data;throw Error('simulated disk full');}};
   assert.throws(()=>commitStepCheckpoint({...f,archive:broken,receipts:[]}),/simulated disk full/);
   assert.throws(()=>readStepCheckpoint({root:f.root,runId:f.archive.id,checkpointId:captured.id}),/CHECKPOINT_NOT_FOUND/);
+});
+
+test('hardlinked workspace files cannot enter a checkpoint',async t=>{
+  const {commitStepCheckpoint}=await api();
+  const f=fixture(t),outside=join(f.root,'outside.txt');
+  writeFileSync(outside,'private content outside the employee workspace');
+  linkSync(outside,join(f.workspace,'linked.txt'));
+  assert.throws(()=>commitStepCheckpoint({...f,receipts:[]}),/CHECKPOINT_PATH_UNSAFE/);
+  assert.equal(readFileSync(outside,'utf8'),'private content outside the employee workspace');
+});
+
+test('hardlinked stored objects are refused on restore and reuse',async t=>{
+  const {commitStepCheckpoint,readStepCheckpoint}=await api();
+  const f=fixture(t),saved=commitStepCheckpoint({...f,receipts:[]});
+  linkSync(join(f.archive.dir,'checkpoint-objects',saved.files[0].sha256),join(f.root,'object-alias.txt'));
+  assert.throws(()=>readStepCheckpoint({root:f.root,runId:f.archive.id,checkpointId:saved.id}),/CHECKPOINT_CONTENT_INVALID/);
+  assert.throws(()=>commitStepCheckpoint({...f,receipts:[]}),/CHECKPOINT_PATH_UNSAFE/);
+  assert.equal(readFileSync(join(f.root,'object-alias.txt'),'utf8'),'first');
 });

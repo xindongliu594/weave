@@ -24,7 +24,7 @@ export function checkpointEnvironment(snapshot,proof) {
 }
 function assertPlain(path,kind) {
   const stat=lstatSync(path);
-  if(stat.isSymbolicLink() || (kind==='directory'?!stat.isDirectory():!stat.isFile()))throw Error('CHECKPOINT_PATH_UNSAFE');
+  if(stat.isSymbolicLink() || (kind==='directory'?!stat.isDirectory():!stat.isFile()) || (stat.isFile()&&stat.nlink>1))throw Error('CHECKPOINT_PATH_UNSAFE');
   return stat;
 }
 export function checkpointLineage(root,source) {
@@ -56,7 +56,7 @@ export function checkpointFiles(workspace) {
     for(const name of readdirSync(dir).sort()) {
       if(++entries>1024)throw Error('CHECKPOINT_FILE_LIMIT');
       const path=validArtifactPath(prefix+name),absolute=join(dir,name),stat=lstatSync(absolute);
-      if(stat.isSymbolicLink())throw Error('CHECKPOINT_PATH_UNSAFE');
+      if(stat.isSymbolicLink()||(stat.isFile()&&stat.nlink>1))throw Error('CHECKPOINT_PATH_UNSAFE');
       if(stat.isDirectory()){visit(absolute,path+'/');continue;}
       if(!stat.isFile()||stat.size>5*1024*1024||files.length>=128||(bytes+=stat.size)>20*1024*1024)throw Error('CHECKPOINT_FILE_LIMIT');
       const content=readFileSync(absolute);
