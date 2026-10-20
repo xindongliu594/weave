@@ -18,6 +18,7 @@ import { AppError, gatewayRequest, PLANNING_TIMEOUT_MS } from './provider.ts';
 import { departmentSchema, gatewaySchema, modelSchema, planSchema, policySchema, validatePlan, hasUnplannedTasks, planningRequiredMessage, placeholderTaskSubject, placeholderTaskCriterion, type Model, type Plan, type Policy } from '../../../packages/contracts/index.ts';
 import { createGoalContract } from '../../../packages/contracts/goal-contract.mjs';
 import { RunCoordinator } from './run-coordinator.ts';
+import {createArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
 import { settings } from './product.ts';
 import { completeBudgeted,requireProjectCostReady,projectCostReadiness,projectCostCarryover,type ProjectCostReadiness,lockCostPolicy,checkDailyBudget,shareCostMaintenance,receiptTransaction } from './cost-control.ts';
 import { costRouter } from './cost-router.ts';
@@ -88,7 +89,7 @@ function assertCarriedOperationOutcomes(traceRoot:string,projectId:string,readin
     if(unknown.length)throw new AppError(409,`此前运行 ${runId} 有结果未知的修改或命令。保留模型费用不能替代操作核对，请先检查原运行记录与产物`,'OPERATION_RECONCILIATION_REQUIRED');
   }
 }
-export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|undefined;createExecutor?:ConstructorParameters<typeof RunCoordinator>[1];assertExecutorReady?:(signal:AbortSignal)=>Promise<void>;demo?:{title:string;projectId:string;gatewayUrl:string};localWorkspace?:{kind:'local';database:'pglite';workspacesPath:string;executionTarget:NonNullable<Policy['executionTarget']>}}={}) {
+export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|undefined;createExecutor?:ConstructorParameters<typeof RunCoordinator>[2];assertExecutorReady?:(signal:AbortSignal)=>Promise<void>;demo?:{title:string;projectId:string;gatewayUrl:string};localWorkspace?:{kind:'local';database:'pglite';workspacesPath:string;executionTarget:NonNullable<Policy['executionTarget']>}}={}) {
   const app = express();
   const identityConfig=loadIdentityConfig(process.env);
   assertRouteInventory();
@@ -99,7 +100,8 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   const allowedOrigins = configuredOrigins();
   if(identityConfig.mode==='oidc')allowedOrigins.add(identityConfig.publicOrigin);
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
-  const coordinator = new RunCoordinator(traceRoot,options.createExecutor,{sandboxMaintenance:options.sandboxMaintenance});
+  const writers=createArchiveWriterManager({traceRoot,workspaceRoots:options.localWorkspace?[resolve(options.localWorkspace.workspacesPath)]:[]});
+  const coordinator = new RunCoordinator(traceRoot,writers,options.createExecutor,{sandboxMaintenance:options.sandboxMaintenance});
   const runtime = coordinator.runtime;
   const managerChat = new ManagerChatService(); managerChat.start();
   const automation = new AutomationLearningService(pool); automation.start();

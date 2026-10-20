@@ -19,9 +19,10 @@ import { assertRunModels,routeFingerprint } from './model-capabilities.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
 import {LocalOperationService,LocalRunExecutor} from './local-execution.ts';
 import type {SandboxMaintenance} from './storage-lifecycle.ts';
+import type {ArchiveWriterManager,ArchiveWriterOwner} from '../../../services/agent-runtime/archive-writer-scope.mjs';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const acceptedRecordingPending='业务已完成，终态记录或费用回填尚待核对；请保留原运行记录与未知费用。';
-type ActiveRun={projectId:string;phase?:'executing'|'draining'|'drain-failed';work?:Promise<void>;writerDrained?:Promise<void>;drainFailure?:Error};
+type ActiveRun={projectId:string;writer:ArchiveWriterOwner;phase?:'executing'|'draining'|'drain-failed';work?:Promise<void>;writerDrained?:Promise<void>;drainFailure?:Error};
 type Heartbeat={ids:string[];held:string[]};
 async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
   signal?.throwIfAborted();if(!signal)return work;
@@ -30,7 +31,8 @@ async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
 }
 export class RunCoordinator {
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,ActiveRun>();closing?:Promise<void>; ticking=false; stopped=false; timer:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
-  constructor(public traceRoot:string,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor'],maintenance:{sandboxMaintenance?:()=>SandboxMaintenance|undefined}={}){
+  constructor(public traceRoot:string,public writers:ArchiveWriterManager,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor'],maintenance:{sandboxMaintenance?:()=>SandboxMaintenance|undefined}={}){
+    if(!writers||writers.traceRoot!==traceRoot)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
     executionMode();
     const local=new LocalOperationService(traceRoot,this.owner);
     this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>{assertExecutionProfile(snapshot);return createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local,maintenance):undefined);},onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data,signal)=>this.reserve(id,data,signal),onResponse:data=>recordProviderResponse(data.id,data),onCallError:async data=>{await recordProviderResponse(data.id,data);await markCallUncertain(data.id,data.code,data.dispatched);}});
@@ -38,14 +40,23 @@ export class RunCoordinator {
   }
   async heartbeat(){
     if(this.stopped)return {ids:[],held:[]};if(this.heartbeatWork)return this.heartbeatWork;
-    const ids=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing').map(([id])=>id);if(!ids.length)return {ids,held:[]};
-    this.heartbeatWork=(async()=>{
-      const held=(await pool.query("UPDATE project_runs SET lease_until=clock_timestamp()+interval '30 seconds' WHERE id=ANY($1::text[]) AND lease_owner=$2 AND status='running' RETURNING id",[ids,this.owner])).rows.map(r=>r.id);
-      // Cancellation may wait for model settlement; it must not hold the shared
-      // heartbeat promise that an admission callback itself is awaiting.
-      for(const id of ids){const entry=this.active.get(id);if(!held.includes(id)&&entry&&(!entry.phase||entry.phase==='executing'))void this.runtime.cancel(id).catch(e=>{if(!this.stopped)console.error('Run lease cancellation:',e instanceof Error?e.name:'error');});}
-      return {ids,held};
-    })();
+    const entries=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing');
+    const ids=entries.map(([id])=>id);if(!ids.length)return {ids,held:[]};
+    // Retain before SQL. Per-run updates restore the exact original ALS owner;
+    // cancellation stays detached from heartbeatWork to avoid admission cycles.
+    const retained:Array<{id:string;entry:ActiveRun;producer:ReturnType<ArchiveWriterOwner['retain']>}>=[];
+    try{for(const [id,entry] of entries)retained.push({id,entry,producer:entry.writer.retain('heartbeat/cancel')});}
+    catch(error){for(const {producer} of retained)producer.finish();throw error;}
+    const updates:Promise<string[]>[]=[];
+    for(const {id,entry,producer} of retained){
+      const sql=producer.run(async()=>(await pool.query("UPDATE project_runs SET lease_until=clock_timestamp()+interval '30 seconds' WHERE id=ANY($1::text[]) AND lease_owner=$2 AND status='running' RETURNING id",[[id],this.owner])).rows.map(r=>r.id));updates.push(sql);
+      const tail=producer.run(async()=>{const held=await sql;if(!held.includes(id)&&this.active.get(id)===entry&&(!entry.phase||entry.phase==='executing'))await this.runtime.cancel(id);});
+      tail.then(()=>producer.finish(),error=>{producer.finish(error);if(!this.stopped)console.error('Run lease cancellation:',error instanceof Error?error.name:'error');});
+    }
+    this.heartbeatWork=Promise.allSettled(updates).then(results=>{
+      const rejected=results.find(result=>result.status==='rejected');if(rejected?.status==='rejected')throw rejected.reason;
+      return {ids,held:results.flatMap(result=>result.status==='fulfilled'?result.value:[])};
+    });
     try{return await this.heartbeatWork;}finally{this.heartbeatWork=undefined;}
   }
   async recordUsage(runId:string,u:RuntimeUsage){
@@ -109,9 +120,18 @@ export class RunCoordinator {
       // Heartbeats precede recovery. A dead worker eventually loses its lease.
       await this.heartbeat();
       const cancel=(await pool.query("SELECT id FROM project_runs WHERE lease_owner=$1 AND cancel_requested=true AND status='running'",[this.owner])).rows;
-      for(const row of cancel)await this.runtime.cancel(row.id);
+      for(const row of cancel){const entry=this.active.get(row.id);if(entry&&(!entry.phase||entry.phase==='executing'))await this.cancelOwned(row.id,entry);}
       await this.recover();
       if(this.stopped||!(await this.runtime.inspect()).ready)return;
+      // Identity discovery holds no SQL lock. Never wait for native locks in a transaction.
+      const candidate=(await pool.query(`SELECT r.id,r.project_id FROM project_runs r WHERE r.status='queued' AND NOT r.cancel_requested
+        AND NOT EXISTS(SELECT 1 FROM project_runs a WHERE a.status='running' AND
+          COALESCE(NULLIF(a.department_ids,'{}'),ARRAY[a.snapshot->>'departmentId']) && COALESCE(NULLIF(r.department_ids,'{}'),ARRAY[r.snapshot->>'departmentId']))
+        ORDER BY r.created_at LIMIT 1`)).rows[0];
+      if(!candidate)return;
+      let writer:ArchiveWriterOwner|undefined=await this.writers.acquireOwner([candidate.id]);
+      try{
+      const job=await writer.run(async()=>{
       const client=await pool.connect();let job:any;
       try{
         await client.query('BEGIN');
@@ -119,25 +139,42 @@ export class RunCoordinator {
         const limit=(await settings(client)).data.maxActiveRuns;
         const count=Number((await client.query("SELECT count(*) FROM project_runs WHERE status='running'")).rows[0].count);
         if(count<limit&&!this.stopped){
-          const candidate=(await client.query(`SELECT r.id,r.project_id FROM project_runs r WHERE r.status='queued' AND NOT r.cancel_requested
+          // All operations lock project before run; skip an in-flight edit instead of inverting that order.
+          const project=(await client.query('SELECT id,version FROM projects WHERE id=$1 FOR UPDATE SKIP LOCKED',[candidate.project_id])).rows[0];
+          if(project)job=(await client.query(`SELECT r.* FROM project_runs r WHERE r.id=$1 AND r.project_id=$2 AND r.project_version=$3 AND r.status='queued' AND NOT r.cancel_requested
             AND NOT EXISTS(SELECT 1 FROM project_runs a WHERE a.status='running' AND
               COALESCE(NULLIF(a.department_ids,'{}'),ARRAY[a.snapshot->>'departmentId']) && COALESCE(NULLIF(r.department_ids,'{}'),ARRAY[r.snapshot->>'departmentId']))
-            ORDER BY r.created_at LIMIT 1`)).rows[0];
-          // All operations lock project before run; skip an in-flight edit instead of inverting that order.
-          if(candidate&&(await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE SKIP LOCKED',[candidate.project_id])).rowCount)
-            job=(await client.query("SELECT * FROM project_runs WHERE id=$1 AND status='queued' AND NOT cancel_requested FOR UPDATE SKIP LOCKED",[candidate.id])).rows[0];
-          if(job){await client.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=clock_timestamp()+interval '30 seconds',started_at=now() WHERE id=$2",[this.owner,job.id]);await client.query("UPDATE projects SET status='RUNNING' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);}
+            FOR UPDATE OF r SKIP LOCKED`,[candidate.id,project.id,project.version])).rows[0];
+          if(job&&!this.stopped){await client.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=clock_timestamp()+interval '30 seconds',started_at=now() WHERE id=$2",[this.owner,job.id]);await client.query("UPDATE projects SET status='RUNNING' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);}else job=undefined;
         }
         await client.query('COMMIT');
       }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
-      if(job&&this.stopped){await finishRun(job.id,this.owner,'interrupted','工作进程关闭，任务尚未启动',row=>this.traceFinished(row,'interrupted','工作进程关闭，任务尚未启动'));return;}
-      if(job){this.active.set(job.id,{projectId:job.project_id});void this.launch(job);}
+      return job;
+      });
+      if(job&&this.stopped){await writer.run(()=>finishRun(job.id,this.owner,'interrupted','工作进程关闭，任务尚未启动',row=>this.traceFinished(row,'interrupted','工作进程关闭，任务尚未启动')));return;}
+      if(job){void this.launch(job,writer);writer=undefined;}
+      }finally{if(writer){writer.finish();await writer.writerDrained;}}
     }catch(e){if(!this.stopped)console.error('Run worker:',e instanceof Error?e.name:'error');}finally{this.ticking=false;}
   }
-  launch(row:any){
-    const entry:ActiveRun=this.active.get(row.id)??{projectId:row.project_id};
+  launch(row:any,writer?:ArchiveWriterOwner){
+    const work=writer?this.launchWithOwner(row,writer):this.writers.acquireOwner([row.id]).then(owner=>this.launchWithOwner(row,owner));
+    work.catch(error=>{if(!this.stopped)console.error('Run completion:',error instanceof Error?error.name:'error');});
+    return work;
+  }
+  private launchWithOwner(row:any,writer:ArchiveWriterOwner){
+    this.writers.assertOwner(writer,row.id);
+    const entry:ActiveRun=this.active.get(row.id)??{projectId:row.project_id,writer};
+    if(entry.writer!==writer)throw Error('ARCHIVE_WRITER_OWNER_MISMATCH');
     this.active.set(row.id,entry);
-    const work=this.launchOwned(row,entry);entry.work=work;
+    const original=writer.run(()=>this.launchOwned(row,entry));
+    const work=(async()=>{
+      let failure:unknown;try{await original;}catch(error){failure=error;}
+      writer.finish(entry.drainFailure??failure);
+      try{await writer.writerDrained;}catch(error){entry.drainFailure=error instanceof Error?error:Error('ARCHIVE_WRITER_DRAIN_FAILED');}
+      if(entry.drainFailure)entry.phase='drain-failed';
+      else if(this.active.get(row.id)===entry)this.active.delete(row.id);
+      if(failure)throw failure;
+    })();entry.work=work;
     work.catch(error=>{if(!this.stopped)console.error('Run completion:',error instanceof Error?error.name:'error');});
     return work;
   }
@@ -166,7 +203,7 @@ export class RunCoordinator {
         entry.writerDrained=started.writerDrained;
         started.writerDrained.catch(()=>{});
       }
-      try{completion=await started.completion;}finally{entry.phase='draining';}
+      try{completion=await started.completion;}finally{entry.phase='draining';entry.writer.closeAdmission();}
       for(const usage of completion.usages)await this.recordUsage(row.id,usage);
       await finishRun(row.id,this.owner,completion.status,completion.recording==='incomplete'?acceptedRecordingPending:completion.message??null);
     }catch(error){
@@ -181,16 +218,17 @@ export class RunCoordinator {
       const message=error instanceof Error?error.message:'启动失败';
       await finishRun(row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
     }finally{
-      entry.phase='draining';
+      entry.phase='draining';entry.writer.closeAdmission();
       try{await entry.writerDrained;}catch(error){
         const code=(error as any)?.code==='RUNTIME_WRITER_DRAIN_UNPROVEN'?'RUNTIME_WRITER_DRAIN_UNPROVEN':'RUNTIME_WRITER_DRAIN_FAILED';
         entry.drainFailure=Object.assign(Error(code),{code});
       }
-      if(entry.drainFailure)entry.phase='drain-failed';
-      else if(this.active.get(row.id)===entry)this.active.delete(row.id);
     }
   }
   async cancel(id:string){
+    return this.writers.withWriter([id],()=>this.cancelRequest(id));
+  }
+  private async cancelRequest(id:string){
     const client=await pool.connect();
     try{await client.query('BEGIN');const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
       await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
@@ -198,13 +236,18 @@ export class RunCoordinator {
       if(row.status==='queued'){await client.query("UPDATE project_runs SET status='cancelled',cancel_requested=true,finished_at=now() WHERE id=$1",[id]);await client.query("UPDATE projects SET status='CANCELLED' WHERE id=$1 AND version=$2",[row.project_id,row.project_version]);}
       else await client.query('UPDATE project_runs SET cancel_requested=true WHERE id=$1',[id]);await client.query('COMMIT');
     }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
-    await this.runtime.cancel(id);
+    const entry=this.active.get(id);if(entry&&(!entry.phase||entry.phase==='executing'))await this.cancelOwned(id,entry);
+  }
+  private cancelOwned(id:string,entry:ActiveRun){
+    const producer=entry.writer.retain('runtime cancellation');
+    const work=producer.run(()=>this.runtime.cancel(id));
+    work.then(()=>producer.finish(),error=>producer.finish(error));return work;
   }
   close(){
     if(!this.closing){
       this.stopped=true;clearInterval(this.timer);
       this.closing=(async()=>{
-        const cancellations=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing').map(([id])=>this.runtime.cancel(id));
+        const cancellations=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing').map(([id,entry])=>this.cancelOwned(id,entry));
         const results=await Promise.allSettled(cancellations);
         while(this.ticking)await sleep(50);
         await this.heartbeatWork;

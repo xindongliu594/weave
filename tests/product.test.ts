@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {recoveryModel} from './model-fixture.ts';
 import { before,after,test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -75,8 +76,8 @@ test('approval knowledge grants reject missing, archived and foreign employee sp
  await assert.rejects(validateKnowledgeGrants([{...agent,knowledgeSpaceIds:[archived.data.id]}],department.id),/知识授权已失效/);
 });
 test('expired runs require explicit checkpoint resume and cancelled queue entries stay visible',async()=>{
- await app.locals.shutdown();
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const coordinator=new RunCoordinator(join(dir,'runs'));await coordinator.close();
+ await app.locals.shutdownBackground();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const coordinator=new RunCoordinator(join(dir,'runs'),createArchiveWriterManager({traceRoot:join(dir,'runs')}));await coordinator.close();
  const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
  const project=(await call('/projects')).data[0];
  const snapshot={title:'Recovery fixture',projectId:project.id,departmentId:project.departmentId,policy:{maxBudget:1},executionBudget:1,tasks:[{id:'first',dependencies:[],taskPrompt:'first'},{id:'second',dependencies:['first'],taskPrompt:'second'}],...await recoveryModel(pool)};
@@ -94,7 +95,7 @@ test('expired runs require explicit checkpoint resume and cancelled queue entrie
 });
 
 test('retry admission preserves billed task cost and all wire calls, and refuses exhausted allowances',async()=>{
- await app.locals.shutdown();
+ await app.locals.shutdownBackground();
  const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
  const source=(await pool.query('SELECT * FROM projects LIMIT 1')).rows[0];
  await pool.query("INSERT INTO models(id,data) VALUES('budget-fixture','{}')");

@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -179,7 +180,7 @@ test('archived departments and revoked private knowledge grants block approval o
 
 test('request admission fences stale lease owners and rechecks current run authorization transactionally',{skip:process.env.SIMULATED_INTEGRATION==='pglite'?'requires independent PostgreSQL backends and row locks':false},async()=>{
  const p=await project(),approved=await call('/projects/'+p.id+'/approve','POST',{version:1});assert.equal(approved.status,202);
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'),createArchiveWriterManager({traceRoot:join(dir,'runs')}));await worker.close();
  await pool.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=now()+interval '1 minute' WHERE id=$2",[worker.owner,approved.data.id]);
  const before=requests,gate=await pool.connect();const gatePid=(await gate.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;await gate.query('BEGIN');await gate.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[p.id]);
  let pending:Promise<any>|undefined;
@@ -202,7 +203,7 @@ test('request admission fences stale lease owners and rechecks current run autho
 });
 
 test('queue skips locked projects and simultaneous retries create at most one successor',{skip:process.env.SIMULATED_INTEGRATION==='pglite'?'requires independent PostgreSQL backends and row locks':false},async()=>{
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'),createArchiveWriterManager({traceRoot:join(dir,'runs')}));await worker.close();
  const p=await project(),approved=await call('/projects/'+p.id+'/approve','POST',{version:1});assert.equal(approved.status,202);
  const gate=await pool.connect();await gate.query('BEGIN');await gate.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[p.id]);
  try{worker.stopped=false;await worker.tick();assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].status,'queued');}

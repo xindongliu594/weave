@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -45,7 +46,7 @@ before(async()=>{
  const {routeFingerprint}=await import('../apps/api/src/model-capabilities.ts');
  route={id:modelId,name:model.name,gatewayId:model.gatewayId,wireModel:model.model,baseUrl:url+'/v1',inputRate:1,outputRate:1,maxOutputTokens:128,
   configurationHash:routeFingerprint((await pool.query('SELECT data FROM models WHERE id=$1',[modelId])).rows[0].data,1)};
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot);await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot,createArchiveWriterManager({traceRoot:traceRoot}));await worker.close();
 });
 beforeEach(async()=>{if(isolated){await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,request_keys,tool_approvals CASCADE');wireCalls=0;await pool.query('UPDATE departments SET deleted_at=NULL WHERE id=$1',[departmentId]);}});
 after(async()=>{

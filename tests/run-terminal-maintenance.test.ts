@@ -1,6 +1,6 @@
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,rm} from 'node:fs/promises';
+import {mkdtemp} from 'node:fs/promises';
 import {existsSync,readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve,relative,isAbsolute} from 'node:path';
@@ -8,6 +8,8 @@ import {randomUUID,createHash} from 'node:crypto';
 import type pg from 'pg';
 import {recoveryModel} from './model-fixture.ts';
 import {createRunArchive,readRun} from '../services/agent-runtime/trace-store.mjs';
+import {createArchiveWriteFence} from '../services/agent-runtime/archive-write-fence.mjs';
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 
 // Actual coordinator/state and isolated SQL; trusted runtime completion/readiness
 // fixtures exercise consumption only, not native Host teardown or task acceptance.
@@ -23,7 +25,7 @@ before(async()=>{
  root=await mkdtemp(join(tmpdir(),'run-terminal-maintenance-'));traceRoot=join(root,'runs');
  process.env.DATA_DIR=root;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(root,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot);await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot,createArchiveWriterManager({traceRoot:traceRoot}));await worker.close();
 });
 beforeEach(async()=>{
  if(!isolated)return;
@@ -35,7 +37,9 @@ after(async()=>{
  if(!isolated)return;
  worker.active.clear();await worker.close();await pool.end();
  const within=relative(resolve(tmpdir()),resolve(root));assert.ok(within.startsWith('run-terminal-maintenance-')&&!within.startsWith('..')&&!isAbsolute(within));
- await rm(root,{recursive:true,force:true});
+ // Failed-drain tests deliberately keep native guards. The parent test runner
+ // cleans this synthetic fixture only after this process has actually exited.
+ console.log('ARCHIVE_WRITER_EXIT_CLEANUP='+root);
 });
 function runtime(options:{ready?:()=>boolean;start?:(input:any)=>Promise<any>}={}){
  let starts=0;
@@ -56,8 +60,8 @@ for(const fail of [false,true])test('SQL terminal retains active actual drain an
  const writerDrained=new Promise<void>((yes,no)=>{release=yes;reject=no;});
  const r=runtime({start:async input=>({runtimeRunId:input.runId,completion:Promise.resolve(completed()),writerDrained})});
  r.fixture.cancel=async()=>{cancels++;return false;};
- worker.active.set(f.id,{projectId:f.projectId});
- const launching=worker.launch(f.row);let ended=false;launching.then(()=>{ended=true;});
+ worker.active.set(f.id,{projectId:f.projectId,writer:await worker.writers.acquireOwner([f.id])});
+ const launching=worker.launch(f.row,worker.active.get(f.id)?.writer);let ended=false;launching.then(()=>{ended=true;});
  try{
   const deadline=Date.now()+4000;while((await stored(f.id)).status!=='completed'&&Date.now()<deadline)await wait();
   assert.equal((await stored(f.id)).status,'completed');
@@ -84,12 +88,14 @@ test('shutdown joins an in-flight original heartbeat after SQL terminal without 
   return (query as any).call(pool,text,...args);
  };
  const r=runtime();r.fixture.cancel=async()=>{cancels++;return false;};
- worker.active.set(f.id,{projectId:f.projectId});
+ worker.active.set(f.id,{projectId:f.projectId,writer:await worker.writers.acquireOwner([f.id])});
  try{
   const heartbeat=worker.heartbeat();await started;
-  await worker.launch(f.row);assert.equal((await stored(f.id)).status,'completed');assert.equal(worker.active.has(f.id),false);
+  const launching=worker.launch(f.row,worker.active.get(f.id)?.writer);
+  const deadline=Date.now()+3000;while((await stored(f.id)).status!=='completed'&&Date.now()<deadline)await wait();
+  assert.equal((await stored(f.id)).status,'completed');assert.equal(worker.active.has(f.id),true);
   const closing=worker.close();let closed=false;closing.then(()=>{closed=true;});await wait();assert.equal(closed,false);
-  release();await heartbeat;await closing;assert.equal(cancels,0);
+  release();await heartbeat;await launching;await closing;assert.equal(cancels,0);assert.equal(worker.active.has(f.id),false);
  }finally{release();pool.query=query;worker.active.clear();worker.closing=undefined;worker.stopped=false;}
 });
 
@@ -114,9 +120,78 @@ async function fixture(status:'queued'|'running'='running',imported=true){
  return {row,id,projectId,snapshot,file,path:join(traceRoot,id,'artifacts',file.path)};
 }
 const stored=async(id:string)=>(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0];
+test('tick waits for native writer outside SQL then rechecks cancellation, version and department conflicts',{skip:!isolated,timeout:20000},async()=>{
+ for(const changed of ['cancel','version','department']){
+  const f=await fixture('queued'),fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}),source=await fence.acquireSource(f.id);
+  const r=runtime();let candidateRead!:()=>void;const seen=new Promise<void>(yes=>{candidateRead=yes;});const query=pool.query;
+  (pool as any).query=async(text:any,...args:any[])=>{const result=await (query as any).call(pool,text,...args);if(typeof text==='string'&&text.includes('ORDER BY r.created_at LIMIT 1'))candidateRead();return result;};
+  const ticking=worker.tick();
+  try{
+   assert.equal(await Promise.race([seen.then(()=>true),ticking.then(()=>false)]),true,'candidate must be read outside SQL before native acquisition');
+   // FIFO PGlite max1: this SQL completing while native acquisition waits proves
+   // no transaction/connection is held by tick; it does not certify PG row locks.
+   if(changed==='cancel')await pool.query('UPDATE project_runs SET cancel_requested=true WHERE id=$1',[f.id]);
+   else if(changed==='version')await pool.query('UPDATE projects SET version=2 WHERE id=$1',[f.projectId]);
+   else {const competing=await fixture('running');await pool.query('UPDATE project_runs SET department_ids=$1 WHERE id=$2',[[f.snapshot.departmentId],competing.id]);}
+  }finally{source.release();pool.query=query;}
+  await ticking;assert.equal(r.starts,0);assert.equal((await stored(f.id)).status,'queued');
+  const available=await fence.acquireSource(f.id);available.release();
+  await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,departments,tool_approvals CASCADE');
+ }
+});
+test('tick transfers its original owner without waiting for business terminal or actual tail',{skip:!isolated,timeout:10000},async()=>{
+ const f=await fixture('queued'),fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')});
+ let terminal!:()=>void,drain!:()=>void;const completion=new Promise<any>(yes=>{terminal=()=>yes(completed());}),writerDrained=new Promise<void>(yes=>{drain=yes;});
+ runtime({start:async()=>{worker.writers.assertWriter(f.id);return {completion,writerDrained};}});
+ await worker.tick();assert.equal((await stored(f.id)).status,'running');assert.equal(worker.active.has(f.id),true);
+ await worker.heartbeat();await assert.rejects(fence.acquireSource(f.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+ terminal();const deadline=Date.now()+3000;while((await stored(f.id)).status!=='completed'&&Date.now()<deadline)await wait();
+ assert.equal((await stored(f.id)).status,'completed');await assert.rejects(fence.acquireSource(f.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+ drain();await worker.active.get(f.id)?.work;assert.equal(worker.active.has(f.id),false);const source=await fence.acquireSource(f.id);source.release();
+});
+test('detached heartbeat SQL and shutdown cancellation run in each original producer context',{skip:!isolated,timeout:10000},async()=>{
+ const fixtures=[await fixture(),await fixture()];let finish!:()=>void;
+ const completion=new Promise<any>(yes=>{finish=()=>yes(completed());});
+ const r=runtime({start:async input=>({completion,writerDrained:Promise.resolve()})});
+ const launching=fixtures.map(f=>worker.launch(f.row));
+ const deadline=Date.now()+3000;while(r.starts<2&&Date.now()<deadline)await wait();assert.equal(r.starts,2);
+ const query=pool.query;let checked=0,cancelled=0;
+ (pool as any).query=async(text:any,...args:any[])=>{
+  if(typeof text==='string'&&text.startsWith('UPDATE project_runs SET lease_until=')){
+   for(const id of args[0][0]){worker.writers.assertWriter(id);checked++;}
+  }
+  return (query as any).call(pool,text,...args);
+ };
+ r.fixture.cancel=async(id?:string)=>{worker.writers.assertWriter(id!);cancelled++;return false;};
+ try{await worker.heartbeat();assert.equal(checked,2);const closing=worker.close();finish();await Promise.all(launching);await closing;assert.equal(cancelled,2);}
+ finally{pool.query=query;finish();await Promise.allSettled(launching);}
+});
+test('a rejected heartbeat waits for every original SQL update and retains the failed owner',{skip:!isolated,timeout:10000},async()=>{
+ const fixtures=[await fixture(),await fixture()];let finish!:()=>void,resume!:()=>void,entered!:()=>void;
+ const completion=new Promise<any>(yes=>{finish=()=>yes(completed());}),gate=new Promise<void>(yes=>{resume=yes;}),started=new Promise<void>(yes=>{entered=yes;});
+ const r=runtime({start:async()=>({completion,writerDrained:Promise.resolve()})}),launching=fixtures.map(f=>worker.launch(f.row));
+ const deadline=Date.now()+3000;while(r.starts<2&&Date.now()<deadline)await wait();assert.equal(r.starts,2);
+ const query=pool.query;
+ (pool as any).query=async(text:any,...args:any[])=>{
+  if(typeof text==='string'&&text.startsWith('UPDATE project_runs SET lease_until=')){
+   if(args[0][0][0]===fixtures[0].id)throw Error('isolated heartbeat failure');entered();await gate;
+  }
+  return (query as any).call(pool,text,...args);
+ };
+ let settled=false;const heartbeat=worker.heartbeat();heartbeat.then(()=>{settled=true;},()=>{settled=true;});
+ try{
+  await started;await wait();assert.equal(settled,false,'first rejection must not discard another original SQL tail');
+  const fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')});
+  await assert.rejects(fence.acquireSource(fixtures[1].id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+  resume();await assert.rejects(heartbeat,/isolated heartbeat failure/);finish();await Promise.all(launching);
+  assert.equal(worker.active.get(fixtures[0].id)?.phase,'drain-failed');
+  await assert.rejects(fence.acquireSource(fixtures[0].id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+  const source=await fence.acquireSource(fixtures[1].id);source.release();
+ }finally{pool.query=query;resume();finish();await Promise.allSettled(launching);}
+});
 const endings=(id:string)=>readRun(traceRoot,id)!.events.filter(event=>event.type==='run/finished');
 async function idle(){const deadline=Date.now()+5000;while(Date.now()<deadline){if(!worker.active.size&&!worker.ticking)return;await new Promise(done=>setTimeout(done,5));}throw Error('isolated coordinator did not settle');}
-async function launch(row:any){worker.active.set(row.id,{projectId:row.project_id});await worker.launch(row);}
+async function launch(row:any){await worker.launch(row);}
 async function unknownReceipt(f:Awaited<ReturnType<typeof fixture>>){
  const id=randomUUID();
  await pool.query("INSERT INTO model_reservations(id,model_id,project_id,run_id,purpose,amount,input_rate,output_rate,status,context,history) VALUES($1,'recovery-model',$2,$3,'fixture',.096526,0,0,'uncertain',$4,$5)",[id,f.projectId,f.id,{originalRequest:'untouched'},JSON.stringify([{source:'fixture',note:'unknown original request'}])]);

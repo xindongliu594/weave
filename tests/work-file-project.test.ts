@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import { before,after,test,mock } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -28,7 +29,7 @@ before(async()=>{
   directory=await mkdtemp(join(tmpdir(),'work-file-project-'));traceRoot=join(directory,'runs');process.env.DATA_DIR=directory;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(directory,'vault');
   const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
   const {createApp}=await import('../apps/api/src/app.ts');app=createApp({assertExecutorReady:async()=>{}});await app.locals.shutdownBackground();server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as AddressInfo).port+'/api';
-  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot);await worker.close();
+  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot,createArchiveWriterManager({traceRoot:traceRoot}));await worker.close();
   mock.method(worker.runtime,'start',async({runId,prepareWorkspace}:any)=>{runtimeStarts++;prepareWorkspace?.();return {runtimeRunId:runId,writerDrained:Promise.resolve(),completion:Promise.resolve({status:'completed' as const,usages:[]})};});
   gateway=http.createServer(async(req,res)=>{
     assert.equal(req.url,'/v1/chat/completions');let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw);providerRequests.push(body);let message:any={content:'OK'};

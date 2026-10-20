@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -62,7 +63,7 @@ test('shared collaborator departments serialize runs and team limits fail before
  for(const p of [p1,p2]){const plan={...p.plan,tasks:p.plan.tasks.map((t:any)=>({...t,subject:'完成协作资料核对',acceptanceCriteria:['说明来源和核对结论']}))};assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan})).status,200);}
  const r1=await call('/projects/'+p1.id+'/approve','POST',{version:2}),r2=await call('/projects/'+p2.id+'/approve','POST',{version:2});assert.equal(r1.status,202,JSON.stringify(r1.data));assert.equal(r2.status,202,JSON.stringify(r2.data));
  await pool.query("UPDATE project_runs SET status='running',lease_owner='fixture',lease_until=now()+interval '1 minute' WHERE id=$1",[r1.data.id]);
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'queue-runs'));await worker.close();worker.stopped=false;await worker.tick();worker.stopped=true;
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'queue-runs'),createArchiveWriterManager({traceRoot:join(dir,'queue-runs')}));await worker.close();worker.stopped=false;await worker.tick();worker.stopped=true;
  assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[r2.data.id])).rows[0].status,'queued');
  await pool.query("UPDATE project_runs SET status='failed',lease_owner=NULL,lease_until=NULL WHERE id=$1",[r1.data.id]);await call('/runs/'+r2.data.id+'/cancel','POST',{});await worker.close();
  const crowded={name:'满员部门',description:'',agents:Array.from({length:6},(_,i)=>({...employee('员工'+i),id:'employee-'+i,role:i===0?'manager':'member'}))};const full=(await call('/departments','POST',crowded)).data;

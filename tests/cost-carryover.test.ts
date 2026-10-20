@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -221,7 +222,7 @@ test('opt-in checkpoint resume inherits unknown wire calls and dispatches only t
  assert.deepEqual(child.snapshot.tasks.map((task:any)=>({id:task.id,dependencies:task.dependencies})),[{id:'prepare',dependencies:[]},{id:'finish',dependencies:['prepare']}]);
  assert.deepEqual(child.snapshot.completedCheckpoints,['prepare']);assert.equal(child.snapshot.recovery.completed[0].taskId,'prepare');
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');
- coordinator=new RunCoordinator(traceRoot,(archive:any)=>({root:join(archive.dir,'artifacts'),prepare:async()=>mkdir(join(archive.dir,'artifacts'),{recursive:true}),close:async()=>{},execute:async()=>{throw Error('FIXTURE_HAS_NO_FILE_OR_COMMAND_GRANT');}}) as any);
+ coordinator=new RunCoordinator(traceRoot,createArchiveWriterManager({traceRoot:traceRoot}),(archive:any)=>({root:join(archive.dir,'artifacts'),prepare:async()=>mkdir(join(archive.dir,'artifacts'),{recursive:true}),close:async()=>{},execute:async()=>{throw Error('FIXTURE_HAS_NO_FILE_OR_COMMAND_GRANT');}}) as any);
  let result:any;const deadline=Date.now()+30000;
  while(Date.now()<deadline){result=(await pool.query('SELECT status,error,snapshot FROM project_runs WHERE id=$1',[child.id])).rows[0];if(!['queued','running'].includes(result.status))break;await new Promise(resolve=>setTimeout(resolve,50));}
  await coordinator.close();coordinator=undefined;

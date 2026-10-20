@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -66,7 +67,7 @@ test('recovery owns a live lease until reconciliation and rejects expired owners
 });
 
 test('recovery reconciles a recorded completion and API state remains authoritative over later trace events',async()=>{
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'),createArchiveWriterManager({traceRoot:join(dir,'runs')}));await worker.close();
  const row=await running();openRunArchive(join(dir,'runs'),row.id).append('run/finished',{status:'completed',message:'recorded before crash'});
  await pool.query("UPDATE project_runs SET lease_until=now()-interval '1 minute' WHERE id=$1",[row.id]);await worker.recover();
  assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[row.project_id])).rows[0].status,'COMPLETED');

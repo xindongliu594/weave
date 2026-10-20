@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -39,12 +40,17 @@ test('only a complete tool roundtrip enables execution; evidence, cost and route
  const department=(await call('/departments','POST',{name:'Capability fixture',description:'',agents:[agent]})).data;
  const project=(await call('/projects','POST',{departmentId:department.id,requirement:'验证团队调度需要工具调用能力',policy:{maxBudget:1,maxAgents:1,maxConcurrentAgents:1,deadlineSeconds:300}})).data;
  assert.equal((await call('/projects/'+project.id+'/approve','POST',{version:1})).data.code,'PLAN_NOT_READY');assert.equal(requests,0);
+ const draft=(await call('/projects')).data.find((item:any)=>item.id===project.id);
+ const plan={...draft.plan,tasks:draft.plan.tasks.map((task:any)=>({...task,subject:'核对工具能力验证的请求和回执',objective:'整理测试请求、工具结果与费用回执的对应关系',kind:'requirements',acceptanceCriteria:['每个工具能力请求都有对应结果与费用回执']}))};
+ assert.equal((await call('/projects/'+project.id+'/plan','PUT',{version:1,plan})).status,200);
  const checked=await call('/models/'+modelId+'/test-tools','POST',{});assert.equal(checked.status,200,JSON.stringify(checked.data));assert.equal(requests,2);
  const current=await model();assert.equal(current.capabilities.tools.status,'supported');assert.equal(current.status,'available');
  const history=(await call('/models/'+modelId+'/capability-tests')).data[0];assert.equal(history.id,current.capabilities.tools.testId);assert.equal(history.status,'supported');assert.equal(history.requestIds.length,2);
  const receipts=(await pool.query("SELECT status FROM model_reservations WHERE context->>'probeId'=$1",[history.id])).rows;assert.ok(receipts.every(r=>r.status==='settled'));assert.equal((await pool.query('SELECT id FROM usage WHERE id=ANY($1::text[])',[history.requestIds])).rowCount,2);
- const approved=await call('/projects/'+project.id+'/approve','POST',{version:1});assert.equal(approved.status,202,JSON.stringify(approved.data));
+ const approved=await call('/projects/'+project.id+'/approve','POST',{version:2});assert.equal(approved.status,202,JSON.stringify(approved.data));
  const snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].snapshot;assert.equal(snapshot.modelRoutes[0].toolCapabilityTestId,history.id);assert.equal(snapshot.modelRoutes[0].configurationHash.length,64);
+ // A stopped approved-run fixture needs its original archive for goal validation.
+ const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');createRunArchive(join(dir,'runs'),snapshot,{id:approved.data.id});
  await call('/runs/'+approved.data.id+'/cancel','POST',{});
  const changed=await call('/models/'+modelId,'PUT',{...current,name:'Renamed configuration',version:current.version,capabilities:current.capabilities});assert.equal(changed.status,200);
  assert.deepEqual((await model()).capabilities,{});assert.equal((await call('/runs/'+approved.data.id+'/retry','POST',{resume:false})).data.code,'MODEL_CAPABILITY_REQUIRED');
@@ -52,7 +58,7 @@ test('only a complete tool roundtrip enables execution; evidence, cost and route
  assert.equal((await call('/runs/'+approved.data.id+'/retry','POST',{resume:false})).data.code,'MODEL_REAPPROVAL_REQUIRED');
  const gatewayRow=(await call('/gateways')).data.find((g:any)=>g.id===gatewayId);
  assert.equal((await call('/gateways/'+gatewayId,'PUT',{...gatewayRow,version:gatewayRow.version})).status,200);assert.deepEqual((await model()).capabilities,{});
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'));await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');const worker=new RunCoordinator(join(dir,'runs'),createArchiveWriterManager({traceRoot:join(dir,'runs')}));await worker.close();
  await pool.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=now()+interval '1 minute' WHERE id=$2",[worker.owner,approved.data.id]);
  const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[approved.data.id])).rows[0],beforeLaunch=requests;
  await worker.launch(row);assert.equal(requests,beforeLaunch,'changed routes never reach the provider from the worker');assert.equal((await pool.query('SELECT status FROM project_runs WHERE id=$1',[approved.data.id])).rows[0].status,'failed');
