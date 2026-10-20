@@ -8,6 +8,7 @@ import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,unlinkSync,exist
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pool,migrate} from '../apps/api/src/db.ts';
+import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 import {LocalOperationService,LocalRunExecutor,localDeviceRouter} from '../apps/api/src/local-execution.ts';
 import {runManagementRouter} from '../apps/api/src/run-management.ts';
 import {workFilesRouter,prepareImportedWorkspace} from '../apps/api/src/work-files.ts';
@@ -47,7 +48,7 @@ async function fixture(){
  const archive=createRunArchive(root,snapshot,{id:runId}),artifacts=join(archive.dir,'artifacts');mkdirSync(artifacts);writeFileSync(join(artifacts,'in.txt'),'input');writeFileSync(join(artifacts,'report.docx'),office);
  archive.append('run/task-mapping',{tasks:[{task_id:'native',seed_id:'task'}]});archive.append('team/checkpoint',{members:[{id:'session',name:'employee'}],tasks:[{id:'native',assignee:'employee',attemptId:'attempt',status:'in_progress'}]});
  const persisted=(await row(runId)).snapshot;
- const service=new LocalOperationService(root,owner),executor=new LocalRunExecutor(archive,persisted,service),signal=AbortSignal.timeout(30000),candidate={runId,taskId:'task',attemptId:'attempt',agentId:'employee',sessionId:'session',runtimeTaskId:'native',contractHash:checkpointContract(persisted,persisted.tasks[0])};
+ const service=new LocalOperationService(root,owner),executor=new LocalRunExecutor(archive,persisted,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint)),signal=AbortSignal.timeout(30000),candidate={runId,taskId:'task',attemptId:'attempt',agentId:'employee',sessionId:'session',runtimeTaskId:'native',contractHash:checkpointContract(persisted,persisted.tasks[0])};
  const assignment=await executor.bindAttempt(candidate,signal),context={agentId:'employee',sessionId:'session',taskId:'task',attemptId:'attempt',generation:assignment.generation};let work:any[]=[],sandboxId=randomUUID();
  async function deliver(action:Promise<any>){
   // Exercise the actual queued -> HTTP poll/start/result -> executor merge path.

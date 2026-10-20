@@ -1,0 +1,36 @@
+{
+  "label": "interleave",
+  "pid": 50916,
+  "parentPid": 15952,
+  "startedAt": "2026-10-20T13:25:19.424Z",
+  "args": [
+    "--import",
+    "tsx",
+    "--import",
+    "./scripts/test-support/pglite-pool.mjs",
+    "--test",
+    "--test-concurrency=1",
+    "--test-reporter=tap",
+    "--test-name-pattern=historical partial",
+    "tests/task-accepted-stop-product-flow.test.ts"
+  ],
+  "startSha": {
+    "tests/task-accepted-stop-product-flow.test.ts": "f32e0d8a4860169d9f4a9f2dd9e95ddc1be6d383c13ed042f37273c75ad825ac",
+    "tests/helpers/task-openshell-product-fixture.cjs": "7270cb220a9f40389ff95eee9c118a5be82b994b123c18e9d8a9cd73bb2ee384",
+    "tests/task-sandbox-flow.test.ts": "bb23e652993d080d65d603f810c2a5b6a3f1ead0642d696aa14bf18b6ae5a65b",
+    "apps/desktop/openshell-executor.cjs": "bb51d3c0e03c38b5133eaf9525486e83602962466a6829795d784d0a4f5b643d",
+    "apps/api/src/local-execution.ts": "7197d66519a490c4721fc15c7784889ac3f2baad01495d4870177a791a4fc11b",
+    "apps/api/src/task-accepted-stop.ts": "cd98427bff283d845b57b6a4d9824b303db39132c446645d07a72db4c9de3f03",
+    "apps/api/src/task-original-commit.ts": "3c1e451672502951a812a8b668342bc19e1248e361593a6ac98ee1d12bd33b75",
+    "apps/api/src/task-checkpoint-state.ts": "33b0ff7c9ada302578825971e18d71fcb5406014d3f00816b26af9c4b593dfb1",
+    "apps/api/src/handoff-checkpoints.ts": "b6a1e436be7091fbb20fc3707bc6fd6851406bb6230631023e855ebc1876295a",
+    "apps/api/src/task-execution.ts": "c2062e9d9fcf41a783ba567d546f1e0147dbd34ebb49cbac6bdfc8032054a7e4",
+    "apps/api/src/storage-lifecycle.ts": "314ac111aaa1431cc249302573e5b2290369c559cbce865d6276c38b24818bf3",
+    "apps/api/src/run-management.ts": "55d9cbd6be16bdf0eddba86fefb45392e05ec22724a143c95ac71997ae878b2d",
+    "apps/api/src/app.ts": "2ad534491aaa04ba336ac85c1c0bd84f223a969cd3306f0b07043002b8f977ea",
+    "apps/api/src/task-accepted-stop-state.ts": "51bf01f2ed8eaa06e7c20ae5423c97fdb8173e2791391cd1ac3be60428884a7a",
+    "apps/api/src/live-canonical-reader.ts": "43a6993f6cfaff154b5d8b94b53609fedf0db517f767a870ec78eac7216fb660",
+    ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-runner.mjs": "ce607d03949e529848f468373afdf570bcae5214a2ea70ebd36124dea04a8e04"
+  },
+  "wrapperDeadlineMs": 240000
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "path": "apps/api/src/task-accepted-stop.ts",
+    "sha256": "79ba4d74b5f65d550e13e18962f5543c629c30c260e4f648b4cad7d6bc839c91"
+  },
+  {
+    "path": "apps/api/src/task-original-commit.ts",
+    "sha256": "3c1e451672502951a812a8b668342bc19e1248e361593a6ac98ee1d12bd33b75"
+  },
+  {
+    "path": "apps/api/src/local-execution.ts",
+    "sha256": "3be24a67d8fe33570955cf76e1f33ea76643f13c3e73cacb25ca208ac88fa9f3"
+  },
+  {
+    "path": "apps/api/src/task-checkpoint-state.ts",
+    "sha256": "33b0ff7c9ada302578825971e18d71fcb5406014d3f00816b26af9c4b593dfb1"
+  },
+  {
+    "path": "apps/api/src/task-execution.ts",
+    "sha256": "c2062e9d9fcf41a783ba567d546f1e0147dbd34ebb49cbac6bdfc8032054a7e4"
+  },
+  {
+    "path": "apps/api/src/handoff-checkpoints.ts",
+    "sha256": "b6a1e436be7091fbb20fc3707bc6fd6851406bb6230631023e855ebc1876295a"
+  },
+  {
+    "path": "apps/api/src/storage-lifecycle.ts",
+    "sha256": "314ac111aaa1431cc249302573e5b2290369c559cbce865d6276c38b24818bf3"
+  },
+  {
+    "path": "apps/api/src/run-coordinator.ts",
+    "sha256": "0b8146c22695e5293a402a206957e6a45734f6a02dbf70fa2a037ea127b7afda"
+  },
+  {
+    "path": "apps/api/src/app.ts",
+    "sha256": "2ad534491aaa04ba336ac85c1c0bd84f223a969cd3306f0b07043002b8f977ea"
+  },
+  {
+    "path": "tests/task-accepted-stop-delivery.test.ts",
+    "sha256": "84f0b0a30f0b6ffa09994e38cd0cd7b08584d62cf11dcd694af6a4eb9df2fdbc"
+  },
+  {
+    "path": "tests/helpers/task-accepted-stop-api-fixture.ts",
+    "sha256": "a28e2544b3e45683946ed3fa94315d0dbe83d2f90b993c4db33c74f8f26c97c5"
+  },
+  {
+    "path": "tests/helpers/task-stop-maintenance.ts",
+    "sha256": "a0201379b4672d603211f948b76c840e6825bd5c80db8e44f311b629c78b9414"
+  },
+  {
+    "path": "tests/task-checkpoint-state.test.ts",
+    "sha256": "7ca425c2ee226743dd9be8175880832ce2a23138261096f8f3f9bfd6043d95a4"
+  },
+  {
+    "path": "tests/task-operation-bridge.test.ts",
+    "sha256": "896aa6783c0058da5f59affb6620bd22781e039678783e3192c8c882e509cc04"
+  },
+  {
+    "path": "tests/task-canonical-readers.test.ts",
+    "sha256": "dda7a871f9def5f9e9bfa47500362b49a4f61a88baab183a830e63d0a7553a26"
+  },
+  {
+    "path": "tests/task-accepted-stop-http.test.ts",
+    "sha256": "5740d16fcbfa246e6d3b8ee645ddb8efb8975456efb6fc804ecc4f3024e6e8df"
+  }
+]

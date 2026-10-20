@@ -1,0 +1,20 @@
+Isolated PGlite; actual product/device executor and bounded transport fixture; zero paid API.
+TAP version 13
+# Subtest: A historical partial stop preserves a later B complete canonical head
+ok 1 - A historical partial stop preserves a later B complete canonical head
+  ---
+  duration_ms: 86076.388
+  type: 'test'
+  ...
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-stop-interleave-summary.json
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 88634.5248
+
+PROCESS {"code":0,"signal":null,"elapsedMs":91024,"timedOut":false}

@@ -98,7 +98,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   const allowedOrigins = configuredOrigins();
   if(identityConfig.mode==='oidc')allowedOrigins.add(identityConfig.publicOrigin);
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
-  const coordinator = new RunCoordinator(traceRoot,options.createExecutor);
+  const coordinator = new RunCoordinator(traceRoot,options.createExecutor,{sandboxMaintenance:options.sandboxMaintenance});
   const runtime = coordinator.runtime;
   const managerChat = new ManagerChatService(); managerChat.start();
   const automation = new AutomationLearningService(pool); automation.start();

@@ -1,0 +1,155 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ dispatching COMMIT boundary payload mutation prevents a new device effect (2991.381ms)
+✖ sync proof surface rejects cp-body changes after its original verification (2305.6814ms)
+✖ sync proof surface rejects accepted-only changes after its original verification (2216.5666ms)
+✖ sync proof surface rejects completed-witness changes after its original verification (2174.2287ms)
+✖ sync proof surface rejects cp-work-object changes after its original verification (1635.3148ms)
+✖ sync proof surface rejects historical-a-object changes after its original verification (2818.9723ms)
+✖ sync proof surface rejects current-b-object changes after its original verification (2878.5651ms)
+✖ sync proof surface rejects producer-origin changes after its original verification (2777.8821ms)
+✖ queued task context cannot be replaced in place with another authorized task (2084.5009ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 0
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24052.9314
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-delivery.test.ts:1:21095
+✖ dispatching COMMIT boundary payload mutation prevents a new device effect (2991.381ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:238:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects cp-body changes after its original verification (2305.6814ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:273:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects accepted-only changes after its original verification (2216.5666ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:273:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects completed-witness changes after its original verification (2174.2287ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:273:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects cp-work-object changes after its original verification (1635.3148ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:273:134)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects historical-a-object changes after its original verification (2818.9723ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:273:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects current-b-object changes after its original verification (2878.5651ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:273:134)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-delivery.test.ts:1:22383
+✖ sync proof surface rejects producer-origin changes after its original verification (2777.8821ms)
+  Error: UNACCEPTED_INPUT: p:p.txt
+      at file:///[workspace]/services/agent-runtime/handoff.mjs:135:30
+      at Array.map (<anonymous>)
+      at HandoffGate.begin (file:///[workspace]/services/agent-runtime/handoff.mjs:130:42)
+      at HandoffGate.prepare (file:///[workspace]/services/agent-runtime/handoff.mjs:212:23)
+      at acceptTask ([workspace]\tests\helpers\task-accepted-stop-api-fixture.ts:71:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:247:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+
+test at tests\task-accepted-stop-delivery.test.ts:1:25604
+✖ queued task context cannot be replaced in place with another authorized task (2084.5009ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'c' !== 'b'
+  
+      at TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:280:101)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'c',
+    expected: 'b',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

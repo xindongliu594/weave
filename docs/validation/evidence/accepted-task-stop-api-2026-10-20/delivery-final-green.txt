@@ -1,0 +1,49 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ task preparation fails closed before SQL when trusted stop maintenance is missing (425.9378ms)
+✔ original commit verifies raw result and historical objects independently of a current lease owner (97.1193ms)
+✔ original commit rejects a separately valid workspace binding for another task key (65.239ms)
+✔ original commit rejects damaged raw-result (62.4092ms)
+✔ original commit rejects damaged merge-digest (59.5515ms)
+✔ original commit rejects damaged committed-output (55.9772ms)
+✔ original commit rejects damaged claim-token (53.8401ms)
+✔ original commit refuses a self-consistent raw result from a different claim (58.144ms)
+✔ API prepares target only after original accepted checkpoint stop commits (2798.3864ms)
+✔ beforeDispatch refuses fresh provider changes without a device effect (1704.0346ms)
+✔ beforeDispatch refuses fresh method changes without a device effect (1671.7653ms)
+✔ beforeDispatch refuses fresh permission changes without a device effect (1537.1389ms)
+✔ beforeDispatch refuses fresh lease changes without a device effect (1586.1561ms)
+✔ beforeDispatch refuses fresh target changes without a device effect (1718.4533ms)
+✔ lost prepared COMMIT acknowledgement never grants a replacement dispatch (2314.9244ms)
+✔ lost dispatching COMMIT acknowledgement never grants a replacement dispatch (1901.9982ms)
+✔ cold bind observes original stopped identity after a lost response without another stop (1879.5578ms)
+✔ real Stopped fact survives cancel after the effect while target admission fails (1757.2709ms)
+✔ real Stopped fact survives lease after the effect while target admission fails (1694.2815ms)
+✔ post-COMMIT authority progress uses relevant assignment semantics (2390.7592ms)
+✔ post-COMMIT authority assignment uses relevant assignment semantics (1421.1103ms)
+✔ original commit rejects a separately valid queued backend binding (57.3388ms)
+✔ current full B canonical requires its own original claim before stopping historical A (2484.4659ms)
+✔ cold observation records original stopped fact after response loss and cancellation (1595.2838ms)
+✔ historical stop rejects synthetic damaged accepted-only provenance (1296.7722ms)
+✔ historical stop rejects synthetic damaged checkpoint-v1 provenance (1316.7728ms)
+✔ historical stop rejects synthetic damaged accepted-output provenance (1352.9168ms)
+✔ historical stop rejects synthetic damaged original-merge provenance (1404.4132ms)
+✔ fresh stop refuses boundary payload taskId contradicting its exact task links (1361.5906ms)
+✔ cold observation refuses boundary payload attemptId contradicting its original links (1594.0864ms)
+✔ dispatching COMMIT boundary payload mutation prevents a new device effect (1576.5498ms)
+✔ sync proof surface rejects cp-body changes after its original verification (1543.0853ms)
+✔ sync proof surface rejects accepted-only changes after its original verification (2067.9327ms)
+✔ sync proof surface rejects completed-witness changes after its original verification (1614.2036ms)
+✔ sync proof surface rejects cp-work-object changes after its original verification (1656.1341ms)
+✔ sync proof surface rejects historical-a-object changes after its original verification (2267.1306ms)
+✔ sync proof surface rejects current-b-object changes after its original verification (2981.7763ms)
+✔ sync proof surface rejects producer-origin changes after its original verification (3721.114ms)
+✔ queued task context cannot be replaced in place with another authorized task (2558.7981ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59996.3015

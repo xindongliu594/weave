@@ -1,7 +1,7 @@
 import type pg from 'pg';import {isDeepStrictEqual} from 'node:util';import {join} from 'node:path';import {existsSync} from 'node:fs';import {createHash} from 'node:crypto';import {createRequire} from 'node:module';
 import {AppError} from './provider.ts';import {readRun} from '../../../services/agent-runtime/trace-store.mjs';import {unresolvedOperations} from '../../../services/agent-runtime/recovery.mjs';import {journalArchiveCandidate,archiveJournal,readJournal} from '../../../services/agent-runtime/journal-archive.mjs';
 const {revision,exportFiles}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
-export type SandboxMaintenance={deviceId:string;grantId:string;fingerprint:string;executor:{storageScopes:()=>any[];inspectStorage:(runId:string)=>Promise<any>;retireStorage:(runId:string,expected:any)=>Promise<any>;reconcileStorage:(runId:string)=>Promise<any>}};
+export type SandboxMaintenance={deviceId:string;grantId:string;fingerprint:string;executor:{storageScopes:()=>any[];inspectStorage:(runId:string)=>Promise<any>;retireStorage:(runId:string,expected:any)=>Promise<any>;reconcileStorage:(runId:string)=>Promise<any>;stopAcceptedTask?:(key:any,expected:any,beforeDispatch:()=>Promise<void>)=>Promise<any>;reconcileAcceptedTaskStop?:(key:any,identity:any)=>Promise<any>}};
 type Database=Pick<pg.PoolClient,'query'>;
 export const maintenanceConfirmation:Record<string,string>={workspace:'CLEAN_WORKSPACE_COPIES',sandbox:'RETIRE_SANDBOX',journal:'ARCHIVE_JOURNAL'};
 export function maintenanceError(error:any){if(error instanceof AppError)return error;if(typeof error.code==='string'&&/^(JOURNAL_|SANDBOX_|WORKSPACE_|OPENSHELL_|LOCAL_)/.test(error.code))return new AppError(409,String(error.message).slice(0,1000),error.code);return error;}

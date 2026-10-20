@@ -1,0 +1,169 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ task preparation fails closed before SQL when trusted stop maintenance is missing (633.3533ms)
+✔ original commit verifies raw result and historical objects independently of a current lease owner (106.0717ms)
+✔ original commit rejects a separately valid workspace binding for another task key (97.261ms)
+✔ original commit rejects damaged raw-result (87.289ms)
+✔ original commit rejects damaged merge-digest (96.0345ms)
+✔ original commit rejects damaged committed-output (96.4578ms)
+✔ original commit rejects damaged claim-token (120.5929ms)
+✔ original commit refuses a self-consistent raw result from a different claim (95.2147ms)
+✔ API prepares target only after original accepted checkpoint stop commits (4400.1715ms)
+✔ beforeDispatch refuses fresh provider changes without a device effect (2674.0196ms)
+✔ beforeDispatch refuses fresh method changes without a device effect (2321.0732ms)
+✔ beforeDispatch refuses fresh permission changes without a device effect (2459.2311ms)
+✔ beforeDispatch refuses fresh lease changes without a device effect (2179.1895ms)
+✔ beforeDispatch refuses fresh target changes without a device effect (2676.5604ms)
+✔ lost prepared COMMIT acknowledgement never grants a replacement dispatch (2536.7181ms)
+✔ lost dispatching COMMIT acknowledgement never grants a replacement dispatch (2206.7865ms)
+✔ cold bind observes original stopped identity after a lost response without another stop (2053.4072ms)
+✔ real Stopped fact survives cancel after the effect while target admission fails (1885.2574ms)
+✔ real Stopped fact survives lease after the effect while target admission fails (2686.0576ms)
+✔ post-COMMIT authority progress uses relevant assignment semantics (1809.0855ms)
+✔ post-COMMIT authority assignment uses relevant assignment semantics (1815.3826ms)
+✔ original commit rejects a separately valid queued backend binding (45.3233ms)
+✔ current full B canonical requires its own original claim before stopping historical A (2078.504ms)
+✔ cold observation records original stopped fact after response loss and cancellation (1295.9091ms)
+✔ historical stop rejects synthetic damaged accepted-only provenance (1148.748ms)
+✔ historical stop rejects synthetic damaged checkpoint-v1 provenance (1083.3378ms)
+✔ historical stop rejects synthetic damaged accepted-output provenance (1098.1302ms)
+✔ historical stop rejects synthetic damaged original-merge provenance (1286.8119ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44266.151
+✔ checkpoint refs preserve A work and original merge while canonical advances to independent B (2281.5862ms)
+✔ before-tool checkpoint uses imported task bytes rather than full canonical revision (593.998ms)
+✔ after-tool checkpoint refuses a missing, other-task, stale or nonexistent operation identity (2397.2576ms)
+✔ SQL unknown blocks checkpoint despite finished events and human acknowledgment (850.1029ms)
+✔ checkpoint refuses missing referenced objects without cache repair (861.3949ms)
+✔ checkpoint refuses corrupt referenced objects without cache repair (862.8552ms)
+✔ checkpoint refuses changed lease (903.8117ms)
+✔ checkpoint refuses changed authority (886.5885ms)
+✔ checkpoint refuses changed assignment (837.8292ms)
+✔ checkpoint refuses changed capability (822.012ms)
+✔ checkpoint refuses changed recovery (976.2933ms)
+✔ checkpoint independently authenticates the task merge record after a newer canonical commit (1751.2343ms)
+✔ checkpoint revalidates lease after asynchronous preparation (852.6003ms)
+✔ checkpoint revalidates authority after asynchronous preparation (838.9374ms)
+✔ checkpoint revalidates assignment after asynchronous preparation (870.4252ms)
+✔ checkpoint revalidates object after asynchronous preparation (1083.1555ms)
+✔ checkpoint publication fences assignment at the real COMMIT response (1221.0622ms)
+✔ checkpoint publication fences object at the real COMMIT response (1115.9929ms)
+✔ checkpoint publication fences abort at the real COMMIT response (1054.0167ms)
+✔ checkpoint publication fences progress at the real COMMIT response (1058.2563ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24356.6403
+✔ two consecutive task writes roll scope and preserve original input lineage (2493.2188ms)
+✔ file operations preserve canonical arguments and transport only the visible revision (2043.3865ms)
+✔ unrelated task commit rebuilds next scope without rebinding inputs (3319.3274ms)
+✔ another task changing a fixed input blocks scope renewal (1776.1372ms)
+✔ approval cannot authorize a renewed scope (2848.1796ms)
+✔ missing generation, widened private scope and cancelled lease are refused before queue (698.7536ms)
+✔ unknown prepare cannot be replayed or bypassed by a new generation (474.6547ms)
+✔ a task cannot accept a successful receipt from another sandbox (839.3674ms)
+✔ queued task state is rechecked by poll and start (1515.6623ms)
+✔ a late authenticated receipt after withdrawal stays evidence and cannot merge (855.1569ms)
+✔ native dispatch derives effective paths and fixed bundle from the trusted scope (1724.4676ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20752.0309
+✔ artifact list and download use one complete SQL committed head despite partial corrupt cache (2230.8518ms)
+✔ from-run imports exact committed text with partial cache (1682.2912ms)
+✔ parent copies require a selected canonical head for task profile and retain all committed files (1564.35ms)
+✔ planning context and accepted work evidence use committed seals with partial cache (1516.7811ms)
+✔ missing committed object blocks every consumer even with good cache without mutation (1474.8729ms)
+✔ corrupt committed object blocks every consumer even with good cache without mutation (1601.094ms)
+✔ unknown profile, SQL/archive profile mismatch, recovery and absent live operation evidence refuse cache fallback (1565.9183ms)
+✔ SQL unknown remains blocked when archive is finished and human acknowledgment is present (1504.795ms)
+✔ a head cannot certify another or damaged original committed SQL operation (1498.6384ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17137.637
+✔ SQL accepted-stop denies queued poll, claimed replay and start without losing the original claim (2782.3053ms)
+✔ SQL stop fence retains authenticated unknown result once as late evidence and never settles its unknown (920.8317ms)
+✔ committed receipt reread survives a SQL stop fence while pending merge cannot publish a head (1663.7241ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7704.2796
+✔ explicit execution mode is independent of identity and task profile stays unavailable (2.8029ms)
+
+
+#
+# Fatal process out of memory: Zone
+#
+----- Native stack trace -----
+
+
+
+#
+# Fatal process out of memory: Zone
+#
+----- Native stack trace -----
+
+ 1: 00007FF721ED6F4D 
+ 2: 00007FF72333DAC6 
+ 3: 00007FF722BCF9F5 
+ 4: 00007FF722549986 
+ 5: 00007FF72210AB32 
+ 6: 00007FF72210C9D8 
+ 7: 00007FF72210C7DF 
+ 8: 00007FF7221C47B1 
+ 9: 00007FF7221C4562 
+10: 00007FF7221C9E2D 
+11: 00007FF7221C8CC7 
+12: 00007FF7221B5BDC 
+13: 00007FF7221B27C9 
+14: 00007FF7221B0DCA 
+15: 00007FF7221B084A 
+16: 00007FF7235C9B5A 
+17: 00007FF72339DDAB 
+18: 00007FF722243256 
+19: 00007FF72223E993 
+20: 00007FF72223E279 
+21: 00007FF7233B0C5F 
+22: 00007FF721ED2E0E 
+23: 00007FF722C24A36 
+24: 00007FF723E85A73 
+25: 00007FFBB32ADDA7 
+26: 00007FFBB3C7EE4C RtlUserThreadStart+44
+✖ tests\task-execution-scope.test.ts (5010.3797ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5023.0895
+
+✖ failing tests:
+
+test at tests\task-execution-scope.test.ts:1:1
+✖ tests\task-execution-scope.test.ts (5010.3797ms)
+  'test failed'

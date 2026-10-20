@@ -12,6 +12,7 @@ import {readCommittedCanonical} from '../apps/api/src/task-canonical.ts';
 import {LocalOperationService,LocalRunExecutor,localDeviceRouter} from '../apps/api/src/local-execution.ts';
 import {assertExecutionProfile} from '../apps/api/src/execution-policy.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
+import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
@@ -50,7 +51,7 @@ async function fixture(){
  writeFileSync(join(archive.dir,'artifacts/in.txt'),'input');writeFileSync(join(archive.dir,'artifacts/private.txt'),'private');
  const state={members:[{id:'session',name:'employee'}],tasks:tasks.map(t=>({id:'native-'+t.id,assignee:'employee',attemptId:'attempt-'+t.id,status:'in_progress'}))};
  archive.append('run/task-mapping',{tasks:tasks.map(t=>({task_id:'native-'+t.id,seed_id:t.id}))});archive.append('team/checkpoint',state);
- const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,snapshot,service);
+ const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,snapshot,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint));
  const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory));
  app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({code:error.code,message:error.message}));
  const server=app.listen(0,'127.0.0.1');await once(server,'listening');

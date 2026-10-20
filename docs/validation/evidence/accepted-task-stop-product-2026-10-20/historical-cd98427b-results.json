@@ -1,0 +1,29 @@
+[
+  {
+    "label": "normal",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 70655,
+    "timedOut": false,
+    "sourceStable": true,
+    "stopSHA": "cd98427bff283d845b57b6a4d9824b303db39132c446645d07a72db4c9de3f03"
+  },
+  {
+    "label": "interleave",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 91024,
+    "timedOut": false,
+    "sourceStable": true,
+    "stopSHA": "cd98427bff283d845b57b6a4d9824b303db39132c446645d07a72db4c9de3f03"
+  },
+  {
+    "label": "loss",
+    "code": 0,
+    "signal": null,
+    "elapsedMs": 21500,
+    "timedOut": false,
+    "sourceStable": true,
+    "stopSHA": "cd98427bff283d845b57b6a4d9824b303db39132c446645d07a72db4c9de3f03"
+  }
+]

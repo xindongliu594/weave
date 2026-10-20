@@ -122,3 +122,9 @@ lazy provider 比较 executor 引用和 deviceId/grantId/fingerprint，不能比
 实际验收新增三 distinct task：开发、QA、经理各有真实 task workspace 操作、不同 key/attempt/sandboxId。沿真实 ProductDshRuntime/Host/HTTP claim-start-result/CAS/Handoff 与真实设备 executor/journal/容量检查；CLI transport 及模型选择为 fixture，不 seed 成功 merge/accepted/CP。记录第三槽 pre-fix RED，以及 accepted→durable CP→stop intent→单 stop→原ID Stopped→下一 prepare 的顺序；保持两槽、128 scope及磁盘预留，不删除文件。另验 A 已验收但 B 已提交时可用 A partial 停 A且保 B；SQL/设备应答丢失、撤权/换lease/provider/目标变化、无 intent/absent 和迟到结果分别保留。
 
 这批只接运行中的 accepted-stop，Task5 恢复/维护/carrier 和 Task6 原生PG/物理JJ/真实模型仍单列；profile 继续封闭到全部开放条件满足。
+
+实现预审补充：provider 冻结并比较 stop/reconcile 方法引用，使用冻结引用调用；当前 B 完整 head 也需 B 自身原 claim/result/context/scope/committed-output 链的正向验证，不能只靠文件摘要。冷只读核对采用窄历史 observation verifier：允许运行已取消/结束或 lease 已转移，仍严格验证原 marker/accepted/v2 CP/SQL commit、原有效 device/grant/backend 与本地授权，只 get 原 ID并补记事实；不读取新知识、授予新工具或派发权限，不给通用 current/transaction/普通 guard 加 ignore 选项。随后普通 bind/执行照常拒绝失效权限。本批不新增公共核对 route。
+
+本批本地产品接线已独立复审PASS：最终同步证明矩阵9项实际RED后完整API39项通过，三distinct员工的正常/交错/应答丢失三场景在最终源码上通过，scope25、类型与构建通过。原claim和完整binding正向校验共用；提交前基线与提交后同步相关档案/对象复核不引入新SQL豁免。实际证据见 `docs/validation/accepted-task-stop-product-2026-10-20.md`。模型、CLI、mTLS/UID/cgroup为工程夹具，不当作真实模型/物理JJ验收。先前OOM/未知进程失败日志保留，不以场景绿色证明长运行稳定性。
+
+源审查另发现最后经理scope仍可能占槽，不能据同run三员工通过宣称跨run容量完成。下一批按已独立冻结的 `docs/superpowers/plans/2026-10-20-task-stop-finalization.md` 复用原队列/journal，补源任务finalizer、共享deadline、SQL派生待维护投影与有权限的原ID网页核对；再验证同一executor连续三项目。任务精确回收、恢复/carrier和Task6仍分批推进，profile不开放。

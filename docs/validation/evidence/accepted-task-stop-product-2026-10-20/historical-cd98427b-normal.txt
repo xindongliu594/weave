@@ -1,0 +1,20 @@
+Isolated PGlite; actual product/device executor and bounded transport fixture; zero paid API.
+TAP version 13
+# Subtest: three distinct product tasks stop accepted scopes through maintenance provider
+ok 1 - three distinct product tasks stop accepted scopes through maintenance provider
+  ---
+  duration_ms: 65597.9321
+  type: 'test'
+  ...
+# [workspace]\\.superpowers\\sdd\\2026-10-20-task-checkpoint-v2-integration\\product-stop-green-summary.json
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 68227.3798
+
+PROCESS {"code":0,"signal":null,"elapsedMs":70655,"timedOut":false}

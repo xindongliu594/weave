@@ -13,6 +13,8 @@ import {assertRunAuthorization,assertCurrentRunPermissions,assertExecutionProfil
 import {initializeTaskCanonical,readCommittedCanonical,commitTaskResult,validateTaskOperationResult} from './task-canonical.ts';
 import {bindTrustedAttempt,resolveTaskScope} from './task-execution.ts';
 import {prepareTaskCheckpoint,type TaskCheckpointContext,type TaskCheckpointOptions} from './task-checkpoint-state.ts';
+import {TaskAcceptedStopLifecycle,requireTaskStopProvider} from './task-accepted-stop.ts';
+import type {SandboxMaintenance} from './storage-lifecycle.ts';
 import {admitTaskOperation,assertNoUnresolvedTaskOperation,publicTaskScope,taskDeviceScope,taskOperationDenied} from './task-operation-admission.ts';
 import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope,TaskCheckpointRefs} from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
@@ -191,8 +193,8 @@ export class LocalOperationService {
  }
 }
 export class LocalRunExecutor {
- root:string;preparing?:Promise<void>;
- constructor(public archive:any,public snapshot:any,public service:LocalOperationService){this.root=join(archive.dir,'artifacts');mkdirSync(this.root,{recursive:true,mode:0o700});}
+ root:string;preparing?:Promise<void>;private acceptedStops:TaskAcceptedStopLifecycle;
+ constructor(public archive:any,public snapshot:any,public service:LocalOperationService,private maintenance:{sandboxMaintenance?:()=>SandboxMaintenance|undefined}={}){this.root=join(archive.dir,'artifacts');mkdirSync(this.root,{recursive:true,mode:0o700});this.acceptedStops=new TaskAcceptedStopLifecycle(archive.id,service,maintenance.sandboxMaintenance);}
  revision(){return revision(exportFiles(this.root));}
  private async taskTransaction<T>(signal:AbortSignal,fn:(db:pg.PoolClient,run:any)=>Promise<T>):Promise<T>{
   if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')throw new AppError(409,'旧执行器没有可信任务上下文','TASK_SCOPE_DENIED');
@@ -213,6 +215,7 @@ export class LocalRunExecutor {
  }
  /** Trusted in-process Host admission only; not registered as a model tool or HTTP route. */
  async bindAttempt(candidate:TrustedTaskCandidate&{generation?:number},signal:AbortSignal):Promise<TrustedTaskAssignment>{
+  await this.acceptedStops.reconcileExisting(signal);
   return this.taskTransaction(signal,(db,run)=>bindTrustedAttempt(db,run,candidate));
  }
  /** Private Host boundary: no model DTO, command dispatch or compatibility-cache read. */
@@ -234,6 +237,9 @@ export class LocalRunExecutor {
  }
  async prepareTask(context:{agentId:string;sessionId:string;taskId:string;attemptId:string;generation:number},signal:AbortSignal):Promise<TaskExecutionScope>{
   if(!context||!Number.isSafeInteger(context.generation)||context.generation<1||Object.keys(context).some(k=>!['agentId','sessionId','taskId','attemptId','generation'].includes(k)))taskOperationDenied('任务初始化身份不完整');
+  context=Object.freeze({agentId:context.agentId,sessionId:context.sessionId,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation});
+  requireTaskStopProvider(this.maintenance.sandboxMaintenance);
+  await this.acceptedStops.reconcileExisting(signal);
   await initializeTaskCanonical(this.service,this.archive.id,signal);
   const previous=await this.taskTransaction(signal,async(db,run)=>{
    const key={runId:run.id,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation};
@@ -244,7 +250,7 @@ export class LocalRunExecutor {
    return existing;
   });
   let id=previous?.id;
-  if(!id){const scope=await this.taskScope(context,signal);id=await this.service.enqueue(this.archive.id,'prepare',{}, {...context,callId:'task-prepare-'+randomUUID(),executionScope:publicTaskScope(scope)},scope.workspace.importedFiles,signal);}
+  if(!id){await this.taskScope(context,signal);await this.acceptedStops.beforeNewTask(context,signal);const scope=await this.taskScope(context,signal);id=await this.service.enqueue(this.archive.id,'prepare',{}, {...context,callId:'task-prepare-'+randomUUID(),executionScope:publicTaskScope(scope)},scope.workspace.importedFiles,signal);}
   if(previous?.merge_state!=='committed'){
    await this.service.wait(id,signal);await commitTaskResult(this.service,id,signal);
   }

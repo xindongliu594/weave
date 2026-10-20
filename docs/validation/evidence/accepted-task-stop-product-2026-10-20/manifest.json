@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "status": "candidate-historical-reviewfix-pending-final-matching",
+  "apiStopSourceSha256": "cd98427bff283d845b57b6a4d9824b303db39132c446645d07a72db4c9de3f03",
+  "totalPayloadBytes": 210987.0,
+  "limits": [
+    "Bounded engineering fixture; zero saved/paid model calls",
+    "No physical OpenShell/JJ or native PostgreSQL evidence",
+    "Whole-file 185s process failure unresolved; stale normal has no final exit",
+    "Post-COMMIT boundary authority review fix pending final matching; historical case PASS does not certify later source",
+    "Terminal C running slot/cross-run cleanup remains a separate gate"
+  ],
+  "files": [
+    {
+      "file": "baseline-red.txt",
+      "bytes": 860,
+      "sha256": "a4df962777a92e681a96f002b5942847586344be190bb4ae1f49edfae520884a",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-baseline-red.txt",
+      "sourceSha256": "a4df962777a92e681a96f002b5942847586344be190bb4ae1f49edfae520884a",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "baseline-summary.json",
+      "bytes": 4390,
+      "sha256": "7b2ef1d33d256a98f42faa0d4d24aa0b54234baa7026fde147422b62601139f4",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-baseline-summary.json",
+      "sourceSha256": "7b2ef1d33d256a98f42faa0d4d24aa0b54234baa7026fde147422b62601139f4",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-results.json",
+      "bytes": 700,
+      "sha256": "bf1cc6170ebf9c874bcd2552c7897fcbc2ef1dc4dc779187a8cd77da6b37b5ea",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-results.json",
+      "sourceSha256": "bf1cc6170ebf9c874bcd2552c7897fcbc2ef1dc4dc779187a8cd77da6b37b5ea",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-source-sha.json",
+      "bytes": 1808,
+      "sha256": "40c25ace59c5bfd622dde20246523154aaeb271139fef02d4155526c32d7ac00",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-source-sha.json",
+      "sourceSha256": "40c25ace59c5bfd622dde20246523154aaeb271139fef02d4155526c32d7ac00",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-normal-summary.json",
+      "bytes": 63433,
+      "sha256": "62fe569271694d82f1743315d34bc8715da3f9189a589b85e2c7f59a8f9fe4ce",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-green-summary.json",
+      "sourceSha256": "62fe569271694d82f1743315d34bc8715da3f9189a589b85e2c7f59a8f9fe4ce",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-interleave-summary.json",
+      "bytes": 71701,
+      "sha256": "9bbdf65a5a3d0eac3b933a9b1510ca4e88815c727c210122554278d60f25a736",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-interleave-summary.json",
+      "sourceSha256": "9bbdf65a5a3d0eac3b933a9b1510ca4e88815c727c210122554278d60f25a736",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-loss-summary.json",
+      "bytes": 22950,
+      "sha256": "aa046c9685c6fc6200904e872497af6d5d7cbf7d9a05ccfcc8dfd7ce5670a536",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-response-loss-summary.json",
+      "sourceSha256": "aa046c9685c6fc6200904e872497af6d5d7cbf7d9a05ccfcc8dfd7ce5670a536",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "whole-file-185s-process-failure.txt",
+      "bytes": 20729,
+      "sha256": "0ceacb1ee60e44fc80b34f7f16ba066dae3a33c109aa0f3afc0ddef599291f7d",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-pre-reviewfix-whole-file-process-failure.txt",
+      "sourceSha256": "aaeea2910e53ea897c9163c8282c5146dd8cbb4b9758f19299a84aad685bef7e",
+      "transformation": "workspace absolute path replaced with [workspace]; original preserved privately"
+    },
+    {
+      "file": "stale-normal-no-final-exit.txt",
+      "bytes": 109,
+      "sha256": "435e20fb201e4279cfaaa1cd1d60f726b6861265d77578f149e41294defcc259",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-interrupted-normal-no-final-exit.txt",
+      "sourceSha256": "435e20fb201e4279cfaaa1cd1d60f726b6861265d77578f149e41294defcc259",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-normal.txt",
+      "bytes": 620,
+      "sha256": "1c40dce57a4d9525383040ee7623003cd273332bc43a52a2f2b783b82c57ae46",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-normal.txt",
+      "sourceSha256": "86ec3cbb02d422e5c36a3a8cfccb6a26096d26acea7bbcc0c651add9c1be2bfe",
+      "transformation": "workspace absolute path replaced with [workspace]; original preserved privately"
+    },
+    {
+      "file": "historical-cd98427b-normal-process.json",
+      "bytes": 4117,
+      "sha256": "eb6bd1d9910ad3bc8d50976eea6e06304b19d0f5937f5e617e70f7a7140be95d",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-normal-process.json",
+      "sourceSha256": "eb6bd1d9910ad3bc8d50976eea6e06304b19d0f5937f5e617e70f7a7140be95d",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-normal-process-start.json",
+      "bytes": 2256,
+      "sha256": "30bd6f7dcc6a8adf1472a88729773116631ebe62560f3a75706009cbe6847df5",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-normal-process-start.json",
+      "sourceSha256": "30bd6f7dcc6a8adf1472a88729773116631ebe62560f3a75706009cbe6847df5",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-interleave.txt",
+      "bytes": 606,
+      "sha256": "96f50d602dd103bc7af7e65588b920d6296e13a2df5b65021e00c5ff9e5426b0",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-interleave.txt",
+      "sourceSha256": "04862e5036a51358d599d7d34e959da1d714dc2c4d7c63e0b1b9f3a4e4d070e5",
+      "transformation": "workspace absolute path replaced with [workspace]; original preserved privately"
+    },
+    {
+      "file": "historical-cd98427b-interleave-process.json",
+      "bytes": 4112,
+      "sha256": "26eba18f6bd23f37b9525760b017eb72cb90b1b08f1e8198a36527a216dab0db",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-interleave-process.json",
+      "sourceSha256": "26eba18f6bd23f37b9525760b017eb72cb90b1b08f1e8198a36527a216dab0db",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-interleave-process-start.json",
+      "bytes": 2251,
+      "sha256": "8c38c0d5a6aa7429bf88c3d081e1e4611e63a049900c239efb919c9379eed542",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-interleave-process-start.json",
+      "sourceSha256": "8c38c0d5a6aa7429bf88c3d081e1e4611e63a049900c239efb919c9379eed542",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-loss.txt",
+      "bytes": 652,
+      "sha256": "9c8fcb54ad08171519319898c9bcfc40f3a1e01a525efe1828607fbbe6123840",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-loss.txt",
+      "sourceSha256": "a4916bb868e6cfbbe07d3695c39129ff37df916bf3cb9db5cb43649f9689840a",
+      "transformation": "workspace absolute path replaced with [workspace]; original preserved privately"
+    },
+    {
+      "file": "historical-cd98427b-loss-process.json",
+      "bytes": 4106,
+      "sha256": "8aa3afbe0be6203928ddabf34fca653c7eae1bc322687658a0e5478332b68f50",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-loss-process.json",
+      "sourceSha256": "8aa3afbe0be6203928ddabf34fca653c7eae1bc322687658a0e5478332b68f50",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "historical-cd98427b-loss-process-start.json",
+      "bytes": 2245,
+      "sha256": "3200883ecb8e00f5374e528caa38354ad9d924fbfaa158adb1b699bb8784b6e1",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/product-stop-final-loss-process-start.json",
+      "sourceSha256": "3200883ecb8e00f5374e528caa38354ad9d924fbfaa158adb1b699bb8784b6e1",
+      "transformation": "none (UTF-8 without BOM)"
+    },
+    {
+      "file": "README.md",
+      "bytes": 3342,
+      "sha256": "ca3ce4081f9adb593e7dbe727d1a401adcea7fd359007016d1aadfb881955339",
+      "source": "candidate evidence explanatory note",
+      "transformation": "authored; final report remains owned by root"
+    }
+  ],
+  "cases": [
+    {
+      "label": "normal",
+      "runId": "10159213-c97e-4b5f-8d2d-e9c21ee61de3",
+      "operations": 19,
+      "prepareOperationIds": [
+        "db4a7348-f712-4442-a0fa-fee9c9866b32",
+        "281aa0ea-e2a1-460b-a677-26c8437128e1",
+        "3473020c-a160-442d-95c2-601c15cf0adb"
+      ],
+      "acceptedStopKeys": [
+        {
+          "runId": "10159213-c97e-4b5f-8d2d-e9c21ee61de3",
+          "taskId": "a",
+          "attemptId": "63298d69-00aa-4839-ae03-d8905b60fefc",
+          "generation": 1
+        },
+        {
+          "runId": "10159213-c97e-4b5f-8d2d-e9c21ee61de3",
+          "taskId": "b",
+          "attemptId": "30ee869c-0037-4c9d-87d7-34a9fedcfb91",
+          "generation": 1
+        }
+      ],
+      "scopeCount": 3,
+      "summary": "historical-cd98427b-normal-summary.json"
+    },
+    {
+      "label": "interleave",
+      "runId": "bf9bdc46-190b-4c2a-a53f-9f2323c090be",
+      "operations": 24,
+      "prepareOperationIds": [
+        "a0b0aee7-02cd-4441-8800-a961729b4234",
+        "d42d825d-e232-41a0-9ff9-fbb02923209e",
+        "8d392b81-f513-493b-a72b-80c043704ecd"
+      ],
+      "acceptedStopKeys": [
+        {
+          "runId": "bf9bdc46-190b-4c2a-a53f-9f2323c090be",
+          "taskId": "a",
+          "attemptId": "46628750-2d88-4a7f-bfaa-17baf53b2722",
+          "generation": 1
+        },
+        {
+          "runId": "bf9bdc46-190b-4c2a-a53f-9f2323c090be",
+          "taskId": "b",
+          "attemptId": "b1d64c16-feda-4405-8817-b3cde1bd5f0c",
+          "generation": 1
+        }
+      ],
+      "scopeCount": 3,
+      "summary": "historical-cd98427b-interleave-summary.json"
+    },
+    {
+      "label": "loss",
+      "runId": "8bde3d24-7971-4611-9180-dbef65981010",
+      "operations": 6,
+      "prepareOperationIds": [
+        "e2ee34fb-2f2b-4b5e-8c47-abcaffd82751"
+      ],
+      "acceptedStopKeys": [
+        {
+          "runId": "8bde3d24-7971-4611-9180-dbef65981010",
+          "taskId": "a",
+          "attemptId": "62728680-6528-4dfd-a1d1-10d395391d71",
+          "generation": 1
+        }
+      ],
+      "scopeCount": 1,
+      "summary": "historical-cd98427b-loss-summary.json"
+    }
+  ]
+}

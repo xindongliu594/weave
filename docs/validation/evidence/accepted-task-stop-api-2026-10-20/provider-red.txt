@@ -1,0 +1,42 @@
+✖ task preparation fails closed before SQL when trusted stop maintenance is missing (26.7817ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15620.0307
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-delivery.test.ts:1:229
+✖ task preparation fails closed before SQL when trusted stop maintenance is missing (26.7817ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   code: 'EACCES'
+  -   code: 'TASK_STOP_UNAVAILABLE'
+    }
+  
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:12:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: connect EACCES 127.0.0.1:55432
+        at [workspace]\node_modules\pg-pool\index.js:45:11
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async transaction ([workspace]\apps\api\src\task-canonical.ts:74:11)
+        at async LocalRunExecutor.prepareTask ([workspace]\apps\api\src\local-execution.ts:237:3)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> ([workspace]\tests\task-accepted-stop-delivery.test.ts:12:3)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3),
+    expected: { code: 'TASK_STOP_UNAVAILABLE' },
+    operator: 'rejects',
+    diff: 'simple'
+  }

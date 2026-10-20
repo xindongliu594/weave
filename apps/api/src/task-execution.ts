@@ -26,7 +26,7 @@ function taskWritePaths(contract:any):string[]{
  return contract.outputs.filter((output:any)=>scoped(output.path,contract.inScope)&&!scoped(output.path,contract.outOfScope)).map((output:any)=>output.path);
 }
 /** Read only trusted archive events. In particular, a model-provided contract is never an input. */
-function effectiveContract(run:any,assignment:TrustedTaskCandidate){
+export function effectiveTaskContract(run:any,assignment:TrustedTaskCandidate){
  let task=run.snapshot.tasks?.find((t:any)=>t.id===assignment.taskId);
  for(const e of run.events??[])if(e.type==='quality/rework-created'){
   const binding=e.data.bindings?.find((b:any)=>b.task_id===assignment.runtimeTaskId&&b.seed_id===assignment.taskId);
@@ -38,7 +38,7 @@ function effectiveContract(run:any,assignment:TrustedTaskCandidate){
  if(task.kind!=='repair'&&taskWritePaths(task).length!==task.outputs.length)denied('输出超出批准范围');
  return task;
 }
-function activeAssignment(run:any,assignment:TrustedTaskCandidate){
+export function activeTaskAssignment(run:any,assignment:TrustedTaskCandidate){
  identity(assignment);
  if(run.id!==assignment.runId)denied('任务跨运行');
  const mappings=new Map<string,string>();for(const e of run.events??[])if(e.type==='run/task-mapping')for(const b of e.data.tasks??[])mappings.set(b.task_id,b.seed_id);
@@ -49,14 +49,14 @@ function activeAssignment(run:any,assignment:TrustedTaskCandidate){
   !task||task.assignee!==assignment.agentId||task.attemptId!==assignment.attemptId||!['claimed','in_progress'].includes(task.status))denied('任务分派已失效');
  const employee=run.snapshot.agents?.find((a:any)=>a.id===assignment.agentId);
  if(!employee)denied('员工未获授权');
- return {employee,contract:effectiveContract(run,assignment)};
+ return {employee,contract:effectiveTaskContract(run,assignment)};
 }
 async function assertLease(db:pg.PoolClient,run:any){
  if(!(await db.query("SELECT id FROM project_runs WHERE id=$1 AND lease_owner=$2 AND status='running' AND cancel_requested=false AND lease_until>clock_timestamp()",[run.id,run.lease_owner])).rowCount)denied('任务租约已失效');
 }
 /** Call inside the existing project -> run transaction locks, only from trusted Host admission. */
 export async function bindTrustedAttempt(db:pg.PoolClient,run:any,candidate:TrustedTaskCandidate&{generation?:number}):Promise<TrustedTaskAssignment>{
- const {employee,contract}=activeAssignment(run,candidate);await assertLease(db,run);
+ const {employee,contract}=activeTaskAssignment(run,candidate);await assertLease(db,run);
  const hashes=taskCapabilityHashes(run.snapshot,employee);
  const rows=(await db.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 ORDER BY generation DESC FOR UPDATE',[run.id,candidate.taskId])).rows;
  const current=rows.find(r=>r.phase==='active');
@@ -73,7 +73,7 @@ export async function bindTrustedAttempt(db:pg.PoolClient,run:any,candidate:Trus
  await db.query('INSERT INTO task_attempt_workspaces(run_id,task_id,attempt_id,generation,principal,session_id,runtime_task_id,contract_hash,permission_hash,capability_hash,contract) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[run.id,candidate.taskId,candidate.attemptId,generation,candidate.agentId,candidate.sessionId,candidate.runtimeTaskId,candidate.contractHash,hashes.permissionHash,hashes.capabilityHash,contract]);
  return {...candidate,generation};
 }
-function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:any,revision:string):TaskInputOrigin[]{
+export function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:any,revision:string):TaskInputOrigin[]{
  const employee=run.snapshot.agents.find((a:any)=>a.id===assignment.agentId);
  return contract.inputs.map((input:any)=>{
   const base={path:input.path,runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,acceptedRevision:revision};
@@ -92,7 +92,7 @@ function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:any,revi
  });
 }
 export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:TrustedTaskAssignment,canonical:TaskCanonical,previous:TaskExecutionScope|null):Promise<TaskExecutionScope>{
- identity(assignment,true);const {employee,contract}=activeAssignment(run,assignment);await assertLease(db,run);
+ identity(assignment,true);const {employee,contract}=activeTaskAssignment(run,assignment);await assertLease(db,run);
  await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation});
  if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)throw new AppError(422,'任务沙箱恢复尚未接通可信 canonical 与检查点来源，请保留原恢复记录','TASK_RECOVERY_UNAVAILABLE');
  const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active' FOR UPDATE",[run.id,assignment.taskId,assignment.attemptId,assignment.generation])).rows[0];

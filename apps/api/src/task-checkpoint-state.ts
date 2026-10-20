@@ -3,19 +3,18 @@ import {createRequire} from 'node:module';
 import {join} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
 import type pg from 'pg';
-import type {TaskCheckpointRefs,TaskExecutionScope,TaskWorkspaceFile} from '../../../packages/contracts/index.ts';
-import {readCommittedCanonical,validateTaskOperationResult} from './task-canonical.ts';
+import type {TaskCheckpointRefs,TaskWorkspaceFile} from '../../../packages/contracts/index.ts';
+import {readCommittedCanonical} from './task-canonical.ts';
 import {assertCurrentRunPermissions} from './execution-policy.ts';
-import {assertExecutionBackendBinding,assertExecutionBackendReceipt,executionBackend} from './execution-backend.ts';
+import {assertExecutionBackendBinding,executionBackend} from './execution-backend.ts';
 import {assertNoUnresolvedTaskOperation,taskOperationDenied} from './task-operation-admission.ts';
 import {resolveTaskScope} from './task-execution.ts';
 import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
 import {storeArchiveObjects} from '../../../services/agent-runtime/archive-objects.mjs';
 import {validateTaskCheckpointRefs} from '../../../services/agent-runtime/step-checkpoints.mjs';
+import {assertOriginalTaskCommit} from './task-original-commit.ts';
 
 const {manifest,revision,decodeFiles}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
-const ordered=(v:any):any=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().filter(k=>v[k]!==undefined).map(k=>[k,ordered(v[k])])):v;
-const digest=(v:any)=>createHash('sha256').update(JSON.stringify(ordered(v))).digest('hex');
 export type TaskCheckpointContext={agentId:string;sessionId:string;taskId:string;attemptId:string;generation:number};
 export type TaskCheckpointOptions={phase:'before-tool'|'after-tool'|'boundary';operationId?:string};
 function immutable<T>(value:T):T{
@@ -49,17 +48,8 @@ export async function prepareTaskCheckpoint(db:pg.PoolClient,run:any,service:{tr
  assertExecutionBackendBinding(executionBackend(device.backend),run.snapshot.executionTarget.backend);
  const canonical=readCommittedCanonical(service.traceRoot,run);
  const scope=await resolveTaskScope(db,run,{...key,agentId:context.agentId,sessionId:context.sessionId,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash},{files:canonical.files,revision:canonical.ref.revision},task.scope);
- const original:TaskExecutionScope=row.payload.taskScope,result=row.result.result,record=row.merge_record,receipt=record?.receipt;
- if(!isDeepStrictEqual(original?.key,key)||!isDeepStrictEqual(original.inputOrigins,scope.inputOrigins)||original.capabilityHash!==scope.capabilityHash||original.workspace.binding.permissionHash!==scope.workspace.binding.permissionHash||original.workspace.binding.contractHash!==task.contract_hash||
-  ['agentId','sessionId','taskId','attemptId','generation'].some(k=>row.payload.context?.[k]!==context[k as keyof TaskCheckpointContext])||row.payload.runId!==run.id)taskOperationDenied('检查点原操作来源与当前任务不符');
- validateTaskOperationResult(row,result);
- assertExecutionBackendReceipt(executionBackend(device.backend),result,result.taskExecution);
- if(result.execution?.sandboxId!==task.sandbox_identity.sandboxId||result.localWorkspace!==task.sandbox_identity.localWorkspace)taskOperationDenied('检查点原操作来自不同任务沙箱');
- if(!record||record.version!==1||record.digest!==digest({...record,digest:undefined})||record.operationId!==row.id||record.resultDigest!==digest(row.result)||record.scopeDigest!==digest(original)||
-  receipt?.status!=='committed'||receipt.mergeId!==row.id||receipt.operationId!==row.id||!isDeepStrictEqual(receipt.key,key)||receipt.scopeHash!==original.workspace.scopeHash||receipt.beforeRevision!==record.before?.revision||receipt.afterRevision!==record.after?.revision||receipt.workRevision!==result.workspaceRevision||
-  record.before.revision!==original.workRevision||record.after.mergeId!==row.id||!isDeepStrictEqual(record.delta,task.committed_outputs.find((entry:any)=>entry.receipt?.operationId===row.id)?.files))taskOperationDenied('检查点原合并记录损坏');
- // The original task commit is independent of a newer complete head from B.
- readCommittedCanonical(service.traceRoot,{...run,canonical_workspace:{version:1,...record.after,receipt}});
+ const {scope:original,result,receipt}=assertOriginalTaskCommit(service.traceRoot,run,task,row,executionBackend(device.backend));
+ if(!isDeepStrictEqual(original.inputOrigins,scope.inputOrigins)||original.capabilityHash!==scope.capabilityHash)taskOperationDenied('检查点原操作与当前任务不符');
  const workFiles:TaskWorkspaceFile[]=options.phase==='after-tool'?result.files:scope.workspace.importedFiles;
  if(revision(workFiles)!==receipt.workRevision||!isDeepStrictEqual(manifest(workFiles),manifest(result.files)))taskOperationDenied('检查点任务文件与原沙箱工作版本不符');
  storeArchiveObjects(join(service.traceRoot,run.id),decodeFiles(workFiles).map((file:any)=>({sha256:createHash('sha256').update(file.bytes).digest('hex'),size:file.bytes.length,content:file.bytes})));

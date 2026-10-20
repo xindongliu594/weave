@@ -1,0 +1,11 @@
+{
+  "sourceFiles": 16,
+  "sourceStable": true,
+  "changedSourcePaths": [],
+  "publicFiles": 60,
+  "manifestFailures": [],
+  "credentialLikeHits": 0,
+  "scanLimit": "bounded credential-pattern scan, not a proof against all secrets",
+  "paidModelCalls": 0,
+  "profileClosed": true
+}

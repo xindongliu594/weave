@@ -5,7 +5,7 @@ import { assertAcceptanceChecks } from '../../../services/agent-runtime/acceptan
 import { canonicalEvidence } from '../../../packages/contracts/run-lineage-evidence.ts';
 import { assertHandoffReport, handoffContractDigest, reportTaskFor } from '../../../packages/contracts/handoff-report.mjs';
 
-function verificationRevision(snapshot:any,record:any,taskId:string,attemptId:string){
+export function acceptedVerificationRevision(snapshot:any,record:any,taskId:string,attemptId:string){
   if(snapshot.executionProfile!=='task-attempt-openshell-v1')return record.workspaceRevision;
   const proof=record.taskExecution,key=proof?.key,sha=(value:unknown)=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
   if(!snapshot.id||record.runId!==snapshot.id||proof?.profile!==snapshot.executionProfile||key?.runId!==record.runId||key.taskId!==taskId||key.attemptId!==attemptId||!Number.isSafeInteger(key.generation)||key.generation<1||!sha(proof.capabilityHash)||!sha(record.sandboxWorkRevision)||!sha(record.workspaceRevision)||!Array.isArray(record.commands))throw Error('TASK_ACCEPTANCE_INVALID: 任务验收缺少准确来源与工作版本');
@@ -47,7 +47,7 @@ export function resumeHandoff(snapshot:any, events:any[], completed:Map<string,a
     const accepted = events.findLast(event=>event.type==='handoff/accepted'&&event.data.taskId===id&&event.data.attemptId===attemptId)?.data
       ?? snapshot.handoffCheckpoints?.find((record:any)=>record.taskId===id&&record.attemptId===attemptId);
     if ((contract?.outputs?.length || ['implementation','repair','review','requirements'].includes(contract?.kind)) && !accepted) throw Error(`任务 ${id} 缺少宿主交付物验收记录，不能跳过，请完整重试`);
-    const checkedRevision=accepted?verificationRevision(snapshot,accepted,id,attemptId):undefined;
+    const checkedRevision=accepted?acceptedVerificationRevision(snapshot,accepted,id,attemptId):undefined;
     if (contract.acceptanceChecks !== undefined) {
       if (!accepted) throw Error(`任务 ${id} 缺少逐项验收凭据，不能跳过`);
       const checks = assertAcceptanceChecks(contract, accepted.commands ?? [], checkedRevision);

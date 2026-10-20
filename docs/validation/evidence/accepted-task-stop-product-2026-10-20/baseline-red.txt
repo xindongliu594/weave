@@ -1,0 +1,8 @@
+Command: PRODUCT_STOP_BASELINE=1 node scripts/test-integration.mjs tests/task-accepted-stop-product-flow.test.ts
+Historical pre-wiring run, before mandatory maintenance provider readiness was installed.
+Observed console: baseline third actual prepare hits unchanged two-running-slot gate (27365.7448ms)
+Runner: tests 2; pass 1; fail 0; skipped 1; exit 0
+Run: 86e89039-531f-44b8-8152-c996842f1801
+A development and B independent QA completed through real ProductDshRuntime/Host/Handoff/HTTP/SQL CAS and actual OpenShellDeviceExecutor/schema2 journal/REMOTE_SCRIPT/Node file tests.
+C manager actual prepare returned SANDBOX_STORAGE_LIMIT at the unchanged two-running-slot gate; two scopes retained; zero accepted-stop calls.
+CLI transport, UID/cgroup and model selection are fixtures. No physical OpenShell/JJ, saved/paid model, install or Git mutation.

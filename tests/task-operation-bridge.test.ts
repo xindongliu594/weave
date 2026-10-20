@@ -16,6 +16,7 @@ import {LocalOperationService,LocalRunExecutor,localDeviceRouter} from '../apps/
 import {readCommittedCanonical} from '../apps/api/src/task-canonical.ts';
 import {assertExecutionProfile} from '../apps/api/src/execution-policy.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
+import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const sha=(v:string)=>createHash('sha256').update(v).digest('hex'),file=(path:string,text:string)=>({path,content:Buffer.from(text).toString('base64')});
@@ -45,7 +46,7 @@ async function fixture({bWritesInput=false,nativeTool=false}={}){
  const archive=createRunArchive(directory,snapshot,{id:runId});mkdirSync(join(archive.dir,'artifacts'));writeFileSync(join(archive.dir,'artifacts/in.txt'),'input');writeFileSync(join(archive.dir,'artifacts/private.txt'),'private');
  const state={members:[{id:'session',name:'employee'}],tasks:tasks.map(t=>({id:'native-'+t.id,assignee:'employee',attemptId:'attempt-'+t.id,status:'in_progress'}))};
  archive.append('run/task-mapping',{tasks:tasks.map(t=>({task_id:'native-'+t.id,seed_id:t.id}))});archive.append('team/checkpoint',state);
- const storedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,storedSnapshot,service),workspaces=new Map<string,any>(),jobs:any[]=[];
+ const storedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,storedSnapshot,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint)),workspaces=new Map<string,any>(),jobs:any[]=[];
  const f={runId,projectId,deviceId,grantId,token,backend,archive,snapshot:storedSnapshot,state,service,executor,workspaces,jobs};
  return f;
 }
@@ -81,7 +82,7 @@ test('two consecutive task writes roll scope and preserve original input lineage
  const first=await prepared(f),one=await write(f,first.context,first.scope,'one');const second=await prepared(f),two=await write(f,second.context,second.scope,'two');
  assert.notEqual(first.scope.workspace.scopeHash,second.scope.workspace.scopeHash);assert.deepEqual(first.scope.inputOrigins,second.scope.inputOrigins);assert.equal(second.scope.inputOrigins[0].origin.acceptedRevision,first.scope.inputOrigins[0].origin.acceptedRevision);assert.equal(two.merge.beforeRevision,one.merge.afterRevision);assert.equal(one.execution.sandboxId,two.execution.sandboxId);
  assert.equal(f.jobs.filter(j=>j.name==='prepare').length,1);assert.deepEqual(readCommittedCanonical(directory,await run(f)).files,[file('a.txt','two'),file('in.txt','input'),file('private.txt','private')]);assert.ok(!JSON.stringify(two).includes('private.txt'));assert.notEqual(two.taskExecution.afterWorkRevision,two.merge.afterRevision);
- const reopened=new LocalRunExecutor(f.archive,f.snapshot,f.service);await reopened.prepareTask(second.context,signal);assert.equal(f.jobs.filter(j=>j.name==='prepare').length,1);
+ const reopened=new LocalRunExecutor(f.archive,f.snapshot,f.service,inProgressTaskMaintenance(f.deviceId,f.grantId,f.backend.fingerprint));await reopened.prepareTask(second.context,signal);assert.equal(f.jobs.filter(j=>j.name==='prepare').length,1);
 });
 test('file operations preserve canonical arguments and transport only the visible revision',{skip:!isolated},async()=>{
  const f=await fixture();let a=await prepared(f);

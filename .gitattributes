@@ -28,3 +28,7 @@ docs/validation/evidence/acceptance-loop-2026-10-19/employee-delivery/** -text
 
 # Synthetic evaluation fixtures carry byte-level digests; preserve on every OS.
 tools/evaluations/datasets/*.json -text
+
+# Preserve raw accepted-stop evidence bytes and console formatting across OSes.
+docs/validation/evidence/accepted-task-stop-api-2026-10-20/** -text -whitespace
+docs/validation/evidence/accepted-task-stop-product-2026-10-20/** -text -whitespace

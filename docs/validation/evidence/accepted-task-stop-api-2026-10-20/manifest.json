@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "status": "verified-local-api-cohort-profile-closed",
+  "paidCalls": 0,
+  "files": [
+    {
+      "file": "provider-red.txt",
+      "bytes": 1835,
+      "sha256": "68a170eaf6b0eaea8d12648f75804b4de9f221e6673196a2a261eaabb2860f74",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-provider-red.txt",
+      "sourceSha256": "d50629a823f254bbf7a837bfbf2de4399c48e99e1b15f51471204f7ff7a2c625",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "original-binding-red.txt",
+      "bytes": 1028,
+      "sha256": "99dbc2638d45188041f7c1b5a017b2bc69241fb470ef947c7bdd57f8be0c5589",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-binding-red.txt",
+      "sourceSha256": "1400a202a26a20bc08620121dc55d9c1c09264bd1e9e568c99b69b0d13d15397",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "original-claim-red.txt",
+      "bytes": 1016,
+      "sha256": "3fc74734eeafbfedc3bc082d3a5506abfbb690032038c33e11cd8d88df8e3d89",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-claim-red.txt",
+      "sourceSha256": "05bd7f32994805968522e13ec9f9dc83d6ede6d1746cdaee14e40ae5ffd23c95",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "four-review-findings-red.txt",
+      "bytes": 3577,
+      "sha256": "037879e1849f8ece6ed6b216ddada0d22e47ba6e6f4c29944830f3715c9a9546",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-review-red.txt",
+      "sourceSha256": "aa0ce0db82bb7394f4cd6b6cca1c03ad4de397498727e57390e921384c6c00bb",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "boundary-red.txt",
+      "bytes": 1946,
+      "sha256": "43cb5d7ddc2368d45e0f1a731d132cb8746d919ff53c3eb6c3777372e9b454bd",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-boundary-red.txt",
+      "sourceSha256": "b3ab304ea56bbd9c1223009e25044f623b5087fe66670707545a2b4c211fbfe4",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "boundary-red.exit.txt",
+      "bytes": 12,
+      "sha256": "cd97d1ac7c97dc0236f7b111dd29bb0195bf55bf73a58410bee5a6513f2b6f82",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-boundary-red.exit.txt",
+      "sourceSha256": "cd97d1ac7c97dc0236f7b111dd29bb0195bf55bf73a58410bee5a6513f2b6f82",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "sync-matrix-initial-fixture-failure.txt",
+      "bytes": 7323,
+      "sha256": "b1a1e4f47d43199275e2a3201ebc5b8782bd0d5031010adb518ac4fb77049328",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-red.txt",
+      "sourceSha256": "60a5d4459fb007cedba385715723d1601f6017268025b38c9e2b2b0d90b143f2",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "sync-matrix-red.txt",
+      "bytes": 7044,
+      "sha256": "8173afd353c3f628c59a281112bb354829440afb4a4ae79809a834a78a0e26a3",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-red-corrected.txt",
+      "sourceSha256": "9910a7d3296bfc1dc7aef0ffa0f51a7c9562de9036cfe8bd0f4568921f3377da",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "sync-matrix-red.exit.txt",
+      "bytes": 12,
+      "sha256": "cd97d1ac7c97dc0236f7b111dd29bb0195bf55bf73a58410bee5a6513f2b6f82",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-red-corrected.exit.txt",
+      "sourceSha256": "cd97d1ac7c97dc0236f7b111dd29bb0195bf55bf73a58410bee5a6513f2b6f82",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "delivery-final-green.txt",
+      "bytes": 3953,
+      "sha256": "b66763e6002f39c20c4e6b29eac254bd06ac83e8592ed68d7797c49ddd1f2eef",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-green.txt",
+      "sourceSha256": "b66763e6002f39c20c4e6b29eac254bd06ac83e8592ed68d7797c49ddd1f2eef",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "delivery-final-green.exit.txt",
+      "bytes": 12,
+      "sha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-green.exit.txt",
+      "sourceSha256": "e05222033cd2c7b46b6fad5ec87b44b62f844dbb6f004476498f71d0e3c9875b",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "related-files-and-scope-oom.txt",
+      "bytes": 8434,
+      "sha256": "dfbd60bacdf805598d176467b89e3a4144b38b5ed1be05d8dcd80bf8a04bbe7d",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-final-tests.txt",
+      "sourceSha256": "dfbd60bacdf805598d176467b89e3a4144b38b5ed1be05d8dcd80bf8a04bbe7d",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "scope-final-green.txt",
+      "bytes": 1949,
+      "sha256": "8ef8dabbf860529f593e242db1cbe339be37a68d0421dbe38627814c78cacd15",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/root-scope-final.txt",
+      "sourceSha256": "8ef8dabbf860529f593e242db1cbe339be37a68d0421dbe38627814c78cacd15",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "scope-final-green.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/root-scope-final.exit.txt",
+      "sourceSha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "source-sha.json",
+      "bytes": 2320,
+      "sha256": "239b7583967e96352ce3c6c195d8a1e99cbf98aeaebef63d5815fa560f7af435",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-final-source-sha.json",
+      "sourceSha256": "239b7583967e96352ce3c6c195d8a1e99cbf98aeaebef63d5815fa560f7af435",
+      "transformation": "UTF-8; remove BOM; redact workspace and temp absolute roots if present"
+    },
+    {
+      "file": "independent-final-review.md",
+      "bytes": 5439,
+      "sha256": "a2cbf0b798a8ec05d84b25218a079c57261e9a64568c6ce3e9a39f100fb83a0f",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-final-review.md",
+      "sourceSha256": "a2cbf0b798a8ec05d84b25218a079c57261e9a64568c6ce3e9a39f100fb83a0f",
+      "transformation": "UTF-8; redact absolute roots if present"
+    },
+    {
+      "file": "product-test-independent-review.md",
+      "bytes": 4097,
+      "sha256": "1d78a19a4f2c5c7650764f780b95b989a8ccd55b211bd22bd7e06ff1ce6767d9",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-product-test-review.md",
+      "sourceSha256": "1d78a19a4f2c5c7650764f780b95b989a8ccd55b211bd22bd7e06ff1ce6767d9",
+      "transformation": "UTF-8; redact absolute roots if present"
+    },
+    {
+      "file": "terminal-contract-independent-review.md",
+      "bytes": 3199,
+      "sha256": "858d37a6b4c76482e28890be2814795734dd6829bf389b26e32682349b3e5404",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/accepted-stop-terminal-contract-v3-review.md",
+      "sourceSha256": "858d37a6b4c76482e28890be2814795734dd6829bf389b26e32682349b3e5404",
+      "transformation": "UTF-8; redact absolute roots if present"
+    },
+    {
+      "file": "process-resource-observation.md",
+      "bytes": 1955,
+      "sha256": "5960cdaf202ea7bed930b04f9946d0bf7b4b9327381891cf28e749e15494f011",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/root-test-resource-observation.md",
+      "sourceSha256": "5960cdaf202ea7bed930b04f9946d0bf7b4b9327381891cf28e749e15494f011",
+      "transformation": "UTF-8; redact absolute roots if present"
+    },
+    {
+      "file": "source-stable.json",
+      "bytes": 127,
+      "sha256": "0cb56adde94aa7bcfe2d19cad6f78ce422e0f17a7b7ea99660504974a077c1c6",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/api-stop-sync-source-stable.json",
+      "sourceSha256": "0cb56adde94aa7bcfe2d19cad6f78ce422e0f17a7b7ea99660504974a077c1c6",
+      "transformation": "UTF-8; redact absolute roots if present"
+    },
+    {
+      "file": "build-final.txt",
+      "bytes": 795,
+      "sha256": "42571ef71a9d2771ed1a1bac46de6a182e2e2f3c447410ea5df71be754b69e55",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/root-api-stop-final-build.txt",
+      "sourceSha256": "42571ef71a9d2771ed1a1bac46de6a182e2e2f3c447410ea5df71be754b69e55",
+      "transformation": "UTF-8; remove BOM if present"
+    },
+    {
+      "file": "build-final.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/root-api-stop-final-build.exit.txt",
+      "sourceSha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "transformation": "UTF-8; remove BOM if present"
+    },
+    {
+      "file": "README.md",
+      "bytes": 1399,
+      "sha256": "bfb6a190c8a7bea928c6c5924bf505c1dca5d50b41dfcc581c025e8df1f219e7",
+      "source": "generated public evidence index",
+      "transformation": "none"
+    },
+    {
+      "file": "archive-verification.json",
+      "bytes": 281,
+      "sha256": "7ef320599d3ca0294a269f564f470961022c9171cb9d8a144d55d81315eecf6f",
+      "source": "root independently recomputed source and archive metadata",
+      "transformation": "none"
+    }
+  ],
+  "totalBytes": 57759
+}

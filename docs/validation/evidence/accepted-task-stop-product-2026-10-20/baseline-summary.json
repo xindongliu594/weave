@@ -1,0 +1,147 @@
+{
+  "label": "baseline-red",
+  "runId": "86e89039-531f-44b8-8152-c996842f1801",
+  "expectedError": "SANDBOX_STORAGE_LIMIT",
+  "paidCalls": 0,
+  "profileClosed": true,
+  "prepare": [
+    {
+      "id": "81299794-d30e-46f6-b753-0c09627d7c86",
+      "name": "prepare",
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "a",
+        "attemptId": "5af77df9-729b-49a9-9136-b4497c9e2148",
+        "generation": 1
+      }
+    },
+    {
+      "id": "9bd1cb78-b8f0-42fe-a4c0-e27fcf6039a1",
+      "name": "prepare",
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "b",
+        "attemptId": "06b9c5f7-6001-4749-8342-b5712a678ddf",
+        "generation": 1
+      }
+    },
+    {
+      "id": "32405761-b37d-430a-8eed-9bca6566d6c9",
+      "name": "prepare",
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "c",
+        "attemptId": "4a5cf071-e9d3-43c1-98e3-b5e46b0831f9",
+        "generation": 1
+      },
+      "error": {
+        "code": "SANDBOX_STORAGE_LIMIT",
+        "message": "任务沙箱运行资源已占满"
+      }
+    }
+  ],
+  "accepted": [
+    {
+      "seq": 319,
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "a",
+        "attemptId": "5af77df9-729b-49a9-9136-b4497c9e2148",
+        "generation": 1
+      },
+      "workRevision": "29ed5c7dfd0830916dd05f99a428777ec13dc4ef0321ccb38d19851d37dbbebd",
+      "fullRevision": "5a2e0f6063d721d1dc9a99bffd2bf1a7a5d6dea564797881e1d11654616b41a7"
+    },
+    {
+      "seq": 651,
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "b",
+        "attemptId": "06b9c5f7-6001-4749-8342-b5712a678ddf",
+        "generation": 1
+      },
+      "workRevision": "945f739267451193ed05ec1a1918bb88cab14e452c90c1c85fc9f82c3febb25f",
+      "fullRevision": "dce1df89721f0ae0c76daa035faee73abddc518241ecd6be4dd339a35fe17ff7"
+    }
+  ],
+  "scopes": [
+    {
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "a",
+        "attemptId": "5af77df9-729b-49a9-9136-b4497c9e2148",
+        "generation": 1
+      },
+      "runId": "86e89039-531f-44b8-8152-c996842f1801",
+      "sandboxId": "88f40676-1179-442e-ba4e-11fbbea6d793",
+      "name": "wwe-5ad9899a02e5",
+      "phase": "ready",
+      "workspaceRevision": "29ed5c7dfd0830916dd05f99a428777ec13dc4ef0321ccb38d19851d37dbbebd",
+      "storage": {
+        "workspace": {
+          "bytes": 221,
+          "files": 3,
+          "entries": 4
+        },
+        "temp": {
+          "bytes": 0,
+          "files": 0,
+          "entries": 1
+        },
+        "disk": {
+          "freeBytes": 195490709504
+        },
+        "limits": {
+          "workspaceBytes": 20971520,
+          "workspaceFiles": 128,
+          "workspaceEntries": 512,
+          "tempBytes": 67108864,
+          "tempEntries": 4096,
+          "minFreeBytes": 268435456
+        },
+        "hardQuota": false,
+        "checkedAt": "2026-10-20T11:40:16.486Z"
+      }
+    },
+    {
+      "key": {
+        "runId": "86e89039-531f-44b8-8152-c996842f1801",
+        "taskId": "b",
+        "attemptId": "06b9c5f7-6001-4749-8342-b5712a678ddf",
+        "generation": 1
+      },
+      "runId": "86e89039-531f-44b8-8152-c996842f1801",
+      "sandboxId": "31578523-3066-4543-b3b1-7f4872d04d7e",
+      "name": "wwe-ab88d8c534de",
+      "phase": "ready",
+      "workspaceRevision": "945f739267451193ed05ec1a1918bb88cab14e452c90c1c85fc9f82c3febb25f",
+      "storage": {
+        "workspace": {
+          "bytes": 348,
+          "files": 3,
+          "entries": 4
+        },
+        "temp": {
+          "bytes": 0,
+          "files": 0,
+          "entries": 1
+        },
+        "disk": {
+          "freeBytes": 195488808960
+        },
+        "limits": {
+          "workspaceBytes": 20971520,
+          "workspaceFiles": 128,
+          "workspaceEntries": 512,
+          "tempBytes": 67108864,
+          "tempEntries": 4096,
+          "minFreeBytes": 268435456
+        },
+        "hardQuota": false,
+        "checkedAt": "2026-10-20T11:40:30.545Z"
+      }
+    }
+  ],
+  "acceptedStops": 0,
+  "originalEvidenceSha256": "23eacf1d4e4aaa4b835e265185a072657b51f8002d6ea7429e22608b659ee2cd"
+}

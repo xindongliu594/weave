@@ -1,0 +1,2 @@
+Isolated PGlite; actual product/device executor and bounded transport fixture; zero paid API.
+TAP version 13

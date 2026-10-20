@@ -13,6 +13,7 @@ import {readCommittedCanonical,commitTaskResult,reconcileTaskMerge} from '../app
 import {assertNoUnresolvedTaskOperation} from '../apps/api/src/task-operation-admission.ts';
 import {decodeTaskAcceptedStop} from '../apps/api/src/task-accepted-stop-state.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
+import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite',signal=new AbortController().signal;
@@ -49,7 +50,7 @@ async function fixture(){
  await pool.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$3,true,$6)',[deviceId,sha(token),'fixture','linux',grantId,backend]);
  const stored=(await getRun(runId)).snapshot,archive=createRunArchive(directory,stored,{id:runId});mkdirSync(join(archive.dir,'artifacts'));writeFileSync(join(archive.dir,'artifacts/in.txt'),'input');writeFileSync(join(archive.dir,'artifacts/private.txt'),'private');
  archive.append('run/task-mapping',{tasks:[{task_id:'native-a',seed_id:'a'}]});archive.append('team/checkpoint',{members:[{id:'session',name:'employee'}],tasks:[{id:'native-a',assignee:'employee',attemptId:'attempt-a',status:'in_progress'}]});
- const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,stored,service);
+ const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,stored,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint));
  const assignment=await executor.bindAttempt({runId,taskId:'a',attemptId:'attempt-a',agentId:'employee',sessionId:'session',runtimeTaskId:'native-a',contractHash:checkpointContract(stored,stored.tasks[0])},signal);
  const context={agentId:'employee',sessionId:'session',taskId:'a',attemptId:'attempt-a',generation:assignment.generation};
  const key={runId,taskId:'a',attemptId:'attempt-a',generation:assignment.generation};
