@@ -1,0 +1,26 @@
+[
+  {
+    "path": "apps/api/src/audit-events.ts",
+    "sha256": "dac2730f0a70f19069f363922c7f8217d43f0cf8561d159dd4102a2b7c0edb2e"
+  },
+  {
+    "path": "apps/api/src/audit-schema.ts",
+    "sha256": "39c43c8537a45d16f9acf52ff603f81c46394370f78792c1dd13cf2bfe9a22cf"
+  },
+  {
+    "path": "apps/api/src/identity-schema.ts",
+    "sha256": "eb403d2e7c296a8d696d2d05b484f2a467bdd9a4415d72bb83422bc97f5473f4"
+  },
+  {
+    "path": "apps/api/src/identity-store.ts",
+    "sha256": "491026a02be8c70b60fa6e72ac1066ba7616d3052a8e6e074683d00a23ca9d56"
+  },
+  {
+    "path": "tests/audit-events.test.ts",
+    "sha256": "5b8cfa3e0e10e25310207674a3d45272238378f062ef85378c8344a50e9989ea"
+  },
+  {
+    "path": "tests/identity-store.test.ts",
+    "sha256": "ce80f3ca4c2384e1bd4d7eb8bcd7239e07e4a80a24306e5284cfdd19854e4838"
+  }
+]

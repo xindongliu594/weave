@@ -1,3 +1,4 @@
+import { migrateAudit } from './audit-schema.ts';
 import type pg from 'pg';
 export type IdentityQueryExecutor = Pick<pg.Pool, 'query'>;
 
@@ -74,4 +75,5 @@ export async function migrateIdentity(db: IdentityQueryExecutor): Promise<void> 
     CREATE TRIGGER human_audit_append_only BEFORE UPDATE OR DELETE ON human_audit_events
       FOR EACH ROW EXECUTE FUNCTION reject_human_audit_mutation();
   `);
+  await migrateAudit(db);
 }

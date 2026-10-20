@@ -1,0 +1,46 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ task_merge_accepts_actual_canonical_sha_revisions_and_rejects_numeric_versions (3782.017ms)
+✔ successful_change_and_audit_rollback_together (3493.52ms)
+✔ outbox_failure_is_atomic_without_caller_transaction (3667.1931ms)
+✔ unknown_fields_raw_body_and_nonfinite_rejected (3413.357ms)
+✔ unidentified_cannot_claim_human (3794.012ms)
+✔ employee_is_execution_attribution (3147.6573ms)
+✔ legacy_event_stays_schema1 (3104.8781ms)
+✔ source_event_id_collision_checks_identical_payload (3362.2916ms)
+✔ published_duplicate_requires_matching_local_projection (3189.8711ms)
+✔ per_action_state_and_scoped_identity_authority_cannot_be_repurposed (3081.2608ms)
+✔ canonical_department_and_authority_sets_are_sorted_without_mutating_input (4268.087ms)
+✔ pre_extension_history_is_preserved_by_two_migrations (2723.9343ms)
+✔ tool_effect_contract_reuses_workspace_classification (3014.4952ms)
+✔ legacy actor identifiers keep their existing range without widening schema2 (3769.6145ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49378.0204
+▶ unused bootstrap closes permanently when prior administration or disabled identity is recognized
+  ✔ prior administrators close bootstrap without a fictitious grant, even after they are disabled (563.3501ms)
+  ✔ an existing disabled bootstrap identity cannot be reactivated by verified login (292.0244ms)
+  ✔ closure audit failure rolls back closure and identity creation together (150.0911ms)
+✔ unused bootstrap closes permanently when prior administration or disabled identity is recognized (5632.5716ms)
+▶ identity persistence, bootstrap, lifecycle and audit stay fail closed
+  ✔ additive repeatable migration preserves old data and enforces constraints (112.1502ms)
+  ✔ OIDC activation persists and forbids local downgrade (18.4444ms)
+  ✔ exact issuer/subject only, same email never links, bootstrap consumes once (38.1701ms)
+  ✔ current user role, status and epoch control session with strict time boundaries (15.306ms)
+  ✔ audit is constrained, append only and stores no arbitrary payload (11.9981ms)
+  ✔ audit failure rolls back a new identity and bootstrap grant (87.0255ms)
+✔ identity persistence, bootstrap, lifecycle and audit stay fail closed (3647.5887ms)
+✔ legacy audit compatibility uses one store without fictitious business authority (3430.5809ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14131.2971

@@ -1,8 +1,10 @@
+import { appendHumanAudit } from './audit-events.ts';
+export { appendHumanAudit, type HumanAuditEvent } from './audit-events.ts';
 import { createHash, randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import type { IdentityQueryExecutor } from './identity-schema.ts';
-import { identityText, principalKey, orgRoles, humanStatuses, type HumanPrincipal, type HumanStatus, type HumanUser,
-  type IdentityConfig, type OidcIdentityConfig, type OrgRole, type Principal } from './identity-types.ts';
+import { identityText, orgRoles, type HumanPrincipal, type HumanStatus, type HumanUser,
+  type IdentityConfig, type OidcIdentityConfig, type OrgRole } from './identity-types.ts';
 
 type IdentityPool = Pick<pg.Pool, 'connect'>;
 type BootstrapRow = { expected_fingerprint: string | null; activated_at: Date | null; consumed_at: Date | null; closed_at: Date | null };
@@ -127,47 +129,4 @@ export async function loadHumanPrincipal(db: IdentityQueryExecutor, session: Hum
     || Number(user.session_epoch) !== session.sessionEpoch) return null;
   return { kind: 'human', userId: user.id, sessionId: session.sessionId, issuer: user.issuer, subject: user.subject,
     orgRole: user.org_role, sessionEpoch: session.sessionEpoch, authenticatedAt: session.authenticatedAt };
-}
-
-const auditActions = ['identity.mode.activated', 'identity.bootstrap', 'identity.bootstrap.closed', 'identity.login', 'identity.user.updated',
-  'identity.sessions.revoked', 'identity.membership.updated', 'identity.membership.removed', 'identity.logout'] as const;
-const auditResources = ['identity_mode', 'human_user', 'department_membership', 'human_session'] as const;
-export type HumanAuditEvent = {
-  actor: Principal; action: typeof auditActions[number]; resourceType: typeof auditResources[number]; resourceId: string;
-  departmentId?: string; requestId?: string; outcome: 'success' | 'denied' | 'failure'; reason?: string;
-  changes?: { status?: HumanStatus; orgRole?: OrgRole; sessionEpoch?: number; version?: number;
-    role?: 'viewer' | 'operator' | 'manager'; canApprove?: boolean };
-};
-
-function allowedKeys(value: unknown, allowed: readonly string[]): value is Record<string, unknown> {
-  return !!value && typeof value === 'object' && !Array.isArray(value)
-    && [Object.prototype, null].includes(Object.getPrototypeOf(value))
-    && Reflect.ownKeys(value).every(key => typeof key === 'string' && allowed.includes(key));
-}
-
-/** Accept only structured identity metadata. Never pass request bodies or credentials to this API. */
-export async function appendHumanAudit(db: IdentityQueryExecutor, event: HumanAuditEvent): Promise<string> {
-  if (!allowedKeys(event, ['actor','action','resourceType','resourceId','departmentId','requestId','outcome','reason','changes'])) throw Error('Invalid audit fields');
-  principalKey(event.actor);
-  if (!auditActions.includes(event.action) || !auditResources.includes(event.resourceType) || !identityText(event.resourceId)
-    || !['success','denied','failure'].includes(event.outcome)
-    || [event.departmentId,event.requestId,event.reason].some(value => value !== undefined && !identityText(value))) throw Error('Invalid audit metadata');
-  const changes = event.changes ?? {};
-  if (!allowedKeys(changes, ['status','orgRole','sessionEpoch','version','role','canApprove'])
-    || (changes.status !== undefined && !humanStatuses.includes(changes.status))
-    || (changes.orgRole !== undefined && !orgRoles.includes(changes.orgRole))
-    || (changes.sessionEpoch !== undefined && (!Number.isSafeInteger(changes.sessionEpoch) || changes.sessionEpoch < 0))
-    || (changes.version !== undefined && (!Number.isSafeInteger(changes.version) || changes.version < 1))
-    || (changes.role !== undefined && !['viewer','operator','manager'].includes(changes.role))
-    || (changes.canApprove !== undefined && typeof changes.canApprove !== 'boolean')) throw Error('Invalid audit changes');
-  const actor = event.actor;
-  const snapshot = actor.kind === 'human' ? { kind: actor.kind, userId: actor.userId, orgRole: actor.orgRole }
-    : actor.kind === 'device' ? { kind: actor.kind, deviceId: actor.deviceId }
-    : actor.kind === 'system' ? { kind: actor.kind, service: actor.service } : { kind: actor.kind };
-  const id = randomUUID();
-  await db.query(`INSERT INTO human_audit_events(id,actor_kind,actor_user_id,actor_snapshot,action,resource_type,resource_id,department_id,request_id,outcome,reason,changes)
-    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-  [id,actor.kind,actor.kind === 'human' ? actor.userId : null,snapshot,event.action,event.resourceType,event.resourceId,
-    event.departmentId ?? null,event.requestId ?? null,event.outcome,event.reason ?? null,changes]);
-  return id;
 }

@@ -221,3 +221,28 @@ test('identity persistence, bootstrap, lifecycle and audit stay fail closed', { 
     } finally { await pool.end(); }
   }
 });
+
+test('legacy audit compatibility uses one store without fictitious business authority', { skip: !process.env.DATABASE_URL && process.env.IDENTITY_TEST_DIRECT_PGLITE !== '1' }, async () => {
+  const schema = `identity_test_${randomUUID().replaceAll('-', '')}`; const pool = await testPool(schema);
+  try { await isolatedIdentitySchema(pool, schema, async pinned => {
+    const user = await upsertOidcIdentity(pinned, oidc, { issuer: oidc.issuer, subject: oidc.bootstrapSubject });
+    const trusted = (await pinned.query('SELECT action,schema_version,authority_evidence FROM human_audit_events ORDER BY occurred_at,id')).rows;
+    assert.ok(trusted.length >= 3);
+    for (const row of trusted) {
+      assert.equal(row.schema_version, 2); assert.ok(['identity-bootstrap-v1','oidc-login-v1'].includes(row.authority_evidence.policyVersion));
+      assert.deepEqual(row.authority_evidence.departmentIds, []); assert.deepEqual(row.authority_evidence.grantVersions, []);
+    }
+    const event = { actor: { kind: 'system' as const, service: 'identity' }, action: 'identity.user.updated' as const,
+      resourceType: 'human_user' as const, resourceId: user.id, outcome: 'success' as const, reason: 'private legacy error text', changes: { status: 'active' as const } };
+    const id = await appendHumanAudit(pinned, event);
+    const row = (await pinned.query('SELECT * FROM human_audit_events WHERE id=$1',[id])).rows[0];
+    assert.equal(row.schema_version, 1); assert.equal(row.authority_evidence,null); assert.equal(row.actor_user_id,null);
+    assert.equal(row.reason,'legacy-reason-unclassified');
+    const outbox = (await pinned.query('SELECT payload FROM audit_outbox WHERE audit_event_id=$1',[id])).rows[0].payload;
+    assert.equal(JSON.stringify(outbox).includes('private legacy error text'),false);
+    await pinned.query("CREATE FUNCTION reject_legacy_outbox() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'outbox unavailable'; END $$; CREATE TRIGGER reject_legacy_outbox BEFORE INSERT ON audit_outbox FOR EACH ROW EXECUTE FUNCTION reject_legacy_outbox()");
+    const before = (await pinned.query('SELECT count(*)::int n FROM human_audit_events')).rows[0].n;
+    await assert.rejects(appendHumanAudit(pinned,event));
+    assert.equal((await pinned.query('SELECT count(*)::int n FROM human_audit_events')).rows[0].n,before);
+  }); } finally { await pool.end(); }
+});
