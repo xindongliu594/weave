@@ -1,0 +1,12 @@
+✔ failed employee setup leaves no published Agent and retains unproven native resources (263.4407ms)
+✔ closing coordination retains original unpublished native setup and latches unproven cleanup (69.1679ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1161.1917
+COMMAND: node --test --test-force-exit --test-name-pattern='failed employee setup|unpublished native' services/agent-runtime/employee-hosts.test.mjs
+EXIT: 0

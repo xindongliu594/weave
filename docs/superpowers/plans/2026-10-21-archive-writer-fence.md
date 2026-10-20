@@ -60,11 +60,69 @@ Guard.release() // idempotent; no implicit timeout expiry
 
 ## Task 2：运行和 SQL writer 接线
 
-先补 ALS 的同链借用与 producer 子任务计数，不重新开发调度器。`tick` 先定位候选、拿 guard、再事务重查；`launch` 的 guard 覆盖准备、Host、模型请求的实际 done、usage/finish/trace 及 heartbeat/cancel 尾部。暴露实际 `writerDrained` Promise，不能把现有 drain 超时当成功排空。
+接线拆成以下连续步骤，先修复当前运行的真实排空判断，再启用写入锁。Task 2a 不单独宣称 source fencing 已完成。
+
+- **2a：真实排空。** 复用 adapter 的实际请求 `done`、Host 的原始 `close` 和 executor 的原始清理 Promise，提供稳定的 `writerDrained`。包括尚在等待批准的未发出请求、费用回填、关闭尾部；现有带时限的 `drain()` 仍用于业务等待，不能作为释放依据。协调器在记录业务终态后仍保留占用，直到真实排空。清理失败、固定 DSH 版本中无法确认已结束的启动/销毁尾部须明确保留未核对状态，不冒充成功排空，也不重复清理或模型请求。
+- **2b：共享配置与作用域。** 固定一个应用根目录映射，接 ALS 同链借用和 producer 生命周期计数。入口先取锁，再进入原 SQL 锁序；后台子任务显式保留原作用域。关闭的作用域不能因迟到回调重新取锁复活。
+- **2c：全部 writer 与同步 append。** 覆盖下面列出的 SQL、文件和回执入口后，将真实 append 校验与持久写入纳入短 journal 锁。独立两进程竞争验证和全入口审查完成前，恢复来源批准保持关闭。
+
+真实排空完成后补 ALS 的同链借用与 producer 子任务计数，不重新开发调度器。`tick` 先定位候选、拿 guard、再事务重查；`launch` 的 guard 覆盖准备、Host、模型请求的实际 done、usage/finish/trace 及 heartbeat/cancel 尾部。不得把现有 drain 超时当成功排空。
 
 覆盖 `run-state`、`LocalOperationService` 的 poll/start/result/wait catch、executor 的 checkpoint publisher/close、canonical 多事务补记、accepted-stop 外层、审批 SQL UPDATE→append、创建/重试 run 与 standalone verification。入口持锁，低层断言；不能只给 append 上锁后声明全部源已静止。closed handle 拒绝迟到回调，不重新申请新 writer 复活。
 
 把 append 校验、去重、seq、写入、fsync 和 cursor 更新放在原语的同步临界区。正常短竞争重试同一尚未写入的事件；写入结果不明沿原完整性错误保留，不盲重放。补充真实两进程连续 seq/sourceKey 与 terminal 后延迟尾部测试。
+
+SQL 尾部采用已有门禁，不增加另一套分布式锁：普通运行状态、accepted-stop 和单收据事务已经先取 project 行锁，来源捕获也必须在取得相同行锁后才读取。费用的批量过期、后台查询过期清扫和同中转站范围更新还可能涉及其他项目；2c 必须让实际执行 UPDATE 的事务持有既有 `918275` shared 门禁，来源捕获则在 project/run 行锁之前取该门禁的 exclusive 模式。不能在持 SQL 锁时等待 native 锁，也不能将独立 autocommit 的“取锁查询”当作覆盖后续 UPDATE。
+
+来源事务沿用 READ COMMITTED，在所有 SQL 门禁取得后读取证据；不能先建立旧快照，再把等待锁当作刷新快照。费用仍按原预算与未知预留规则在初始化时重查，不宣称任务历史摘要覆盖了没有纳入格式的费用字段。原生 PostgreSQL 必须验证：旧事务已发出 UPDATE/COMMIT 后客户端断开，以及跨项目费用清扫排队，来源读取仍等待数据库的实际结果。本段是后续接线要求，本批尚未实现。
+
+### Task 2a：实际运行尾部与关闭合同
+
+本步骤修改当前生产调用链，但不启用 native 锁或恢复来源批准。使用现成 DSH 生命周期和 adapter 已有请求 `done`，不引入另一个调度器。
+
+**范围**：`openai-compatible.mjs`/声明、`product-runtime.mjs`/声明、必要的 `host.mjs`/`employee-hosts.mjs` 生命周期记录、`run-coordinator.ts` 及相应测试。允许窄改 `sandbox.mjs` 的共享关闭 Promise 和 `index.ts` 的关闭拒绝观察；trace append、run-state SQL 合同、权限、计费策略、原生插件与生产配置不在本步修改。
+
+合同：
+
+1. Adapter 提供同一个只读 `writerDrained: Promise<void>`。永久停止准入后，所有已进入的请求实际 `finally` 完成才履约，包括未 dispatched、还在 `beforeRequest` 中、正在 `onResponse`/`onUsage`/`onCallError` 的请求。请求准入停止前不提前履约。原 `drain(timeoutMs,signal)` 的限时业务语义保持，不把它的返回值用作真实排空证据。
+2. Runtime `start()` 返回业务 `completion` 和独立的 `writerDrained`。后者等待原执行与原 Host/executor 关闭及 adapter 真正排空；关闭只调用一次，超时只影响业务等待。所有返回的拒绝 Promise 立即有观察者，不制造未处理拒绝。请求或业务失败本身不等同于清理失败。
+3. 固定 DSH 中启动被放弃、未交还 handle 的原生 setup，以及关闭失败，不能只靠 `allSettled` 判为安全。能跟踪的原 Promise 必须跟踪；无法证明结束则保留失败锁存，使用稳定的 `RUNTIME_WRITER_DRAIN_UNPROVEN`/`RUNTIME_WRITER_DRAIN_FAILED`，不泄露内部错误。执行器准备失败且未进入 Host 时，只核对实际已构造的资源，不凭空标记原生遗留。
+4. 业务完成而尾部尚在处理时，保留 job/资源引用，`inspect()` 明确未就绪；拒绝新的 `start()` 必须发生在 workspace preparation 之前。成功排空后才释放引用。失败锁存保留占用，不能把失败对象删除后恢复 ready；保持既有已验收业务结果与未知费用。
+5. 协调器写完业务终态后仍保留 active 项，直到实际排空。区分执行、排空、排空失败；排空项不再续写 running 租约，也不因已完成 SQL 状态被 heartbeat 当作丢租约再次取消。`close()` 等待原工作与关闭 Promise；已知失败明确拒绝，不能陷入只等 `active.size` 清空的死循环，不能重发模型或设备动作。
+6. 不用测试兼容分支给缺失 `writerDrained` 的产品调用伪造已排空。已有 runtime fixture 要显式提供该合同，并标明它只能验证消费端；真实 runtime/DSH 测试必须覆盖独立的生产者行为。
+7. 旧 `RunSandbox.close()` 在重置 `started` 后曾丢失原 Docker remove Promise，abort 路径还会脱离调用链启动 close。本步按实际容器代次保存并复用原 close Promise，保留原先每次 terminal 后关闭、下次工具再启动的顺序行为；新启动必须等待旧关闭成功。观察拒绝并向 runtime 提供真实失败，不重复删除、不扩大 Docker 命令权限，也不把终端状态误认为进程已退出。`index.ts` 观察 shutdown 拒绝，不能在排空失败后继续关闭数据库或宣称正常退出。
+
+验收方法：
+
+- [x] 先记录 RED：限时 drain 返回后仍有未发出准入或费用回填尾部，`writerDrained` 仍 pending；释放原回调后一次完成，零重复请求。
+- [x] 正常执行、失败/取消、Host 建立前失败，以及真实 DSH 启动中断/关闭失败的结果分别正确；被锁存的未知尾部不误报安全。
+- [x] 实际 runtime 的已验收关闭超过原限时后，业务完成、排空未完成、不能启动新项目；原关闭完成才释放。关闭拒绝时业务仍保留、状态明确失败。
+- [x] 实际 coordinator + 隔离 SQL：终态先落库、active 保留、heartbeat 不再误取消；排空成功后释放；失败后 shutdown 明确拒绝而不无限循环。保留历史未知费用与已完成节点。
+- [x] 相关模型结算、终态、租约、类型/构建回归与独立审查通过；说明未接 native 锁，不等同于跨进程恢复验收。
+
+2026-10-21：实现 `1ed2563`，独立审查所发现的同步预算回调漏洞修复于 `6bc0404`；限定复审 PASS。生命周期 44/44、协调器/租约/文件各 23/23、9/9、3/3、独立恢复状态 2/2；修复相关 adapter/预算回归 96/96，声明与构建通过。PGlite 不支持的原生锁用例被中断并保留原失败记录，未标通过。详见[实际排空验证](../../validation/runtime-writer-drain-2026-10-21.md)。2b/2c、生产部署及企业恢复仍未完成。
+
+### Task 2b：统一目录配置与运行写入作用域
+
+在 2a 独立审查通过后进行。复用 Node `AsyncLocalStorage` 和 Task 1 的原生锁，增加一个小型生命周期适配层；不重新实现锁、租约、计费或调度器。
+
+**范围**：新增 runtime 内的作用域模块、声明和隔离测试；API 在应用组成入口创建共享实例，注入 coordinator；修改 coordinator 的候选获取、启动移交及原工作尾部。低层 `trace-store` 强制校验、所有 HTTP/SQL writer 和费用批量事务留给 2c，恢复入口保持关闭。
+
+1. 逻辑 traceRoot 与 lockRoot 在启动时固定，默认锁目录为 traceRoot 父目录的 `.archive-write-locks`；如支持显式覆盖，须一次解析并验证。目录普通且互不嵌套，不进入工具工作区、备份移动或清理范围。同一进程对同一逻辑根的冲突映射必须拒绝；无法检测另一进程错误配置的事实须保留为部署限制。应用不能为每次 append 或 LocalOperationService 各建一套锁。
+2. 作用域使用私有身份绑定 manager、根目录、已排序 run 集合和原 guard。相同调用链的嵌套子集可以借用；扩大集合或借用其他 manager 必须拒绝。独立调用链仍各自申请原生锁，不通过全局 runId 查找并借用别人的活 scope。
+3. 在注册异步回调、启动后台子工作前显式 retain；回调恢复原 scope，原 Promise 真正结束才 finish。关闭父级准入后，既有 producer 可以完成尾部，不能新建 producer；整个 scope 结束后，迟到回调拒绝，不能自动重新取锁复活。已知失败或无法证明结束须锁存并保留原 guard，不能用超时或 catch 清空计数。
+4. 普通结构化 helper 可等待自身工作排空；tick 使用显式获取的 owner，认领后将这个 owner 整体交给 launch，在 tick 返回时不关闭运行 scope 的准入。运行结束进入排空才关闭准入；已 retain 的尾部继续完成。不能让整个长任务占住 tick，也不能先关闭父准入、又让后续心跳偷偷恢复 retain。未认领的 owner 由 tick 结束。所有移交在结束原 owner 之前完成，返回的拒绝 Promise 立即被观察。
+5. tick 先无锁读取候选身份、取得 native writer，再进入原 SQL 事务，重新核对全局上限、部门冲突、任务状态、版本和取消条件后认领。不得持 SQL 锁等待 native 锁。未认领释放；认领成功后沿用同一 scope 完成准备、Host、回执、终态及 2a 的实际排空。
+6. 独立心跳保留所涉及运行的原 producer；不在 SQL 锁内扩大 run 集合。关闭期间已开始的 heartbeat/cancel 和运行尾部均须纳入原 scope。旧未知费用、已验收结果和故障状态不因锁获取成功而改变。
+7. 当前生产调用者和测试夹具需要的配置须显式对齐。部分入口尚未接线时，不注册“所有档案 writer 已受保护”的全局保证，不启用 source/恢复；不增加绕过已注册保护的 unsafe 开关。
+
+验收方法：
+
+- [ ] 作用域子集借用、跨链独立获取、品牌/根/集合不符、关闭后复活均有正反例。
+- [ ] 真正延迟的 producer 在 parent 返回或业务终态后仍阻挡另一个实际进程取得 source；成功原尾部结束才释放；失败锁存保持占用。
+- [ ] tick 取得 native 锁前不占 SQL 锁；等待期间被取消、版本改变或部门已被占用，事务重查后不能启动。
+- [ ] 用实际 coordinator 和隔离数据库验证移交、心跳、关闭；锁竞争/SQL 锁序的生产数据库结论另用原生 PostgreSQL，不以 PGlite 替代。
+- [ ] 相关回归、声明/构建及独立审查通过；再次列出尚未覆盖的 2c/Task 3 入口，企业 profile 不开放。
 
 ## Task 3：对象、维护与备份接线
 

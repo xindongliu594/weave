@@ -1,0 +1,48 @@
+✖ synchronous budget stop retains the original admission and undispatched accounting until finally (11.6992ms)
+✖ synchronous budget rejection releases request ownership after its original error observer (2.1875ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 845.1373
+
+✖ failing tests:
+
+test at services\agent-runtime\writer-drain.test.mjs:16:1
+✖ synchronous budget stop retains the original admission and undispatched accounting until finally (11.6992ms)
+  AssertionError [ERR_ASSERTION]: budget callbacks cannot drain an original admission still able to write
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/writer-drain.test.mjs:32:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\writer-drain.test.mjs:46:1
+✖ synchronous budget rejection releases request ownership after its original error observer (2.1875ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/writer-drain.test.mjs:55:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+COMMAND: node --test --test-name-pattern='synchronous budget' services/agent-runtime/writer-drain.test.mjs
+EXIT: 1

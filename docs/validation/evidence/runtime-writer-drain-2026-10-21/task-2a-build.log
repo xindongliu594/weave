@@ -1,0 +1,8 @@
+
+> agent-department@0.2.0 build
+> tsc --noEmit && vite build
+
+apps/api/src/run-coordinator.ts(140,50): error TS2339: Property 'work' does not exist on type 'ActiveRun | { projectId: any; }'.
+  Property 'work' does not exist on type '{ projectId: any; }'.
+COMMAND: npm run build
+EXIT: 2

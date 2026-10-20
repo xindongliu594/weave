@@ -1,0 +1,14 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ recovery owns a live lease until reconciliation and rejects expired owners including earlier recovery processes (5293.954ms)
+✔ recovery reconciles a recorded completion and API state remains authoritative over later trace events (284.2403ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6112.0037
+COMMAND: node scripts/test-integration.mjs --test-name-pattern='recovery owns|recovery reconciles' tests/run-state.test.ts
+EXIT: 0

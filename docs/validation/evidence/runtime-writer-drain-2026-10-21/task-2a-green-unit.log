@@ -1,0 +1,18 @@
+✔ sandbox original cleanup is shared per container generation: false (21.554ms)
+✔ sandbox original cleanup is shared per container generation: true (4.5103ms)
+✔ actual writer drain retains original beforeRequest beyond business drain (16.2676ms)
+✔ actual writer drain retains original onResponse beyond business drain (33.8926ms)
+✔ actual writer drain retains original onUsage beyond business drain (13.6787ms)
+✔ actual writer drain retains original onCallError beyond business drain (15.6245ms)
+✔ pre-Host preparation failure joins only constructed executor cleanup: false (69.7868ms)
+✔ pre-Host preparation failure joins only constructed executor cleanup: true (32.3628ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1024.5724
+COMMAND: node --test services/agent-runtime/writer-drain.test.mjs services/agent-runtime/sandbox-close.test.mjs
+EXIT: 0

@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-21",
+  "base": "f3c451c",
+  "candidate": "1ed2563",
+  "review": "pass after fix1",
+  "task": "Archive writer fence Task 2a: original runtime writer drain",
+  "projectModelCalls": 0,
+  "jjProductionChanges": 0,
+  "source": [
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "sha256": "7fffb957ad258780437266e03d2f41e8c7515e837a35993eba02065900a5a24c",
+      "gitLfSha256": "157fdc862c84bb5a1c7b6c59b7c8f17daaaceb152a1df261eceb6793dc57a69a"
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.d.mts",
+      "sha256": "1171730a786178188b7060d4bdb06878e47c949a67502e2a79ac730cf47e2f7c",
+      "gitLfSha256": "2758264002ce3ff13fefbf77cf6ffb04ede7bee059bba0b1eb47061da12f32dc"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "7f614ba74297f19626dee2cf240cc73aff8750764ee6ee0231974ba7d2471b44",
+      "gitLfSha256": "110b50c67673007416c39f836b457bcb1963b91909725c6c3fa05da576cb3cea"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.d.mts",
+      "sha256": "1b96450e2c978d539cfc7866357f89933afbbd6fe4f9276f17cdc5b6e53e6e6f",
+      "gitLfSha256": "cd644878d8a9b15c2aadce4a277ce0b07aafa56099403c8ce63f751c3e285a00"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "sha256": "c4185b391e7bfbf5c51fada615ab11da3978cd12ab93afb062a895e15de355c1",
+      "gitLfSha256": "38e4df382b9b3fe7d92b500953d29ba41a0ac5bc9ef0049715b1c71b77913272"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256": "ceecc21c3c2f4467df8876d1bf025cc9e33de4669d666f4ebd33bcfa8ab7c648",
+      "gitLfSha256": "856c6dd38c905807f760cd6f46a4af0c9f317e0a209436c8bb9f89ba9df57bbc"
+    },
+    {
+      "path": "services/agent-runtime/host-lifecycle.mjs",
+      "sha256": "2088a687ac8f8b566fe99bca8b3e660183136eeb815384e437b5d8b8f184f21d",
+      "gitLfSha256": "2088a687ac8f8b566fe99bca8b3e660183136eeb815384e437b5d8b8f184f21d"
+    },
+    {
+      "path": "services/agent-runtime/sandbox.mjs",
+      "sha256": "fd4773923aa334fba5603fcd67267d46833975a99579fc79bf57e45c3ff027de",
+      "gitLfSha256": "db135b8417103ff2bb89268ef5d1738c7a6af2ea446475ae4d64603d06153b4b"
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "sha256": "777a914838fcffddc7b431bb2be063745815a0dcc4e5759b0b2969539c9c1a24",
+      "gitLfSha256": "17b338c3fbd29070628bdda3e693f6b78e6a529afbc5a0c6f5e760234e95b9f4"
+    },
+    {
+      "path": "apps/api/src/index.ts",
+      "sha256": "5b18045f2b5dd2c653382b862ca23a282574f25f17b2a1aedea65a716a8fc1c0",
+      "gitLfSha256": "c6c43986562572cfdaf836cc53fa01f89a1d79b1d3a635b77e47805c6a080677"
+    },
+    {
+      "path": "services/agent-runtime/writer-drain.test.mjs",
+      "sha256": "0992ccf05b097e055273ab6c3ca82a47dacdad280652c5081997ca8f18fe1393",
+      "gitLfSha256": "0992ccf05b097e055273ab6c3ca82a47dacdad280652c5081997ca8f18fe1393"
+    },
+    {
+      "path": "services/agent-runtime/sandbox-close.test.mjs",
+      "sha256": "9df609d48ad2258697ba6f3b61d8c40e891bc710ae0823e66e6cdf05e1144367",
+      "gitLfSha256": "9df609d48ad2258697ba6f3b61d8c40e891bc710ae0823e66e6cdf05e1144367"
+    },
+    {
+      "path": "services/agent-runtime/terminal-finalization.test.mjs",
+      "sha256": "f070757244180d18adf2ef1c6ccc1d704f0cbf2776916c693fbe6f71973b0660",
+      "gitLfSha256": "f070757244180d18adf2ef1c6ccc1d704f0cbf2776916c693fbe6f71973b0660"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.test.mjs",
+      "sha256": "4e9b56ebe352b94f72b748256973cd4f319a7c194825573837fd9ec8caccf8cf",
+      "gitLfSha256": "09925e009983f67e9582d6618d172f406764bf209822248d13fa48aa7c0c21bf"
+    },
+    {
+      "path": "services/agent-runtime/model-settlement.test.mjs",
+      "sha256": "51208292edc94b0db63d0755115c43e55b2ec0c8f4a4aee6782a721a897ebca8",
+      "gitLfSha256": "51208292edc94b0db63d0755115c43e55b2ec0c8f4a4aee6782a721a897ebca8"
+    },
+    {
+      "path": "services/agent-runtime/host-admission.test.mjs",
+      "sha256": "6bc3548ca0c3806d0f6e4935810968d517ab8b64d003a0f9e4a455d2842e77cd",
+      "gitLfSha256": "40e587cf70a138efda30f106256c1ee8c417296771e3e0bcffae4762f6c69ef3"
+    },
+    {
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "sha256": "ffd96bc207f75004f4bd4d18331bfc81376255ce3d20bdc889ee908a05062720",
+      "gitLfSha256": "86155c3013386634f79a86d1f79cfc2895e5ff46c587900299a59e436aecf2c7"
+    },
+    {
+      "path": "tests/run-live-lease.test.ts",
+      "sha256": "1520f5769e885629d6ef09db731d9bb82a1d80d8e2a848fddd3a890d56d47836",
+      "gitLfSha256": "1520f5769e885629d6ef09db731d9bb82a1d80d8e2a848fddd3a890d56d47836"
+    },
+    {
+      "path": "tests/work-file-project.test.ts",
+      "sha256": "21143e0c604918bc70566738b3594f4f7f9db36feff81d62e8afa96710051268",
+      "gitLfSha256": "328bc4b9d7f114f2ee5ce5ad6f298e789085e65c19e9744892751d54aa361b60"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "task-2a-build-final.log",
+      "bytes": 826,
+      "sha256": "4b4cb320c77862b6fd12b798b9b295d7759b3f561bc18f3ce2414bbd52f5ed37"
+    },
+    {
+      "path": "task-2a-build.log",
+      "bytes": 293,
+      "sha256": "344afd3ef2dab8656ad9a77c83aa50c37a80dcc1ebb5ce23a3f9e1d74d05b4c0"
+    },
+    {
+      "path": "task-2a-declarations.log",
+      "bytes": 270,
+      "sha256": "8065a73b03d7f8a4d91cee0a630f8ed0b668d812deea05667522a6128f5df3c2"
+    },
+    {
+      "path": "task-2a-fix1-build.log",
+      "bytes": 826,
+      "sha256": "6cddc41dab0f368506f5a79c3c7f9b715a488f8dabfc49b717a949b71eed19ad"
+    },
+    {
+      "path": "task-2a-fix1-green.log",
+      "bytes": 457,
+      "sha256": "4c13f0400a18a1389ff6f26a2dae6a361dc7b3024aad69a1d3a48e0c8ab593f5"
+    },
+    {
+      "path": "task-2a-fix1-red.log",
+      "bytes": 1940,
+      "sha256": "6827fd77587bb01978261d75bb302bdbb85e35e374b0f26030bf5e9b92de3f10"
+    },
+    {
+      "path": "task-2a-fix1-regression-ordinary.log",
+      "bytes": 11792,
+      "sha256": "aa1f67d90423605e08dfdf333487ef0065835e2e3fff646720c0d414c79d5ff2"
+    },
+    {
+      "path": "task-2a-fix1-regression.log",
+      "bytes": 10677,
+      "sha256": "351c7d30f49f2a0f4617ebf8b9000224e5b199b35aa4ad426b74e55a719f3cfd"
+    },
+    {
+      "path": "task-2a-fix1-report.md",
+      "bytes": 4957,
+      "sha256": "4753bc7df10b5a9755bad3924efc447ab46bef82dafd244a35efecc1fb5e9177"
+    },
+    {
+      "path": "task-2a-fix1-reproducer.log",
+      "bytes": 215,
+      "sha256": "6def999cc9dda47f2205d267ad9410dd71840a956074ab15dd8c3b370ca89e63"
+    },
+    {
+      "path": "task-2a-green-integration-final.log",
+      "bytes": 4638,
+      "sha256": "d219240a3a483d079039b2ec4a605946c86717f3377640f4b902855a1fa452b5"
+    },
+    {
+      "path": "task-2a-green-integration.log",
+      "bytes": 5239,
+      "sha256": "88361dde56c75e904f6f7c5708f61e6775ac399d58c43ce0dbc6bb5b7dee50fc"
+    },
+    {
+      "path": "task-2a-green-lifecycle-regression.log",
+      "bytes": 4996,
+      "sha256": "ccd6b2fc82b5b88640c081dc1e5ead560b12fec40615c451793686eb868d3dd3"
+    },
+    {
+      "path": "task-2a-green-native.log",
+      "bytes": 1856,
+      "sha256": "a8ae618296237c7d204165ec6d83637daba89570bc1bd7a370185cf550aad500"
+    },
+    {
+      "path": "task-2a-green-runtime-final.log",
+      "bytes": 4516,
+      "sha256": "51a67a67594e00ce165ab0c95638d1f5844214f79ce1031295be024a5ffd6746"
+    },
+    {
+      "path": "task-2a-green-runtime-ordinary.log",
+      "bytes": 5218,
+      "sha256": "663f4134546dd9b58e9f136dcf53f8254c84768b2cc78343237163cc0efe9915"
+    },
+    {
+      "path": "task-2a-green-unit.log",
+      "bytes": 942,
+      "sha256": "a338bc9d5ccc5e0fbd10d47044de77e74d3c9355ae426b4d3bac84de33af6a4f"
+    },
+    {
+      "path": "task-2a-native-focused.log",
+      "bytes": 493,
+      "sha256": "7f57e674f959084416e521acf49b74d635b01dd89ed11a746ca9abc68e795c83"
+    },
+    {
+      "path": "task-2a-red-adapter.log",
+      "bytes": 5968,
+      "sha256": "16e3e90e00777a4af4c79c3a20aa50bafc71b7340e960b30724eba22fd7568a5"
+    },
+    {
+      "path": "task-2a-red-coordinator-ordinary.log",
+      "bytes": 2106,
+      "sha256": "e90c37bae850c9cad1bb8bde4d395486b54ba4cdef61b1f873109e8bc600324f"
+    },
+    {
+      "path": "task-2a-red-coordinator.log",
+      "bytes": 3323,
+      "sha256": "68c3e06e254dcc5031baaac53474f192273bb37bb232c2d990701fe41b29bd58"
+    },
+    {
+      "path": "task-2a-red-heartbeat.log",
+      "bytes": 1436,
+      "sha256": "49c1e8fea7af17851c66eaf876e0148f57cfc2c4ae69def803c557b0d55ba453"
+    },
+    {
+      "path": "task-2a-red-native.log",
+      "bytes": 2397,
+      "sha256": "8591cbd2d530a8544673d58f122d01d6fc8cb383316c530b18bb7a7cc16f1744"
+    },
+    {
+      "path": "task-2a-red-sandbox.log",
+      "bytes": 2187,
+      "sha256": "03586968d64f439d10bc282ddaedcab8bf19ae91d06cedbbc8bb7e5d2e8de82d"
+    },
+    {
+      "path": "task-2a-report.md",
+      "bytes": 11215,
+      "sha256": "4499d5e7b04f529f5159dc743eb0dcd5949d2351fac418f65545419b64f5d36f"
+    },
+    {
+      "path": "task-2a-rereview.md",
+      "bytes": 3093,
+      "sha256": "e8e645c544d40a5e3addcae373ba8da6c05ff1302b1e307ef85559aa67e7c38d"
+    },
+    {
+      "path": "task-2a-review.md",
+      "bytes": 5657,
+      "sha256": "50c043bad0d2a9c145f07203903a384e7e279cb07d94c6a75a00bee5fed909a5"
+    },
+    {
+      "path": "task-2a-run-state-safe.log",
+      "bytes": 746,
+      "sha256": "624796636449539bdf926949ec67c9b09e22d15935185c688a8e2cfd93ee8123"
+    },
+    {
+      "path": "task-2a-source-sha256.txt",
+      "bytes": 2046,
+      "sha256": "f15d8ae87a5faa22230dfe1427ec7c81e93d0f85be283e7977a3667f4a18de90"
+    }
+  ],
+  "results": {
+    "finalLifecycle": {
+      "passed": 44,
+      "failed": 0,
+      "exit": 0
+    },
+    "priorSandboxGenerations": 2,
+    "priorCheckpointPolicy": 7,
+    "isolatedSql": {
+      "coordinator": 23,
+      "lease": 9,
+      "workFile": 3,
+      "enclosingCommandExit": 1,
+      "note": "Those three files passed; subsequent native-only lock case under single-backend PGlite was interrupted. Not a whole-command pass."
+    },
+    "safeRecovery": {
+      "passed": 2,
+      "exit": 0
+    },
+    "buildExit": 0,
+    "declarationsExit": 0
+  },
+  "exclusions": [
+    "paid model acceptance",
+    "real Docker or JJ device shutdown",
+    "native PostgreSQL cross-connection locking",
+    "native archive fence production integration",
+    "enterprise source recovery and activation",
+    "JJ deployment"
+  ],
+  "fixes": [
+    {
+      "commit": "6bc0404",
+      "review": "pass",
+      "source": [
+        {
+          "path": "services/agent-runtime/openai-compatible.mjs",
+          "sha256": "496638d364ec4a78b05bea8d4c3860260bbc57c9797cad69ab4b8d3c216ae1f6",
+          "gitLfSha256": "701fdfecabce884dcad7ae08cbc7c911f61574652ad60f40054dc89ac089c0a4"
+        },
+        {
+          "path": "services/agent-runtime/writer-drain.test.mjs",
+          "sha256": "6b288a67193f1644f50f723b6005047cb099242d24733932262861aa41b0bbaf",
+          "gitLfSha256": "6b288a67193f1644f50f723b6005047cb099242d24733932262861aa41b0bbaf"
+        }
+      ],
+      "focused": {
+        "passed": 2,
+        "exit": 0
+      },
+      "regression": {
+        "passed": 96,
+        "failed": 0,
+        "exit": 0
+      },
+      "buildExit": 0,
+      "reproducer": {
+        "beforeRequestPending": true,
+        "writerDrained": false,
+        "activeRequests": 1,
+        "beforeRequestCalls": 1
+      }
+    }
+  ],
+  "finalSourceCommit": "6bc0404",
+  "reviewHistory": [
+    {
+      "commit": "1ed2563",
+      "verdict": "needs-fixes",
+      "report": "task-2a-review.md"
+    },
+    {
+      "commit": "6bc0404",
+      "verdict": "pass",
+      "report": "task-2a-rereview.md"
+    }
+  ],
+  "finalSource": [
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "sha256": "496638d364ec4a78b05bea8d4c3860260bbc57c9797cad69ab4b8d3c216ae1f6",
+      "gitLfSha256": "701fdfecabce884dcad7ae08cbc7c911f61574652ad60f40054dc89ac089c0a4"
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.d.mts",
+      "sha256": "1171730a786178188b7060d4bdb06878e47c949a67502e2a79ac730cf47e2f7c",
+      "gitLfSha256": "2758264002ce3ff13fefbf77cf6ffb04ede7bee059bba0b1eb47061da12f32dc"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "7f614ba74297f19626dee2cf240cc73aff8750764ee6ee0231974ba7d2471b44",
+      "gitLfSha256": "110b50c67673007416c39f836b457bcb1963b91909725c6c3fa05da576cb3cea"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.d.mts",
+      "sha256": "1b96450e2c978d539cfc7866357f89933afbbd6fe4f9276f17cdc5b6e53e6e6f",
+      "gitLfSha256": "cd644878d8a9b15c2aadce4a277ce0b07aafa56099403c8ce63f751c3e285a00"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "sha256": "c4185b391e7bfbf5c51fada615ab11da3978cd12ab93afb062a895e15de355c1",
+      "gitLfSha256": "38e4df382b9b3fe7d92b500953d29ba41a0ac5bc9ef0049715b1c71b77913272"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256": "ceecc21c3c2f4467df8876d1bf025cc9e33de4669d666f4ebd33bcfa8ab7c648",
+      "gitLfSha256": "856c6dd38c905807f760cd6f46a4af0c9f317e0a209436c8bb9f89ba9df57bbc"
+    },
+    {
+      "path": "services/agent-runtime/host-lifecycle.mjs",
+      "sha256": "2088a687ac8f8b566fe99bca8b3e660183136eeb815384e437b5d8b8f184f21d",
+      "gitLfSha256": "2088a687ac8f8b566fe99bca8b3e660183136eeb815384e437b5d8b8f184f21d"
+    },
+    {
+      "path": "services/agent-runtime/sandbox.mjs",
+      "sha256": "fd4773923aa334fba5603fcd67267d46833975a99579fc79bf57e45c3ff027de",
+      "gitLfSha256": "db135b8417103ff2bb89268ef5d1738c7a6af2ea446475ae4d64603d06153b4b"
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "sha256": "777a914838fcffddc7b431bb2be063745815a0dcc4e5759b0b2969539c9c1a24",
+      "gitLfSha256": "17b338c3fbd29070628bdda3e693f6b78e6a529afbc5a0c6f5e760234e95b9f4"
+    },
+    {
+      "path": "apps/api/src/index.ts",
+      "sha256": "5b18045f2b5dd2c653382b862ca23a282574f25f17b2a1aedea65a716a8fc1c0",
+      "gitLfSha256": "c6c43986562572cfdaf836cc53fa01f89a1d79b1d3a635b77e47805c6a080677"
+    },
+    {
+      "path": "services/agent-runtime/writer-drain.test.mjs",
+      "sha256": "6b288a67193f1644f50f723b6005047cb099242d24733932262861aa41b0bbaf",
+      "gitLfSha256": "6b288a67193f1644f50f723b6005047cb099242d24733932262861aa41b0bbaf"
+    },
+    {
+      "path": "services/agent-runtime/sandbox-close.test.mjs",
+      "sha256": "9df609d48ad2258697ba6f3b61d8c40e891bc710ae0823e66e6cdf05e1144367",
+      "gitLfSha256": "9df609d48ad2258697ba6f3b61d8c40e891bc710ae0823e66e6cdf05e1144367"
+    },
+    {
+      "path": "services/agent-runtime/terminal-finalization.test.mjs",
+      "sha256": "f070757244180d18adf2ef1c6ccc1d704f0cbf2776916c693fbe6f71973b0660",
+      "gitLfSha256": "f070757244180d18adf2ef1c6ccc1d704f0cbf2776916c693fbe6f71973b0660"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.test.mjs",
+      "sha256": "4e9b56ebe352b94f72b748256973cd4f319a7c194825573837fd9ec8caccf8cf",
+      "gitLfSha256": "09925e009983f67e9582d6618d172f406764bf209822248d13fa48aa7c0c21bf"
+    },
+    {
+      "path": "services/agent-runtime/model-settlement.test.mjs",
+      "sha256": "51208292edc94b0db63d0755115c43e55b2ec0c8f4a4aee6782a721a897ebca8",
+      "gitLfSha256": "51208292edc94b0db63d0755115c43e55b2ec0c8f4a4aee6782a721a897ebca8"
+    },
+    {
+      "path": "services/agent-runtime/host-admission.test.mjs",
+      "sha256": "6bc3548ca0c3806d0f6e4935810968d517ab8b64d003a0f9e4a455d2842e77cd",
+      "gitLfSha256": "40e587cf70a138efda30f106256c1ee8c417296771e3e0bcffae4762f6c69ef3"
+    },
+    {
+      "path": "tests/run-terminal-maintenance.test.ts",
+      "sha256": "ffd96bc207f75004f4bd4d18331bfc81376255ce3d20bdc889ee908a05062720",
+      "gitLfSha256": "86155c3013386634f79a86d1f79cfc2895e5ff46c587900299a59e436aecf2c7"
+    },
+    {
+      "path": "tests/run-live-lease.test.ts",
+      "sha256": "1520f5769e885629d6ef09db731d9bb82a1d80d8e2a848fddd3a890d56d47836",
+      "gitLfSha256": "1520f5769e885629d6ef09db731d9bb82a1d80d8e2a848fddd3a890d56d47836"
+    },
+    {
+      "path": "tests/work-file-project.test.ts",
+      "sha256": "21143e0c604918bc70566738b3594f4f7f9db36feff81d62e8afa96710051268",
+      "gitLfSha256": "328bc4b9d7f114f2ee5ce5ad6f298e789085e65c19e9744892751d54aa361b60"
+    }
+  ]
+}

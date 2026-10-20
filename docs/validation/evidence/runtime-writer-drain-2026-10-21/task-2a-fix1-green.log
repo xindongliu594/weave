@@ -1,0 +1,12 @@
+✔ synchronous budget stop retains the original admission and undispatched accounting until finally (11.5295ms)
+✔ synchronous budget rejection releases request ownership after its original error observer (1.0055ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 900.1789
+COMMAND: node --test --test-name-pattern='synchronous budget' services/agent-runtime/writer-drain.test.mjs
+EXIT: 0
