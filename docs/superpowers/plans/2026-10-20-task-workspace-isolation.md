@@ -40,10 +40,12 @@
 - `planTaskMerge` verifies current canonical revision equals base revision (conservative v1), every target baseline unchanged, then returns complete mergedFiles, beforeRevision, afterRevision, scopeHash and delta. Output arrays include all untouched canonical files. This is a pure plan; no filesystem mutation or receipt creation.
 - Types mirror exported runtime contracts; no production integration in this first task.
 
-- [ ] Write failing tests for canonical order stability, disjoint outputs preserved, changed unrelated revision conflict, changed/deleted read-only input, missing/extra origin, mutated scope/binding/basehash, bad path/case/prefix, file limits and baseline output visibility.
-- [ ] Run `node --test tests/task-workspace.test.mjs` to confirm failures then implement with existing helpers.
-- [ ] Run task tests and existing local executor/path tests as relevant; `npx tsc --noEmit`.
-- [ ] Independent review and scoped commit. Clearly state helper-only status; B2 remains unimplemented.
+- [x] Write failing tests for canonical order stability, disjoint outputs preserved, changed unrelated revision conflict, changed/deleted read-only input, missing/extra origin, mutated scope/binding/basehash, bad path/case/prefix, file limits and baseline output visibility.
+- [x] Run `node --test tests/task-workspace.test.mjs` to confirm failures then implement with existing helpers.
+- [x] Run task tests and existing local executor/path tests as relevant; `npx tsc --noEmit`.
+- [x] Independent review; helper-only status explicitly recorded. Scoped commit recorded in the plan ledger; B2 remains unimplemented.
+
+Schema detail accepted during implementation: `baseCanonicalManifest` retains metadata only to verify the complete baseline; `inputManifest[].origin` and `outputBaseline` are the exported names. The complete manifest remains trusted-host metadata, not employee-visible input. Tests: task/base64 14/14, existing executor 7/7, workspace revision 2/2; independent review found no blocker.
 
 ### Task 2: Trusted persistent commit and executor integration
 
