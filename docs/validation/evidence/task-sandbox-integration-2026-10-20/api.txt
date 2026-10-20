@@ -1,0 +1,75 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ two consecutive task writes roll scope and preserve original input lineage (2906.0132ms)
+✔ file operations preserve canonical arguments and transport only the visible revision (2036.2879ms)
+✔ unrelated task commit rebuilds next scope without rebinding inputs (3721.8705ms)
+✔ another task changing a fixed input blocks scope renewal (1652.0299ms)
+✔ approval cannot authorize a renewed scope (2357.9997ms)
+✔ missing generation, widened private scope and cancelled lease are refused before queue (560.219ms)
+✔ unknown prepare cannot be replayed or bypassed by a new generation (400.4812ms)
+✔ a task cannot accept a successful receipt from another sandbox (666.1643ms)
+✔ queued task state is rechecked by poll and start (1238.5569ms)
+✔ a late authenticated receipt after withdrawal stays evidence and cannot merge (683.6402ms)
+✔ native dispatch derives effective paths and fixed bundle from the trusted scope (1277.2477ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19889.2353
+✔ expired durable intent settles as rejected and no longer fences independent work (773.8112ms)
+✔ committed SQL receipt repairs evidence after plan change without new execution authority (285.3006ms)
+✔ a deterministic second-transaction denial settles intent but damaged archive evidence stays pending (390.8579ms)
+✔ commits full canonical, retains other task file, deduplicates merge and rolls own durable outputs (410.3307ms)
+✔ queued baseline CAS conflict preserves newer complete B and rejects old output (379.6754ms)
+✔ second operation uses durable own output and retains original input ancestry (603.8677ms)
+✔ changed plan and revoked device authority cannot publish a completed receipt (299.2662ms)
+✔ actual result route validates receipts, deduplicates transmission, and preserves plan withdrawal as late evidence (581.0566ms)
+✔ actual result route validates receipts, deduplicates transmission, and preserves backend withdrawal as late evidence (499.9708ms)
+✔ fault intent never publishes a partial set and reconciliation never executes a command (321.389ms)
+✔ fault blob-fsync never publishes a partial set and reconciliation never executes a command (334.0128ms)
+✔ fault before-sql-commit never publishes a partial set and reconciliation never executes a command (365.2017ms)
+✔ fault after-sql-commit never publishes a partial set and reconciliation never executes a command (311.2473ms)
+✔ fault archive-append never publishes a partial set and reconciliation never executes a command (338.9071ms)
+✔ fault cache-mirror never publishes a partial set and reconciliation never executes a command (338.3587ms)
+✔ missing or corrupt object freezes reads, merge and cache recovery with original files retained (163.2653ms)
+✔ task profile launch stays closed while prepare only initializes canonical (178.5746ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8680.559
+✔ legacy registration gets native default; OpenShell registration requires Linux and hides credentials (1755.6031ms)
+✔ existing device cannot change backend fingerprint, grant or platform or re-enable itself (115.8976ms)
+✔ unbound or changed approved backend cannot enqueue; valid approved identity can (120.1607ms)
+✔ employee permissions and exact per-command approvals still apply to OpenShell (114.2304ms)
+✔ invalid sandbox receipt leaves started operation unresolved; valid receipt is durable and idempotent (363.6234ms)
+✔ lost unstarted claim is re-offered; started unknown outcome is never replayed (248.9046ms)
+✔ withdrawn grant preserves late receipt without completing or reactivating the device (159.4312ms)
+✔ only an approved task opt-in adds the trusted confinement profile to test operations (104.6351ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3815.5887
+✔ native plugin dispatch binds the runtime employee alias to its approved file contract (1908.7118ms)
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (4051.9553ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20567.5883ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (2318.4492ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (316.2203ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29910.9258

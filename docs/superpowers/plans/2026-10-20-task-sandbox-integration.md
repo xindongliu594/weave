@@ -191,4 +191,4 @@ materializeCommittedCanonical(traceRoot:string, run:any):void;
 
 本计划完成自检：scope 身份/实际工具入口/初始全量泄漏/第二次 merge/CAS 完整候选/持久提交/迟到回执/传输限制/未知不重放/检查点/普通消费者/备份/清理/旧 profile/企业 failclosed/真实 JJ 验证均有归属。没有重新建设执行引擎、异步调度器或通用文件系统；C1 外部核对补偿、其他企业基础模块仍由总计划推进。
 
-制定本计划时仅形成设计。后续状态：Task1 可信 scope、Task2 设备适配和 Task3 持久成果合并已本地验证并独立复审；Task3 的确定拒绝结论单独记录在 additive merge_rejection JSONB，保留原 merge_record/设备 result 不变。Task4–6 仍未完成；不能将这些模块测试称为完整 B2、JJ 或真实业务验收。profile 继续关闭。
+制定本计划时仅形成设计。后续状态：Task1 可信 scope、Task2 设备适配和 Task3 持久成果合并已本地验证并独立复审；Task3 的确定拒绝结论单独记录在 additive merge_rejection JSONB，保留原 merge_record/设备 result 不变。Task4 现已完成本地工具/审批/guard/Handoff 接线及三例完整产品工程链测试，独立复审通过；Task5/6 仍未完成。不能将这些模块或工程夹具称为完整 B2、JJ、物理沙箱或真实模型业务验收。profile 继续关闭，详细证据见 docs/validation/task-sandbox-integration-2026-10-20.md。

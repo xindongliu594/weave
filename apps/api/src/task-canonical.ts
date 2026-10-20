@@ -42,7 +42,8 @@ export function validateTaskOperationResult(row:any,result:any){
  if(name==='terminal'||name==='terminal_test'){
   if(!Number.isSafeInteger(result.exitCode)||typeof result.output!=='string'||Buffer.byteLength(result.output)>1024*1024)denied('命令执行结果不完整');
  }else if(name==='native_plugin'){
-  if(result.pluginId!==args.pluginId||result.toolName!==args.toolName||typeof result.nativeResult?.isError!=='boolean')denied('插件执行结果与批准工具不符');
+  const binding=row.payload.deviceArguments??args;
+  if(result.pluginId!==binding.pluginId||result.toolName!==binding.toolName||typeof result.nativeResult?.isError!=='boolean')denied('插件执行结果与批准工具不符');
  }else if(name==='filesystem'||name==='artifact_write'){
   const file=decodeFiles(files).find((f:any)=>f.path===args.path);
   if(!file||result.path!==args.path||result.sha256!==createHash('sha256').update(file.bytes).digest('hex'))denied('文件业务回执与内容不符');

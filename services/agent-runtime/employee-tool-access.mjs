@@ -10,7 +10,7 @@ export const EMPLOYEE_INFRASTRUCTURE_TOOLS = Object.freeze([
 ]);
 
 /** Native registry remains authoritative; this adapter only narrows access. */
-export function installEmployeeToolAccess(ctx, agentCtx, { agent, employee, infrastructureNames = EMPLOYEE_INFRASTRUCTURE_TOOLS }) {
+export function installEmployeeToolAccess(ctx, agentCtx, { agent, employee, infrastructureNames = EMPLOYEE_INFRASTRUCTURE_TOOLS, boundary }) {
   if (!Array.isArray(employee?.tools)) throw Error('TOOL_PERMISSION_IDENTITY: 无法核对员工工具授权');
   const infrastructure = new Set(infrastructureNames), grants = new Set(employee.tools);
   const definitions = new Map(ctx.tools.schemas().filter(schema => grants.has(schema.name) || infrastructure.has(schema.name))
@@ -19,14 +19,16 @@ export function installEmployeeToolAccess(ctx, agentCtx, { agent, employee, infr
   // Native restrict does not filter a scope's own registrations, so it must be
   // paired with the monotonic guard and exact definition binding below.
   if (definitions.size) agentCtx.tools.restrict({ allow: [...definitions.keys()] });
-  ctx.tools.guard(exec => {
+  const check = (exec, actual) => {
     if (exec.agent !== agent || ctx.agents.get(agent.id) !== agent)
       return 'TOOL_PERMISSION_IDENTITY: 工具调用不属于当前员工';
     const admitted = definitions.get(exec.name);
-    if (!admitted || ctx.tools.get(exec.name, agent) !== admitted)
+    if (!admitted || actual !== undefined && actual !== admitted || ctx.tools.get(exec.name, agent) !== admitted)
       return 'TOOL_PERMISSION_DENIED: 工具未获授权或注册定义已改变，请重新批准';
     return undefined;
-  });
+  };
+  ctx.tools.guard(exec=>check(exec));
+  boundary?.setPolicy(check);
   return { granted: [...definitions.keys()].filter(name => grants.has(name)),
     removed: ctx.tools.schemas().map(schema => schema.name).filter(name => !definitions.has(name)) };
 }

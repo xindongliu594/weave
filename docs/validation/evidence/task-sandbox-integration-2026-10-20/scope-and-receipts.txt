@@ -1,0 +1,39 @@
+✔ legacy native policies and receipts remain valid without added metadata (5.1826ms)
+✔ an OpenShell selection must bind the approved environment fingerprint (5.9708ms)
+✔ sandbox receipts reject missing, changed or privileged execution identities (6.6472ms)
+✔ task backend receipts bind the exact task operation and both visible revisions (0.9419ms)
+✔ explicit execution mode is independent of identity and task profile stays unavailable (3.8282ms)
+✔ server allocates generation, pins true import ancestry and never imports private files (5072.3697ms)
+✔ forged employee rejected before queue (4985.9543ms)
+✔ forged task rejected before queue (2665.8992ms)
+✔ forged attempt rejected before queue (2320.3907ms)
+✔ forged session rejected before queue (2676.704ms)
+✔ forged assignee rejected before queue (2472.3029ms)
+✔ completed task rejected before queue (4094.6615ms)
+✔ failed task rejected before queue (3069.8428ms)
+✔ model readPaths rejected before queue (3473.4453ms)
+✔ stale rework hash rejected before queue (3046.4426ms)
+✔ expired lease rejected before queue (2669.1808ms)
+✔ missing generation rejected before queue (2781.6262ms)
+✔ import denied rejected before queue (3580.9275ms)
+✔ input changed rejected before queue (4091.2312ms)
+✔ existing output rejected before queue (3012.9686ms)
+✔ unaccepted producer rejected before queue (2259.3287ms)
+✔ cross run accepted rejected before queue (2173.5603ms)
+✔ cross run checkpoint rejected before queue (3378.6604ms)
+✔ scope rolls unrelated baseline while original input SHA stays pinned (2821.1079ms)
+✔ own committed input modifications roll twice and preserve original import ancestry (2894.2979ms)
+✔ task profile launch stays closed and unbound execute never reaches shared operation queue (8.0575ms)
+✔ real LocalRunExecutor binds and rechecks trusted archive against isolated SQL before any queue (2458.0892ms)
+✔ trusted rework contract pins original accepted attempt rather than stale snapshot contract (2069.3682ms)
+✔ real multi-output ReworkGate keeps sealed delivery inputs and grants only narrowed writes through later scopes (2201.9138ms)
+✔ independent task receipt validation recomputes manifests and keeps revision domains distinct (3300.4773ms)
+✔ canonical metadata is bounded and validated before any object file is opened (2.5256ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83277.0136

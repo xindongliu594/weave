@@ -24,3 +24,10 @@ test('sandbox receipts reject missing, changed or privileged execution identitie
   assert.throws(()=>assertExecutionBackendReceipt(backend,{execution:{...execution,...change}}),{code:'LOCAL_BACKEND_PROOF_INVALID'});
 });
 
+test('task backend receipts bind the exact task operation and both visible revisions',()=>{
+ const taskExecution={profile:'task-attempt-openshell-v1',key:{runId:'run',taskId:'task',attemptId:'attempt',generation:1},scopeHash:'a'.repeat(64),operationId:'operation',beforeWorkRevision:'b'.repeat(64),afterWorkRevision:'c'.repeat(64)};
+ assert.doesNotThrow(()=>(assertExecutionBackendReceipt as any)(backend,{execution,taskExecution},taskExecution));
+ for(const change of [{operationId:'other'},{key:{...taskExecution.key,generation:2}},{beforeWorkRevision:'d'.repeat(64)},{afterWorkRevision:'d'.repeat(64)},{scopeHash:'d'.repeat(64)}])assert.throws(()=>(assertExecutionBackendReceipt as any)(backend,{execution,taskExecution:{...taskExecution,...change}},taskExecution),{code:'LOCAL_BACKEND_PROOF_INVALID'});
+ assert.throws(()=>(assertExecutionBackendReceipt as any)(backend,{execution},taskExecution),{code:'LOCAL_BACKEND_PROOF_INVALID'});
+});
+

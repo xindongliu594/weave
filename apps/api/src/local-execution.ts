@@ -12,6 +12,7 @@ import {shareCostMaintenance} from './cost-control.ts';
 import {assertRunAuthorization,assertCurrentRunPermissions,assertExecutionProfile} from './execution-policy.ts';
 import {initializeTaskCanonical,readCommittedCanonical,commitTaskResult,validateTaskOperationResult} from './task-canonical.ts';
 import {bindTrustedAttempt,resolveTaskScope} from './task-execution.ts';
+import {admitTaskOperation,assertNoUnresolvedTaskOperation,publicTaskScope,taskDeviceScope,taskOperationDenied} from './task-operation-admission.ts';
 import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope} from '../../../packages/contracts/index.ts';
 import {withFreshLocalAdmission} from './local-admission.ts';
 import {openRunArchive,readRun} from '../../../services/agent-runtime/trace-store.mjs';
@@ -27,7 +28,8 @@ function validateResult(row:any,result:any){
  if(name==='terminal'||name==='terminal_test'){
   if(!Number.isInteger(result.exitCode)||typeof result.output!=='string')throw new AppError(422,'缺少命令退出码或输出');
  }else if(name==='native_plugin'){
-  if(result.pluginId!==args.pluginId||result.toolName!==args.toolName||typeof result.nativeResult?.isError!=='boolean')throw new AppError(422,'原生插件回执版本或工具不匹配');
+  const binding=row.payload.deviceArguments??args;
+  if(result.pluginId!==binding.pluginId||result.toolName!==binding.toolName||typeof result.nativeResult?.isError!=='boolean')throw new AppError(422,'原生插件回执版本或工具不匹配');
  }else if(name==='filesystem'||name==='artifact_write'){
   const file=files.find((item:any)=>item.path===args.path);
   if(result.path!==args.path||!file||result.sha256!==createHash('sha256').update(file.bytes).digest('hex'))throw new AppError(422,'文件回执与回传内容不符');
@@ -67,13 +69,18 @@ async function operationTransaction<T>(id:string,fn:(db:pg.PoolClient,row:any,ru
   const value=await fn(db,row,run,device);await db.query('COMMIT');return value;
  }catch(error){await db.query('ROLLBACK');throw error;}finally{db.release();}
 }
-async function executable(db:pg.PoolClient,row:any,run:any,device:any,receiptOnly=false){
+async function executable(db:pg.PoolClient,row:any,run:any,device:any,receiptOnly=false,traceRoot?:string){
  if(!device?.enabled||row.grant_id!==device.grant_id||run.status!=='running'||run.cancel_requested||run.lease_owner!==row.lease_owner||!(await db.query('SELECT id FROM project_runs WHERE id=$1 AND lease_until>clock_timestamp()',[run.id])).rowCount||!(await db.query('SELECT id FROM local_operations WHERE id=$1 AND deadline>clock_timestamp()',[row.id])).rowCount)return false;
  // A started operation can return its authenticated receipt while polling is
  // delayed. Heartbeat freshness is admission evidence, not grant withdrawal;
  // the device, run, lease, deadline and full authorization checks still apply.
- if(receiptOnly&&run.snapshot.executionProfile==='task-attempt-openshell-v1'){
-  try{await assertCurrentRunPermissions(run,db,{requireLocalOnline:row.started!==true});}
+ if(run.snapshot.executionProfile==='task-attempt-openshell-v1'){
+  try{
+   if(!traceRoot)taskOperationDenied('缺少任务档案');
+   await admitTaskOperation(db,run,traceRoot!,row.payload.context,row.payload.taskScope,row.id,{requireLocalOnline:row.started!==true});
+   if(!isDeepStrictEqual(row.payload.executionScope,taskDeviceScope(row.payload.taskScope,revision(row.payload.taskScope.workspace.importedFiles))))return false;
+   if(row.approval_id&&!(await db.query("SELECT id FROM tool_approvals WHERE id=$1 AND run_id=$2 AND agent_id=$3 AND tool=$4 AND arguments=$5::jsonb AND status='approved'",[row.approval_id,run.id,row.payload.context.agentId,row.payload.name,JSON.stringify(row.payload.arguments)])).rowCount)return false;
+  }
   catch(error){
    // An authenticated result is still evidence after authority is withdrawn.
    // Keep it in late_result; do not turn it into permission to merge or retry.
@@ -81,6 +88,12 @@ async function executable(db:pg.PoolClient,row:any,run:any,device:any,receiptOnl
    throw error;
   }
  }else await assertRunAuthorization(run,db,{requireLocalOnline:row.started!==true});return true;
+}
+/** Never spread private queued payloads into the device protocol. */
+function deviceJob(row:any,claimToken:string){
+ const p=row.payload;
+ if(!p.taskScope)return {id:row.id,...p,claimToken};
+ return {id:row.id,runId:p.runId,grantId:p.grantId,deviceId:p.deviceId,name:p.name,arguments:p.deviceArguments,context:{callId:p.context.callId},approvalId:p.approvalId,executionScope:p.executionScope,...(p.verificationProfile?{verificationProfile:p.verificationProfile}:{}),...(p.files?{files:p.files}:{}),claimToken};
 }
 export class LocalOperationService {
  constructor(public traceRoot:string,public owner:string){}
@@ -97,20 +110,47 @@ export class LocalOperationService {
    await db.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
    const run=(await db.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[runId])).rows[0];
    if(run.status!=='running'||run.cancel_requested||run.lease_owner!==this.owner||!(await db.query('SELECT id FROM project_runs WHERE id=$1 AND lease_until>clock_timestamp()',[runId])).rowCount)throw new AppError(409,'本机操作的运行租约已失效','LOCAL_LEASE_DENIED');
-   await assertRunAuthorization(run,db,{requireLocalOnline:false});const target=await localTarget(run.snapshot.policy,run.snapshot.agents,db,false);
+   const taskMode=run.snapshot.executionProfile==='task-attempt-openshell-v1';
+   if(!taskMode)await assertRunAuthorization(run,db,{requireLocalOnline:false});
+   let taskAdmission:any;
+   if(taskMode){
+    const bound=(await db.query("SELECT scope FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active'",[run.id,context.taskId??null,context.attemptId??null,context.generation??null])).rows[0]?.scope;
+    if(!bound)taskOperationDenied('操作缺少 host 准备的任务 scope');
+    taskAdmission=await admitTaskOperation(db,run,this.traceRoot,context,bound);
+   }
+   const target=await localTarget(run.snapshot.policy,run.snapshot.agents,db,false);
    if(target.kind!=='local')throw new AppError(422,'此运行没有批准本机设备','LOCAL_TARGET_DENIED');
    const employee=run.snapshot.agents.find((agent:any)=>agent.id===context.agentId);
    if(name!=='prepare'&&(!employee?.tools.includes(name==='native_plugin'?args.toolName:name)||!context.callId||!context.sessionId))throw new AppError(422,'本机操作不属于获授权员工','LOCAL_EMPLOYEE_DENIED');
-   if(name==='prepare')decodeFiles(files??[]);
+   const approvedArgs=args;let deviceArguments=args;
+   if(name==='prepare'){
+    decodeFiles(files??[]);
+    if(taskMode){
+     if(!isDeepStrictEqual(args,{})||!isDeepStrictEqual(files,taskAdmission.scope.workspace.importedFiles))taskOperationDenied('任务初始化只能导入已授权副本');
+     if((await db.query("SELECT id FROM local_operations WHERE run_id=$1 AND payload->>'name'='prepare' AND payload->'taskScope'->'key'=$2::jsonb",[run.id,JSON.stringify(taskAdmission.scope.key)])).rowCount)taskOperationDenied('任务已有初始化记录，禁止重复创建','TASK_PREPARATION_UNRESOLVED');
+    }
+   }
    else if(name==='native_plugin'){
     if(target.backend?.kind!=='openshell')throw new AppError(422,'原生插件需要 OpenShell 隔离','NATIVE_BACKEND_REQUIRED');
     const binding=nativeToolBinding(run.snapshot,args.toolName),tool=binding.manifest.tools.find((item:any)=>item.name===args.toolName);
-    const access=nativeFileAccess(tool,args.arguments),task=run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&(item.assignee??item.assigneeId)===employee.id);
+    const access=nativeFileAccess(tool,args.arguments),task=taskMode?taskAdmission.task.contract:run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&(item.assignee??item.assigneeId)===employee.id);
     if(!task||!Array.isArray(task.inputs)||!Array.isArray(task.outputs))throw new AppError(422,'原生插件必须固定当前任务的输入和输出合同','NATIVE_TASK_REQUIRED');
-    const readPaths=[...new Set<string>([...task.inputs,...task.outputs].map((item:any)=>item.path))],writePaths=task.outputs.map((item:any)=>item.path);
+    const readPaths:string[]=taskMode?taskAdmission.scope.workspace.readPaths:[...new Set<string>([...task.inputs,...task.outputs].map((item:any)=>item.path))],writePaths:string[]=taskMode?taskAdmission.scope.workspace.writePaths:task.outputs.map((item:any)=>item.path);
     if(access.read.some(path=>!readPaths.includes(path))||access.write.some(path=>!writePaths.includes(path)))throw new AppError(422,'原生插件参数超出当前任务文件合同','NATIVE_PATH_DENIED');
-    args={toolName:tool.name,pluginId:binding.id,originalName:tool.originalName,arguments:args.arguments,expectedWorkspaceRevision:args.expectedWorkspaceRevision,readPaths,writePaths:access.write.length?writePaths:[]};
+    const nativeArgs={toolName:tool.name,pluginId:binding.id,originalName:tool.originalName,arguments:args.arguments,expectedWorkspaceRevision:args.expectedWorkspaceRevision,readPaths,writePaths:access.write.length?writePaths:[]};
+    if(taskMode){
+     if(args.pluginId!==undefined&&args.pluginId!==binding.id||args.originalName!==undefined&&args.originalName!==tool.originalName||args.readPaths!==undefined&&!isDeepStrictEqual(args.readPaths,readPaths)||args.writePaths!==undefined&&!isDeepStrictEqual(args.writePaths,nativeArgs.writePaths))taskOperationDenied('原生工具绑定或路径范围与可信合同不同');
+     deviceArguments=nativeArgs;
+    }else args=nativeArgs;
    }else if(!['artifact_write','filesystem','terminal','terminal_test'].includes(name))throw new AppError(422,'未开放此本机工具');
+   if(taskMode&&name!=='prepare'){
+    if(!taskAdmission.task.sandbox_identity)taskOperationDenied('任务工作区尚未完成初始化');
+    const w=taskAdmission.scope.workspace;
+    if(name==='filesystem'&&!w.readPaths.includes(args.path)||name==='artifact_write'&&!w.writePaths.includes(args.path))taskOperationDenied('文件操作超出任务合同');
+    if(args.expectedWorkspaceRevision!==taskAdmission.scope.workRevision)taskOperationDenied('已批准完整工作版本已变化');
+    if(!isDeepStrictEqual(args.executionScope,publicTaskScope(taskAdmission.scope)))taskOperationDenied('操作参数未绑定准确任务 scope');
+    deviceArguments={...deviceArguments,expectedWorkspaceRevision:revision(w.importedFiles)};
+   }
    let approvalId=null;
    if(name==='terminal'||name==='terminal_test'){
     approvalId=z.uuid().parse(context.approvalId);
@@ -119,12 +159,12 @@ export class LocalOperationService {
    signal?.throwIfAborted();
    await localTarget(run.snapshot.policy,run.snapshot.agents,db);
    signal?.throwIfAborted();
-   const task=run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&(item.assignee??item.assigneeId)===employee?.id);
+   const task=taskMode?taskAdmission.task.contract:run.snapshot.tasks.find((item:any)=>item.id===context.taskId&&(item.assignee??item.assigneeId)===employee?.id);
    let verificationProfile;
    if(name==='terminal_test'&&target.backend?.kind==='openshell'&&task?.verificationReuse==='same-workspace'&&task.verify?.includes(args.command)){
     try{verificationProfile=checkpointTestInvocation(args.command,'/sandbox').profile;}catch{/* Other approved commands still run, with fresh verification required. */}
    }
-   const payload={runId,grantId:target.grantId,name,arguments:args,context,approvalId,...(verificationProfile?{verificationProfile}:{}),...(files?{files}:{}),deviceId:target.deviceId};
+   const payload={runId,grantId:target.grantId,name,arguments:taskMode?approvedArgs:args,context,approvalId,...(taskMode?{taskScope:taskAdmission.scope,executionScope:taskDeviceScope(taskAdmission.scope,revision(taskAdmission.scope.workspace.importedFiles)),deviceArguments}:{}),...(verificationProfile?{verificationProfile}:{}),...(files?{files}:{}),deviceId:target.deviceId};
    await db.query('INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,approval_id) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,target.deviceId,runId,target.grantId,this.owner,payload,approvalId]);
    signal?.throwIfAborted();
    openRunArchive(this.traceRoot,runId).append('local/operation-queued',{operationId:id,name,deviceId:target.deviceId,...context});committing=true;await db.query('COMMIT');return id;
@@ -135,9 +175,9 @@ export class LocalOperationService {
    while(true){
     signal?.throwIfAborted();
     const state=await operationTransaction(id,async(db,row,run,device)=>{
-     if(row.status==='completed')return await executable(db,row,run,device,true)?row:{...row,status:'cancelled'};
+     if(row.status==='completed')return await executable(db,row,run,device,true,this.traceRoot)?row:{...row,status:'cancelled'};
      if(['failed','cancelled'].includes(row.status))return row;
-     if(!await executable(db,row,run,device)){
+     if(!await executable(db,row,run,device,false,this.traceRoot)){
       await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[id]);return {...row,status:'cancelled'};
      }return row;
     });
@@ -186,8 +226,42 @@ export class LocalRunExecutor {
    return resolveTaskScope(db,run,assignment,canonical?{files:canonical.files,revision:canonical.ref.revision}:{files:exportFiles(this.root),revision:this.revision()},row.scope);
   });
  }
+ async prepareTask(context:{agentId:string;sessionId:string;taskId:string;attemptId:string;generation:number},signal:AbortSignal):Promise<TaskExecutionScope>{
+  if(!context||!Number.isSafeInteger(context.generation)||context.generation<1||Object.keys(context).some(k=>!['agentId','sessionId','taskId','attemptId','generation'].includes(k)))taskOperationDenied('任务初始化身份不完整');
+  await initializeTaskCanonical(this.service,this.archive.id,signal);
+  const previous=await this.taskTransaction(signal,async(db,run)=>{
+   const key={runId:run.id,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation};
+   const rows=(await db.query("SELECT * FROM local_operations WHERE run_id=$1 AND payload->>'name'='prepare' AND payload->'taskScope'->'key'=$2::jsonb ORDER BY created_at",[run.id,JSON.stringify(key)])).rows;
+   if(rows.length>1)taskOperationDenied('同一任务存在多个初始化记录');
+   const existing=rows[0];await assertNoUnresolvedTaskOperation(db,run.id,existing?.id??null);
+   if(existing&&(!['queued','claimed','started','completed'].includes(existing.status)||existing.merge_state==='unknown'||existing.merge_state==='rejected'))taskOperationDenied('原任务初始化尚未核对，禁止重建','TASK_PREPARATION_UNRESOLVED');
+   return existing;
+  });
+  let id=previous?.id;
+  if(!id){const scope=await this.taskScope(context,signal);id=await this.service.enqueue(this.archive.id,'prepare',{}, {...context,callId:'task-prepare-'+randomUUID(),executionScope:publicTaskScope(scope)},scope.workspace.importedFiles,signal);}
+  if(previous?.merge_state!=='committed'){
+   await this.service.wait(id,signal);await commitTaskResult(this.service,id,signal);
+  }
+  await this.taskTransaction(signal,async(db,run)=>{
+   const operation=(await db.query("SELECT * FROM local_operations WHERE id=$1 AND merge_state='committed'",[id])).rows[0];
+   if(!operation?.result?.ok)taskOperationDenied('任务初始化没有已提交回执');
+   const identity={sandboxId:operation.result.result.execution.sandboxId,localWorkspace:operation.result.result.localWorkspace};
+   const task=(await db.query('SELECT sandbox_identity FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4',[run.id,context.taskId,context.attemptId,context.generation])).rows[0];
+   if(task?.sandbox_identity&&!isDeepStrictEqual(task.sandbox_identity,identity))taskOperationDenied('任务沙箱身份已变化');
+   await db.query('UPDATE task_attempt_workspaces SET sandbox_identity=$1 WHERE run_id=$2 AND task_id=$3 AND attempt_id=$4 AND generation=$5',[identity,run.id,context.taskId,context.attemptId,context.generation]);
+  });
+  const scope=await this.taskScope(context,signal);
+  await this.taskTransaction(signal,async(db,run)=>{
+   const latest=(await db.query("SELECT * FROM local_operations WHERE run_id=$1 AND payload->'taskScope'->'key'=$2::jsonb AND result->>'ok'='true' ORDER BY created_at DESC,id DESC LIMIT 1",[run.id,JSON.stringify(scope.key)])).rows[0];
+   const task=(await db.query('SELECT sandbox_identity FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4',[run.id,context.taskId,context.attemptId,context.generation])).rows[0];
+   if(latest?.merge_state!=='committed'||!task?.sandbox_identity)taskOperationDenied('任务最后执行成果尚未提交，禁止继续使用工作区');
+   validateTaskOperationResult(latest,latest.result.result);
+   if(latest.result.result.workspaceRevision!==revision(scope.workspace.importedFiles)||latest.result.result.execution?.sandboxId!==task.sandbox_identity.sandboxId||latest.result.result.localWorkspace!==task.sandbox_identity.localWorkspace)taskOperationDenied('任务工作版本或沙箱与最后持久回执不同');
+  });
+  return scope;
+ }
  async prepare(signal:AbortSignal){
-  assertExecutionProfile(this.snapshot);
+  if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')assertExecutionProfile(this.snapshot);
   return this.preparing??=(async()=>{
    if(this.snapshot.executionProfile==='task-attempt-openshell-v1'){
     await initializeTaskCanonical(this.service,this.archive.id,signal);return;
@@ -199,8 +273,14 @@ export class LocalRunExecutor {
   })();
  }
  async execute(name:string,args:any,signal:AbortSignal,context:any){
-  assertExecutionProfile(this.snapshot);
-  await this.prepare(signal);const id=await this.service.enqueue(this.archive.id,name,args,context,undefined,signal);const result=await this.service.wait(id,signal);
+  if(this.snapshot.executionProfile!=='task-attempt-openshell-v1'){assertExecutionProfile(this.snapshot);await this.prepare(signal);}
+  else{
+   const binding=context?.executionScope,key={runId:this.archive.id,taskId:context?.taskId,attemptId:context?.attemptId,generation:context?.generation};
+   if(!context||['agentId','sessionId','taskId','attemptId'].some(k=>typeof context[k]!=='string'||!context[k])||!Number.isSafeInteger(context.generation)||context.generation<1||
+    !/^[a-f0-9]{64}$/.test(binding?.scopeHash??'')||!/^[a-f0-9]{64}$/.test(binding?.workRevision??'')||
+    !isDeepStrictEqual(binding,{profile:'task-attempt-openshell-v1',key,scopeHash:binding?.scopeHash,workRevision:binding?.workRevision}))taskOperationDenied('执行器缺少 host 准备的任务 scope');
+  }
+  const id=await this.service.enqueue(this.archive.id,name,args,context,undefined,signal);const result=await this.service.wait(id,signal);
   if(this.snapshot.executionProfile==='task-attempt-openshell-v1'){
    const merge=await commitTaskResult(this.service,id,signal);const visible=await this.taskResultSummary(id);
    this.archive.append('local/operation-finished',{operationId:id,name,...context,localWorkspace:result.localWorkspace,execution:result.execution,merge},{callId:context.callId});return visible;
@@ -234,14 +314,14 @@ export function localDeviceRouter(traceRoot:string){
   if(!device.enabled)throw new AppError(403,'本机设备已被停用','LOCAL_DEVICE_DENIED');
   const input=z.object({active:z.object({id:z.uuid(),claimToken:z.uuid()}).nullable().default(null)}).parse(req.body);
   await pool.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[id]);
-  if(input.active){const cancel=await operationTransaction(input.active.id,async(db,row,run,current)=>{if(row.device_id!==id||row.claim_token!==input.active!.claimToken)throw new AppError(403,'操作领取凭证不正确');const valid=['claimed','started'].includes(row.status)&&await executable(db,row,run,current);if(!valid&&['claimed','started'].includes(row.status))await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[row.id]);return !valid;});return res.json({cancel});}
+  if(input.active){const cancel=await operationTransaction(input.active.id,async(db,row,run,current)=>{if(row.device_id!==id||row.claim_token!==input.active!.claimToken)throw new AppError(403,'操作领取凭证不正确');const valid=['claimed','started'].includes(row.status)&&await executable(db,row,run,current,false,traceRoot);if(!valid&&['claimed','started'].includes(row.status))await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[row.id]);return !valid;});return res.json({cancel});}
   const orphan=(await pool.query("SELECT id,claim_token,started FROM local_operations WHERE device_id=$1 AND status IN ('claimed','started') ORDER BY created_at LIMIT 1",[id])).rows[0];
   if(orphan){
    // A poll reply may be lost after claiming but before the device receives it.
    // Re-offer only an unstarted claim. /start still transitions atomically once;
    // a started operation must keep its unknown-outcome reconciliation path.
    const recovered=await operationTransaction(orphan.id,async(db,row,run,current)=>{
-    if(row.status==='claimed'&&!row.started&&await executable(db,row,run,current))return {job:{id:row.id,...row.payload,claimToken:row.claim_token}};
+    if(row.status==='claimed'&&!row.started&&await executable(db,row,run,current,false,traceRoot))return {job:deviceJob(row,row.claim_token)};
     if(['claimed','started'].includes(row.status))return {orphan:{id:row.id,claimToken:row.claim_token,started:row.started}};
     return {job:null};
    });
@@ -250,15 +330,15 @@ export function localDeviceRouter(traceRoot:string){
   const pending=(await pool.query("SELECT id FROM local_operations WHERE device_id=$1 AND status='queued' ORDER BY created_at LIMIT 1",[id])).rows[0];if(!pending)return res.json({job:null});
   const job=await operationTransaction(pending.id,async(db,row,run,current)=>{
    if(row.status!=='queued')return null;
-   if(!await executable(db,row,run,current)){await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[row.id]);return null;}
+   if(!await executable(db,row,run,current,false,traceRoot)){await db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1",[row.id]);return null;}
    if((await db.query("SELECT id FROM local_operations WHERE device_id=$1 AND status IN ('claimed','started') AND id<>$2",[id,row.id])).rowCount)return null;
-   const claimToken=randomUUID();await db.query("UPDATE local_operations SET status='claimed',claim_token=$1 WHERE id=$2",[claimToken,row.id]);return {id:row.id,...row.payload,claimToken};
+   const claimToken=randomUUID();await db.query("UPDATE local_operations SET status='claimed',claim_token=$1 WHERE id=$2",[claimToken,row.id]);return deviceJob(row,claimToken);
   });res.json({job});
  });
  router.post('/local-devices/:id/operations/:operation/start',async(req,res)=>{
   const id=z.uuid().parse(req.params.id);await proof(id,req.get('X-Local-Device-Key'));const token=z.uuid().parse(req.body.claimToken);
   await operationTransaction(z.uuid().parse(req.params.operation),async(db,row,run,device)=>{
-   if(row.device_id!==id||row.claim_token!==token||row.status!=='claimed'||!await executable(db,row,run,device))throw new AppError(409,'操作已启动、停止或授权失效','LOCAL_START_DENIED');
+   if(row.device_id!==id||row.claim_token!==token||row.status!=='claimed'||!await executable(db,row,run,device,false,traceRoot))throw new AppError(409,'操作已启动、停止或授权失效','LOCAL_START_DENIED');
    await db.query("UPDATE local_operations SET status='started',started=true WHERE id=$1",[row.id]);
   });res.json({ok:true});
  });
@@ -275,11 +355,17 @@ export function localDeviceRouter(traceRoot:string){
     if(taskReceipt)validateTaskOperationResult(row,input.result);
     // Verify the original approved execution. Current backend/grant permission
     // is checked separately below; a changed backend may only retain late evidence.
-    assertExecutionBackendReceipt(executionBackend(taskReceipt?run.snapshot.executionTarget.backend:device.backend),input.result);
+    const expectedTask=taskReceipt?{profile:row.payload.taskScope.profile,key:row.payload.taskScope.key,scopeHash:row.payload.taskScope.workspace.scopeHash,operationId:row.id,beforeWorkRevision:row.payload.executionScope.expectedWorkRevision,afterWorkRevision:revision(input.result.files)}:undefined;
+    assertExecutionBackendReceipt(executionBackend(taskReceipt?run.snapshot.executionTarget.backend:device.backend),input.result,expectedTask);
+    if(taskReceipt&&row.payload.name!=='prepare'){
+     const key=row.payload.taskScope.key;
+     const bound=(await db.query('SELECT sandbox_identity FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4',[run.id,key.taskId,key.attemptId,key.generation])).rows[0]?.sandbox_identity;
+     if(!bound||input.result.execution.sandboxId!==bound.sandboxId||input.result.localWorkspace!==bound.localWorkspace)taskOperationDenied('回执来自不同的任务沙箱');
+    }
    }
    if(row.result){if(!isDeepStrictEqual(row.result,input))throw new AppError(409,'已有不同操作回执');return;}
    if(input.ok&&!row.started)throw new AppError(409,'操作尚未确认开始');
-   if(!['claimed','started'].includes(row.status)||!await executable(db,row,run,device,true)){
+   if(!['claimed','started'].includes(row.status)||!await executable(db,row,run,device,true,traceRoot)){
     if(row.late_result&&!isDeepStrictEqual(row.late_result,input))throw new AppError(409,'已有不同迟到回执');
     await db.query("UPDATE local_operations SET status='cancelled',late_result=$1,finished_at=now() WHERE id=$2",[input,row.id]);return;
    }

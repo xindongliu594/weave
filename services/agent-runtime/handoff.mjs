@@ -7,9 +7,10 @@ import { artifactFile, listArtifacts } from './sandbox.mjs';
 import { Semaphore } from './limits.mjs';
 import { commandEvidence } from './run-evidence.mjs';
 import { taskContractErrors } from '../../packages/contracts/task-contracts.mjs';
-import { canonicalManifest } from '../../apps/desktop/local-executor.cjs';
+import { canonicalManifest,revision as filesRevision } from '../../apps/desktop/local-executor.cjs';
 import { observeAcceptanceChecks, assertAcceptanceChecks } from './acceptance-checks.mjs';
 import { createHandoffReport, handoffContractError, handoffReportGuidance } from '../../packages/contracts/handoff-report.mjs';
+import {isDeepStrictEqual} from 'node:util';
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 export function inspectArtifact(root, declaration) {
@@ -49,6 +50,7 @@ export class HandoffGate {
     this.committed = new Map(this.accepted);
     this.bindings = new Map(); this.commands = new Map(); this.writes = new Map(); this.blocked = new Map(); this.scopeViolations = new Map();
     this.mutex = new Semaphore(1);
+    this.executionScopes=new Map();
     this.stepStatus=new Map();this.stepSessions=new Map();this.inheritanceChecked=new Set();
     this.environment=archive?.dir?checkpointEnvironment(snapshot,readRun(dirname(archive.dir),archive.id)?.events.findLast(event=>event.type==='local/device-bound')?.data.execution):null;
     // Archived approvals may pin both fields. Keep their exact SHA checks in
@@ -126,8 +128,25 @@ export class HandoffGate {
     if (name === 'artifact_write' && ((task.inScope?.length && !scoped(args.path, task.inScope)) || scoped(args.path, task.outOfScope))) throw Error('OUT_OF_SCOPE: ' + args.path);
     return listArtifacts(this.sandbox.root);
   }
+  bindExecutionScope(taskId,attemptId,scope){
+    const task=this.tasks.get(taskId),key=scope?.key;
+    if(this.snapshot.executionProfile!=='task-attempt-openshell-v1'||scope?.profile!==this.snapshot.executionProfile||key?.runId!==this.archive.id||key.taskId!==taskId||key.attemptId!==attemptId||!Number.isSafeInteger(key.generation)||key.generation<1||!task||scope.workspace?.binding?.assigneeId!==task.assignee||scope.workRevision!==workspaceRevision(this.sandbox.root))throw Error('TASK_SCOPE_REQUIRED: 无法核对当前任务工作区');
+    const previous=this.executionScopes.get(this.key(taskId,attemptId));
+    if(previous&&(!isDeepStrictEqual(previous.key,scope.key)||!isDeepStrictEqual(previous.workspace.binding,scope.workspace.binding)||previous.capabilityHash!==scope.capabilityHash))this.invalidateCommands(taskId,attemptId);
+    this.executionScopes.set(this.key(taskId,attemptId),scope);
+  }
+  taskWorkRevision(taskId,attemptId){
+    const scope=this.executionScopes.get(this.key(taskId,attemptId));if(!scope)throw Error('TASK_SCOPE_REQUIRED: 缺少任务工作版本');
+    const paths=new Set([...scope.workspace.readPaths,...scope.workspace.writePaths]);
+    return hash(JSON.stringify(canonicalManifest(listArtifacts(this.sandbox.root).filter(file=>paths.has(file.path)))));
+  }
   observe(taskId, attemptId, name, args, result, before, context = {}) {
     const task = this.tasks.get(taskId), key = this.key(taskId, attemptId);
+    const taskMode=this.snapshot.executionProfile==='task-attempt-openshell-v1',scope=this.executionScopes.get(key);
+    if(taskMode){
+      const receipt=result.taskExecution,merge=result.merge;
+      if(!scope||receipt?.profile!==scope.profile||!isDeepStrictEqual(receipt.key,scope.key)||receipt.scopeHash!==scope.workspace.scopeHash||!receipt.operationId||receipt.beforeWorkRevision!==filesRevision(scope.workspace.importedFiles)||merge?.status!=='committed'||merge.operationId!==receipt.operationId||merge.mergeId!==receipt.operationId||!isDeepStrictEqual(merge.key,scope.key)||merge.scopeHash!==receipt.scopeHash||merge.beforeRevision!==scope.workRevision||merge.afterRevision!==workspaceRevision(this.sandbox.root)||merge.workRevision!==receipt.afterWorkRevision||receipt.afterWorkRevision!==this.taskWorkRevision(taskId,attemptId)||result.workspaceRevision!==undefined&&result.workspaceRevision!==receipt.afterWorkRevision)throw Error('TASK_MERGE_REQUIRED: 任务结果缺少已提交且匹配的成果证明');
+    }
     if(context.sessionId)this.stepSessions.set(key,context.sessionId);
     if(result.execution)this.environment=checkpointEnvironment(this.snapshot,result.execution);
     const previous = new Map(before.map(f => [f.path, f.sha256]));
@@ -146,7 +165,8 @@ export class HandoffGate {
     }
     if (name === 'terminal' || name === 'terminal_test') {
       const entries = this.commands.get(key) ?? []; this.commands.set(key, entries);
-      const observation = { command: args.command, exitCode: result.exitCode, workspaceRevision: workspaceRevision(this.sandbox.root),
+      const observation = { command: args.command, exitCode: result.exitCode, workspaceRevision: taskMode?this.taskWorkRevision(taskId,attemptId):workspaceRevision(this.sandbox.root),
+        ...(taskMode?{canonicalRevision:result.merge.afterRevision,scopeHash:scope.workspace.scopeHash,mergeId:result.merge.mergeId,taskExecution:result.taskExecution}:{}),
         evidence: commandEvidence({ archive: this.archive, name, taskId, attemptId, args, result, context }) };
       if (task.acceptanceChecks !== undefined) observation.acceptanceChecks = observeAcceptanceChecks(task, args.command, result);
       entries.push(observation);
@@ -161,19 +181,20 @@ export class HandoffGate {
     this.inherit(taskId,attemptId);
     if (this.scopeViolations.has(key)) throw Error(this.scopeViolations.get(key));
     const outputs = (task.outputs ?? []).map(output => inspectArtifact(this.sandbox.root, output));
-    const revision = workspaceRevision(this.sandbox.root), observed = this.commands.get(key) ?? [];
+    const revision = workspaceRevision(this.sandbox.root), verificationRevision=this.snapshot.executionProfile==='task-attempt-openshell-v1'?this.taskWorkRevision(taskId,attemptId):revision, observed = this.commands.get(key) ?? [];
     for (const command of task.verify ?? []) {
       const actual = observed.findLast(entry => entry.command === command);
       const expectedExit = task.acceptanceChecks?.find(check => check.command === command)?.expectedExitCode ?? 0;
-      if (!actual || actual.exitCode !== expectedExit || actual.workspaceRevision !== revision) throw Error('UNVERIFIED_COMMAND: ' + command);
+      if (!actual || actual.exitCode !== expectedExit || actual.workspaceRevision !== verificationRevision) throw Error('UNVERIFIED_COMMAND: ' + command);
     }
-    const acceptanceChecks = assertAcceptanceChecks(task, observed, revision);
+    const acceptanceChecks = assertAcceptanceChecks(task, observed, verificationRevision);
     const employeeReport = createHandoffReport(task, update);
     if (['implementation', 'repair'].includes(task.kind)) {
       const actual = this.observedChangedPaths(taskId, attemptId);
       if (JSON.stringify([...(update.changedPaths ?? [])].sort()) !== JSON.stringify(actual)) throw Error('CHANGED_PATHS_MISMATCH: 当前 attempt 的宿主观察为 changedPaths='+JSON.stringify(actual)+'；恢复或仅读取的旧文件不算本轮修改，交付文件由 outputs 独立核验。请修正清单，不要为通过校验而重写文件。');
     }
     return { taskId, attemptId, runId: this.archive.id, workspaceRevision: revision, inputs: this.bindings.get(key) ?? [], outputs, commands: observed,
+      ...(this.snapshot.executionProfile==='task-attempt-openshell-v1'?{sandboxWorkRevision:verificationRevision,taskExecution:{profile:this.snapshot.executionProfile,key:{...this.executionScopes.get(key).key},capabilityHash:this.executionScopes.get(key).capabilityHash}}:{}),
       ...(employeeReport ? { employeeReport } : {}),
       ...(task.acceptanceChecks !== undefined ? { acceptanceChecks } : {}), acceptedAt: new Date().toISOString() };
   }

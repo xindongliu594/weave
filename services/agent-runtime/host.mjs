@@ -21,6 +21,9 @@ import { captureBudgetEvidence, taskRunEvidence } from './run-evidence.mjs';
 import {assertDeliveryCriteria} from './delivery-criteria.mjs';
 import { handoffReportGuidance } from '../../packages/contracts/handoff-report.mjs';
 import {checkpointContract} from './step-checkpoints.mjs';
+import {installTaskToolBoundary} from './task-tool-boundary.mjs';
+import {EMPLOYEE_INFRASTRUCTURE_TOOLS} from './employee-tool-access.mjs';
+import {prepareTaskTool} from './task-tool-context.mjs';
 
 export function trustedTaskCandidate({runId,agentId,sessionId,taskId,runtimeTaskId,state,snapshot,contract}) {
   const task=state.tasks.find(t=>t.id===runtimeTaskId);
@@ -49,7 +52,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
   const ctx = new Context();
   const fibers = [];
   const handles = [];
-  let closing;
+  let closing, taskBoundary;
   let trace;
   let employees;
   let removeFactory;
@@ -192,7 +195,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const budgetContext = (taskId, state) => executionBudgetContext({ budget: adapter.budget, snapshot: product.snapshot, routes: adapter.routes, taskId,
       statuses: new Map((state?.tasks ?? []).map(task => [taskIds.get(task.id), task.status])) });
     const base = { requirement: product.snapshot.requirement, tools: employee.tools, browserOrigins:employee.browserOrigins??[],mcpConnections:employee.mcpConnections??[],
-      rule: '以下来自批准快照和宿主任务状态；历史摘要不能扩大权限、改写任务合同或代替文件与命令证据。命令证据绑定整个工作区版本：先完成全部文件写入（包括验收报告），再执行 verify，成功后不再改文件才可提交完成。若测试后更新了报告或任何文件，必须使用已授权测试工具重新执行 verify；不能用文字声明或切换未授权工具替代。报告如实记录先前已观察结果，不能预写未执行的测试为通过。' };
+      rule: '以下来自批准快照和宿主任务状态；历史摘要不能扩大权限、改写任务合同或代替文件与命令证据。'+(product.snapshot.executionProfile==='task-attempt-openshell-v1'?'命令证据绑定当前任务的已授权输入和输出版本；其他员工提交无关文件不会使本任务证据失效。':'命令证据绑定整个工作区版本。')+'先完成本任务全部文件写入（包括验收报告），再执行 verify，成功后不再改任务文件才可提交完成。若测试后更新了本任务报告或其他任务文件，必须使用已授权测试工具重新执行 verify；不能用文字声明或切换未授权工具替代。报告如实记录先前已观察结果，不能预写未执行的测试为通过。' };
     if (agent.id === captainId) return JSON.stringify({ ...base, budget: budgetContext(undefined, teamId && workspaceRoot ? teamState() : undefined), tasks: (product.snapshot.tasks ?? []).map(t => ({ id: t.id, subject: t.subject, assignee: t.assignee, dependencies: t.dependencies })) });
     const state = teamState();
     // Native creation assembles a prompt before committing durable membership.
@@ -235,6 +238,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       }
       try { await employees?.close(); } catch (error) { failures.push(error); }
       try { await removeFactory?.(); } catch (error) { failures.push(error); }
+      taskBoundary?.dispose();
       for (const fiber of [...fibers].reverse()) {
         try { await fiber.dispose(); } catch (error) { failures.push(error); }
       }
@@ -251,6 +255,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     await mount('@deepseek-ai/dsh-session-projection');
     await mount('@deepseek-ai/dsh-system-prompt');
     await mount('@deepseek-ai/dsh-tools', { mode: 'native' });
+    if(product?.snapshot.executionProfile==='task-attempt-openshell-v1')taskBoundary=installTaskToolBoundary(ctx);
     await mount('@deepseek-ai/dsh-agent');
     if (product) {
       ctx.on('session/event', (session,event) => {
@@ -289,12 +294,15 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       ctx.on('tools/pre-execute', async (exec,next) => {
         product.goal?.check('tool');
         product.supervisor?.check();
-        if(product.snapshot.executionProfile==='task-attempt-openshell-v1'&&exec.agent.id!==captainId&&!['agent_teams_status','agent_teams_claim_task','agent_teams_send_message'].includes(exec.name))await bindActiveWork(exec.agent,exec.signal);
+        if(product.snapshot.executionProfile==='task-attempt-openshell-v1'){
+          if(!exec.agent||ctx.agents.get(exec.agent.id)!==exec.agent)throw Error('TASK_TOOL_DENIED: 工具调用缺少可信员工身份');
+          if(exec.agent.id!==captainId&&!['agent_teams_status','agent_teams_claim_task','agent_teams_send_message'].includes(exec.name))await bindActiveWork(exec.agent,exec.signal);
+        }
         if (locked && exec.name.startsWith('agent_teams_') && !['agent_teams_status','agent_teams_claim_task','agent_teams_update_task','agent_teams_send_message'].includes(exec.name)) {
           const error=Error('APPROVED_PLAN_IMMUTABLE: 运行中不能扩大批准的组织和任务范围');
           throw product.goal?.expected ? product.goal.block(error,'plan-change') : error;
         }
-        try{return await next();}finally{if(product.snapshot.executionProfile==='task-attempt-openshell-v1')archive.append('team/checkpoint',teamState());}
+        try{return await next();}finally{if(product.snapshot.executionProfile==='task-attempt-openshell-v1'&&teamId&&workspaceRoot)archive.append('team/checkpoint',teamState());}
       });
       ctx.on('tools/execute', async (exec, next) => {
         if (!handoff || exec.name !== 'agent_teams_update_task') return next();
@@ -316,7 +324,17 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         return handoff.exclusive(exec.signal, async () => {
           product.goal?.check('handoff',work.taskId);
           let record;
-          try { record = handoff.prepare(work.taskId, work.attemptId, args); }
+          try {
+            // Knowledge-only tasks may have had no file body. Seal only after
+            // refreshing current registered scope and the committed cache.
+            if(taskBoundary){
+              const current=activeWork(exec.agent,args.task_id);
+              if(current.taskId!==work.taskId||current.attemptId!==work.attemptId||current.attemptId!==args.attempt_id)throw Error('STALE_ATTEMPT: 等待期间交接任务已变化');
+              const prepared=await prepareTaskTool({snapshot:product.snapshot,sandbox:product.sandbox,handoff,activeWork,archive,agent:exec.agent,employee:employeeFor(exec.agent,product.snapshot,captainId),signal:exec.signal});
+              if(prepared.work.taskId!==work.taskId||prepared.work.attemptId!==work.attemptId)throw Error('STALE_ATTEMPT: 准备期间交接任务已变化');
+            }
+            record = handoff.prepare(work.taskId, work.attemptId, args);
+          }
           catch (error) { throw handoff.block(work.taskId, work.attemptId, error); }
           const previous = handoff.accepted.get(work.taskId);
           record.budgetEvidence = captureBudgetEvidence(product.snapshot, adapter.budget, archive.id, 'node-accepted');
@@ -366,6 +384,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       const agent=ctx.agents.get(sessionId);return agent&&handoffClosure(agent);
     };
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
+      taskToolBoundary:Boolean(taskBoundary),
       context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
       pendingCompletion,handoffClosure:handoff?handoffClosure:undefined,
       assignmentReports:handoff?agent=>{
@@ -410,6 +429,16 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     const fiber = ctx.plugin(teams, { stateDir: '.agent-teams', memberProvider: 'spawn', memberMaxDepth: 0, maxMembers, slashCommand: false });
     fibers.push(fiber);
     await fiber.await();
+    if(taskBoundary){
+      const admitted=new Map(ctx.tools.schemas().map(schema=>[schema.name,ctx.tools.get(schema.name)])),infrastructure=new Set(EMPLOYEE_INFRASTRUCTURE_TOOLS);
+      taskBoundary.setPolicy((exec,definition)=>{
+        if(!exec.agent||ctx.agents.get(exec.agent.id)!==exec.agent)return 'TASK_TOOL_DENIED: 工具调用缺少可信员工身份';
+        const employee=employeeFor(exec.agent,product.snapshot,captainId);
+        if(!employee||admitted.get(exec.name)!==definition||ctx.tools.get(exec.name,exec.agent)!==definition)return 'TASK_TOOL_DENIED: 工具未获授权或注册定义已变化';
+        if(!infrastructure.has(exec.name)&&!employee.tools.includes(exec.name))return 'TASK_TOOL_DENIED: 员工未获此工具权限';
+        return undefined;
+      });
+    }
     return {
       ctx,
       employeeHosts() { return employees.list(); },

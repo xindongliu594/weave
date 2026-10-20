@@ -31,7 +31,7 @@ async function fixture(){
  CREATE TABLE project_runs(id text PRIMARY KEY,status text,lease_owner text,lease_until timestamptz,cancel_requested boolean,project_id text DEFAULT 'project',project_version int DEFAULT 1,snapshot jsonb);
  INSERT INTO project_runs(id,status,lease_owner,lease_until,cancel_requested) VALUES('run','running','owner',now()+interval '1 hour',false);
  CREATE TABLE task_attempt_workspaces(run_id text,task_id text,attempt_id text,generation int,principal text,session_id text,runtime_task_id text,contract_hash text,permission_hash text,capability_hash text,contract jsonb,input_origins jsonb DEFAULT '[]',committed_outputs jsonb DEFAULT '[]',scope jsonb,work_revision text,phase text DEFAULT 'active',PRIMARY KEY(run_id,task_id,attempt_id,generation));
- CREATE TABLE local_operations(id text);`);
+ CREATE TABLE local_operations(id text,run_id text,status text,merge_state text,payload jsonb,result jsonb,late_result jsonb,started boolean);`);
  const db={query:async(s:string,p?:any[])=>{const r=await sql.query(s,p);return {...r,rowCount:r.rows.length||r.affectedRows};}} as any;
  const task={id:'task',assignee:'employee',inputs:[{path:'input.txt'}],outputs:[{path:'output.txt'}],inScope:['output.txt'],outOfScope:[],dependencies:[]};
  const snapshot:any={projectId:'project',planVersion:1,executionProfile:'task-attempt-openshell-v1',agents:[{id:'employee',employeeId:'original',tools:['filesystem','artifact_write']}],tasks:[task],policy:{allowedTools:['filesystem','artifact_write']},executionTarget:{kind:'local',backend:{kind:'openshell',version:'0.1.2',image:'image@sha256:'+sha('image'),policySha256:sha('policy')}},importedFiles:[{path:'input.txt',content:'input',sha256:sha('input'),snapshotId:'snapshot',agentIds:['original']}]};
@@ -118,12 +118,12 @@ test('own committed input modifications roll twice and preserve original import 
   await assert.rejects(()=>execution.resolveTaskScope(f.db,f.run,a,f.canonical,previous));
  }finally{await f.sql.close();}
 });
-test('task profile prepare and execute never reach shared operation queue',async()=>{
+test('task profile launch stays closed and unbound execute never reaches shared operation queue',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'task-scope-'));let enqueued=0;
  try{
   const executor=new LocalRunExecutor({id:'run',dir,append(){}},{executionProfile:'task-attempt-openshell-v1'},{enqueue(){enqueued++;throw Error('queue reached');}} as any);
-  await assert.rejects(()=>executor.prepare(new AbortController().signal),{code:'TASK_EXECUTION_UNAVAILABLE'});
-  for(const context of [{},{agentId:'forged'},{taskId:'forged'},{attemptId:'forged'},{sessionId:'forged'},{generation:0}])await assert.rejects(()=>executor.execute('filesystem',{path:'private.txt'},new AbortController().signal,context),{code:'TASK_EXECUTION_UNAVAILABLE'});
+  assert.throws(()=>assertExecutionProfile(executor.snapshot),{code:'TASK_EXECUTION_UNAVAILABLE'});
+  for(const context of [{},{agentId:'forged'},{taskId:'forged'},{attemptId:'forged'},{sessionId:'forged'},{generation:0}])await assert.rejects(()=>executor.execute('filesystem',{path:'private.txt'},new AbortController().signal,context),{code:'TASK_SCOPE_DENIED'});
   assert.equal(enqueued,0);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });

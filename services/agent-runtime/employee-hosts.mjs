@@ -9,13 +9,15 @@ import { installApprovedSkills } from './approved-skills.mjs';
 import { installEmployeeCapabilities } from './employee-capabilities.mjs';
 import { projectAssignmentReports, projectClaimReport } from './assignment-reports.mjs';
 import { employeeHandoffDefinition, nativeHandoffArguments } from './employee-handoff.mjs';
+import {installTaskToolBoundary} from './task-tool-boundary.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports }) {
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports, taskToolBoundary }) {
     Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports });
+    this.taskToolBoundary=taskToolBoundary===true;
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -38,7 +40,7 @@ export class EmployeeHostFactory {
     const hostId = randomUUID(), ctx = new Context(), fibers = [];
     const abort = new AbortController(), ready = Promise.withResolvers();
     const slot = { hostId, sessionId, ctx, agent: undefined, close: undefined };
-    let handle, detachAgent, unfollowOwner, disposing;
+    let handle, detachAgent, unfollowOwner, disposing, boundary;
     const signal = AbortSignal.any([abort.signal, ...(options.signal ? [options.signal] : [])]);
     const dispose = (ownerTriggered = false) => disposing ??= (async () => {
       abort.abort(Error('Employee host disposed'));
@@ -48,6 +50,7 @@ export class EmployeeHostFactory {
       catch (error) { failures.push(error); }
       try { await handle?.dispose(); } catch (error) { failures.push(error); }
       detachAgent?.();
+      boundary?.dispose();
       for (const fiber of fibers.reverse()) {
         try { await fiber.dispose(); } catch (error) { failures.push(error); }
       }
@@ -84,6 +87,7 @@ export class EmployeeHostFactory {
       await mount('@deepseek-ai/dsh-session-projection');
       await mount('@deepseek-ai/dsh-system-prompt');
       await mount('@deepseek-ai/dsh-tools', { mode: 'native' });
+      if(this.taskToolBoundary)boundary=installTaskToolBoundary(ctx);
       await mount('@deepseek-ai/dsh-agent');
       await mount('@deepseek-ai/dsh-session-persistence-jsonl', { root: this.sessionRoot, compression: 'none' });
       // Captain and members both own their session in this Host. Reuse the
@@ -207,7 +211,7 @@ export class EmployeeHostFactory {
           // the coordinator's execution permission checks remain authoritative.
           if (!Array.isArray(employee.tools)) throw new HarnessError('无法核对员工已批准的工具权限', 'TOOL_PERMISSION_IDENTITY');
           installEmployeeCapabilities(ctx,{employee,agent,manifest:this.skillManifest,queryKnowledge:this.queryKnowledge,archive:this.archive,activeWork:this.activeWork});
-          const access = installEmployeeToolAccess(ctx, agentCtx, { agent, employee });
+          const access = installEmployeeToolAccess(ctx, agentCtx, { agent, employee, boundary });
           this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, ...access, resumed: resume }, { sessionId: agent.id });
         }
         return { commit: () => {

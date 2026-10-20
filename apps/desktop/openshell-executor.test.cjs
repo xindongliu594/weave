@@ -9,6 +9,7 @@ const {randomUUID}=require('node:crypto');
 const {EventEmitter}=require('node:events');
 const {OpenShellDeviceExecutor,OPENSHELL_CONSTANTS,POLICY_TEXT,canonicalConfigFingerprint,cliTransport,REMOTE_SCRIPT}=require('./openshell-executor.cjs');
 const {manifest,revision}=require('./local-executor.cjs');
+const {createTaskWorkspace}=require('./task-workspace.cjs');
 
 function executeFixtureScript(script,input,root,control={}){
  return new Promise((resolve,reject)=>{
@@ -429,12 +430,41 @@ test('task-attempt keys isolate sandboxes and persisted scope changes are reject
   const mapping=f.executor.taskStateFile(key),saved=fs.readFileSync(mapping,'utf8');
   fs.writeFileSync(mapping,JSON.stringify({...JSON.parse(saved),workManifest:[{path:'out.txt',size:1,sha256:'0'.repeat(64)}]}));
   assert.throws(()=>reopened.read(key),{code:'LOCAL_SCOPE_DENIED'});fs.writeFileSync(mapping,saved);
-  for(const patch of [{scopeHash:'d'.repeat(64)},{profile:'wrong'},{binding:{...binding,permissionHash:'d'.repeat(64)}},{expectedWorkRevision:'d'.repeat(64)}]){
+  for(const patch of [{scopeHash:'invalid'},{profile:'wrong'},{binding:{...binding,permissionHash:'d'.repeat(64)}},{expectedWorkRevision:'d'.repeat(64)}]){
    const before=f.calls.length;
    await assert.rejects(reopened.execute(f.job('filesystem',{path:'input.txt'},{executionScope:{...rolled,...patch}})),{code:'LOCAL_SCOPE_DENIED'});
    assert.equal(f.calls.length,before);
   }
   assert.throws(()=>f.executor.stateFile(key),{code:'LOCAL_SCOPE_DENIED'});
+ }finally{f.cleanup();}
+});
+
+test('unrelated canonical commit renews task scope without changing its sandbox work revision',async()=>{
+ const f=fixture();try{
+  const files=[{path:'input.txt',content:Buffer.from('fixed A input').toString('base64')}];
+  const key={runId:f.runId,taskId:'A',attemptId:'attempt-1',generation:1};
+  const binding={projectId:'project',planVersion:1,...key,assigneeId:'worker',contractHash:'a'.repeat(64),permissionHash:'b'.repeat(64),backend:{kind:'openshell',version:'0.1.2',image:OPENSHELL_CONSTANTS.image,policyHash:OPENSHELL_CONSTANTS.policyHash}};
+  const origins=[{path:'input.txt',runId:f.runId,taskId:'A',attemptId:key.attemptId,acceptedRevision:revision(files)}];
+  const plan=canonicalFiles=>createTaskWorkspace({binding,readPaths:['input.txt'],writePaths:['out.txt'],canonicalFiles,origins});
+  const device=workspace=>({profile:'task-attempt-openshell-v1',key,binding:workspace.binding,scopeHash:workspace.scopeHash,readPaths:workspace.readPaths,writePaths:workspace.writePaths,inputManifest:workspace.inputManifest,expectedWorkRevision:revision(workspace.importedFiles)});
+  const first=plan(files),prepared=await f.executor.execute(f.job('prepare',{}, {files:first.importedFiles,executionScope:device(first)}));
+  const renewed=plan([...files,{path:'b.txt',content:Buffer.from('B independently committed').toString('base64')}]);
+  assert.notEqual(renewed.baseCanonicalRevision,first.baseCanonicalRevision);
+  assert.notEqual(renewed.scopeHash,first.scopeHash);
+  assert.deepEqual(renewed.inputManifest,first.inputManifest);
+  assert.equal(device(renewed).expectedWorkRevision,prepared.workspaceRevision);
+  const read=await f.executor.execute(f.job('filesystem',{path:'input.txt'},{executionScope:device(renewed)}));
+  assert.equal(read.content,'fixed A input');assert.equal(read.execution.sandboxId,prepared.execution.sandboxId);
+  assert.equal(read.taskExecution.scopeHash,renewed.scopeHash);assert.equal(read.workspaceRevision,prepared.workspaceRevision);
+  assert.deepEqual(read.files.map(file=>file.path),['input.txt']);
+  assert.equal(f.calls.filter(call=>call.args[3]==='create').length,1);
+  const before=f.calls.length;
+  for(const patch of [
+   {inputManifest:renewed.inputManifest.map(item=>({...item,sha256:'0'.repeat(64)}))},
+   {binding:{...renewed.binding,permissionHash:'0'.repeat(64)}},
+   {readPaths:['input.txt','b.txt']},
+  ])await assert.rejects(f.executor.execute(f.job('filesystem',{path:'input.txt'},{executionScope:{...device(renewed),...patch}})),{code:'LOCAL_SCOPE_DENIED',notExecuted:true});
+  assert.equal(f.calls.length,before,'forged inputs or authority never reach CLI');
  }finally{f.cleanup();}
 });
 

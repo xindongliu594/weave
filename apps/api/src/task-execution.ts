@@ -6,6 +6,7 @@ import type {TrustedTaskCandidate,TrustedTaskAssignment,TaskExecutionScope,TaskI
 import {checkpointContract} from '../../../services/agent-runtime/step-checkpoints.mjs';
 import {ancestors} from '../../../services/agent-runtime/checkpoint-context.mjs';
 import {AppError} from './provider.ts';
+import {assertNoUnresolvedTaskOperation} from './task-operation-admission.ts';
 const {createTaskWorkspace,validateTaskExport}=createRequire(import.meta.url)('../../desktop/task-workspace.cjs') as TaskWorkspacePlanner;
 const hash=(value:any)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const bytesHash=(value:Buffer)=>createHash('sha256').update(value).digest('hex');
@@ -63,6 +64,8 @@ export async function bindTrustedAttempt(db:pg.PoolClient,run:any,candidate:Trus
   return {...candidate,generation:current.generation};
  }
  if(candidate.generation!==undefined)denied('不能由调用方创建 generation');
+ if(rows.some(row=>row.phase==='unknown'))denied('任务存在未知工作区，不能创建 generation');
+ if(rows.length)await assertNoUnresolvedTaskOperation(db,run.id);
  if(current)await db.query("UPDATE task_attempt_workspaces SET phase='retired' WHERE run_id=$1 AND task_id=$2 AND phase='active'",[run.id,candidate.taskId]);
  const generation=(rows[0]?.generation??0)+1;
  await db.query('INSERT INTO task_attempt_workspaces(run_id,task_id,attempt_id,generation,principal,session_id,runtime_task_id,contract_hash,permission_hash,capability_hash,contract) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[run.id,candidate.taskId,candidate.attemptId,generation,candidate.agentId,candidate.sessionId,candidate.runtimeTaskId,candidate.contractHash,hashes.permissionHash,hashes.capabilityHash,contract]);

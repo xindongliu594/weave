@@ -38,7 +38,6 @@ function advanceTaskScope(scope,next){
  if(!isDeepStrictEqual(reads,next.readPaths)||scope.readPaths.some(name=>!reads.includes(name))||reads.some(name=>!old.has(name)&&!writes.has(name)))throw denied('任务读取范围未获批准');
  const current=scope.workManifest??scope.sourceManifest,expected=current.filter(item=>reads.includes(item.path));
   if(!Array.isArray(next.inputManifest)||!isDeepStrictEqual(next.inputManifest.map(({path,size,sha256})=>({path,size,sha256})),expected))throw denied('任务输入清单与当前沙箱版本不一致');
- if(next.scopeHash!==scope.scopeHash&&next.expectedWorkRevision===scope.expectedWorkRevision)throw denied('任务 scopeHash 未绑定新工作版本');
  scope.scopeHash=next.scopeHash;scope.expectedWorkRevision=next.expectedWorkRevision;scope.readPaths=next.readPaths;scope.inputManifest=next.inputManifest;scope.inputWorkManifest=current;
 }
 function taskFileName(key){return hash(JSON.stringify([key.runId,key.taskId,key.attemptId,key.generation]))+'.json';}

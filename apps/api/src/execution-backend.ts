@@ -1,6 +1,6 @@
 import {isDeepStrictEqual} from 'node:util';
 import {z} from 'zod';
-import {executionBackendSchema,type ExecutionBackend} from '../../../packages/contracts/index.ts';
+import {executionBackendSchema,type ExecutionBackend,type TaskExecutionReceipt} from '../../../packages/contracts/index.ts';
 import {AppError} from './provider.ts';
 
 export function executionBackend(value:unknown):ExecutionBackend {
@@ -16,7 +16,9 @@ const executionProofSchema=z.object({kind:z.literal('openshell'),version:z.liter
  cpu:z.tuple([z.number().int().positive(),z.number().int().positive()]).refine(([quota,period])=>quota/period===1),
  memory:z.literal('536870912'),
  effectivePolicyHash:z.literal('27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5')}).passthrough();
-export function assertExecutionBackendReceipt(backend:ExecutionBackend,result:any) {
+export function assertExecutionBackendReceipt(backend:ExecutionBackend,result:any,expectedTaskExecution?:TaskExecutionReceipt) {
+ if(expectedTaskExecution&&(backend.kind!=='openshell'||!isDeepStrictEqual(result.taskExecution,expectedTaskExecution)))
+  throw new AppError(422,'任务执行回执与已批准操作不符','LOCAL_BACKEND_PROOF_INVALID');
  if(backend.kind==='native'){
   if(result.execution?.kind==='openshell')throw new AppError(422,'原生执行设备不能返回沙箱执行证明','LOCAL_BACKEND_PROOF_INVALID');
   return;

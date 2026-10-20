@@ -12,7 +12,7 @@ import {createRunArchive,readRun} from '../services/agent-runtime/trace-store.mj
 import {checkpointContract} from '../services/agent-runtime/step-checkpoints.mjs';
 import {initializeTaskCanonical,readCommittedCanonical,commitTaskResult,reconcileTaskMerge,materializeCommittedCanonical} from '../apps/api/src/task-canonical.ts';
 import {LocalOperationService,LocalRunExecutor,localDeviceRouter} from '../apps/api/src/local-execution.ts';
-import {assertCurrentRunPermissions} from '../apps/api/src/execution-policy.ts';
+import {assertCurrentRunPermissions,assertExecutionProfile} from '../apps/api/src/execution-policy.ts';
 import {AppError} from '../apps/api/src/provider.ts';
 import {bindTrustedAttempt,resolveTaskScope} from '../apps/api/src/task-execution.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
@@ -44,7 +44,9 @@ async function fixture(){
  const db=await pool.connect();let scope:any;try{await db.query('BEGIN');const assignment=await bindTrustedAttempt(db,run,candidate);const canonical=readCommittedCanonical(directory,run);scope=await resolveTaskScope(db,run,assignment,{files:canonical.files,revision:canonical.ref.revision},null);await db.query('COMMIT');}catch(error){await db.query('ROLLBACK');throw error;}finally{db.release();}
  const id=randomUUID(),files=[file('in.txt','input'),file('out.txt','output')],executionScope={profile:scope.profile,key:scope.key,binding:scope.workspace.binding,scopeHash:scope.workspace.scopeHash,readPaths:scope.workspace.readPaths,writePaths:scope.workspace.writePaths,inputManifest:scope.workspace.inputManifest,expectedWorkRevision:revision(scope.workspace.importedFiles)};
  const result={localWorkspace:'/sandbox',path:'out.txt',bytes:6,sha256:sha('output'),files,artifacts:manifest(files),workspaceRevision:revision(files),execution:{...backend,sandboxId:randomUUID(),sandboxName:'fixture',uid:1000,gid:1000,node:'v24.19.0',cpu:[100000,100000],memory:'536870912',effectivePolicyHash:'27ae8e91e5dd6b505e6a331bb5b24a7a2b47aced33257f4f7e7a7c892978e6b5'},taskExecution:{profile:scope.profile,key:scope.key,scopeHash:scope.workspace.scopeHash,operationId:id,beforeWorkRevision:executionScope.expectedWorkRevision,afterWorkRevision:revision(files)}};
- const payload={runId,deviceId,grantId,name:'artifact_write',arguments:{path:'out.txt',content:'output'},context:{...candidate,generation:1,callId:'call'},taskScope:scope,executionScope};
+ // Synthetic merge fixture represents an already prepared task sandbox.
+ await pool.query('UPDATE task_attempt_workspaces SET sandbox_identity=$1',[{sandboxId:result.execution.sandboxId,localWorkspace:result.localWorkspace}]);
+ const payload={runId,deviceId,grantId,name:'artifact_write',arguments:{path:'out.txt',content:'output'},context:{...candidate,generation:1,callId:'call',executionScope:{profile:scope.profile,key:scope.key,scopeHash:scope.workspace.scopeHash,workRevision:scope.workRevision}},taskScope:scope,executionScope};
  await pool.query("INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,status,started,result,claim_token) VALUES($1,$2,$3,$4,$5,$6,'completed',true,$7,$8)",[id,deviceId,runId,grantId,owner,payload,{ok:true,result},randomUUID()]);
  return {runId,id,service,scope,archive,deviceId,files,result};
 }
@@ -61,7 +63,7 @@ async function completedWrite(f:Awaited<ReturnType<typeof fixture>>,taskId:strin
  const path=task.outputs[0].path,files=[...scope.workspace.importedFiles.filter(file=>file.path!==path),file(path,text)],id=randomUUID();
  const executionScope={profile:scope.profile,key:scope.key,binding:scope.workspace.binding,scopeHash:scope.workspace.scopeHash,readPaths:scope.workspace.readPaths,writePaths:scope.workspace.writePaths,inputManifest:scope.workspace.inputManifest,expectedWorkRevision:revision(scope.workspace.importedFiles)};
  const result={...f.result,path,bytes:Buffer.byteLength(text),sha256:sha(text),files,artifacts:manifest(files),workspaceRevision:revision(files),taskExecution:{profile:scope.profile,key:scope.key,scopeHash:scope.workspace.scopeHash,operationId:id,beforeWorkRevision:executionScope.expectedWorkRevision,afterWorkRevision:revision(files)}};
- const payload={runId:f.runId,deviceId:f.deviceId,grantId:run.snapshot.executionTarget.grantId,name:'artifact_write',arguments:{path,content:text},context:{...assignment,callId:randomUUID()},taskScope:scope,executionScope};
+ const payload={runId:f.runId,deviceId:f.deviceId,grantId:run.snapshot.executionTarget.grantId,name:'artifact_write',arguments:{path,content:text},context:{...assignment,callId:randomUUID(),executionScope:{profile:scope.profile,key:scope.key,scopeHash:scope.workspace.scopeHash,workRevision:scope.workRevision}},taskScope:scope,executionScope};
  await pool.query("INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,status,started,result,claim_token) VALUES($1,$2,$3,$4,$5,$6,'completed',true,$7,$8)",[id,f.deviceId,f.runId,payload.grantId,f.service.owner,payload,{ok:true,result},randomUUID()]);
  return {id,scope};
 }
@@ -202,4 +204,4 @@ test('missing or corrupt object freezes reads, merge and cache recovery with ori
  assert.throws(()=>readCommittedCanonical(directory,run));await assert.rejects(()=>commitTaskResult(f.service,f.id,new AbortController().signal));assert.throws(()=>materializeCommittedCanonical(directory,run));assert.equal(readFileSync(join(f.archive.dir,'artifacts/secret.txt'),'utf8'),'private');
  writeFileSync(object,'wrong');assert.throws(()=>readCommittedCanonical(directory,run));
 });
-test('task profile remains unstartable after canonical implementation',{skip:!isolated},async()=>{const f=await fixture();const executor=new LocalRunExecutor(f.archive,(await getRun(f.runId)).snapshot,f.service);await assert.rejects(()=>executor.prepare(new AbortController().signal),{code:'TASK_EXECUTION_UNAVAILABLE'});assert.equal((await pool.query('SELECT count(*)::int AS n FROM local_operations')).rows[0].n,1);});
+test('task profile launch stays closed while prepare only initializes canonical',{skip:!isolated},async()=>{const f=await fixture(),snapshot=(await getRun(f.runId)).snapshot;const executor=new LocalRunExecutor(f.archive,snapshot,f.service);assert.throws(()=>assertExecutionProfile(snapshot),{code:'TASK_EXECUTION_UNAVAILABLE'});await executor.prepare(new AbortController().signal);assert.equal((await pool.query('SELECT count(*)::int AS n FROM local_operations')).rows[0].n,1);});

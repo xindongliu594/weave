@@ -67,12 +67,8 @@ export class ProductDshRuntime {
   async execute(job, archive, snapshot, routes) {
     const usages = [];
     let runtimeFailure;
-    let host, adapter, goal;
-    const sandbox = this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id, join(archive.dir, 'artifacts'));
-    const supervisor = new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
-    const durableArchive=archive;
-    archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
-    archive.append('runtime/supervision',{version:1,progressTimeoutSeconds:snapshot.policy.progressTimeoutSeconds??300,repeatActionLimit:snapshot.policy.repeatActionLimit??8,repeatErrorLimit:snapshot.policy.repeatErrorLimit??3,maxReadRetries:snapshot.policy.maxReadRetries??2});
+    let host, adapter, goal, sandbox, supervisor;
+    const taskMode=snapshot.executionProfile==='task-attempt-openshell-v1';
     const gate = new Semaphore(snapshot.policy.maxConcurrentAgents);
     const timer = setTimeout(() => {
       job.deadlineExceeded = true;
@@ -81,8 +77,21 @@ export class ProductDshRuntime {
       void job.host?.close();
     }, snapshot.policy.deadlineSeconds * 1000);
     try {
+      if(taskMode){
+        if(snapshot.executionTarget?.kind!=='local'||snapshot.executionTarget.backend?.kind!=='openshell'||typeof this.createExecutor!=='function')throw Error('TASK_EXECUTION_REQUIRED: 任务执行只能使用已配置的 OpenShell 任务执行器');
+        if(snapshot.recovery)throw Error('TASK_RECOVERY_UNAVAILABLE: 任务检查点恢复链路尚未完成');
+        sandbox=this.createExecutor(archive,snapshot);
+        if(!sandbox||['prepare','prepareTask','bindAttempt','execute','close'].some(name=>typeof sandbox[name]!=='function'))throw Error('TASK_EXECUTION_REQUIRED: 任务执行器缺少可信接口');
+        // The root is a compatibility cache, never the publication authority.
+        // Rebuild it from the committed head before supervisor/Handoff reads.
+        await sandbox.prepare(job.controller.signal);job.controller.signal.throwIfAborted();
+      }else sandbox=this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id,join(archive.dir,'artifacts'));
+      supervisor=new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
+      const durableArchive=archive;
+      archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
+      archive.append('runtime/supervision',{version:1,progressTimeoutSeconds:snapshot.policy.progressTimeoutSeconds??300,repeatActionLimit:snapshot.policy.repeatActionLimit??8,repeatErrorLimit:snapshot.policy.repeatErrorLimit??3,maxReadRetries:snapshot.policy.maxReadRetries??2});
       goal = new GoalGuard({ snapshot, archive, onFailure: error => { runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error); } });
-      await sandbox.prepare?.(job.controller.signal);
+      if(!taskMode)await sandbox.prepare?.(job.controller.signal);
       for (const file of snapshot.recovery?.files ?? []) {
         if (inspectArtifact(sandbox.root,file).sha256 !== file.sha256) throw Error('RECOVERY_FILE_CHANGED: ' + file.path);
       }
@@ -172,7 +181,7 @@ export class ProductDshRuntime {
       archive.append('run/finished', { status: 'completed', tasks: status.tasks, summary, usageCost: usages.reduce((sum, usage) => sum + usage.cost, 0) });
       return { status: 'completed', usages, summary };
     } catch (error) {
-      supervisor.stop(error); adapter?.stopAdmission(error);
+      supervisor?.stop(error); adapter?.stopAdmission(error);
       try {
         if (!job.cancelled && !job.deadlineExceeded && !job.controller.signal.aborted && adapter?.pendingRequests) {
           archive.append('runtime/model-settling', { maxWaitMs: 30000, pendingRequests: adapter.pendingRequests });
@@ -192,7 +201,7 @@ export class ProductDshRuntime {
       return { status: job.cancelled ? 'cancelled' : 'failed', usages, message };
     } finally {
       clearTimeout(timer);
-      await sandbox.close();
+      await sandbox?.close?.();
       job.host = undefined;
     }
   }

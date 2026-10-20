@@ -15,6 +15,14 @@ import { commandEvidence, nodeTestCounts, localOperationEvidence, captureBudgetE
 const sha = value => createHash('sha256').update(value).digest('hex');
 const childEnv = { ...process.env }; delete childEnv.NODE_TEST_CONTEXT;
 const summary = '# tests 2\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 1\n# todo 0\n';
+test('task sandbox command validity compares its accepted work revision while canonical includes unrelated files',()=>{
+ const work='a'.repeat(64),canonical='b'.repeat(64),key={runId:'run',taskId:'a',attemptId:'attempt',generation:1};
+ const tasks=[{id:'a',dependencies:[]},{id:'b',dependencies:['a']}],snapshot={tasks},record={taskId:'a',attemptId:'attempt',runId:'run',workspaceRevision:canonical,sandboxWorkRevision:work,taskExecution:{profile:'task-attempt-openshell-v1',key},commands:[{command:'check',exitCode:0,workspaceRevision:work,taskExecution:{profile:'task-attempt-openshell-v1',key,afterWorkRevision:work}}]};
+ const evidence=taskRunEvidence({snapshot,taskId:'b',state:{tasks:[{id:'a',status:'completed',attemptId:'attempt'}]},taskIds:new Map(),handoff:{tasks:new Map(tasks.map(t=>[t.id,t])),committed:new Map([['a',record]])},runId:'run'});
+ assert.equal(evidence.completedAncestors[0].commands[0].validAtAccepted,true);
+ record.commands[0].taskExecution.key={...key,generation:2};
+ assert.equal(taskRunEvidence({snapshot,taskId:'b',state:{tasks:[{id:'a',status:'completed',attemptId:'attempt'}]},taskIds:new Map(),handoff:{tasks:new Map(tasks.map(t=>[t.id,t])),committed:new Map([['a',record]])},runId:'run'}).completedAncestors[0].commands[0].validAtAccepted,false);
+});
 test('source checkpoint retains durable admission call provenance while old inherited snapshots keep the wire basis', () => {
   const callsBasis = 'durable-admissions-and-archived-wire-requests';
   const snapshot = { projectId: 'project', planVersion: 8, executionBudget: .7, costCarryover: { recordedCost: .2, reserved: .096526 },

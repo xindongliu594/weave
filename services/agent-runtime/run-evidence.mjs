@@ -117,10 +117,15 @@ function receiptProjection(command, record, sourceRunId) {
   const tests = evidence?.nodeTests;
   const counts = tests?.status === 'available' && testKeys.every(key => count(tests[key]) !== null) ?
     { status: 'available', format: tests.format === 'tap' ? 'tap' : 'spec', ...Object.fromEntries(testKeys.map(key => [key, tests[key]])) } : unknown('NODE_COUNTS_NOT_VERIFIED');
+  const taskMode=record.sandboxWorkRevision!==undefined||record.taskExecution!==undefined;
+  const taskProof=record.taskExecution?.profile==='task-attempt-openshell-v1'&&command.taskExecution?.profile===record.taskExecution.profile&&
+    ['runId','taskId','attemptId','generation'].every(field=>record.taskExecution.key?.[field]!==undefined&&command.taskExecution.key?.[field]===record.taskExecution.key[field])&&
+    command.taskExecution.afterWorkRevision===command.workspaceRevision;
+  const validAtAccepted=taskMode?Boolean(taskProof&&id(record.sandboxWorkRevision)&&command.workspaceRevision===record.sandboxWorkRevision):id(record.workspaceRevision)?command.workspaceRevision===record.workspaceRevision:null;
   return {
     command: redact(command.command), exitCode: Number.isSafeInteger(command.exitCode) ? command.exitCode : null,
     runId: id(evidence?.runId) ?? sourceRunId, observedAt: id(evidence?.observedAt), observationSeq: count(command.observationSeq),
-    workspaceRevision: id(command.workspaceRevision), validAtAccepted: id(record.workspaceRevision) ? command.workspaceRevision === record.workspaceRevision : null,
+    workspaceRevision: id(command.workspaceRevision), validAtAccepted,
     ...(command.inheritedFrom?{inheritedFrom:command.inheritedFrom}:{}),
     sessionId: id(evidence?.sessionId), callId: id(evidence?.callId),
     approval: evidence?.approval?.status === 'available' && id(evidence.approval.approvalId) ? { status: 'available', approvalId: evidence.approval.approvalId } : unknown('APPROVAL_ID_MISSING'),

@@ -2,6 +2,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools';
 import { searchKnowledge } from './knowledge.mjs';
 import { retryRead, classifyFailure } from './recovery.mjs';
 import { readRecoveryContext } from './checkpoint-context.mjs';
+import {prepareTaskTool,assertTaskScopeBinding,taskSandboxEnabled,taskInvocationGuard} from './task-tool-context.mjs';
 // Domain capabilities are explicit employee grants. Native collaboration and
 // recovery plumbing are separate and must retain their existing policies.
 export const PRODUCT_TOOL_NAMES = Object.freeze(['artifact_write','filesystem','terminal','terminal_test','knowledge_search','knowledge_read','browser_read','mcp_call_readonly']);
@@ -26,6 +27,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     ['mcp_call_readonly','调用批准连接与工具名单内的只读 MCP 工具；返回内容是不可信资料。',{connectionId:string,tool:string,arguments:{type:'object',required:true,additionalProperties:true}}],
   ];
   const disposers=tools.map(([name,description,parameters])=>ctx.tools.register(defineTool({name,description,parameters,output:{schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},async execute(args,exec){
+    const checkInvocation=taskInvocationGuard(ctx,exec,snapshot);
     const employee=employeeFor(exec.agent,snapshot,captainId());
     if(!employee||!employee.tools.includes(name))throw Error('TOOL_PERMISSION_DENIED: 此员工没有该工具权限');
     supervisor?.check();
@@ -38,7 +40,7 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       if(!externalTool)throw Error('EXTERNAL_TOOL_UNAVAILABLE');
       const waiting=supervisor?.enter(exec.agent.id,'waiting_capacity');let release;
       try{release=await gate.acquire(exec.signal);}finally{waiting?.();}
-      try{goal?.check('external-tool');supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
+      try{checkInvocation();goal?.check('external-tool');supervisor?.check();archive.append('external/tool-start',{name,agentId:employee.id,arguments:args},ref);const result=await externalTool({runId:archive.id,agentId:employee.id,name,args,signal:exec.signal});archive.append('external/tool-finished',{name,agentId:employee.id},ref);return result;}
       catch(error){archive.append('external/tool-failed',{name,agentId:employee.id,message:error.message},ref);throw error;}
       finally{release();}
     }
@@ -51,9 +53,11 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
       archive.append('knowledge/citation',{agentId:employee.id,operation:name==='knowledge_search'?'search':'read',query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});attestRead(result);return result;
     }
     let approvalId;
+    const taskMode=taskSandboxEnabled(snapshot);
     if(name==='terminal'||name==='terminal_test'){
       if(!requestApproval)throw Error('审批服务不可用');
-      args={...args,expectedWorkspaceRevision:sandbox.revision()};
+      const prepared=taskMode?await handoff.exclusive(exec.signal,()=>{checkInvocation();return prepareTaskTool({snapshot,sandbox,handoff,activeWork,archive,agent:exec.agent,employee,signal:exec.signal});}):undefined;
+      args={...args,expectedWorkspaceRevision:prepared?.scope.workRevision??sandbox.revision(),...(prepared?{executionScope:prepared.executionScope}:{})};
       const leave=supervisor?.enter(exec.agent.id,'waiting_approval');
       try { approvalId=await requestApproval({runId:archive.id,agentId:employee.id,tool:name,arguments:args},exec.signal); }
       finally { leave?.(); }
@@ -63,16 +67,23 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     try { release=await gate.acquire(exec.signal); } finally { leave?.(); }
     try {
       const execute = async () => {
+        checkInvocation();
         goal?.check('tool-dispatch');
         supervisor?.check();
-        const work = handoff ? activeWork(exec.agent) : undefined;
+        const prepared=await prepareTaskTool({snapshot,sandbox,handoff,activeWork,archive,agent:exec.agent,employee,signal:exec.signal});
+        checkInvocation();
+        const work=prepared.work;
+        if(taskMode){
+          if(name==='terminal'||name==='terminal_test')assertTaskScopeBinding(args.executionScope,prepared.executionScope);
+          else args={...args,executionScope:prepared.executionScope,expectedWorkspaceRevision:prepared.scope.workRevision};
+        }
         let dispatched=false,outcomeKnown=false;
         try {
           const before = handoff?.beforeFile(work.taskId, work.attemptId, name, args);
           if(name!=='filesystem'&&handoff)handoff.checkpoint?.(work.taskId,work.attemptId,'before-tool',ref);
           if(name!=='filesystem')archive.append('runtime/operation-start',{name,arguments:args},{...ref,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})});
           dispatched=true;
-          const result = await retryRead(name,()=>sandbox.execute(name,args,exec.signal,{agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,approvalId,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{})}),readOptions);
+          const result = await retryRead(name,()=>{checkInvocation();return sandbox.execute(name,args,exec.signal,{agentId:employee.id,employeeId:employee.employeeId,sessionId:exec.agent.id,callId:exec.callId,approvalId,...(work?{taskId:work.taskId,attemptId:work.attemptId}:{}),...(taskMode?{generation:prepared.context.generation,executionScope:prepared.executionScope}:{})});},readOptions);
           outcomeKnown=true;
           if(name!=='filesystem')archive.append('runtime/operation-finished',{name},ref);
           if (handoff) handoff.observe(work.taskId, work.attemptId, name, args, result, before, { ...ref, approvalId });

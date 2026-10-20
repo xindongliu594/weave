@@ -1,7 +1,25 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {LlmAdapter,createUserMessage} from '@deepseek-ai/dsh-llm';import {createTeamHost} from './host.mjs';import {Semaphore} from './limits.mjs';import {createRunArchive} from './trace-store.mjs';import {PRODUCT_TOOL_NAMES} from './product-tools.mjs';
+import {defineTool} from '@deepseek-ai/dsh-tools';
 class NeverModel extends LlmAdapter{providerInfo(){return{id:'fixture',name:'fixture'};}async resolveModel(){return{provider:'fixture',id:'test',name:'test'};}async *stream(){throw Error('Unexpected model call');}}
+
+test('task profile rejects late coordinator and scoped shadow tool bodies in the actual Host',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'task-host-boundary-'));let host,bodies=0;
+ const snapshot={executionProfile:'task-attempt-openshell-v1',agents:[{id:'manager',role:'manager',tools:['knowledge_search']}],knowledge:{manager:[]}};
+ const archive=createRunArchive(root,snapshot);
+ const definition=name=>defineTool({name,description:name,parameters:{},output:{schema:{type:'json'},render:()=>[]},execute:async()=>{bodies++;return{};}});
+ try{
+  host=await createTeamHost({adapter:new NeverModel(),provider:'fixture',sessionRoot:join(root,'sessions'),archive,product:{snapshot,gate:new Semaphore(1)}});
+  const captain=await host.captain({cwd:root,model:'test'});
+  host.ctx.tools.register(definition('late_tool'));
+  let result=await host.ctx.tools.execute({callId:'late-body',name:'late_tool',arguments:{},agent:captain,signal:AbortSignal.timeout(1000)});
+  assert.equal(result.isError,true);assert.equal(bodies,0,'late unapproved body must never run');assert.match(result.error.message,/TASK_TOOL/);
+  captain.ctx.tools.register(definition('knowledge_search'));
+  result=await captain.ctx.tools.execute({callId:'shadow-body',name:'knowledge_search',arguments:{},agent:captain,signal:AbortSignal.timeout(1000)});
+  assert.equal(result.isError,true);assert.equal(bodies,0,'scope-local replacement must never run');assert.match(result.error.message,/TASK_TOOL|TOOL_PERMISSION/);
+ }finally{await host?.close();await rm(root,{recursive:true,force:true,maxRetries:3,retryDelay:100});}
+});
 
 test('a queued external tool rechecks a goal pause after capacity is released',async()=>{
  const {GoalGuard}=await import('./goal-guard.mjs');const {createGoalContract}=await import('../../packages/contracts/goal-contract.mjs');

@@ -1,0 +1,118 @@
+{
+  "baseCommit": "45aa3e6b28649cd5b6c2f6a5bb60ada1d17ed226",
+  "scope": "B2 Task4 local engineering integration; no physical sandbox or real model claims",
+  "files": [
+    {
+      "path": "apps/api/src/execution-backend.ts",
+      "sha256": "f43c052bf564d737f7a7bae2dae85fbfba9ca07d85263197eaf989512cb272d4"
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256": "e9394ca4c1a6068b1c26026b7625a2e8ba7f33fbc23bf2af3e9b318024b5ee20"
+    },
+    {
+      "path": "apps/api/src/task-operation-admission.ts",
+      "sha256": "68e5ae5101b30c0ab17569f023e629a084ea3b12982a156ed2bf487b5cc3bfc9"
+    },
+    {
+      "path": "apps/api/src/task-execution.ts",
+      "sha256": "998fbc94987eeec4dffa43c32e5b8ff1d3d06499186d4c2b1d903f679088368f"
+    },
+    {
+      "path": "apps/api/src/task-canonical.ts",
+      "sha256": "420aa37b89abaf95b4c437bf1af1a83c49538d5d897e5718e8f98c8b013555b1"
+    },
+    {
+      "path": "apps/desktop/openshell-executor.cjs",
+      "sha256": "489c6d5200dc680cf21428406ddb70995bf794f5351ec14055566d7c1d7a8dbe"
+    },
+    {
+      "path": "apps/desktop/openshell-executor.test.cjs",
+      "sha256": "1b0e1564045e10367ef244cad6c13459863c3fa0a14d82b944bdedd2ed6fb95b"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256": "e31b37fc18edff2b3ba087a72eb441919d93feacdc7c8b4c1f8996aa420c405a"
+    },
+    {
+      "path": "services/agent-runtime/employee-tool-access.mjs",
+      "sha256": "e5d0d3c6d00538a9ef994308ba718136d427477c5953b0454c968cab128219b6"
+    },
+    {
+      "path": "services/agent-runtime/handoff.mjs",
+      "sha256": "e892286e1f3be84a9d213ab4b73be3568183b46aa622d019e946e94ca0fea2ab"
+    },
+    {
+      "path": "services/agent-runtime/handoff.d.mts",
+      "sha256": "7606ed3a399ee4d8c66e425f0cd157af4a783d3dcdc86f5397deeee609519b3b"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "sha256": "d6eda7c2e12da3095af734a9ddcceeb6692968836bb72a7a28ed19028dc876c1"
+    },
+    {
+      "path": "services/agent-runtime/native-plugin-tools.mjs",
+      "sha256": "a03958fd414fdd6930c3d13932558566c55477ae8e96ecd12eef017959a104f5"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "2d4d38c33fd067319f1317ff50743ba3bd8cd9fb40a8e4d7a8f5628ef95ceded"
+    },
+    {
+      "path": "services/agent-runtime/product-tools.mjs",
+      "sha256": "258138d0125278f8a83dcabc50b3b83f2228584047ddea6b8d567211f49ee991"
+    },
+    {
+      "path": "services/agent-runtime/product-tools.test.mjs",
+      "sha256": "3472cf1cfa42dfc65a19f7994fd8b071241bd436be8dc0327cb7241af57ef4e9"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "ae61a3d3c27e2d57a8b3e6f34b9a6311265fdecb0e2a1a96c32e9a5df6576b67"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.test.mjs",
+      "sha256": "948c383a41f1d39681c9d03e770bcb24e52e8d6db7a64d48fe1eeb52c5747251"
+    },
+    {
+      "path": "services/agent-runtime/task-tool-context.mjs",
+      "sha256": "66b5c9a6fdd92fa609730a2c8d581d46c1c8802f1b2be7f614a1dcd10f77ab24"
+    },
+    {
+      "path": "services/agent-runtime/task-tool-boundary.mjs",
+      "sha256": "0513bd2f63260406f94f0b10ce6c6a3a24acd54ed67587de55d8f6670fb350b4"
+    },
+    {
+      "path": "services/agent-runtime/task-tool-boundary.test.mjs",
+      "sha256": "f6fbd94d0d1af9262657cfeec826e45938ddefb8d007ed51bcc395e205d8c810"
+    },
+    {
+      "path": "services/agent-runtime/task-sandbox-flow.test.mjs",
+      "sha256": "9ba00a34f37b6a99ad114c69c627696c8a41a6e79ec68e619f94ed70a33ca83f"
+    },
+    {
+      "path": "services/agent-runtime/task-readonly-handoff.test.mjs",
+      "sha256": "1c5e80474165b7dc735a1b0879a115d4924e8365fc9f73d2244c710244e35007"
+    },
+    {
+      "path": "tests/task-operation-bridge.test.ts",
+      "sha256": "a71bd046e5d1e3411778274703c5e317fcf95483e4c6b6dfef9b94e2afb02270"
+    },
+    {
+      "path": "tests/task-sandbox-flow.test.ts",
+      "sha256": "aa2b18cab9acab97a12c65f8a3e6ab7cbd9be47bc6d072300418c1f5bf05ef0d"
+    },
+    {
+      "path": "tests/execution-backend.test.ts",
+      "sha256": "534a83ed47fb19398c3ef7461fc6b1efab4e46d1e2050091dbb9a989d1eb2783"
+    },
+    {
+      "path": "tests/task-canonical.test.ts",
+      "sha256": "a5af3e91dfb088c896874c8a8af12b04daf2cd1804b9b77642a9373fdbf45979"
+    },
+    {
+      "path": "tests/task-execution-scope.test.ts",
+      "sha256": "ba54a0a257871655e3c79bf3caa40681e483d9bc6db8eb8098b548a50e39dcc1"
+    }
+  ]
+}
