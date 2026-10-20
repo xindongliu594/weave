@@ -11,6 +11,7 @@ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const MAX_TASK_EXEC_STDIN_BYTES=3*1024*1024;
 const taskProfile='task-attempt-openshell-v1';
+const ACCEPTED_STOP_CAPABILITIES=Object.freeze({version:1,deadline:'shared-abort-v1'});
 const digest=/^[a-f0-9]{64}$/;
 function taskKey(value){
  if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).sort().join(',')!=='attemptId,generation,runId,taskId'||
@@ -107,16 +108,19 @@ function atomicJson(file,value){
 function cliTransport(cliPath,args,{env,input,signal,timeoutMs=30000,maxOutput=32*1024*1024}={}){
  signal?.throwIfAborted();return new Promise((resolve,reject)=>{
   const child=spawn(cliPath,args,{env,stdio:['pipe','pipe','pipe'],windowsHide:true});
-  let stdout=[],stderr=[],bytes=0,spawned=false,settled=false;
+  let stdout=[],stderr=[],bytes=0,spawned=false,settled=false,abortError;
   const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);error?reject(error):resolve(value);};
-  const abort=()=>{child.kill('SIGKILL');finish(Object.assign(Error('OpenShell 连接中断；远端结果待核对'),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:!spawned}));};
+  // A failed kill is not settlement; only the original child's close is proof.
+  const kill=()=>{try{child.kill('SIGKILL');}catch{}};
+  const abort=()=>{if(settled||abortError)return;abortError=Object.assign(Error('OpenShell 连接中断；远端结果待核对'),{code:'LOCAL_OUTCOME_UNKNOWN',notExecuted:!spawned});clearTimeout(timer);signal?.removeEventListener('abort',abort);if(spawned)kill();};
   const timer=setTimeout(abort,timeoutMs);signal?.addEventListener('abort',abort,{once:true});
   const collect=list=>chunk=>{bytes+=chunk.length;if(bytes>maxOutput){abort();}else list.push(chunk);};
   child.stdout.on('data',collect(stdout));child.stderr.on('data',collect(stderr));
-  child.once('spawn',()=>{spawned=true;if(signal?.aborted)abort();else child.stdin.end(input??'');});
+  child.once('spawn',()=>{spawned=true;if(abortError){abortError.notExecuted=false;kill();}else if(signal?.aborted)abort();else child.stdin.end(input??'');});
   child.stdin.on('error',()=>{}); // Close/error is classified by the retained CLI result.
-  child.once('error',error=>finish(Object.assign(error,{notExecuted:!spawned})));
-  child.once('close',code=>{if(code===null)return finish(unknown('OpenShell CLI 未取得确定退出码'));finish(null,{exitCode:code,stdout:Buffer.concat(stdout).toString('utf8'),stderr:Buffer.concat(stderr).toString('utf8')});});
+  child.once('error',error=>{if(!spawned)finish(Object.assign(error,{notExecuted:true}));else abort();});
+  child.once('close',code=>{if(abortError)return finish(abortError);if(code===null)return finish(unknown('OpenShell CLI 未取得确定退出码'));finish(null,{exitCode:code,stdout:Buffer.concat(stdout).toString('utf8'),stderr:Buffer.concat(stderr).toString('utf8')});});
+  if(signal?.aborted)abort();
  });
 }
 
@@ -242,6 +246,7 @@ class OpenShellDeviceExecutor {
  save(scope){const key=scope.schema===2?scope.key:scope.runId;atomicJson(scope.schema===2?this.taskStateFile(key):this.stateFile(key),scope);this.scopes.set(scope.schema===2?taskFileName(key):scope.runId,scope);}
  async cli(args,signal,{input,timeoutMs=30000,mutation=false}={}){
   signal?.throwIfAborted();const response=await this.transport(this.config.cliPath,['--gateway',this.config.gateway,...args],{env:this.env,input,signal,timeoutMs});
+  signal?.throwIfAborted();
   if(response.exitCode!==0)throw mutation?unknown('OpenShell 外部操作没有完整成功回执，拒绝自动重放'):denied('OpenShell 状态查询失败','OPENSHELL_STATUS_UNAVAILABLE');return response;
  }
  async get(scope,signal){const value=JSON.parse((await this.cli(['sandbox','get',scope.name,'--output','json'],signal)).stdout);if(value.name!==scope.name||scope.sandboxId&&value.id!==scope.sandboxId||!uuid.test(value.id))throw denied('OpenShell 沙箱身份已变化','OPENSHELL_IDENTITY_MISMATCH');return value;}
@@ -388,7 +393,21 @@ class OpenShellDeviceExecutor {
    const runId=entry.name.slice(0,-5);try{const scope=this.read(runId);rows.push({runId,sandboxId:scope.sandboxId,name:scope.name,phase:scope.phase,workspaceRevision:scope.workspaceRevision,storage:scope.storage,retirement:scope.retirement});}catch{rows.push({runId,phase:'unverified',error:'映射授权或格式未核对'});}
   }}finally{dir.closeSync();}return [...rows,...this.taskScopeRows()];
  }
- maintenance(fn){if(this.closing||this.closed)return Promise.reject(denied('OpenShell 执行器已关闭'));const task=this.queue.then(fn);this.queue=task.catch(()=>{});return task;}
+ maintenance(fn,signal){
+  if(this.closing||this.closed)return Promise.reject(denied('OpenShell 执行器已关闭'));
+  if(!signal){const task=this.queue.then(fn);this.queue=task.catch(()=>{});return task;}
+  if(signal.aborted)return Promise.reject(signal.reason);
+  let state='pending',resolveCaller,rejectCaller;
+  const caller=new Promise((resolve,reject)=>{resolveCaller=resolve;rejectCaller=reject;});
+  const abort=()=>{if(state!=='pending')return;state='cancelled';signal.removeEventListener('abort',abort);rejectCaller(signal.reason);};
+  signal.addEventListener('abort',abort,{once:true});
+  const task=this.queue.then(async()=>{
+   if(state==='cancelled')return;if(signal.aborted){abort();return;}
+   state='started';signal.removeEventListener('abort',abort);
+   try{signal.throwIfAborted();const result=await fn();signal.throwIfAborted();resolveCaller(result);}catch(error){rejectCaller(error);}
+  });
+  this.queue=task.catch(()=>{});return caller;
+ }
  async inspectTaskExportNow(scope,operationId,signal){
   if(scope.acceptedStop)throw denied('已验收停止意图已封存，禁止重新导出');
   await this.admit(scope,signal);
@@ -414,17 +433,23 @@ class OpenShellDeviceExecutor {
   if(canonicalConfigFingerprint(this.config)!==this.backend.fingerprint)throw denied('停止前 OpenShell 固定配置已变化','OPENSHELL_CONFIG_MISMATCH');
  }
  async observeAcceptedTaskStop(scope,signal){
+  signal.throwIfAborted();
   this.assertAcceptedStopGrant(scope.key);
   await this.assertGatewayIdentity(signal);
+  signal.throwIfAborted();
   const state=JSON.parse((await this.cli(['sandbox','get',scope.sandboxId,'--output','json'],signal)).stdout);
+  signal.throwIfAborted();
   if(state.id!==scope.sandboxId||state.name!==scope.name)throw denied('原停止沙箱身份不匹配','OPENSHELL_IDENTITY_MISMATCH');
   if(state.phase!=='Stopped'||state.configuration_admission?.state!=='accepted'||state.configuration_admission.policy_hash!==OPENSHELL_CONSTANTS.effectivePolicyHash)throw unknown('原沙箱未取得受准入的 Stopped 状态');
  }
- async reconcileAcceptedTaskStopNow(key,identity){
+ acceptedStopCapabilities(){return ACCEPTED_STOP_CAPABILITIES;}
+ async reconcileAcceptedTaskStopNow(key,identity,signal){
+  signal.throwIfAborted();
   const scope=this.read(key);
   if(!scope?.acceptedStop||!isDeepStrictEqual(checkedAcceptedStop(scope),identity))throw denied('没有匹配原请求的停止意图，不能核对');
   try{
-   await this.observeAcceptedTaskStop(scope,AbortSignal.timeout(120000));
+   await this.observeAcceptedTaskStop(scope,signal);
+   signal.throwIfAborted();
    this.assertAcceptedStopGrant(key);
    if(!isDeepStrictEqual(this.read(key),scope))throw denied('核对期间任务停止记录已变化');
    const result=acceptedStopResult(identity);scope.phase='stopped';scope.accepted=true;scope.acceptedStop={...scope.acceptedStop,stage:'stopped_confirmed',result};this.save(scope);return result;
@@ -434,20 +459,23 @@ class OpenShellDeviceExecutor {
    throw unknown('原任务停止结果待核对，禁止重发停止');
   }
  }
- reconcileAcceptedTaskStop(key,expected){
+ reconcileAcceptedTaskStop(key,expected,signal){
+  signal??=AbortSignal.timeout(120000);
   let identity;try{identity=acceptedStopIdentity(expected);if(!isDeepStrictEqual(taskKey(key),identity.key))throw denied('停止核对任务身份不同');}catch(error){return Promise.reject(error);}
-  return this.maintenance(()=>this.reconcileAcceptedTaskStopNow(identity.key,identity));
+  return this.maintenance(()=>this.reconcileAcceptedTaskStopNow(identity.key,identity,signal),signal);
  }
- stopAcceptedTask(key,expected,beforeDispatch){
+ stopAcceptedTask(key,expected,beforeDispatch,signal){
+  signal??=AbortSignal.timeout(120000);
   let identity;try{identity=acceptedStopIdentity(expected,true);if(!isDeepStrictEqual(taskKey(key),identity.key)||typeof beforeDispatch!=='function')throw denied('停止任务身份或可信回调缺失');}catch(error){return Promise.reject(error);}
   return this.maintenance(async()=>{
    const scope=this.read(identity.key);
    if(!scope||scope.sandboxId!==identity.sandboxId||scope.workspaceRevision!==identity.workspaceRevision)throw denied('停止目标与原任务沙箱或工作版本不同');
-   if(scope.acceptedStop)return this.reconcileAcceptedTaskStopNow(identity.key,identity);
+   if(scope.acceptedStop)return this.reconcileAcceptedTaskStopNow(identity.key,identity,signal);
    if(scope.phase!=='ready'||scope.activeOperation||scope.commandFence||scope.retirement)throw unknown('任务沙箱状态未核对，不能停止');
    this.assertAcceptedStopGrant(identity.key);
-   const signal=AbortSignal.timeout(120000);await this.admit(scope,signal);
+   await this.admit(scope,signal);signal.throwIfAborted();
    await beforeDispatch();
+   signal.throwIfAborted();
    // No await may separate this fresh authority/journal check from the durable
    // intent and the one external stop dispatch.
    this.assertAcceptedStopGrant(identity.key);
@@ -455,13 +483,13 @@ class OpenShellDeviceExecutor {
    scope.phase='stopping';scope.acceptedStop={identity,stage:'stop_intent',intentAt:new Date().toISOString()};this.save(scope);
    try{
     await this.cli(['sandbox','stop',scope.name],signal,{mutation:true,timeoutMs:90000});
-    return await this.reconcileAcceptedTaskStopNow(identity.key,identity);
+    return await this.reconcileAcceptedTaskStopNow(identity.key,identity,signal);
    }catch(error){
     const current=this.read(identity.key);
     if(current?.acceptedStop&&isDeepStrictEqual(current.acceptedStop.identity,identity)&&current.acceptedStop.stage==='stop_intent'){current.phase='unknown';current.lastError={code:error.code??'LOCAL_OUTCOME_UNKNOWN',message:'任务停止结果待核对',notExecuted:false};this.save(current);}
     throw unknown('任务停止结果待核对，禁止重发停止');
    }
-  });
+  },signal);
  }
  inspectStorage(runId){return this.maintenance(()=>this.inspectStorageNow(runId));}
  async inspectStorageNow(runId){

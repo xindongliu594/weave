@@ -77,6 +77,173 @@ function acceptedStopExpected(scope){return {version:1,stopId:randomUUID(),key:{
 function stopIdentity({version,stopId,key,sandboxId,workspaceRevision,proofDigest}){return {version,stopId,key,sandboxId,workspaceRevision,proofDigest};}
 const mutationCalls=calls=>calls.filter(call=>['create','stop','start','exec','delete'].includes(call.args[3]));
 
+const nextTurn=()=>new Promise(done=>setImmediate(done));
+function tracked(promise){const state={settled:false};state.outcome=promise.then(value=>({value}),error=>({error})).then(outcome=>{state.settled=true;return outcome;});return state;}
+function localTransportFixture({kill='success'}={}){
+ const child=new EventEmitter();child.stdin=new EventEmitter();child.stdin.end=()=>{};child.stdout=new EventEmitter();child.stderr=new EventEmitter();
+ const state={child,kills:0,spawns:0};child.kill=()=>{state.kills++;if(kill==='throw')throw Error('fixture kill failed');return kill!=='false';};
+ const module={exports:{}};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'openshell-executor.cjs'),'utf8'),{
+  require:name=>name==='node:child_process'?{spawn:()=>{state.spawns++;return child;}}:require(name),module,Buffer,process,AbortSignal,
+  setTimeout:fn=>{state.timeout=fn;return 1;},clearTimeout:()=>{},
+ });
+ state.transport=module.exports.cliTransport;return state;
+}
+
+test('maintenance shared deadline permanently skips a pending cancellation without reordering the queue',async()=>{
+ const f=fixture();let release;
+ try{
+  const order=[],blocker=f.executor.maintenance(()=>new Promise(done=>{release=()=>{order.push('A');done();};}));await nextTurn();
+  const control=new AbortController(),reason=Error('fixture deadline');
+  const pending=tracked(f.executor.maintenance(()=>{order.push('B');},control.signal));
+  const tail=f.executor.maintenance(()=>{order.push('C');return 7;});control.abort(reason);await nextTurn();
+  assert.equal(pending.settled,true,'cancelled caller must finish while A is held');assert.equal((await pending.outcome).error,reason);assert.deepEqual(order,[]);
+  release();await blocker;assert.equal(await tail,7);assert.deepEqual(order,['A','C']);
+  await assert.rejects(f.executor.maintenance(()=>{order.push('aborted');},control.signal),error=>error===reason);await f.executor.queue;
+  assert.deepEqual(order,['A','C']);
+ }finally{release?.();await f.executor.queue;f.cleanup();}
+});
+
+test('maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener',async()=>{
+ const f=fixture();let release;
+ try{
+  const control=new AbortController(),signal=control.signal,add=signal.addEventListener.bind(signal),remove=signal.removeEventListener.bind(signal),listeners=new Set();
+  signal.addEventListener=(event,fn,options)=>{if(event==='abort')listeners.add(fn);return add(event,fn,options);};
+  signal.removeEventListener=(event,fn)=>{if(event==='abort')listeners.delete(fn);return remove(event,fn);};
+  const pending=tracked(f.executor.maintenance(async()=>{await new Promise(done=>{release=done;});signal.throwIfAborted();},signal));
+  assert.equal(listeners.size,1);await nextTurn();assert.equal(listeners.size,0);
+  let next=false;const tail=f.executor.maintenance(()=>{next=true;});control.abort(Error('started cancellation'));await nextTurn();
+  assert.equal(pending.settled,false);assert.equal(next,false);release();assert.equal((await pending.outcome).error,signal.reason);await tail;assert.equal(next,true);assert.equal(listeners.size,0);
+ }finally{await nextTurn();release?.();await f.executor.queue;f.cleanup();}
+});
+
+test('maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller',async()=>{
+ const f=fixture();let release;
+ try{
+  f.executor.maintenance(()=>new Promise(done=>{release=done;}));await nextTurn();
+  const control=new AbortController(),signal=control.signal,add=signal.addEventListener.bind(signal),remove=signal.removeEventListener.bind(signal),listeners=new Set();
+  signal.addEventListener=(event,fn,options)=>{if(event==='abort')listeners.add(fn);return add(event,fn,options);};
+  signal.removeEventListener=(event,fn)=>{if(event==='abort')listeners.delete(fn);return remove(event,fn);};
+  const pending=tracked(f.executor.maintenance(()=>assert.fail('cancelled fn ran'),signal));assert.equal(listeners.size,1);
+  control.abort();await nextTurn();assert.equal(pending.settled,true);assert.equal(listeners.size,0);assert.equal((await pending.outcome).error,signal.reason);
+ }finally{release?.();await f.executor.queue;f.cleanup();}
+});
+
+test('accepted stop shared deadline expires in queue with no callback intent or later stop',async()=>{
+ const f=fixture();let release;
+ try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key));
+  f.executor.maintenance(()=>new Promise(done=>{release=done;}));await nextTurn();
+  const control=new AbortController(),before=f.calls.length;let callbacks=0;
+  const pending=tracked(f.executor.stopAcceptedTask(key,expected,async()=>{callbacks++;},control.signal));control.abort(Error('fixture shared deadline'));await nextTurn();
+  assert.equal(pending.settled,true);assert.equal((await pending.outcome).error,control.signal.reason);
+  release();await f.executor.queue;assert.equal(callbacks,0);assert.equal(f.executor.read(key).phase,'ready');assert.equal(f.executor.read(key).acceptedStop,undefined);assert.equal(f.calls.length,before);
+ }finally{release?.();await f.executor.queue;f.cleanup();}
+});
+
+test('accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent',async()=>{
+ for(const stage of ['entry','callback']){
+  const f=fixture();try{
+   const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),control=new AbortController(),reason=Error('fixture '+stage),before=f.calls.length;let callbacks=0;
+   if(stage==='entry')control.abort(reason);
+   await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{callbacks++;await Promise.resolve();control.abort(reason);},control.signal),error=>error===reason);
+   assert.equal(callbacks,stage==='entry'?0:1);assert.equal(f.executor.read(key).phase,'ready');assert.equal(f.executor.read(key).acceptedStop,undefined);
+   assert.equal(f.calls.slice(before).filter(call=>call.args[3]==='stop').length,0);if(stage==='entry')assert.equal(f.calls.length,before);
+  }finally{f.cleanup();}
+ }
+});
+
+test('accepted stop shared deadline passes one signal through admission stop and original ID observation',async()=>{
+ const f=fixture();try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),control=new AbortController(),transport=f.executor.transport,signals=[];
+  f.executor.transport=(cli,args,options)=>{signals.push(options.signal);return transport(cli,args,options);};
+  assert.equal((await f.executor.stopAcceptedTask(key,expected,async()=>{},control.signal)).phase,'stopped');assert.ok(signals.length>=6);assert.ok(signals.every(signal=>signal===control.signal));
+  signals.length=0;const before=f.calls.length;
+  await f.executor.stopAcceptedTask(key,expected,async()=>assert.fail('repeated stop callback'),control.signal);
+  await f.executor.reconcileAcceptedTaskStop(key,stopIdentity(expected),control.signal);
+  assert.ok(signals.length>=4);assert.ok(signals.every(signal=>signal===control.signal));assert.equal(mutationCalls(f.calls.slice(before)).length,0);
+  const saved=f.executor.read(key);assert.deepEqual(Object.keys(saved.acceptedStop.identity).sort(),['key','proofDigest','sandboxId','stopId','version','workspaceRevision']);
+ }finally{f.cleanup();}
+});
+
+test('accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation',async()=>{
+ const f=fixture(),timeout=AbortSignal.timeout,signals=[];let release;
+ try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),transport=f.executor.transport;
+  f.executor.transport=(cli,args,options)=>{signals.push(options.signal);return transport(cli,args,options);};
+  const fallbacks=[];AbortSignal.timeout=ms=>{assert.equal(ms,120000);const control=new AbortController();fallbacks.push(control);return control.signal;};
+  f.executor.maintenance(()=>new Promise(done=>{release=done;}));await nextTurn();
+  const pending=tracked(f.executor.stopAcceptedTask(key,expected,async()=>{}));assert.equal(fallbacks.length,1,'fallback must start before dequeue');release();
+  assert.equal((await pending.outcome).value.phase,'stopped');assert.equal(fallbacks.length,1);assert.ok(signals.every(signal=>signal===fallbacks[0].signal));
+  signals.length=0;await f.executor.reconcileAcceptedTaskStop(key,stopIdentity(expected));assert.equal(fallbacks.length,2);assert.ok(signals.every(signal=>signal===fallbacks[1].signal));
+ }finally{AbortSignal.timeout=timeout;release?.();await f.executor.queue;f.cleanup();}
+});
+
+test('accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement',async()=>{
+ const f=fixture();let release;
+ try{
+  const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key));await preparedTask(f,'B');
+  const control=new AbortController(),transport=f.executor.transport;
+  f.executor.transport=async(cli,args,options)=>{const result=await transport(cli,args,options);if(args[3]==='stop'){await new Promise(done=>{release=done;});options.signal.throwIfAborted();}return result;};
+  const pending=tracked(f.executor.stopAcceptedTask(key,expected,async()=>{},control.signal));
+  for(let i=0;i<20&&!release;i++)await nextTurn();assert.equal(typeof release,'function');assert.equal(f.executor.read(key).acceptedStop.stage,'stop_intent');
+  control.abort(Error('fixture dispatched deadline'));let next=false;const tail=f.executor.maintenance(()=>{next=true;});await nextTurn();assert.equal(pending.settled,false);assert.equal(next,false);
+  release();assert.equal((await pending.outcome).error?.code,'LOCAL_OUTCOME_UNKNOWN');await tail;
+  const saved=f.executor.read(key);assert.equal(saved.phase,'unknown');assert.equal(saved.acceptedStop.stage,'stop_intent');assert.deepEqual(saved.acceptedStop.identity,stopIdentity(expected));assert.throws(()=>f.executor.admitTaskCapacity(true),{code:'SANDBOX_STORAGE_LIMIT'});
+  const reopened=new OpenShellDeviceExecutor(f.options),before=f.calls.length;
+  assert.equal((await reopened.reconcileAcceptedTaskStop(key,stopIdentity(expected),new AbortController().signal)).phase,'stopped');
+  assert.equal(mutationCalls(f.calls.slice(before)).length,0);assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);assert.doesNotThrow(()=>reopened.admitTaskCapacity(true));
+ }finally{release?.();await f.executor.queue;f.cleanup();}
+});
+
+test('accepted stop shared deadline rejects late transport success before journal confirmation',async()=>{
+ for(const stage of ['stop','observation']){
+  const f=fixture();try{
+   const {key}=await preparedTask(f),expected=acceptedStopExpected(f.executor.read(key)),control=new AbortController(),transport=f.executor.transport;
+   f.executor.transport=async(cli,args,options)=>{const result=await transport(cli,args,options);if(stage==='stop'&&args[3]==='stop'||stage==='observation'&&args[3]==='get'&&args[4]===expected.sandboxId)control.abort(Error('fixture late success'));return result;};
+   await assert.rejects(f.executor.stopAcceptedTask(key,expected,async()=>{},control.signal),{code:'LOCAL_OUTCOME_UNKNOWN'});
+   assert.equal(f.executor.read(key).phase,'unknown');assert.equal(f.executor.read(key).acceptedStop.stage,'stop_intent');assert.equal(f.calls.filter(call=>call.args[3]==='stop').length,1);
+  }finally{f.cleanup();}
+ }
+});
+
+test('accepted stop capabilities advertise exact shared abort contract with a stable method reference',()=>{
+ const f=fixture();try{
+  assert.equal(typeof f.executor.acceptedStopCapabilities,'function');const method=f.executor.acceptedStopCapabilities;
+  assert.deepEqual(method.call(f.executor),{version:1,deadline:'shared-abort-v1'});assert.equal(Object.isFrozen(method.call(f.executor)),true);assert.equal(f.executor.acceptedStopCapabilities,method);
+ }finally{f.cleanup();}
+});
+
+test('CLI abort settlement waits for close after kill and preserves unknown even when kill fails',async()=>{
+ for(const cause of ['signal','timeout','overflow','kill-false','kill-throw']){
+  const f=localTransportFixture({kill:cause==='kill-false'?'false':cause==='kill-throw'?'throw':'success'}),control=new AbortController();
+  const pending=tracked(f.transport('fixture-cli',[],{signal:control.signal,maxOutput:1}));f.child.emit('spawn');
+  try{
+   if(cause==='timeout')f.timeout();else if(cause==='overflow')f.child.stdout.emit('data',Buffer.from('xx'));else control.abort();
+   await nextTurn();assert.equal(pending.settled,false,cause+' cannot settle before close');assert.equal(f.kills,1);
+   f.child.emit('error',Error('fixture error after spawn'));await nextTurn();assert.equal(pending.settled,false);
+   f.child.emit('close',0);const result=await pending.outcome;assert.equal(result.error?.code,'LOCAL_OUTCOME_UNKNOWN');assert.equal(result.error?.notExecuted,false);
+  }finally{f.child.emit('close',null);await pending.outcome;}
+ }
+});
+
+test('CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn',async()=>{
+ const f=localTransportFixture(),control=new AbortController();control.abort(Error('before spawn'));
+ assert.throws(()=>f.transport('fixture-cli',[],{signal:control.signal}),error=>error===control.signal.reason);assert.equal(f.spawns,0);
+ const pending=tracked(f.transport('fixture-cli',[]));f.child.emit('error',Object.assign(Error('not found'),{code:'ENOENT'}));
+ const result=await pending.outcome;assert.equal(result.error.code,'ENOENT');assert.equal(result.error.notExecuted,true);assert.equal(f.kills,0);f.child.emit('close',null);
+});
+
+test('CLI abort settlement real local transport terminates its original child before returning unknown',async()=>{
+ const f=fixture(),control=new AbortController(),file=path.join(f.base,'transport-pid');let pending;
+ try{
+  pending=tracked(cliTransport(process.execPath,['-e',"require('node:fs').writeFileSync(process.argv[1],String(process.pid));setInterval(()=>{},1000)",file],{signal:control.signal,timeoutMs:5000}));
+  for(let i=0;i<100&&!fs.existsSync(file);i++)await new Promise(done=>setTimeout(done,10));assert.equal(fs.existsSync(file),true);
+  const pid=Number(fs.readFileSync(file,'utf8'));control.abort();const result=await pending.outcome;
+  assert.equal(result.error?.code,'LOCAL_OUTCOME_UNKNOWN');assert.equal(result.error?.notExecuted,false);assert.throws(()=>process.kill(pid,0),{code:'ESRCH'});
+ }finally{control.abort();await pending?.outcome;f.cleanup();}
+});
+
 test('accepted stop rejects a different expected sandbox ID before callback or stop dispatch',async()=>{
  const f=fixture();try{
   const {key}=await preparedTask(f),expected={...acceptedStopExpected(f.executor.read(key)),sandboxId:randomUUID()};let callbacks=0;

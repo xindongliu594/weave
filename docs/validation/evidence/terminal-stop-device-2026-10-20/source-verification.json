@@ -1,0 +1,26 @@
+{
+  "sourceStable": true,
+  "files": [
+    {
+      "path": "apps/desktop/openshell-executor.cjs",
+      "sha256": "6ac776928fc86c89cce0a6687574709d6683b17e0cd647b4f1ae9ed3502af82c"
+    },
+    {
+      "path": "apps/desktop/openshell-executor.test.cjs",
+      "sha256": "9e4851f13e336f224bef41c3811a044135df09a2ad60d1ff462576a42144221b"
+    }
+  ],
+  "nodeCheckExit": 0,
+  "focused": {
+    "pass": 13,
+    "fail": 0,
+    "skip": 0
+  },
+  "regression": {
+    "pass": 68,
+    "fail": 0,
+    "skip": 0
+  },
+  "paidCalls": 0,
+  "profileClosed": true
+}

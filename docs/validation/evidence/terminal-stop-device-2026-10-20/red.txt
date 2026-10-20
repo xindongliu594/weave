@@ -1,0 +1,215 @@
+✖ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (67.1998ms)
+✖ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (32.1511ms)
+✖ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (30.5864ms)
+✖ accepted stop shared deadline expires in queue with no callback intent or later stop (256.0515ms)
+✖ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (239.3651ms)
+✖ accepted stop shared deadline passes one signal through admission stop and original ID observation (238.9435ms)
+✖ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (226.2997ms)
+✖ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (329.985ms)
+✖ accepted stop shared deadline rejects late transport success before journal confirmation (224.6266ms)
+✖ accepted stop capabilities advertise exact shared abort contract with a stable method reference (26.1134ms)
+✖ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (7.1908ms)
+✔ CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn (2.8069ms)
+✔ CLI abort settlement real local transport terminates its original child before returning unknown (141.672ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 2
+ℹ fail 11
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1994.105
+
+✖ failing tests:
+
+test at apps\desktop\openshell-executor.test.cjs:93:1
+✖ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (67.1998ms)
+  AssertionError [ERR_ASSERTION]: cancelled caller must finish while A is held
+  
+  false !== true
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:100:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:107:1
+✖ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (32.1511ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:114:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:120:1
+✖ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (30.5864ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:127:100)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:132:1
+✖ accepted stop shared deadline expires in queue with no callback intent or later stop (256.0515ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:139:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:144:1
+✖ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (239.3651ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:149:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:156:1
+✖ accepted stop shared deadline passes one signal through admission stop and original ID observation (238.9435ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(signals.every(signal=>signal===control.signal))
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:160:146)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:169:1
+✖ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (226.2997ms)
+  AssertionError [ERR_ASSERTION]: fallback must start before dequeue
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:176:87)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:182:1
+✖ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (329.985ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'LOCAL_OUTCOME_UNKNOWN'
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:191:20)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'LOCAL_OUTCOME_UNKNOWN',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:199:1
+✖ accepted stop shared deadline rejects late transport success before journal confirmation (224.6266ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:204:4)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'LOCAL_OUTCOME_UNKNOWN' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:210:1
+✖ accepted stop capabilities advertise exact shared abort contract with a stable method reference (26.1134ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:212:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\desktop\openshell-executor.test.cjs:217:1
+✖ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (7.1908ms)
+  AssertionError [ERR_ASSERTION]: signal cannot settle before close
+  
+  true !== false
+  
+      at TestContext.<anonymous> ([workspace]\apps\desktop\openshell-executor.test.cjs:223:28)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

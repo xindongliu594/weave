@@ -1,0 +1,96 @@
+✔ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (79.5944ms)
+✔ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (29.3257ms)
+✔ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (29.2559ms)
+✔ accepted stop shared deadline expires in queue with no callback intent or later stop (149.6327ms)
+✔ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (293.748ms)
+✔ accepted stop shared deadline passes one signal through admission stop and original ID observation (352.8782ms)
+✔ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (285.3763ms)
+✔ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (463.1341ms)
+✔ accepted stop shared deadline rejects late transport success before journal confirmation (484.5032ms)
+✔ accepted stop capabilities advertise exact shared abort contract with a stable method reference (27.9364ms)
+✔ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (14.6582ms)
+✔ CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn (2.1091ms)
+✔ CLI abort settlement real local transport terminates its original child before returning unknown (159.0797ms)
+✔ accepted stop rejects a different expected sandbox ID before callback or stop dispatch (136.2677ms)
+✔ accepted stop requires exact identity, all proofs and a private callback before any CLI (135.8302ms)
+✔ accepted stop fsyncs an immutable intent before one stop and confirms only original ID (406.6248ms)
+✔ accepted stop response loss survives a cold executor and reserves capacity until read-only reconciliation (708.8927ms)
+✔ accepted stop blocks all ordinary execution, export and storage paths without starting retained files (551.0446ms)
+✔ accepted stop rejects native plugin work before loading its bundle and rechecks after a loader await (559.2084ms)
+✔ accepted stop reconciliation uses only the installed original-ID get syntax without policy-by-ID (362.5113ms)
+✔ accepted stop rechecks the entire journal and grant synchronously after its callback (1491.4962ms)
+✔ accepted stop clones queued identity and rejects missing or corrupted original intent on restart (549.4395ms)
+✔ accepted stop reconciliation refuses absent, Ready, wrong identity, mTLS and policy without lifecycle mutations (2111.4559ms)
+✔ accepted stop journal failures never retry a mutation and preserve intent for later observation (658.7301ms)
+✔ stdin restores exact source bytes; CAS/revisions/metadata match existing contract, no host workspace writes (471.0361ms)
+✔ grant, approval, hidden paths and file limits deny before any CLI dispatch (181.2052ms)
+✔ large contents stay out of argv; duplicate completed jobs and cold mapping never repeat create/exec (362.3116ms)
+✔ connection loss persists unknown across reopen; no repeated external operation and no host fallback (234.9378ms)
+✔ changed effective policy blocks before employee operation; clean close stops same scope once (199.9684ms)
+✔ configuration fingerprint is field-order invariant and every fixed field changes its identity (36.0452ms)
+✔ approved remote command nonzero exit is a known result; child output cannot forge transport receipt (205.2453ms)
+✔ remote workspace governance files and hard links are refused before returning any artifacts (280.9385ms)
+✔ clean shutdown and cold reopen start the same sandbox once, retain files and never replay completed operations (428.9566ms)
+✔ cold recovery checks saved revision before a new write even without caller-supplied workspace revision (282.941ms)
+✔ ambiguous start or stop is retained across reopen and never repeated (517.0252ms)
+✔ service shutdown refuses new work immediately and concurrent close stops the sandbox only once (135.4738ms)
+✔ cancellation or truncated receipt after a remote write preserves the unknown outcome without replay (613.1677ms)
+✔ actual helper checks UID, GID, Node and cgroup values before an employee write (1069.279ms)
+✔ sandbox ID replacement blocks cold start before any new external mutation (220.7739ms)
+✔ prepare accepts an exact 5 MiB file and 20 MiB workspace through stdin (2106.9395ms)
+✔ damaged persistent mappings cannot omit recovery versions or redirect a sandbox name (558.2459ms)
+✔ real local transport forwards large stdin, bounds output, and classifies cancellation after spawn as unknown (515.7128ms)
+✔ maintenance inspects exact bytes then retires only the matching sandbox once (385.8445ms)
+✔ maintenance refuses changed versions and does not send delete (171.7158ms)
+✔ delete disconnect survives executor recreation and reconciles absence without replay (337.4038ms)
+✔ deletion accepted with a still-present sandbox is not reported as reclaimed (260.6347ms)
+✔ running command is killed when temporary storage exceeds limits before its normal exit (471.7145ms)
+✔ task export remains unknown when a command background process survives group kill (382.88ms)
+✔ task command exports only after confirmed stop, restart and read-only inspect (342.2722ms)
+✔ task command stop, start or export uncertainty retains the original operation without replay (1464.8612ms)
+✔ task command transport loss before receipt cannot be inspected as a safe export (240.9108ms)
+✔ cold pre-receipt command dispatch snapshot cannot export, including snapshots without operation kind (473.5763ms)
+✔ cold fence-stage snapshots retain identity and capacity but cannot execute or export (936.4772ms)
+✔ task-attempt keys isolate sandboxes and persisted scope changes are rejected (1645.2377ms)
+✔ unrelated canonical commit renews task scope without changing its sandbox work revision (397.7031ms)
+✔ same attempt reads its newly committed output after a bounded scope advance (748.4973ms)
+✔ original readable output retains ancestry and permits write, cold reopen, then write again (695.1527ms)
+✔ task prepare rejects a full envelope above 3 MiB before create (254.0016ms)
+✔ unknown task scopes retain resource slots and stopped scopes count toward the 128 scope limit (11928.1358ms)
+✔ task capacity includes retained workspace and temp occupancy in disk admission (336.1465ms)
+✔ real directory storage counts bytes and free filesystem without reading file contents (17.0347ms)
+✔ temporary file growth stops admission independently of workspace exports (10.0979ms)
+✖ bounded enumeration and directory links fail closed without traversing targets (6.1775ms)
+✔ concurrent temporary deletion triggers a bounded rescan rather than an admission failure (16.7645ms)
+✔ persistent directory churn is bounded and permission errors are never swallowed (17.3015ms)
+✔ readonly task export inspects the original operation and rejects undeclared files (53.6555ms)
+✔ remote task parser rejects 3 MiB plus one byte before any task mutation (19.2249ms)
+✔ serialized task envelope counts UTF-8 bytes at the exact transport limit (32.8025ms)
+ℹ tests 68
+ℹ suites 0
+ℹ pass 67
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40133.0891
+
+✖ failing tests:
+
+test at apps\desktop\sandbox-storage.test.cjs:6:1
+✖ bounded enumeration and directory links fail closed without traversing targets (6.1775ms)
+  Error: EPERM: operation not permitted, symlink '[workspace]\apps\desktop\.sandbox-storage-87719752-4871-4001-9d3d-9fefb7e5be0d\work' -> '[workspace]\apps\desktop\.sandbox-storage-87719752-4871-4001-9d3d-9fefb7e5be0d\temp\link'
+      at Object.symlinkSync (node:fs:1869:11)
+      at TestContext.<anonymous> ([workspace]\apps\desktop\sandbox-storage.test.cjs:6:175)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'symlink',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-87719752-4871-4001-9d3d-9fefb7e5be0d\\work',
+    dest: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\desktop\\.sandbox-storage-87719752-4871-4001-9d3d-9fefb7e5be0d\\temp\\link'
+  }

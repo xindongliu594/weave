@@ -1,0 +1,21 @@
+✔ maintenance shared deadline permanently skips a pending cancellation without reordering the queue (38.5635ms)
+✔ maintenance shared deadline started entry awaits cancellation-aware work and removes its pending listener (30.0294ms)
+✔ maintenance shared deadline removes the pending abort listener before rejecting a cancelled caller (30.1548ms)
+✔ accepted stop shared deadline expires in queue with no callback intent or later stop (150.4428ms)
+✔ accepted stop shared deadline rechecks abort after beforeDispatch before fsynced intent (290.3108ms)
+✔ accepted stop shared deadline passes one signal through admission stop and original ID observation (364.7131ms)
+✔ accepted stop shared deadline selects one legacy fallback before queue wait and never renews observation (284.3215ms)
+✔ accepted stop shared deadline cancellation after dispatch retains unknown intent through local settlement (482.6927ms)
+✔ accepted stop shared deadline rejects late transport success before journal confirmation (481.7707ms)
+✔ accepted stop capabilities advertise exact shared abort contract with a stable method reference (27.039ms)
+✔ CLI abort settlement waits for close after kill and preserves unknown even when kill fails (13.7097ms)
+✔ CLI abort settlement prevents spawn for preabort and settles a definitive failed spawn (2.1025ms)
+✔ CLI abort settlement real local transport terminates its original child before returning unknown (150.4495ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2504.0151

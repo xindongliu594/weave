@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "status": "verified-device-prerequisite-runtime-not-yet-integrated",
+  "files": [
+    {
+      "file": "red.txt",
+      "bytes": 9569,
+      "sha256": "f77ab8ed0a69bb29152e59d88db324f906242b169787314266f31993ac2b1938",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-red.txt",
+      "sourceSha256": "d89e65474cf830cce4e414325cff4f84f933fffa21cab641b9a30cedb1707f14",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "red.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-red.exit.txt",
+      "sourceSha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "red-interrupted-harness.txt",
+      "bytes": 115,
+      "sha256": "3763b8ab888c7b35fe01fd926b23195c5c5077ee531bc3a06ef13e621f6954e9",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-red-interrupted-harness.txt",
+      "sourceSha256": "3763b8ab888c7b35fe01fd926b23195c5c5077ee531bc3a06ef13e621f6954e9",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "green.txt",
+      "bytes": 1596,
+      "sha256": "842eefd14f504411c83c941ca84aa895f89a5d1d02afe09fd45f7e8e68a20dd4",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-green.txt",
+      "sourceSha256": "842eefd14f504411c83c941ca84aa895f89a5d1d02afe09fd45f7e8e68a20dd4",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "green.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-green.exit.txt",
+      "sourceSha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "regression.txt",
+      "bytes": 8716,
+      "sha256": "fa04715d3333912a052451661eafdae43c8900cd15c4a66d6a2aed1f0ce83f86",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-regression.txt",
+      "sourceSha256": "8525cf03091343afc4e989907bd19d2b7119eef6244f629afff675e1f45cb35b",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "regression.exit.txt",
+      "bytes": 3,
+      "sha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-regression.exit.txt",
+      "sourceSha256": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "regression-escalated.txt",
+      "bytes": 7361,
+      "sha256": "7121744d4d5362c5e1d345c74be0bb281c042c26a2b4fd215b220e66762a64b7",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-regression-escalated.txt",
+      "sourceSha256": "7121744d4d5362c5e1d345c74be0bb281c042c26a2b4fd215b220e66762a64b7",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "regression-escalated.exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-regression-escalated.exit.txt",
+      "sourceSha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "independent-review.md",
+      "bytes": 5178,
+      "sha256": "58c9fdf4fb87a931560ba3c7fd1b1a39ef2974df7dd8aed6063ddbcbecc69ca8",
+      "source": ".superpowers/sdd/2026-10-20-task-checkpoint-v2-integration/terminal-device-independent-review.md",
+      "sourceSha256": "58c9fdf4fb87a931560ba3c7fd1b1a39ef2974df7dd8aed6063ddbcbecc69ca8",
+      "transformation": "UTF-8, redact absolute workspace/temp roots"
+    },
+    {
+      "file": "source-verification.json",
+      "bytes": 545,
+      "sha256": "76a6be72ca73fb42a99168ef047fd54cb6f7532ca43a61a22e47d0e4bf6c5840",
+      "source": "root verified original private SHA and node --check results",
+      "transformation": "relative paths; lowercase SHA"
+    }
+  ]
+}
