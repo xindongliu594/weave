@@ -1,0 +1,22 @@
+[
+  {
+    "path": "/healthz",
+    "status": "failed",
+    "milliseconds": 15391
+  },
+  {
+    "path": "/auth/session",
+    "status": "failed",
+    "milliseconds": 15011
+  },
+  {
+    "path": "/api/capabilities/plugins",
+    "status": "failed",
+    "milliseconds": 15015
+  },
+  {
+    "path": "/",
+    "status": "failed",
+    "milliseconds": 15010
+  }
+]

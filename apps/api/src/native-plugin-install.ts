@@ -60,7 +60,7 @@ export function createNativeInstallManager(root=nativeCapabilityRoot(), buildBun
    save(state,'installing');
    scratch=mkdtempSync(join(root,'.install-'));
    save(state,'installing',{scratchName:basename(scratch)});
-   const npmCli=[join(dirname(process.execPath),'node_modules','npm','bin','npm-cli.js'),'/usr/share/nodejs/npm/bin/npm-cli.js','/usr/local/lib/node_modules/npm/bin/npm-cli.js'].find(existsSync);
+   const npmCli=[join(dirname(process.execPath),'node_modules','npm','bin','npm-cli.js'),join(dirname(dirname(process.execPath)),'lib','node_modules','npm','bin','npm-cli.js'),'/usr/share/nodejs/npm/bin/npm-cli.js','/usr/local/lib/node_modules/npm/bin/npm-cli.js'].find(existsSync);
    if(!npmCli)throw Error('NPM_UNAVAILABLE');
    const env:NodeJS.ProcessEnv={};for(const key of ['SystemRoot','WINDIR','LANG'])if(process.env[key])env[key]=process.env[key];
    env.PATH=process.platform==='win32'?[dirname(process.execPath),join(process.env.SystemRoot??'C:\\Windows','System32')].join(';'):'/usr/bin:/bin';
@@ -77,7 +77,7 @@ export function createNativeInstallManager(root=nativeCapabilityRoot(), buildBun
    const npmReadRoot=npmCli.startsWith('/usr/share/nodejs/')?'/usr/share/nodejs':dirname(dirname(npmCli));
    save(state,'installing',{scratchUnsafe:true});
    let npmStderr='';
-   const completion=new Promise<void>((resolve,reject)=>{child=execFile(process.execPath,['--permission',`--allow-fs-read=${npmReadRoot}`,`--allow-fs-read=${scratch}`,`--allow-fs-write=${scratch}`,npmCli,'install','--ignore-scripts','--no-audit','--no-fund','--legacy-peer-deps','--save-exact',`${def.package}@${def.version}`],{cwd:scratch,env,signal:abort.signal,timeout:120000,maxBuffer:1024*1024,windowsHide:true},(error,_stdout,stderr)=>{npmStderr=stderr??'';error?reject(error):resolve();});child.once('close',()=>{closed=true;resolveClose();});});
+   const completion=new Promise<void>((resolve,reject)=>{child=execFile(process.execPath,['--permission',`--allow-fs-read=${npmReadRoot}`,`--allow-fs-read=${scratch}`,`--allow-fs-write=${scratch}`,npmCli,'install','--ignore-scripts','--bin-links=false','--no-audit','--no-fund','--legacy-peer-deps','--save-exact',`${def.package}@${def.version}`],{cwd:scratch,env,signal:abort.signal,timeout:120000,maxBuffer:1024*1024,windowsHide:true},(error,_stdout,stderr)=>{npmStderr=stderr??'';error?reject(error):resolve();});child.once('close',()=>{closed=true;resolveClose();});});
    try {if(child?.pid)save(state,'installing',{childPid:child.pid,scratchUnsafe:false});await completion;}catch(error:any){const permission=/ERR_ACCESS_DENIED|ERR_UNKNOWN_OPTION|operation not permitted/i.test(npmStderr)||['EACCES','EPERM','ERR_ACCESS_DENIED'].includes(String(error?.code));throw resourceError??Error(permission?'NATIVE_NPM_PERMISSION_DENIED':'NPM_FAILED');}finally{clearInterval(timer);if(!closed){await Promise.race([close,new Promise(resolve=>setTimeout(resolve,5000))]);if(!closed){child?.kill('SIGKILL');await Promise.race([close,new Promise(resolve=>setTimeout(resolve,5000))]);}if(!closed){preserveScratch=true;state.scratchUnsafe=true;save(state,state.stage);}}if(closed){delete state.childPid;delete state.scratchUnsafe;save(state,state.stage);}}
    if(preserveScratch)throw Error('NPM_CHILD_STILL_RUNNING');
    const lock=join(scratch,'package-lock.json');if(!existsSync(lock))throw Error('NPM_FAILED');

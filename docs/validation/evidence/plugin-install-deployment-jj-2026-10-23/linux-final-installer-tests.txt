@@ -1,0 +1,17 @@
+✔ installer accepts only exact public package coordinates and declared file policy (5.028823ms)
+✔ unfinished durable job is marked interrupted on manager restart (0.890781ms)
+✔ restart removes only an exactly recorded owned scratch directory (0.601465ms)
+✔ restart refuses forged scratch path outside the installation root (0.435279ms)
+✔ restart retains scratch when a recorded npm PID may still be alive (0.432327ms)
+✔ restart retains scratch during the spawn to PID persistence window (0.414282ms)
+✔ version directory cap rejects a new install before starting a job (2.765967ms)
+✔ invalid portable bundle fails with sanitized status and no installed version (7.732903ms)
+✔ install routes are explicitly admin only and demo rejects execution (272.058978ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1966.514682

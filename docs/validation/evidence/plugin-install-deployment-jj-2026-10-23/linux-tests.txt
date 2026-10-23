@@ -1,0 +1,70 @@
+✔ all mounted business routes have an explicit policy (279.767509ms)
+✔ machine access is restricted to four exact operation paths (0.618087ms)
+✔ implicit HEAD and OPTIONS, encoded separators and unknown routes fail closed (0.347337ms)
+✔ administrative routes require a current admin while device credentials stay on device routes (0.657219ms)
+✔ idempotency rejects missing authenticated principal before touching storage (0.452519ms)
+✔ administrator writes require CSRF before the next middleware (0.445102ms)
+✔ every registered route denies a member or unproven device before handler entry (330.592171ms)
+✔ local launcher stores installed plugins in the workspace, independently of its credential directory (0.956412ms)
+✔ registry admits installed bytes, preserves old version across upgrade, denies revoke/tamper and missing grants (2025.581729ms)
+✔ builder rejects a package main outside installed package before reading it (1.893931ms)
+✘ [ERROR] NATIVE_PACKAGE_SOURCE_DENIED [plugin native-source-boundary]
+
+    node_modules/esbuild/lib/main.js:1217:27:
+      1217 │         let result = await callback({
+           ╵                            ^
+
+    at file:///home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/scripts/plugins/build-native-tool-bundle.mjs:49:160
+    at requestCallbacks.on-resolve (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:1217:28)
+    at handleRequest (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:628:17)
+    at handleIncomingPacket (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:653:7)
+    at Socket.readFromStdout (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+
+  This error came from the "onResolve" callback registered here:
+
+    node_modules/esbuild/lib/main.js:1141:20:
+      1141 │       let promise = setup({
+           ╵                     ^
+
+    at setup (file:///home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/scripts/plugins/build-native-tool-bundle.mjs:49:13)
+    at handlePlugins (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:1141:21)
+    at buildOrContextImpl (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:854:5)
+    at Object.buildOrContext (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:680:5)
+    at /home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:2026:15
+    at new Promise (<anonymous>)
+    at Object.build (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:2025:25)
+    at build (/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/node_modules/esbuild/lib/main.js:1876:51)
+    at buildNativeToolBundle (file:///home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023/scripts/plugins/build-native-tool-bundle.mjs:47:9)
+
+  The plugin "native-source-boundary" was triggered by this import
+
+    ../../../../../../../tmp/native-boundary-HxyGqO/plugin/index.mjs:1:18:
+      1 │ import value from '../secret.mjs'; export default value;
+        ╵                   ~~~~~~~~~~~~~~~
+
+✔ builder rejects a relative import escaping the installed package before loading it (56.437264ms)
+✔ builder resolves an ancestor-shadowed bare dependency from fixed runtime modules (107.195096ms)
+✔ installer accepts only exact public package coordinates and declared file policy (4.890323ms)
+✔ unfinished durable job is marked interrupted on manager restart (0.899058ms)
+✔ restart removes only an exactly recorded owned scratch directory (0.554407ms)
+✔ restart refuses forged scratch path outside the installation root (0.422701ms)
+✔ restart retains scratch when a recorded npm PID may still be alive (0.419086ms)
+✔ restart retains scratch during the spawn to PID persistence window (0.367924ms)
+✔ version directory cap rejects a new install before starting a job (2.677329ms)
+✔ invalid portable bundle fails with sanitized status and no installed version (7.22487ms)
+✔ install routes are explicitly admin only and demo rejects execution (307.232253ms)
+✔ public deployment origins must be explicit canonical HTTPS origins (1.463466ms)
+✔ cross-site navigation is limited to the exact OIDC GET callback (0.17225ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8342.456519

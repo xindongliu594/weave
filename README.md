@@ -96,7 +96,7 @@ npm run demo
 
 ## 当前实现与验证
 
-2026-10-23 新增兼容工具插件的网页安装入口：公共 npm 精确版本或可移植包 → 默认停用 → 启用 → 员工和项目授权。已用原版计算器验证共享目录、真实工具调用、未授权拒绝与会话重开，另通过原版 Office 的公共 npm 安装；本轮零模型调用，尚未发布 JJ。参见[安装说明](docs/plugin-installation.md)与[本轮证据](docs/validation/plugin-plug-and-play-2026-10-23.md)。原生插件网页和后台服务模式仍需分别适配。
+2026-10-23 新增兼容工具插件的网页安装入口：公共 npm 精确版本或可移植包 → 默认停用 → 启用 → 员工和项目授权。已用原版计算器验证共享目录、真实工具调用、未授权拒绝与会话重开，另通过原版 Office 的公共 npm 安装。已部署 JJ，Linux 原版安装、类型与构建通过，历史记录保留，本轮零模型调用；隧道与网页复核状态见[部署记录](docs/validation/plugin-install-deployment-jj-2026-10-23.md)。参见[安装说明](docs/plugin-installation.md)与[本轮证据](docs/validation/plugin-plug-and-play-2026-10-23.md)。原生插件网页和后台服务模式仍需分别适配。
 
 2026-10-21 正在加固企业任务隔离与恢复，企业 task profile 尚未开放。已完成恢复记录严格校验、Windows/JJ 文件锁私有适配器验证；实际运行尾部、清理等待和协调器写入作用域已通过本地回归及独立复审。批量费用的数据库尾部保护另通过真实 PostgreSQL 验证。全部写入入口覆盖和恢复来源核对仍待完成。本轮代码尚未发布到 JJ 生产服务。[企业阶段清单](docs/superpowers/plans/2026-10-20-enterprise-foundations.md) · [写入锁证据](docs/validation/archive-writer-fence-primitive-2026-10-21.md) · [实际排空证据](docs/validation/runtime-writer-drain-2026-10-21.md) · [写入作用域证据](docs/validation/archive-writer-scope-2026-10-21.md) · [费用事务尾部](docs/validation/cost-maintenance-tail-2026-10-21.md)
 

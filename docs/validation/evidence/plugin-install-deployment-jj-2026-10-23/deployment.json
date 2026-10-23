@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023",
+  "baseRelease": "/home/jj/.local/share/weiwu/releases/weiwu-hardening-coordination-20261020",
+  "pluginCommit": "d4c5eca",
+  "backup": "/home/jj/.local/share/weiwu/backups/plugin-install-predeploy-20261023",
+  "database": "connected",
+  "runCount": 65,
+  "usageCount": 732,
+  "unknownHolds": 7,
+  "modelCalls": 0,
+  "stoppedAudit": {
+    "activeRuns": 0,
+    "activeMessages": 0,
+    "pendingCalls": 0,
+    "activeCapabilities": 0
+  },
+  "npmInstall": {
+    "id": "bcee665f-57ec-418b-a65c-f35684861d04",
+    "kind": "npm",
+    "stage": "complete",
+    "createdAt": "2026-10-23T11:35:41.980Z",
+    "updatedAt": "2026-10-23T11:36:01.103Z",
+    "bundleId": "6697cf44d6a34851b4c1745732cd7b6263096d58a5e3bd910a783495f26555b6",
+    "modelCalls": 0,
+    "tools": 10
+  }
+}

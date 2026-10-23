@@ -1,0 +1,1 @@
+{"passed":true,"before":{"gateways":1,"departments":3,"models":2,"projects":15,"project_runs":65,"usage":732,"local_devices":2,"model_reservations":739},"after":{"gateways":1,"departments":3,"models":2,"projects":15,"project_runs":65,"usage":732,"local_devices":2,"model_reservations":739},"modelsCalled":0,"target":"disposable stopped database copy"}
