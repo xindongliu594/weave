@@ -154,7 +154,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.use('/api', idempotency);
   app.use('/api', managerChatRouter());
   app.use('/api', browserMcpRouter());
-  app.use('/api', nativeCapabilityRouter());
+  app.use('/api', nativeCapabilityRouter({demo:options.demo}));
   app.use('/api', workFilesRouter(pool,traceRoot));
   app.use('/api', automationLearningRouter({ service: automation, publishKnowledge: (input, id) => saveKnowledgeDocument(input, id, true) }));
   app.use('/api',localDeviceRouter(traceRoot));

@@ -9,6 +9,7 @@ import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { isNativeToolName } from '../../../packages/contracts/native-tool-ids.mjs';
 import { nativeManifestId, nativeToolBinding, assertNativeTaskAccess } from '../../../services/agent-runtime/native-capabilities.mjs';
+import { createNativeInstallManager } from './native-plugin-install.ts';
 export { assertNativeTaskAccess };
 
 type Database = Pick<pg.PoolClient,'query'>;
@@ -91,9 +92,12 @@ export async function listNativeCapabilities(db:Database=pool,root=nativeCapabil
   if(ids.length>100)throw new AppError(422,'插件安装版本超过目录限制，请先归档未引用版本');
   return ids.map(id=>{const state=states.find(row=>row.manifest_id===id);try{const {manifest}=readNativeBundle(id,root);return {id,manifest,available:true,enabled:!!state?.enabled};}catch{return {id,namespace:state?.namespace,available:false,enabled:!!state?.enabled,error:'安装文件缺失、版本不符或校验失败；可停用后重新安装固定版本'};}});
 }
-export function nativeCapabilityRouter() {
+export function nativeCapabilityRouter(options:{demo?:unknown;root?:string}={}) {
  const router=Router();
+ const installer=createNativeInstallManager(options.root);
  router.get('/capabilities/plugins',async(_req,res)=>res.json(await listNativeCapabilities()));
+ router.post('/capabilities/plugins/install',(req,res)=>{if(options.demo)return res.status(403).json({message:'演示环境不能下载安装插件。'});try{res.status(202).json(installer.start(req.body));}catch(error:any){res.status(error?.status??422).json({message:typeof error?.status==='number'?error.message:'插件安装配置无效；请检查精确包名、版本及工具文件字段。'});}});
+ router.get('/capabilities/plugins/install/:id',(req,res)=>{const state=installer.get(String(req.params.id));if(!state)return res.status(404).json({message:'安装任务不存在'});res.json(state);});
  router.put('/capabilities/plugins/:id',async(req,res)=>{const enabled=z.object({enabled:z.boolean()}).parse(req.body).enabled;res.json(await setNativeCapability(String(req.params.id),enabled));});
  return router;
 }

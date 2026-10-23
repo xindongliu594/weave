@@ -1,0 +1,1 @@
+export function buildNativeToolBundle(definitionFile:string,installedPackage:string,lockFile:string,outputRoot:string):Promise<{id:string;directory:string;package:string;version:string;tools:number;compressedBytes:number;modelCalls:number}>;

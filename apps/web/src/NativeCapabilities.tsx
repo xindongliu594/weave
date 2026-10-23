@@ -14,10 +14,22 @@ export function ToolPicker({value,onChange}:{value:string[];onChange:(value:stri
 }
 export function NativeCapabilities(){
  const [items,setItems]=useState<any[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true);
+ const [recipe,setRecipe]=useState('{\n  "namespace": "example",\n  "package": "@scope/dsh-tool",\n  "version": "1.0.0",\n  "config": {},\n  "files": {"tool_name": {"read": [], "write": []}}\n}');
+ const [install,setInstall]=useState<any>(null),[portable,setPortable]=useState<any>(null);
  const refresh=async()=>setItems(await api<any[]>('/capabilities/plugins'));
  useEffect(()=>{refresh().catch(e=>setError(e.message)).finally(()=>setLoading(false));},[]);
+ useEffect(()=>{const id=sessionStorage.getItem('native-install-job');if(id)api<any>('/capabilities/plugins/install/'+id).then(setInstall).catch(()=>sessionStorage.removeItem('native-install-job'));},[]);
+ useEffect(()=>{if(!install?.id||!['queued','installing','building','verifying'].includes(install.stage))return;const timer=setTimeout(()=>{api<any>('/capabilities/plugins/install/'+install.id).then(value=>{setInstall(value);if(value.stage==='complete')void refresh().catch(e=>setError(e.message));}).catch(e=>setError(e.message));},1200);return()=>clearTimeout(timer);},[install]);
+ const start=async()=>{setBusy(true);setError('');try{const request=portable??{kind:'npm',recipe:JSON.parse(recipe)};const state=await api<any>('/capabilities/plugins/install','POST',request);sessionStorage.setItem('native-install-job',state.id);setInstall(state);if(state.stage==='complete')await refresh();}catch(e){setError((e as Error).message);}finally{setBusy(false);}};
+ const upload=async(file?:File)=>{if(!file)return;try{if(file.size>1400000)throw Error('可移植安装包超过当前网页上传限制。');const value=JSON.parse(await file.text());if(!value.id||!value.manifest||!value.compressed||!value.metadata)throw Error('安装包需要 id、manifest、compressed、metadata 字段。');setPortable({kind:'portable',...value});setError('');}catch(e){setError((e as Error).message);}};
  const toggle=async(item:any)=>{setBusy(true);setError('');try{await api('/capabilities/plugins/'+item.id,'PUT',{enabled:!item.enabled});await refresh();}catch(e){setError((e as Error).message);}finally{setBusy(false);}};
  return <section className="panel padded lower"><h2>原生插件工具</h2><p className="subcopy">启用已安装的插件后，在部门员工与项目策略中分配工具。当前支持在 OpenShell 中执行已核对的文件工具型插件；公司 Skill 仍从知识库按授权发现。</p>
+  <div className="agent-edit"><h3>安装兼容工具插件</h3><p className="subcopy">输入精确 npm 包版本和逐工具文件权限配置，或选择经审核的可移植安装包。安装完成后先启用版本，再分配给部门员工与项目策略。需要独立网页或后台服务的插件不适用此入口。</p>
+  <label>接入配置 JSON<textarea aria-label="插件接入配置 JSON" value={recipe} onChange={e=>{setRecipe(e.target.value);setPortable(null);}} rows={9} style={{width:'100%'}}/></label>
+  <label>可移植安装包 JSON<input type="file" accept=".json,application/json" onChange={e=>void upload(e.target.files?.[0])}/></label>
+  {portable&&<p>已选择可移植包：{portable.manifest?.package} {portable.manifest?.version}</p>}
+  <button disabled={busy||!!install&&['queued','installing','building','verifying'].includes(install.stage)} onClick={()=>void start()}>开始安装</button>
+  {install&&<p role="status">安装状态：{({queued:'等待',installing:'下载依赖',building:'构建与工具探测',verifying:'校验',complete:'安装完成，请在目录核对启用和授权状态',failed:'失败',interrupted:'服务重启，已中断'} as Record<string,string>)[install.stage]??install.stage}{install.error?'；'+install.error:''}</p>}</div>
   {error&&<p role="alert" className="form-error">{error}</p>}
   {loading&&<p>正在读取已安装插件…</p>}
   {!loading&&!error&&!items.length&&<p>尚未安装兼容插件。管理员安装原版包并生成经过核对的沙箱安装包后，插件会出现在这里。</p>}

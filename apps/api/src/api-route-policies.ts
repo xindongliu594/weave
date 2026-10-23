@@ -29,6 +29,8 @@ export const routePolicies:readonly RoutePolicy[] = [
   {method:'POST',path:'/api/backup/export',access:'admin',source:'backup.ts'},
   {method:'POST',path:'/api/backup/restore',access:'admin',source:'backup.ts'},
   {method:'GET',path:'/api/capabilities/plugins',access:'admin',source:'native-capabilities.ts'},
+  {method:'POST',path:'/api/capabilities/plugins/install',access:'admin',source:'native-capabilities.ts'},
+  {method:'GET',path:'/api/capabilities/plugins/install/:id',access:'admin',source:'native-capabilities.ts'},
   {method:'PUT',path:'/api/capabilities/plugins/:id',access:'admin',source:'native-capabilities.ts'},
   {method:'GET',path:'/api/costs',access:'admin',source:'cost-router.ts'},
   {method:'POST',path:'/api/costs/:id/query-provider',access:'admin',source:'cost-router.ts'},

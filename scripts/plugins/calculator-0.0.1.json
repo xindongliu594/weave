@@ -1,0 +1,11 @@
+{
+  "namespace": "calculator",
+  "package": "@deepseek-ai/dsh-tool-calculator",
+  "version": "0.0.1",
+  "source": {
+    "kind": "npm",
+    "reference": "https://github.com/omdsh-dev/dsh-tool-calculator/tree/b2007a13f06bcf75bf07b9d277ee8d434a316490"
+  },
+  "config": {},
+  "files": { "calculator": { "read": [], "write": [] } }
+}

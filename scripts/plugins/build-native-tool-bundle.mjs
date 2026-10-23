@@ -2,7 +2,7 @@
 // DSH/pnpm's responsibility; this script only packages the sandbox entry point.
 import { build } from 'esbuild';
 import { createRequire } from 'node:module';
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, existsSync, renameSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -11,8 +11,8 @@ import { createHash } from 'node:crypto';
 import { nativeManifestId } from '../../services/agent-runtime/native-capabilities.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const [definitionFile, installedPackage, lockFile, outputRoot] = process.argv.slice(2).map(value => resolve(value));
-if (!outputRoot) throw Error('Usage: node build-native-tool-bundle.mjs definition.json installed-package-directory lockfile output-root');
+export async function buildNativeToolBundle(definitionFile, installedPackage, lockFile, outputRoot) {
+definitionFile=resolve(definitionFile);installedPackage=resolve(installedPackage);lockFile=resolve(lockFile);outputRoot=resolve(outputRoot);
 const definition = JSON.parse(readFileSync(definitionFile, 'utf8'));
 const pkg = JSON.parse(readFileSync(join(installedPackage, 'package.json'), 'utf8'));
 if (pkg.name !== definition.package || pkg.version !== definition.version) throw Error('NATIVE_PACKAGE_VERSION_MISMATCH');
@@ -38,7 +38,7 @@ try {
  const result=request.name==='__schemas'?ctx.tools.schemas():await ctx.tools.execute({name:request.name,arguments:request.arguments,callId:request.callId,signal:AbortSignal.timeout(45000)});
  process.stdout.write(JSON.stringify(result));
 }finally{for(const f of fibers.reverse())await f.dispose();}`;
-  await build({ stdin: { contents: source, resolveDir: repo, sourcefile: 'native-plugin-entry.mjs' }, bundle: true, platform: 'node', format: 'esm', target: 'node24', outfile: join(staging, 'lib/runner.mjs'), minify: false, external: ['@napi-rs/canvas'],
+  await build({ stdin: { contents: source, resolveDir: repo, sourcefile: 'native-plugin-entry.mjs' }, nodePaths:[join(repo,'services/agent-runtime/node_modules')], bundle: true, platform: 'node', format: 'esm', target: 'node24', outfile: join(staging, 'lib/runner.mjs'), minify: false, external: ['@napi-rs/canvas'],
     banner: { js: "import {createRequire as __nativeRequire} from 'node:module'; import {fileURLToPath as __fileURLToPath} from 'node:url'; import {dirname as __nativeDirname} from 'node:path'; const require=__nativeRequire(import.meta.url), __filename=__fileURLToPath(import.meta.url), __dirname=__nativeDirname(__filename);" } });
   const env = Object.fromEntries(['SystemRoot', 'WINDIR', 'PATH', 'LANG'].filter(key => process.env[key]).map(key => [key, process.env[key]]));
   const probe = spawnSync(process.execPath, ['--permission', `--allow-fs-read=${staging}`, join(staging, 'lib/runner.mjs')], {
@@ -52,9 +52,21 @@ try {
     bundle: { sha256: hash(compressed), codeSha256: hash(code), metadataSha256: hash(metadata), bytes: compressed.length },
     tools: schemas.map(tool => ({ name: `plugin__${definition.namespace}__${tool.name}`, originalName: tool.name, description: tool.description, parameters: tool.parameters, files: definition.files[tool.name] })) };
   const id = nativeManifestId(manifest), destination = join(outputRoot, id);
-  mkdirSync(destination, { mode: 0o700 });
-  writeFileSync(join(destination, 'bundle.gz'), compressed, { flag: 'wx' });
-  writeFileSync(join(destination, 'package.json'), metadata, { flag: 'wx' });
-  writeFileSync(join(destination, 'manifest.json'), JSON.stringify(manifest, null, 2), { flag: 'wx' });
-  console.log(JSON.stringify({ id, directory: destination, package: pkg.name, version: pkg.version, tools: schemas.length, compressedBytes: compressed.length, modelCalls: 0 }));
+  const result={ id, directory: destination, package: pkg.name, version: pkg.version, tools: schemas.length, compressedBytes: compressed.length, modelCalls: 0 };
+  if(existsSync(destination)) {
+    const existing=JSON.parse(readFileSync(join(destination,'manifest.json'),'utf8'));
+    if(nativeManifestId(existing)!==id || !readFileSync(join(destination,'bundle.gz')).equals(compressed) || !readFileSync(join(destination,'package.json')).equals(metadata))throw Error('NATIVE_VERSION_CONFLICT');
+  } else {
+    writeFileSync(join(staging,'bundle.gz'),compressed,{flag:'wx'});
+    writeFileSync(join(staging,'manifest.json'),JSON.stringify(manifest,null,2),{flag:'wx'});
+    rmSync(join(staging,'lib'),{recursive:true});
+    renameSync(staging,destination);
+  }
+  return result;
 } finally { rmSync(staging, { recursive: true, force: true }); }
+}
+if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
+ const args=process.argv.slice(2);
+ if(args.length!==4)throw Error('Usage: node build-native-tool-bundle.mjs definition.json installed-package-directory lockfile output-root');
+ console.log(JSON.stringify(await buildNativeToolBundle(...args)));
+}
