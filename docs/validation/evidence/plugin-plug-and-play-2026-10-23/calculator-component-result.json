@@ -1,0 +1,15 @@
+{
+  "kind": "real-original-plugin-employee-host-component",
+  "modelCalls": 0,
+  "pluginId": "d185e885e5215ddf727575872187bb4f2bbd126108b4e414988cc7a5c82f11c9",
+  "runId": "fe2311c8-0ce4-4dd0-b611-e48918027fdf",
+  "checks": [
+    "granted employee discovers original plugin in shared DSH catalogue",
+    "real original calculator result is 96 through employee Host and restricted worker",
+    "ungranted employee denied before worker",
+    "reopened employee retains original binding and computes 512",
+    "temporary runtime removed; zero model calls"
+  ],
+  "passed": true,
+  "workerCalls": 2
+}

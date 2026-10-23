@@ -1,0 +1,46 @@
+// Original calculator + employee Host component proof. No model response is fabricated; model calls throw.
+import assert from 'node:assert/strict';
+import {readFileSync,mkdirSync,writeFileSync,readdirSync} from 'node:fs';
+import {resolve,join} from 'node:path';
+import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
+import {randomUUID} from 'node:crypto';
+import {nativeManifestId} from '../../services/agent-runtime/native-capabilities.mjs';
+import {createTeamHost} from '../../services/agent-runtime/host.mjs';
+import {EmployeeHostFactory} from '../../services/agent-runtime/employee-hosts.mjs';
+import {installNativePluginTools} from '../../services/agent-runtime/native-plugin-tools.mjs';
+import {HandoffGate,workspaceRevision} from '../../services/agent-runtime/handoff.mjs';
+import {Semaphore} from '../../services/agent-runtime/limits.mjs';
+import {createRunArchive} from '../../services/agent-runtime/trace-store.mjs';
+import {runNativeTool} from '../../apps/desktop/native-plugin-worker.cjs';
+const req=createRequire(resolve('services/agent-runtime/package.json')),base=createRequire(req.resolve('@deepseek-ai/dsh-base/package.json'));
+const {LlmAdapter}=await import(pathToFileURL(req.resolve('@deepseek-ai/dsh-llm')).href);
+const [bundleDirectory, outputDirectory] = process.argv.slice(2);
+if (!bundleDirectory || !outputDirectory) throw Error('Usage: node native-plugin-calculator-smoke.mjs bundle-directory new-output-directory');
+const version=nativeManifestId(JSON.parse(readFileSync(join(resolve(bundleDirectory),'manifest.json'),'utf8')));
+const dir=resolve(bundleDirectory),out=resolve(outputDirectory);
+mkdirSync(out,{recursive:true});
+const manifest=JSON.parse(readFileSync(join(dir,'manifest.json'),'utf8')),compressed=readFileSync(join(dir,'bundle.gz')),metadata=readFileSync(join(dir,'package.json'));
+const root=join(out,'artifacts'),temporary=join(out,'temporary');mkdirSync(root);mkdirSync(temporary);
+const tool=manifest.tools[0].name,agents=[{id:'calculator',role:'manager',tools:[tool]},{id:'denied',role:'member',tools:[]}];
+const tasks=[{id:'compute',kind:'work',assigneeId:'calculator',dependencies:[],inputs:[],outputs:[]},{id:'deny',kind:'work',assigneeId:'denied',dependencies:[],inputs:[],outputs:[]}];
+const snapshot={agents,tasks,nativeCapabilities:[{id:version,manifest}]},archive=createRunArchive(join(out,'runs'),snapshot);
+let modelCalls=0,workerCalls=0;
+const sandbox={root,revision:()=>workspaceRevision(root),async execute(name,args,signal){assert.equal(name,'native_plugin');const nativeResult=await runNativeTool({root,tempRoot:temporary,bundle:{...manifest.bundle,compressed:compressed.toString('base64'),metadata:metadata.toString('base64')},originalName:'calculator',args:args.arguments,callId:randomUUID(),readPaths:[],writePaths:[]},{signal});workerCalls++;return {pluginId:version,toolName:tool,nativeResult,artifacts:[],workspaceRevision:workspaceRevision(root)};}};
+const handoff=new HandoffGate({snapshot,sandbox,archive}),activeWork=agent=>({taskId:agent.options.model==='calculator'?'compute':'deny',attemptId:'attempt-1'});
+const host=await createTeamHost({provider:'fixture',adapter:new class extends LlmAdapter{async *stream(){modelCalls++;throw Error('PAID_MODEL_FORBIDDEN');}}(),sessionRoot:join(out,'sessions')});
+const captainId=randomUUID(),dispose=installNativePluginTools(host.ctx,{snapshot,archive,sandbox,gate:new Semaphore(1),captainId:()=>captainId,handoff,activeWork});
+const factory=new EmployeeHostFactory({coordinator:host.ctx,provider:'fixture',sessionRoot:join(out,'sessions'),archive,activeWork,identify:agent=>agents.find(item=>item.id===agent.options.model),loadPlugin:name=>import(pathToFileURL(base.resolve(name)).href)});
+const result={kind:'real-original-plugin-employee-host-component',modelCalls:0,pluginId:version,runId:archive.id,checks:[],passed:false};
+try{
+ let employee=await factory.createAgent(host.ctx,{sessionId:captainId,agentOptions:{provider:'fixture',model:'calculator'}});
+ const denied=await factory.createAgent(host.ctx,{sessionId:randomUUID(),agentOptions:{provider:'fixture',model:'denied'}});
+ const call=(actor,name,args)=>factory.list().find(item=>item.sessionId===actor.agent.id).ctx.tools.execute({agent:actor.agent,name,arguments:args,callId:randomUUID(),signal:AbortSignal.timeout(15000)});
+ const discovered=await call(employee,'capability_search',{query:'calculator mathematical'});assert.equal(discovered.isError,false);assert.ok(discovered.value.tools.some(item=>item.name===tool));result.checks.push('granted employee discovers original plugin in shared DSH catalogue');
+ const computed=await call(employee,tool,{expression:'15 + 27 * sqrt(9)'});assert.equal(computed.isError,false,JSON.stringify(computed));assert.equal(computed.value.value,96,JSON.stringify(computed));result.checks.push('real original calculator result is 96 through employee Host and restricted worker');
+ const blocked=await call(denied,tool,{expression:'1+2'});assert.equal(blocked.isError,true);assert.equal(workerCalls,1);result.checks.push('ungranted employee denied before worker');
+ const actorId=employee.agent.id;await employee.dispose();employee=await factory.resume(host.ctx,{resumeSessionId:actorId,agentOptions:{provider:'fixture',model:'calculator'}});
+ const resumed=await call(employee,tool,{expression:'2 ** 3 ** 2'});assert.equal(resumed.isError,false,JSON.stringify(resumed));assert.equal(resumed.value.value,512);result.checks.push('reopened employee retains original binding and computes 512');
+ assert.equal(readdirSync(temporary).length,0);assert.equal(modelCalls,0);result.checks.push('temporary runtime removed; zero model calls');result.passed=true;
+}finally{await factory.close();dispose();await host.close();result.workerCalls=workerCalls;result.modelCalls=modelCalls;writeFileSync(join(out,'result.json'),JSON.stringify(result,null,2));}
+console.log(JSON.stringify(result));

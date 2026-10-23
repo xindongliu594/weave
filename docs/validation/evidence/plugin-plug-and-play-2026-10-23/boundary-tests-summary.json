@@ -1,0 +1,14 @@
+{
+  "command": "node --import tsx --test tests/native-plugin-build-boundary.test.ts",
+  "exitCode": 0,
+  "tests": 3,
+  "pass": 3,
+  "fail": 0,
+  "cases": [
+    "reject outside package main",
+    "reject outside relative import",
+    "ancestor-shadowed bare dependency builds before later schema probe failure"
+  ],
+  "actualOfficeInstallAlsoPassed": true,
+  "modelCalls": 0
+}

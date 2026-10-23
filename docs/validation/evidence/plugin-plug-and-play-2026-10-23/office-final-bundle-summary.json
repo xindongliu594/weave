@@ -1,0 +1,29 @@
+{
+  "package": "@huiliyi37/dsh-office",
+  "version": "0.2.4",
+  "source": {
+    "kind": "npm",
+    "reference": "@huiliyi37/dsh-office@0.2.4",
+    "integrity": "sha512-cTLnwzv9MdIXGO4vfK+1QHkOziZndFF4K/T8B98Im8h3gmQn1sAUpQ1z5PliEQHJsX4j4jCbFBBPBx37XFsZGw=="
+  },
+  "dshVersion": "0.1.5-rc.1",
+  "lockSha256": "b818525bc87da7b6a43128ec1ac46ad2e18f3f41635526dac364285ba9d73c21",
+  "bundle": {
+    "sha256": "21c83d0aa84cc039cd6927364b64869353193003d5153a1923ee4df18f1d8f7c",
+    "codeSha256": "efbd1de0d22a8937fb723f0dc2c0593f1bdb19a28e12e0e4976bbae05c16dbb9",
+    "metadataSha256": "170c3d556b6ec8c099f719a32b791cf29d380f1203a5e24f80495e79a35927a2",
+    "bytes": 2012356
+  },
+  "tools": [
+    "plugin__office__xlsx_read",
+    "plugin__office__xlsx_write",
+    "plugin__office__xlsx_edit",
+    "plugin__office__xlsx_recalc",
+    "plugin__office__xlsx_audit",
+    "plugin__office__pptx_create",
+    "plugin__office__pptx_edit",
+    "plugin__office__pptx_read",
+    "plugin__office__docx_create",
+    "plugin__office__docx_read"
+  ]
+}

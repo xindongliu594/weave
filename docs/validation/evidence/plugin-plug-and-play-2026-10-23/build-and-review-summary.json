@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-23T10:43:25.066Z",
+  "build": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "includes": [
+      "TypeScript noEmit",
+      "Vite production build"
+    ],
+    "modules": 1720,
+    "warning": "main chunk exceeds 500 kB"
+  },
+  "review": {
+    "initial": "changes requested",
+    "final": "P1 source boundary and P2 UI recovery closed; no P1/P2 blocker in reviewed slice"
+  },
+  "scope": "local isolated verification; no JJ deployment or paid model calls",
+  "sourceSha256": {
+    "apps/api/src/native-plugin-install.ts": "165f0eb0bb1474d10d1c4ee666c7d3ba5dbc2021e2886ceb3a0599943c5a167a",
+    "apps/web/src/NativeCapabilities.tsx": "a774dedf226d8e9ed678ed28fcf0eaffc3c6e8cd3af57f5cfa7b4e5599e169d4",
+    "scripts/plugins/build-native-tool-bundle.mjs": "f27028e969f81d5667716cdbbc55e524753bf6a49eee7b99a0fa8c52682e7e0e",
+    "tests/native-plugin-build-boundary.test.ts": "2974aeda69eb4828ec1a10f97efb6eb92bb26a71db8a439ceb1e1a1a5dace109",
+    "tests/native-plugin-install.test.ts": "3274080a21f4e7b9d80d035a7a18671b82cac6e325b58fdfdf243919c1fa438c"
+  }
+}
