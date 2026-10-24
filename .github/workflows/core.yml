@@ -33,6 +33,14 @@ jobs:
       - run: npm ci --prefix services/agent-runtime
       - run: npm run build
       - run: npm run test:rules
+      - run: node --test tests/maintenance-report.test.mjs
+      - run: node --import tsx --test tests/identity-session.test.ts tests/identity-management-ui.test.ts tests/maintenance-health.test.ts tests/storage-center.test.ts tests/audit-query-api.test.ts tests/audit-history-ui.test.ts tests/tool-effect-review-ui.test.ts
+      - run: node scripts/test-integration.mjs tests/identity-management.test.ts tests/resource-authorization.test.ts tests/source-bounds.test.ts tests/api-access.test.ts tests/api-idempotency.test.ts tests/completion-protocol-api.test.ts tests/organization-session.test.ts
+      - run: node scripts/test-integration.mjs tests/api-enterprise-boundary.test.ts tests/resource-project-routes.test.ts tests/resource-file-lineage.test.ts tests/resource-knowledge-lineage.test.ts tests/tool-effect-contracts.test.ts tests/tool-effect-sources.test.ts tests/tool-effect-production.test.ts tests/tool-effect-review-api.test.ts tests/tool-operations.test.ts tests/tool-effect-recovery.test.ts tests/tool-effect-approval.test.ts tests/backup-enterprise-protection.test.ts
+      - run: node scripts/test-integration.mjs tests/resource-approval-audit.test.ts tests/storage-maintenance-writer.test.ts tests/identity-initialization-barrier.test.ts
+      - run: node scripts/test-integration.mjs tests/app-startup-recovery.test.ts tests/backup-restore-state.test.ts tests/backup-writer.test.ts tests/run-current-authority.test.ts
+      - run: node --import tsx --test tests/observation-pipeline.test.ts
+      - run: node scripts/test-integration.mjs tests/run-terminal-maintenance.test.ts tests/run-admission-writer.test.ts tests/local-operation-writer.test.ts tests/task-canonical-writer.test.ts tests/local-executor-writer.test.ts tests/task-accepted-stop-writer.test.ts
       - run: npm run runtime:inspect
       - run: npm run runtime:test:portable
       - run: npm run test:integration
@@ -61,7 +69,19 @@ jobs:
           docker compose -p agent-department-ci -f infra/compose.yml up -d --wait
           docker pull node:22.19.0-bookworm-slim
       - run: python3 scripts/install-embedding-model.py
-      - run: npm test
+      - name: Native backend suites
+        # These suites require per-file PGlite or an explicit owned native fixture.
+        # Portable suites run above; never weaken native production-database guards.
+        shell: bash
+        run: |
+          native_tests=()
+          for test_file in tests/*.test.ts; do
+            case "$test_file" in
+              tests/identity-management.test.ts|tests/resource-authorization.test.ts|tests/source-bounds.test.ts|tests/api-idempotency.test.ts|tests/completion-protocol-api.test.ts|tests/organization-session.test.ts|tests/api-enterprise-boundary.test.ts|tests/resource-project-routes.test.ts|tests/resource-file-lineage.test.ts|tests/resource-knowledge-lineage.test.ts|tests/knowledge-department-lock.test.ts|tests/resource-approval-audit.test.ts|tests/storage-maintenance-writer.test.ts|tests/identity-initialization-barrier.test.ts|tests/app-startup-recovery.test.ts|tests/backup-restore-state.test.ts|tests/backup-writer.test.ts|tests/run-current-authority.test.ts|tests/tool-effect-contracts.test.ts|tests/tool-effect-sources.test.ts|tests/tool-effect-production.test.ts|tests/tool-effect-review-api.test.ts|tests/tool-operations.test.ts|tests/tool-effect-recovery.test.ts|tests/tool-effect-approval.test.ts|tests/backup-enterprise-protection.test.ts) continue ;;
+            esac
+            native_tests+=("$test_file")
+          done
+          node --import tsx --test "${native_tests[@]}"
       - run: node --test services/agent-runtime/sandbox.test.mjs
       - name: Database diagnostics on failure
         if: failure()

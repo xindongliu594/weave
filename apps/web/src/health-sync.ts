@@ -1,6 +1,6 @@
 import { api, ApiError } from './api.ts';
 
-export type Health = { database: string; runtime: { ready: boolean; reason: string }; version: string;
+export type Health = { database: string; runtime: { ready: boolean; reason: string }; version: string; executionMode?:'legacy'|'enterprise';
   demo?: { title: string; projectId: string }; workspace?: { kind: 'local'; workspacesPath: string } };
 export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'reachable';
 type HealthSnapshot = { health: Health | null; status: ConnectionStatus; checking: boolean;

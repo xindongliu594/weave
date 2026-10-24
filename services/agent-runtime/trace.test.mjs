@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { runTraceVerification, verificationSnapshot } from './verification.mjs';
+import { createArchiveWriterManager } from './archive-writer-scope.mjs';
 import { readRun, openRunArchive, createRunArchive } from './trace-store.mjs';
 
 test('actual team execution archives prompts, task attempts, messages and results across a new process', { timeout: 30_000 }, async () => {
@@ -12,7 +13,7 @@ test('actual team execution archives prompts, task attempts, messages and result
   try {
     const snapshot = verificationSnapshot();
     const originalRole = snapshot.agents[1].rolePrompt;
-    const result = await runTraceVerification(root, { snapshot });
+    const result = await runTraceVerification(root, { snapshot, writers: createArchiveWriterManager({traceRoot:root}) });
     assert.equal(result.status, 'completed');
     assert.equal(result.integrity, 'ok');
     const requests = result.events.filter(e => e.type === 'model/request');

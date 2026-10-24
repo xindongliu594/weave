@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,afterEach,test,mock} from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -21,6 +22,7 @@ import {fixtureTaskContext} from './model-fixture.ts';
 const require=createRequire(import.meta.url);
 const {createProductDeviceFixture}=require('./helpers/task-openshell-product-fixture.cjs');
 const {manifest,revision,exportFiles}=require('../apps/desktop/local-executor.cjs');
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex');
 const file=(path:string,content:string)=>({path,content:Buffer.from(content).toString('base64')});
@@ -30,10 +32,10 @@ let directory:string,server:http.Server,url:string,sharedFallbacks=0;
 before(async()=>{
  if(!isolated)return;assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);
  mkdirSync(evidenceRoot,{recursive:true});directory=mkdtempSync(join(evidenceRoot,'product-stop-fixture-'));
- process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;process.env.OBSIDIAN_VAULT=join(directory,'vault');process.env.LOCAL_WORKSPACE_ROOT=directory;
+ process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;writers=createArchiveWriterManager({traceRoot:directory});process.env.OBSIDIAN_VAULT=join(directory,'vault');process.env.LOCAL_WORKSPACE_ROOT=directory;
  await migrate();mock.method(RunSandbox,'assertReady',async()=>{sharedFallbacks++;throw Error('UNEXPECTED_SHARED_SANDBOX');});
  for(const name of ['start','file','sync','execute'] as const)mock.method(RunSandbox.prototype as any,name,async()=>{sharedFallbacks++;throw Error('UNEXPECTED_SHARED_SANDBOX');});
- const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory));
+ const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory,writers));
  app.use((error:any,_request:any,response:any,_next:any)=>response.status(error.status??500).json({code:error.code,message:error.message}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port;
 });
@@ -75,7 +77,7 @@ async function fixture(mode:Mode,shared?:SharedDevice){
  if(shared){const original=(await pool.query('SELECT * FROM local_devices WHERE id=$1',[deviceId])).rows[0];assert.ok(original?.enabled);assert.equal(original.grant_id,grantId);assert.equal(original.token_hash,hash(token));assert.deepEqual(original.backend,backend);}
  else await pool.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$3,true,$6)',[deviceId,hash(token),'engineering device','linux',grantId,backend]);
  snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
- const service=new LocalOperationService(directory,owner),jobs:any[]=[],checks:any[]=[],requests:any[]=[],steps=new Map<string,number>(),timeline:any[]=[];
+ const service=new LocalOperationService(directory,owner,writers),jobs:any[]=[],checks:any[]=[],requests:any[]=[],steps=new Map<string,number>(),timeline:any[]=[];
  const canonical=new Map([['in.txt','input'],['private.txt','private']]);let archive:any,executor:LocalRunExecutor;
  const events=()=>readRun(directory,runId)?.events??[];
  const provider=http.createServer(async(request,response)=>{
@@ -174,7 +176,7 @@ async function assertSuccessful(f:Fixture,result:any){
  assert.equal(f.device.observations.filter((row:any)=>row.kind==='accepted-stop'&&row.journal.key.runId===f.runId).length,3);assert.ok(f.device.observations.filter((row:any)=>row.kind==='create').every((row:any)=>row.running<=2));
  const scopes=f.device.executor.storageScopes().filter((scope:any)=>scope.key?.runId===f.runId);assert.equal(scopes.length,3);for(const scope of scopes){assert.equal(scope.phase,'stopped');assert.ok(scope.storage);const remote=[...f.device.sandboxes.values()].find((row:any)=>row.id===scope.sandboxId) as any;assert.ok(remote);assert.deepEqual(manifest(exportFiles(remote.root)),f.device.executor.read(scope.key).workManifest);for(const item of f.device.executor.read(scope.key).workManifest)assert.equal(hash(readFileSync(join(remote.root,item.path))),item.sha256);}
  const operations=(await pool.query('SELECT * FROM local_operations WHERE run_id=$1',[f.runId])).rows;assert.equal(operations.length,f.jobs.length);assert.ok(operations.every(row=>row.started&&row.status==='completed'&&row.merge_state==='committed'));for(const row of operations)assert.equal(hash(JSON.stringify(operationFacts(row))),f.checks.find(check=>check.operationId===row.id).operationFactsSha256,'stopping preserves original SQL operation/claim/result/merge');assert.equal(sharedFallbacks,0);
- assert.equal(await finishRun(f.runId,f.service.owner,'completed'),true);assert.equal((await acceptedWorkEvidence(pool,directory,f.runId)).receipts.length,3);
+ assert.equal(await writers.withWriter([f.runId],()=>finishRun(writers,f.runId,f.service.owner,'completed')),true);assert.equal((await acceptedWorkEvidence(pool,directory,f.runId)).receipts.length,3);
 }
 async function retainedProjectEvidence(runId:string,device:any){
  const run=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0];assert.equal(run.status,'completed');
@@ -234,7 +236,7 @@ test('lost accepted stop response cold API bind only observes original ID and ne
  const target=(await pool.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id='b'",[f.runId])).rows[0];assert.ok(target);
  const context={agentId:target.principal,sessionId:target.session_id,taskId:target.task_id,attemptId:target.attempt_id,generation:target.generation};
  await assert.rejects(f.executor.taskScope(context,new AbortController().signal),{code:'TASK_SCOPE_DENIED'});
- const before=f.device.calls.length,coldDevice=f.device.reopen(),cold=new LocalRunExecutor(f.archive,f.snapshot,new LocalOperationService(directory,f.service.owner),{sandboxMaintenance:f.maintenance} as any);
+ const before=f.device.calls.length,coldDevice=f.device.reopen(),cold=new LocalRunExecutor(f.archive,f.snapshot,new LocalOperationService(directory,f.service.owner,writers),{sandboxMaintenance:f.maintenance} as any);
  // The next task has failed after the lost response. bind still performs its
  // existing-only reconciliation before the unchanged active assignment guard.
  await assert.rejects(cold.bindAttempt({...context,runId:f.runId,runtimeTaskId:target.runtime_task_id,contractHash:target.contract_hash},new AbortController().signal),{code:'TASK_SCOPE_DENIED'});

@@ -12,6 +12,7 @@ import { unresolvedOperations } from '../../../services/agent-runtime/recovery.m
 import { hasUnplannedTasks, planningRequiredMessage } from '../../../packages/contracts/index.ts';
 import { assertGoalRecovery } from './goal-recovery.ts';
 import { recoveryTaskCallLimit } from './recovery-resource-plan.ts';
+import {requireResolvedProjectEffectsIn} from './tool-operations.ts';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 type History = Awaited<ReturnType<typeof budgetHistory>>;
@@ -86,6 +87,7 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
     common.push(issue(409, 'PROJECT_ALREADY_RUNNING', '此项目已有运行'));
   if (hasUnplannedTasks({ tasks: snapshot.approvedTasks ?? snapshot.tasks })) common.push(issue(422, 'PLAN_NOT_READY', planningRequiredMessage + '旧运行不能直接重试，请修改项目方案后重新批准。'));
   const run = readRun(traceRoot, runId);
+  try { await requireResolvedProjectEffectsIn(db,row.project_id); } catch(error) { addError(error); }
   try { assertGoalRecovery(snapshot,run); } catch(error) { addError(error); }
   if (run && run.integrity !== 'ok') common.push(issue(409, 'BUDGET_HISTORY_MISSING', '档案不完整，先导出并检查，不能自动恢复'));
   const unknown = run ? unresolvedOperations(run.events) : [];

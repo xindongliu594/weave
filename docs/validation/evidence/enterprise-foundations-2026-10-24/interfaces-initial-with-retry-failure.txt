@@ -1,0 +1,87 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ whole app waits for actual restore evidence before identity, HTTP admission and background starts (2642.7827ms)
+✔ app observes committed trace and disposes observation even when worker close fails (530.1006ms)
+✔ unresolved restore blocks the app while liveness stays available (416.291ms)
+✔ shutdown while restore is waiting prevents late identity or background activation (790.0881ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28511.614
+✔ startup inspector is read-only and treats a broken active pointer as pending (1517.7115ms)
+✔ same-transaction receipt proves commit and a valid new generation clears pending without replay (1174.7947ms)
+✔ absent receipt plus unchanged DB generation restores verified old trace key and vault and retains new trace (1049.9613ms)
+✔ committed DB cannot certify changed physical bytes and leaves original evidence pending (633.5371ms)
+✔ missing active pointer cannot hide an unfinished durable operation (454.5978ms)
+✔ new staged archive files are fsynced before publishing the active durable operation (437.3921ms)
+✔ process restart after prepared reconciles actual SQL and recorded physical generations without replay (9738.8331ms)
+✔ process restart after old-moved reconciles actual SQL and recorded physical generations without replay (9045.4683ms)
+✔ process restart after installed reconciles actual SQL and recorded physical generations without replay (6754.3628ms)
+OWNED_TEST_ROOTS=<temporary paths omitted; raw evidence retained locally>
+✔ process restart after committed reconciles actual SQL and recorded physical generations without replay (7138.8656ms)
+✔ vault physical rollback failure does not replace the first frozen restore error (129.4085ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39788.6457
+✔ restore waits for original native writer before SQL or live effects (4019.402ms)
+✔ a real COMMIT followed by lost acknowledgement keeps the committed physical generation and original error (1585.3896ms)
+✔ COMMIT failure before dispatch also preserves both generations and blocks a second write without replay (4065.8746ms)
+✔ a deterministic SQL failure and acknowledged rollback restore old files, release root and permit a fresh request (1783.5122ms)
+OWNED_TEST_ROOTS=<temporary paths omitted; raw evidence retained locally>
+✔ rollback acknowledgement failure preserves the first error, discards the client and keeps pending evidence (1042.0103ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18400.4485
+✔ static application import does not eagerly evaluate the provider through an authority class cycle (13285.5098ms)
+✔ real reservation and C1 dispatch survive absent browser sessions, then epoch alone stops the next effects (1901.7731ms)
+✔ disabled authorizer and loss of a collaborating department stop C1 before creating an intent (245.66ms)
+✔ withdrawn employee tool grant blocks the next actual C1 admission without changing its fixed snapshot (320.4337ms)
+✔ enterprise rejects unbound old authority without backfill while legacy-local preserves its existing path (219.7639ms)
+✔ paused coordinator admits no background work until one explicit start and close prevents revival (125.7106ms)
+✔ actual coordinator and independent employee Hosts await current authority before registered tool bodies (2402.5289ms)
+✔ device start rejects a revoked authorizer while the original authenticated late receipt is preserved (1008.0601ms)
+✔ worker tick durably pauses revoked queued work before claiming a running lease (168.6363ms)
+✔ runtime approval callback cannot create a new request under revoked authority (255.5603ms)
+✖ retry HTTP rechecks original authority before its existing child and before a successful idempotency cache (1328.493ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25003.014
+
+✖ failing tests:
+
+test at tests\run-current-authority.test.ts:2:17369
+✖ retry HTTP rechecks original authority before its existing child and before a successful idempotency cache (1328.493ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  200 !== 403
+
+      at TestContext.<anonymous> (<workspace>\tests\run-current-authority.test.ts:180:57)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,afterEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -13,6 +14,7 @@ import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
 // Engineering API integration only: an isolated in-memory PGlite database,
 // real loopback HTTP/auth/SQL transitions, and declared sandbox receipt fixtures.
 // No OpenShell process, sandbox isolation claim, real employee or model call.
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const opts={skip:!isolated,timeout:30000};
 const backend={kind:'openshell',version:'0.1.2',gateway:'weiwu-openshell-v012',
@@ -28,11 +30,11 @@ before(async()=>{
  if(!isolated)return;
  assert.match(process.env.DATABASE_URL??'',/^postgresql:\/\/postgres:postgres@127\.0\.0\.1:\d+\/postgres$/);
  directory=await mkdtemp(join(tmpdir(),'openshell-api-fixture-'));traceRoot=join(directory,'runs');
- process.env.DATA_DIR=directory;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(directory,'vault');
+ process.env.DATA_DIR=directory;process.env.TRACE_ROOT=traceRoot;writers=createArchiveWriterManager({traceRoot:traceRoot});process.env.OBSIDIAN_VAULT=join(directory,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',[departmentId,{name:'OpenShell API fixture',agents:[employee]}]);
  local=await import('../apps/api/src/local-execution.ts');
- const app=express();app.use(express.json({limit:'32mb'}));app.use('/api',local.localDeviceRouter(traceRoot));
+ const app=express();app.use(express.json({limit:'32mb'}));app.use('/api',local.localDeviceRouter(traceRoot,writers));
  app.use((error:any,_request:any,response:any,_next:any)=>response.status(error.status??500).json({code:error.code,message:error.message}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port+'/api';
 });
@@ -61,7 +63,7 @@ async function fixture():Promise<Fixture>{
  const snapshot={projectId,planVersion:1,departmentId,policy,agents:[employee],tasks,executionTarget:{...policy.executionTarget,platform:'linux',label:'isolated',allowCommands:true}};
  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',[projectId,departmentId,'API fixture','No employee/model execution',policy,{agents:[employee],tasks},'manual']);
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,lease_owner,lease_until,started_at) VALUES($1,$2,1,'running',$3,$4,clock_timestamp()+interval '3 minutes',now())",[runId,projectId,snapshot,owner]);
- createRunArchive(traceRoot,snapshot,{id:runId});return {device,runId,projectId,owner,policy,snapshot,service:new local.LocalOperationService(traceRoot,owner)};
+ createRunArchive(traceRoot,snapshot,{id:runId});return {device,runId,projectId,owner,policy,snapshot,service:new local.LocalOperationService(traceRoot,owner,writers)};
 }
 async function queue(f:Fixture){return f.service.enqueue(f.runId,'prepare',{}, {},[]);}
 

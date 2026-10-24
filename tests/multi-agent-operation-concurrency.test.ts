@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import { before, after, beforeEach, afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
@@ -15,6 +16,7 @@ import { createRunArchive } from '../services/agent-runtime/trace-store.mjs';
 // Actual product HTTP and native file execution in independent temporary data.
 // PGlite serializes one backend: competing HTTP clients are tested, independent
 // PostgreSQL row-lock/interleaving and multiple OS helper processes are not.
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated = process.env.SIMULATED_INTEGRATION === 'pglite';
 const { LocalExecutor } = createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 let pool: pg.Pool, directory: string, traceRoot: string, server: http.Server, gateway: http.Server, url: string;
@@ -38,7 +40,7 @@ before(async () => {
   if (!isolated) return;
   assert.match(process.env.DATABASE_URL ?? '', /@127\.0\.0\.1:\d+\/postgres$/);
   directory = await mkdtemp(join(tmpdir(), 'multi-agent-operation-')); traceRoot = join(directory, 'runs');
-  process.env.DATA_DIR = directory; process.env.TRACE_ROOT = traceRoot; process.env.OBSIDIAN_VAULT = join(directory, 'vault');
+  process.env.DATA_DIR = directory; process.env.TRACE_ROOT = traceRoot;writers=createArchiveWriterManager({traceRoot:traceRoot}); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate();
   gateway = http.createServer((_request, response) => { providerRequests++; response.writeHead(500); response.end('INFERENCE_FORBIDDEN'); });
   gateway.listen(0, '127.0.0.1'); await once(gateway, 'listening');
@@ -46,7 +48,7 @@ before(async () => {
   await pool.query("INSERT INTO models(id,data,status) VALUES($1,$2,'available')", [modelId, { id: modelId, name: 'Never-called model', model: 'unused', gatewayId: 'operation-concurrency-gateway', inputRate: 2, outputRate: 10 }]);
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [departmentId, { name: '并发隔离部门', agents: employees }]);
   const local = await import('../apps/api/src/local-execution.ts'); LocalOperationService = local.LocalOperationService;
-  const app = express(); app.use(express.json({ limit: '32mb' })); app.use('/api', local.localDeviceRouter(traceRoot));
+  const app = express(); app.use(express.json({ limit: '32mb' })); app.use('/api', local.localDeviceRouter(traceRoot,writers));
   app.use((error: any, _request: any, response: any, _next: any) => response.status(error.status ?? 500).json({ code: error.code, message: error.message }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as any).port + '/api';
 });
@@ -91,7 +93,7 @@ async function fixture(): Promise<Fixture> {
     dependencies: [], objective: 'Write only bounded temporary fixture text', taskPrompt: 'Write only bounded temporary fixture text', acceptanceCriteria: ['fixture version verified'], estimatedInputTokens: 10, estimatedOutputTokens: 10 }));
   const snapshot = { projectId, planVersion: 1, templateVersion: 'operation-concurrency-fixture', requirement: 'Isolated local-operation concurrency checks',
     policy, departmentId, agents: employees.map(employee => ({ ...employee, roleVersion: 1, rolePrompt: employee.instructions, model: 'unused' })), tasks, executionTarget };
-  const service = new LocalOperationService(traceRoot, owner), executor = new LocalExecutor(device.grant);
+  const service = new LocalOperationService(traceRoot, owner,writers), executor = new LocalExecutor(device.grant);
   const f: Fixture = { device, runId, owner, workspace: join(root, runId), service, executor };
   const registration = await request(f, '/local-devices/register', { id: device.id, token: device.token, name: '并发测试设备', platform: process.platform,
     grant: { id: device.grant.id, label: 'isolated', allowCommands: false } });

@@ -6,6 +6,8 @@ import {validateKnowledgeGrants} from './knowledge-store.ts';
 import {validateProjectTeam} from './collaboration.ts';
 import {localTarget} from './local-execution.ts';
 import {assertNativeCapabilities} from './native-capabilities.ts';
+import {assertCurrentRunAuthority,type RunEffect} from './run-current-authority.ts';
+type CurrentOptions={requireLocalOnline?:boolean;authorityLock?:boolean;effect?:RunEffect};
 export type ExecutionMode='legacy'|'enterprise';
 export function executionMode(env:NodeJS.ProcessEnv=process.env):ExecutionMode{
  const mode=env.WEIWU_EXECUTION_MODE??'legacy';
@@ -29,12 +31,13 @@ export function assertPolicy(agents:Agent[],policy:Policy){
 export function assertPlanningModel(id:string,policy:Policy){
  if(!policy.allowedModelIds?.includes(id))throw new AppError(422,'规划模型不在项目允许范围内，请先编辑项目策略','POLICY_MODEL_DENIED');
 }
-export async function assertRunAuthorization(row:any,db:Pick<pg.PoolClient,'query'>=pool,{requireLocalOnline=true}:{requireLocalOnline?:boolean}={}){
+export async function assertRunAuthorization(row:any,db:Pick<pg.PoolClient,'query'>=pool,options:CurrentOptions={}){
  assertExecutionProfile(row.snapshot);
- return assertCurrentRunPermissions(row,db,{requireLocalOnline});
+ return assertCurrentRunPermissions(row,db,options);
 }
 /** Current permissions only. Launching/executing still requires assertRunAuthorization's profile gate. */
-export async function assertCurrentRunPermissions(row:any,db:Pick<pg.PoolClient,'query'>=pool,{requireLocalOnline=true}:{requireLocalOnline?:boolean}={}){
+export async function assertCurrentRunPermissions(row:any,db:Pick<pg.PoolClient,'query'>=pool,{requireLocalOnline=true,authorityLock=false,effect='resume'}:CurrentOptions={}){
+ const authority=await assertCurrentRunAuthority(db,row.id,effect,{lock:authorityLock});
  const project=(await db.query('SELECT version,department_id FROM projects WHERE id=$1',[row.project_id])).rows[0];
  if(!project||project.version!==row.project_version)throw new AppError(409,'项目已有新方案，请批准当前版本，不能恢复旧版本','RUN_REAPPROVAL_REQUIRED');
  if(!Array.isArray(row.snapshot.agents)||!row.snapshot.agents.length)throw new AppError(422,'运行快照缺少员工授权，请重新批准','RUN_REAPPROVAL_REQUIRED');
@@ -48,5 +51,6 @@ export async function assertCurrentRunPermissions(row:any,db:Pick<pg.PoolClient,
   if(row.snapshot.executionTarget?.deviceId!==target.deviceId||row.snapshot.executionTarget?.grantId!==target.grantId||row.snapshot.executionTarget?.platform!==target.platform)throw new AppError(409,'本机运行的设备快照不一致，请重新批准','LOCAL_GRANT_CHANGED');
   if(requireLocalOnline)await localTarget(row.snapshot.policy,row.snapshot.agents,db);
  }
+ return authority;
 }
 export {bindPolicy};

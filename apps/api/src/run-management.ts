@@ -1,3 +1,5 @@
+import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
+import {lockedRun} from './run-state.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
 import {hasUnplannedTasks,planningRequiredMessage} from '../../../packages/contracts/index.ts';
 import { Router } from 'express';
@@ -22,21 +24,79 @@ import { recoveryResourceRouter } from './recovery-resource-router.ts';
 import {selectStepCheckpoint,stepCheckpointError} from './step-checkpoint-recovery.ts';
 import {sourceBudgetEvidence} from '../../../services/agent-runtime/run-evidence.mjs';
 import {readLiveCanonical} from './live-canonical-reader.ts';
-export function runManagementRouter(traceRoot:string){
+import {httpPrincipal,administrative,requireRunRoute,assertRunArchiveBinding,lockProjectAuthority,lockDepartmentAuthority,lockActiveDepartments,routeAudit} from './project-route-access.ts';
+import {resolveRunDepartments} from './resource-authorization.ts';
+import {auditActor,type AuditInput} from './audit-events.ts';
+import {appendBusinessAudit,recordDeniedAudit} from './human-audit.ts';
+import {projectAuditOutbox} from './audit-outbox.ts';
+import {readRunBounds} from './source-bounds.ts';
+import {requireResolvedProjectEffectsIn} from './tool-operations.ts';
+import {assertCurrentRunAuthority,recordRunAuthorityDenial} from './run-current-authority.ts';
+export function runManagementRouter(traceRoot:string,writers:ArchiveWriterManager){
+ if(!writers||writers.traceRoot!==traceRoot)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
  const router=Router();
+ const authorizedArchive=async(id:string,res:import('express').Response)=>{
+  const principal=httpPrincipal(res);await requireRunRoute(pool,principal,id,'viewer');
+  const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0],archive=readRun(traceRoot,id);
+  assertRunArchiveBinding(principal,row,archive);return {row,archive:archive!};
+ };
  router.use(recoveryResourceRouter(traceRoot));
  router.get('/approvals',async(req,res)=>res.json((await pool.query('SELECT id,run_id AS "runId",agent_id AS "agentId",tool,arguments,status,created_at AS "createdAt" FROM tool_approvals WHERE ($1::text IS NULL OR run_id=$1) ORDER BY created_at DESC LIMIT 200',[req.query.runId??null])).rows));
- router.post('/approvals/:id',async(req,res)=>{const input=z.object({decision:z.enum(['approved','denied'])}).parse(req.body);const r=await pool.query("UPDATE tool_approvals SET status=$1,decided_at=now() WHERE id=$2 AND status='pending' AND EXISTS(SELECT 1 FROM project_runs WHERE id=tool_approvals.run_id AND status='running' AND NOT cancel_requested) RETURNING run_id,agent_id",[input.decision,req.params.id]);if(!r.rowCount)throw new AppError(409,'审批已处理或运行已停止');openRunArchive(traceRoot,r.rows[0].run_id).append('approval/decided',{id:req.params.id,decision:input.decision,agentId:r.rows[0].agent_id});res.json({ok:true});});
- router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id),archive=readRun(traceRoot,id);if(!archive)throw new AppError(404,'运行不存在');const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0],canonical=await readLiveCanonical(pool,traceRoot,row,archive);res.json(canonical?canonical.ref.manifest:listArtifacts(join(traceRoot,id,'artifacts')));});
- router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path),archive=readRun(traceRoot,id);if(!archive)throw new AppError(404,'运行不存在');const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0],canonical=await readLiveCanonical(pool,traceRoot,row,archive);let file:string|undefined,bytes:Buffer|undefined;
+ router.post('/approvals/:id',async(req,res)=>{
+  const input=z.object({decision:z.enum(['approved','denied'])}).strict().parse(req.body),id=z.uuid().parse(req.params.id),principal=httpPrincipal(res);
+  const requestId=randomUUID(),eventId=randomUUID(),policyVersion='human-approval-v1';
+  const identity=(await pool.query('SELECT a.run_id,r.project_id FROM tool_approvals a JOIN project_runs r ON r.id=a.run_id WHERE a.id=$1',[id])).rows[0];
+  if(!identity)throw new AppError(404,'资源不存在或不可访问','RESOURCE_NOT_FOUND');
+  let commitStarted=false,failure:unknown;
+  try{
+   const outcome=await writers.withWriter([identity.run_id],async()=>{
+    const client=await pool.connect();let discard=false,transactionError:unknown;
+    try{
+   await client.query('BEGIN');
+   const project=(await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
+   const run=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[identity.run_id])).rows[0];
+   const approval=(await client.query('SELECT * FROM tool_approvals WHERE id=$1 FOR UPDATE',[id])).rows[0];
+   if(!project||!run||!approval||run.project_id!==project.id||approval.run_id!==run.id)throw new AppError(409,'审批来源已变化');
+   const departments=await resolveRunDepartments(client,run.id);
+   const authority={...await lockDepartmentAuthority(client,principal,departments??[],'operator',true),policyVersion,approvalId:id};
+   await lockActiveDepartments(client,authority.departmentIds);
+   await requireRunRoute(client,principal,run.id,'operator',true);
+   if(run.status!=='running'||run.cancel_requested||approval.status!=='pending')throw new AppError(409,'审批已处理或运行已停止');
+   await appendBusinessAudit(client,{eventId,action:'tool.approval',actor:auditActor(principal),authority,
+    correlation:{correlationId:requestId,requestId,projectId:project.id,runId:run.id,approvalId:id},resource:{type:'tool_operation',id,departmentIds:authority.departmentIds},
+    outcome:'success',changes:{decision:input.decision,policyVersion}});
+   await client.query(`UPDATE tool_approvals SET status=$1,decided_at=now(),decided_by_user_id=$2,decided_epoch=$3,
+     decision_actor_kind=$4,decision_request_id=$5,decision_reason=$6,decision_audit_id=$7 WHERE id=$8`,
+    [input.decision,principal.kind==='human'?principal.userId:null,principal.kind==='human'?principal.sessionEpoch:null,principal.kind,requestId,input.decision+'-by-current-authority',eventId,id]);
+   commitStarted=true;await client.query('COMMIT');
+    }catch(error){transactionError=error;discard=commitStarted;try{await client.query('ROLLBACK');}catch{discard=true;}}
+    finally{try{client.release(discard);}catch(error){discard=true;transactionError??=error;}}
+    // Only a confirmed rollback may leave the writer scope normally. Unknown persistence retains its failure latch.
+    if(transactionError&&discard)throw transactionError;
+    return {error:transactionError};
+   });failure=outcome.error;
+  }catch(error){failure=error;}
+  if(failure){
+   const denied=failure instanceof AppError&&failure.status>=400&&failure.status<500;
+   const event:AuditInput={eventId:randomUUID(),action:'tool.approval',actor:auditActor(principal),
+    correlation:{correlationId:requestId,requestId,projectId:identity.project_id,runId:identity.run_id,approvalId:id},resource:{type:'tool_operation',id,departmentIds:[]},
+    outcome:commitStarted?'unknown':denied?'denied':'failure',reasonCode:commitStarted?'result-unknown':denied?'forbidden':'storage-unavailable',changes:{decision:input.decision,policyVersion}};
+   try{await recordDeniedAudit(pool,event);}catch{/* Preserve the original denial/failure even if independent audit storage is unavailable. */}
+   throw failure;
+  }
+  // The coordinator polls this committed DB decision. Projection never acquires an active archive writer.
+  try{await projectAuditOutbox(pool,{limit:20,now:new Date()});}catch{/* Durable outbox remains retryable; do not report a committed approval as failed. */}
+  res.json({ok:true});
+ });
+ router.get('/runs/:id/artifacts',async(req,res)=>{const id=z.uuid().parse(req.params.id),{row,archive}=await authorizedArchive(id,res),canonical=await readLiveCanonical(pool,traceRoot,row,archive);res.json(canonical?canonical.ref.manifest:listArtifacts(join(traceRoot,id,'artifacts')));});
+ router.get('/runs/:id/artifact',async(req,res)=>{const id=z.uuid().parse(req.params.id),path=z.string().parse(req.query.path),{row,archive}=await authorizedArchive(id,res),canonical=await readLiveCanonical(pool,traceRoot,row,archive);let file:string|undefined,bytes:Buffer|undefined;
   if(canonical){const found=canonical.files.find(file=>file.path===path);if(!found)throw new AppError(404,'交付物不存在或路径不允许');bytes=Buffer.from(found.content,'base64');}
   else try{file=artifactFile(join(traceRoot,id,'artifacts'),path);}catch{throw new AppError(404,'交付物不存在或路径不允许');}
   res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.setHeader('X-Content-Type-Options','nosniff');res.type('application/octet-stream');res.attachment(path.split('/').at(-1));if(bytes)res.send(bytes);else res.sendFile(file!,{dotfiles:'allow'});
  });
- router.get('/runs/:id/export',async(req,res)=>{const run=readRun(traceRoot,z.uuid().parse(req.params.id));if(!run)throw new AppError(404,'运行不存在');res.attachment('run-'+run.id+'.json').json(run);});
+ router.get('/runs/:id/export',async(req,res)=>{const {archive:run}=await authorizedArchive(z.uuid().parse(req.params.id),res);res.attachment('run-'+run.id+'.json').json(run);});
  router.get('/runs/:id/citations/:chunkId',async(req,res)=>{
-  const run=readRun(traceRoot,z.uuid().parse(req.params.id));
-  if(!run)throw new AppError(404,'运行不存在');
+  const {archive:run}=await authorizedArchive(z.uuid().parse(req.params.id),res);
   if(run.integrity!=='ok')throw new AppError(409,'运行档案不完整，无法核对引用');
   const chunkId=z.string().min(1).max(200).parse(req.params.chunkId);
   const event=run.events.find(e=>e.type==='knowledge/citation'&&e.data.sources?.some((c:any)=>c.chunkId===chunkId));
@@ -52,6 +112,7 @@ export function runManagementRouter(traceRoot:string){
   const choices={retainUncertainCosts:booleanQuery.parse(req.query.retainUncertainCosts),acknowledgeUnknownOperations:booleanQuery.parse(req.query.acknowledgeUnknownOperations),...(req.query.checkpointId?{checkpointId:z.uuid().parse(req.query.checkpointId)}:{})};
   const client=await pool.connect();
   try{await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    await requireRunRoute(client,httpPrincipal(res),id,'viewer');
    const result=await inspectRecoveryConditions(client,traceRoot,id,choices);
    await client.query('COMMIT');res.setHeader('Cache-Control','no-store');res.json(result);
   }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
@@ -62,11 +123,23 @@ export function runManagementRouter(traceRoot:string){
   if(input.checkpointId&&(!input.resume||input.budgetPreviewId))throw new AppError(409,'步骤恢复须沿用原方案与资源；请先核对预算，再选择恢复点','CHECKPOINT_RESUME_ONLY');
   if(input.budgetPreviewId&&input.confirmation!=='APPROVE_RESOURCES_AND_RESUME')throw new AppError(400,'请明确确认资源额度与续跑','RESOURCE_CONFIRMATION_REQUIRED');
   if(input.budgetPreviewId&&!input.resume)throw new AppError(409,'资源补充只允许续跑未完成节点','RESOURCE_RESUME_ONLY');
+  const newId=randomUUID();
+  const admission=await writers.withWriter([newId],async()=>{
   const client=await pool.connect();
+  let commitDispatched=false,discard=false;
   try{await client.query('BEGIN');await shareCostMaintenance(client);
    const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
-   await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
+   const project=(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
    const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
+   const principal=httpPrincipal(res);
+   // Recovery checks two people. Lock their rows in one order before either
+   // person's memberships, then recheck original authority in this transaction.
+   const actors=[...new Set([old.authorized_by_user_id,principal.kind==='human'?principal.userId:undefined].filter((value):value is string=>typeof value==='string'))].sort();
+   if(actors.length)await client.query('SELECT id FROM human_users WHERE id=ANY($1::text[]) ORDER BY id FOR UPDATE',[actors]);
+   await assertCurrentRunAuthority(client,id,'retry');
+   const authority=await lockProjectAuthority(client,principal,project,'operator',true);
+   await requireRunRoute(client,principal,id,'operator',true);
+   if(input.budgetPreviewId&&!administrative(principal))throw new AppError(403,'补充资源与预算需要管理员批准','RESOURCE_BUDGET_ADMIN_REQUIRED');
    if(!input.resume&&old.snapshot.resourceRevision)throw new AppError(409,'资源补充只批准未完成节点，完整重试需要另外批准方案','RESOURCE_RESUME_ONLY');
    if(!['failed','interrupted','cancelled'].includes(old.status))throw new AppError(409,'仅能恢复或重试已停止的运行');
    // A repeated recovery request returns its committed child even while that
@@ -77,9 +150,10 @@ export function runManagementRouter(traceRoot:string){
     if(input.budgetPreviewId&&(already.snapshot.approval?.kind!=='resume-resources'||already.snapshot.resourceApproval?.previewId!==input.budgetPreviewId||
        already.snapshot.resourceApproval?.sourceRunId!==id||already.snapshot.resourceRevision!==(old.snapshot.resourceRevision??0)+1))
       throw new AppError(409,'此运行已有其他续跑记录，请打开已有运行后重新核对资源方案','RESOURCE_PREVIEW_STALE');
-    await client.query('COMMIT');return res.json({id:already.id,existing:true});
+    commitDispatched=true;await client.query('COMMIT');return {ok:true as const,status:200,data:{id:already.id,existing:true}};
    }
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
+   await requireResolvedProjectEffectsIn(client,old.project_id);
    if(hasUnplannedTasks({tasks:old.snapshot.approvedTasks??old.snapshot.tasks}))throw new AppError(422,planningRequiredMessage+'旧运行不能直接重试，请修改项目方案后重新批准。','PLAN_NOT_READY');
    const run=readRun(traceRoot,id);if(run&&run.integrity!=='ok')throw new AppError(409,'档案不完整，先导出并检查，不能自动恢复');
    assertGoalRecovery(old.snapshot,run);
@@ -122,10 +196,21 @@ export function runManagementRouter(traceRoot:string){
    const config=await lockCostPolicy(client);await checkDailyBudget(client,config,snapshot.departmentId,snapshot.departmentBudgets[snapshot.departmentId]??0,snapshot.executionBudget);
    for(const departmentId of snapshot.departmentIds??[snapshot.departmentId])if(departmentId!==snapshot.departmentId)await checkDailyBudget(client,config,departmentId,snapshot.departmentBudgets[departmentId]??0,0);
    snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.budgetPreviewId?'resume-resources':input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id,retainUncertainCosts:input.retainUncertainCosts,...(unknown.length?{reconciledOperations:unknown}: {})};
-   const newId=randomUUID(),attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);
-   await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,parent_run_id,department_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[newId,old.project_id,old.project_version,'queued',snapshot,attempt,id,old.department_ids??snapshot.departmentIds??[snapshot.departmentId]]);
-   await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1 AND version=$2",[old.project_id,old.project_version]);await client.query('COMMIT');res.status(202).json({id:newId,completedCheckpoints:[...done.keys()]});
-  }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
+   const attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);
+   const sourceBounds=await readRunBounds(client,id),departments=old.department_ids??snapshot.departmentIds??[snapshot.departmentId];
+   if(sourceBounds.requiredDepartmentIds.some(department=>!departments.includes(department)))throw new AppError(422,'目标运行必须保留全部来源部门','SOURCE_BOUNDS_INVALID');
+   await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,parent_run_id,department_ids,requested_by_user_id,authorized_by_user_id,authorized_epoch,authority_kind,authority_department_ids,source_bounds) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$9,$10,$11,$12,$13)',[newId,old.project_id,old.project_version,'queued',snapshot,attempt,id,departments,principal.kind==='human'?principal.userId:null,principal.kind==='human'?principal.sessionEpoch:null,principal.kind==='human'?'human':'local-owner',authority.departmentIds,sourceBounds]);
+   await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1 AND version=$2",[old.project_id,old.project_version]);
+   await routeAudit(client,principal,authority,'run.recover',newId,{state:'requested',...(input.checkpointId?{checkpointId:input.checkpointId}:{})},{projectId:old.project_id,runId:newId});
+   commitDispatched=true;await client.query('COMMIT');return {ok:true as const,status:202,data:{id:newId,completedCheckpoints:[...done.keys()]}};
+  }catch(error){
+   try{await client.query('ROLLBACK');}catch{discard=true;throw error;}
+   if(commitDispatched)throw error;
+   return {ok:false as const,error};
+  }finally{client.release(discard);}
+  });
+  if(!admission.ok){await recordRunAuthorityDenial(pool,admission.error);throw admission.error;}
+  res.status(admission.status).json(admission.data);
  });
  router.get('/diagnostics',async(_req,res)=>{let sandbox=false;try{await RunSandbox.assertReady(AbortSignal.timeout(5000));sandbox=true;}catch{}res.json({sandbox,sandboxImage:SANDBOX_IMAGE,worker:(await pool.query("SELECT status,count(*)::int FROM project_runs GROUP BY status")).rows,knowledge:(await pool.query('SELECT count(*)::int FROM knowledge_documents WHERE deleted_at IS NULL')).rows[0].count,node:process.versions.node,platform:process.platform});});
  router.post('/sandbox/install',async(_req,res)=>{await command(['pull',SANDBOX_IMAGE],{signal:AbortSignal.timeout(180000),limit:2000000});res.json({ok:true});});

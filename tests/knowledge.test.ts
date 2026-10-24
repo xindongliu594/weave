@@ -75,7 +75,10 @@ test('full corpus retrieval covers late chunks, stays permission scoped and pins
   assert.equal((await store.queryKnowledge(manifest,manager.id,'search','needleomega'))[0].version,1);
   await assert.rejects(store.knowledgeSnapshot([manager],'department'),/知识授权已失效/);
 
-  const archive=createRunArchive(join(dir,'runs'),{knowledge:manifest,agents:[manager]});
+  // Citation reads require a persisted resource anchor, including for an explicit local owner.
+  await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES('citation-project','department',1,'Fixture','Fixed citation',$1,$2,'manual')",[{allowedDepartmentIds:['department']},{agents:[manager],tasks:[]}]);
+  const fixed={projectId:'citation-project',planVersion:1,departmentId:'department',knowledge:manifest,agents:[manager]},archive=createRunArchive(join(dir,'runs'),fixed);
+  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids) VALUES($1,'citation-project',1,'completed',$2,ARRAY['department'])",[archive.id,fixed]);
   archive.append('knowledge/citation',{agentId:manager.id,sources:[{documentId:old.documentId,version:old.version,chunkId:old.id,sha256:old.sha256}]});
   const citation=await fetch(url+'/runs/'+archive.id+'/citations/'+old.id);
   assert.equal(citation.status,200);assert.equal((await citation.json() as any).content,old.content);

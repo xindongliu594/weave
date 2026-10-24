@@ -37,7 +37,7 @@ export function companySkills(manifest, employee) {
 }
 
 /** Thin authorization adapter; registry, catalog and loader belong to DSH. */
-export async function installApprovedSkills(ctx, mount, { manifest, employee, agent, archive, queryKnowledge }) {
+export async function installApprovedSkills(ctx, mount, { manifest, employee, agent, archive, queryKnowledge,beforeKnowledge, fixedRegistry = false }) {
   const skills = approvedSkills(manifest, employee);
   const company=companySkills(manifest,employee),catalog=[...skills,...company];
   if (!catalog.length) return;
@@ -49,17 +49,29 @@ export async function installApprovedSkills(ctx, mount, { manifest, employee, ag
       signal?.throwIfAborted();
       const method=company.find(item=>item.name===candidate.name);
       if(!method||!queryKnowledge)throw Error('KNOWLEDGE_SERVICE_UNAVAILABLE: 公司方法加载服务不可用');
+      await beforeKnowledge?.(signal);
       const loaded=await queryKnowledge(manifest,employee.id,'skill',method.evidence.documentId);
       signal?.throwIfAborted();
       if(!loaded||loaded.documentId!==method.evidence.documentId||loaded.version!==method.evidence.version||loaded.sha256!==method.evidence.sha256||typeof loaded.content!=='string'||!loaded.content.trim()||loaded.content.length>16000||createHash('sha256').update(loaded.content).digest('hex')!==method.evidence.sha256)throw Error('APPROVED_SKILL_INVALID: 公司工作方法正文或固定版本校验失败');
       const {evidence,rank,...summary}=method;return {...summary,content:loaded.content};
     }}));
   await mount('@deepseek-ai/dsh-tool-skill', { catalogDescriptionMaxLength: 200 });
-  ctx.tools.guard(exec => exec.name === 'skill' && (exec.agent !== agent || ctx.agents.get(agent.id) !== agent) ? 'SKILL_PERMISSION_DENIED: 工作方法只允许获授权的当前员工读取' : undefined);
+  // The pinned DSH registry invalidates revision on provider/runtime changes.
+  // A reviewed production composition cannot silently acquire another loader.
+  const registry=ctx.skills,revision=registry.revision,layers=registry.layers;
+  if(fixedRegistry&&!Number.isSafeInteger(revision))throw Error('SKILL_SOURCE_CHANGED');
+  const checkSource=()=>!fixedRegistry||(ctx.skills.layers===layers&&ctx.skills.revision===revision);
+  ctx.tools.guard(exec => {
+    if(exec.name!=='skill')return;
+    if(exec.agent!==agent||ctx.agents.get(agent.id)!==agent)return 'SKILL_PERMISSION_DENIED: 工作方法只允许获授权的当前员工读取';
+    if(fixedRegistry&&(!checkSource()||!catalog.some(item=>item.name===exec.arguments?.name)))
+      return 'SKILL_SOURCE_CHANGED: 工作方法来源已变化，请重新批准后使用';
+  });
   ctx.on('tools/result', (exec, result) => {
     if (exec.name !== 'skill' || result.isError) return;
     const skill = catalog.find(item => item.name === exec.arguments.name);
     if (skill) archive?.append('skill/loaded', { agentId: employee.id, name: skill.name, ...skill.evidence }, { sessionId: agent.id, callId: exec.callId });
   });
   archive?.append('skill/catalog', { agentId: employee.id, skills: catalog.map(({ name, evidence }) => ({ name, ...evidence })) }, { sessionId: agent.id });
+  return checkSource;
 }

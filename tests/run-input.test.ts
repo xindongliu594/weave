@@ -22,7 +22,7 @@ before(async()=>{
 });
 after(async()=>{await app?.locals.shutdown();if(server)await new Promise<void>(r=>server.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir)await rm(dir,{recursive:true,force:true});});
 
-test('approval intersects long-term scope, freezes per-employee run inputs and preserves old citations through backup',async()=>{
+test('approval freezes per-employee inputs and preserves old citations while unsupported online backup is refused',async()=>{
  const manager={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调',modelId:'model',tools:['knowledge_search','knowledge_read'],knowledgeSpaceIds:[] as string[]};
  const other={...manager,id:'other',name:'员工',role:'member',knowledgeSpaceIds:[] as string[]};
  const department={name:'资料隔离部门',description:'测试',agents:[manager,other]};
@@ -73,8 +73,10 @@ test('approval intersects long-term scope, freezes per-employee run inputs and p
  await assert.rejects(store.knowledgeSnapshot([manager],d.id,undefined,[secret.id]),e=>(e as any).code==='KNOWLEDGE_SCOPE_INVALID');
  await assert.rejects(store.knowledgeSnapshot([manager],d.id,undefined,['missing']),e=>(e as any).code==='KNOWLEDGE_SCOPE_INVALID');
  assert.equal((await store.knowledgeSnapshot([manager],d.id,undefined,[doc2.id])).documents.length,1);
- const backup=await call('/backup/export','POST',{password:'run-inputs-backup'});assert.equal(backup.status,200);
- assert.equal((await call('/backup/restore','POST',{password:'run-inputs-backup',backup:backup.data,confirmation:'RESTORE'})).status,200);
+ // Local work now records audit authority. The legacy business-only backup must
+ // refuse to silently discard that chain; complete enterprise backup is pending.
+ const backup=await call('/backup/export','POST',{password:'run-inputs-backup'});assert.equal(backup.status,409);
+ assert.equal(backup.data.code,'BACKUP_SOURCE_IDENTITY_UNSUPPORTED');
  assert.equal((await call('/runs/'+runId+'/citations/'+input.id)).data.content,input.content);
  const largeInputs=Array.from({length:5},(_,i)=>({id:'large'+i,title:'中文资料',content:'中'.repeat(50000),agentIds:['manager']}));
  assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:3,plan:{...second,runInputs:largeInputs}})).status,200,'the HTTP body limit accommodates the declared 250,000 Chinese-character input allowance');

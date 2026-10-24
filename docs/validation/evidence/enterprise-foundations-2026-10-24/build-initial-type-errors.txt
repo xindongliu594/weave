@@ -1,0 +1,6 @@
+
+> agent-department@0.2.0 build
+> tsc --noEmit && vite build
+
+tests/run-current-authority.test.ts(117,132): error TS7016: Could not find a declaration file for module '../services/agent-runtime/host.mjs'. 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/host.mjs' implicitly has an 'any' type.
+tests/run-current-authority.test.ts(117,195): error TS7016: Could not find a declaration file for module '../services/agent-runtime/limits.mjs'. 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/limits.mjs' implicitly has an 'any' type.

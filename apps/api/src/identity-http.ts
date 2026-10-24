@@ -20,8 +20,8 @@ const regenerate=(req:Request)=>new Promise<void>((resolve,reject)=>req.session.
 const destroy=(req:Request)=>new Promise<void>((resolve,reject)=>req.session.destroy(error=>error?reject(error):resolve()));
 
 /** All dependencies come from startup code. Never populate these options from HTTP input. */
-export function createIdentityHttp({pool,config,transport,now=()=>new Date()}: {
-  pool:pg.Pool;config:IdentityConfig;transport?:CustomFetch;now?:()=>Date;
+export function createIdentityHttp({pool,config,transport,now=()=>new Date(),initializeAfter}: {
+  pool:pg.Pool;config:IdentityConfig;transport?:CustomFetch;now?:()=>Date;initializeAfter?:Promise<void>;
 }) {
   const router=express.Router({caseSensitive:true,strict:true});
   const protocol=config.mode==='oidc'?createIdentityOidc({pool,config,transport,now}):undefined;
@@ -102,15 +102,20 @@ export function createIdentityHttp({pool,config,transport,now=()=>new Date()}: {
   const middleware:RequestHandler=config.mode==='oidc'?session({store,secret:config.sessionSecrets,name:cookieName,
     genid:req=>{freshRequests.add(req);return randomBytes(32).toString('base64url');},
     cookie:{...cookieOptions,maxAge:8*60*60_000},resave:false,saveUninitialized:false,rolling:false}):(_req,_res,next)=>next();
-  let closed=false;
+  let closed=false,initializing=false,initialized=false;
   let cleanup:Promise<void>|undefined;
   const ready=(async()=>{
+    if(initializeAfter)await initializeAfter;
+    if(closed)throw Error('Identity service is closed');
+    initializing=true;
     await activateIdentityMode(pool,config);
     if(protocol){await pool.query('SELECT sid FROM human_sessions LIMIT 0');await pool.query('SELECT sid FROM human_session_lifecycles LIMIT 0');await protocol.initialize();}
+    if(closed)throw Error('Identity service is closed');
+    initialized=true;
   })();
   // Own and drain one bounded cleanup operation; the store's unbounded background prune is disabled.
   const timer=protocol?setInterval(()=>{
-    if(closed||cleanup)return;
+    if(closed||!initialized||cleanup)return;
     cleanup=(async()=>{
       await pool.query('DELETE FROM oidc_login_transactions WHERE id IN (SELECT id FROM oidc_login_transactions WHERE expires_at<=$1 LIMIT 500)',[now()]);
       await pool.query('DELETE FROM human_sessions WHERE sid IN (SELECT sid FROM human_sessions WHERE expire<=to_timestamp($1) LIMIT 500)',[now().getTime()/1000]);
@@ -188,5 +193,5 @@ export function createIdentityHttp({pool,config,transport,now=()=>new Date()}: {
     res.clearCookie(cookieName,cookieOptions);res.sendStatus(204);
   });
   const drainMaintenance=async()=>{await cleanup;};
-  return {router,sessionMiddleware,ready,authenticate,csrf,drainMaintenance,async close(){closed=true;if(timer)clearInterval(timer);await drainMaintenance();await store?.close();}};
+  return {router,sessionMiddleware,ready,authenticate,csrf,drainMaintenance,async close(){closed=true;if(timer)clearInterval(timer);if(initializing)await ready.catch(()=>{});await drainMaintenance();await store?.close();}};
 }

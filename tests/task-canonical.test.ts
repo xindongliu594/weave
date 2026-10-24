@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,afterEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,rmSync,unlinkSync,linkSync} from 'node:fs';
@@ -16,12 +17,14 @@ import {assertCurrentRunPermissions,assertExecutionProfile} from '../apps/api/sr
 import {AppError} from '../apps/api/src/provider.ts';
 import {bindTrustedAttempt,resolveTaskScope} from '../apps/api/src/task-execution.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
+import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const sha=(v:string)=>createHash('sha256').update(v).digest('hex'),file=(path:string,text:string)=>({path,content:Buffer.from(text).toString('base64')});
 let directory:string;
 const employee={id:'employee',employeeId:'employee',modelId:'unused',tools:['filesystem','artifact_write','terminal'],name:'Fixture',role:'manager'};
-before(async()=>{if(!isolated)return;assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);directory=mkdtempSync(join(tmpdir(),'task-canonical-'));process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;process.env.OBSIDIAN_VAULT=join(directory,'vault');await migrate();await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'fixture',agents:[employee]}]);});
+before(async()=>{if(!isolated)return;assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);directory=mkdtempSync(join(tmpdir(),'task-canonical-'));process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;writers=createArchiveWriterManager({traceRoot:directory});process.env.OBSIDIAN_VAULT=join(directory,'vault');await migrate();await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'fixture',agents:[employee]}]);});
 beforeEach(async()=>{if(isolated)await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,tool_approvals CASCADE');});
 afterEach(async()=>{if(!isolated)return;for(const name of ['usage','model_reservations'])assert.equal((await pool.query('SELECT count(*)::int AS n FROM '+name)).rows[0].n,0);});
 after(async()=>{if(!isolated)return;await pool.end();assert.ok(directory.startsWith(join(tmpdir(),'task-canonical-')));rmSync(directory,{recursive:true,force:true});});
@@ -38,7 +41,7 @@ async function fixture(){
  const archive=createRunArchive(directory,snapshot,{id:runId});mkdirSync(join(archive.dir,'artifacts'));
  writeFileSync(join(archive.dir,'artifacts/in.txt'),'input');writeFileSync(join(archive.dir,'artifacts/secret.txt'),'private');
  archive.append('run/task-mapping',{tasks:[{task_id:'native',seed_id:'task'},{task_id:'native-b',seed_id:'task-b'}]});archive.append('team/checkpoint',{members:[{id:'session',name:'employee'}],tasks:[{id:'native',assignee:'employee',attemptId:'attempt',status:'in_progress'},{id:'native-b',assignee:'employee',attemptId:'attempt-b',status:'in_progress'}]});
- const service=new LocalOperationService(directory,owner);await initializeTaskCanonical(service,runId,new AbortController().signal);
+ const service=new LocalOperationService(directory,owner,writers);await initializeTaskCanonical(service,runId,new AbortController().signal);
  const run=await getRun(runId);run.events=readRun(directory,runId)!.events;
  const candidate={runId,taskId:'task',attemptId:'attempt',agentId:'employee',sessionId:'session',runtimeTaskId:'native',contractHash:checkpointContract(run.snapshot,run.snapshot.tasks[0])};
  const db=await pool.connect();let scope:any;try{await db.query('BEGIN');const assignment=await bindTrustedAttempt(db,run,candidate);const canonical=readCommittedCanonical(directory,run);scope=await resolveTaskScope(db,run,assignment,{files:canonical.files,revision:canonical.ref.revision},null);await db.query('COMMIT');}catch(error){await db.query('ROLLBACK');throw error;}finally{db.release();}
@@ -115,10 +118,10 @@ test('commits full canonical, retains other task file, deduplicates merge and ro
  const f=await fixture(),before=readCommittedCanonical(directory,await getRun(f.runId));
  const receipt=await commitTaskResult(f.service,f.id,new AbortController().signal);assert.equal(receipt.status,'committed');assert.equal(receipt.mergeId,f.id);
  const after=readCommittedCanonical(directory,await getRun(f.runId));assert.deepEqual(after.files,[file('in.txt','input'),file('out.txt','output'),file('secret.txt','private')]);assert.notEqual(before.ref.revision,after.ref.revision);
- assert.deepEqual(await reconcileTaskMerge(new LocalOperationService(directory,f.service.owner),f.id),receipt);
+ assert.deepEqual(await reconcileTaskMerge(new LocalOperationService(directory,f.service.owner,writers),f.id),receipt);
  assert.equal(readRun(directory,f.runId)!.events.filter(e=>e.type==='task/merge-committed').length,1);
  const own=(await pool.query('SELECT committed_outputs FROM task_attempt_workspaces')).rows[0].committed_outputs;assert.equal(own.length,1);assert.equal(own[0].receipt.beforeWorkRevision,f.scope.workRevision);assert.equal(own[0].receipt.afterWorkRevision,after.ref.revision);
- materializeCommittedCanonical(directory,await getRun(f.runId));assert.equal(readFileSync(join(f.archive.dir,'artifacts/secret.txt'),'utf8'),'private');
+ await writers.withWriter([f.runId],async()=>materializeCommittedCanonical(f.service,await getRun(f.runId)));assert.equal(readFileSync(join(f.archive.dir,'artifacts/secret.txt'),'utf8'),'private');
  const executor=new LocalRunExecutor(f.archive,{},f.service);const visible=await executor.taskResultSummary(f.id);assert.deepEqual(visible.artifacts.map((r:any)=>r.path),['in.txt','out.txt']);assert.ok(!JSON.stringify(visible).includes('secret.txt'));
  assert.equal((await pool.query('SELECT count(*)::int AS n FROM local_operations')).rows[0].n,1);
 });
@@ -164,7 +167,7 @@ for(const withdrawal of ['plan','backend'])test(`actual result route validates r
  const f=await fixture(),claim=(await getOp(f.id)).claim_token,token='a'.repeat(64);
  await pool.query('UPDATE local_devices SET token_hash=$1 WHERE id=$2',[sha(token),f.deviceId]);
  await pool.query("UPDATE local_operations SET result=NULL,status='started' WHERE id=$1",[f.id]);
- const app=express();app.use(express.json({limit:'32mb'}));app.use('/api',localDeviceRouter(directory));
+ const app=express();app.use(express.json({limit:'32mb'}));app.use('/api',localDeviceRouter(directory,writers));
  app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({error:error.message,code:error.code}));
  const server=app.listen(0,'127.0.0.1');await once(server,'listening');
  const send=(id:string,claimToken:string,result:any)=>fetch(`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/local-devices/${f.deviceId}/operations/${id}/result`,{method:'POST',headers:{'content-type':'application/json','X-Local-Device-Key':token},body:JSON.stringify({claimToken,ok:true,result})});
@@ -201,7 +204,7 @@ for(const point of ['intent','blob-fsync','before-sql-commit','after-sql-commit'
 });
 test('missing or corrupt object freezes reads, merge and cache recovery with original files retained',{skip:!isolated},async()=>{
  const f=await fixture(),run=await getRun(f.runId),object=join(f.archive.dir,'checkpoint-objects',sha('private'));unlinkSync(object);
- assert.throws(()=>readCommittedCanonical(directory,run));await assert.rejects(()=>commitTaskResult(f.service,f.id,new AbortController().signal));assert.throws(()=>materializeCommittedCanonical(directory,run));assert.equal(readFileSync(join(f.archive.dir,'artifacts/secret.txt'),'utf8'),'private');
+ assert.throws(()=>readCommittedCanonical(directory,run));await assert.rejects(()=>commitTaskResult(f.service,f.id,new AbortController().signal));await assert.rejects(writers.withWriter([f.runId],()=>materializeCommittedCanonical(f.service,run)));assert.equal(readFileSync(join(f.archive.dir,'artifacts/secret.txt'),'utf8'),'private');
  writeFileSync(object,'wrong');assert.throws(()=>readCommittedCanonical(directory,run));
 });
-test('task profile launch stays closed while prepare only initializes canonical',{skip:!isolated},async()=>{const f=await fixture(),snapshot=(await getRun(f.runId)).snapshot;const executor=new LocalRunExecutor(f.archive,snapshot,f.service);assert.throws(()=>assertExecutionProfile(snapshot),{code:'TASK_EXECUTION_UNAVAILABLE'});await executor.prepare(new AbortController().signal);assert.equal((await pool.query('SELECT count(*)::int AS n FROM local_operations')).rows[0].n,1);});
+test('task profile launch stays closed while prepare only initializes canonical',{skip:!isolated},async()=>{const f=await fixture(),snapshot=(await getRun(f.runId)).snapshot;const target=snapshot.executionTarget,executor=new LocalRunExecutor(f.archive,snapshot,f.service,inProgressTaskMaintenance(target.deviceId,target.grantId,target.backend.fingerprint));assert.throws(()=>assertExecutionProfile(snapshot),{code:'TASK_EXECUTION_UNAVAILABLE'});await executor.prepare(new AbortController().signal);assert.equal((await pool.query('SELECT count(*)::int AS n FROM local_operations')).rows[0].n,1);});

@@ -8,3 +8,11 @@ dist/
 # Generated delivery copies and machine-local acceptance archives.
 source-delivery-*/
 docs/test-evidence/
+
+# Private continuation records, isolated dependency/DB fixtures, and local caches.
+.private/
+.superpowers/
+__pycache__/
+*.pyc
+*.pyo
+apps/desktop/.openshell-test-*/

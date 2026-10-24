@@ -1,7 +1,8 @@
+import express from 'express';
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp} from 'node:fs/promises';
-import {existsSync,readFileSync} from 'node:fs';
+import {existsSync,readFileSync,appendFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve,relative,isAbsolute} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
@@ -26,6 +27,7 @@ before(async()=>{
  if(!isolated)return;
  assert.match(process.env.DATABASE_URL??'',/^postgresql:\/\/postgres:postgres@127\.0\.0\.1:\d+\/postgres$/);
  root=await mkdtemp(join(tmpdir(),'run-terminal-maintenance-'));traceRoot=join(root,'runs');
+ console.log('ARCHIVE_WRITER_FIXTURE_CREATED='+JSON.stringify({root,pid:process.pid,traceRoot}));
  process.env.DATA_DIR=root;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(root,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
  const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot,createArchiveWriterManager({traceRoot:traceRoot}));await worker.close();
@@ -275,6 +277,176 @@ test('a rejected heartbeat waits for every original SQL update and retains the f
  }finally{pool.query=query;resume();finish();await Promise.allSettled(launching);console.error=logError;}
 });
 const endings=(id:string)=>readRun(traceRoot,id)!.events.filter(event=>event.type==='run/finished');
+for(const action of ['heartbeat','shutdown'] as const)test('Task2c3 failed usage with pending completion isolates '+action,{skip:!isolated,timeout:15000},async()=>{
+ const failed=await fixture(),healthy=await fixture(),usageId=randomUUID(),failure=Error('pending completion usage persistence failure'),query=pool.query;
+ let failUsage!:()=>void,consumed!:()=>void,finishFailed!:()=>void,finishHealthy!:()=>void,drainFailed!:()=>void;
+ const trigger=new Promise<void>(done=>{failUsage=done;}),recorded=new Promise<void>(done=>{consumed=done;});
+ const failedCompletion=new Promise<void>(done=>{finishFailed=done;}),healthyCompletion=new Promise<void>(done=>{finishHealthy=done;}),failedDrain=new Promise<void>(done=>{drainFailed=done;});
+ const cancellations:string[]=[];
+ (pool as any).query=function(text:any,...args:any[]){if(text==='SELECT id FROM model_reservations WHERE id=$1'&&args[0]?.[0]===usageId)throw failure;return (query as any).call(pool,text,...args);};
+ const r=runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:input.runId===failed.id?failedDrain:Promise.resolve(),completion:input.runId===failed.id?(async()=>{
+  await trigger;await assert.rejects(worker.recordUsage(failed.id,{id:usageId} as any),error=>error===failure);consumed();await failedCompletion;return completed();
+ })():healthyCompletion.then(()=>completed())})});
+ r.fixture.cancel=async(id?:string)=>{cancellations.push(id!);return false;};
+ const failedLaunch=worker.launch(failed.row),healthyLaunch=worker.launch(healthy.row);
+ let closing:Promise<void>|undefined,observed:Promise<unknown>|undefined;
+ try{
+  const deadline=Date.now()+3000;while(r.starts<2&&Date.now()<deadline)await wait();assert.equal(r.starts,2);
+  failUsage();await recorded;await wait();assert.equal(worker.active.get(failed.id)?.drainFailure,failure);
+  if(action==='heartbeat'){
+   await pool.query("UPDATE project_runs SET lease_until=now()-interval '1 minute' WHERE id=$1",[healthy.id]);
+   const before=await stored(failed.id),heartbeat=await worker.heartbeat();
+   assert.deepEqual(heartbeat,{ids:[healthy.id],held:[healthy.id]});
+   assert.ok(new Date((await stored(healthy.id)).lease_until).getTime()>Date.now());
+   assert.deepEqual(await stored(failed.id),before);assert.deepEqual(cancellations,[]);
+  }else{
+   closing=worker.close();let settled=false;observed=closing.then(()=>{settled=true;},error=>{settled=true;return error;});
+   await wait();assert.equal(settled,false,'shutdown must join the still-pending original work despite its latched writer');
+   assert.deepEqual(cancellations,[healthy.id],'failed work must not receive another cancellation');
+   finishHealthy();await healthyLaunch;finishFailed();await wait();assert.equal(settled,false,'original writer drain is still pending');
+   const fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')});
+   await assert.rejects(fence.acquireSource(failed.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+   drainFailed();await failedLaunch;assert.equal(await observed,failure);
+   assert.equal(worker.active.get(failed.id)?.phase,'drain-failed');
+   await assert.rejects(fence.acquireSource(failed.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+   const source=await fence.acquireSource(healthy.id);source.release();
+  }
+ }finally{failUsage();finishFailed();finishHealthy();drainFailed();await Promise.allSettled([failedLaunch,healthyLaunch]);await observed;pool.query=query;worker.closing=undefined;worker.stopped=false;}
+});
+async function withClientHook<T>(hook:(client:pg.PoolClient,query:any,text:any,args:any[])=>Promise<any>,work:()=>Promise<T>){
+ const connect=pool.connect;
+ (pool as any).connect=function(callback?:unknown){
+  if(typeof callback==='function')return (connect as any).call(pool,callback);
+  return (connect as ()=>Promise<pg.PoolClient>).call(pool).then(client=>{const query=client.query,release=client.release;
+   (client as any).query=function(text:any,...args:any[]){return hook(client,query,text,args);};
+   client.release=function(error?:Error|boolean){client.query=query;client.release=release;release.call(client,error);};return client;
+  });
+ };
+ try{return await work();}finally{pool.connect=connect;}
+}
+async function approvalApi(){
+ const {runManagementRouter}=await import('../apps/api/src/run-management.ts'),app=express();app.use(express.json());app.use(runManagementRouter(traceRoot,worker.writers));
+ app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({message:error.message}));
+ const server=app.listen(0,'127.0.0.1');await once(server,'listening');
+ return {async decide(id:string){const response=await fetch('http://127.0.0.1:'+(server.address() as any).port+'/approvals/'+id,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({decision:'denied'})});return {status:response.status,data:await response.json()};},async close(){server.closeAllConnections();await new Promise<void>(done=>server.close(()=>done()));}};
+}
+test('Task2c3 local recovery retains source through receipt replay and rechecks after native waiting',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),usage={id:randomUUID(),modelId:'recovery-model',inputTokens:2,outputTokens:1,cost:0};
+ await pool.query("UPDATE project_runs SET snapshot=jsonb_set(snapshot,'{executionTarget}','{\"kind\":\"local\"}'),lease_until=now()-interval '1 minute' WHERE id=$1",[f.id]);
+ const {openRunArchive}=await import('../services/agent-runtime/trace-store.mjs');openRunArchive(traceRoot,f.id).append('billing/usage',usage);
+ const fence=createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}),source=await fence.acquireSource(f.id),connect=pool.connect;let connects=0;
+ (pool as any).connect=function(...args:any[]){connects++;return (connect as any).apply(pool,args);};
+ // Global expiry and read-only discovery connect; claiming cannot connect yet.
+ const recovery=worker.recover();
+ try{await new Promise(done=>setTimeout(done,50));assert.equal(connects,2);pool.connect=connect;
+  await pool.query("UPDATE project_runs SET lease_until=now()+interval '1 minute',lease_owner='renewed' WHERE id=$1",[f.id]);
+ }finally{pool.connect=connect;source.release();await recovery;}
+ assert.equal((await stored(f.id)).lease_owner,'renewed');assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage WHERE run_id=$1',[f.id])).rows[0].n,0);
+ await pool.query("UPDATE project_runs SET lease_until=now()-interval '1 minute' WHERE id=$1",[f.id]);
+ const original=worker.recordUsage;let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(done=>{release=done;}),started=new Promise<void>(done=>{entered=done;});
+ worker.recordUsage=async(id,u)=>{entered();await gate;return original.call(worker,id,u);};
+ const replay=worker.recover();let probe:Awaited<ReturnType<typeof sourceProbe>>|undefined;
+ try{await started;probe=await sourceProbe(f.id);assert.equal((await stored(f.id)).status,'running');release();await replay;await probe.acquire();assert.equal((await stored(f.id)).status,'interrupted');assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage WHERE id=$1',[usage.id])).rows[0].n,1);}
+ finally{release();worker.recordUsage=original;await replay;await probe?.stop();}
+});
+
+test('Task2c3 denied approval and duplicate usage drain after ordinary bookkeeping',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),usage={id:randomUUID(),modelId:'recovery-model',inputTokens:2,outputTokens:1,cost:0},owner=await worker.writers.acquireOwner([f.id]),probe=await sourceProbe(f.id);
+ try{await owner.run(async()=>{
+  await worker.recordUsage(f.id,usage);await worker.recordUsage(f.id,usage);
+  const pending=worker.approveTool({runId:f.id,agentId:'employee-1',tool:'terminal',arguments:{}});const observed=assert.rejects(pending,/未获批准/);
+  while(!(await pool.query('SELECT id FROM tool_approvals WHERE run_id=$1',[f.id])).rowCount)await wait();
+  await pool.query("UPDATE tool_approvals SET status='denied' WHERE run_id=$1",[f.id]);await observed;
+ });owner.finish();await owner.writerDrained;await probe.acquire();assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage WHERE id=$1',[usage.id])).rows[0].n,1);}
+ finally{await probe.stop();}
+});
+
+test('Task2c3 HTTP approval commit and competition retain then release original writer',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),id=randomUUID(),api=await approvalApi();await pool.query("INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments) VALUES($1,$2,'employee-1','terminal','{}')",[id,f.id]);
+ let release!:()=>void,entered!:()=>void;const held=new Promise<void>(done=>{release=done;}),started=new Promise<void>(done=>{entered=done;});
+ try{await withClientHook(async(client,query,text,args)=>{if(text==='COMMIT'){entered();await held;}return query.call(client,text,...args);},async()=>{
+  const deciding=api.decide(id);await started;const probe=await sourceProbe(f.id);
+  try{release();assert.equal((await deciding).status,200);await probe.acquire();}finally{release();await probe.stop();}
+ });assert.equal((await api.decide(id)).status,409);const source=await createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}).acquireSource(f.id);source.release();assert.equal(readRun(traceRoot,f.id)!.events.filter(e=>e.type==='approval/decided').length,1);}
+ finally{release();await api.close();}
+});
+
+test('Task2c3 trace integrity and rollback failure preserve original cause and latch owner',{skip:!isolated,timeout:15000},async()=>{
+ const state=await import('../apps/api/src/run-state.ts'),f=await fixture(),owner=await worker.writers.acquireOwner([f.id]),probe=await sourceProbe(f.id);
+ appendFileSync(join(traceRoot,f.id,'events.jsonl'),'corrupt');let original:unknown;
+ try{await withClientHook(async(client,query,text,args)=>{const result=await query.call(client,text,...args);if(text==='ROLLBACK')throw Error('secondary rollback failure');return result;},async()=>{
+  await owner.run(async()=>{try{await state.finishRun(worker.writers,f.id,worker.owner,'interrupted',null,row=>worker.traceFinished(row,'interrupted','test'));}catch(error){original=error;}});
+ });owner.finish();await assert.rejects(owner.writerDrained,error=>error===original);assert.match((original as Error).message,/incomplete/);assert.equal((await stored(f.id)).status,'running');await assert.rejects(createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}).acquireSource(f.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});}
+ finally{await probe.stop();}
+});
+
+test('Task2c3 HTTP approval append failure never succeeds or releases',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),id=randomUUID(),api=await approvalApi();await pool.query("INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments) VALUES($1,$2,'employee-1','terminal','{}')",[id,f.id]);appendFileSync(join(traceRoot,f.id,'events.jsonl'),'corrupt');
+ try{assert.equal((await api.decide(id)).status,500);assert.equal((await pool.query('SELECT status FROM tool_approvals WHERE id=$1',[id])).rows[0].status,'pending');const probe=await sourceProbe(f.id);await probe.stop();}
+ finally{await api.close();}
+});
+for(const afterCommit of [false,true])test('Task2c3 uncertain terminal commit is never retried: '+afterCommit,{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),failure=Error('uncertain terminal commit');let release!:()=>void,entered!:()=>void,commits=0,mutations=0;
+ const held=new Promise<void>(done=>{release=done;}),started=new Promise<void>(done=>{entered=done;});
+ runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:held,completion:Promise.resolve(completed())})});
+ await withClientHook(async(client,query,text,args)=>{
+  if(typeof text==='string'&&text.startsWith('UPDATE project_runs SET status='))mutations++;
+  if(text==='COMMIT'){commits++;if(afterCommit)await query.call(client,text,...args);entered();throw failure;}
+  return query.call(client,text,...args);
+ },async()=>{const launching=launch(f.row);let probe:Awaited<ReturnType<typeof sourceProbe>>|undefined;
+  try{await started;probe=await sourceProbe(f.id);assert.equal((await stored(f.id)).status,afterCommit?'completed':'running');release();await launching;assert.equal(commits,1);assert.equal(mutations,1);assert.equal(worker.active.get(f.id)?.drainFailure,failure);}
+  finally{release();await launching;await probe?.stop();}
+ });
+});
+
+test('Task2c3 approval poll persistence failure keeps its first error without cancellation retry',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),owner=await worker.writers.acquireOwner([f.id]),query=pool.query,failure=Error('approval poll persistence failure');
+ (pool as any).query=function(text:any,...args:any[]){if(text==='SELECT status FROM tool_approvals WHERE id=$1')throw failure;return (query as any).call(pool,text,...args);};
+ try{await owner.run(async()=>{await assert.rejects(worker.approveTool({runId:f.id,agentId:'employee-1',tool:'terminal',arguments:{}}),error=>error===failure);});owner.finish();await assert.rejects(owner.writerDrained,error=>error===failure);assert.equal((await pool.query('SELECT status FROM tool_approvals WHERE run_id=$1',[f.id])).rows[0].status,'pending');const probe=await sourceProbe(f.id);await probe.stop();}
+ finally{pool.query=query;}
+});
+
+test('Task2c3 locked legacy target change defers operations and replay while global expiry remains active',{skip:!isolated},async()=>{
+ const f=await fixture(),device=randomUUID(),receipt=await unknownReceipt(f),operation=randomUUID();
+ await pool.query("INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label) VALUES($1,'fixture','fixture','win32','grant','fixture')",[device]);
+ await pool.query("INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,status) VALUES($1,$2,$3,'grant',$4,'{}','queued')",[operation,device,f.id,worker.owner]);
+ await pool.query("UPDATE model_reservations SET status='pending',expires_at=now()-interval '1 minute' WHERE id=$1",[receipt.id]);
+ await pool.query("UPDATE project_runs SET snapshot=jsonb_set(snapshot,'{executionTarget}','{\"kind\":\"local\"}'),lease_until=now()-interval '1 minute' WHERE id=$1",[f.id]);
+ let changed=false;await withClientHook(async(client,query,text,args)=>{
+  if(!changed&&text==='SELECT * FROM project_runs WHERE id=$1 FOR UPDATE'){changed=true;await query.call(client,"UPDATE project_runs SET snapshot=jsonb_set(snapshot,'{executionTarget}','{\"kind\":\"docker\"}') WHERE id=$1",[f.id]);}
+  return query.call(client,text,...args);
+ },()=>worker.recover());await worker.recover();
+ assert.equal(changed,true);assert.equal((await stored(f.id)).status,'running');assert.equal((await stored(f.id)).lease_owner,worker.owner);
+ assert.equal((await pool.query('SELECT status FROM local_operations WHERE id=$1',[operation])).rows[0].status,'queued');assert.deepEqual(endings(f.id),[]);
+ const storedReceipt=(await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receipt.id])).rows[0];assert.equal(storedReceipt.status,'uncertain');assert.equal(storedReceipt.amount,receipt.amount);assert.deepEqual(storedReceipt.history.slice(0,1),receipt.history);assert.equal(storedReceipt.history.length,2);
+ assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage WHERE run_id=$1',[f.id])).rows[0].n,0);
+});
+test('Task2c3 consumed usage persistence failure stays excluded after completed runtime and original drain',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture(),query=pool.query,failure=Error('consumed usage persistence failure');let release!:()=>void,recorded!:()=>void;
+ const drain=new Promise<void>(done=>{release=done;}),consumed=new Promise<void>(done=>{recorded=done;});
+ (pool as any).query=function(text:any,...args:any[]){if(text==='SELECT id FROM model_reservations WHERE id=$1')throw failure;return (query as any).call(pool,text,...args);};
+ runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:drain,completion:(async()=>{await assert.rejects(worker.recordUsage(f.id,{id:randomUUID()} as any),error=>error===failure);recorded();return completed();})()})});
+ const launching=launch(f.row);let probe:Awaited<ReturnType<typeof sourceProbe>>|undefined;
+ try{await consumed;probe=await sourceProbe(f.id);assert.equal((await stored(f.id)).status,'running');release();await launching;assert.equal(worker.active.get(f.id)?.phase,'drain-failed');assert.equal(worker.active.get(f.id)?.drainFailure,failure);await assert.rejects(createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}).acquireSource(f.id),{code:'E_ARCHIVE_FENCE_TIMEOUT'});}
+ finally{pool.query=query;release();await launching;await probe?.stop();}
+});
+
+test('Task2c3 legacy recovery is unchanged on repeated scans',{skip:!isolated,timeout:15000},async()=>{
+ const f=await fixture();await pool.query("UPDATE project_runs SET lease_until=now()-interval '1 minute' WHERE id=$1",[f.id]);
+ const before=await stored(f.id),events=readRun(traceRoot,f.id)!.events,receipt=await unknownReceipt(f);
+ await worker.recover();await worker.recover();assert.deepEqual(await stored(f.id),before);assert.deepEqual(readRun(traceRoot,f.id)!.events,events);
+ assert.deepEqual((await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receipt.id])).rows[0],receipt);
+ const source=await createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}).acquireSource(f.id);source.release();
+});
+
+test('Task2c3 state assertion precedes SQL and normal null/false results drain',{skip:!isolated},async()=>{
+ const state=await import('../apps/api/src/run-state.ts'),f=await fixture(),connect=pool.connect;let connections=0;
+ (pool as any).connect=function(...args:any[]){connections++;return (connect as any).apply(pool,args);};
+ try{await assert.rejects((state.finishRun as any)(worker.writers,f.id,worker.owner,'completed'),{code:'E_ARCHIVE_WRITER_SCOPE'});assert.equal(connections,0);}
+ finally{pool.connect=connect;}
+ await worker.writers.withWriter([f.id],async()=>{assert.equal(await (state.claimExpiredRun as any)(worker.writers,f.id),null);assert.equal(await (state.finishRun as any)(worker.writers,f.id,'foreign','completed'),false);});
+ const source=await createArchiveWriteFence({traceRoot,lockRoot:join(root,'.archive-write-locks')}).acquireSource(f.id);source.release();
+});
 async function idle(){const deadline=Date.now()+5000;while(Date.now()<deadline){if(!worker.active.size&&!worker.ticking)return;await new Promise(done=>setTimeout(done,5));}throw Error('isolated coordinator did not settle');}
 async function launch(row:any){await worker.launch(row);}
 async function unknownReceipt(f:Awaited<ReturnType<typeof fixture>>){
@@ -298,12 +470,12 @@ test('usage replay error after trusted completion cannot rewrite business failur
  runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed('complete',[{id:receipt.id,modelId:'recovery-model',inputTokens:4,outputTokens:2,cost:0}]))})});
  worker.recordUsage=async()=>{throw Error('PRIVATE_USAGE_REPLAY_FAILURE');};
  try{await launch(f.row);}finally{worker.recordUsage=original;}
- const row=await stored(f.id);assert.equal(row.status,'completed');assert.match(row.error,/待核对|记录不完整/);assert.ok(!row.error.includes('PRIVATE_USAGE'));
+ const row=await stored(f.id);assert.equal(row.status,'running');assert.equal(row.error,null);assert.equal(worker.active.get(f.id)?.phase,'drain-failed');
  assert.deepEqual(endings(f.id),[]);assert.equal((await pool.query('SELECT count(*)::int AS n FROM usage WHERE run_id=$1',[f.id])).rows[0].n,0);
  assert.deepEqual((await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receipt.id])).rows[0],receipt);
 });
 
-test('finish bookkeeping error after trusted completion retries completed bookkeeping without failed trace',{skip:!isolated},async()=>{
+test('finish bookkeeping error after trusted completion retains pending reconciliation without retry',{skip:!isolated},async()=>{
  const f=await fixture(),connect=pool.connect;let injected=0;
  (pool as any).connect=function(callback?:unknown){
   if(typeof callback==='function')return (connect as any).call(pool,callback);
@@ -314,8 +486,8 @@ test('finish bookkeeping error after trusted completion retries completed bookke
   });
  };
  try{await launch(f.row);}finally{pool.connect=connect;}
- assert.equal(injected,1);const row=await stored(f.id);assert.equal(row.status,'completed');assert.match(row.error,/待核对|记录不完整/);assert.ok(!row.error.includes('PRIVATE_FINISH'));
- assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[f.projectId])).rows[0].status,'COMPLETED');assert.deepEqual(endings(f.id),[]);
+ assert.equal(injected,1);const row=await stored(f.id);assert.equal(row.status,'running');assert.equal(row.error,null);assert.match(worker.active.get(f.id)?.drainFailure?.message??'',/PRIVATE_FINISH/);
+ assert.equal((await pool.query('SELECT status FROM projects WHERE id=$1',[f.projectId])).rows[0].status,'RUNNING');assert.deepEqual(endings(f.id),[]);
 });
 
 test('cancellation after trusted acceptance cannot turn bookkeeping uncertainty into business cancellation or failure',{skip:!isolated},async()=>{
@@ -323,7 +495,7 @@ test('cancellation after trusted acceptance cannot turn bookkeeping uncertainty 
  runtime({start:async input=>({runtimeRunId:input.runId,writerDrained:Promise.resolve(),completion:Promise.resolve(completed('complete',[{id:randomUUID()}]))})});
  worker.recordUsage=async()=>{await worker.cancel(f.id);throw Error('PRIVATE_POST_ACCEPTANCE_REPLAY_FAILURE');};
  try{await launch(f.row);}finally{worker.recordUsage=original;}
- const row=await stored(f.id);assert.equal(row.status,'completed');assert.equal(row.cancel_requested,true);assert.match(row.error,/待核对|记录不完整/);assert.deepEqual(endings(f.id),[]);
+ const row=await stored(f.id);assert.equal(row.status,'running');assert.equal(row.cancel_requested,true);assert.equal(row.error,null);assert.deepEqual(endings(f.id),[]);
 });
 
 test('trusted acceptance fallback cannot overwrite a replacement owner after replay bookkeeping loses ownership',{skip:!isolated},async()=>{

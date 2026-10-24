@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { AppError } from './provider.ts';
+import {httpPrincipal,administrative,visibleProjectsQuery} from './project-route-access.ts';
+import {visibleResourceQuery} from './resource-authorization.ts';
+import type {Principal} from './identity-types.ts';
 
 type Database = { query: (sql: string, parameters?: any[]) => Promise<{ rows: any[] }> };
 export const departmentWorkbenchQuery = z.object({
@@ -11,13 +14,14 @@ export const departmentWorkbenchQuery = z.object({
 
 /** A bounded read model. It never opens trace archives, expires reservations,
  * resumes work, or infers relationships from display titles. */
-export async function readDepartmentWorkbench(db: Database, query: z.infer<typeof departmentWorkbenchQuery>) {
+export async function readDepartmentWorkbench(db: Database, query: z.infer<typeof departmentWorkbenchQuery>,principal:Principal={kind:'local-owner'}) {
   const { departmentId, limit, offset } = query;
+  const projects=visibleProjectsQuery(principal,'viewer',3),costs=visibleResourceQuery(principal,'cost','viewer',{parameterOffset:3+projects.values.length});
   const result = await db.query(`
     WITH scoped AS (
       SELECT p.id,p.requirement,p.version,p.status,p.created_at
       FROM projects p JOIN departments d ON d.id=p.department_id
-      WHERE p.department_id=$1 AND d.deleted_at IS NULL
+      WHERE p.department_id=$1 AND d.deleted_at IS NULL AND p.id IN (${projects.text})
     ), enriched AS (
       SELECT p.*, latest.run, done.run AS completed_run,
         coalesce(latest.pending,0) AS pending,
@@ -49,13 +53,13 @@ export async function readDepartmentWorkbench(db: Database, query: z.infer<typeo
         'running',count(*) FILTER(WHERE bucket='running'),'attention',count(*) FILTER(WHERE bucket='attention'),
         'completed',count(*) FILTER(WHERE completed_run IS NOT NULL),
         'pendingApprovals',coalesce(sum(pending),0),
-        'recordedCost',coalesce((SELECT sum(cost) FROM usage WHERE department_id=$1),0)) AS summary,
+        'recordedCost',coalesce((SELECT sum(cost) FROM usage WHERE department_id=$1 ${administrative(principal)?'':`AND project_id IN (SELECT id FROM scoped) AND id IN (${costs.text})`}),0)) AS summary,
       coalesce((SELECT jsonb_agg(page.item ORDER BY page.created_at DESC,page.id DESC) FROM (
         SELECT id,created_at,jsonb_build_object('id',id,'requirement',left(requirement,700),'version',version,
           'status',status,'createdAt',created_at,'bucket',bucket,'latestRun',run,'completedRun',completed_run) AS item
         FROM enriched ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3
       ) page),'[]'::jsonb) AS items
-    FROM enriched`, [departmentId, limit, offset]);
+    FROM enriched`, [departmentId, limit, offset,...projects.values,...(administrative(principal)?[]:costs.values)]);
   const row = result.rows[0];
   if (!row?.exists) throw new AppError(404, '部门不存在或已归档，请选择其他部门。');
   return { departmentId, summary: row.summary, items: row.items, limit, offset,
@@ -65,7 +69,7 @@ export async function readDepartmentWorkbench(db: Database, query: z.infer<typeo
 export function departmentWorkbenchRouter(db: Database) {
   const router = Router();
   router.get('/department-workbench', async (req, res) => {
-    res.json(await readDepartmentWorkbench(db, departmentWorkbenchQuery.parse(req.query)));
+    res.json(await readDepartmentWorkbench(db, departmentWorkbenchQuery.parse(req.query),httpPrincipal(res)));
   });
   return router;
 }

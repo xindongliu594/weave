@@ -10,4 +10,4 @@ export interface ArchiveWriteFence {
   withJournalAppendSync<T>(guard: ArchiveFenceGuard, runId: string, syncFn: () => T, options?: { timeoutMs?: number }): T;
 }
 /** Private primitive; production writer coverage and root mapping are caller responsibilities. */
-export function createArchiveWriteFence(options: { traceRoot: string; lockRoot: string }): ArchiveWriteFence;
+export function createArchiveWriteFence(options: { traceRoot: string; lockRoot: string; allowMissingTraceRoot?: boolean }): ArchiveWriteFence;

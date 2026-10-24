@@ -1,0 +1,11 @@
+[Unit]
+Description=Weiwu daily read-only maintenance report
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=300
+Unit=weiwu-maintenance.service
+
+[Install]
+WantedBy=timers.target

@@ -7,12 +7,16 @@ import {AppError} from './provider.ts';
 import {workEfficiency} from './work-efficiency.ts';
 import {acceptedAdoptions} from '../../../services/agent-runtime/employee-capabilities.mjs';
 import {readLiveCanonical} from './live-canonical-reader.ts';
+import type {Principal} from './identity-types.ts';
+import {knowledgePrincipal,requireRunRoute,assertRunArchiveBinding} from './project-route-access.ts';
 
 /** A small index of real work. Raw conversations and employee source files stay in their archives. */
-export async function acceptedWorkEvidence(db:Pick<pg.Pool,'query'>,traceRoot:string,runId:string){
+export async function acceptedWorkEvidence(db:Pick<pg.Pool,'query'>,traceRoot:string,runId:string,identity?:Principal){
+ const principal=knowledgePrincipal(identity);await requireRunRoute(db,principal,runId,'viewer');
  const row=(await db.query('SELECT r.*,p.department_id,d.deleted_at FROM project_runs r JOIN projects p ON p.id=r.project_id JOIN departments d ON d.id=p.department_id WHERE r.id=$1',[runId])).rows[0];
  const run=readRun(traceRoot,runId);
  if(!row||!run)throw new AppError(404,'工作运行不存在');
+ assertRunArchiveBinding(principal,row,run);
  if(row.deleted_at)throw new AppError(409,'部门已归档；工作历史仍保留，恢复部门后可查看');
  const snapshot=run.snapshot as any;
  if(row.status!=='completed'||run.status!=='completed'||run.integrity!=='ok'||snapshot.projectId!==row.project_id||snapshot.planVersion!==row.snapshot.planVersion)
@@ -36,9 +40,9 @@ export async function acceptedWorkEvidence(db:Pick<pg.Pool,'query'>,traceRoot:st
  return {row,run,snapshot,receipts,files,nodes,reviews,adoptions,shareable};
 }
 
-export async function acceptedWorkRecord(db:Pick<pg.Pool,'query'>,traceRoot:string,runId:string){
- const {row,run,snapshot,files,nodes,reviews,adoptions,shareable}=await acceptedWorkEvidence(db,traceRoot,runId);
- const efficiency=await workEfficiency(db,traceRoot,run);
+export async function acceptedWorkRecord(db:Pick<pg.Pool,'query'>,traceRoot:string,runId:string,identity?:Principal){
+ const principal=knowledgePrincipal(identity),{row,run,snapshot,files,nodes,reviews,adoptions,shareable}=await acceptedWorkEvidence(db,traceRoot,runId,principal);
+ const efficiency=await workEfficiency(db,traceRoot,run,principal);
  let content=['# 工作记录',`来源运行：${runId}`,`项目：${row.project_id} · 方案 v${snapshot.planVersion}`,`完成时间：${run.events.findLast(e=>e.type==='run/finished')?.at??'未封存'}`,'','## 需求',String(snapshot.requirement??snapshot.title??'').slice(0,8000),'','## 已核验节点与实际命令','```json',JSON.stringify(nodes,null,2),'```','## 正式审查记录','```json',JSON.stringify(reviews,null,2),'```','## 交付版本索引','```json',JSON.stringify(files,null,2),'```','## 效率与知识复用实测',efficiency.method,efficiency.baseline?'已找到可比较的首次运行。':'尚无同条件的首次运行，暂不计算减少百分比。','```json',JSON.stringify(efficiency,null,2),'```','原始交付、完整命令输出和费用保留在来源运行。此记录可供检索复用，Skill 或工具的采纳仍需独立评估。'].join('\n');
  if(adoptions.length)content+='\n\n## 已采用的固定知识与方法\n员工声明实际采用，来源读取已核对；仅收录已封存成功尝试，不代表已证明方法带来提速。\n```json\n'+JSON.stringify(adoptions,null,2)+'\n```';
  if(Buffer.byteLength(content)>64*1024)throw new AppError(422,'工作记录超过 64 KiB，请先缩小登记范围');

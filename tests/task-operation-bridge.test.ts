@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,afterEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
@@ -18,12 +19,13 @@ import {assertExecutionProfile} from '../apps/api/src/execution-policy.ts';
 import {pool,migrate} from '../apps/api/src/db.ts';
 import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const sha=(v:string)=>createHash('sha256').update(v).digest('hex'),file=(path:string,text:string)=>({path,content:Buffer.from(text).toString('base64')});
 const signal=new AbortController().signal;
 let directory:string,server:any,url:string;
 const employee={id:'employee',employeeId:'employee',modelId:'unused',tools:['filesystem','artifact_write','terminal','terminal_test'],name:'Fixture',role:'manager'};
-before(async()=>{if(!isolated)return;assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);directory=mkdtempSync(join(tmpdir(),'task-operation-bridge-'));process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;process.env.OBSIDIAN_VAULT=join(directory,'vault');await migrate();await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'fixture',agents:[employee]}]);const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory));app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.status??500).json({code:e.code,message:e.message}));server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port;});
+before(async()=>{if(!isolated)return;assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);directory=mkdtempSync(join(tmpdir(),'task-operation-bridge-'));process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;writers=createArchiveWriterManager({traceRoot:directory});process.env.OBSIDIAN_VAULT=join(directory,'vault');await migrate();await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'fixture',agents:[employee]}]);const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory,writers));app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.status??500).json({code:e.code,message:e.message}));server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port;});
 beforeEach(async()=>{if(isolated){await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,tool_approvals,native_capabilities CASCADE');await pool.query('UPDATE departments SET data=$1',[{name:'fixture',agents:[employee]}]);}});
 afterEach(async()=>{if(isolated)for(const table of ['usage','model_reservations','models'])assert.equal((await pool.query('SELECT count(*)::int AS n FROM '+table)).rows[0].n,0);});
 after(async()=>{if(!isolated)return;if(server)await new Promise<void>(done=>{server.closeAllConnections();server.close(done);});await pool.end();assert.ok(directory.startsWith(join(tmpdir(),'task-operation-bridge-')));rmSync(directory,{recursive:true,force:true});});
@@ -46,7 +48,7 @@ async function fixture({bWritesInput=false,nativeTool=false}={}){
  const archive=createRunArchive(directory,snapshot,{id:runId});mkdirSync(join(archive.dir,'artifacts'));writeFileSync(join(archive.dir,'artifacts/in.txt'),'input');writeFileSync(join(archive.dir,'artifacts/private.txt'),'private');
  const state={members:[{id:'session',name:'employee'}],tasks:tasks.map(t=>({id:'native-'+t.id,assignee:'employee',attemptId:'attempt-'+t.id,status:'in_progress'}))};
  archive.append('run/task-mapping',{tasks:tasks.map(t=>({task_id:'native-'+t.id,seed_id:t.id}))});archive.append('team/checkpoint',state);
- const storedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,storedSnapshot,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint)),workspaces=new Map<string,any>(),jobs:any[]=[];
+ const storedSnapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;const service=new LocalOperationService(directory,owner,writers),executor=new LocalRunExecutor(archive,storedSnapshot,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint)),workspaces=new Map<string,any>(),jobs:any[]=[];
  const f={runId,projectId,deviceId,grantId,token,backend,archive,snapshot:storedSnapshot,state,service,executor,workspaces,jobs};
  return f;
 }

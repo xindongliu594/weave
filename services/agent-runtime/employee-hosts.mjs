@@ -11,14 +11,30 @@ import { projectAssignmentReports, projectClaimReport } from './assignment-repor
 import { employeeHandoffDefinition, nativeHandoffArguments } from './employee-handoff.mjs';
 import {installTaskToolBoundary} from './task-tool-boundary.mjs';
 import { observeNativeTeardown } from './host-lifecycle.mjs';
+import { captureToolDefinition, indexEffectContracts } from './tool-definition-effects.mjs';
+import { effectDigest } from './tool-effects.mjs';
+import { installToolEffectRuntime } from './tool-effect-runtime.mjs';
 
 const mergeNamed = (shared, local) => [...new Map([...shared, ...local].map(item => [item.name, item])).values()];
 
 /** Public AgentFactory seam: coordination owns identities; each Agent owns a Host. */
 export class EmployeeHostFactory {
-  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports, taskToolBoundary }) {
-    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports });
-    this.taskToolBoundary=taskToolBoundary===true;
+  constructor({ coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge, beforeTool,beforeKnowledge,activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports, taskToolBoundary, effectSnapshot, effectAuthority }) {
+    Object.assign(this, { coordinator, loadPlugin, provider, sessionRoot, trace, archive, identify, context, protectedContext, waitForProtectedContext, concludesAcceptedTask, skillManifest, queryKnowledge,beforeTool,beforeKnowledge, activeWork, prepareToolArguments, pendingCompletion, handoffClosure, onIncompleteCompletion, assignmentReports });
+    this.effectContracts = indexEffectContracts(effectSnapshot);
+    this.effectSnapshot = this.effectContracts && { effectContractVersion: 1, effectContracts: [...this.effectContracts.values()] };
+    this.effectAuthority = effectAuthority;
+    if (this.effectContracts && (typeof effectAuthority?.assertSnapshot !== 'function' || typeof effectAuthority?.withAdmission !== 'function')) throw Error('TOOL_EFFECT_AUTHORITY_REQUIRED');
+    this.taskToolBoundary=taskToolBoundary===true || Boolean(this.effectContracts);
+    this.effectForwards = new Map();
+    this.effectExecutions = new WeakMap();
+    if (this.effectContracts) this.removeEffectGuard = coordinator.tools.guard(exec => {
+      const permit = this.effectForwards.get(exec.callId);
+      this.effectForwards.delete(exec.callId);
+      if (!permit || permit.agent !== exec.agent || permit.name !== exec.name || permit.argumentsSha256 !== effectDigest(exec.arguments))
+        return 'TOOL_EFFECT_FORWARD_REQUIRED: 必须经已批准的员工合同入口调用';
+      this.effectExecutions.set(exec,permit);
+    });
     this.live = new Map();
     this.pending = new Set();
     this.closed = false;
@@ -34,15 +50,20 @@ export class EmployeeHostFactory {
 
   async materialize(ownerCtx, options, resume) {
     if (this.closed) throw Error('EMPLOYEE_HOSTS_CLOSED');
-    this.coordinatorDefinitions ??= new Map(this.coordinator.tools.schemas().map(schema => [schema.name, this.coordinator.tools.get(schema.name)]));
+    if (this.effectContracts) await this.effectAuthority.assertSnapshot(this.effectSnapshot, options.signal);
+    if (this.closed) throw Error('EMPLOYEE_HOSTS_CLOSED');
+    this.coordinatorDefinitions ??= new Map(this.coordinator.tools.schemas().map(schema => {
+      const definition = this.coordinator.tools.get(schema.name);
+      return [schema.name, { definition, binding: captureToolDefinition(definition, 'weiwu-coordinator-registry-v1') }];
+    }));
     ownerCtx.fiber.assertActive();
     const sessionId = resume ? options.resumeSessionId : options.sessionId;
     if (this.live.has(sessionId)) throw Error('EMPLOYEE_ALREADY_ACTIVE: ' + sessionId);
     const hostId = randomUUID(), ctx = new Context(), fibers = [];
     const nativeTeardown = observeNativeTeardown(ctx);
     const abort = new AbortController(), ready = Promise.withResolvers();
-    const slot = { hostId, sessionId, ctx, agent: undefined, close: undefined, stopAdmission: () => boundary?.stopAdmission() };
-    let handle, detachAgent, unfollowOwner, disposing, boundary, nativeStarted = false;
+    const slot = { hostId, sessionId, ctx, agent: undefined, close: undefined, stopAdmission: () => { boundary?.stopAdmission(); runtimeEffects?.stopAdmission(); } };
+    let handle, detachAgent, unfollowOwner, disposing, boundary, runtimeEffects, skillSourceCheck, nativeStarted = false;
     const setups = new Set();
     const signal = AbortSignal.any([abort.signal, ...(options.signal ? [options.signal] : [])]);
     const checkAdmission = () => {
@@ -59,6 +80,7 @@ export class EmployeeHostFactory {
       try { if (handle) await this.coordinator.subagents?.drainContinuableDescendants([handle.agent]); }
       catch (error) { failures.push(error); }
       try { await handle?.dispose(); } catch (error) { failures.push(error); }
+      try { await runtimeEffects?.close(); } catch (error) { failures.push(error); }
       detachAgent?.();
       for (const fiber of fibers.reverse()) {
         try { await fiber.dispose(); } catch (error) { failures.push(error); }
@@ -137,18 +159,28 @@ export class EmployeeHostFactory {
       });
       const claimReport=(agent,value)=>this.protectedContext&&this.assignmentReports
         ? projectClaimReport(value,JSON.parse(this.protectedContext(agent)),this.assignmentReports(agent)):value;
-      for (const [name, definition] of this.coordinatorDefinitions) {
+      const sourceCheck = name => {
+        if(name==='skill' && skillSourceCheck && !skillSourceCheck())return false;
+        const source = this.coordinatorDefinitions.get(name);
+        return !source || source.binding.matches(coordinator.tools.get(name));
+      };
+      const effectContracts = this.effectContracts, effectForwards = this.effectForwards;
+      for (const [name, { definition }] of this.coordinatorDefinitions) {
         const schema = { name };
         const structuredHandoff = this.protectedContext && schema.name === 'agent_teams_update_task';
         const contextForHandoff = this.protectedContext;
         ctx.tools.register({ ...(structuredHandoff ? employeeHandoffDefinition(definition) : definition), async execute(args, exec) {
           if (coordinator.agents.get(exec.agent?.id) !== exec.agent) throw Error('EMPLOYEE_NOT_LIVE');
-          if (coordinator.tools.get(name) !== definition) throw new HarnessError('已批准的工具定义已变化，请重新核对运行版本', 'TOOL_DEFINITION_CHANGED');
-          const normalized = structuredHandoff && Object.hasOwn(args,'report')
+          if (!sourceCheck(name)) throw new HarnessError('已批准的工具定义已变化，请重新核对运行版本', 'TOOL_DEFINITION_CHANGED');
+          const normalized = !runtimeEffects && structuredHandoff && Object.hasOwn(args,'report')
             ? nativeHandoffArguments(args, JSON.parse(contextForHandoff(exec.agent) || '{}').task) : args;
-          const forwarded=prepareToolArguments?.(exec.agent,schema.name,normalized)??normalized;
+          const forwarded=runtimeEffects?runtimeEffects.effectiveArguments(exec):prepareToolArguments?.(exec.agent,schema.name,normalized)??normalized;
           if (structuredHandoff) forwardedCalls.add(exec.callId);
-          const result = await coordinator.tools.execute({ callId: exec.callId, name: schema.name, arguments: forwarded, agent: exec.agent, signal: exec.signal });
+          const permit=effectContracts?{agent:exec.agent,name,callId:exec.callId,argumentsSha256:effectDigest(forwarded),closed:false,bodyEntered:false}:undefined;
+          if (permit) effectForwards.set(exec.callId, permit);
+          let result;
+          try { result = await coordinator.tools.execute({ callId: exec.callId, name: schema.name, arguments: forwarded, agent: exec.agent, signal: exec.signal }); }
+          finally { if(permit)permit.closed=true;effectForwards.delete(exec.callId); }
           if (result.isError) throw new HarnessError(result.error.message, result.error.info?.code ?? 'COORDINATOR_TOOL_FAILED');
           for (const context of result.additionalContexts ?? []) exec.deferContext(context);
           // The committed handoff already contains the employee's report and
@@ -223,14 +255,39 @@ export class EmployeeHostFactory {
         }, { prepend: true });
         const employee = this.identify?.(agent);
         if (employee) {
-          await installApprovedSkills(ctx, mount, { manifest: this.skillManifest, employee, agent, archive: this.archive, queryKnowledge:this.queryKnowledge });
+          if(this.beforeTool)ctx.on('tools/pre-execute',async(exec,next)=>{
+            await this.beforeTool(exec.signal);exec.signal?.throwIfAborted();return next();
+          });
+          skillSourceCheck=await installApprovedSkills(ctx, mount, { manifest: this.skillManifest, employee, agent, archive: this.archive, queryKnowledge:this.queryKnowledge,beforeKnowledge:this.beforeKnowledge, fixedRegistry:Boolean(this.effectAuthority?.runtimeOperations) });
           // Child setup installs the durable descriptor first. Restrict only
           // this known employee's domain schemas before publication/assembly;
           // the coordinator's execution permission checks remain authoritative.
           if (!Array.isArray(employee.tools)) throw new HarnessError('无法核对员工已批准的工具权限', 'TOOL_PERMISSION_IDENTITY');
-          installEmployeeCapabilities(ctx,{employee,agent,manifest:this.skillManifest,queryKnowledge:this.queryKnowledge,archive:this.archive,activeWork:this.activeWork});
-          const access = installEmployeeToolAccess(ctx, agentCtx, { agent, employee, boundary });
-          this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, ...access, resumed: resume }, { sessionId: agent.id });
+          let access;
+          installEmployeeCapabilities(ctx,{employee,agent,manifest:this.skillManifest,queryKnowledge:this.queryKnowledge,beforeKnowledge:this.beforeKnowledge,archive:this.archive,activeWork:this.activeWork,toolCatalog:()=>access.catalog()});
+          access = installEmployeeToolAccess(ctx, agentCtx, { agent, employee, boundary, sourceCheck, effectContracts: this.effectContracts,
+            contractBinding: name => this.coordinatorDefinitions.get(name)?.binding });
+          if(this.effectContracts && this.effectAuthority.runtimeOperations)runtimeEffects=installToolEffectRuntime(ctx,{
+            operations:this.effectAuthority.runtimeOperations,contracts:this.effectContracts,access,boundary,employee,activeWork:this.activeWork,
+            prepareArguments:exec=>{
+              if(!this.coordinatorDefinitions.has(exec.name))return exec.arguments;
+              const args=this.protectedContext&&exec.name==='agent_teams_update_task'&&Object.hasOwn(exec.arguments,'report')
+                ?nativeHandoffArguments(exec.arguments,JSON.parse(this.protectedContext(exec.agent)||'{}').task):exec.arguments;
+              return prepareToolArguments?.(exec.agent,exec.name,args)??args;
+            },
+          });
+          else if (this.effectContracts) ctx.on('tools/execute', async (exec, next) => {
+            const contract = this.effectContracts.get(exec.name), originalSignal = exec.signal;
+            if (!contract || access.check(exec) !== undefined) throw Error('TOOL_EFFECT_UNREVIEWED');
+            try {
+              return await this.effectAuthority.withAdmission(contract, async signal => {
+                exec.signal = signal; signal.throwIfAborted();
+                const denied = access.check(exec); if (denied) throw Error(denied);
+                return next();
+              }, originalSignal);
+            } finally { exec.signal = originalSignal; }
+          });
+          this.archive?.append('runtime/tool-schema-filtered', { hostId, sessionId: agent.id, agentId: employee.id, granted: access.granted, removed: access.removed, resumed: resume }, { sessionId: agent.id });
         }
         return { commit: () => {
           checkAdmission(); prepared?.commit();
@@ -261,6 +318,11 @@ export class EmployeeHostFactory {
   }
 
   list() { return [...this.live.values()]; }
+  checkForwardBody(exec) {
+    const permit=this.effectExecutions.get(exec);
+    if(!permit||permit.closed||permit.bodyEntered||permit.agent!==exec.agent||permit.name!==exec.name||permit.callId!==exec.callId||permit.argumentsSha256!==effectDigest(exec.arguments))return 'TOOL_EFFECT_FORWARD_REQUIRED';
+    permit.bodyEntered=true;
+  }
   stopAdmission() {
     this.closed = true;
     for (const slot of this.live.values()) slot.stopAdmission();
@@ -278,6 +340,7 @@ export class EmployeeHostFactory {
           if (failures.some(failure => failure.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN')) error.code = 'RUNTIME_WRITER_DRAIN_UNPROVEN';
           throw error;
         }
+        this.removeEffectGuard?.();
       })();
       this.closing.catch(() => {});
     }

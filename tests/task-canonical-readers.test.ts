@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import express from 'express';
@@ -21,6 +22,7 @@ import {checkpointContract} from '../services/agent-runtime/step-checkpoints.mjs
 import {createOfficeFile} from '../services/agent-runtime/office-files.mjs';
 import {HandoffGate} from '../services/agent-runtime/handoff.mjs';
 
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 const hash=(v:string|Buffer)=>createHash('sha256').update(v).digest('hex');
@@ -29,8 +31,8 @@ const employee={id:'employee',employeeId:'employee',modelId:'unused',tools:['fil
 const api=async(path:string,body?:any)=>{const r=await fetch(url+path,{method:body?'POST':'GET',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});return {status:r.status,data:await r.json() as any};};
 const row=async(id:string)=>(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0];
 before(async()=>{
- if(!isolated)return;root=mkdtempSync(join(tmpdir(),'task-readers-'));process.env.DATA_DIR=root;process.env.TRACE_ROOT=root;process.env.OBSIDIAN_VAULT=join(root,'vault');await migrate();
- const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(root));app.use(runManagementRouter(root));app.use(workFilesRouter(pool,root));app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.status??500).json({code:e.code,message:e.message}));server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port;
+ if(!isolated)return;root=mkdtempSync(join(tmpdir(),'task-readers-'));process.env.DATA_DIR=root;process.env.TRACE_ROOT=root;writers=createArchiveWriterManager({traceRoot:root});process.env.OBSIDIAN_VAULT=join(root,'vault');await migrate();
+ const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(root,writers));app.use(runManagementRouter(root,writers));app.use(workFilesRouter(pool,root));app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.status??500).json({code:e.code,message:e.message}));server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port;
 });
 after(async()=>{if(!isolated)return;server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));await pool.end();assert.ok(root.startsWith(join(tmpdir(),'task-readers-')));rmSync(root,{recursive:true,force:true});});
 beforeEach(async()=>{if(!isolated)return;await pool.query('TRUNCATE local_operations,local_devices,task_attempt_workspaces,project_runs,projects,departments,usage,model_reservations,work_file_snapshots CASCADE');f=await fixture();});
@@ -48,7 +50,7 @@ async function fixture(){
  const archive=createRunArchive(root,snapshot,{id:runId}),artifacts=join(archive.dir,'artifacts');mkdirSync(artifacts);writeFileSync(join(artifacts,'in.txt'),'input');writeFileSync(join(artifacts,'report.docx'),office);
  archive.append('run/task-mapping',{tasks:[{task_id:'native',seed_id:'task'}]});archive.append('team/checkpoint',{members:[{id:'session',name:'employee'}],tasks:[{id:'native',assignee:'employee',attemptId:'attempt',status:'in_progress'}]});
  const persisted=(await row(runId)).snapshot;
- const service=new LocalOperationService(root,owner),executor=new LocalRunExecutor(archive,persisted,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint)),signal=AbortSignal.timeout(30000),candidate={runId,taskId:'task',attemptId:'attempt',agentId:'employee',sessionId:'session',runtimeTaskId:'native',contractHash:checkpointContract(persisted,persisted.tasks[0])};
+ const service=new LocalOperationService(root,owner,writers),executor=new LocalRunExecutor(archive,persisted,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint)),signal=AbortSignal.timeout(30000),candidate={runId,taskId:'task',attemptId:'attempt',agentId:'employee',sessionId:'session',runtimeTaskId:'native',contractHash:checkpointContract(persisted,persisted.tasks[0])};
  const assignment=await executor.bindAttempt(candidate,signal),context={agentId:'employee',sessionId:'session',taskId:'task',attemptId:'attempt',generation:assignment.generation};let work:any[]=[],sandboxId=randomUUID();
  async function deliver(action:Promise<any>){
   // Exercise the actual queued -> HTTP poll/start/result -> executor merge path.

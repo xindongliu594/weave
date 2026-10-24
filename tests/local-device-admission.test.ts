@@ -18,6 +18,7 @@ import {toolEvidence} from './model-fixture.ts';
 // Fresh in-memory PGlite only; authenticated loopback device protocol, native
 // Node command in a test-owned temporary workspace, and a loopback model double.
 // Never use the application database, credentials, API or employee artifacts.
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const {LocalExecutor,exportFiles,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 const departmentId='admission-fixture-department',modelId='admission-fixture-model';
@@ -32,10 +33,10 @@ before(async()=>{
  if(!isolated)return;
  assert.match(process.env.DATABASE_URL??'',/^postgresql:\/\/postgres:postgres@127\.0\.0\.1:\d+\/postgres$/);
  directory=await mkdtemp(join(tmpdir(),'local-device-admission-'));traceRoot=join(directory,'runs');
- process.env.DATA_DIR=directory;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(directory,'vault');
+ process.env.DATA_DIR=directory;process.env.TRACE_ROOT=traceRoot;writers=createArchiveWriterManager({traceRoot:traceRoot});process.env.OBSIDIAN_VAULT=join(directory,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
  local=await import('../apps/api/src/local-execution.ts');cost=await import('../apps/api/src/cost-control.ts');
- const app=express();app.use(express.json({limit:'32mb'}));app.use('/api',local.localDeviceRouter(traceRoot));
+ const app=express();app.use(express.json({limit:'32mb'}));app.use('/api',local.localDeviceRouter(traceRoot,writers));
  app.post('/v1/chat/completions',(_req,res)=>{wireCalls++;res.json({choices:[{message:{role:'assistant',content:'isolated fixture reply'},finish_reason:'stop'}],usage:{prompt_tokens:4,completion_tokens:2}});});
  app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({code:error.code,message:error.message}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port;
@@ -46,7 +47,7 @@ before(async()=>{
  const {routeFingerprint}=await import('../apps/api/src/model-capabilities.ts');
  route={id:modelId,name:model.name,gatewayId:model.gatewayId,wireModel:model.model,baseUrl:url+'/v1',inputRate:1,outputRate:1,maxOutputTokens:128,
   configurationHash:routeFingerprint((await pool.query('SELECT data FROM models WHERE id=$1',[modelId])).rows[0].data,1)};
- const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot,createArchiveWriterManager({traceRoot:traceRoot}));await worker.close();
+ const {RunCoordinator}=await import('../apps/api/src/run-coordinator.ts');worker=new RunCoordinator(traceRoot,writers);await worker.close();
 });
 beforeEach(async()=>{if(isolated){await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,request_keys,tool_approvals CASCADE');wireCalls=0;await pool.query('UPDATE departments SET deleted_at=NULL WHERE id=$1',[departmentId]);}});
 after(async()=>{
@@ -68,7 +69,7 @@ async function fixture():Promise<Fixture>{
  const snapshot={projectId,planVersion:1,departmentId,departmentIds:[departmentId],executionBudget:1,policy,agents:[employee],
   tasks:[{id:'review',subject:'Isolated admission',assigneeId:employee.employeeId,assignee:employee.id,dependencies:[],maxBudget:1}],modelRoutes:[route],
   executionTarget:{...policy.executionTarget,platform:process.platform,label:'isolated',allowCommands:true}};
- const service=new local.LocalOperationService(traceRoot,worker.owner),f={device,projectId,runId,service,executor:new LocalExecutor(device.grant),workspace:join(root,runId)};
+ const service=new local.LocalOperationService(traceRoot,worker.owner,writers),f={device,projectId,runId,service,executor:new LocalExecutor(device.grant),workspace:join(root,runId)};
  assert.equal((await protocol(f,'register',{id:device.id,token:device.token,name:'Isolated device',platform:process.platform,grant:{id:device.grant.id,label:'isolated',allowCommands:true}})).status,200);
  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$4,$5,$6,$7)',
   [projectId,departmentId,'Isolated admission','Isolated heartbeat admission',policy,{agents:[employee],tasks:snapshot.tasks},'manual']);

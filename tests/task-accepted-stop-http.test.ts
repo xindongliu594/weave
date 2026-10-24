@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,afterEach,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
@@ -16,6 +17,7 @@ import {pool,migrate} from '../apps/api/src/db.ts';
 import {inProgressTaskMaintenance} from './helpers/task-stop-maintenance.ts';
 
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite',signal=new AbortController().signal;
 const sha=(value:string)=>createHash('sha256').update(value).digest('hex');
 const ordered=(value:any):any=>Array.isArray(value)?value.map(ordered):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,ordered(value[key])])):value;
@@ -26,9 +28,9 @@ let directory:string,server:any,url:string;
 const employee={id:'employee',employeeId:'employee',modelId:'unused',tools:['filesystem','artifact_write'],name:'Fixture',role:'manager'};
 before(async()=>{
  if(!isolated)return;assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);
- mkdirSync(scratch,{recursive:true});directory=mkdtempSync(join(scratch,'sql-stop-http-'));process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;process.env.OBSIDIAN_VAULT=join(directory,'vault');
+ mkdirSync(scratch,{recursive:true});directory=mkdtempSync(join(scratch,'sql-stop-http-'));process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;writers=createArchiveWriterManager({traceRoot:directory});process.env.OBSIDIAN_VAULT=join(directory,'vault');
  await migrate();await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['stop-department',{name:'fixture',agents:[employee]}]);
- const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory));app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({code:error.code,message:error.message}));
+ const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory,writers));app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({code:error.code,message:error.message}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+server.address().port;
 });
 beforeEach(async()=>{if(isolated)await pool.query('TRUNCATE local_operations,local_devices,project_runs,projects,usage,model_reservations,tool_approvals CASCADE');});
@@ -50,7 +52,7 @@ async function fixture(){
  await pool.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$3,true,$6)',[deviceId,sha(token),'fixture','linux',grantId,backend]);
  const stored=(await getRun(runId)).snapshot,archive=createRunArchive(directory,stored,{id:runId});mkdirSync(join(archive.dir,'artifacts'));writeFileSync(join(archive.dir,'artifacts/in.txt'),'input');writeFileSync(join(archive.dir,'artifacts/private.txt'),'private');
  archive.append('run/task-mapping',{tasks:[{task_id:'native-a',seed_id:'a'}]});archive.append('team/checkpoint',{members:[{id:'session',name:'employee'}],tasks:[{id:'native-a',assignee:'employee',attemptId:'attempt-a',status:'in_progress'}]});
- const service=new LocalOperationService(directory,owner),executor=new LocalRunExecutor(archive,stored,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint));
+ const service=new LocalOperationService(directory,owner,writers),executor=new LocalRunExecutor(archive,stored,service,inProgressTaskMaintenance(deviceId,grantId,backend.fingerprint));
  const assignment=await executor.bindAttempt({runId,taskId:'a',attemptId:'attempt-a',agentId:'employee',sessionId:'session',runtimeTaskId:'native-a',contractHash:checkpointContract(stored,stored.tasks[0])},signal);
  const context={agentId:'employee',sessionId:'session',taskId:'a',attemptId:'attempt-a',generation:assignment.generation};
  const key={runId,taskId:'a',attemptId:'attempt-a',generation:assignment.generation};

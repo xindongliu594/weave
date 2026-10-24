@@ -12,7 +12,7 @@ export function employeeFor(agent,snapshot,captainId){
   const name=descriptor?.data?.label?.split(':').at(-1);
   return snapshot.agents.find(a=>a.id===name);
 }
-export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,externalTool,handoff,activeWork,supervisor,goal,captureReadScope,onReadEvidence,onWriteEvidence}){
+export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestApproval,captainId,queryKnowledge,beforeKnowledge,externalTool,handoff,activeWork,supervisor,goal,captureReadScope,onReadEvidence,onWriteEvidence}){
   const string={type:'string',required:true};
   const local=snapshot.executionTarget?.kind==='local';
   const demo=Boolean(snapshot.demo?.fixture);
@@ -37,6 +37,10 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     if (['filesystem','knowledge_search','knowledge_read','artifact_write'].includes(name)) try { readScope=captureReadScope?.(exec.agent); } catch { /* No proof: retain the complete group. */ }
     const attestRead=value=>{if(readScope)try{onReadEvidence?.({name,args,value,scope:readScope,agent:exec.agent,callId:exec.callId});}catch{/* Optional optimization fails closed; the read result is unchanged. */}};
     const readOptions={signal:exec.signal,maxRetries:snapshot.policy?.maxReadRetries??2,onRetry:data=>archive.append('runtime/read-retry',data,ref)};
+    if(snapshot.effectContractVersion===1){
+      const contract=snapshot.effectContracts?.find(item=>item.toolName===name);
+      if(contract?.effect!=='read'||contract.retry!=='bounded-read')readOptions.maxRetries=0;
+    }
     if(name==='browser_read'||name==='mcp_call_readonly'){
       if(!externalTool)throw Error('EXTERNAL_TOOL_UNAVAILABLE');
       const waiting=supervisor?.enter(exec.agent.id,'waiting_capacity');let release;
@@ -48,7 +52,8 @@ export function installProductTools(ctx,{snapshot,archive,sandbox,gate,requestAp
     if(name.startsWith('knowledge_')){
       const chunks=snapshot.knowledge?.[employee.id]??[];
       if(snapshot.knowledge?.format==='document-versions-v2'&&!queryKnowledge)throw Error('KNOWLEDGE_SERVICE_UNAVAILABLE: 历史版本检索服务不可用');
-      const result=queryKnowledge?await retryRead(name,()=>queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000)),readOptions):
+      await beforeKnowledge?.(exec.signal);
+      const result=queryKnowledge?await retryRead(name,async()=>{await beforeKnowledge?.(exec.signal);return queryKnowledge(snapshot.knowledge,employee.id,name==='knowledge_search'?'search':'read',String(name==='knowledge_search'?args.query:args.chunkId).slice(0,1000));},readOptions):
         name==='knowledge_search'?searchKnowledge(chunks,String(args.query).slice(0,1000)):chunks.find(c=>c.id===args.chunkId);
       if(!result)throw Error('知识切片不存在或未授权');
       archive.append('knowledge/citation',{agentId:employee.id,operation:name==='knowledge_search'?'search':'read',query:args.query,sources:(Array.isArray(result)?result:[result]).map(c=>({documentId:c.documentId,version:c.version,chunkId:c.id,title:c.title,lineStart:c.lineStart,lineEnd:c.lineEnd,sha256:c.sha256,source:c.source}))},{sessionId:exec.agent.id});attestRead(result);return result;

@@ -82,7 +82,10 @@ before(async () => {
   await pool.query("INSERT INTO mcp_connections(id,data,credential,tools) VALUES('mcp',$1,$2,$3)", [{ name: 'Fixture MCP', url: 'http://127.0.0.1:1/mcp', enabled: true, allowedEmployees: [{ departmentId: 'department', agentId: 'manager' }], allowedTools: ['read'] }, vault.seal('fixture-token'), JSON.stringify([{ name: 'read', inputSchema: { type: 'object' } }])]);
   const snapshot = files.prepareWorkFileSnapshot({ name: '导入目录', files: [{ path: 'todo/README.md', base64: Buffer.from('Todo API').toString('base64') }] });
   await pool.query("INSERT INTO work_file_snapshots(id,name,files,bytes) VALUES('files',$1,$2,$3)", [snapshot.name, JSON.stringify(snapshot.files), snapshot.bytes]);
-  const app = express(); app.use(express.json({ limit: '45mb' })); app.use(backupModule.backupRouter(join(directory, 'runs'))); app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message }));
+  const {createArchiveWriterManager}=await import('../services/agent-runtime/archive-writer-scope.mjs');
+  const {createBackupRestoreState,migrateBackupRestoreState}=await import('../apps/api/src/backup-restore-state.ts');await migrateBackupRestoreState(pool);
+  const writers=createArchiveWriterManager({traceRoot:join(directory,'runs')}),state=createBackupRestoreState({pool,writers,traceRoot:join(directory,'runs'),dataRoot:directory});await state.reconcilePending();
+  const app = express(); app.use(express.json({ limit: '45mb' }));app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();}); app.use(backupModule.backupRouter(join(directory, 'runs'),writers,state)); app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 });
 after(async () => { if (server) await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await pool?.end(); await admin.query(`DROP SCHEMA ${schema} CASCADE`); await admin.end(); if (directory) await rm(directory, { recursive: true, force: true }); });

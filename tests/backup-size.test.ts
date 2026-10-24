@@ -65,8 +65,11 @@ before(async () => {
   await mkdir(join(traceRoot, runId, 'artifacts'), { recursive: true });
   const bytes = Buffer.alloc(31 * MiB, 'fixture-only-size-data\n'); artifactHash = hash(bytes);
   await writeFile(artifact, bytes);
-  const app = express(); app.use(express.json({ limit: '70mb' }));
-  app.use(backupModule.backupRouter(traceRoot));
+  const {createArchiveWriterManager}=await import('../services/agent-runtime/archive-writer-scope.mjs');
+  const {createBackupRestoreState,migrateBackupRestoreState}=await import('../apps/api/src/backup-restore-state.ts');await migrateBackupRestoreState(pool);
+  const writers=createArchiveWriterManager({traceRoot}),state=createBackupRestoreState({pool,writers,traceRoot,dataRoot:process.env.DATA_DIR!});await state.reconcilePending();
+  const app = express(); app.use(express.json({ limit: '70mb' }));app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();});
+  app.use(backupModule.backupRouter(traceRoot,writers,state));
   app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
   url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;

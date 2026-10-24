@@ -24,8 +24,15 @@ export function verificationSnapshot() {
 }
 
 /** Explicit offline verification only. Never use this adapter for a product run. */
-export async function runTraceVerification(root, { snapshot = verificationSnapshot() } = {}) {
-  const archive = createRunArchive(root, snapshot);
+export async function runTraceVerification(root, { writers, snapshot = verificationSnapshot() } = {}) {
+  if (!writers || writers.traceRoot !== root) throw Object.assign(Error('Verification requires the application writer manager'), { code: 'E_ARCHIVE_WRITER_CONFIG' });
+  const id = randomUUID();
+  const result = await writers.withWriter([id], async () => {
+  const stored = createRunArchive(root, snapshot, { id });
+  let archiveFailure;
+  const archive = { ...stored, append(...args) {
+    try { return stored.append(...args); } catch (error) { archiveFailure ??= error; throw error; }
+  } };
   const workspace = join(archive.dir, 'workspace');
   mkdirSync(workspace, { recursive: true, mode: 0o700 });
   const steps = new Map();
@@ -56,9 +63,10 @@ export async function runTraceVerification(root, { snapshot = verificationSnapsh
       }
     }
   }();
-  let host;
+  let host, lifecycle, closing;
+  const close = () => closing ??= Promise.resolve().then(() => (lifecycle ?? host)?.close());
   try {
-    host = await createTeamHost({ adapter, provider: 'trace-fixture', sessionRoot: join(archive.dir, 'sessions'), archive });
+    host = await createTeamHost({ adapter, provider: 'trace-fixture', sessionRoot: join(archive.dir, 'sessions'), archive, onLifecycle: value => { lifecycle = value; } });
     let reports = 0;
     host.ctx.on('tools/result', (exec, result) => { if (exec.name === 'agent_teams_send_message' && !result.isError) reports++; });
     const captainConfig = snapshot.agents[0];
@@ -84,14 +92,19 @@ export async function runTraceVerification(root, { snapshot = verificationSnapsh
     if (!status.deliverable || reports !== 2) throw new Error('Verification deadline exceeded');
     // Quiesce before sealing the archive so final reports and cancellation events are included.
     await captain.whenIdle();
-    await host.close();
-    host = undefined;
+    await close();
     archive.append('run/finished', { status: 'completed', description: '测试模型流程完成；未调用真实 API', tasks: status.tasks });
   } catch (error) {
-    try { await host?.close(); } finally {
-      archive.append('run/finished', { status: 'failed', message: String(error.message ?? error) });
-    }
-    throw error;
+    let cleanupFailure;
+    try { await close(); } catch (failure) { cleanupFailure = failure; }
+    try { archive.append('run/finished', { status: 'failed', message: String(error?.message ?? error) }); }
+    catch { throw error; } // Preserve the original failure; the append still latches this scope.
+    if (archiveFailure || cleanupFailure || error?.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN') throw error;
+    // Only proven quiescent business rejection leaves the native scope normally.
+    return { ok: false, error };
   }
-  return readRun(root, archive.id);
+  return { ok: true, value: readRun(root, archive.id) };
+  });
+  if (!result.ok) throw result.error;
+  return result.value;
 }

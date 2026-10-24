@@ -12,12 +12,17 @@ import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
 import { artifactFile } from '../../../services/agent-runtime/sandbox.mjs';
 import { completedTasks, resumeHandoff } from './handoff-checkpoints.ts';
 import {readLiveCanonical,type LiveCanonical} from './live-canonical-reader.ts';
+import {readRunBounds,rootSourceBounds,type SourceBounds} from './source-bounds.ts';
+import {httpPrincipal,administrative,currentRoutePrincipal,requireFileRoute,requireRunRoute,lockDepartmentAuthority,authorizeFileSelection,assertRunArchiveBinding,type FileConsumerAuthority} from './project-route-access.ts';
+import {visibleSourceQuery,resolveRunDepartments} from './resource-authorization.ts';
+import {appendAudit,auditActor,type AuthorityEvidence} from './audit-events.ts';
+import {principalKey,type Principal} from './identity-types.ts';
 
 type Database = Pick<pg.PoolClient,'query'>;
 export const workFileLimits={files:100,fileBytes:2*1024*1024,totalBytes:8*1024*1024,textCharacters:250000};
 export const workFileTables=['work_file_snapshots'];
 export type WorkFile = {path:string;bytes:number;sha256:string;kind:string;text:string;warnings:string[];base64:string};
-export type WorkFileSnapshot = {id:string;name:string;files:WorkFile[];bytes:number;createdAt:string;sourceRunId?:string|null};
+export type WorkFileSnapshot = {id:string;name:string;files:WorkFile[];bytes:number;createdAt:string;sourceRunId?:string|null;sourceBounds:SourceBounds|null};
 export type WorkFileSelection = {snapshotId:string;paths:string[];agentIds:string[];mode?:'reference'|'workspace'};
 export const workFileSelectionSchema=z.object({snapshotId:z.string().uuid(),paths:z.array(z.string().min(1).max(240)).min(1).max(100),agentIds:z.array(z.string().min(1).max(180)).min(1).max(6),mode:z.enum(['reference','workspace']).optional()}).strict();
 const uploadSchema=z.object({name:z.string().trim().min(1).max(100),files:z.array(z.object({path:z.string().min(1).max(240),base64:z.string().max(Math.ceil(workFileLimits.fileBytes/3)*4),kind:z.literal('file').optional()}).strict()).min(1).max(workFileLimits.files)}).strict();
@@ -42,40 +47,40 @@ export function prepareWorkFileSnapshot(value:unknown){
   });
   return {name:input.name,files,bytes};
 }
-export async function migrateWorkFiles(db:Database){await db.query(`CREATE TABLE IF NOT EXISTS work_file_snapshots(id text PRIMARY KEY,name text NOT NULL,files jsonb NOT NULL,bytes integer NOT NULL,created_at timestamptz NOT NULL DEFAULT now());`);await db.query('ALTER TABLE work_file_snapshots ADD COLUMN IF NOT EXISTS source_run_id text');}
+export async function migrateWorkFiles(db:Database){await db.query(`CREATE TABLE IF NOT EXISTS work_file_snapshots(id text PRIMARY KEY,name text NOT NULL,files jsonb NOT NULL,bytes integer NOT NULL,created_at timestamptz NOT NULL DEFAULT now());`);await db.query('ALTER TABLE work_file_snapshots ADD COLUMN IF NOT EXISTS source_run_id text');await db.query('ALTER TABLE work_file_snapshots ADD COLUMN IF NOT EXISTS source_bounds jsonb');}
 export async function readWorkFileSnapshot(id:string,db:Database=pool):Promise<WorkFileSnapshot>{
-  const row=(await db.query('SELECT id,name,files,bytes,created_at AS "createdAt",source_run_id AS "sourceRunId" FROM work_file_snapshots WHERE id=$1',[id])).rows[0];
+  const row=(await db.query('SELECT id,name,files,bytes,created_at AS "createdAt",source_run_id AS "sourceRunId",source_bounds AS "sourceBounds" FROM work_file_snapshots WHERE id=$1',[id])).rows[0];
   if(!row)throw new AppError(404,'导入快照不存在。');return row;
 }
 function verifiedText(file:WorkFile){
   const raw=Buffer.from(file.base64,'base64');if(createHash('sha256').update(raw).digest('hex')!==file.sha256)throw new AppError(409,'素材完整性校验失败。');
   const parsed=readOfficeFile(file.path,raw);if(parsed.text!==file.text||parsed.kind!==file.kind)throw new AppError(409,'素材正文与原文件不一致。');return raw;
 }
-export async function selectedWorkFileInputs(selections:WorkFileSelection[],db:Database=pool){
-  const selected=z.array(workFileSelectionSchema).max(20).parse(selections),inputs:{id:string;title:string;content:string;agentIds:string[]}[]=[];const seen=new Set<string>();
+export async function selectedWorkFileInputs(selections:WorkFileSelection[],db:Database=pool,authority?:FileConsumerAuthority){
+  const selected=z.array(workFileSelectionSchema).max(20).parse(selections),inputs:{id:string;title:string;content:string;agentIds:string[];sourceBounds:SourceBounds;sourceFile:{snapshotId:string;path:string;sha256:string}}[]=[];const seen=new Set<string>();
   for(const selection of selected){
-    const snapshot=await readWorkFileSnapshot(selection.snapshotId,db);
+    const sourceBounds=await authorizeFileSelection(db,selection.snapshotId,authority),snapshot=await readWorkFileSnapshot(selection.snapshotId,db);
     for(const path of selection.paths){
       const file=snapshot.files.find(file=>file.path===path);if(!file)throw new AppError(422,'选用文件不在导入快照中：'+path);verifiedText(file);
       const key=snapshot.id+':'+path;if(seen.has(key))throw new AppError(422,'请合并同一文件的员工授权，不能重复选用。');seen.add(key);
       if(!file.text.trim())throw new AppError(422,'选用文件没有可读正文：'+path);
       if(file.text.length>50000)throw new AppError(422,'项目选用的每个文件正文最多 50,000 字符，请先拆分：'+path);
-      inputs.push({id:'import_'+createHash('sha256').update(key).digest('hex').slice(0,40),title:(snapshot.name+' / '+path).slice(0,200),content:file.text,agentIds:[...new Set(selection.agentIds)]});
+      inputs.push({id:'import_'+createHash('sha256').update(key).digest('hex').slice(0,40),title:(snapshot.name+' / '+path).slice(0,200),content:file.text,agentIds:[...new Set(selection.agentIds)],sourceBounds,sourceFile:{snapshotId:snapshot.id,path,sha256:file.sha256}});
     }
   }
   if(inputs.length>20||inputs.reduce((n,file)=>n+file.content.length,0)>250000)throw new AppError(422,'本次选用资料最多 20 份、正文合计最多 250,000 字符。');
   return inputs;
 }
 /** Exact selected files only; callers still enforce employee grants and Run workspace boundaries. */
-export async function selectedWorkFileCopies(selections:WorkFileSelection[],db:Database=pool){
-  const selected=z.array(workFileSelectionSchema).max(20).parse(selections);const files:{path:string;content:string;sha256:string;agentIds:string[];snapshotId:string}[]=[];const paths=new Set<string>();
-  for(const selection of selected){if(selection.mode!=='workspace')continue;const snapshot=await readWorkFileSnapshot(selection.snapshotId,db);for(const path of selection.paths){
+export async function selectedWorkFileCopies(selections:WorkFileSelection[],db:Database=pool,authority?:FileConsumerAuthority){
+  const selected=z.array(workFileSelectionSchema).max(20).parse(selections);const files:{path:string;content:string;sha256:string;agentIds:string[];snapshotId:string;sourceBounds:SourceBounds}[]=[];const paths=new Set<string>();
+  for(const selection of selected){if(selection.mode!=='workspace')continue;const sourceBounds=await authorizeFileSelection(db,selection.snapshotId,authority),snapshot=await readWorkFileSnapshot(selection.snapshotId,db);for(const path of selection.paths){
     const file=snapshot.files.find(file=>file.path===path);if(!file)throw new AppError(422,'选用文件不在导入快照中。');validateWorkFilePath(path);
     if(!['text','csv'].includes(file.kind))continue;
     if(paths.has(path.toLowerCase()))throw new AppError(422,'不同素材快照有相同目标路径，请只保留一份：'+path);paths.add(path.toLowerCase());
     const raw=verifiedText(file);
     // utf8 decoder intentionally preserves original bytes including BOM for hash-bound copies.
-    files.push({path,content:raw.toString('utf8'),sha256:file.sha256,agentIds:[...new Set(selection.agentIds)],snapshotId:snapshot.id});
+    files.push({path,content:raw.toString('utf8'),sha256:file.sha256,agentIds:[...new Set(selection.agentIds)],snapshotId:snapshot.id,sourceBounds});
   }}return files;
 }
 type ImportedFile={path:string;content:string;sha256:string};
@@ -136,27 +141,52 @@ export function prepareImportedWorkspace(traceRoot:string,runId:string,files:Imp
 }
 export function workFilesRouter(db:Pick<pg.Pool,'query'|'connect'>=pool,traceRoot=resolve(process.env.TRACE_ROOT??'.data/runs')){
   const router=Router();
-  router.get('/work-files',async(_req,res)=>res.json((await db.query('SELECT id,name,bytes,created_at AS "createdAt",source_run_id AS "sourceRunId",jsonb_array_length(files) AS "fileCount" FROM work_file_snapshots ORDER BY created_at DESC LIMIT 200')).rows));
-  async function store(value:unknown,sourceRunId?:string){
-    const snapshot=prepareWorkFileSnapshot(value),id=randomUUID(),client=await db.connect();
-    try{await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918279)');
+  router.get('/work-files',async(req,res)=>{
+    const {limit,offset}=z.object({limit:z.coerce.number().int().min(1).max(200).default(200),offset:z.coerce.number().int().min(0).max(100000).default(0)}).strict().parse(req.query);
+    const visible=visibleSourceQuery(httpPrincipal(res),'file','viewer');
+    res.json((await db.query(`SELECT id,name,bytes,created_at AS "createdAt",source_run_id AS "sourceRunId",jsonb_array_length(files) AS "fileCount" FROM work_file_snapshots
+      WHERE id IN (${visible.text}) ORDER BY created_at DESC,id LIMIT $${visible.values.length+1} OFFSET $${visible.values.length+2}`,[...visible.values,limit,offset])).rows);
+  });
+  async function store(value:unknown,principal:Principal,sourceRunId?:string,transaction?:{client:pg.PoolClient;sourceBounds:SourceBounds;authority:AuthorityEvidence}){
+    const snapshot=prepareWorkFileSnapshot(value),id=randomUUID(),client=transaction?.client??await db.connect();
+    let commitAttempted=false,discard=false;
+    try{if(!transaction)await client.query('BEGIN');
+      let authority=transaction?.authority;
+      if(!authority){
+        await currentRoutePrincipal(client,principal,true);if(!administrative(principal))throw new AppError(403,'未绑定来源的文件仅管理员可创建');
+        authority={decisionId:randomUUID(),checkedAt:new Date().toISOString(),policyVersion:'work-files-admin-v1',principalKey:principalKey(principal),departmentIds:[],membershipVersions:[],grantVersions:[],permissionSha256:createHash('sha256').update(JSON.stringify({principal:principalKey(principal),epoch:principal.kind==='human'?principal.sessionEpoch:null})).digest('hex')};
+      }
+      await client.query('SELECT pg_advisory_xact_lock(918279)');
       if(sourceRunId){
         const signature=(files:WorkFile[])=>files.map(file=>file.path+':'+file.sha256).sort().join('\n');
         const prior=(await client.query('SELECT id,name,files,bytes FROM work_file_snapshots WHERE source_run_id=$1',[sourceRunId])).rows.find(row=>signature(row.files)===signature(snapshot.files));
-        if(prior){prior.files.forEach(verifiedText);await client.query('COMMIT');return {id:prior.id,name:prior.name,bytes:prior.bytes,fileCount:prior.files.length,sourceRunId,existing:true};}
+        if(prior){await requireFileRoute(client,principal,prior.id);prior.files.forEach(verifiedText);if(!transaction){commitAttempted=true;await client.query('COMMIT');}return {id:prior.id,name:prior.name,bytes:prior.bytes,fileCount:prior.files.length,sourceRunId,existing:true};}
       }
-      const row=(await client.query('SELECT count(*)::int AS count,coalesce(sum(bytes),0)::bigint AS bytes FROM work_file_snapshots')).rows[0];if(row.count>=200||Number(row.bytes)+snapshot.bytes>128*1024*1024)throw new AppError(422,'素材库已达到 200 份快照或 128 MiB 限额。');await client.query('INSERT INTO work_file_snapshots(id,name,files,bytes,source_run_id) VALUES($1,$2,$3,$4,$5)',[id,snapshot.name,JSON.stringify(snapshot.files),snapshot.bytes,sourceRunId??null]);await client.query('COMMIT');return {id,name:snapshot.name,bytes:snapshot.bytes,fileCount:snapshot.files.length,...(sourceRunId?{sourceRunId}:{})};}catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
+      const sourceBounds=transaction?.sourceBounds??(sourceRunId?await readRunBounds(client,sourceRunId):rootSourceBounds());
+      const row=(await client.query('SELECT count(*)::int AS count,coalesce(sum(bytes),0)::bigint AS bytes FROM work_file_snapshots')).rows[0];if(row.count>=200||Number(row.bytes)+snapshot.bytes>128*1024*1024)throw new AppError(422,'素材库已达到 200 份快照或 128 MiB 限额。');
+      await client.query('INSERT INTO work_file_snapshots(id,name,files,bytes,source_run_id,source_bounds) VALUES($1,$2,$3,$4,$5,$6)',[id,snapshot.name,JSON.stringify(snapshot.files),snapshot.bytes,sourceRunId??null,sourceBounds]);
+      await appendAudit(client,{eventId:randomUUID(),action:'file.create',actor:auditActor(principal),authority,correlation:{correlationId:randomUUID(),...(sourceRunId?{runId:sourceRunId}:{}),requestId:id},resource:{type:'file',id,departmentIds:sourceBounds.requiredDepartmentIds},outcome:'success',changes:{snapshotId:id,...(sourceRunId?{sourceRunId}:{}),manifestSha256:createHash('sha256').update(JSON.stringify(snapshot.files)).digest('hex')}});
+      if(!transaction){commitAttempted=true;await client.query('COMMIT');}return {id,name:snapshot.name,bytes:snapshot.bytes,fileCount:snapshot.files.length,...(sourceRunId?{sourceRunId}:{})};
+    }catch(error){if(!transaction){discard=commitAttempted;try{await client.query('ROLLBACK');}catch{discard=true;}}throw error;}finally{if(!transaction)client.release(discard);}
   }
-  router.post('/work-files',async(req,res)=>res.status(201).json(await store(req.body)));
+  router.post('/work-files',async(req,res)=>res.status(201).json(await store(req.body,httpPrincipal(res))));
   router.post('/work-files/from-run',async(req,res)=>{
     const input=z.object({runId:z.uuid(),paths:z.array(z.string().min(1).max(240)).min(1).max(100),name:z.string().trim().min(1).max(100).optional()}).strict().parse(req.body);
-    const row=(await db.query('SELECT * FROM project_runs WHERE id=$1',[input.runId])).rows[0];
+    const principal=httpPrincipal(res),client=await db.connect();let commitAttempted=false,discard=false;
+    try{await client.query('BEGIN');
+    const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[input.runId])).rows[0];if(!identity)throw new AppError(404,'来源运行不存在。');
+    const project=(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
+    const row=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[input.runId])).rows[0];
+    const departments=await resolveRunDepartments(client,input.runId),authority=await lockDepartmentAuthority(client,principal,departments??[project.department_id],'operator');
+    await requireRunRoute(client,principal,input.runId,'operator');
+    const sourceBounds=await readRunBounds(client,input.runId);
     const run=readRun(traceRoot,input.runId);
     if(!row||!run)throw new AppError(404,'来源运行不存在。');
+    assertRunArchiveBinding(principal,row,run);
     const sourceProjectId=(run.snapshot as {projectId?:unknown}).projectId;
     if(row.status!=='completed'||run.status!=='completed'||run.integrity!=='ok'||typeof sourceProjectId!=='string'||row.snapshot.projectId!==sourceProjectId||row.snapshot.planVersion!==run.snapshot.planVersion)throw new AppError(409,'只能复用完整且已完成的正式运行。');
     const root=join(traceRoot,input.runId,'artifacts');
-    const canonical=await readLiveCanonical(db,traceRoot,row,run);
+    const canonical=await readLiveCanonical(client,traceRoot,row,run);
     let receipts:any[];
     try{const done=completedTasks(run.events,run.snapshot);if(!done.size||!run.snapshot.tasks.every((task:any)=>done.has(task.id)))throw Error('任务尚未全部核验完成');receipts=resumeHandoff(run.snapshot,run.events,done,root,canonical?.ref.manifest);}catch(error){throw new AppError(409,'来源交接不能核对：'+(error as Error).message);}
     const sealed=receipts.flatMap(record=>[...(record.inputs??[]),...(record.outputs??[])]);
@@ -166,18 +196,20 @@ export function workFilesRouter(db:Pick<pg.Pool,'query'|'connect'>=pool,traceRoo
       if(!sealed.some(file=>file.path===path&&file.sha256===sha256))throw new AppError(409,'文件未绑定已核验交接，或版本已变化：'+path);
       return {path,base64:raw.toString('base64')};
     });
-    const result=await store({name:input.name??('已验收交付 · '+input.runId),files},input.runId);
+    const result=await store({name:input.name??('已验收交付 · '+input.runId),files},principal,input.runId,{client,sourceBounds,authority});
+    commitAttempted=true;await client.query('COMMIT');
     res.status(result.existing?200:201).json(result);
+    }catch(error){discard=commitAttempted;try{await client.query('ROLLBACK');}catch{discard=true;}throw error;}finally{client.release(discard);}
   });
   router.post('/work-files/generate',async(req,res)=>{
     const input=z.object({format:z.enum(['csv','docx','xlsx']),name:z.string().trim().min(1).max(80),title:z.string().max(200).optional(),text:z.string().max(250000).optional(),rows:z.array(z.array(z.union([z.string(),z.number().finite(),z.boolean(),z.null()]))).optional()}).strict().parse(req.body);
     let output:ReturnType<typeof createOfficeFile>;try{output=createOfficeFile({...input,title:input.title??input.name});}catch(error){throw new AppError(422,(error as Error).message);}
-    res.status(201).json(await store({name:input.name,files:[{path:input.name.replace(/[\\/:*?"<>|]/g,'_')+'.'+output.extension,base64:output.buffer.toString('base64')}]}));
+    res.status(201).json(await store({name:input.name,files:[{path:input.name.replace(/[\\/:*?"<>|]/g,'_')+'.'+output.extension,base64:output.buffer.toString('base64')}]},httpPrincipal(res)));
   });
-  router.get('/work-files/:id',async(req,res)=>{const snapshot=await readWorkFileSnapshot(String(req.params.id),db);res.json({...snapshot,files:snapshot.files.map(({base64,...file})=>file)});});
+  router.get('/work-files/:id',async(req,res)=>{await requireFileRoute(db,httpPrincipal(res),String(req.params.id));const snapshot=await readWorkFileSnapshot(String(req.params.id),db);res.json({...snapshot,files:snapshot.files.map(({base64,...file})=>file)});});
   router.get('/work-files/:id/files/:index/download',async(req,res)=>{
-    const snapshot=await readWorkFileSnapshot(String(req.params.id),db),index=Number(req.params.index);if(!/^\d+$/.test(String(req.params.index))||!Number.isInteger(index)||!snapshot.files[index])throw new AppError(404,'文件不存在。');
-    const file=snapshot.files[index];res.setHeader('Content-Type','application/octet-stream');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Content-Disposition',"attachment; filename*=UTF-8''"+encodeURIComponent(file.path.split('/').at(-1)!));res.send(Buffer.from(file.base64,'base64'));
+    await requireFileRoute(db,httpPrincipal(res),String(req.params.id));const snapshot=await readWorkFileSnapshot(String(req.params.id),db),index=Number(req.params.index);if(!/^\d+$/.test(String(req.params.index))||!Number.isInteger(index)||!snapshot.files[index])throw new AppError(404,'文件不存在。');
+    const file=snapshot.files[index],bytes=verifiedText(file);res.setHeader('Content-Type','application/octet-stream');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Content-Disposition',"attachment; filename*=UTF-8''"+encodeURIComponent(file.path.split('/').at(-1)!));res.send(bytes);
   });
   return router;
 }

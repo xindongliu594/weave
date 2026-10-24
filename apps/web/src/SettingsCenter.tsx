@@ -3,6 +3,7 @@ import { CostControl } from './CostControl.tsx';
 import { api } from './api.ts';
 import {LocalDevices} from './LocalDevices.tsx';
 import {StorageCenter} from './StorageCenter.tsx';
+import {AuditHistory} from './AuditHistory.tsx';
 export function downloadJSON(value:unknown,name:string){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export function SettingsCenter({localWorkspace}:{localWorkspace?:{workspacesPath:string}}){
  const [settings,setSettings]=useState<any>(null),[diag,setDiag]=useState<any>(null),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[password,setPassword]=useState(''),[backup,setBackup]=useState<any>(null),[confirmText,setConfirmText]=useState('');
@@ -13,6 +14,7 @@ export function SettingsCenter({localWorkspace}:{localWorkspace?:{workspacesPath
  <CostControl/>
  <LocalDevices/>
  <StorageCenter/>
+ <AuditHistory/>
  <section className="panel padded lower"><h2>加密备份与恢复</h2><p className="subcopy">备份包含业务数据、模型凭证、运行档案及已登记的 Obsidian 笔记，使用你设置的密码加密。密码无法找回。备份和恢复前须停止所有队列及运行任务，并等待模型调用结束。待核对的费用预留会包含在备份中。</p><label className="field">备份密码（至少 12 个字符）<input type="password" minLength={12} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><button disabled={busy||password.length<12} onClick={()=>void act(async()=>{const b=await api('/backup/export','POST',{password});downloadJSON(b,'agent-department-backup-'+new Date().toISOString().slice(0,10)+'.json');setNotice('加密备份已生成。请保存密码并妥善保管文件。');})}>生成并下载备份</button><details className="lower"><summary>从备份恢复（覆盖当前业务数据）</summary><label className="field">选择加密备份<input type="file" accept=".json" onChange={e=>{const f=e.target.files?.[0];if(f){if(f.size>45*1024*1024){setError('备份文件过大');return;}f.text().then(t=>setBackup(JSON.parse(t))).catch(()=>setError('备份文件不是有效 JSON'));}}}/></label><label className="field">输入 RESTORE 确认覆盖<input value={confirmText} onChange={e=>setConfirmText(e.target.value)}/></label><button disabled={busy||!backup||password.length<12||confirmText!=='RESTORE'} onClick={()=>void act(async()=>{await api('/backup/restore','POST',{backup,password,confirmation:confirmText});setConfirmText('');setNotice('恢复完成，请刷新页面加载数据。');})}>恢复备份</button></details></section>
  <section className="panel padded lower"><h2>桌面客户端</h2><p>{localWorkspace?'本机工作台的后端、数据与工作区都保存在运行服务的电脑。':'Windows 与 macOS 客户端连接同一个服务器；后端与数据保存在运行服务的电脑。'}</p><a href={import.meta.env.BASE_URL+'downloads/Agent-Department-0.2.0-win-x64.exe'}>Windows x64 安装包</a><span> · </span><a href={import.meta.env.BASE_URL+'downloads/Agent-Department-0.2.0-mac-arm64.dmg'}>macOS Apple Silicon</a><span> · </span><a href={import.meta.env.BASE_URL+'downloads/Agent-Department-0.2.0-mac-x64.dmg'}>macOS Intel</a><p className="subcopy">安装包尚未配置商业代码签名。Windows 安装、启动、登录、重连及卸载已通过原生 CI 验证。</p></section></>;
 }

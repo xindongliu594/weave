@@ -32,7 +32,7 @@ function assignmentAuthority(run:any,events:any[],task:any,context:TaskCheckpoin
 }
 
 /** Prepare under project -> run locks; invoke the private synchronous publisher after COMMIT. */
-export async function prepareTaskCheckpoint(db:pg.PoolClient,run:any,service:{traceRoot:string;owner:string},context:TaskCheckpointContext,signal:AbortSignal,options:TaskCheckpointOptions):Promise<()=>TaskCheckpointRefs>{
+export async function prepareTaskCheckpoint(db:pg.PoolClient,run:any,service:{traceRoot:string;owner:string},context:TaskCheckpointContext,signal:AbortSignal,options:TaskCheckpointOptions,persist:<T>(fn:()=>T)=>T=fn=>fn()):Promise<()=>TaskCheckpointRefs>{
  signal.throwIfAborted();
  if(!context||['agentId','sessionId','taskId','attemptId'].some(k=>typeof (context as any)[k]!=='string'||!(context as any)[k])||!Number.isSafeInteger(context.generation)||context.generation<1||Object.keys(context).some(k=>!['agentId','sessionId','taskId','attemptId','generation'].includes(k))||
   !options||!['before-tool','after-tool','boundary'].includes(options.phase)||Object.keys(options).some(k=>!['phase','operationId'].includes(k))||options.operationId!==undefined&&(typeof options.operationId!=='string'||!options.operationId)||options.phase==='after-tool'&&!options.operationId)taskOperationDenied('检查点缺少准确任务或原操作身份');
@@ -52,7 +52,7 @@ export async function prepareTaskCheckpoint(db:pg.PoolClient,run:any,service:{tr
  if(!isDeepStrictEqual(original.inputOrigins,scope.inputOrigins)||original.capabilityHash!==scope.capabilityHash)taskOperationDenied('检查点原操作与当前任务不符');
  const workFiles:TaskWorkspaceFile[]=options.phase==='after-tool'?result.files:scope.workspace.importedFiles;
  if(revision(workFiles)!==receipt.workRevision||!isDeepStrictEqual(manifest(workFiles),manifest(result.files)))taskOperationDenied('检查点任务文件与原沙箱工作版本不符');
- storeArchiveObjects(join(service.traceRoot,run.id),decodeFiles(workFiles).map((file:any)=>({sha256:createHash('sha256').update(file.bytes).digest('hex'),size:file.bytes.length,content:file.bytes})));
+ persist(()=>storeArchiveObjects(join(service.traceRoot,run.id),decodeFiles(workFiles).map((file:any)=>({sha256:createHash('sha256').update(file.bytes).digest('hex'),size:file.bytes.length,content:file.bytes}))));
  const refs:TaskCheckpointRefs={profile:scope.profile,key:scope.key,inputManifest:scope.workspace.inputManifest,inputOrigins:scope.inputOrigins,workManifest:manifest(workFiles),canonical:canonical.ref,lastMerge:receipt,scopeHash:options.phase==='after-tool'?original.workspace.scopeHash:scope.workspace.scopeHash,capabilityHash:scope.capabilityHash};
  // DSH may publish progress during an await. Resolve the latest semantic
  // assignment rather than requiring the complete checkpoint event to stay equal.

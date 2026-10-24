@@ -10,6 +10,8 @@ import { AppError } from './provider.ts';
 import { isNativeToolName } from '../../../packages/contracts/native-tool-ids.mjs';
 import { nativeManifestId, nativeToolBinding, assertNativeTaskAccess } from '../../../services/agent-runtime/native-capabilities.mjs';
 import { createNativeInstallManager } from './native-plugin-install.ts';
+import {httpPrincipal,administrative} from './project-route-access.ts';
+import {visibleResourceQuery} from './resource-authorization.ts';
 export { assertNativeTaskAccess };
 
 type Database = Pick<pg.PoolClient,'query'>;
@@ -95,7 +97,20 @@ export async function listNativeCapabilities(db:Database=pool,root=nativeCapabil
 export function nativeCapabilityRouter(options:{demo?:unknown;root?:string}={}) {
  const router=Router();
  const installer=createNativeInstallManager(options.root);
- router.get('/capabilities/plugins',async(_req,res)=>res.json(await listNativeCapabilities()));
+ router.get('/capabilities/plugins',async(_req,res)=>{
+  const principal=httpPrincipal(res);if(administrative(principal))return res.json(await listNativeCapabilities());
+  const visible=visibleResourceQuery(principal,'department','viewer');
+  const departments=(await pool.query(`SELECT data FROM departments WHERE id IN (${visible.text})`,visible.values)).rows;
+  const names=new Set<string>(departments.flatMap(row=>(row.data.agents??[]).flatMap((agent:any)=>agent.tools??[]).filter(isNativeToolName)));
+  const namespaces=[...new Set([...names].map(name=>name.split('__')[1]))];
+  const rows=(await pool.query('SELECT namespace,manifest_id FROM native_capabilities WHERE enabled=true AND namespace=ANY($1::text[]) ORDER BY namespace LIMIT 100',[namespaces])).rows;
+  const result=[];
+  for(const row of rows){try{const {id,manifest}=readNativeBundle(row.manifest_id,options.root);if(manifest.namespace!==row.namespace)continue;
+    const tools=manifest.tools.filter((tool:any)=>names.has(tool.name)).map(({name,originalName,description}:any)=>({name,originalName,description}));
+    if(tools.length)result.push({id,available:true,enabled:true,manifest:{namespace:manifest.namespace,package:manifest.package,version:manifest.version,dshVersion:manifest.dshVersion,source:{kind:manifest.source.kind},tools}});
+  }catch{/* An unverified installed version grants no member metadata. */}}
+  res.json(result);
+ });
  router.post('/capabilities/plugins/install',(req,res)=>{if(options.demo)return res.status(403).json({message:'演示环境不能下载安装插件。'});try{res.status(202).json(installer.start(req.body));}catch(error:any){res.status(error?.status??422).json({message:typeof error?.status==='number'?error.message:'插件安装配置无效；请检查精确包名、版本及工具文件字段。'});}});
  router.get('/capabilities/plugins/install/:id',(req,res)=>{const state=installer.get(String(req.params.id));if(!state)return res.status(404).json({message:'安装任务不存在'});res.json(state);});
  router.put('/capabilities/plugins/:id',async(req,res)=>{const enabled=z.object({enabled:z.boolean()}).parse(req.body).enabled;res.json(await setNativeCapability(String(req.params.id),enabled));});

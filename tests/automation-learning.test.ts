@@ -23,10 +23,11 @@ before(async () => {
   await pool.query("INSERT INTO departments(id,data) VALUES('department',$1)", [{ name: '研发', agents: [{ id: 'employee', name: '工程师' }] }]);
   await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES('source','department',1,'研发','测试项目需求与工具范围',$1,$2,'manual')", [{ maxBudget: 1, allowedTools: ['knowledge_read'], allowedKnowledgeSpaceIds: ['space'] }, { agents: [], tasks: [], workFileSelections: [{ id: 'selected-file', version: 2 }], browserScope: ['https://example.org'] }]);
   service = new module.AutomationLearningService(pool, { clock: () => now });
-  const app = express(); app.use(express.json()); app.use(module.automationLearningRouter({ db: pool, service, publishKnowledge: async (input, id) => {
+  const app = express(); app.use(express.json()); app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();});app.use(module.automationLearningRouter({ db: pool, service, publishKnowledge: async (input, id, _bounds, context) => {
+    assert.ok(context?.client);const transaction=context.client;
     publishCalls++;
-    await pool.query('INSERT INTO knowledge_documents(id,space_id,title) VALUES($1,$2,$3)', [id, input.spaceId, input.title]);
-    await pool.query('INSERT INTO knowledge_revisions(document_id,version,content,sha256,source) VALUES($1,1,$2,$3,$4)', [id, input.content, digest(input.content), input.source]);
+    await transaction.query('INSERT INTO knowledge_documents(id,space_id,title) VALUES($1,$2,$3)', [id, input.spaceId, input.title]);
+    await transaction.query('INSERT INTO knowledge_revisions(document_id,version,content,sha256,source) VALUES($1,1,$2,$3,$4)', [id, input.content, digest(input.content), input.source]);
     if (failAfterPublication) { failAfterPublication = false; throw Error('simulated lost response'); }
     return { id, version: 1 };
   } }));
@@ -105,14 +106,15 @@ test('knowledge candidates use approved source versions, deduplicate and never p
   await pool.query("UPDATE knowledge_spaces SET deleted_at=now() WHERE id='space'");
   assert.equal((await api('/knowledge-candidates/' + candidate.id + '/publish', { version: 1, reviewed: true })).status, 422);
   await pool.query("UPDATE knowledge_spaces SET deleted_at=NULL WHERE id='space'");
-  await api('/knowledge-candidates/' + candidate.id, { title: '已审查经验', content: '测试结果需要附命令及实际输出。', version: 1, spaceId: 'private-space' }, 'PUT');
+  assert.equal((await api('/knowledge-candidates/' + candidate.id, { title: '已审查经验', content: '测试结果需要附命令及实际输出。', version: 1, spaceId: 'private-space' }, 'PUT')).status,422);
+  assert.equal((await api('/knowledge-candidates/' + candidate.id, { title: '已审查经验', content: '测试结果需要附命令及实际输出。', version: 1 }, 'PUT')).status,200);
   failAfterPublication = true;
   assert.equal((await api('/knowledge-candidates/' + candidate.id + '/publish', { version: 2, reviewed: true })).status, 500);
   assert.equal((await api('/knowledge-candidates/' + candidate.id + '/publish', { version: 2, reviewed: true })).status, 200);
-  assert.equal(publishCalls, 1, 'retry recovers the same stable document identity');
+  assert.equal(publishCalls, 2, 'known callback failure rolled back the document; retry commits the stable identity once');
   assert.equal((await pool.query('SELECT space_id FROM knowledge_documents WHERE id=$1', [candidate.id])).rows[0].space_id, 'space');
   assert.equal((await api('/knowledge-candidates/' + candidate.id + '/publish', { version: 2, reviewed: true })).status, 200);
-  assert.equal(publishCalls, 1);
+  assert.equal(publishCalls, 2);
 });
 
 test('fixed evaluation cases retain actual before/after outputs and manual adoption rollback without runtime mutation', async () => {

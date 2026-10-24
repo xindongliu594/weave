@@ -1,10 +1,34 @@
 import {useEffect,useRef,useState} from 'react';
 import {api} from './api.ts';
 import {TaskStopMaintenance,taskStopScopeKey} from './TaskStopMaintenance.tsx';
+import type {MaintenanceHealth} from '../../api/src/maintenance-health.ts';
 type Cleanup={id:string;status:string;createdAt:string;preview:{kind?:string;expiresAt:string;bytes:number;candidates:{runId:string;path:string;bytes:number}[];protectedRuns:{runId:string;reason:string}[]};result?:{bytes?:number;savedBytes?:number;state?:string;message?:string;replayed?:boolean;observed?:{runId:string;path:string;state:string}[]}};
 const sandboxRetirementNotice='当前自动沙箱回收尚未开放，正式交付保留。';
 const confirmations:Record<string,string>={workspace:'CLEAN_WORKSPACE_COPIES',sandbox:'RETIRE_SANDBOX',journal:'ARCHIVE_JOURNAL'};
 const bytes=(n:number)=>n>=1024**3?(n/1024**3).toFixed(2)+' GiB':n>=1024**2?(n/1024**2).toFixed(2)+' MiB':n>=1024?(n/1024).toFixed(1)+' KiB':n+' B';
+type MaintenanceView=Omit<MaintenanceHealth,'code'>&{code:MaintenanceHealth['code']|'REPORT_FETCH_FAILED'};
+export async function loadMaintenanceHealth():Promise<MaintenanceView>{
+ try{return await api<MaintenanceHealth>('/storage/maintenance');}
+ catch{return {version:1,currentStatus:'unknown',availability:'unavailable',code:'REPORT_FETCH_FAILED',maxAgeHours:48,slots:[]};}
+}
+const maintenanceStatus=(status?:string)=>({passed:'记录通过',failed:'记录失败',unknown:'待核对'} as Record<string,string>)[status??'unknown']??'待核对';
+export function MaintenanceHealthReport({data}:{data?:MaintenanceView}){
+ const report=data?.report,unavailable:Record<string,string>={NOT_CONFIGURED:'尚未配置周期维护记录。',REPORTS_MISSING:'尚无周期维护记录。',REPORT_UNAVAILABLE:'现有维护记录均无法使用。',REPORT_DIRECTORY_UNAVAILABLE:'维护记录暂时无法安全读取。',REPORT_FETCH_FAILED:'维护记录暂时无法加载，容量和清理功能仍可使用。'};
+ return <details className="lower"><summary>周期维护记录</summary>
+  <p>当前状态尚未现场复核。这里只读取已保存的历史报告。</p>
+  <p className="subcopy">仅展示最近 48 小时的有效报告；当前恢复能力仍待核对。</p>
+  {data?.availability==='degraded'&&<p role="alert" className="banner error">部分维护记录不可用，当前显示其余有效记录。</p>}
+  {!report?<p>{data?unavailable[data.code]??'维护记录暂时不可用。':'正在读取维护记录…'}</p>:<>
+   <p>历史报告：{new Date(report.checkedAt).toLocaleString('zh-CN')} · {maintenanceStatus(report.status)}</p>
+   <p>文件盘点：{maintenanceStatus(report.checks?.storage?.status)}{report.checks?.storage?.bytes!==undefined?' · '+bytes(report.checks.storage.bytes):''}{report.checks?.storage?.files!==undefined?' · '+report.checks.storage.files+' 个文件':''}</p>
+   <p>可用空间：{maintenanceStatus(report.checks?.disk?.status)}{report.checks?.disk?.freeBytes!==undefined?' · '+bytes(report.checks.disk.freeBytes):''}</p>
+   <p>保留建议：{maintenanceStatus(report.checks?.retention?.status)}{report.checks?.retention?.recommendations!==undefined?' · '+report.checks.retention.recommendations+' 项':''}</p>
+   <p>恢复证据：{maintenanceStatus(report.checks?.backup?.status)}{report.checks?.backup?.recordedStatus==='passed'?' · 演练记录曾通过，当前恢复能力仍待核对。':''}</p>
+  </>}
+  {data?.slots?.some(slot=>slot.state==='stale')&&<p>部分记录已超过 48 小时。</p>}
+  {data?.slots?.some(slot=>slot.state==='future')&&<p>部分记录的时间在未来，请核对报告生成机器的时钟。</p>}
+ </details>;
+}
 export function RetentionReport({data,busy,onPreview}:{data:any;busy:boolean;onPreview:(kind:string,id:string)=>void}){return <details className="lower"><summary>保留与维护建议</summary>
  <p>按完成时间给出建议，不自动删除。预览仍会核对费用、授权、原档案和文件版本；失败与结果未知的现场保留。</p>
  <p>完成日志保留 {data.policy.hotJournalHours} 小时后可预览压缩；完成工作区副本保留 {data.policy.completedCopiesDays} 天后可预览回收。</p>
@@ -42,15 +66,16 @@ export function CleanupHistory({rows,busy,onReconcile}:{rows:Cleanup[];busy:bool
  {row.result?.observed?.map(o=><p key={o.runId+'/'+o.path}>{o.runId}/{o.path}：{({present:'副本仍在',changed:'副本已变化',unverified:'暂未核对','missing-copy':'副本已不存在，交付档案保留'} as Record<string,string>)[o.state]??o.state}</p>)}
  </div>;})}</details>;}
 export function StorageCenter(){
- const [data,setData]=useState<any>(),[sandboxes,setSandboxes]=useState<any>(),[retention,setRetention]=useState<any>(),[rows,setRows]=useState<Cleanup[]>([]),[preview,setPreview]=useState<Cleanup>(),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const lock=useRef(false),mounted=useRef(true);
- async function refresh(){const [report,history,sandboxReport,advice]=await Promise.all([api('/storage'),api<Cleanup[]>('/storage/cleanups'),api('/storage/sandboxes'),api('/storage/retention')]);if(mounted.current){setData(report);setRows(history);setSandboxes(sandboxReport);setRetention(advice);}}
+ const [data,setData]=useState<any>(),[sandboxes,setSandboxes]=useState<any>(),[retention,setRetention]=useState<any>(),[maintenance,setMaintenance]=useState<MaintenanceView>(),[rows,setRows]=useState<Cleanup[]>([]),[preview,setPreview]=useState<Cleanup>(),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const lock=useRef(false),mounted=useRef(true),maintenanceRequest=useRef(0);
+ async function refresh(){const request=++maintenanceRequest.current;void loadMaintenanceHealth().then(value=>{if(mounted.current&&request===maintenanceRequest.current)setMaintenance(value);});const [report,history,sandboxReport,advice]=await Promise.all([api('/storage'),api<Cleanup[]>('/storage/cleanups'),api('/storage/sandboxes'),api('/storage/retention')]);if(mounted.current){setData(report);setRows(history);setSandboxes(sandboxReport);setRetention(advice);}}
  useEffect(()=>{mounted.current=true;void refresh().catch(e=>{if(mounted.current)setError(e.message);});return()=>{mounted.current=false;};},[]);
  async function act(fn:()=>Promise<void>){if(lock.current)return;lock.current=true;setBusy(true);setError('');setNotice('');try{await fn();}catch(e){if(mounted.current)setError((e as Error).message);}finally{try{await refresh();}catch(e){if(mounted.current)setError((e as Error).message);}lock.current=false;if(mounted.current)setBusy(false);}}
  async function makePreview(body:any){const saved=await api<Cleanup>('/storage/preview','POST',body);if(mounted.current)setPreview(saved);}
  return <section className="panel padded lower"><h2>文件与数据容量</h2><p className="subcopy">先核对占用，再确认维护。交付、知识和操作收据保护；完成日志可校验压缩。旧发布与缓存只读盘点；沙箱只统计获授权的可写目录。</p>
  {error&&<p role="alert" className="banner error">{error}</p>}{notice&&<p role="status" className="banner">{notice}</p>}{data?<StorageReport data={data} busy={busy} onJournalPreview={id=>void act(()=>makePreview({kind:'journal',runId:id}))}/>:<p>正在核对容量…</p>}
  <button disabled={busy} onClick={()=>void act(refresh)}>刷新容量</button>{' '}<button disabled={busy} onClick={()=>void act(async()=>{const saved=await api<Cleanup>('/storage/preview','POST',{});if(mounted.current)setPreview(saved);})}>生成清理预览</button>
+ <MaintenanceHealthReport data={maintenance}/>
  {retention&&<RetentionReport data={retention} busy={busy} onPreview={(kind,id)=>void act(()=>makePreview(kind==='workspace'?{}:{kind,runId:id}))}/>}
  <SandboxStorageReport data={sandboxes} busy={busy} onTaskRefresh={refresh} onInspect={id=>void act(async()=>{await api('/storage/sandboxes/'+id+'/inspect','POST',{});if(mounted.current)setNotice('容量与当前文件版本已核对，未删除沙箱。');})} onPreview={id=>void act(()=>makePreview({kind:'sandbox',runId:id}))}/>
  {preview&&<CleanupPreview row={preview} busy={busy} onConfirm={()=>void act(async()=>{const saved=await api<Cleanup>('/storage/cleanups/'+preview.id+'/confirm','POST',{confirmation:confirmations[preview.preview.kind??'workspace']});if(mounted.current){setPreview(saved);setNotice(saved.status==='completed'?'维护记录已保存，正式交付和恢复证据保留。':'请查看维护记录并核对结果。');}})}/>}

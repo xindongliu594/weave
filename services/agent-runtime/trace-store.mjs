@@ -2,6 +2,35 @@ import { mkdirSync, openSync, writeSync, fsyncSync, closeSync, readFileSync, rea
 import { join, resolve } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import {readJournal,assertJournalWritable} from './journal-archive.mjs';
+import {summarizeObservation,observationCorrelation} from './observation-summary.mjs';
+
+const observationRoots=new Map(),increment=value=>Math.min(Number.MAX_SAFE_INTEGER,value+1);
+const observationRoot=root=>{const value=resolve(root);return process.platform==='win32'?value.toLowerCase():value;};
+export function observeRunArchive(root,sink){
+  if(typeof root!=='string'||!root||typeof sink!=='function')throw Error('OBSERVATION_SUBSCRIPTION_INVALID');
+  const key=observationRoot(root);let state=observationRoots.get(key);
+  if(!state){if(observationRoots.size>=16)throw Error('OBSERVATION_ROOT_LIMIT');state={listeners:new Set(),emitted:0,dropped:0,failures:0};observationRoots.set(key,state);}
+  if(state.listeners.size>=8)throw Error('OBSERVATION_SUBSCRIBER_LIMIT');
+  const listener={sink,pending:false};state.listeners.add(listener);let disposed=false;
+  return ()=>{if(disposed)return;disposed=true;state.listeners.delete(listener);if(!state.listeners.size)observationRoots.delete(key);};
+}
+export function runArchiveObservationHealth(root){const state=observationRoots.get(observationRoot(root));return {subscribers:state?.listeners.size??0,emitted:state?.emitted??0,dropped:state?.dropped??0,failures:state?.failures??0};}
+function observeCommitted(root,id,text,cursor){
+  const state=observationRoots.get(observationRoot(root));if(!state)return;
+  try{
+    const event=JSON.parse(text);
+    const summary=summarizeObservation({kind:'trace',runId:id,event,correlation:cursor.observationVerified?cursor.observationContext:undefined});
+    if(!summary){state.dropped=increment(state.dropped);return;}
+    state.emitted=increment(state.emitted);
+    for(const listener of [...state.listeners]){
+      if(!state.listeners.has(listener))continue;
+      if(listener.pending){state.dropped=increment(state.dropped);continue;}
+      listener.pending=true;
+      try{const result=listener.sink(summary);if(result&&typeof result.then==='function'){Promise.resolve(result).then(()=>{listener.pending=false;},()=>{listener.pending=false;state.failures=increment(state.failures);});}else listener.pending=false;}
+      catch{listener.pending=false;state.failures=increment(state.failures);}
+    }
+  }catch{state.failures=increment(state.failures);}
+}
 
 const validId = /^[a-f0-9-]{36}$/;
 function location(root, id) {
@@ -52,7 +81,9 @@ export function openRunArchive(root, id) {
       const text = JSON.stringify(event) + '\n', key = location(resolve(root), id);
       try { durableWrite(join(dir, 'events.jsonl'), text, 'a'); }
       catch (error) { discardAppendCursor(key); throw error; }
+      if(event.type==='run/created')try{const saved=JSON.parse(text);if(saved.seq===event.seq&&saved.type==='run/created'&&saved.data?.snapshotSha256===current.observationSnapshotSha256)current.observationVerified=true;}catch{/* Invalid persisted records are never observation authority. */}
       advanceAppendCursor(key, current, event, Buffer.byteLength(text));
+      observeCommitted(root,id,text,current);
       return event;
     },
   };
@@ -110,10 +141,13 @@ function verifiedAppendCursor(root, id) {
   const run = readRun(root, id);
   if (!run) throw new Error('Run not found');
   if (run.integrity !== 'ok') throw new Error('Run journal is incomplete; repair is required before appending');
+  const observationSnapshotSha256=createHash('sha256').update(readFileSync(join(key,'snapshot.json'))).digest('hex');
+  const observationContext=observationCorrelation(run.snapshot?.auditContext);
+  const observationVerified=run.events.some(event=>event.type==='run/created'&&event.data?.snapshotSha256===observationSnapshotSha256);
   const after = archiveIdentity(key);
   if (!before || !after || contentIdentityKey(before) !== contentIdentityKey(after))
     throw new Error('Run journal changed during validation; inspect it before appending');
-  const sourceKeys = new Set(), entry = { seq: run.events.length, sourceKeys, identity: after, bytes: 1024 };
+  const sourceKeys = new Set(), entry = { seq: run.events.length, sourceKeys, identity: after, bytes: 1024+Buffer.byteLength(JSON.stringify(observationContext)),observationContext,observationSnapshotSha256,observationVerified };
   for (const event of run.events) {
     // JSON written by this module normalizes nonfinite numbers to null. A
     // foreign legacy literal such as 1e400 can nevertheless parse as Infinity;
@@ -139,6 +173,7 @@ function advanceAppendCursor(key, entry, event, writtenBytes) {
     journalFixedFields(before[1]) !== journalFixedFields(after[1]) ||
     BigInt(after[1].find(([name]) => name === 'size')[1]) !==
       BigInt(before[1].find(([name]) => name === 'size')[1]) + BigInt(writtenBytes)) {
+    entry.observationVerified=false;
     discardAppendCursor(key); return;
   }
   if (entry.fullRun) { discardAppendCursor(key); return; }

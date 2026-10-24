@@ -116,6 +116,18 @@ async function reserveCallAttempt(input:CallInput) {
   const project=input.projectId?(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[input.projectId])).rows[0]:null;
   if(input.projectId&&!project)throw new AppError(404,'项目不存在');
   if(input.projectVersion!==undefined&&project.version!==input.projectVersion)throw new AppError(409,'方案版本已变化');
+  let run:any,offlineError:unknown;
+  if(input.runId){
+   run=(await client.query("SELECT * FROM project_runs WHERE id=$1 AND project_id=$2 AND status='running' AND NOT cancel_requested FOR UPDATE",[input.runId,input.projectId])).rows[0];
+   if(!run)throw new AppError(409,'运行已停止，不能再发起模型请求');
+   if(input.leaseOwner&&(run.lease_owner!==input.leaseOwner||!run.lease_until||new Date(run.lease_until).getTime()<=Date.now()))throw new AppError(409,'工作进程已失去运行租约','LEASE_LOST');
+   if(input.authorize)try{await input.authorize(client,run);}catch(error){
+    if((error as any)?.code!=='LOCAL_DEVICE_OFFLINE')throw error;
+    // Complete hard budget checks before retrying fresh local-device admission.
+    offlineError=error;
+   }
+  }
+  if(project&&!input.runId&&input.authorize)await input.authorize(client,project);
   const config=await lockCostPolicy(client);
   let planningBudget=project?.policy.maxBudget;
   if(input.resourcePlanningRunId!==undefined){
@@ -146,7 +158,6 @@ async function reserveCallAttempt(input:CallInput) {
   if(input.maxCost!==undefined&&greater(input.amount,input.maxCost))throw new AppError(422,'本次模型请求预留超过单次费用上限','CALL_BUDGET_EXCEEDED');
   const billingDepartmentId=input.billingDepartmentId??project?.department_id??null;
   let departmentAdditional=input.amount;
-  let offlineError:unknown;
   let planningCarryover:ReturnType<typeof projectCostCarryover>|undefined;
   if(project&&!input.runId){
    const readiness=await requireProjectCostReady(client,project.id,input.retainUncertainCosts===true,planningBudget);
@@ -155,15 +166,6 @@ async function reserveCallAttempt(input:CallInput) {
    if(input.retainUncertainCosts===true)planningCarryover=projectCostCarryover(readiness,true);
   }
   if(input.runId){
-   const run=(await client.query("SELECT * FROM project_runs WHERE id=$1 AND project_id=$2 AND status='running' AND NOT cancel_requested FOR UPDATE",[input.runId,input.projectId])).rows[0];
-   if(!run)throw new AppError(409,'运行已停止，不能再发起模型请求');
-   if(input.leaseOwner&&(run.lease_owner!==input.leaseOwner||!run.lease_until||new Date(run.lease_until).getTime()<=Date.now()))throw new AppError(409,'工作进程已失去运行租约','LEASE_LOST');
-   if(input.authorize)try{await input.authorize(client,run);}catch(error){
-    if((error as any)?.code!=='LOCAL_DEVICE_OFFLINE')throw error;
-    // Finish the remaining hard checks before permitting an outside-transaction
-    // wait for a fresh heartbeat. Nothing has been reserved or dispatched.
-    offlineError=error;
-   }
    if(input.billingDepartmentId&&!(run.department_ids?.length?run.department_ids:run.snapshot.departmentIds??[run.snapshot.departmentId]).includes(input.billingDepartmentId))throw new AppError(422,'费用归属部门不在批准快照中','POLICY_DEPARTMENT_DENIED');
    // A late bill from an earlier run can exceed its retained amount. Recheck
    // the whole project under the same lock used by receipt settlement.
@@ -260,7 +262,7 @@ export function budgetedRequestEstimate(model:Pick<Model,'inputRate'|'outputRate
  const inputBytes=Buffer.byteLength(JSON.stringify(envelope))+1024;
  return {inputBytes,reservation:(inputBytes*model.inputRate+maxTokens*model.outputRate)/1e6};
 }
-export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;resourcePlanningRunId?:string;maxCost?:number;context?:Record<string,any>;timeoutMs?:number;retainUncertainCosts?:boolean},request:CompletionOptions={}) {
+export async function completeBudgeted(model:Model,messages:ChatMessage[],maxTokens:number,options:{purpose:string;projectId?:string;projectVersion?:number;resourcePlanningRunId?:string;maxCost?:number;context?:Record<string,any>;timeoutMs?:number;retainUncertainCosts?:boolean;authorize?:CallInput['authorize']},request:CompletionOptions={}) {
  const estimate=budgetedRequestEstimate(model,messages,maxTokens,request),amount=estimate.reservation;
  assertCompletionContext(model,estimate.inputBytes,maxTokens);
  const {timeoutMs,...reservation}=options;

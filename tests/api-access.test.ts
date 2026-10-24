@@ -6,9 +6,10 @@ import {idempotency} from '../apps/api/src/idempotency.ts';
 import express from 'express';
 import {once} from 'node:events';
 import type {AddressInfo} from 'node:net';
+import {pool} from '../apps/api/src/db.ts';
 
 test('all mounted business routes have an explicit policy',()=>{
-  assert.equal(routePolicies.length,145);
+  assert.equal(routePolicies.length,158);
   assert.doesNotThrow(()=>assertRouteInventory());
 });
 
@@ -44,6 +45,22 @@ test('administrative routes require a current admin while device credentials sta
   assert.equal(authorizeRoute(routePolicy('POST',`/api/local-devices/${id}/poll`),{kind:'device',deviceId:'different'},`/api/local-devices/${id}/poll`),false);
 });
 
+test('identity administration stays admin-only on all six exact routes',()=>{
+  for(const [method,path] of [['GET','/api/identity/users'],['PATCH','/api/identity/users/u'],['POST','/api/identity/users/u/revoke-sessions'],
+    ['GET','/api/identity/departments/d/members'],['PUT','/api/identity/departments/d/members/u'],['DELETE','/api/identity/departments/d/members/u']]){
+    assert.equal(routePolicy(method,path)?.access,'admin');
+    assert.equal(authorizeRoute(routePolicy(method,path),{kind:'device',deviceId:'device'}),false);
+    assert.equal(routePolicy(method,path+'/'),null);
+  }
+});
+
+test('maintenance reports have one read-only administrator route',()=>{
+  const policy=routePolicy('GET','/api/storage/maintenance');
+  assert.equal(policy?.access,'admin');
+  assert.equal(authorizeRoute(policy,{kind:'device',deviceId:'device'}),false);
+  for(const method of ['POST','PUT','DELETE','HEAD'])assert.equal(routePolicy(method,'/api/storage/maintenance'),null);
+});
+
 test('idempotency rejects missing authenticated principal before touching storage',async()=>{
   let status=0,nextCalled=false;
   const req={method:'POST',path:'/departments',originalUrl:'/api/departments',body:{},get:(name:string)=>name==='Idempotency-Key'?'12345678':undefined};
@@ -62,24 +79,34 @@ test('administrator writes require CSRF before the next middleware',async()=>{
   assert.equal(csrf,true);assert.equal(status,403);assert.equal(nextCalled,false);
 });
 
-test('every registered route denies a member or unproven device before handler entry',async()=>{
+test('every registered route enforces its explicit member/admin/device policy before handler entry',async()=>{
   const app=express(),member={kind:'human' as const,userId:'u',sessionId:'s',issuer:'https://issuer.example',subject:'sub',orgRole:'member' as const,sessionEpoch:0,authenticatedAt:new Date().toISOString()};
   const identity={authenticate:async()=>member,csrf:(_req:unknown,_res:unknown,next:()=>void)=>next()};
   let handlers=0;
+  // This unit host has no database. Provide only a current identity; resource
+  // lookups remain empty. Real membership/resource SQL is covered by the HTTP integration suite.
+  const query=pool.query;let current=true,identityChecks=0;
+  pool.query=(async(sql:string)=>{if(sql.startsWith('SELECT id FROM human_users WHERE id=$1 AND issuer=$2')){identityChecks++;return {rows:current?[{id:'u'}]:[],rowCount:current?1:0};}return {rows:[],rowCount:0};}) as typeof pool.query;
   app.use('/api',apiAccess(identity as never,{mode:'oidc',publicOrigin:'https://example.com',issuer:'https://issuer.example',clientId:'c',clientSecret:'x',sessionSecrets:['x'],bootstrapIssuer:'https://issuer.example',bootstrapSubject:'sub'}));
   app.use((_req,res)=>{handlers++;res.sendStatus(200);});
   const server=app.listen(0,'127.0.0.1');await once(server,'listening');
   try{
     const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    const collectionRoutes=['/api/departments','/api/projects','/api/runs','/api/work-files','/api/automation/knowledge-candidates','/api/automation/knowledge-sources','/api/capabilities/plugins','/api/knowledge/documents','/api/knowledge/spaces','/api/knowledge/work-records','/api/costs'];
     for(const policy of routePolicies){
       const path=policy.path.replace(/:[A-Za-z][A-Za-z0-9_]*/g,'11111111-1111-4111-8111-111111111111');
       const response=await fetch(base+path,{method:policy.method});
-      assert.equal(response.status,403,`${policy.method} ${path}`);
+      const unscopedList=policy.method==='GET'&&collectionRoutes.includes(policy.path);
+      assert.equal(response.status,policy.access==='member'?(unscopedList?200:404):403,`${policy.method} ${path}`);
     }
     for(const path of ['/api/health/','/API/health','/api/%68ealth','/api//health','/api/unknown'])
       assert.equal((await fetch(base+path)).status,404,path);
     assert.equal((await fetch(base+'/api/health',{method:'HEAD'})).status,404);
     assert.equal((await fetch(base+'/api/health',{method:'OPTIONS'})).status,404);
-    assert.equal(handlers,0);
-  }finally{server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));}
+    assert.equal(handlers,collectionRoutes.length);
+    assert.equal(identityChecks,routePolicies.filter(policy=>policy.access==='member').length);
+    current=false;
+    for(const path of collectionRoutes)assert.equal((await fetch(base+path)).status,404,path);
+    assert.equal(handlers,collectionRoutes.length,'revoked identity never reaches even a list handler');
+  }finally{pool.query=query;server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));}
 });

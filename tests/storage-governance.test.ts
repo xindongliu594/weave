@@ -10,21 +10,24 @@ import fs from 'node:fs';
 import {syncBuiltinESMExports} from 'node:module';
 import {createRequire} from 'node:module';
 import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 let pool:any,server:any,url:string,root:string,traceRoot:string,workspaceRoot:string,runId:string,routerModule:any;
 const fixtures:any={};
 let attempt=0;
 let sandboxAdapter:any;
+let writers:ReturnType<typeof createArchiveWriterManager>,latched=false;
 const {exportFiles,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 before(async()=>{if(!isolated)return;
  root=await mkdtemp(join(tmpdir(),'storage-api-'));traceRoot=join(root,'runs');workspaceRoot=join(root,'workspaces');await mkdir(workspaceRoot);
+ await writeFile(join(root,'.fixture-owner'),String(process.pid));writers=createArchiveWriterManager({traceRoot,workspaceRoots:[workspaceRoot]});
  process.env.DATA_DIR=root;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(root,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
  await pool.query("INSERT INTO departments(id,data) VALUES('storage-department',$1)",[{name:'storage fixture',agents:[]}]);
  await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,status,source) VALUES('storage-project','storage-department',1,'storage fixture','fixture only',$1,$2,'COMPLETED','manual')",[{}, {agents:[],tasks:[]}]);
  await pool.query("INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label) VALUES('native','fixture','fixture','test','fixture-grant','fixture')");
  routerModule=await import('../apps/api/src/storage-governance.ts').catch(error=>{if(error.code==='ERR_MODULE_NOT_FOUND')return {};throw error;});
- const app=express();app.use(express.json());if(routerModule.storageRouter)app.use('/api',routerModule.storageRouter(traceRoot,{dataRoot:root,workspaceRoot,nativeDeviceId:'native',sandbox:()=>sandboxAdapter},pool));
+ const app=express();app.use(express.json());app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();});if(routerModule.storageRouter)app.use('/api',routerModule.storageRouter(traceRoot,{dataRoot:root,workspaceRoot,nativeDeviceId:'native',sandbox:()=>sandboxAdapter},pool,writers));
  app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??(error.name==='ZodError'?422:error.code==='STORAGE_CANDIDATE_CHANGED'?409:500)).json({message:error.message,code:error.code}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url=`http://127.0.0.1:${server.address().port}/api`;
 });
@@ -33,7 +36,7 @@ beforeEach(async()=>{if(!isolated)return;sandboxAdapter=undefined;const archive=
  for(const base of [join(archive.dir,'artifacts'),join(workspaceRoot,runId)])await writeFile(join(base,'delivery.txt'),'official delivery');
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt) VALUES($1,'storage-project',1,'completed',$2,$3)",[runId,{executionTarget:{kind:'local',deviceId:'native'}},++attempt]);fixtures[runId]=archive;
 });
-after(async()=>{if(!isolated)return;server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));await pool.end();await rm(root,{recursive:true,force:true});});
+after(async()=>{if(!isolated)return;server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));await pool.end();assert.equal(fs.realpathSync(root),root);assert.equal(fs.readFileSync(join(root,'.fixture-owner'),'utf8'),String(process.pid));if(latched)console.log('STORAGE_GOVERNANCE_EXIT_CLEANUP='+JSON.stringify({root,pid:process.pid}));else await rm(root,{recursive:true,force:true});});
 async function call(path:string,body?:any){const response=await fetch(url+path,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const text=await response.text();let data:any;try{data=JSON.parse(text);}catch{data={message:text};}return {status:response.status,data};}
 async function preview(){const r=await call('/storage/preview',{});assert.equal(r.status,201);return r.data;}
 const confirm={confirmation:'CLEAN_WORKSPACE_COPIES'};
@@ -80,7 +83,7 @@ test('expired persisted previews reject confirmation',{skip:!isolated},async()=>
 test('restart preserves preview/history and interrupted deletion is reconciled without replay',{skip:!isolated},async()=>{
  const p=await preview();await pool.query("UPDATE storage_cleanups SET status='started' WHERE id=$1",[p.id]);await rm(join(workspaceRoot,runId,'delivery.txt'));
  server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));
- const restarted=express();restarted.use(express.json());restarted.use('/api',routerModule.storageRouter(traceRoot,{dataRoot:root,workspaceRoot,nativeDeviceId:'native',sandbox:()=>sandboxAdapter},pool));
+ const restarted=express();restarted.use(express.json());restarted.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();});restarted.use('/api',routerModule.storageRouter(traceRoot,{dataRoot:root,workspaceRoot,nativeDeviceId:'native',sandbox:()=>sandboxAdapter},pool,writers));
  restarted.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??(error.name==='ZodError'?422:500)).json({message:error.message,code:error.code}));server=restarted.listen(0,'127.0.0.1');await once(server,'listening');url=`http://127.0.0.1:${server.address().port}/api`;
  assert.equal((await call('/storage/cleanups/'+p.id+'/confirm',confirm)).status,409);
  const list=await call('/storage/cleanups');assert.ok(list.data.some((row:any)=>row.id===p.id&&row.status==='started'));
@@ -140,10 +143,12 @@ test('changed canonical delivery blocks sandbox retirement before external delet
  const f=await enableSandbox(),p=await call('/storage/preview',{kind:'sandbox',runId});assert.equal(p.status,201);await writeFile(join(traceRoot,runId,'artifacts','delivery.txt'),'new version');
  assert.equal((await call('/storage/cleanups/'+p.data.id+'/confirm',{confirmation:'RETIRE_SANDBOX'})).status,409);assert.equal(f.counts().retired,0);
 });
-test('sandbox uncertain deletion records partial and only reconciles without another delete',{skip:!isolated},async()=>{
+test('sandbox uncertain deletion records partial and keeps its original process guard without another delete',{skip:!isolated},async()=>{
  const f=await enableSandbox(),p=await call('/storage/preview',{kind:'sandbox',runId});assert.equal(p.status,201);sandboxAdapter.disconnect=true;
+ latched=true;
  assert.equal((await call('/storage/cleanups/'+p.data.id+'/confirm',{confirmation:'RETIRE_SANDBOX'})).status,409);
- const checked=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(checked.status,200);assert.equal(checked.data.result.replayed,false);assert.equal(f.counts().retired,1);
+ assert.equal((await pool.query('SELECT status FROM storage_cleanups WHERE id=$1',[p.data.id])).rows[0].status,'partial');
+ const checked=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(checked.status,409);assert.equal(checked.data.code,'STORAGE_WRITER_BUSY');assert.equal(f.counts().retired,1);
 });
 test('journal preview seals real completed events and preserves exact trace reads',{skip:!isolated},async()=>{
  fixtures[runId].append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});
@@ -152,12 +157,14 @@ test('journal preview seals real completed events and preserves exact trace read
  await assert.rejects(readFile(join(traceRoot,runId,'events.jsonl')),{code:'ENOENT'});assert.equal((await readFile(join(traceRoot,runId,'events.jsonl.gz'))).length>0,true);
 });
 
-test('unresolved sandbox reconciliation can query the same ID again without replaying deletion',{skip:!isolated},async()=>{
- const f=await enableSandbox(),p=await call('/storage/preview',{kind:'sandbox',runId});sandboxAdapter.disconnect=true;
- await call('/storage/cleanups/'+p.data.id+'/confirm',{confirmation:'RETIRE_SANDBOX'});
+test('persisted unresolved sandbox receipt can be queried repeatedly without dispatching retirement',{skip:!isolated},async()=>{
+ const f=await enableSandbox(),p=await call('/storage/preview',{kind:'sandbox',runId});
+ // Model a durable receipt loaded without a live original producer. Native
+ // process-exit release is covered by archive-maintenance-scope.test.mjs.
+ await pool.query("UPDATE storage_cleanups SET status='partial' WHERE id=$1",[p.data.id]);
  let checks=0;sandboxAdapter.executor.reconcileStorage=async()=>({runId,sandboxId:f.sandboxId,state:++checks===1?'present':'retired',replayed:false});
  const first=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(first.data.status,'partial');assert.equal(first.data.result.state,'present');
- const last=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(last.data.result.state,'retired');assert.equal(checks,2);assert.equal(f.counts().retired,1);
+ const last=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(last.data.result.state,'retired');assert.equal(checks,2);assert.equal(f.counts().retired,0);
 });
 test('journal archive refuses post-preview append and never removes original evidence',{skip:!isolated},async()=>{
  fixtures[runId].append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});

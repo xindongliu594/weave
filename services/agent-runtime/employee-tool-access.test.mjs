@@ -58,3 +58,43 @@ test('employee Hosts restrict arbitrary native tools, preserve grants on resume,
     assert.equal(executed, 2);
   } finally { await factory.close(); await host.close(); await rm(root, { recursive: true, force: true }); }
 });
+
+for (const [label, mutate] of [
+  ['coordinator execute', (source, local, replaced) => { source.execute = replaced; }],
+  ['coordinator parameter schema', source => { source.parameters.properties.newField = { type: 'string' }; }],
+  ['coordinator output schema', source => { source.output.schema = { type: 'string' }; }],
+  ['employee execute', (source, local, replaced) => { local.execute = replaced; }],
+  ['employee description', (source, local) => { local.description = 'changed declaration'; }],
+]) test(`employee rejects same-object ${label} mutation before body entry`, { timeout: 15000 }, async () => {
+  const root = await mkdtemp(join(tmpdir(), 'native-definition-'));
+  const host = await createTeamHost({ adapter: new class extends LlmAdapter { async *stream() { throw Error('NO_MODEL_CALL'); } }(), provider: 'fixture', sessionRoot: join(root, 'sessions') });
+  let executed = 0;
+  const source = defineTool({ name: 'office_read', description: 'office read', parameters: {}, output: { schema: { type: 'json' }, render: (_, value) => [{ type: 'text', text: JSON.stringify(value) }] }, execute: async () => { executed++; return 'ok'; } });
+  host.ctx.tools.register(source);
+  const factory = new EmployeeHostFactory({ coordinator: host.ctx, provider: 'fixture', sessionRoot: join(root, 'sessions'), identify: () => ({ id: 'reader', tools: ['office_read'] }), loadPlugin: name => import(pathToFileURL(base.resolve(name)).href) });
+  try {
+    const reader = await factory.createAgent(host.ctx, { sessionId: randomUUID(), agentOptions: { provider: 'fixture', model: 'reader' } });
+    const ctx = factory.list()[0].ctx;
+    const call = () => ctx.tools.execute({ name: 'office_read', arguments: {}, agent: reader.agent, callId: randomUUID(), signal: AbortSignal.timeout(2000) });
+    assert.equal((await call()).isError, false); assert.equal(executed, 1);
+    mutate(source, ctx.tools.get('office_read', reader.agent), async () => { executed++; return 'replacement'; });
+    const result = await call();
+    assert.equal(result.isError, true, 'changed definition must be rejected');
+    assert.equal(executed, 1, 'no changed or formerly approved body may run after drift');
+  } finally { await factory.close(); await host.close(); await rm(root, { recursive: true, force: true }); }
+});
+
+test('employee integrity capture accepts final B2 registered definitions', { timeout: 15000 }, async () => {
+  const root = await mkdtemp(join(tmpdir(), 'native-definition-b2-'));
+  const host = await createTeamHost({ adapter: new class extends LlmAdapter { async *stream() { throw Error('NO_MODEL_CALL'); } }(), provider: 'fixture', sessionRoot: join(root, 'sessions') });
+  let executed = 0;
+  host.ctx.tools.register(defineTool({ name: 'office_read', description: 'office read', parameters: {}, output: { schema: { type: 'json' }, render: (_, value) => [{ type: 'text', text: JSON.stringify(value) }] }, execute: async () => { executed++; return 'ok'; } }));
+  const factory = new EmployeeHostFactory({ coordinator: host.ctx, taskToolBoundary: true, provider: 'fixture', sessionRoot: join(root, 'sessions'), identify: () => ({ id: 'reader', tools: ['office_read'] }), loadPlugin: name => import(pathToFileURL(base.resolve(name)).href) });
+  try {
+    const reader = await factory.createAgent(host.ctx, { sessionId: randomUUID(), agentOptions: { provider: 'fixture', model: 'reader' } });
+    const ctx = factory.list()[0].ctx, definition = ctx.tools.get('office_read', reader.agent);
+    assert.equal(Object.isFrozen(definition), true);
+    assert.equal((await ctx.tools.execute({ name: 'office_read', arguments: {}, agent: reader.agent, callId: randomUUID(), signal: AbortSignal.timeout(2000) })).isError, false);
+    assert.equal(executed, 1);
+  } finally { await factory.close(); await host.close(); await rm(root, { recursive: true, force: true }); }
+});

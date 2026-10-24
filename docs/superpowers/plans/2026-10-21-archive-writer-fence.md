@@ -168,7 +168,7 @@ SQL 尾部采用已有门禁，不增加另一套分布式锁：普通运行状�
 
 **范围**：`run-coordinator.ts` 的 recover、recordUsage、approveTool、traceFinished，以及 launchOwned 的记录失败收尾；`run-state.ts` 的现有事务和三个状态入口；`run-management.ts` 的审批决定；`app.ts` 仅传入现有 manager，以及必要调用方测试。创建/重试、verification、设备协议、canonical、accepted-stop 和低层 trace 强制注册留在后续步骤。
 
-1. 每个待恢复候选先取得独立 run writer，再进入认领事务并重新核对租约、owner 和 active 状态；作用域持续覆盖原费用重放、状态收尾和档案记录。认领失败的 null 正常释放；不得持 SQL 锁等 native 锁。旧 Docker 恢复没有可核对的原停止收据，本步通过 `claimExpiredRun` 的锁内 exclusion 对 `executionTarget?.kind !== 'local'` 的旧路径明确延期：在 claim UPDATE 和 Docker 派发之前拒绝，不改操作、运行、费用或档案，沿现有日志报告。重复扫描、重启仍不派发，不把旧容器当作已停止。实际停止核对留在设备协议步骤。
+1. 每个待恢复候选先取得独立 run writer，再进入认领事务并重新核对租约、owner 和 active 状态；作用域持续覆盖原费用重放、状态收尾和档案记录。认领失败的 null 正常释放；不得持 SQL 锁等 native 锁。旧 Docker 恢复没有可核对的原停止收据，本步通过 `claimExpiredRun` 的锁内 exclusion 对 `executionTarget?.kind !== 'local'` 的旧路径明确延期：在 claim UPDATE 和 Docker 派发之前拒绝，不对该候选取消操作、重放/结算收据或修改运行及档案，沿现有日志报告。原统一费用过期清扫继续执行，可能把到期预留标为待核对；不为旧运行豁免清扫，也不声称所有费用字段恒定。重复扫描、重启仍不派发，不把旧容器当作已停止。实际停止核对留在设备协议步骤。
 2. 状态 helper 接收并断言应用原 manager 的现有作用域，断言在任何 SQL 前执行；实际持久化在断言后的嵌套 `withWriter` 中完成，仅借原作用域，不自动取得另一条调用链的 owner。沿用 shared 门禁→project 行→run 行的锁序，等待原 COMMIT/ROLLBACK；错误时保留原错误，回滚失败丢弃原连接。保持租约、版本、attempt 的现有条件和 false/null 正常拒绝语义。
 3. 原 fallback usage INSERT、审批申请 INSERT/取消 UPDATE、恢复的 local_operations UPDATE 放入上述短事务，不使用仅有 ALS 包装的裸 pool 写入。recordUsage 的原收据结算/重复无修改也属于记录边界；审批申请及 requested append、最终取消记账分别属于记录边界。审批轮询不持 SQL 锁，其正常 denied/abort 业务结果在这些嵌套持久化回调外处理。正常预算与授权拒绝也留在原业务调用者；不要把 reserve 的整个准入判断改成失败锁存。
 4. 实际 SQL/档案持久化失败必须在原 owner 内留下失败事实，即使运行时已经处理回调错误或业务 catch 保留了验收结果，也不能把该 owner 误当作成功排空。`traceFinished` 不再吞掉档案完整性或 append 错误；它的异常穿过原状态事务。launchOwned 的记录部分失败后保留首个 `entry.drainFailure`、原验收结果并等待原 runtime drain，不再向已失败的作用域重试 finishRun、另取 owner 或绕过断言。若终态 SQL 未成功，它保持待核对；不能保证在持久化已经失败后仍能写入“已完成”注释，更不能把已验收成果改成未验收。不得增加清除失败接口。
@@ -176,6 +176,23 @@ SQL 尾部采用已有门禁，不增加另一套分布式锁：普通运行状�
 6. 显式更新直接调用状态 helper / runManagementRouter 的测试配置，使用同一应用根的 manager；不增加测试专用无锁模式。失败锁存夹具仍由实际持有进程退出后清理。
 
 验收集中覆盖：native 在 SQL 前取得并在等待后重查；null/false 和审批竞争无修改结果释放；原 replay/append 未结束时其他进程不能取得 source；外层已验收或运行时已处理的记录失败仍保持占用且不重试终态写入；正常拒绝审批在成功收尾后可排空；旧 Docker 路径重复扫描零派发、零恢复修改；原状态原子性和租约行为不变。保留有效 RED、受影响控制/状态回归、类型构建与独立审查。PGlite 只证明业务行为，现有原生 PG 并行用例若未执行须明确标记，不用 SQL 字符串断言代替实际数据库尾部结论。本步不宣称全部 writer 或来源批准完成。
+
+### Task 2c.4：批准与重试的目标运行写入接线
+
+2026-10-24：2c.3 本地接线已验证并补 pending-completion 失败锁存修复；2c.4 目标写入接线已实现，16/16 定向测试通过。原生完整迁移竞争测试已准备，本机 PostgreSQL 缓存无 pgvector 配套，该项待带 pgvector 的隔离 PostgreSQL 验证。未开放父/祖先 source 捕获，Task 3/4 仍待做。阶段证据见 `../../validation/enterprise-plugin-foundations-2026-10-24.md`。
+
+复用现有两个 HTTP handler、原事务和应用 manager，不另建准入服务。接续只读审查核对了导入文件、知识、能力快照、检查点、资源规划预览和 readiness 调用：这些路径没有复制工作区、追加档案、调用模型或启动员工。默认 Docker readiness 是等待结束的只读 image inspect；批准/重试的修改是原事务末尾的 run INSERT 与 project UPDATE。
+
+**范围**：`app.ts` 项目 approve handler、`run-management.ts` retry handler，以及必要的限定测试。在 2c.3 复审通过后实施；不改方案、预算、权限、父运行恢复格式或各业务 validator。
+
+1. 输入解析后，每请求只分配一个拟建目标 UUID，再取得该目标的 writer，最后才 connect/BEGIN/取得 SQL 锁。snapshot 的输入 ID 与最终 INSERT 使用同一个 UUID。已有运行/子运行分支仍按原条件返回它，不去扩大锁集合或取得正在运行的旧子运行 owner。
+2. 在原事务重新核对 version、状态、已有 attempt、资源预览与所有原批准/恢复条件；保留 shared 费用门禁→project→parent 的锁序、日/部门/项目预算、历史调用、未知费用保留和未知操作确认。
+3. 明确区分尚未派发 COMMIT 与已经派发 COMMIT。经审查的准入路径无文件/外部修改或游离 producer；因此在前一阶段发生错误、且原 ROLLBACK 成功时，可以返回携带原错误的内部结果，作用域排空后再按原 HTTP 形状抛出。依据是实际事务已回滚，不是错误类别；不得建立任意 AppError/4xx 白名单。
+4. 每处 COMMIT（含已有运行分支）调用前即标记已派发。COMMIT 不明或 ROLLBACK 失败在原作用域内拒绝、保留首个错误并按需丢弃原连接；后续回滚成功也不能证明先前 COMMIT 未成功。不得重试 INSERT/COMMIT、另取 owner 或在 catch 中抹去回滚失败。
+5. writer 持有到实际提交/回滚及原 client 清理结束。批准后的 activity log 和独立 tick 保留原后置顺序；activity log 失败不等于 run 未提交，也不能导致重复创建。未来 readiness 若变成修改或游离任务，须重新审查，不能继续套用本步的已回滚证明。
+6. 这是目标运行写入保护。父/祖先的 checkpoint、档案与 budgetHistory 读取尚未被 source exclusive 固定；仅给父运行加 shared 也不能证明稳定。完整来源读取仍由后续 source/maintenance 接线完成，本步不开放企业来源批准。
+
+验收：阻塞目标 writer 时未进入 SQL，等待后重新检查版本/状态；代表性原拒绝和意外 validator 错误在确认回滚后释放；末尾 INSERT/UPDATE 失败全部回滚；提交结果不明或回滚失败持续阻塞；并发批准只创建一次；重试按原条件返回已有且可能活跃的子运行；未知费用/操作/资源预览拒绝不变；准入不写档案/工作区、不执行模型或设备任务。运行受影响批准/重试/导入/预算用例及类型构建，独立审查后记录边界，不重跑无关套件。
 
 ## Task 3：对象、维护与备份接线
 

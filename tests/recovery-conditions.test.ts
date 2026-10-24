@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import { before, after, beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
@@ -52,7 +53,7 @@ before(async () => {
   await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)", [modelId, model, toolEvidence]);
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [departmentId, { name: '恢复检查隔离部门', agents: [employee] }]);
   const { runManagementRouter } = await import('../apps/api/src/run-management.ts');
-  const app = express(); app.use(express.json()); app.use('/api', runManagementRouter(traceRoot));
+  const app = express(); app.use(express.json()); app.use('/api', runManagementRouter(traceRoot,createArchiveWriterManager({traceRoot:traceRoot})));
   app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message, code: error.code, ...(error.outputDiagnostic?{diagnostic:error.outputDiagnostic}:{}) }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as any).port + '/api';
 });

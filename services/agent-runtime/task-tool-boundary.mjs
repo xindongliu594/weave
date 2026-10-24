@@ -18,7 +18,7 @@ export function installTaskToolBoundary(ctx) {
   const tools = ctx.tools, originalDescriptor = Object.getOwnPropertyDescriptor(tools, 'register');
   const register = tools.register, admissions = new WeakMap(), definitions = new WeakSet();
   if (tools.schemas().length) throw Error('TASK_TOOL_BOUNDARY_ORDER: 必须在注册工具之前安装执行门禁');
-  let policy = () => denied, disposed = false, closed = false;
+  let policy = () => denied, bodyPolicy, disposed = false, closed = false;
   const check = (exec, definition) => {
     if (closed || disposed || !exec.agent || !definition || !definitions.has(definition)) return denied;
     const reason = policy(exec, definition);
@@ -36,6 +36,8 @@ export function installTaskToolBoundary(ctx) {
         ctx.tools.get(definition.name, exec.agent) !== definition) throw Error('TASK_TOOL_BINDING_CHANGED: 工具调用或实际注册定义已改变');
       const reason = check(exec, definition);
       if (reason !== undefined) throw Error(reason);
+      const bodyReason = bodyPolicy?.(exec, definition);
+      if (bodyReason !== undefined) throw Error(typeof bodyReason === 'string' ? bodyReason : 'TASK_TOOL_POLICY_INVALID');
       return Reflect.apply(rawExecute, captured, [args, exec]);
     } });
     definitions.add(definition);
@@ -63,5 +65,8 @@ export function installTaskToolBoundary(ctx) {
   return { setPolicy(checkPolicy) {
     if (disposed || typeof checkPolicy !== 'function') throw Error('TASK_TOOL_POLICY_INVALID');
     policy = checkPolicy;
+  }, setBodyPolicy(checkPolicy) {
+    if (disposed || typeof checkPolicy !== 'function') throw Error('TASK_TOOL_POLICY_INVALID');
+    bodyPolicy = checkPolicy;
   }, stopAdmission() { closed = true; }, dispose };
 }

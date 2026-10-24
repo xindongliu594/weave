@@ -10,6 +10,7 @@ import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
 import {assertAcceptanceChecks} from '../../../services/agent-runtime/acceptance-checks.mjs';
 import {assertHandoffReport} from '../../../packages/contracts/handoff-report.mjs';
 import {TaskAcceptedStopLifecycle} from './task-accepted-stop.ts';
+import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
 import type {SandboxMaintenance} from './storage-lifecycle.ts';
 
 export type TaskStopProjectionInput={run:any;rows:readonly any[];archive:any;operations?:readonly any[];rowsTruncated?:boolean};
@@ -192,7 +193,7 @@ export async function readTaskStopMaintenance({db,traceRoot,runId,readArchive=re
 }
 
 /** Mounted only behind the existing admin authentication and CSRF gates. */
-export function taskStopMaintenanceRouter(traceRoot:string,service:{traceRoot:string;owner:string},provider?:()=>SandboxMaintenance|undefined){
+export function taskStopMaintenanceRouter(traceRoot:string,service:{traceRoot:string;owner:string;writers:ArchiveWriterManager},provider?:()=>SandboxMaintenance|undefined){
  const router=express.Router();
  router.post('/runs/:id/task-stops/reconcile',async(req,res)=>{
   const parsed=taskStopReconcileInputSchema.safeParse(req.body);

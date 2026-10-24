@@ -68,3 +68,28 @@ test('historical completed sandbox receipts are pending physical re-verification
  const html=renderToStaticMarkup(createElement(ui.CleanupHistory,{rows:[{...preview,status:'completed',preview:{...preview.preview,kind:'journal'},result:{state:'archived',savedBytes:4}}],busy:false,onReconcile:()=>{}}));
  assert.ok(html.includes('清理完成'));assert.ok(html.includes('原事件已核对归档'));assert.ok(html.includes('压缩节省'));
 });
+
+test('periodic maintenance clearly separates historical results from current unverified health',()=>{
+ assert.equal(typeof ui.MaintenanceHealthReport,'function');
+ const html=renderToStaticMarkup(createElement(ui.MaintenanceHealthReport,{data:{version:1,currentStatus:'unknown',availability:'degraded',code:'REPORT_DEGRADED',maxAgeHours:48,slots:[{slot:0,state:'available'},{slot:1,state:'invalid'}],report:{checkedAt:'2026-10-24T01:00:00.000Z',status:'failed',checks:{storage:{status:'passed',bytes:17,files:1},disk:{status:'failed',freeBytes:1},retention:{status:'unknown'},backup:{status:'unknown',recordedStatus:'passed',checkedAt:'2026-10-23T01:00:00.000Z'}}}}}));
+ for(const text of ['周期维护记录','历史报告','记录失败','当前状态尚未现场复核','部分维护记录不可用','17 B','演练记录曾通过','当前恢复能力仍待核对'])assert.ok(html.includes(text),text);
+ assert.ok(!html.includes('当前健康'));assert.ok(!html.includes('维护全部通过'));
+});
+
+test('missing stale and failed-to-load maintenance records remain explicit unknown without actions',()=>{
+ assert.equal(typeof ui.MaintenanceHealthReport,'function');
+ for(const code of ['NOT_CONFIGURED','REPORTS_MISSING','REPORT_UNAVAILABLE','REPORT_FETCH_FAILED']){
+  const html=renderToStaticMarkup(createElement(ui.MaintenanceHealthReport,{data:{version:1,currentStatus:'unknown',availability:'unavailable',code,maxAgeHours:48,slots:[{slot:0,state:'stale'}]}}));
+  assert.ok(html.includes('当前状态尚未现场复核'));assert.ok(html.includes('48 小时'));assert.ok(!html.includes('<button'));assert.ok(!html.includes('通过'));
+ }
+});
+
+test('maintenance transport uses the authorized GET wrapper and contains a failed optional report',async()=>{
+ assert.equal(typeof ui.loadMaintenanceHealth,'function');
+ const {identitySession}=await import('../apps/web/src/identity-session.ts');const original=globalThis.fetch;const calls:Array<{url:string;init?:RequestInit}>=[];
+ try{
+  globalThis.fetch=async(input,init)=>{const url=String(input);calls.push({url,init});return url.includes('/auth/session')?Response.json({mode:'legacy-local',authenticated:true,user:null,csrf:null,loginAvailable:false}):Response.json({message:'PRIVATE SERVER PATH'},{status:503});};
+  await identitySession.refresh();const value=await ui.loadMaintenanceHealth();assert.equal(value.currentStatus,'unknown');assert.equal(value.code,'REPORT_FETCH_FAILED');assert.ok(!JSON.stringify(value).includes('PRIVATE'));
+  const business=calls.filter(call=>call.url.includes('/api/'));assert.equal(business.length,1);assert.ok(business[0].url.endsWith('/api/storage/maintenance'));assert.equal(business[0].init?.method,'GET');assert.equal(business[0].init?.cache,'no-store');
+ }finally{globalThis.fetch=original;}
+});

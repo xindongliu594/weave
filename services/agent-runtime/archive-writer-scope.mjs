@@ -16,25 +16,34 @@ function runSet(ids){
 }
 
 /** Shared startup mapping only. This does not register strict trace-store coverage. */
-export function createArchiveWriterManager({traceRoot,lockRoot=path.join(path.dirname(traceRoot),'.archive-write-locks'),workspaceRoots=[]}){
+export function createArchiveWriterManager({traceRoot,lockRoot=path.join(path.dirname(traceRoot),'.archive-write-locks'),workspaceRoots=[],initializeTraceRoot=true}){
+  if(typeof initializeTraceRoot!=='boolean')throw fail('CONFIG');
   if([traceRoot,lockRoot,...workspaceRoots].some(value=>typeof value!=='string'||!path.isAbsolute(value)||path.normalize(value)!==value))throw fail('CONFIG');
   if(contains(traceRoot,lockRoot)||contains(lockRoot,traceRoot)||workspaceRoots.some(root=>contains(root,lockRoot)||contains(lockRoot,root)))throw fail('CONFIG');
   const prior=mappings.get(key(traceRoot));
   if(prior){if(key(prior.lockRoot)!==key(lockRoot))throw fail('CONFIG');return prior;}
-  fs.mkdirSync(traceRoot,{recursive:true});fs.mkdirSync(lockRoot,{recursive:true});
-  const fence=createArchiveWriteFence({traceRoot,lockRoot});
+  if(initializeTraceRoot)fs.mkdirSync(traceRoot,{recursive:true});fs.mkdirSync(lockRoot,{recursive:true});
+  const fence=createArchiveWriteFence({traceRoot,lockRoot,allowMissingTraceRoot:!initializeTraceRoot});
   const failedScopes=new Set();
   let manager;
-  function assertContext(runId){
+  function assertContext(runId,mode='writer'){
     const context=current.getStore();
     if(!context||context.state.manager!==manager||!context.live||context.state.failed||context.state.released||!context.state.ids.includes(runId))throw fail();
-    fence.assertGuard(context.state.guard,{mode:'writer',runId});
+    if(mode==='maintenance'&&context.state.mode!=='maintenance')throw fail();
+    // An exclusive maintenance owner can call ordinary writer helpers. Always
+    // validate its actual native mode; a shared writer can never upgrade.
+    fence.assertGuard(context.state.guard,{mode:context.state.mode,runId});
     return context;
   }
-  function makeOwner(ids,guard){
+  function assertRootContext(){
+    const context=current.getStore();
+    if(!context||context.state.manager!==manager||!context.live||context.state.failed||context.state.released||context.state.mode!=='root-exclusive')throw fail();
+    fence.assertGuard(context.state.guard,{mode:'root-exclusive'});return context;
+  }
+  function makeOwner(ids,guard,mode){
     let resolve,reject;
     const writerDrained=new Promise((yes,no)=>{resolve=yes;reject=no;});writerDrained.catch(()=>{});
-    const state={manager,ids,guard,admission:true,failed:undefined,released:false,producers:new Set(),owner:undefined};
+    const state={manager,ids,guard,mode,admission:true,failed:undefined,released:false,producers:new Set(),owner:undefined};
     function latch(error){if(!state.failed){state.failed=error instanceof Error?error:fail('FAILED');failedScopes.add(state);reject(state.failed);}}
     function drain(){
       if(state.admission||state.failed||state.released||state.producers.size)return;
@@ -42,7 +51,9 @@ export function createArchiveWriterManager({traceRoot,lockRoot=path.join(path.di
     }
     function invoke(record,fn){
       if(state.failed||state.released)throw fail();
-      for(const id of ids)fence.assertGuard(guard,{mode:'writer',runId:id});
+      // Root mode has no run IDs, but must still validate its real native guard.
+      fence.assertGuard(guard,{mode});
+      for(const id of ids)fence.assertGuard(guard,{mode,runId:id});
       const context={state,live:true,invoke:nested=>invoke(record,nested)};record.inflight++;
       const settle=()=>{context.live=false;record.inflight--;if(record.finished&&!record.inflight)state.producers.delete(record);drain();};
       let result;
@@ -78,34 +89,39 @@ export function createArchiveWriterManager({traceRoot,lockRoot=path.join(path.di
     }
     const owner=producer(true);state.owner=owner;owners.set(owner,state);return owner;
   }
+  async function withMode(mode,runIds,fn,options){
+    const ids=mode==='root-exclusive'?[]:runSet(runIds),context=current.getStore();
+    const assertRequested=()=>{if(mode==='root-exclusive')assertRootContext();else for(const id of ids)assertContext(id,mode);};
+    if(context){
+      assertRequested();
+      return context.invoke(nested=>{
+        const borrowed=Object.freeze({retain(label){if(current.getStore()!==nested)throw fail();assertRequested();return nested.state.owner.retain(label);}});
+        return fn(borrowed);
+      });
+    }
+    const guard=await (mode==='root-exclusive'?fence.acquireRootExclusive(options):mode==='maintenance'?fence.acquireMaintenance(ids,options):fence.acquireWriter(ids,options)),owner=makeOwner(ids,guard,mode);
+    let result;
+    try{result=await owner.run(()=>fn(owner));}catch(error){owner.finish(error);throw error;}
+    owner.finish();await owner.writerDrained;return result;
+  }
   manager=Object.freeze({
     traceRoot,lockRoot,
     async acquireOwner(runIds,options){
       // Explicit ownership is a top-level operation; nesting uses withWriter.
       if(current.getStore())throw fail();
-      const ids=runSet(runIds),guard=await fence.acquireWriter(ids,options);return makeOwner(ids,guard);
+      const ids=runSet(runIds),guard=await fence.acquireWriter(ids,options);return makeOwner(ids,guard,'writer');
     },
     assertOwner(owner,runId){
       const state=owners.get(owner);
       if(!state||state.manager!==manager||state.failed||state.released||!state.admission||!state.ids.includes(runId))throw fail();
-      fence.assertGuard(state.guard,{mode:'writer',runId});
+      fence.assertGuard(state.guard,{mode:state.mode,runId});
     },
     assertWriter(runId){assertContext(runId);},
-    async withWriter(runIds,fn,options){
-      const ids=runSet(runIds),context=current.getStore();
-      if(context){
-        for(const id of ids)assertContext(id);
-        return context.invoke(nested=>{
-          // An unretained view belongs to this exact invocation, not another owner.
-          const borrowed=Object.freeze({retain(label){if(current.getStore()!==nested)throw fail();for(const id of ids)assertContext(id);return nested.state.owner.retain(label);}});
-          return fn(borrowed);
-        });
-      }
-      const owner=await manager.acquireOwner(ids,options);
-      let result;
-      try{result=await owner.run(()=>fn(owner));}catch(error){owner.finish(error);throw error;}
-      owner.finish();await owner.writerDrained;return result;
-    },
+    assertMaintenance(runId){assertContext(runId,'maintenance');},
+    assertRootExclusive(){assertRootContext();},
+    withWriter(runIds,fn,options){return withMode('writer',runIds,fn,options);},
+    withMaintenance(runIds,fn,options){return withMode('maintenance',runIds,fn,options);},
+    withRootExclusive(fn,options){return withMode('root-exclusive',[],fn,options);},
   });
   mappings.set(key(traceRoot),manager);return manager;
 }

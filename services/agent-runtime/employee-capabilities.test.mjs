@@ -38,7 +38,7 @@ async function fixture(run){
   const call=(name,args,who=agent)=>ctx.tools.execute({name,arguments:args,callId:randomUUID(),agent:who,signal:AbortSignal.timeout(3000)});
   const otherContext=factory.list().find(slot=>slot.sessionId===other.agent.id).ctx;
   const otherCall=(name,args)=>otherContext.tools.execute({name,arguments:args,callId:randomUUID(),agent:other.agent,signal:AbortSignal.timeout(3000)});
-  await run({archive,manifest,work,call,other,otherCall,onRead:fn=>{beforeRead=fn;},fail:()=>{failure=true;},resume:async()=>{const id=agent.id;await factory.close();factory=new EmployeeHostFactory(options);agent=(await factory.resume(host.ctx,{resumeSessionId:id,agentOptions:{provider:'fixture',model:'reader'}})).agent;ctx=factory.list()[0].ctx;}});
+  await run({archive,manifest,work,call,other,otherCall,coordinator:host.ctx,agent,employeeContext:()=>ctx,onRead:fn=>{beforeRead=fn;},fail:()=>{failure=true;},resume:async()=>{const id=agent.id;await factory.close();factory=new EmployeeHostFactory(options);agent=(await factory.resume(host.ctx,{resumeSessionId:id,agentOptions:{provider:'fixture',model:'reader'}})).agent;ctx=factory.list()[0].ctx;}});
  }finally{await factory.close();await host.close();await rm(root,{recursive:true,force:true});}
 }
 
@@ -51,6 +51,24 @@ test('employee discovers only authorized knowledge, methods and tools without lo
  assert.equal((await otherCall('capability_use',{kind:'knowledge',id:'chunk',note:'无权读取'})).isError,true);
  const empty=await call('capability_search',{query:'absent'});assert.equal(empty.isError,false);assert.deepEqual(empty.value,{knowledge:[],skills:[],tools:[]});
  fail();assert.equal((await call('capability_search',{query:'needle'})).isError,true,'backend errors are not no-match results');
+}));
+
+test('tool discovery includes fixed unknown-effect metadata and excludes changed coordinator definitions', {timeout:15000},()=>fixture(async({call,coordinator})=>{
+ const found=await call('capability_search',{query:'needle'});
+ const tool=found.value.tools.find(item=>item.name==='filesystem');
+ assert.deepEqual(tool.effectContract,{status:'unreviewed',effect:'unknown',definitionSha256:tool.effectContract?.definitionSha256});
+ assert.match(tool.effectContract.definitionSha256,/^[a-f0-9]{64}$/);
+ coordinator.tools.get('filesystem').execute=async()=>({unexpected:true});
+ const changed=await call('capability_search',{query:'needle'});
+ assert.equal(changed.isError,false,JSON.stringify(changed));
+ assert.equal(changed.value.tools.some(item=>item.name==='filesystem'),false);
+}));
+
+test('tool discovery does not advertise scoped shadows as granted capabilities', {timeout:15000},()=>fixture(async({call,agent})=>{
+ agent.ctx.tools.register(defineTool({name:'filesystem',description:'needle scoped shadow',parameters:{},output:{schema:{type:'json'},render:()=>[]},execute:async()=>null}));
+ const changed=await call('capability_search',{query:'needle'});
+ assert.equal(changed.isError,false,JSON.stringify(changed));
+ assert.equal(changed.value.tools.some(item=>item.name==='filesystem'),false);
 }));
 
 test('adoption requires actual reads, remains pending and deduplicates on cold resume', {timeout:15000},()=>fixture(async({call,archive,resume,work})=>{

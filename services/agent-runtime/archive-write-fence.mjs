@@ -41,10 +41,14 @@ function ancestors(name) {
   }
 }
 
-function canonicalRoot(name) {
+function canonicalRoot(name, allowMissing = false) {
   if (typeof name !== 'string' || !path.isAbsolute(name) || path.normalize(name) !== name || name === path.parse(name).root || name.includes('\0')) throw fail('PATH');
   // Network shares and Windows alternate streams are outside the verified platform contract.
   if (process.platform === 'win32' && (!/^[A-Za-z]:\\/.test(name) || name.slice(2).includes(':'))) throw fail('PATH');
+  if (allowMissing) {
+    try { fs.lstatSync(name); }
+    catch (error) { if (error.code === 'ENOENT') { directory(path.dirname(name), 'PATH'); return name; } throw fail('PATH'); }
+  }
   directory(name, 'PATH');
   return name;
 }
@@ -119,12 +123,15 @@ function delay(ms, signal) {
 /** Private primitive only; callers must share one deployment-owned trace/lock root mapping. */
 export function createArchiveWriteFence(roots) {
   if (!roots || typeof roots !== 'object') throw fail('PATH');
-  let { traceRoot, lockRoot } = roots;
+  let { traceRoot, lockRoot, allowMissingTraceRoot = false } = roots;
+  if (typeof allowMissingTraceRoot !== 'boolean') throw fail('PATH');
   if (!['win32', 'linux'].includes(process.platform) || process.arch !== 'x64') throw fail('UNAVAILABLE');
   let native;
   try { native = createRequire(import.meta.url)('fs-native-extensions'); }
   catch { throw fail('UNAVAILABLE'); }
-  traceRoot = canonicalRoot(traceRoot); lockRoot = canonicalRoot(lockRoot);
+  // Startup reconciliation may encounter the original root between renames.
+  // Only root-exclusive skips binding this inode; every run mode still requires it.
+  traceRoot = canonicalRoot(traceRoot, allowMissingTraceRoot); lockRoot = canonicalRoot(lockRoot);
   const logical = process.platform === 'win32' ? traceRoot.toLowerCase() : traceRoot;
   const lockLogical = process.platform === 'win32' ? lockRoot.toLowerCase() : lockRoot;
   if (logical === lockLogical || logical.startsWith(`${lockLogical}${path.sep}`) || lockLogical.startsWith(`${logical}${path.sep}`)) throw fail('PATH');

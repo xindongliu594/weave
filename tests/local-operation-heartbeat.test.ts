@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import { before, after, beforeEach, afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
@@ -18,6 +19,7 @@ import { createRunArchive } from '../services/agent-runtime/trace-store.mjs';
 // test-owned temporary directories. No employee deliverable or model acceptance.
 // Backdating last_seen exercises the actual 15-second SQL boundary without
 // changing timeouts. PGlite does not reproduce independent PostgreSQL row locks.
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated = process.env.SIMULATED_INTEGRATION === 'pglite';
 const { LocalExecutor, exportFiles, revision } = createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 let pool: pg.Pool, directory: string, traceRoot: string, server: http.Server, url: string;
@@ -37,12 +39,12 @@ before(async () => {
   if (!isolated) return;
   assert.match(process.env.DATABASE_URL ?? '', /@127\.0\.0\.1:\d+\/postgres$/);
   directory = await mkdtemp(join(tmpdir(), 'local-operation-heartbeat-')); traceRoot = join(directory, 'runs');
-  process.env.DATA_DIR = directory; process.env.TRACE_ROOT = traceRoot; process.env.OBSIDIAN_VAULT = join(directory, 'vault');
+  process.env.DATA_DIR = directory; process.env.TRACE_ROOT = traceRoot;writers=createArchiveWriterManager({traceRoot:traceRoot}); process.env.OBSIDIAN_VAULT = join(directory, 'vault');
   const db = await import('../apps/api/src/db.ts'); pool = db.pool; await db.migrate();
   await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)', [departmentId, { name: '隔离心跳测试', agents: [employee] }]);
   const local = await import('../apps/api/src/local-execution.ts'); LocalOperationService = local.LocalOperationService;
   ({ assertRunAuthorization } = await import('../apps/api/src/execution-policy.ts'));
-  const app = express(); app.use(express.json({ limit: '32mb' })); app.use('/api', local.localDeviceRouter(traceRoot));
+  const app = express(); app.use(express.json({ limit: '32mb' })); app.use('/api', local.localDeviceRouter(traceRoot,writers));
   app.use((error: any, _request: any, response: any, _next: any) => response.status(error.status ?? 500).json({ code: error.code, message: error.message }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = 'http://127.0.0.1:' + (server.address() as any).port + '/api';
 });
@@ -85,7 +87,7 @@ async function fixture(): Promise<Fixture> {
     acceptanceCriteria: ['native fixture receipt known'], estimatedInputTokens: 10, estimatedOutputTokens: 10 }];
   const snapshot = { projectId, planVersion: 1, templateVersion: 'heartbeat-engineering-fixture', requirement: 'Isolated heartbeat lifecycle',
     policy, departmentId, agents: [{ ...employee, roleVersion: 1, rolePrompt: employee.instructions, model: 'unused' }], tasks, executionTarget };
-  const service = new LocalOperationService(traceRoot, owner), executor = new LocalExecutor(device.grant);
+  const service = new LocalOperationService(traceRoot, owner,writers), executor = new LocalExecutor(device.grant);
   const f: Fixture = { device, runId, projectId, owner, workspace: join(root, runId), service, executor };
   assert.equal((await request(f, 'register', { id: device.id, token: device.token, name: '隔离心跳设备', platform: process.platform,
     grant: { id: device.grant.id, label: 'isolated', allowCommands: true } })).status, 200);

@@ -1,0 +1,17 @@
+[Unit]
+Description=Weiwu offline read-only maintenance health evidence
+
+[Service]
+Type=oneshot
+# Adapt these explicit local paths to the approved release and data directory.
+WorkingDirectory=/home/jj/.local/share/weiwu/current
+ExecStart=/home/jj/.local/share/weiwu/runtime/node-v24.19.0-linux-x64/bin/node scripts/maintenance/report.mjs --root=/home/jj/.local/share/weiwu/data/pilot --report-dir=/home/jj/.local/share/weiwu/maintenance-reports --timeout-ms=30000
+# Exit 2 means evidence is incomplete, not health passed. The JSON retains unknown.
+SuccessExitStatus=2
+TimeoutStartSec=45
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+PrivateNetwork=true
+StandardOutput=journal
+StandardError=journal

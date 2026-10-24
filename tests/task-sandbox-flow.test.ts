@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import {before,after,beforeEach,afterEach,test,mock} from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -23,6 +24,7 @@ import {pool,migrate} from '../apps/api/src/db.ts';
 import {fixtureTaskContext} from './model-fixture.ts';
 
 const {manifest,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
+let writers:ReturnType<typeof createArchiveWriterManager>;
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex');
 const file=(path:string,content:string)=>({path,content:Buffer.from(content).toString('base64')});
@@ -36,11 +38,11 @@ before(async()=>{
  assert.match(process.env.DATABASE_URL??'',/@127\.0\.0\.1:\d+\/postgres$/);
  const scratch=join(process.cwd(),'.superpowers','sdd','2026-10-20-task-sandbox-integration');
  mkdirSync(scratch,{recursive:true});directory=mkdtempSync(join(scratch,'task-full-flow-'));
- process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;process.env.OBSIDIAN_VAULT=join(directory,'vault');process.env.LOCAL_WORKSPACE_ROOT=directory;
+ process.env.DATA_DIR=directory;process.env.TRACE_ROOT=directory;writers=createArchiveWriterManager({traceRoot:directory});process.env.OBSIDIAN_VAULT=join(directory,'vault');process.env.LOCAL_WORKSPACE_ROOT=directory;
  await migrate();
  mock.method(RunSandbox,'assertReady',async()=>{sharedFallbacks++;throw Error('UNEXPECTED_SHARED_SANDBOX');});
  for(const name of ['start','file','sync','execute'] as const)mock.method(RunSandbox.prototype as any,name,async()=>{sharedFallbacks++;throw Error('UNEXPECTED_SHARED_SANDBOX');});
- const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory));
+ const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(directory,writers));
  app.use((error:any,_request:any,response:any,_next:any)=>response.status(error.status??500).json({code:error.code,message:error.message}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url='http://127.0.0.1:'+(server.address() as any).port;
 });
@@ -91,7 +93,7 @@ async function fixture(mode:Mode){
  await pool.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$3,true,$6)',[deviceId,hash(token),'engineering device','linux',grantId,backend]);
  // Runtime consumes the persisted approved snapshot, as the real coordinator does.
  snapshot=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0].snapshot;
- const service=new LocalOperationService(directory,owner),jobs:any[]=[],canonicalChecks:any[]=[],approvals:any[]=[],requests:any[]=[],steps=new Map<string,number>(),workspaces=new Map<string,any>();
+ const service=new LocalOperationService(directory,owner,writers),jobs:any[]=[],canonicalChecks:any[]=[],approvals:any[]=[],requests:any[]=[],steps=new Map<string,number>(),workspaces=new Map<string,any>();
  const canonical=new Map([['in.txt','input'],['private.txt','private']]);
  // Legacy HTTP fixture only: the sibling accepted-stop product test owns the
  // real OpenShell executor/journal/capacity evidence. Keep this adapter explicit.
@@ -229,7 +231,7 @@ async function runFixture(f:Fixture){
   }
   const operations=(await pool.query('SELECT * FROM local_operations WHERE run_id=$1',[f.runId])).rows;
   assert.equal(operations.length,f.jobs.length);assert.ok(operations.every(row=>row.started&&row.status==='completed'&&row.merge_state==='committed'));
-  assert.equal(await finishRun(f.runId,f.service.owner,'completed'),true,'the real coordinator finalization makes work evidence eligible');
+  assert.equal(await writers.withWriter([f.runId],()=>finishRun(writers,f.runId,f.service.owner,'completed')),true,'the real coordinator finalization makes work evidence eligible');
   const evidence=await acceptedWorkEvidence(pool,directory,f.runId);
   assert.equal(evidence.receipts.length,2,'both accepted task-local command proofs remain usable by the work/knowledge consumer');
   return result;

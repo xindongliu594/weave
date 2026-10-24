@@ -11,7 +11,7 @@ test('startup inventory rejects changed mounts and unsupported Express registrat
     ['all methods','app.ts',(source:string)=>source+"\napp.all('/api/unclassified-review',(_req,res)=>res.json({ok:true}));"],
     ['router instance','app.ts',(source:string)=>source+"\napp.use('/api/unclassified-review', reviewRouter);"],
     ['outside api','app.ts',(source:string)=>source+"\napp.get('/unclassified-review',(_req,res)=>res.json({ok:true}));"],
-    ['mount prefix','app.ts',(source:string)=>source.replace("app.use('/api',localDeviceRouter(traceRoot));","app.use('/unexpected',localDeviceRouter(traceRoot));")],
+    ['mount prefix','app.ts',(source:string)=>source.replace("app.use('/api',localDeviceRouter(traceRoot,writers));","app.use('/unexpected',localDeviceRouter(traceRoot,writers));")],
     ['head registration','app.ts',(source:string)=>source+"\napp.head('/api/unclassified-review',(_req,res)=>res.end());"],
     ['options registration','app.ts',(source:string)=>source+"\napp.options('/api/unclassified-review',(_req,res)=>res.end());"],
     ['other HTTP registration','app.ts',(source:string)=>source+"\napp.trace('/api/unclassified-review',(_req,res)=>res.end());"],

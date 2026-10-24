@@ -19,6 +19,23 @@ before(async () => {
     server: { middlewareMode: true, hmr: false, watch: null } });
   ui = await server.ssrLoadModule('/apps/web/src/OrganizationChat.tsx') as typeof ui;
   costs = await server.ssrLoadModule('/apps/web/src/CostControl.tsx') as typeof costs;
+  const {identitySession}=await server.ssrLoadModule('/apps/web/src/identity-session.ts');
+  const originalFetch=globalThis.fetch;
+  try{
+    globalThis.fetch=async input=>{assert.equal(String(input),'/auth/session');return Response.json({mode:'legacy-local',authenticated:true,user:null,csrf:null,loginAvailable:false});};
+    await identitySession.refresh();assert.equal(identitySession.getSnapshot().status,'local-owner');
+  }finally{globalThis.fetch=originalFetch;}
+});
+
+test('member cost summary accepts the scoped API shape without global totals or billing controls', () => {
+  const html=renderToStaticMarkup(createElement(costs.MemberCostSummary,{data:{timezone:'UTC',departments:[{id:'department-a',spent:0.2,retained:0.4,limit:10}]}}));
+  assert.match(html,/department-a/);assert.match(html,/0\.200000/);assert.match(html,/0\.400000/);assert.match(html,/UTC/);
+  assert.doesNotMatch(html,/NaN|中转站请求|手动核对|最近 20|<button|<form/);
+});
+
+test('member cost summary distinguishes no visible departments from zero global spending',()=>{
+  const html=renderToStaticMarkup(createElement(costs.MemberCostSummary,{data:{timezone:'UTC',departments:[]}}));
+  assert.match(html,/暂无可查看的部门费用/);assert.doesNotMatch(html,/全部已记录费用|NaN/);
 });
 after(async () => {
   await server?.close();

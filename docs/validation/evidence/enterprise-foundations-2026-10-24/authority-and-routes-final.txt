@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ static application import does not eagerly evaluate the provider through an authority class cycle (8168.2067ms)
+✔ real reservation and C1 dispatch survive absent browser sessions, then epoch alone stops the next effects (1322.8163ms)
+✔ disabled authorizer and loss of a collaborating department stop C1 before creating an intent (281.9882ms)
+✔ withdrawn employee tool grant blocks the next actual C1 admission without changing its fixed snapshot (355.9922ms)
+✔ enterprise rejects unbound old authority without backfill while legacy-local preserves its existing path (239.2765ms)
+✔ paused coordinator admits no background work until one explicit start and close prevents revival (142.1913ms)
+✔ actual coordinator and independent employee Hosts await current authority before registered tool bodies (1615.924ms)
+✔ device start rejects a revoked authorizer while the original authenticated late receipt is preserved (991.0072ms)
+✔ worker tick durably pauses revoked queued work before claiming a running lease (204.2349ms)
+✔ runtime approval callback cannot create a new request under revoked authority (228.1104ms)
+✔ retry HTTP rechecks original authority before its existing child and before a successful idempotency cache (2437.3108ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16820.9266
+✔ enterprise createApp route, device, cache and network gates (9119.0506ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9731.0447

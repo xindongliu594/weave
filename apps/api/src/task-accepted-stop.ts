@@ -6,6 +6,8 @@ import type pg from 'pg';
 import {z} from 'zod';
 import type {TaskAttemptKey} from '../../../packages/contracts/index.ts';
 import {pool} from './db.ts';
+import {shareCostMaintenance} from './cost-control.ts';
+import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
 import {AppError} from './provider.ts';
 import type {SandboxMaintenance} from './storage-lifecycle.ts';
 import {decodeTaskAcceptedStop,type TaskAcceptedStopRecord} from './task-accepted-stop-state.ts';
@@ -64,7 +66,39 @@ export function requireTaskStopProvider(provider?:Provider):Selected{
 
 /** No model/HTTP input can create a selection or recover a fresh dispatch closure. */
 export class TaskAcceptedStopLifecycle{
- constructor(private runId:string,private service:{traceRoot:string;owner:string},private provider?:Provider){}
+ private producerFailure?:unknown;
+ get writerFailure(){return this.producerFailure;}
+ constructor(private runId:string,private service:{traceRoot:string;owner:string;writers:ArchiveWriterManager},private provider?:Provider){}
+ private async writer<T>(fn:()=>Promise<T>,signal?:AbortSignal):Promise<T>{
+  if(this.producerFailure)throw this.producerFailure;
+  const writers=this.service.writers;if(!writers||writers.traceRoot!==this.service.traceRoot)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
+  const outcome=await writers.withWriter([this.runId],async()=>{
+   try{return {ok:true as const,value:await fn()};}catch(error){
+    try{writers.assertWriter(this.runId);}catch{this.producerFailure??=error;throw this.producerFailure;}
+    return {ok:false as const,error};
+   }
+  },{signal});if(!outcome.ok)throw outcome.error;return outcome.value;
+ }
+ private async produce<T>(fn:()=>Promise<T>,known?:(error:unknown)=>boolean):Promise<T>{
+  const result=await this.service.writers.withWriter([this.runId],async()=>{
+   try{return {ok:true as const,value:await fn()};}catch(error){
+    if(known?.(error)){try{this.service.writers.assertWriter(this.runId);return {ok:false as const,error};}catch{}}
+    this.producerFailure??=error;throw this.producerFailure;
+   }
+  });if(!result.ok)throw result.error;return result.value;
+ }
+ private dispatch(selected:Selected,key:TaskAttemptKey,expected:any,beforeDispatch:()=>Promise<void>,signal:AbortSignal){
+  let refused=false,refusal:unknown,admitted=false;
+  const admission=async()=>{try{await beforeDispatch();admitted=true;}catch(error){refused=true;refusal=error;throw error;}};
+  // Only the original beforeDispatch rejection can prove that the trusted
+  // provider never received permission. Provider errors are not this proof.
+  return this.produce(async()=>{
+   const result=await selected.stop.call(selected.executor,key,expected,admission,signal);
+   const {accepted,checkpointResolved,operationsResolved,...identity}=expected;
+   if(!admitted||!isDeepStrictEqual(result,{...identity,phase:'stopped',replayed:false}))denied('可信设备停止回执或派发身份不符');
+   return result;
+  },error=>!admitted&&refused&&error===refusal);
+ }
  private selected(expected?:Selected){
   const selected=requireTaskStopProvider(this.provider);
   if(expected&&(selected.executor!==expected.executor||selected.stop!==expected.stop||selected.reconcile!==expected.reconcile||selected.capabilities!==expected.capabilities||!isDeepStrictEqual(selected.capability,expected.capability)||['deviceId','grantId','fingerprint'].some(k=>selected[k as keyof Selected]!==expected[k as keyof Selected])))denied('任务停止期间可信设备已变化','TASK_STOP_UNAVAILABLE');
@@ -77,17 +111,16 @@ export class TaskAcceptedStopLifecycle{
   run.events=archived.events;return archived;
  }
  private async transaction<T>(fn:(db:pg.PoolClient,run:any)=>Promise<T>,signal?:AbortSignal):Promise<T>{
-  signal?.throwIfAborted();
-  const db=signal?await new Promise<pg.PoolClient>((resolve,reject)=>{
-   let settled=false;
-   const abort=()=>{if(!settled){settled=true;signal.removeEventListener('abort',abort);reject(signal.reason);}};
-   signal.addEventListener('abort',abort,{once:true});
-   pool.connect().then(client=>{if(settled||signal.aborted){try{client.release();}catch{}abort();return;}settled=true;signal.removeEventListener('abort',abort);resolve(client);},error=>{if(!settled){settled=true;signal.removeEventListener('abort',abort);reject(error);}});
-  }):await pool.connect();
+  const outcome=await this.service.writers.withWriter([this.runId],async()=>{
+  // Pool acquisition itself is an original producer. Abort cannot replace its
+  // promise with a race winner and leave a late connection unaccounted for.
+  let db:pg.PoolClient;
+  try{db=await pool.connect();}catch(error){return {ok:false as const,error};}
+  if(signal?.aborted){db.release();return {ok:false as const,error:signal.reason};}
   const raw=db.query.bind(db),bounded=Object.create(db) as pg.PoolClient;
-  let released=false,poisoned=false;
-  // pg's read timeout settles its callback but does not evict the connection.
-  // Discard first; neither a late SQL reply nor any continuation may reuse it.
+  let released=false,poisoned=false,committing=false;
+  // Keep awaiting the original query promise after abort/discard. A client
+  // query_timeout callback is not proof that its physical SQL has settled.
   const discard=()=>{poisoned=true;if(!released){released=true;db.release(true);}};
   const usable=()=>{if(signal?.aborted){discard();signal.throwIfAborted();}if(poisoned)denied('任务停止 SQL 连接已丢弃');};
   signal?.addEventListener('abort',discard,{once:true});
@@ -95,7 +128,7 @@ export class TaskAcceptedStopLifecycle{
    usable();
    try{
     const request=typeof args[0]==='string'?{text:args[0],values:args[1]}:{...args[0]};
-    const result=await (raw as any)({...request,query_timeout:signal?remaining(signal):maintenanceMs});
+    const result=await (raw as any)(request);
     usable();return result;
    }catch(error){
     if(signal?.aborted||!(error as any)?.severity||['57014','55P03'].includes((error as any)?.code))discard();
@@ -107,14 +140,17 @@ export class TaskAcceptedStopLifecycle{
    return native(...args);
   };
   try{
-   await native('BEGIN');
+   await native('BEGIN');await shareCostMaintenance(bounded);
    const identity=(await bounded.query('SELECT project_id FROM project_runs WHERE id=$1',[this.runId])).rows[0];if(!identity)denied('停止运行不存在');
    const project=(await bounded.query('SELECT id,version FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
    const run=(await bounded.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[this.runId])).rows[0];
-   if(!project||!run)denied('停止运行不存在');
-   const result=await fn(bounded,run);await bounded.query('COMMIT');usable();return result;
-  }catch(error){if(!poisoned)try{await native('ROLLBACK');}catch{discard();}throw error;}
-  finally{signal?.removeEventListener('abort',discard);if(!released){released=true;db.release();}}
+   if(!project||!run||run.project_id!==identity.project_id)denied('停止运行不存在');
+   const result=await fn(bounded,run);committing=true;await bounded.query('COMMIT');usable();return {ok:true as const,value:result};
+  }catch(error){
+   if(!poisoned)try{await native('ROLLBACK');}catch{discard();}
+   if(committing||poisoned){discard();throw error;}return {ok:false as const,error};
+  }finally{signal?.removeEventListener('abort',discard);if(!released){released=true;db.release();}}
+  },{signal});if(!outcome.ok)throw outcome.error;return outcome.value;
  }
  private async current(db:pg.PoolClient,run:any,selected:Selected,signal:AbortSignal){
   signal.throwIfAborted();this.selected(selected);this.archive(run);
@@ -355,6 +391,10 @@ export class TaskAcceptedStopLifecycle{
  }
  /** Trusted source-only acceptance boundary. No target or client proof is accepted. */
  async finalizeAccepted(parent:AbortSignal):Promise<TaskStopFinalization>{
+  try{return await this.writer(()=>this.finalizeAcceptedOwned(parent),parent);}
+  catch(error){return {version:1,state:'pending',reasonCode:error instanceof AppError&&/^TASK_[A-Z_]+$/.test(error.code??'')?error.code:'TASK_ACCEPTED_STOP_UNRESOLVED'};}
+ }
+ private async finalizeAcceptedOwned(parent:AbortSignal):Promise<TaskStopFinalization>{
   const shared=budget(parent),signal=shared.signal;
   try{
    signal.throwIfAborted();const selected=this.selected();
@@ -380,7 +420,7 @@ export class TaskAcceptedStopLifecycle{
      this.terminalSync(dispatched,selected,signal);committed=true;
     };
     const expected={...prepared.marker.identity,accepted:true,checkpointResolved:true,operationsResolved:true};
-    const result=await selected.stop.call(selected.executor,key,expected,beforeDispatch,signal);
+    const result=await this.dispatch(selected,key,expected,beforeDispatch,signal);
     if(!committed)denied('终态停止缺少成功提交的派发回调');
     await this.recordStopped(selected,prepared.marker,result,false,signal);
     signal.throwIfAborted();this.selected(selected);
@@ -388,17 +428,21 @@ export class TaskAcceptedStopLifecycle{
    const final=await this.transaction((db,run)=>this.terminalEvidence(db,run,selected,signal),signal);this.terminalSync(final,selected,signal);
    if(final.retainedPending||final.candidates.length)denied('仍有保留的历史任务 scope 未完成停止核对');
    return {version:1,state:'stopped'};
-  }catch(error){return {version:1,state:'pending',reasonCode:error instanceof AppError&&/^TASK_[A-Z_]+$/.test(error.code??'')?error.code:'TASK_ACCEPTED_STOP_UNRESOLVED'};}
-  finally{shared.dispose();}
+  }finally{shared.dispose();}
  }
  private async observeMarker(selected:Selected,marker:TaskAcceptedStopRecord,signal:AbortSignal){
   const recheck=await this.transaction((db,run)=>this.observation(db,run,selected,marker,signal),signal);
   recheck();
-  const result=await selected.reconcile.call(selected.executor,marker.identity.key,marker.identity,signal);
+  const result=await this.produce(async()=>{
+   const observed=await selected.reconcile.call(selected.executor,marker.identity.key,marker.identity,signal);
+   if(!isDeepStrictEqual(observed,{...marker.identity,phase:'stopped',replayed:false}))denied('可信设备停止观察回执身份不符');
+   return observed;
+  });
   await this.recordStopped(selected,marker,result,true,signal);
  }
  /** Exact original-ID observation only; callers independently authorize their admin principal. */
- async reconcileExact(request:TaskStopExactRequest, parent:AbortSignal):Promise<void>{
+ async reconcileExact(request:TaskStopExactRequest,parent:AbortSignal){return this.writer(()=>this.reconcileExactOwned(request,parent),parent);}
+ private async reconcileExactOwned(request:TaskStopExactRequest, parent:AbortSignal):Promise<void>{
   const parsed=exactRequest.safeParse(request);
   if(!parsed.success)return denied('原停止请求身份不完整','TASK_STOP_IDENTITY_MISMATCH');
   if(parsed.data.key.runId!==this.runId)return denied('原停止请求跨运行','TASK_STOP_IDENTITY_MISMATCH');
@@ -412,17 +456,19 @@ export class TaskAcceptedStopLifecycle{
     if(!sameKey(rowKey(row),identity.key)||!sameKey(identity.key,exact.key)||identity.sandboxId!==exact.sandboxId||identity.workspaceRevision!==exact.workspaceRevision||identity.stopId!==exact.stopId)denied('原停止请求与持久身份不同','TASK_STOP_IDENTITY_MISMATCH');return marker;
    },signal);
    await this.observeMarker(selected,marker,signal);
-  }catch(error){if(error instanceof AppError&&/^TASK_/.test(error.code??''))throw error;denied('原停止事实尚未取得可验证的回执');}
+  }catch(error){throw error;}
   finally{shared.dispose();}
  }
- async reconcileExisting(signal:AbortSignal){
+ async reconcileExisting(signal:AbortSignal){return this.writer(()=>this.reconcileExistingOwned(signal),signal);}
+ private async reconcileExistingOwned(signal:AbortSignal){
   const markers=await this.transaction(async db=>this.markers(db),signal);
   for(const marker of markers.filter(marker=>marker.state!=='stopped')){
    const selected=this.selected();
    await this.observeMarker(selected,marker,signal);
   }
  }
- async beforeNewTask(context:TaskCheckpointContext,signal:AbortSignal){
+ async beforeNewTask(context:TaskCheckpointContext,signal:AbortSignal){return this.writer(()=>this.beforeNewTaskOwned(context,signal),signal);}
+ private async beforeNewTaskOwned(context:TaskCheckpointContext,signal:AbortSignal){
   const selected=this.selected();await this.reconcileExisting(signal);
   const candidates=await this.transaction(async(db,run)=>{
    await this.current(db,run,selected,signal);await this.target(db,run,context);
@@ -449,7 +495,7 @@ export class TaskAcceptedStopLifecycle{
     dispatchCommitted=true;
    };
    const expected={...prepared.marker.identity,accepted:true,checkpointResolved:true,operationsResolved:true};
-   const result=await selected.stop.call(selected.executor,candidate.key,expected,beforeDispatch,signal);
+   const result=await this.dispatch(selected,candidate.key,expected,beforeDispatch,signal);
    if(!dispatchCommitted)denied('停止 provider 缺少成功提交的派发回调');
    // A trusted device may only reconcile its prior intent; it cannot invent a fresh effect.
    await this.recordStopped(selected,prepared.marker,result,false,signal);

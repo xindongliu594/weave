@@ -1,19 +1,21 @@
-import {claimExpiredRun,deferUnstartedRun,finishRun,terminalStatus} from './run-state.ts';
+import {lockedRun,claimExpiredRun,deferUnstartedRun,finishRun,terminalStatus} from './run-state.ts';
 import {assertRunAuthorization,assertExecutionProfile,executionMode} from './execution-policy.ts';
+import {assertCurrentRunAuthority,recordRunAuthorityDenial,type RunEffect} from './run-current-authority.ts';
 import { executeBrowserMcpTool } from './work-tools-browser.ts';
 import { randomUUID } from 'node:crypto';
 import {join} from 'node:path';
 import { prepareImportedWorkspace } from './work-files.ts';
 import {readLiveCanonical} from './live-canonical-reader.ts';
 import {restoreStepWorkspace} from './step-checkpoint-recovery.ts';
+import {requireResolvedProjectEffectsIn} from './tool-operations.ts';
+import {createToolEffectComposition} from './tool-effect-composition.ts';
 import { pool } from './db.ts';
 import { unseal } from './vault.ts';
 import { AppError } from './provider.ts';
 import { ProductDshRuntime,type RuntimeCompletion } from '../../../services/agent-runtime/product-runtime.mjs';
 import { readRun, createRunArchive, openRunArchive } from '../../../services/agent-runtime/trace-store.mjs';
-import { command } from '../../../services/agent-runtime/sandbox.mjs';
 import { queryKnowledge } from './knowledge-store.ts';
-import { reserveCall,settleCall,markCallUncertain,expireReservations,recordProviderResponse } from './cost-control.ts';
+import { reserveCall,settleCall,markCallUncertain,expireReservations,recordProviderResponse,shareCostMaintenance } from './cost-control.ts';
 import { settings } from './product.ts';
 import { assertRunModels,routeFingerprint } from './model-capabilities.ts';
 import type { RuntimeUsage } from '../../../services/agent-runtime/openai-compatible.mjs';
@@ -30,17 +32,22 @@ async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
   try{return await Promise.race([work,cancelled]);}finally{signal.removeEventListener('abort',abort!);}
 }
 export class RunCoordinator {
-  owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,ActiveRun>();closing?:Promise<void>; ticking=false; stopped=false; timer:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
-  constructor(public traceRoot:string,public writers:ArchiveWriterManager,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor'],maintenance:{sandboxMaintenance?:()=>SandboxMaintenance|undefined}={}){
+  owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,ActiveRun>();closing?:Promise<void>; ticking=false; stopped=false; timer?:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
+  constructor(public traceRoot:string,public writers:ArchiveWriterManager,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor'],maintenance:{startPaused?:boolean;sandboxMaintenance?:()=>SandboxMaintenance|undefined;toolEffects?:ReturnType<typeof createToolEffectComposition>}={}){
     if(!writers||writers.traceRoot!==traceRoot)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
     executionMode();
-    const local=new LocalOperationService(traceRoot,this.owner);
-    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>{assertExecutionProfile(snapshot);return createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local,maintenance):undefined);},onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data,signal)=>this.reserve(id,data,signal),onResponse:data=>recordProviderResponse(data.id,data),onCallError:async data=>{await recordProviderResponse(data.id,data);await markCallUncertain(data.id,data.code,data.dispatched);}});
+    const local=new LocalOperationService(traceRoot,this.owner,this.writers);
+    const toolEffects=maintenance.toolEffects??createToolEffectComposition(pool,writers);
+    this.runtime=new ProductDshRuntime({traceRoot,queryKnowledge,beforeTool:(id,signal)=>this.authorizeEffect(id,'tool',signal),beforeKnowledge:(id,signal)=>this.authorizeEffect(id,'knowledge',signal),runtimeBindingsForRun:(id,snapshot)=>toolEffects.runtimeBindingsForRun(id,snapshot,this.owner),externalTool:executeBrowserMcpTool,createExecutor:(archive,snapshot)=>{assertExecutionProfile(snapshot);return createExecutor?.(archive,snapshot)??(snapshot.executionTarget?.kind==='local'?new LocalRunExecutor(archive,snapshot,local,maintenance):undefined);},onUsage:(id,u)=>this.recordUsage(id,u),requestApproval:(input,signal)=>this.approveTool(input,signal),beforeRequest:(id,data,signal)=>this.reserve(id,data,signal),onResponse:data=>recordProviderResponse(data.id,data),onCallError:async data=>{await recordProviderResponse(data.id,data);await markCallUncertain(data.id,data.code,data.dispatched);}});
+    if(!maintenance.startPaused)this.start();
+  }
+  start(){
+    if(this.timer||this.stopped||this.closing)return;
     this.timer=setInterval(()=>{void this.heartbeat().catch(e=>{if(!this.stopped)console.error('Run heartbeat:',e instanceof Error?e.name:'error');});void this.tick();},1000);this.timer.unref();void this.tick();
   }
   async heartbeat(){
     if(this.stopped)return {ids:[],held:[]};if(this.heartbeatWork)return this.heartbeatWork;
-    const entries=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing');
+    const entries=[...this.active].filter(([,entry])=>!entry.drainFailure&&(!entry.phase||entry.phase==='executing'));
     const ids=entries.map(([id])=>id);if(!ids.length)return {ids,held:[]};
     // Retain before SQL. Per-run updates restore the exact original ALS owner;
     // cancellation stays detached from heartbeatWork to avoid admission cycles.
@@ -60,12 +67,16 @@ export class RunCoordinator {
     try{return await this.heartbeatWork;}finally{this.heartbeatWork=undefined;}
   }
   async recordUsage(runId:string,u:RuntimeUsage){
+    this.writers.assertWriter(runId);
+    return this.writers.withWriter([runId],async()=>{
     if((await pool.query('SELECT id FROM model_reservations WHERE id=$1',[u.id])).rowCount){await settleCall(u.id,u.inputTokens,u.outputTokens,u);return;}
-    const run=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[runId])).rows[0];
+    await lockedRun(this.writers,runId,async(client,run)=>{
     const agent=run?.snapshot?.agents?.find((item:any)=>item.id===u.agentId||item.employeeId===u.employeeId);
     const departmentId=agent?.sourceDepartmentId??run?.snapshot?.departmentId??null;
-    await pool.query(`INSERT INTO usage(id,model_id,project_id,department_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
+    await client.query(`INSERT INTO usage(id,model_id,project_id,department_id,run_id,input_tokens,output_tokens,cost,purpose,agent_id,employee_id,session_id,task_id,attempt_id,request_id,duration_ms)
       SELECT $1,$2,project_id,$7,id,$3,$4,$5,$15,$8,$9,$10,$11,$12,$13,$14 FROM project_runs WHERE id=$6 ON CONFLICT(id) DO NOTHING`,[u.id,u.modelId,u.inputTokens,u.outputTokens,u.cost,runId,departmentId,u.agentId??null,u.employeeId??null,u.sessionId??null,u.taskId??null,u.attemptId??null,u.requestId??null,u.durationMs??null,u.requestPurpose==='compaction'?'上下文摘要':u.requestPurpose==='handoff'?'正式交接':'项目执行']);
+    });
+    });
   }
   async reserve(runId:string,data:any,signal?:AbortSignal){
     signal?.throwIfAborted();
@@ -83,35 +94,68 @@ export class RunCoordinator {
     const agent=run.snapshot.agents.find((item:any)=>item.id===data.agentId||item.employeeId===data.employeeId)??(!data.agentId&&!data.employeeId?run.snapshot.agents[0]:undefined);
     if(!agent)throw new AppError(422,'调用员工不在批准快照中');
     const billingDepartmentId=agent.sourceDepartmentId??run.snapshot.departmentId;
-    await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':data.requestPurpose==='handoff'?'正式交接':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,signal,authorize:async(db,row)=>{await assertRunModels(row.snapshot,db);await assertRunAuthorization(row,db);},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});
+    try{await reserveCall({id:data.id,model,amount:data.reservation,purpose:data.requestPurpose==='compaction'?'上下文摘要':data.requestPurpose==='handoff'?'正式交接':'项目执行',projectId:run.project_id,runId,leaseOwner:this.owner,billingDepartmentId,signal,authorize:async(db,row)=>{await assertRunModels(row.snapshot,db);await assertRunAuthorization(row,db,{authorityLock:true,effect:'model'});},context:{agentId:data.agentId,employeeId:data.employeeId,sourceDepartmentId:billingDepartmentId,sourceAgentId:agent.sourceAgentId,sessionId:data.sessionId,taskId:data.taskId,runtimeTaskId:data.runtimeTaskId,reworkRound:data.reworkRound,attemptId:data.attemptId,requestId:data.requestId,requestPurpose:data.requestPurpose}});}catch(error){await recordRunAuthorityDenial(pool,error);throw error;}
+  }
+  /** Short effect admission; locks never span the tool body or provider call. */
+  async authorizeEffect(runId:string,effect:RunEffect,signal?:AbortSignal):Promise<void>{
+    const result=await this.writers.withWriter([runId],async()=>{
+      const client=await pool.connect();let discard=false,committing=false,primary:unknown;
+      try{
+        signal?.throwIfAborted();try{await client.query('BEGIN');}catch(error){discard=true;throw error;}
+        await shareCostMaintenance(client);
+        const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[runId])).rows[0];
+        if(identity)await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
+        const row=(await client.query('SELECT *,lease_until>clock_timestamp() AS lease_valid FROM project_runs WHERE id=$1 FOR UPDATE',[runId])).rows[0];
+        if(!row||row.project_id!==identity?.project_id||row.status!=='running'||row.cancel_requested||row.lease_owner!==this.owner||!row.lease_valid)throw new AppError(409,'运行已停止或租约失效','LEASE_LOST');
+        await assertRunAuthorization(row,client,{authorityLock:true,effect,requireLocalOnline:false});signal?.throwIfAborted();
+        committing=true;await client.query('COMMIT');return {ok:true as const};
+      }catch(error){primary=error;try{await client.query('ROLLBACK');}catch{discard=true;}
+        if(discard||committing){discard=true;throw error;}return {ok:false as const,error};
+      }finally{try{client.release(discard);}catch(error){if(primary===undefined)throw error;}}
+    },{signal});
+    if(!result.ok){await recordRunAuthorityDenial(pool,result.error);throw result.error;}
   }
   async approveTool(input:any,signal?:AbortSignal){
     signal?.throwIfAborted();const id=randomUUID();
-    await pool.query('INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments) VALUES($1,$2,$3,$4,$5)',[id,input.runId,input.agentId,input.tool,input.arguments]);
-    openRunArchive(this.traceRoot,input.runId).append('approval/requested',{id,...input});
-    try{while(true){signal?.throwIfAborted();const row=(await pool.query('SELECT status FROM tool_approvals WHERE id=$1',[id])).rows[0];if(row?.status==='approved')return id;if(row?.status!=='pending')throw Error('工具操作未获批准');await sleep(500);}}
-    finally{await pool.query("UPDATE tool_approvals SET status='cancelled',decided_at=now() WHERE id=$1 AND status='pending'",[id]);}
+    const request=await lockedRun(this.writers,input.runId,async(client,row)=>{
+      try{await assertCurrentRunAuthority(client,row.id,'tool');}
+      catch(error){if(error instanceof AppError&&error.code==='RUN_AUTHORITY_REVOKED')return {denied:error};throw error;}
+      await client.query('INSERT INTO tool_approvals(id,run_id,agent_id,tool,arguments) VALUES($1,$2,$3,$4,$5)',[id,input.runId,input.agentId,input.tool,input.arguments]);
+      openRunArchive(this.traceRoot,input.runId).append('approval/requested',{id,...input});
+    });
+    if(request?.denied){await recordRunAuthorityDenial(pool,request.denied);throw request.denied;}
+    let persistenceFailed=false;
+    try{while(true){signal?.throwIfAborted();
+      this.writers.assertWriter(input.runId);
+      const row=await this.writers.withWriter([input.runId],async()=>{try{return (await pool.query('SELECT status FROM tool_approvals WHERE id=$1',[id])).rows[0];}catch(error){persistenceFailed=true;throw error;}});
+      if(row?.status==='approved'){await this.authorizeEffect(input.runId,'tool',signal);return id;}if(row?.status!=='pending')throw Error('工具操作未获批准');await sleep(500);
+    }}finally{if(!persistenceFailed)await lockedRun(this.writers,input.runId,async(client)=>{await client.query("UPDATE tool_approvals SET status='cancelled',decided_at=now() WHERE id=$1 AND status='pending'",[id]);});}
   }
+
   async recover(){
     await expireReservations();
     const stale=(await pool.query("SELECT id FROM project_runs WHERE status='running' AND (lease_until IS NULL OR lease_until<clock_timestamp())")).rows;
     for(const candidate of stale){
-      // Recheck under the existing project/run locks. An event-loop or pool
-      // stall cannot turn this coordinator's still-active job into a dead one.
-      const row=await claimExpiredRun(candidate.id,current=>current.lease_owner===this.owner&&this.active.has(current.id));if(!row)continue;
-      await pool.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE run_id=$1 AND status IN ('queued','claimed','started')",[row.id]);
-      if(row.snapshot.executionTarget?.kind!=='local'&&/^[a-f0-9-]{36}$/.test(row.id))try{await command(['rm','-f','agent-department-'+row.id],{signal:AbortSignal.timeout(5000)});}catch{}
+      await this.writers.withWriter([candidate.id],async()=>{
+      let legacy=false;
+      const row=await claimExpiredRun(this.writers,candidate.id,current=>{
+        legacy=current.snapshot.executionTarget?.kind!=='local';
+        return legacy||(current.lease_owner===this.owner&&this.active.has(current.id));
+      });
+      if(!row){if(legacy)console.error('Run recovery: legacy cleanup deferred');return;}
+      await lockedRun(this.writers,row.id,async(client)=>{await client.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE run_id=$1 AND status IN ('queued','claimed','started')",[row.id]);});
       const archived=readRun(this.traceRoot,row.id);
       if(archived?.integrity==='ok'){
         for(const event of archived.events.filter(e=>e.type==='billing/usage'))await this.recordUsage(row.id,event.data);
         const finished=archived.events.findLast(e=>e.type==='run/finished');
-        if(finished&&terminalStatus(finished.data.status)){await finishRun(row.id,row.lease_owner,finished.data.status,finished.data.message??null);continue;}
+        if(finished&&terminalStatus(finished.data.status)){await finishRun(this.writers,row.id,row.lease_owner,finished.data.status,finished.data.message??null);return;}
       }
-      await finishRun(row.id,row.lease_owner,'interrupted','运行进程中断，请检查记录后恢复',record=>this.traceFinished(record,'interrupted','服务租约过期，运行已停止；可从已记录的任务结果恢复。'));
+      await finishRun(this.writers,row.id,row.lease_owner,'interrupted','运行进程中断，请检查记录后恢复',record=>this.traceFinished(record,'interrupted','服务租约过期，运行已停止；可从已记录的任务结果恢复。'));
+      });
     }
   }
   traceFinished(row:any,status:string,message:string){
-    try{const existing=readRun(this.traceRoot,row.id);const archive=existing?openRunArchive(this.traceRoot,row.id):createRunArchive(this.traceRoot,row.snapshot,{id:row.id});archive.append('run/finished',{status,message});}catch{}
+    const existing=readRun(this.traceRoot,row.id);const archive=existing?openRunArchive(this.traceRoot,row.id):createRunArchive(this.traceRoot,row.snapshot,{id:row.id});archive.append('run/finished',{status,message});
   }
 
   async tick(){
@@ -145,13 +189,23 @@ export class RunCoordinator {
             AND NOT EXISTS(SELECT 1 FROM project_runs a WHERE a.status='running' AND
               COALESCE(NULLIF(a.department_ids,'{}'),ARRAY[a.snapshot->>'departmentId']) && COALESCE(NULLIF(r.department_ids,'{}'),ARRAY[r.snapshot->>'departmentId']))
             FOR UPDATE OF r SKIP LOCKED`,[candidate.id,project.id,project.version])).rows[0];
-          if(job&&!this.stopped){await client.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=clock_timestamp()+interval '30 seconds',started_at=now() WHERE id=$2",[this.owner,job.id]);await client.query("UPDATE projects SET status='RUNNING' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);}else job=undefined;
+          if(job&&!this.stopped){
+            try{await assertCurrentRunAuthority(client,job.id,'resume');}
+            catch(error){
+              if(!(error instanceof AppError)||error.code!=='RUN_AUTHORITY_REVOKED')throw error;
+              await client.query("UPDATE project_runs SET status='interrupted',error=$2,finished_at=now(),lease_owner=NULL,lease_until=NULL WHERE id=$1",[job.id,error.message]);
+              await client.query("UPDATE projects SET status='INTERRUPTED' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);
+              await client.query('COMMIT');return {authorityDenied:error};
+            }
+            await client.query("UPDATE project_runs SET status='running',lease_owner=$1,lease_until=clock_timestamp()+interval '30 seconds',started_at=now() WHERE id=$2",[this.owner,job.id]);await client.query("UPDATE projects SET status='RUNNING' WHERE id=$1 AND version=$2",[job.project_id,job.project_version]);
+          }else job=undefined;
         }
         await client.query('COMMIT');
       }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
       return job;
       });
-      if(job&&this.stopped){await writer.run(()=>finishRun(job.id,this.owner,'interrupted','工作进程关闭，任务尚未启动',row=>this.traceFinished(row,'interrupted','工作进程关闭，任务尚未启动')));return;}
+      if(job?.authorityDenied){await recordRunAuthorityDenial(pool,job.authorityDenied);return;}
+      if(job&&this.stopped){await writer.run(()=>finishRun(this.writers,job.id,this.owner,'interrupted','工作进程关闭，任务尚未启动',row=>this.traceFinished(row,'interrupted','工作进程关闭，任务尚未启动')));return;}
       if(job){void this.launch(job,writer);writer=undefined;}
       }finally{if(writer){writer.finish();await writer.writerDrained;}}
     }catch(e){if(!this.stopped)console.error('Run worker:',e instanceof Error?e.name:'error');}finally{this.ticking=false;}
@@ -166,6 +220,7 @@ export class RunCoordinator {
     const entry:ActiveRun=this.active.get(row.id)??{projectId:row.project_id,writer};
     if(entry.writer!==writer)throw Error('ARCHIVE_WRITER_OWNER_MISMATCH');
     this.active.set(row.id,entry);
+    writer.writerDrained.catch(error=>{entry.drainFailure??=error instanceof Error?error:Error('ARCHIVE_WRITER_DRAIN_FAILED');});
     const original=writer.run(()=>this.launchOwned(row,entry));
     const work=(async()=>{
       let failure:unknown;try{await original;}catch(error){failure=error;}
@@ -181,8 +236,13 @@ export class RunCoordinator {
   private async launchOwned(row:any,entry:ActiveRun){
     let completion:RuntimeCompletion|undefined,runtimeStarted=false;
     try{
+      const effectDenial=await lockedRun(this.writers,row.id,async client=>{
+        try{await requireResolvedProjectEffectsIn(client,row.project_id);}
+        catch(error){if(error instanceof AppError&&error.code==='TOOL_OPERATION_UNRESOLVED')return error;throw error;}
+      });
+      if(effectDenial)throw effectDenial;
       if(!(await this.runtime.inspect()).ready)throw new AppError(409,'上一运行资源仍在收尾，本次运行尚未启动','RUNTIME_TEARDOWN_PENDING');
-      await assertRunAuthorization(row);await assertRunModels(row.snapshot);
+      await this.authorizeEffect(row.id,'resume');await assertRunModels(row.snapshot);
       const routes=[];
       for(const route of row.snapshot.modelRoutes){
         const gateway=(await pool.query("SELECT g.credential,g.version,m.data FROM models m JOIN gateways g ON g.id=m.data->>'gatewayId' WHERE m.id=$1 AND g.id=$2",[route.id,route.gatewayId])).rows[0];
@@ -205,49 +265,62 @@ export class RunCoordinator {
       }
       try{completion=await started.completion;}finally{entry.phase='draining';entry.writer.closeAdmission();}
       for(const usage of completion.usages)await this.recordUsage(row.id,usage);
-      await finishRun(row.id,this.owner,completion.status,completion.recording==='incomplete'?acceptedRecordingPending:completion.message??null);
+      await finishRun(this.writers,row.id,this.owner,completion.status,completion.recording==='incomplete'?acceptedRecordingPending:completion.message??null);
     }catch(error){
       if(completion?.status==='completed'){
-        await finishRun(row.id,this.owner,'completed',acceptedRecordingPending);
+        entry.drainFailure??=error instanceof Error?error:Error('ARCHIVE_WRITER_DRAIN_FAILED');
         return;
       }
+      if(entry.drainFailure)return;
       if(!runtimeStarted&&(error as any)?.code==='RUNTIME_TEARDOWN_PENDING'){
-        await deferUnstartedRun(row.id,this.owner,{projectId:row.project_id,projectVersion:row.project_version,attempt:row.attempt});
+        await deferUnstartedRun(this.writers,row.id,this.owner,{projectId:row.project_id,projectVersion:row.project_version,attempt:row.attempt});
         return;
       }
       const message=error instanceof Error?error.message:'启动失败';
-      await finishRun(row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
+      await finishRun(this.writers,row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
     }finally{
       entry.phase='draining';entry.writer.closeAdmission();
       try{await entry.writerDrained;}catch(error){
         const code=(error as any)?.code==='RUNTIME_WRITER_DRAIN_UNPROVEN'?'RUNTIME_WRITER_DRAIN_UNPROVEN':'RUNTIME_WRITER_DRAIN_FAILED';
-        entry.drainFailure=Object.assign(Error(code),{code});
+        entry.drainFailure??=Object.assign(Error(code),{code});
       }
     }
   }
-  async cancel(id:string){
-    const denial=await this.writers.withWriter([id],()=>this.cancelRequest(id));
+  async cancel(id:string,authorize?:(db:import('pg').PoolClient,row:any)=>Promise<void>){
+    const denial=await this.writers.withWriter([id],()=>this.cancelRequest(id,authorize));
     if(denial)throw denial.denied;
   }
-  private async cancelRequest(id:string){
+  private async cancelRequest(id:string,authorize?:(db:import('pg').PoolClient,row:any)=>Promise<void>){
     const client=await pool.connect();
+    let authorizationDenial:AppError|undefined,discard=false;
     const deny=async(denied:AppError)=>{await client.query('ROLLBACK');return {denied};};
     try{await client.query('BEGIN');const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)return await deny(new AppError(404,'运行不存在'));
       await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
       const row=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!row)return await deny(new AppError(404,'运行不存在'));if(!['running','queued'].includes(row.status))return await deny(new AppError(409,'运行已结束'));
+      try{await authorize?.(client,row);}catch(error){
+        if(error instanceof AppError&&[401,403,404].includes(error.status))authorizationDenial=error;
+        throw error;
+      }
       if(row.status==='queued'){await client.query("UPDATE project_runs SET status='cancelled',cancel_requested=true,finished_at=now() WHERE id=$1",[id]);await client.query("UPDATE projects SET status='CANCELLED' WHERE id=$1 AND version=$2",[row.project_id,row.project_version]);}
       else await client.query('UPDATE project_runs SET cancel_requested=true WHERE id=$1',[id]);await client.query('COMMIT');
-    }catch(e){await client.query('ROLLBACK');throw e;}finally{client.release();}
+    }catch(e){
+      try{await client.query('ROLLBACK');}catch{discard=true;throw e;}
+      // Only an authorization denial before mutation, with a proven rollback,
+      // may leave the writer scope as a private outcome. Uncertain failures latch.
+      if(authorizationDenial&&e===authorizationDenial)return {denied:authorizationDenial};
+      throw e;
+    }finally{client.release(discard);}
     const entry=this.active.get(id);if(entry&&(!entry.phase||entry.phase==='executing'))await this.cancelOwned(id,entry);
   }
   private cancelOwned(id:string,entry:ActiveRun){
+    if(entry.drainFailure)return Promise.resolve();
     const producer=entry.writer.retain('runtime cancellation');
     const work=producer.run(()=>this.runtime.cancel(id));
     work.then(()=>producer.finish(),error=>producer.finish(error));return work;
   }
   close(){
     if(!this.closing){
-      this.stopped=true;clearInterval(this.timer);
+      this.stopped=true;clearInterval(this.timer);this.timer=undefined;
       this.closing=(async()=>{
         const cancellations=[...this.active].filter(([,entry])=>!entry.phase||entry.phase==='executing').map(([id,entry])=>this.cancelOwned(id,entry));
         const results=await Promise.allSettled(cancellations);

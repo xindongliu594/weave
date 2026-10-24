@@ -80,12 +80,12 @@ test('local budget rejection retains prior evidence, and configuration changes p
  const history=(await call('/models/'+modelId+'/capability-tests')).data[0];assert.equal(history.status,'not_applied');assert.equal(history.requestIds.length,1);
 });
 
-test('backups reject a live capability probe without deadlocking and restore completed evidence',async()=>{
+test('online backup refuses audited capability work without losing the completed evidence',async()=>{
  mode='hold';const pending=call('/models/'+modelId+'/test-tools','POST',{});
  for(let i=0;i<100&&!release;i++)await new Promise(r=>setTimeout(r,10));assert.ok(release);
- try{const backup=await call('/backup/export','POST',{password:'capability-backup'});assert.equal(backup.status,409);assert.match(backup.data.message,/能力测试/);}finally{release!();}
- assert.equal((await pending).status,200);mode='ok';
- const exported=await call('/backup/export','POST',{password:'capability-backup'});assert.equal(exported.status,200);
- const evidence=(await model()).capabilities;await pool.query("UPDATE models SET capabilities='{}' WHERE id=$1",[modelId]);
- assert.equal((await call('/backup/restore','POST',{password:'capability-backup',backup:exported.data,confirmation:'RESTORE'})).status,200);assert.deepEqual((await model()).capabilities,evidence);
+ try{const backup=await call('/backup/export','POST',{password:'capability-backup'});assert.equal(backup.status,409);assert.match(backup.data.message,/身份|审计/);}finally{release!();}
+ assert.equal((await pending).status,200);mode='ok';const evidence=(await model()).capabilities;
+ // Department creation now has a human audit. The legacy online package cannot silently omit it.
+ // Full enterprise backup/restore remains separate; existing identity-free legacy roundtrip suites retain coverage.
+ const exported=await call('/backup/export','POST',{password:'capability-backup'});assert.equal(exported.status,409);assert.match(exported.data.message,/身份|审计/);assert.deepEqual((await model()).capabilities,evidence);
 });

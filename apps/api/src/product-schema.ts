@@ -20,6 +20,7 @@ export async function migrateProduct(pool: pg.Pool) {
     CREATE TABLE IF NOT EXISTS knowledge_spaces (id text PRIMARY KEY, name text NOT NULL, scope text NOT NULL, department_id text, agent_ids jsonb NOT NULL DEFAULT '[]', version integer NOT NULL DEFAULT 1, deleted_at timestamptz);
     CREATE TABLE IF NOT EXISTS knowledge_documents (id text PRIMARY KEY, space_id text NOT NULL REFERENCES knowledge_spaces(id), title text NOT NULL, version integer NOT NULL DEFAULT 1, deleted_at timestamptz, created_at timestamptz NOT NULL DEFAULT now());
     CREATE TABLE IF NOT EXISTS knowledge_revisions (document_id text NOT NULL REFERENCES knowledge_documents(id), version integer NOT NULL, content text NOT NULL, sha256 text NOT NULL, source jsonb NOT NULL DEFAULT '{}', created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(document_id,version));
+    ALTER TABLE knowledge_revisions ADD COLUMN IF NOT EXISTS source_bounds jsonb;
     CREATE TABLE IF NOT EXISTS knowledge_chunks (id text PRIMARY KEY, document_id text NOT NULL, version integer NOT NULL, line_start integer NOT NULL, line_end integer NOT NULL, content text NOT NULL, tokens jsonb NOT NULL);
     CREATE INDEX IF NOT EXISTS knowledge_chunks_document ON knowledge_chunks(document_id,version);
     CREATE INDEX IF NOT EXISTS knowledge_chunks_tokens ON knowledge_chunks USING gin(tokens);
@@ -36,6 +37,12 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS parent_run_id text;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS cancel_requested boolean NOT NULL DEFAULT false;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS department_ids text[] NOT NULL DEFAULT '{}';
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS requested_by_user_id text REFERENCES human_users(id);
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS authorized_by_user_id text REFERENCES human_users(id);
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS authorized_epoch bigint CHECK(authorized_epoch BETWEEN 0 AND 9007199254740991);
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS authority_kind text CHECK(authority_kind IN ('human','local-owner','automatic-policy'));
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS authority_department_ids text[];
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS source_bounds jsonb;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS canonical_workspace jsonb;
     UPDATE project_runs SET department_ids=ARRAY[snapshot->>'departmentId'] WHERE department_ids='{}' AND snapshot ? 'departmentId';
     CREATE INDEX IF NOT EXISTS project_runs_departments ON project_runs USING gin(department_ids);

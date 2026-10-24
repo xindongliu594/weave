@@ -1,3 +1,4 @@
+import {createArchiveWriterManager} from '../../services/agent-runtime/archive-writer-scope.mjs';
 import assert from 'node:assert/strict';
 import express from 'express';
 import {once} from 'node:events';
@@ -18,6 +19,7 @@ const signal=()=>new AbortController().signal;
 
 /** Real HTTP/SQL commits and Handoff seals; only physical operations/stop effects are fixtures. */
 export async function acceptedStopApiFixture(root:string,{producerInput=false}={}){
+ const writers=createArchiveWriterManager({traceRoot:root});
  const runId=randomUUID(),projectId=randomUUID(),deviceId=randomUUID(),grantId=randomUUID(),owner=randomUUID(),token='a'.repeat(64);
  const employee={id:'employee',employeeId:'employee',modelId:'unused',tools:['filesystem','artifact_write'],name:'Fixture',role:'manager'};
  const backend={kind:'openshell',version:'0.1.2',gateway:'fixture',image:'node@sha256:'+sha('image'),policySha256:sha('policy'),fingerprint:sha('backend')};
@@ -42,8 +44,8 @@ export async function acceptedStopApiFixture(root:string,{producerInput=false}={
  },reconcileAcceptedTaskStop:async(_key:any,identity:any,signal?:AbortSignal)=>{if(signal)control.signals.push(signal);signal?.throwIfAborted();control.reconciles++;const current=lstatSync(bindingRoot);if(current.dev!==binding.dev||current.ino!==binding.ino)throw Error('LOCAL_BINDING_CHANGED');const result=observed.get(identity.stopId);if(!result)throw Object.assign(Error('No original device intent'),{code:'LOCAL_OUTCOME_UNKNOWN'});return result;}};
  let currentExecutor=stopExecutor;
  const maintenance=()=>({deviceId,grantId,fingerprint:backend.fingerprint,executor:currentExecutor});
- const service=new LocalOperationService(root,owner),executor=new LocalRunExecutor(archive,snapshot,service,{sandboxMaintenance:maintenance});
- const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(root));app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({code:error.code,message:error.message}));
+ const service=new LocalOperationService(root,owner,writers),executor=new LocalRunExecutor(archive,snapshot,service,{sandboxMaintenance:maintenance});
+ const app=express();app.use(express.json({limit:'32mb'}));app.use(localDeviceRouter(root,writers));app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??500).json({code:error.code,message:error.message}));
  const server=app.listen(0,'127.0.0.1');await once(server,'listening');const endpoint='http://127.0.0.1:'+(server.address() as any).port+'/local-devices/'+deviceId;
  async function request(path:string,body:any){const response=await fetch(endpoint+path,{method:'POST',headers:{'content-type':'application/json','X-Local-Device-Key':token},body:JSON.stringify(body)}),data=await response.json() as any;assert.equal(response.status,200,JSON.stringify(data));return data;}
  const work=new Map<string,{files:any[];sandboxId:string}>(),jobs:any[]=[];

@@ -14,6 +14,9 @@ import { buildPlanningExecutionContext } from './planning-execution-context.ts';
 import type {PlanningOutputDiagnostic} from './planning-output.ts';
 import {planningConversation} from './planning-conversation.ts';
 import {organizationTaskPlanningInstructions} from './organization-task-planning.ts';
+import type {Principal} from './identity-types.ts';
+import {administrative,requireProjectRoute} from './project-route-access.ts';
+import {participantDepartmentIds} from './collaboration.ts';
 
 type Database = Pick<pg.PoolClient, 'query'>;
 /** Safe diagnostics only; no provider text, request body or credential is saved. */
@@ -43,7 +46,9 @@ export function planningProjectFingerprint(project: any) {
 }
 
 /** Shared assembly for the read-only quote and the eventual budgeted request. */
-export async function prepareProjectPlanning(db: Database, projectId: string, input: ProjectPlanningInput) {
+export async function prepareProjectPlanning(db: Database, projectId: string, input: ProjectPlanningInput,principal?:Principal) {
+  if(!principal&&(process.env.WEIWU_AUTH_MODE??'legacy-local')!=='legacy-local')throw new AppError(401,'需要当前身份');
+  const actor:Principal=principal??{kind:'local-owner'};await requireProjectRoute(db,actor,projectId,'viewer');
   const saved = (await db.query('SELECT * FROM projects WHERE id=$1', [projectId])).rows[0];
   if (!saved) throw new AppError(404, '项目不存在');
   if (saved.version !== input.version) throw new AppError(409, '方案版本已变化，请刷新', 'VERSION_CONFLICT');
@@ -54,8 +59,9 @@ export async function prepareProjectPlanning(db: Database, projectId: string, in
   if (!model || model.status !== 'available') throw new AppError(422, '请先测试规划模型连接', 'PLANNING_MODEL_REQUIRED');
   project.policy = bindPolicy(project.policy, project.plan.agents, project.department_id);
   assertPlanningModel(model.id, project.policy);
-  const importedReferences = await selectedWorkFileInputs(project.plan.workFileSelections ?? [], db);
-  const importedManifest = (await selectedWorkFileCopies(project.plan.workFileSelections ?? [], db)).map(({ path, sha256, agentIds }) => ({ path, sha256, agentIds }));
+  const fileAuthority={principal:actor,targetDepartmentIds:participantDepartmentIds(project.plan.agents,project.department_id),targetAdminOnly:administrative(actor)};
+  const importedReferences = await selectedWorkFileInputs(project.plan.workFileSelections ?? [], db,fileAuthority);
+  const importedManifest = (await selectedWorkFileCopies(project.plan.workFileSelections ?? [], db,fileAuthority)).map(({ path, sha256, agentIds }) => ({ path, sha256, agentIds }));
   const readiness = await projectCostReadiness(db, project.id);
   const executionHistory = await buildPlanningExecutionContext(db, resolve(process.env.TRACE_ROOT ?? '.data/runs'), project);
   const conversation=await planningConversation(db,project.id,project.version);
@@ -85,8 +91,8 @@ export async function prepareProjectPlanning(db: Database, projectId: string, in
 }
 
 /** GET never expires receipts, reserves money, writes a preview or sends a model request. */
-export async function inspectProjectPlanning(db: Database, projectId: string, input: ProjectPlanningInput) {
-  const prepared = await prepareProjectPlanning(db, projectId, input);
+export async function inspectProjectPlanning(db: Database, projectId: string, input: ProjectPlanningInput,principal?:Principal) {
+  const prepared = await prepareProjectPlanning(db, projectId, input,principal);
   const { project, model, messages, readiness } = prepared;
   const estimate = budgetedRequestEstimate(model, messages, input.maxOutputTokens);
   const reasons: { code: string; message: string }[] = [];

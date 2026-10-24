@@ -19,11 +19,19 @@ type CostCall = {
   providerReconciliation?: ProviderQuery;
   accountingMode?: 'conversation' | 'budgeted';
 };
-type CostData = {
+type AdministrativeCostData = {
   spent: number; reserved: number; timezone: string; conversationSpent?: number; recordedSpent?: number;
   departments: { id: string; name: string; spent: number; reserved: number; limit: number | null }[];
   calls: CostCall[]; recent: CostCall[];
 };
+type MemberCostData = {timezone:string;departments:{id:string;spent:number;retained:number;limit:number|null}[]};
+type CostData = AdministrativeCostData | MemberCostData;
+
+export function MemberCostSummary({data}:{data:MemberCostData}){
+  return <><p className="subcopy">当前可查看部门的费用 · {data.timezone} 自然日。预留包含尚未结算或待核对的费用。</p>
+    {data.departments.length===0?<p className="subcopy">暂无可查看的部门费用。</p>:data.departments.map(department=><p key={department.id}>部门 {department.id}：已确认 ${Number(department.spent).toFixed(6)} + 预留 ${Number(department.retained).toFixed(6)} / {department.limit===null?'沿用全局限制':'$'+department.limit}</p>)}
+  </>;
+}
 const queryLabels: Record<ProviderQuery['status'], string> = { querying: '正在查询账单', settled: '账单已核对', unresolved: '暂未确定对应账单', failed: '账单查询失败', 'already-settled': '费用已结算' };
 function errorMessage(error: unknown) { return error instanceof TypeError && /fetch/i.test(error.message) ? '后端连接失败，请检查本机服务后重新查询。' : error instanceof Error ? error.message : '请求失败，请稍后重新查询。'; }
 
@@ -34,7 +42,7 @@ export function CostCallSummary({ call }: { call: Pick<CostCall, 'modelName' | '
   return <><strong>{call.modelName} · {purposeLabel(call)}</strong><p>{call.status === 'pending' ? '请求进行中' : '费用待核对'} · {call.accountingMode === 'conversation'
     ? '不设预算预留，实际费用待核对' : <>预留 ${Number(call.amount).toFixed(6)}</>}</p></>;
 }
-export function CostTotals({ data }: { data: Pick<CostData, 'spent' | 'reserved' | 'timezone' | 'conversationSpent' | 'recordedSpent'> }) {
+export function CostTotals({ data }: { data: Pick<AdministrativeCostData, 'spent' | 'reserved' | 'timezone' | 'conversationSpent' | 'recordedSpent'> }) {
   return <><p>今日预算计入的已确认费用 ${Number(data.spent).toFixed(6)} · 未结算预留 ${Number(data.reserved).toFixed(6)} · {data.timezone} 自然日</p>
     {data.conversationSpent !== undefined && <p>需求对话已记录费用 ${Number(data.conversationSpent).toFixed(6)}（不计入执行预算）{data.recordedSpent !== undefined && <> · 今日全部已记录费用 ${Number(data.recordedSpent).toFixed(6)}</>}</p>}
   </>;
@@ -73,7 +81,7 @@ export function CostControl() {
     if (pendingRead.current) return pendingRead.current;
     if (mounted.current) setRefreshing(true);
     const request = api<CostData>('/costs').then(next => { if (mounted.current) { setData(next); setReadError(''); } }).catch(failure => {
-      if (mounted.current) setReadError(errorMessage(failure));
+      if (mounted.current) { setData(null);setReadError(errorMessage(failure)); }
       throw failure;
     }).finally(() => { pendingRead.current = null; if (mounted.current) setRefreshing(false); });
     pendingRead.current = request;
@@ -134,20 +142,22 @@ export function CostControl() {
     return result?.status === 'querying' && Date.now() - new Date(result.checkedAt).getTime() < 30000;
   }
   const locked = busy || !!querying;
-  const current = data?.calls.find(call => call.id === selected);
+  const administrativeData = data && 'calls' in data ? data : null;
+  const current = administrativeData?.calls.find(call => call.id === selected);
   return <section className="panel padded lower"><div className="section-title"><h2>每日预算与待核对费用</h2><button type="button" disabled={refreshing || locked} onClick={() => void refresh().catch(() => {})}>{refreshing ? '正在刷新…' : '刷新费用'}</button></div>
     {(error || readError) && <p className="banner error" role="alert">{error || readError}</p>}{notice && <p className="banner" role="status">{notice}</p>}
-    {data && <><CostTotals data={data}/>
+    {data && !('calls' in data) && <MemberCostSummary data={data}/>}
+    {administrativeData && <><CostTotals data={administrativeData}/>
       <p className="subcopy">新需求对话不预留或拦截，实际费用单独记录，不计入执行的每日预算。项目规划、连接测试和执行仍受每日限额约束；这些请求超时或未返回用量时保留原有预留。预留不是账单。可以先查询中转站账单，只有确定对应请求后才核对费用。查询不发起模型推理，也不会自动恢复项目；结果不明确时保留待核对状态。</p>
-      {data.departments.map(d => <p key={d.id}>{d.name}：已确认 ${Number(d.spent).toFixed(6)} + 预留 ${Number(d.reserved).toFixed(6)} / {d.limit === null ? '沿用全局限制' : '$' + d.limit}</p>)}
-      {data.calls.length === 0 ? <p className="subcopy">没有进行中或待核对的调用。</p> : data.calls.map(call => <div className="document-row cost-call" key={call.id}>
+      {administrativeData.departments.map(d => <p key={d.id}>{d.name}：已确认 ${Number(d.spent).toFixed(6)} + 预留 ${Number(d.reserved).toFixed(6)} / {d.limit === null ? '沿用全局限制' : '$' + d.limit}</p>)}
+      {administrativeData.calls.length === 0 ? <p className="subcopy">没有进行中或待核对的调用。</p> : administrativeData.calls.map(call => <div className="document-row cost-call" key={call.id}>
         <CostCallSummary call={call}/><small>{new Date(call.createdAt).toLocaleString('zh-CN')}<br/>本机调用 ID：{call.id}</small>
         <ProviderResponseDetails call={call}/>
         <div className="cost-call-actions">{call.runId && <a href={'#run/' + call.runId}>查看对应运行</a>}{call.status === 'uncertain' && <><button type="button" disabled={locked || queryInProgress(call)} onClick={() => void queryProvider(call)}>{querying === call.id || queryInProgress(call) ? '正在查询中转站账单…' : '查询中转站账单'}</button><button type="button" disabled={locked} onClick={() => { setSelected(call.id); setInput(''); setOutput(''); setNote(''); setConfirmed(false); }}>手动核对费用</button></>}</div>
         <ProviderQueryResult result={latestQuery(call)}/>
       </div>)}
       {current && <form className="lower" onSubmit={e => { e.preventDefault(); void reconcile(); }}><h3>核对 {current.modelName} 的这次请求</h3><ProviderResponseDetails call={current}/><p className="subcopy">请依据中转站账单填写完整输入与输出 Token。只有确认没有扣费时才将两项都填 0。单价固定为请求时输入 ${current.inputRate}、输出 ${current.outputRate} / 百万 Token。</p><div className="form-grid"><label className="field">账单输入 Token<input required disabled={locked} type="number" min={0} max={2147483647} value={input} onChange={e => setInput(e.target.value)}/></label><label className="field">账单输出 Token<input required disabled={locked} type="number" min={0} max={2147483647} value={output} onChange={e => setOutput(e.target.value)}/></label></div><label className="field">核对依据<textarea required disabled={locked} minLength={5} maxLength={1000} value={note} onChange={e => setNote(e.target.value)} placeholder="例如账单请求编号、查询时间及确认结果"/></label><label><input disabled={locked} type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)}/>我已核对供应方账单，确认以上用量</label><div className="lower-small"><button className="primary" disabled={locked || !confirmed || input === '' || output === '' || note.trim().length < 5}>{busy ? '正在记录…' : '确认记录用量'}</button><button type="button" disabled={locked} onClick={() => setSelected('')}>取消</button></div></form>}
-      <details className="lower"><summary>最近 20 次已结算或未发送的请求</summary>{data.recent.map(call => <details key={call.id}><summary>{call.modelName} · {purposeLabel(call)} · {call.status === 'released' ? '请求未发送' : '已结算'}</summary><ProviderResponseDetails call={call}/><ProviderQueryResult result={latestQuery(call)}/><pre className="product-pre">{JSON.stringify({ id: call.id, history: call.history }, null, 2)}</pre></details>)}</details>
+      <details className="lower"><summary>最近 20 次已结算或未发送的请求</summary>{administrativeData.recent.map(call => <details key={call.id}><summary>{call.modelName} · {purposeLabel(call)} · {call.status === 'released' ? '请求未发送' : '已结算'}</summary><ProviderResponseDetails call={call}/><ProviderQueryResult result={latestQuery(call)}/><pre className="product-pre">{JSON.stringify({ id: call.id, history: call.history }, null, 2)}</pre></details>)}</details>
     </>}
   </section>;
 }

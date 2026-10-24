@@ -8,3 +8,6 @@ export function readRun(root: string, id: string): RunDetail | null;
 export function redact(value: unknown): unknown;
 export function createRunArchive(root: string, snapshot: unknown, options?: { id?: string }): { id: string; dir: string; append(type: string, data?: unknown, links?: unknown): unknown };
 export function openRunArchive(root: string, id: string): { id: string; dir: string; append(type: string, data?: unknown, links?: unknown): unknown };
+/** Process-local, bounded root subscription; sink receives only fresh safe summaries after successful fsync. */
+export function observeRunArchive(root:string,sink:(summary:import('./observation-summary.mjs').ObservationSummary)=>unknown):()=>void;
+export function runArchiveObservationHealth(root:string):{subscribers:number;emitted:number;dropped:number;failures:number};

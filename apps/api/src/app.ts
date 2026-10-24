@@ -1,4 +1,5 @@
 import {employeeHistoryRouter} from './employee-history.ts';
+import {identityManagementRouter} from './identity-management.ts';
 import {nativeCapabilityRouter,snapshotNativeCapabilities,assertNativeTaskAccess} from './native-capabilities.ts';
 import {storageRouter} from './storage-governance.ts';
 import type {SandboxMaintenance} from './storage-lifecycle.ts';
@@ -6,7 +7,12 @@ import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-gov
 import { departmentWorkbenchRouter } from './department-workbench.ts';
 import { openRigRouter } from './openrig-router.ts';
 import { runLineageEvidenceRouter } from './run-lineage-evidence.ts';
-import {bindPolicy,assertPolicy,assertPlanningModel,executionProfileForApproval} from './execution-policy.ts';
+import {observabilityRouter} from './observability-router.ts';
+import {createObservability} from './observability.ts';
+import {bindPolicy,assertPolicy,assertPlanningModel,executionProfileForApproval,executionMode} from './execution-policy.ts';
+import {createToolEffectComposition} from './tool-effect-composition.ts';
+import {toolEffectContractsRouter} from './tool-effect-contracts.ts';
+import {requireResolvedProjectEffectsIn} from './tool-operations.ts';
 import { probeTools,routeFingerprint } from './model-capabilities.ts';
 import { startKnowledgeIndex,waitKnowledgeIndex } from './knowledge-vector.ts';
 import express from 'express';
@@ -40,9 +46,10 @@ import { resumeHandoff, completedTasks } from './handoff-checkpoints.ts';
 import {readLiveCanonical} from './live-canonical-reader.ts';
 import { unresolvedOperations } from '../../../services/agent-runtime/recovery.mjs';
 import { backupRouter } from './backup.ts';
+import {createBackupRestoreState,inspectBackupRestoreStartup} from './backup-restore-state.ts';
 import { idempotency } from './idempotency.ts';
 import { obsidianRouter, syncObsidian } from './obsidian.ts';
-import {assertProjectProvenance,buildProjectTeam,validateProjectTeam} from './collaboration.ts';
+import {assertProjectProvenance,buildProjectTeam,validateProjectTeam,participantDepartmentIds} from './collaboration.ts';
 import {deliveryCriteriaRevisionErrors} from '../../../packages/contracts/orchestration.ts';
 import {orchestrationExecutionErrors} from '../../../packages/contracts/index.ts';
 import {localDeviceRouter,localTarget,LocalOperationService} from './local-execution.ts';
@@ -62,6 +69,11 @@ import { saveKnowledgeDocument } from './knowledge.ts';
 import { approvedExecutionPhase, approvedTaskPrompt, approvedExecutionDescription, plannedAcceptanceErrors } from './execution-prompt.ts';
 import {planningConversation} from './planning-conversation.ts';
 import {archiveStorageUsage,ARCHIVE_ROOT_LIMIT_BYTES,RUN_ARCHIVE_LIMIT_BYTES} from '../../../services/agent-runtime/archive-storage.mjs';
+import {httpPrincipal,administrative,safeProjectSql,visibleProjectsQuery,lockDepartmentAuthority,lockProjectAuthority,assertMemberPlan,assertMemberAgentGrants,assertMemberPolicy,assertMemberCreation,assertManagerDepartmentChange,routeAudit} from './project-route-access.ts';
+import {visibleResourceQuery,requireResource,resolveProjectMaterialDepartments} from './resource-authorization.ts';
+import {safeRunSql,requireProjectRoute} from './project-route-access.ts';
+import {combineSourceBounds,readKnowledgeRevisionBounds,readFileBounds,rootSourceBounds,sourceHash,assertTargetContainsSources} from './source-bounds.ts';
+import type {Principal} from './identity-types.ts';
 
 async function modelsFrom(db:Pick<import('pg').PoolClient,'query'>): Promise<Model[]> {
   const { rows } = await db.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
@@ -93,24 +105,53 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   const app = express();
   const identityConfig=loadIdentityConfig(process.env);
   assertRouteInventory();
-  const identity=createIdentityHttp({pool,config:identityConfig});
-  app.locals.ready=identity.ready;
-  void identity.ready.catch(()=>{});
   if(identityConfig.mode==='oidc')app.set('trust proxy',(ip:string)=>ip==='127.0.0.1'||ip==='::1'||ip==='::ffff:127.0.0.1');
   const allowedOrigins = configuredOrigins();
   if(identityConfig.mode==='oidc')allowedOrigins.add(identityConfig.publicOrigin);
   const traceRoot = resolve(process.env.TRACE_ROOT ?? '.data/runs');
-  const writers=createArchiveWriterManager({traceRoot,workspaceRoots:options.localWorkspace?[resolve(options.localWorkspace.workspacesPath)]:[]});
-  const coordinator = new RunCoordinator(traceRoot,writers,options.createExecutor,{sandboxMaintenance:options.sandboxMaintenance});
+  const dataRoot=resolve(process.env.DATA_DIR??'.data');
+  const pendingRestore=inspectBackupRestoreStartup({traceRoot,dataRoot}).pending;
+  const writers=createArchiveWriterManager({traceRoot,initializeTraceRoot:!pendingRestore,workspaceRoots:options.localWorkspace?[resolve(options.localWorkspace.workspacesPath)]:[]});
+  const restoreState=createBackupRestoreState({pool,writers,traceRoot,dataRoot});
+  const toolEffects=createToolEffectComposition(pool,writers);
+  const coordinator = new RunCoordinator(traceRoot,writers,options.createExecutor,{sandboxMaintenance:options.sandboxMaintenance,toolEffects,startPaused:true});
   const runtime = coordinator.runtime;
-  const managerChat = new ManagerChatService(); managerChat.start();
-  const automation = new AutomationLearningService(pool); automation.start();
-  const reconciliation = new ProviderReconciliationService(); reconciliation.start();
+  const managerChat = new ManagerChatService();
+  const automation = new AutomationLearningService(pool);
+  const reconciliation = new ProviderReconciliationService();
+  const observation=createObservability({traceRoot,db:pool});
+  app.locals.observationHealth=observation.snapshot;
   let stopping=false,vaultBusy=false,vaultWork=Promise.resolve();
-  const vaultTimer = setInterval(() => { if(stopping||vaultBusy)return;vaultBusy=true;vaultWork=syncObsidian().then(async()=>{const row=(await pool.query('SELECT data FROM product_settings WHERE id=1')).rows[0];if(!stopping&&row?.data.knowledgeSearchMode==='hybrid')await startKnowledgeIndex();}).catch(() => {}).finally(()=>{vaultBusy=false;}); }, 10000); vaultTimer.unref();
-  app.locals.shutdownBackground = async () => { stopping=true;clearInterval(vaultTimer); await managerChat.close(); await automation.close(); await coordinator.close(); await reconciliation.close(); await closeBrowserMcp(); await vaultWork;await waitKnowledgeIndex(); };
+  let vaultTimer:NodeJS.Timeout|undefined,backgroundClose:Promise<void>|undefined,fullClose:Promise<void>|undefined;
   let identityClosed=false;
-  app.locals.shutdown = async () => {identityClosed=true;await app.locals.shutdownBackground();await identity.close();};
+  const restoreReady=Promise.resolve().then(()=>restoreState.reconcilePending());
+  const identity=createIdentityHttp({pool,config:identityConfig,initializeAfter:restoreReady.then(()=>{
+    if(identityClosed)throw new AppError(503,'服务正在关闭','APPLICATION_CLOSED');
+  })});
+  const ready=identity.ready.then(()=>{
+    if(identityClosed)throw new AppError(503,'服务正在关闭','APPLICATION_CLOSED');
+    if(stopping)return;
+    coordinator.start();managerChat.start();automation.start();reconciliation.start();
+    vaultTimer=setInterval(()=>{if(stopping||vaultBusy)return;vaultBusy=true;vaultWork=syncObsidian().then(async()=>{const row=(await pool.query('SELECT data FROM product_settings WHERE id=1')).rows[0];if(!stopping&&row?.data.knowledgeSearchMode==='hybrid')await startKnowledgeIndex();}).catch(()=>{}).finally(()=>{vaultBusy=false;});},10000);vaultTimer.unref();
+  });
+  app.locals.ready=ready;void ready.catch(()=>{});
+  app.locals.shutdownBackground=()=>{
+    if(backgroundClose)return backgroundClose;
+    stopping=true;clearInterval(vaultTimer);
+    backgroundClose=(async()=>{
+      const results=await Promise.allSettled([managerChat.close(),automation.close(),coordinator.close(),reconciliation.close(),closeBrowserMcp(),vaultWork,waitKnowledgeIndex(),restoreReady.catch(()=>{})]);
+      await observation.close();
+      const failure=results.find(result=>result.status==='rejected');if(failure?.status==='rejected')throw failure.reason;
+    })();return backgroundClose;
+  };
+  app.locals.shutdown=()=>{
+    if(fullClose)return fullClose;
+    identityClosed=true;
+    fullClose=(async()=>{
+      const results=await Promise.allSettled([app.locals.shutdownBackground(),identity.close()]);
+      const failure=results.find(result=>result.status==='rejected');if(failure?.status==='rejected')throw failure.reason;
+    })();return fullClose;
+  };
   let verifying = false;
   app.disable('x-powered-by');
   app.use((req, res, next) => {
@@ -136,7 +177,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.get('/healthz',(_req,res)=>res.json({ok:true}));
   app.use((req,res,next)=>{
     if(identityClosed){res.status(503).json({error:'Identity service unavailable'});return;}
-    void identity.ready.then(()=>next(),()=>res.status(503).json({error:'Identity service unavailable'}));
+    void ready.then(()=>identityClosed?res.status(503).json({error:'Identity service unavailable'}):next(),()=>res.status(503).json({error:'Application recovery or identity service unavailable'}));
   });
   app.use((req,res,next)=>routePolicy(req.method,req.path)?.access==='device'?next():identity.sessionMiddleware(req,res,next));
   app.use((req,res,next)=>isClassifiedEntry(req.method,req.path)?next():res.sendStatus(404));
@@ -152,12 +193,15 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   app.use('/api',apiAccess(identity,identityConfig));
   app.use('/api', idempotency);
+  app.use('/api', identityManagementRouter());
   app.use('/api', managerChatRouter());
   app.use('/api', browserMcpRouter());
   app.use('/api', nativeCapabilityRouter({demo:options.demo}));
+  app.use('/api',toolEffectContractsRouter(toolEffects.service,toolEffects.sources));
   app.use('/api', workFilesRouter(pool,traceRoot));
-  app.use('/api', automationLearningRouter({ service: automation, publishKnowledge: (input, id) => saveKnowledgeDocument(input, id, true) }));
-  app.use('/api',localDeviceRouter(traceRoot));
+  app.use('/api', automationLearningRouter({ service: automation, publishKnowledge: (input, id, sourceBounds, context) => saveKnowledgeDocument(input, id, true, sourceBounds, context) }));
+  app.use('/api',observabilityRouter(pool));
+  app.use('/api',localDeviceRouter(traceRoot,writers));
   app.use('/api', obsidianRouter());
   app.use('/api', knowledgeRouter(traceRoot));
   app.use('/api', productRouter());
@@ -165,16 +209,17 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.use('/api', departmentWorkbenchRouter(pool));
   app.use('/api', openRigRouter(pool));
   app.use('/api', runLineageEvidenceRouter(pool,traceRoot));
-  app.use('/api', taskStopMaintenanceRouter(traceRoot,new LocalOperationService(traceRoot,coordinator.owner),options.sandboxMaintenance));
+  app.use('/api', taskStopMaintenanceRouter(traceRoot,new LocalOperationService(traceRoot,coordinator.owner,writers),options.sandboxMaintenance));
   app.use('/api', costRouter());
-  app.use('/api', runManagementRouter(traceRoot));
-  app.use('/api', backupRouter(traceRoot));
-  app.use('/api',storageRouter(traceRoot,{dataRoot:process.env.LOCAL_WORKSPACE_ROOT,workspaceRoot:options.localWorkspace?.workspacesPath,nativeDeviceId:options.localWorkspace?.executionTarget.kind==='local'?options.localWorkspace.executionTarget.deviceId:undefined,deploymentBase:process.env.WEIWU_STORAGE_BASE,sandbox:options.sandboxMaintenance}));
+  app.use('/api', runManagementRouter(traceRoot,writers));
+  app.use('/api', backupRouter(traceRoot,writers,restoreState));
+  app.use('/api',storageRouter(traceRoot,{dataRoot:process.env.LOCAL_WORKSPACE_ROOT,workspaceRoot:options.localWorkspace?.workspacesPath,nativeDeviceId:options.localWorkspace?.executionTarget.kind==='local'?options.localWorkspace.executionTarget.deviceId:undefined,deploymentBase:process.env.WEIWU_STORAGE_BASE,maintenanceReportDir:process.env.WEIWU_MAINTENANCE_REPORT_DIR,sandbox:options.sandboxMaintenance},pool,writers));
   app.get('/api/health', async (_req, res) => {
-    await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.2.0',...(options.demo?{demo:options.demo}: {}),...(options.localWorkspace?{workspace:options.localWorkspace}:{}) });
+    await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.2.0',executionMode:executionMode(),...(options.demo?{demo:options.demo}: {}),...(options.localWorkspace?{workspace:options.localWorkspace}:{}) });
   });
   app.get('/api/departments', async (_req, res) => {
-    const { rows } = await pool.query(`SELECT d.*, (SELECT count(*)::int FROM projects p WHERE p.department_id=d.id) AS project_count FROM departments d WHERE deleted_at IS NULL ORDER BY created_at DESC`);
+    const principal=httpPrincipal(res),departments=visibleResourceQuery(principal,'department','viewer'),projects=visibleProjectsQuery(principal,'viewer',departments.values.length);
+    const { rows } = await pool.query(`SELECT d.*, (SELECT count(*)::int FROM projects p WHERE p.department_id=d.id AND p.id IN (${projects.text})) AS project_count FROM departments d WHERE deleted_at IS NULL AND d.id IN (${departments.text}) ORDER BY created_at DESC`,[...departments.values,...projects.values]);
     res.json(rows.map(r => ({ ...r.data, id: r.id, version: r.version, createdAt: r.created_at, updatedAt: r.updated_at, runCount: r.project_count })));
   });
   app.post('/api/departments', async (req, res) => {
@@ -185,10 +230,15 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   app.put('/api/departments/:id', async (req, res) => {
     const data = departmentSchema.parse(req.body), version = numericVersion.parse(req.body.version);
-    const before = requireRow((await pool.query('SELECT data FROM departments WHERE id=$1 AND deleted_at IS NULL', [req.params.id])).rows[0]);
+    const client=await pool.connect(),principal=httpPrincipal(res);
+    try{await client.query('BEGIN');const authority=await lockDepartmentAuthority(client,principal,[String(req.params.id)],'manager');
+    const before = requireRow((await client.query('SELECT data FROM departments WHERE id=$1 AND deleted_at IS NULL FOR UPDATE', [req.params.id])).rows[0]);
+    assertManagerDepartmentChange(principal,before.data,data);
     data.agents = data.agents.map(a => { const old = before.data.agents.find((item: any) => item.id === a.id); const changed = !old || ['instructions','systemConstraints','outputFormat','title'].some(key => (old[key] ?? '') !== ((a as any)[key] ?? '')); return {...a, roleVersion: old ? (old.roleVersion ?? 1) + (changed ? 1 : 0) : 1}; });
-    const result = await pool.query('UPDATE departments SET data=$1,version=version+1,updated_at=now() WHERE id=$2 AND version=$3 AND deleted_at IS NULL RETURNING id', [data, req.params.id, version]);
+    const result = await client.query('UPDATE departments SET data=$1,version=version+1,updated_at=now() WHERE id=$2 AND version=$3 AND deleted_at IS NULL RETURNING id', [data, req.params.id, version]);
     if (!result.rowCount) throw new AppError(409, '部门已被修改或删除，请刷新后重试', 'VERSION_CONFLICT');
+    await routeAudit(client,principal,authority,'department.configure',String(req.params.id),{beforeVersion:String(version),afterVersion:String(version+1)});
+    await client.query('COMMIT');}catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
     await log('department', `更新部门「${data.name}」及员工配置`); res.json({ ok: true });
   });
   app.delete('/api/departments/:id', async (req, res) => {
@@ -296,13 +346,14 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     if(testing.has(model.id))throw new AppError(409,'此模型正在测试');testing.add(model.id);
     try{res.json(await probeTools(model,maxCost));}finally{testing.delete(model.id);}
   });
-  app.get('/api/projects', async (_req, res) => {
+  app.get('/api/projects', async (req, res) => {
     const catalog = await models();
+    const page=z.object({limit:z.coerce.number().int().min(1).max(200).default(100),offset:z.coerce.number().int().min(0).max(1000000).default(0)}).parse(req.query),visible=visibleProjectsQuery(httpPrincipal(res));
     // Keep the legacy planningCost field (all recorded project costs), but
     // validate against the same net ledger used by approval in one DB view.
     const { rows } = await pool.query(`SELECT p.*, COALESCE((SELECT sum(cost) FROM usage WHERE project_id=p.id),0) AS planning_cost,
       COALESCE((SELECT sum(amount) FROM model_reservations WHERE project_id=p.id AND status IN ('pending','uncertain')),0) AS retained_cost
-      FROM projects p ORDER BY created_at DESC`);
+      FROM projects p WHERE p.id IN (${visible.text}) ORDER BY created_at DESC,id DESC LIMIT $${visible.values.length+1} OFFSET $${visible.values.length+2}`,[...visible.values,page.limit,page.offset]);
     res.json(rows.map(r => ({ id: r.id, departmentId: r.department_id, departmentVersion: r.department_version, departmentName: r.department_name, requirement: r.requirement, policy: r.policy, plan: r.plan, version: r.version, source: r.source, status: r.status, createdAt: r.created_at, planningCost: Number(r.planning_cost), validation: validatePlan(r.plan, { ...r.policy, maxBudget: r.policy.maxBudget - Number(r.planning_cost) - Number(r.retained_cost) }, catalog) })));
   });
   app.post('/api/projects', async (req, res) => {
@@ -312,13 +363,18 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     let department:any,plan:Plan;
     try {
       await client.query('BEGIN');
+      const principal=httpPrincipal(res),authority=await lockDepartmentAuthority(client,principal,[input.departmentId,...input.collaboratingAgents.map(item=>item.departmentId)],'operator');
+      const lockedDepartments=await client.query('SELECT id FROM departments WHERE id=ANY($1::text[]) AND deleted_at IS NULL ORDER BY id FOR SHARE',[authority.departmentIds]);
+      if(lockedDepartments.rows.length!==authority.departmentIds.length)throw new AppError(404,'参与部门不存在或不可访问','RESOURCE_NOT_FOUND');
       department = requireRow((await client.query('SELECT * FROM departments WHERE id=$1 AND deleted_at IS NULL FOR SHARE', [input.departmentId])).rows[0]);
       const team=await buildProjectTeam(department,input.collaboratingAgents,client);
       if(team.agents.length>input.policy.maxAgents)throw new AppError(422,'所选团队人数超过项目策略的 Agent 上限','COLLABORATOR_LIMIT');
       input.policy=bindPolicy({...input.policy,allowedDepartmentIds:team.departments.map(d=>d.id)},team.agents,department.id);assertPolicy(team.agents,input.policy);
+      await assertMemberCreation(client,principal,team.departments.map(d=>d.id),input.policy,team.agents);
       plan = { rationale: team.departments.length>1?'手动跨部门草案：请为各部门员工拆分任务，并用任务依赖明确交接。':'手动草案：请生成 AI 方案，或编辑任务后进行校验。', agents: team.agents, tasks: [{ id: 'deliver', subject: placeholderTaskSubject, objective: input.requirement, assigneeId: team.agents.find((a: { role: string }) => a.role === 'manager')!.id, dependencies: [], acceptanceCriteria: [placeholderTaskCriterion], estimatedInputTokens: 10000, estimatedOutputTokens: 4000 }] };
       await client.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,$3,$4,$5,$6,$7,$8)', [id, department.id, department.version, department.data.name, input.requirement, input.policy, plan, 'manual']);
       await client.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,1,$2,$3)', [id, plan,input.policy]);
+      await routeAudit(client,principal,authority,'project.plan',id,{afterVersion:'1'},{projectId:id});
       await client.query('COMMIT');
     } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
     await log('project', `为「${department.data.name}」创建${input.collaboratingAgents.length?'跨部门':''}项目需求`); res.status(201).json({ id });
@@ -328,18 +384,19 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   app.get('/api/projects/:id/knowledge-options',async(req,res)=>{
     const project=requireRow((await pool.query('SELECT department_id,plan FROM projects WHERE id=$1',[req.params.id])).rows[0]);
-    const manifest=await knowledgeSnapshot(project.plan.agents,project.department_id);
+    const principal=httpPrincipal(res),manifest=await knowledgeSnapshot(project.plan.agents,project.department_id,undefined,undefined,{principal,targetDepartmentIds:participantDepartmentIds(project.plan.agents,project.department_id),targetAdminOnly:administrative(principal)});
     res.json(manifest.documents.map(doc=>({id:doc.documentId,title:doc.title,version:doc.version,spaceId:doc.spaceId,agentIds:Object.entries(manifest.agentDocuments).filter(([,ids])=>ids.includes(doc.documentId)).map(([id])=>id)})));
   });
   app.put('/api/projects/:id/plan', async (req, res) => {
     const plan = planSchema.parse(req.body.plan), version = numericVersion.parse(req.body.version);
-    await savePlan(String(req.params.id), version, plan, 'manual',req.body.policy===undefined?undefined:policySchema.parse(req.body.policy)); res.json({ ok: true });
+    await savePlan(String(req.params.id), version, plan, 'manual',req.body.policy===undefined?undefined:policySchema.parse(req.body.policy),httpPrincipal(res)); res.json({ ok: true });
   });
   app.get('/api/projects/:id/cost-readiness',async(req,res)=>res.json(await projectCostReadiness(pool,String(req.params.id))));
   const planningQuote:express.RequestHandler=async(req,res)=>{
     const input=req.method==='POST'?projectPlanningInputSchema.parse(req.body):projectPlanningQuerySchema.parse(req.query),client=await pool.connect();
     try { await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
-      const {quote}=await inspectProjectPlanning(client,String(req.params.id),input);
+      await requireProjectRoute(client,httpPrincipal(res),String(req.params.id),'viewer');
+      const {quote}=await inspectProjectPlanning(client,String(req.params.id),input,httpPrincipal(res));
       await client.query('COMMIT');res.json(quote);
     } catch(error) {await client.query('ROLLBACK');throw error;} finally {client.release();}
   };
@@ -352,10 +409,10 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     planning.add(lockId);
     try {
     const input = projectPlanningInputSchema.parse(req.body);
-    const { prepared, quote } = await inspectProjectPlanning(pool, lockId, input);
+    const { prepared, quote } = await inspectProjectPlanning(pool, lockId, input,httpPrincipal(res));
     if (!quote.allowed) { const first=quote.reasons[0]; throw new AppError(first.code==='COST_PENDING'||first.code==='PROJECT_ACTIVE'?409:422,first.message,first.code); }
     const { project, model, catalog, messages, baseFingerprint, conversation:{messages:_conversationMessages,...conversation} } = prepared;
-      const response = await completeBudgeted(model,messages,input.maxOutputTokens,{purpose:'组织规划',projectId:project.id,projectVersion:input.version,maxCost:input.maxPlanningCost,timeoutMs:PLANNING_TIMEOUT_MS,...(input.retainUncertainCosts === undefined ? {} : { retainUncertainCosts: input.retainUncertainCosts })}).catch(error=>{
+      const response = await completeBudgeted(model,messages,input.maxOutputTokens,{purpose:'组织规划',projectId:project.id,projectVersion:input.version,maxCost:input.maxPlanningCost,timeoutMs:PLANNING_TIMEOUT_MS,authorize:async(db,locked)=>{await lockProjectAuthority(db,httpPrincipal(res),locked);},...(input.retainUncertainCosts === undefined ? {} : { retainUncertainCosts: input.retainUncertainCosts })}).catch(error=>{
         if(error instanceof AppError&&error.code==='GATEWAY_TIMEOUT')throw new AppError(502,'AI 方案生成超时：未在等待时限内收到完整结果（最长 3 分钟）。原方案未被替换；本轮费用待核对，请在系统设置中核对中转站账单后再重试。','PLANNING_TIMEOUT');
         throw error;
       });
@@ -386,6 +443,10 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
         plan:parsed.data,policy:project.policy,usageId:response.usageId,modelId:model.id};
       const previewClient=await pool.connect();
       try {await previewClient.query('BEGIN');
+        const locked=requireRow((await previewClient.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[project.id])).rows[0]);
+        await lockProjectAuthority(previewClient,httpPrincipal(res),locked);assertMemberPlan(httpPrincipal(res),parsed.data);
+        assertMemberAgentGrants(httpPrincipal(res),parsed.data.agents,locked.plan.agents);
+        if(locked.version!==input.version)throw new AppError(409,'方案版本已变化；本次费用已保留','VERSION_CONFLICT');
         await previewClient.query('INSERT INTO organization_previews(id,data,project_id) VALUES($1,$2,$3)',[previewId,draft,project.id]);
         await previewClient.query('UPDATE usage SET planning_preview_id=$1 WHERE id=$2',[previewId,response.usageId]);
         await previewClient.query('COMMIT');
@@ -399,6 +460,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     const input=z.object({previewId:z.uuid(),version:numericVersion,retainUncertainCosts:z.boolean().optional()}).strict().parse(req.body),client=await pool.connect();
     try {await client.query('BEGIN');
       const project=requireRow((await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[req.params.id])).rows[0]);
+      await lockProjectAuthority(client,httpPrincipal(res),project);
       const row=requireRow((await client.query('SELECT * FROM organization_previews WHERE id=$1 FOR UPDATE',[input.previewId])).rows[0]);
       const draft=row.data;
       if(draft.kind!=='project-plan'||draft.projectId!==project.id||row.project_id!==project.id)
@@ -416,7 +478,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
       const plan=planSchema.parse(draft.plan);
       const acceptanceErrors=plannedAcceptanceErrors(plan.tasks);
       if(acceptanceErrors.length)throw new AppError(422,acceptanceErrors.join('；'),'PLAN_ACCEPTANCE_REQUIRED');
-      const version=await savePlanTransaction(client,project.id,input.version,plan,'model');
+      const version=await savePlanTransaction(client,project.id,input.version,plan,'model',undefined,httpPrincipal(res));
       const costReadiness=await projectCostReadiness(client,project.id),catalog=await modelsFrom(client);
       const validation=validatePlan(plan,{...draft.policy,maxBudget:costReadiness.availableBudget},catalog);
       await client.query('UPDATE organization_previews SET data=$1 WHERE id=$2',[{...draft,confirmedVersion:version,confirmedAt:new Date().toISOString()},input.previewId]);
@@ -425,20 +487,29 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
   });
   app.post('/api/projects/:id/approve', async (req, res) => {
-    const input = z.object({ version: numericVersion, retainUncertainCosts:z.boolean().default(false) }).parse(req.body);
-    const client = await pool.connect();
+    const input = z.object({ version: numericVersion, retainUncertainCosts:z.boolean().default(false),requireReviewedTools:z.boolean().default(false) }).parse(req.body);
+    const runId = randomUUID();
     let launch: { runId: string; projectId: string; snapshot: any; routes: any[] } | undefined;
-    let existing: { id: string; status: string } | undefined;
+    let existing: { id: string; status: string; snapshot: any } | undefined;
+    const admission=await writers.withWriter([runId],async()=>{
+    const client = await pool.connect();
+    let commitDispatched=false,discard=false;
     try {
       await client.query('BEGIN');await shareCostMaintenance(client);
       const project = requireRow((await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE', [req.params.id])).rows[0]);
+      const principal=httpPrincipal(res),authority=await lockProjectAuthority(client,principal,project,'operator',true);
       if (project.version !== input.version) throw new AppError(409, '方案版本已变化，请刷新后重新批准', 'VERSION_CONFLICT');
       const orchestrationErrors=orchestrationExecutionErrors(project.plan);
       if(orchestrationErrors.length)throw new AppError(422,orchestrationErrors.join('；')+'；请使用无新模板引用的旧协作方案，或等待该模板完成真实小任务与恢复验收后由服务端开放。','ORCHESTRATION_PREVIEW_ONLY');
       if (hasUnplannedTasks(project.plan)) throw new AppError(422, planningRequiredMessage, 'PLAN_NOT_READY');
-      existing = (await client.query('SELECT id,status FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
-      if (existing) { await client.query('COMMIT'); }
+      existing = (await client.query('SELECT id,status,snapshot FROM project_runs WHERE project_id=$1 AND project_version=$2 ORDER BY attempt DESC LIMIT 1', [project.id, project.version])).rows[0];
+      if (existing) {
+        if((input.requireReviewedTools||executionMode()==='enterprise')&&existing.snapshot?.effectContractVersion!==1)
+          throw new AppError(409,'原运行未绑定已审核工具。请保留原记录，确认新方案版本后重新批准','TOOL_EFFECT_REAPPROVAL_REQUIRED');
+        commitDispatched=true;await client.query('COMMIT');
+      }
       else {
+        await requireResolvedProjectEffectsIn(client,project.id);
         assertStorageHeadroom(traceRoot);
         if(archiveStorageUsage(traceRoot).bytes>=ARCHIVE_ROOT_LIMIT_BYTES)throw new AppError(422,'运行档案达到 1 GiB，已保留原数据并阻止新运行；请先归档历史数据','ARCHIVE_STORAGE_LIMIT');
         const { rows: modelRows } = await client.query('SELECT id,data,version,status,checked_at,capabilities FROM models WHERE deleted_at IS NULL ORDER BY id');
@@ -485,14 +556,14 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
           const maxOutputTokens = Math.min(32768, Math.max(512, ...assigned.map((task: any) => task.maxOutputTokens ?? task.estimatedOutputTokens)));
           return { id: row.id, gatewayId: model.gatewayId, configurationHash:routeFingerprint(row.data,row.gateway_version),toolCapabilityTestId:model.capabilities?.tools?.testId, ...(model.protocol ? { protocol: model.protocol } : {}), ...(model.thinkingMode === undefined ? {} : { thinkingMode: model.thinkingMode }), contextBytes: model.contextBytes, contextWindowTokens: model.contextWindowTokens, name: model.name, wireModel: model.model, baseUrl: row.gateway_data.baseUrl, apiKey: row.credential ? unseal(row.credential) : '', inputRate: model.inputRate, outputRate: model.outputRate, maxOutputTokens };
         });
-        const runId = randomUUID();
-        const importedInputs = await selectedWorkFileInputs(project.plan.workFileSelections??[],client);
+        const fileAuthority={principal,targetDepartmentIds:participatingDepartments.map(d=>d.id),targetAdminOnly:administrative(principal)};
+        const importedInputs = await selectedWorkFileInputs(project.plan.workFileSelections??[],client,fileAuthority);
         const combinedInputs = [...(project.plan.runInputs??[]),...importedInputs];
         if (combinedInputs.length>20 || combinedInputs.reduce((total:number,item:any)=>total+item.content.length,0)>250000) throw new AppError(422,'临时资料与导入资料合计最多20份、250,000字符');
         const workspaceSelections = (project.plan.workFileSelections??[]).filter((item:any)=>item.mode==='workspace');
         for (const selection of workspaceSelections) if (project.plan.agents.some((agent:any)=>agent.tools.some((tool:string)=>['filesystem','artifact_write','terminal','terminal_test'].includes(tool))&&!selection.agentIds.includes(agent.id))) throw new AppError(422,'复制到共享运行工作区的文件必须授权给所有文件和终端员工');
-        const importedFiles = await selectedWorkFileCopies(workspaceSelections,client);
-        const knowledge=attachRunInputs(await knowledgeSnapshot(agents,project.department_id,client,project.plan.knowledgeDocumentIds),combinedInputs,agents,runId);
+        const importedFiles = await selectedWorkFileCopies(workspaceSelections,client,fileAuthority);
+        const knowledge=attachRunInputs(await knowledgeSnapshot(agents,project.department_id,client,project.plan.knowledgeDocumentIds,fileAuthority),combinedInputs,agents,runId);
         for(const agent of agents){
           if(executionTarget.kind==='local')agent.rolePrompt+='\n\n本次文件与命令执行位置是获授权的本机独立运行工作区。只使用相对路径；操作系统为 '+executionTarget.platform+'，Windows 命令使用 PowerShell，macOS 命令使用 sh。仍须遵守原工具与文件交接合同；命令必须逐次申请批准。';
           const inputs=knowledge.runInputs?.filter(input=>input.agentIds.includes(agent.id));
@@ -508,16 +579,36 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
           orchestration:project.plan.orchestration,deliveryCriteria:project.plan.deliveryCriteria,
           approval: { kind: req.body.automatic ? 'automatic-policy' : 'project', approvedAt: new Date().toISOString(), projectVersion: project.version, retainUncertainCosts:input.retainUncertainCosts }, agents, tasks,
           modelRoutes: routes.map(({ apiKey: _secret, ...route }) => route),...(options.demo?{demo:{title:options.demo.title,fixture:true}}:{}) };
-        const approvedSnapshot={...snapshot,executionProfile:executionProfileForApproval(snapshot),goalContract:createGoalContract(snapshot)};
-        await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids) VALUES($1,$2,$3,$4,$5,$6)', [runId, project.id, project.version, 'queued', approvedSnapshot,participatingDepartments.map(d=>d.id)]);
+        const effects=input.requireReviewedTools||executionMode()==='enterprise'?await toolEffects.snapshotIn(client,snapshot):{};
+        const approvedSnapshot={...snapshot,...effects,executionProfile:executionProfileForApproval(snapshot),goalContract:createGoalContract(snapshot)};
+        const departmentIds=participatingDepartments.map(d=>d.id);
+        const materialDepartments=await resolveProjectMaterialDepartments(client,project.id);
+        const sourceFree=(await client.query(`SELECT id FROM projects p WHERE id=$1 AND ${safeProjectSql('p')}`,[project.id])).rows.length>0;
+        const sourceBounds=combineSourceBounds([{requiredDepartmentIds:materialDepartments??departmentIds,adminOnly:!materialDepartments||!sourceFree,private:false,refs:[]},
+          ...(project.plan.runInputs?.length?[rootSourceBounds()]:[]),
+          ...await Promise.all((project.plan.workFileSelections??[]).map((selection:any)=>readFileBounds(client,selection.snapshotId))),
+          ...await Promise.all(knowledge.documents.map(doc=>readKnowledgeRevisionBounds(client,doc.documentId,doc.version)))]);
+        if(sourceBounds.requiredDepartmentIds.some(id=>!departmentIds.includes(id)))throw new AppError(422,'目标运行必须包含全部来源部门','SOURCE_BOUNDS_INVALID');
+        // A legacy administrative run keeps every source restriction on the run itself.
+        // It is never exposed through the member resource projection.
+        if(!administrative(principal))assertTargetContainsSources(departmentIds,sourceBounds);
+        const actorId=principal.kind==='human'?principal.userId:null,epoch=principal.kind==='human'?principal.sessionEpoch:null;
+        await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids,requested_by_user_id,authorized_by_user_id,authorized_epoch,authority_kind,authority_department_ids,source_bounds) VALUES($1,$2,$3,$4,$5,$6,$7,$7,$8,$9,$6,$10)', [runId, project.id, project.version, 'queued', approvedSnapshot,departmentIds,actorId,epoch,principal.kind==='human'?'human':'local-owner',sourceBounds]);
         await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1", [project.id]);
-        await client.query('COMMIT');
+        await routeAudit(client,principal,authority,'project.approve',project.id,{version:String(project.version),snapshotSha256:sourceHash(JSON.stringify(approvedSnapshot))},{projectId:project.id,runId});
+        commitDispatched=true;await client.query('COMMIT');
         launch = { runId, projectId: project.id, snapshot:approvedSnapshot, routes };
       }
+      return {ok:true as const};
     } catch (error) {
-      await client.query('ROLLBACK').catch(() => undefined);
-      throw error;
-    } finally { client.release(); }
+      try{await client.query('ROLLBACK');}catch{discard=true;throw error;}
+      // No archive/workspace/external writes occur in admission. Only a confirmed
+      // rollback before COMMIT dispatch proves that this target can be released.
+      if(commitDispatched)throw error;
+      return {ok:false as const,error};
+    } finally { client.release(discard); }
+    });
+    if(!admission.ok)throw admission.error;
     if (existing) return res.json({ id: existing.id, status: existing.status, existing: true });
     if (!launch) throw new AppError(500, '运行准备失败');
     await log('run', `已批准「${launch.snapshot.departmentName}」项目并进入执行队列`);
@@ -530,7 +621,12 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.get('/api/usage', async (_req, res) => {
     const { rows } = await pool.query('SELECT u.id,u.model_id AS "modelId",u.project_id AS "projectId",u.department_id AS "departmentId",u.run_id AS "runId",u.agent_id AS "agentId",u.employee_id AS "employeeId",u.session_id AS "sessionId",u.task_id AS "taskId",u.attempt_id AS "attemptId",u.request_id AS "requestId",u.duration_ms AS "durationMs",u.input_tokens AS "inputTokens",u.output_tokens AS "outputTokens",u.cost::float AS cost,u.purpose,u.created_at AS "createdAt",(SELECT a->>\'name\' FROM jsonb_array_elements(r.snapshot->\'agents\') a WHERE a->>\'id\'=u.agent_id LIMIT 1) AS "agentName" FROM usage u LEFT JOIN project_runs r ON r.id=u.run_id ORDER BY u.created_at DESC'); res.json(rows);
   });
-  app.get('/api/runs', async (_req, res) => {
+  app.get('/api/runs', async (req, res) => {
+    const principal=httpPrincipal(res);
+    if(!administrative(principal)){
+      const visible=visibleResourceQuery(principal,'run','viewer'),limit=z.coerce.number().int().min(1).max(200).default(100).parse(req.query.limit),offset=z.coerce.number().int().min(0).max(1000000).default(0).parse(req.query.offset);
+      return res.json((await pool.query(`SELECT r.id,r.project_id AS "projectId",r.project_version AS "projectVersion",r.created_at AS "createdAt",r.snapshot->>'title' AS title,r.status FROM project_runs r WHERE r.id IN (${visible.text}) AND ${safeRunSql('r')} ORDER BY r.created_at DESC,r.id LIMIT $${visible.values.length+1} OFFSET $${visible.values.length+2}`,[...visible.values,limit,offset])).rows);
+    }
     const archived=listRuns(traceRoot),stored=(await pool.query(`SELECT id,created_at AS "createdAt",snapshot->>'title' AS title,status,error FROM project_runs`)).rows;
     const byId=new Map(stored.map(row=>[row.id,row]));
     res.json([...stored.filter(row=>!archived.some(a=>a.id===row.id)).map(row=>({...row,createdAt:new Date(row.createdAt).toISOString(),mode:'product',eventCount:0,integrity:'ok'})),...archived.map(run=>({...run,...(byId.has(run.id)?{status:byId.get(run.id).status,error:byId.get(run.id).error}:{})}))]);
@@ -559,13 +655,19 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   app.post('/api/runs/:id/cancel', async (req, res) => {
     const id = z.uuid().parse(req.params.id);
-    await coordinator.cancel(id);
+    await coordinator.cancel(id,async(db,row)=>{
+      const principal=httpPrincipal(res),project=requireRow((await db.query('SELECT * FROM projects WHERE id=$1',[row.project_id])).rows[0]);
+      const authority=await lockProjectAuthority(db,principal,project);
+      await requireResource(db,principal,{kind:'run',id},'operator');
+      if(!administrative(principal)&&!(await db.query(`SELECT r.id FROM project_runs r WHERE r.id=$1 AND ${safeRunSql('r')}`,[id])).rows.length)throw new AppError(404,'资源不存在或不可访问');
+      await routeAudit(db,principal,authority,'run.cancel',id,{state:row.status==='queued'?'cancelled':'cancel-requested'},{projectId:project.id,runId:id});
+    });
     res.status(202).json({ id, status: 'cancelling' });
   });
   app.post('/api/runs/verify', async (_req, res) => {
     if (verifying) throw new AppError(409, '追溯验证正在运行，请稍候');
     verifying = true;
-    try { const run = await runTraceVerification(traceRoot); res.status(201).json({ id: run.id }); }
+    try { const run = await runTraceVerification(traceRoot,{writers}); res.status(201).json({ id: run.id }); }
     finally { verifying = false; }
   });
   app.use((_req, res) => res.status(404).json({ message: '接口不存在' }));
@@ -583,24 +685,29 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   return app;
 }
-async function savePlanTransaction(client:Pick<import('pg').PoolClient,'query'>,id:string,version:number,plan:Plan,source:string,requestedPolicy?:Policy) {
+async function savePlanTransaction(client:Pick<import('pg').PoolClient,'query'>,id:string,version:number,plan:Plan,source:string,requestedPolicy:Policy|undefined,principal:Principal) {
     const current=requireRow((await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[id])).rows[0]);
+    const authority=await lockProjectAuthority(client,principal,current);assertMemberPlan(principal,plan);
+    assertMemberAgentGrants(principal,plan.agents,current.plan.agents);
     if(current.version!==version)throw new AppError(409,'方案已被修改，请刷新后重试','VERSION_CONFLICT');
     if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[id])).rowCount)throw new AppError(409,'请先停止项目运行，再修改方案或策略','PROJECT_ACTIVE');
     assertProjectProvenance(plan.agents,current.plan.agents);
     const policy=bindPolicy({...((requestedPolicy??current.policy) as Policy),allowedDepartmentIds:current.policy.allowedDepartmentIds??[current.department_id]},current.plan.agents,current.department_id);assertPolicy(plan.agents,policy);
-    await validateProjectTeam(plan.agents,current.department_id,policy,client);
-    await selectedWorkFileInputs(plan.workFileSelections??[],client);
+    assertMemberPolicy(principal,policy,current.policy);
+    const targetDepartments=await validateProjectTeam(plan.agents,current.department_id,policy,client);
+    await selectedWorkFileInputs(plan.workFileSelections??[],client,{principal,targetDepartmentIds:targetDepartments.map(d=>d.id),targetAdminOnly:administrative(principal)});
+    await knowledgeSnapshot(plan.agents,current.department_id,client,plan.knowledgeDocumentIds,{principal,targetDepartmentIds:targetDepartments.map(d=>d.id),targetAdminOnly:administrative(principal)});
     const result = await client.query(`UPDATE projects SET plan=$1,version=version+1,status='DRAFT',source=$2,policy=$5 WHERE id=$3 AND version=$4 RETURNING version`, [plan, source, id, version,policy]);
     if (!result.rowCount) throw new AppError(409, '方案已被修改，请刷新后重试', 'VERSION_CONFLICT');
     await client.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,$2,$3,$4)', [id, result.rows[0].version, plan,policy]);
+    await routeAudit(client,principal,authority,'project.plan',id,{beforeVersion:String(version),afterVersion:String(result.rows[0].version)},{projectId:id});
     return result.rows[0].version as number;
 }
-async function savePlan(id: string, version: number, plan: Plan, source: string, requestedPolicy?:Policy) {
+async function savePlan(id: string, version: number, plan: Plan, source: string, requestedPolicy?:Policy,principal:Principal={kind:'local-owner'}) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await savePlanTransaction(client,id,version,plan,source,requestedPolicy);
+    await savePlanTransaction(client,id,version,plan,source,requestedPolicy,principal);
     await client.query('COMMIT');
   } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
   await log('plan', source === 'model' ? '用户确认了新的 AI 方案' : '保存新的方案版本');

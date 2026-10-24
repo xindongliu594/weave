@@ -11,9 +11,10 @@ import {canonicalEvidence,handoffSealValue,sameHandoffSeal,type RunLineageEviden
 import {runAcceptanceEvidence} from './run-acceptance-evidence.ts';
 import {verifiedResourceEdge} from './recovery-resource-plan.ts';
 import {assertHandoffReport,reportTaskFor} from '../../../packages/contracts/handoff-report.mjs';
+import {httpPrincipal,requireRunRoute,assertRunArchiveBinding} from './project-route-access.ts';
+import type {IdentityQueryExecutor} from './identity-schema.ts';
 
-type Database={query:(sql:string,args?:any[])=>Promise<{rows:any[]}>};
-type Loaders={run:(id:string)=>any;operations:(runId:string,ids:string[])=>Promise<any[]>};
+type Loaders={run:(id:string)=>any|Promise<any>;operations:(runId:string,ids:string[])=>Promise<any[]>};
 const MAX_DEPTH=16,MAX_TASKS=200,MAX_COMMANDS=200,MAX_OUTPUT_BYTES=256*1024;
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
 const attempt=(value:any)=>value?.attemptId??value?.attempt_id;
@@ -36,7 +37,7 @@ export async function collectRunLineageEvidence(current:any,load:Loaders):Promis
   let next=recovery.sourceRunId;
   while(next){
    assert(z.uuid().safeParse(next).success&&!seen.has(next)&&runs.length<=MAX_DEPTH,'LINEAGE_INVALID');seen.add(next);
-   const source=load.run(next);
+   const source=await load.run(next);
    const descendant=runs.at(-1);
    const resourceEdge=descendant.snapshot.resourceRevision||source?.snapshot.resourceRevision;
    assert(source&&source.id===next&&source.integrity==='ok'&&source.snapshot.projectId===response.projectId&&source.snapshot.planVersion===response.planVersion&&
@@ -44,7 +45,7 @@ export async function collectRunLineageEvidence(current:any,load:Loaders):Promis
       canonicalEvidence(contracts(source))===canonicalEvidence(contracts(descendant))),'LINEAGE_INVALID');
    runs.push(source);assert(!source.snapshot.recovery||source.snapshot.recovery.version===1,'LINEAGE_INVALID');next=source.snapshot.recovery?.sourceRunId;
   }
- }catch{response.status='unavailable';response.issues.push({code:'LINEAGE_INVALID',message:messages.LINEAGE_INVALID});return response;}
+ }catch(error){if(error instanceof AppError&&[401,403,404].includes(error.status))throw error;response.status='unavailable';response.issues.push({code:'LINEAGE_INVALID',message:messages.LINEAGE_INVALID});return response;}
  const completed=recovery.completed;
  if(!Array.isArray(completed)||completed.length>MAX_TASKS||new Set(completed.map((t:any)=>t.taskId)).size!==completed.length){response.status='unavailable';response.issues.push({code:'SEAL_INVALID',message:messages.SEAL_INVALID});return response;}
  let commandCount=0;
@@ -116,28 +117,31 @@ export async function collectRunLineageEvidence(current:any,load:Loaders):Promis
     response.tests.push({taskId:proof.taskId,attemptId:executionAttempt,sourceRunId:executionSource.id,operationId:row.id,command:String(redact(command.command)),exitCode:result.exitCode,
      output:String(redact(result.output)),outputSha256:e.output.sha256,workspaceRevision:command.workspaceRevision,observationSeq:command.observationSeq,acceptanceSeq:proof.acceptanceSeq,
      nodeTests:nodeTestCounts(command.command,result.output,true)});
-   }catch{response.issues.push({taskId:proof.taskId,code:'COMMAND_UNAVAILABLE',message:messages.COMMAND_UNAVAILABLE});}
+   }catch(error){if(error instanceof AppError&&[401,403,404].includes(error.status))throw error;response.issues.push({taskId:proof.taskId,code:'COMMAND_UNAVAILABLE',message:messages.COMMAND_UNAVAILABLE});}
   }
  }
  response.status=response.issues.length?'partial':'verified';return response;
 }
 
-export function runLineageEvidenceRouter(database:Database,traceRoot:string){
+export function runLineageEvidenceRouter(database:IdentityQueryExecutor,traceRoot:string){
  const router=Router();
  router.get('/runs/:id/lineage-evidence',async(req,res)=>{
   const id=z.uuid().parse(req.params.id);z.object({}).strict().parse(req.query);
-  const row=(await database.query('SELECT project_id,project_version FROM project_runs WHERE id=$1',[id])).rows[0];
+  const principal=httpPrincipal(res);await requireRunRoute(database,principal,id,'viewer');
+  const row=(await database.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0];
   if(!row)throw new AppError(404,'正式运行不存在');
   let total=0;
-  const load=(runId:string)=>{
+  const load=async(runId:string)=>{
    z.uuid().parse(runId);
+   await requireRunRoute(database,principal,runId,'viewer');
+   const source=(await database.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0];
    for(const name of ['snapshot.json','events.jsonl']){const size=statSync(resolve(traceRoot,runId,name)).size;total+=size;if(total>64*1024*1024)throw Error('LINEAGE_ARCHIVE_LIMIT');}
-   return readRun(traceRoot,runId);
+   const archive=readRun(traceRoot,runId);assertRunArchiveBinding(principal,source,archive);return archive;
   };
   let current:any;
-  try{current=load(id);}catch{throw new AppError(409,'运行档案缺失或超出证据读取上限','LINEAGE_ARCHIVE_UNAVAILABLE');}
+  try{current=await load(id);}catch(error){if(error instanceof AppError&&[401,403,404].includes(error.status))throw error;throw new AppError(409,'运行档案缺失或超出证据读取上限','LINEAGE_ARCHIVE_UNAVAILABLE');}
   if(!current||current.snapshot.projectId!==row.project_id||current.snapshot.planVersion!==row.project_version)throw new AppError(409,'运行档案与正式项目版本不一致','LINEAGE_ARCHIVE_UNAVAILABLE');
-  const data=await collectRunLineageEvidence(current,{run:load,operations:async(runId,ids)=>(await database.query('SELECT id,run_id AS "runId",status,started,payload,result FROM local_operations WHERE run_id=$1 AND id=ANY($2::text[])',[runId,ids])).rows});
+  const data=await collectRunLineageEvidence(current,{run:load,operations:async(runId,ids)=>{await requireRunRoute(database,principal,runId,'viewer');return (await database.query('SELECT id,run_id AS "runId",status,started,payload,result FROM local_operations WHERE run_id=$1 AND id=ANY($2::text[])',[runId,ids])).rows;}});
   data.acceptance=runAcceptanceEvidence(current,data);
   res.json(data);
  });

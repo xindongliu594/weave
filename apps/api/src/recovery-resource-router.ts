@@ -11,12 +11,15 @@ import { completedTasks } from './handoff-checkpoints.ts';
 import { budgetHistory } from './budget-history.ts';
 import { extractPlanningObject, PlanningOutputError, planningOutputDiagnostic, planningSchemaMessage } from './planning-output.ts';
 import { policySchema } from '../../../packages/contracts/index.ts';
+import {httpPrincipal,administrative,currentRoutePrincipal,lockProjectAuthority,requireRunRoute} from './project-route-access.ts';
 import { applyRecoveryResources, recoveryResourceProposalSchema, recoveryTaskMinimumBudget, recoveryCallRequirements,
   recoveryCallRequirementVersion, recoveryMinimumProjectBudget, recoveryTaskOutputLimit, recoveryTaskOutputBudgets, recoveryContextSnapshot, recoveryCoordinatorRequirement } from './recovery-resource-plan.ts';
 
 export function recoveryResourceRouter(traceRoot:string) {
   const router=Router(),planning=new Set<string>();
   router.post('/runs/:id/resource-proposal',async(req,res)=>{
+    const principal=httpPrincipal(res);if(!administrative(principal))throw new AppError(403,'补充资源与预算需要管理员批准','RESOURCE_BUDGET_ADMIN_REQUIRED');
+    await currentRoutePrincipal(pool,principal);
     const id=z.uuid().parse(req.params.id),input=z.object({modelId:z.string().min(1),maxBudget:z.number().finite().positive().max(10000),
       maxPlanningCost:z.number().finite().positive().max(1),retainUncertainCosts:z.boolean().default(false),
       maxModelCalls:z.number().int().min(1).max(1000).optional(),maxTaskModelCalls:z.number().int().min(1).max(1000).optional(),
@@ -101,7 +104,8 @@ export function recoveryResourceRouter(traceRoot:string) {
       const request=/^(?:deepseek-(?:chat|v4(?:\.1)?-(?:flash|pro))|gpt-4\.1(?:-mini|-nano)?(?:-\d{4}-\d{2}-\d{2})?)$/.test(model.model)
         ?{response_format:{type:'json_object' as const}}:{};
       const response=await completeBudgeted(model,messages,512,{purpose:'预算补充规划',projectId:row.project_id,
-        projectVersion:row.project_version,resourcePlanningRunId:id,maxCost:input.maxPlanningCost,retainUncertainCosts:input.retainUncertainCosts},request);
+        projectVersion:row.project_version,resourcePlanningRunId:id,maxCost:input.maxPlanningCost,retainUncertainCosts:input.retainUncertainCosts,
+        authorize:async(db,project)=>{await db.query('SELECT id FROM project_runs WHERE id=$1 FOR UPDATE',[id]);await lockProjectAuthority(db,principal,project,'operator',true);await requireRunRoute(db,principal,id,'operator',true);}},request);
       let proposal;
       try{proposal=boundedSchema.parse(extractPlanningObject(response.choices[0].message.content));}
       catch(error){
@@ -122,7 +126,9 @@ export function recoveryResourceRouter(traceRoot:string) {
         ...(input.contextBytes===undefined?{}:{contextBytes:input.contextBytes}),
         ...(input.taskContinuationLimits===undefined?{}:{taskContinuationLimits:input.taskContinuationLimits})};
       const client=await pool.connect();
-      try{await client.query('BEGIN');await client.query('INSERT INTO organization_previews(id,data,project_id) VALUES($1,$2,$3)',[previewId,data,row.project_id]);
+      try{await client.query('BEGIN');const project=(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[row.project_id])).rows[0];
+        await client.query('SELECT id FROM project_runs WHERE id=$1 FOR UPDATE',[id]);await lockProjectAuthority(client,principal,project,'operator',true);await requireRunRoute(client,principal,id,'operator',true);
+        await client.query('INSERT INTO organization_previews(id,data,project_id) VALUES($1,$2,$3)',[previewId,data,row.project_id]);
         await client.query('UPDATE usage SET planning_preview_id=$1 WHERE id=$2',[previewId,response.usageId]);await client.query('COMMIT');}
       catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
       res.json({previewId,...data,completedTaskIds:done});

@@ -1,0 +1,59 @@
+✔ maintenance holds the native exclusive against a writer in another process until its retained producer settles (724.0428ms)
+✔ maintenance borrows writer helpers under its actual native mode; shared writers cannot upgrade (364.6729ms)
+✔ maintenance waits for a live original writer before invoking the producer (221.2393ms)
+✔ failed maintenance keeps the OS guard until its owning process exits (582.8462ms)
+✔ root scope spans its retained original producer and excludes all native modes in a second process (637.7155ms)
+✔ root scope waits for original writer and permits only root nesting without forged run authority (402.9569ms)
+✔ root exchange validates the real root mode with an empty ID set and permits the next writer on the new generation (167.8797ms)
+✔ unknown root producer preserves the original error and guard until its process exits (392.8248ms)
+✔ pending restore startup never creates a missing trace; only the original root mode may reconcile it (346.8722ms)
+✔ raw prompt and nested secrets never enter a new scalar summary (7.1923ms)
+✔ unknown and model/session/request body sources are dropped without visiting getters (6.0848ms)
+✔ arbitrary string identity and unsafe numeric metadata are never admitted (0.9544ms)
+✔ audit projection exports actor kind and canonical UUID correlations but no raw actor or capability claims (0.6237ms)
+✔ only explicit unknown and fixed phase values survive source mapping (0.5982ms)
+✔ checkpoint mapping uses the registered team event (0.6035ms)
+✔ finished lifecycle does not claim execution success (0.4826ms)
+✔ inventory uses the actual DSH registration with no model, agent, archive or execution and disposes normally (8195.137ms)
+✔ variants preserve final definitions and independent inventories do not leak registrations (4085.2322ms)
+✔ release fingerprint includes actual registered implementation bytes and exact installed package versions (516.5466ms)
+✔ native inventory registers only the existing wrapper and validates identity without loading plugin code (3569.6571ms)
+✔ inventory rejects custom loading, business state, invalid variants and oversized or accessor input (3.4723ms)
+✔ C1 workspace knowledge search cannot use the old internal read retry (7.5814ms)
+✔ Host checks exact production runtime bindings before constructing a runtime (1.4715ms)
+✔ real DSH employee forwarding records one operation and dispatches one original body after checkpoint (2219.1325ms)
+▶ real DSH binds the effective forwarded arguments and rejects mutation after durable dispatch
+  ✔ normalized forwarding is prepared once (457.923ms)
+  ✔ downstream argument replacement cannot enter body (253.8338ms)
+  ✔ direct reuse of an earlier execution cannot enter body twice (206.3259ms)
+✔ real DSH binds the effective forwarded arguments and rejects mutation after durable dispatch (920.7827ms)
+▶ real DSH checkpoint, uncertain dispatch and receipt failure never resend an original body
+  ✔ checkpoint fails before preparing (196.9502ms)
+  ✔ dispatch reply lost keeps the original operation and enters no body (250.9358ms)
+  ✔ receipt reply lost retains dispatch and close failure (203.5304ms)
+✔ real DSH checkpoint, uncertain dispatch and receipt failure never resend an original body (653.7305ms)
+▶ real DSH refuses prepared/dispatch failure before body
+  ✔ prepare (183.2651ms)
+  ✔ dispatch (158.7213ms)
+✔ real DSH refuses prepared/dispatch failure before body (343.2827ms)
+✔ known dispatch refusal closes only its original prepared operation (179.0045ms)
+✔ cancellation after prepare closes the unstarted operation without using the cancelled signal (182.081ms)
+✔ real DSH cancellation waits for original body and retains unknown then original late evidence (295.8266ms)
+✔ successful fsync and sourceKey dedupe produce exactly one safe observation (56.8706ms)
+✔ failed fsync emits nothing and does not turn an exception into a successful append (20.3129ms)
+✔ observer throw or rejected promise never changes the durable append or leaks raw error (34.6894ms)
+✔ observers receive isolated frozen values and disposal removes root state (29.4451ms)
+✔ legacy snapshot without a verified created hash cannot invent correlation (23.1455ms)
+✔ a snapshot changed during fsync cannot supply previously verified correlation (23.1403ms)
+✔ observer uses the exact serialized committed event rather than the caller object (20.7774ms)
+✔ subscription changes during dispatch cannot extend the current notification traversal (25.1017ms)
+✔ a synchronous observer cannot reenter itself through another durable append (35.9042ms)
+✔ root and subscriber limits are reusable after disposal and pending callbacks are bounded (52.3624ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 48
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16893.8966

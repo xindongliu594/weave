@@ -1,17 +1,18 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createHash} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {PGlite} from '@electric-sql/pglite';
 import * as execution from '../apps/api/src/task-execution.ts';
 import {checkpointContract} from '../services/agent-runtime/step-checkpoints.mjs';
 import {executionMode,executionProfileForApproval,assertExecutionProfile} from '../apps/api/src/execution-policy.ts';
 import {LocalRunExecutor} from '../apps/api/src/local-execution.ts';
-import {mkdtempSync,rmSync,writeFileSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,rmSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pool} from '../apps/api/src/db.ts';
 import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 const {ReworkGate}=createRequire(import.meta.url)('../services/agent-runtime/rework.mjs');
 const {revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 const sha=(s:string)=>createHash('sha256').update(s).digest('hex');
@@ -121,7 +122,8 @@ test('own committed input modifications roll twice and preserve original import 
 test('task profile launch stays closed and unbound execute never reaches shared operation queue',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'task-scope-'));let enqueued=0;
  try{
-  const executor=new LocalRunExecutor({id:'run',dir,append(){}},{executionProfile:'task-attempt-openshell-v1'},{enqueue(){enqueued++;throw Error('queue reached');}} as any);
+  const writers=createArchiveWriterManager({traceRoot:dir});
+  const executor=new LocalRunExecutor({id:randomUUID(),dir,append(){}},{executionProfile:'task-attempt-openshell-v1'},{traceRoot:dir,writers,enqueue(){enqueued++;throw Error('queue reached');}} as any);
   assert.throws(()=>assertExecutionProfile(executor.snapshot),{code:'TASK_EXECUTION_UNAVAILABLE'});
   for(const context of [{},{agentId:'forged'},{taskId:'forged'},{attemptId:'forged'},{sessionId:'forged'},{generation:0}])await assert.rejects(()=>executor.execute('filesystem',{path:'private.txt'},new AbortController().signal,context),{code:'TASK_SCOPE_DENIED'});
   assert.equal(enqueued,0);
@@ -138,13 +140,15 @@ test('real LocalRunExecutor binds and rechecks trusted archive against isolated 
   for(const event of f.run.events)archive.append(event.type,event.data);
   await f.db.query('UPDATE project_runs SET id=$1,snapshot=$2',[archive.id,f.run.snapshot]);
   (pool as any).connect=async()=>({...f.db,release(){}});
-  const executor=new LocalRunExecutor(archive,f.run.snapshot,{owner:'owner',traceRoot:dir} as any);
+  const writers=createArchiveWriterManager({traceRoot:dir});
+  const executor=new LocalRunExecutor(archive,f.run.snapshot,{owner:'owner',traceRoot:dir,writers} as any);
   // The adapter is an in-memory database; no environment DATABASE_URL is read or contacted.
   const candidate={...f.candidate,runId:archive.id},signal=new AbortController().signal;
   const assignment=await executor.bindAttempt(candidate,signal);
   assert.equal(assignment.generation,1);
   const context={agentId:assignment.agentId,sessionId:assignment.sessionId,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation};
   // Populate the trusted compatibility cache only for this unavailable profile fixture.
+  mkdirSync(executor.root,{recursive:true});
   for(const item of f.canonical.files)writeFileSync(join(executor.root,item.path),Buffer.from(item.content,'base64'));
   const scope=await executor.taskScope(context,signal);assert.equal(scope.key.runId,archive.id);
   for(const field of ['agentId','sessionId','taskId','attemptId','generation'])await assert.rejects(()=>executor.taskScope({...context,[field]:field==='generation'?99:'forged'} as any,signal));

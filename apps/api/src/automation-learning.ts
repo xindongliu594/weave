@@ -7,6 +7,12 @@ import { AppError } from './provider.ts';
 import { validateKnowledgeGrants } from './knowledge-store.ts';
 import {syncReuseCandidates,validateReuseEvidence} from './knowledge-reuse.ts';
 import {resolve} from 'node:path';
+import type {Principal} from './identity-types.ts';
+import {httpPrincipal,knowledgePrincipal,administrative,lockDepartmentAuthority,requireRunRoute} from './project-route-access.ts';
+import {visibleSourceQuery,visibleCandidateQuery,requireCandidate,requireKnowledgeRevision} from './resource-authorization.ts';
+import {withVaultLock,writeVaultDocument} from './obsidian.ts';
+import type {KnowledgeWriteContext} from './knowledge.ts';
+import {combineSourceBounds,readRunBounds,readKnowledgeRevisionBounds,readCandidateBounds,rootSourceBounds,type SourceBounds} from './source-bounds.ts';
 
 export const automationTables = ['automation_schedules', 'automation_occurrences', 'automation_notifications', 'automation_observations', 'automation_knowledge_candidates', 'automation_improvements', 'automation_evaluations', 'automation_reviews'];
 export async function migrateAutomationLearning(db: pg.Pool) {
@@ -23,6 +29,7 @@ export async function migrateAutomationLearning(db: pg.Pool) {
     CREATE INDEX IF NOT EXISTS automation_notifications_unread ON automation_notifications(read_at,created_at);
     ALTER TABLE automation_knowledge_candidates ADD COLUMN IF NOT EXISTS publishing_at timestamptz;
     ALTER TABLE automation_knowledge_candidates ADD COLUMN IF NOT EXISTS reuse_evidence jsonb;
+    ALTER TABLE automation_knowledge_candidates ADD COLUMN IF NOT EXISTS source_bounds jsonb;
   `);
 }
 
@@ -32,9 +39,10 @@ const iso = (value: Date | string) => new Date(value).toISOString();
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 async function transaction<T>(db: pg.Pool, work: (client: pg.PoolClient) => Promise<T>) {
   const client = await db.connect();
-  try { await client.query('BEGIN'); const result = await work(client); await client.query('COMMIT'); return result; }
-  catch (error) { await client.query('ROLLBACK'); throw error; }
-  finally { client.release(); }
+  let commitStarted=false,discard=false;
+  try { await client.query('BEGIN'); const result = await work(client); commitStarted=true;await client.query('COMMIT'); return result; }
+  catch (error) { discard=commitStarted;try{await client.query('ROLLBACK');}catch{discard=true;}throw error; }
+  finally { client.release(discard); }
 }
 async function notify(db: Database, key: string, kind: string, title: string, details: unknown, now: Date) {
   await db.query('INSERT INTO automation_notifications(id,event_key,kind,title,details,created_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(event_key) DO NOTHING', [randomUUID(), key, kind, title, details, now]);
@@ -115,19 +123,36 @@ export function evaluateImprovement(cases: ImprovementCase[], responses: { caseI
   return { method: 'deterministic-rules-v1', modelExecuted: false, beforeScore: results.reduce((n, r) => n + r.before.score, 0) / results.length, afterScore: results.reduce((n, r) => n + r.after.score, 0) / results.length, cases, results };
 }
 
-async function authorizedSource(db: Database, runId: string, documentId: string) {
+async function authorizedSource(db: Database, runId: string, documentId: string,principal:Principal) {
+  await requireRunRoute(db,principal,runId,'viewer');
   const run = (await db.query('SELECT snapshot FROM project_runs WHERE id=$1', [runId])).rows[0];
   if (!run?.snapshot?.approval) throw new AppError(404, '请先选择已批准运行');
   const snapshot = run.snapshot, reference = snapshot.knowledge?.documents?.find((d: any) => d.documentId === documentId);
   const agents = (snapshot.agents ?? []).filter((a: any) => snapshot.knowledge?.agentDocuments?.[a.id]?.includes(documentId));
   if (!reference || !agents.length) throw new AppError(403, '资料不在本次运行授权范围');
+  await requireKnowledgeRevision(db,principal,documentId,reference.version);
   await validateKnowledgeGrants(agents, snapshot.departmentId, db);
-  const source = (await db.query('SELECT d.title,d.space_id,r.content,r.sha256 FROM knowledge_documents d JOIN knowledge_spaces s ON s.id=d.space_id JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=$2 WHERE d.id=$1 AND d.deleted_at IS NULL AND s.deleted_at IS NULL', [documentId, reference.version])).rows[0];
+  const source = (await db.query('SELECT d.title,d.space_id,r.content,r.sha256,r.source AS source_metadata FROM knowledge_documents d JOIN knowledge_spaces s ON s.id=d.space_id JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=$2 WHERE d.id=$1 AND d.deleted_at IS NULL AND s.deleted_at IS NULL', [documentId, reference.version])).rows[0];
   if (!source || source.sha256 !== reference.sha256 || hash(source.content)!==reference.sha256 || source.space_id !== reference.spaceId) throw new AppError(409, '引用资料已归档、正文校验失败或授权版本缺失');
   return { ...source, version: reference.version };
 }
 
-export type PublishKnowledge = (input: { spaceId: string; title: string; content: string; source: { runId: string; note: string } }, id: string) => Promise<{ id: string; version: number }>;
+/** Match project/run → current identity → membership ordering used by execution. */
+async function lockKnowledgeRuns(db:Database,ids:string[]){
+  const unique=[...new Set(ids)].sort();await db.query('SELECT id FROM projects WHERE id IN (SELECT project_id FROM project_runs WHERE id=ANY($1::text[])) ORDER BY id FOR UPDATE',[unique]);
+  await db.query('SELECT id FROM project_runs WHERE id=ANY($1::text[]) ORDER BY id FOR SHARE',[unique]);
+}
+async function lockCandidate(db:Database,principal:Principal,id:string){
+  await requireCandidate(db,principal,id,'operator');
+  const metadata=(await db.query('SELECT run_id,reuse_evidence FROM automation_knowledge_candidates WHERE id=$1',[id])).rows[0];
+  const references=metadata.reuse_evidence?.workReferences??metadata.reuse_evidence?.works??[];
+  await lockKnowledgeRuns(db,[metadata.run_id,...references.map((ref:any)=>ref.runId)]);
+  const candidate=(await db.query('SELECT * FROM automation_knowledge_candidates WHERE id=$1 FOR UPDATE',[id])).rows[0];
+  const scope=await requireCandidate(db,principal,id,'operator');await lockDepartmentAuthority(db,principal,scope.departments??[],'operator');
+  await requireCandidate(db,principal,id,'operator');return candidate;
+}
+
+export type PublishKnowledge = (input: { spaceId: string; title: string; content: string; source: { runId: string; note: string;skillName?:string } }, id: string,sourceBounds:SourceBounds,context?:KnowledgeWriteContext) => Promise<{ id: string; version: number }>;
 export function automationLearningRouter(options: { db?: pg.Pool; service?: AutomationLearningService; publishKnowledge?: PublishKnowledge } = {}) {
   const db = options.db ?? pool, router = Router();
   router.get('/automation/status', (_req, res) => res.json({ lastCheckedAt: options.service?.lastCheckedAt ?? null, error: options.service?.lastError ?? null, dispatchMode: 'approval-draft', observation: 'hourly-and-terminal', actualMultiDayValidation: false }));
@@ -150,48 +175,50 @@ export function automationLearningRouter(options: { db?: pg.Pool; service?: Auto
   router.get('/automation/notifications', async (_req, res) => res.json((await db.query('SELECT id,kind,title,details,created_at AS "createdAt",read_at AS "readAt" FROM automation_notifications ORDER BY created_at DESC LIMIT 300')).rows));
   router.post('/automation/notifications/:id/read', async (req, res) => { await db.query('UPDATE automation_notifications SET read_at=now() WHERE id=$1 AND read_at IS NULL', [req.params.id]); res.json({ ok: true }); });
   router.get('/automation/observations', async (_req, res) => res.json((await db.query('SELECT id,run_id AS "runId",status,details,observed_at AS "observedAt" FROM automation_observations ORDER BY observed_at DESC LIMIT 200')).rows));
-  router.get('/automation/knowledge-sources', async (_req, res) => {
-    const runs = (await db.query("SELECT id,snapshot FROM project_runs WHERE snapshot ? 'approval' ORDER BY created_at DESC LIMIT 100")).rows;
-    res.json(runs.map(r => ({ runId: r.id, title: r.snapshot.title ?? r.id, documents: (r.snapshot.knowledge?.documents ?? []).map((d: any) => ({ id: d.documentId, title: d.title, version: d.version })) })));
+  router.get('/automation/knowledge-sources',async(_req,res)=>{
+    const visible=visibleSourceQuery(httpPrincipal(res),'run','viewer');
+    const runs=(await db.query(`SELECT id,snapshot FROM project_runs WHERE snapshot ? 'approval' AND id IN (${visible.text}) ORDER BY created_at DESC LIMIT 100`,visible.values)).rows;
+    res.json(runs.map(r=>({runId:r.id,title:r.snapshot.title??r.id,documents:(r.snapshot.knowledge?.documents??[]).map((d:any)=>({id:d.documentId,title:d.title,version:d.version}))})));
   });
-  router.get('/automation/knowledge-candidates', async (_req, res) => res.json((await db.query('SELECT id,run_id AS "runId",document_id AS "documentId",source_version AS "sourceVersion",source_hash AS "sourceHash",space_id AS "spaceId",title,content,status,published_document_id AS "publishedDocumentId",reuse_evidence AS "reuseEvidence",version FROM automation_knowledge_candidates ORDER BY created_at DESC LIMIT 100')).rows));
-  router.post('/automation/knowledge-candidates', async (req, res) => {
-    const input = z.object({ runId: z.string().min(1), documentId: z.string().min(1) }).parse(req.body);
-    const result = await transaction(db, async client => {
-      const source = await authorizedSource(client, input.runId, input.documentId), id = randomUUID();
-      const content = `# 待审查知识摘录\n\n来源：${source.title}（版本 ${source.version}）\n\n${source.content.slice(0, 12000)}${source.content.length > 12000 ? '\n\n[摘录已截断，请核对原文后整理。]' : ''}`;
-      const row = (await client.query("INSERT INTO automation_knowledge_candidates(id,run_id,document_id,source_version,source_hash,space_id,title,content) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(document_id,source_hash) DO UPDATE SET document_id=EXCLUDED.document_id RETURNING id", [id, input.runId, input.documentId, source.version, source.sha256, source.space_id, ('经验整理：' + source.title).slice(0, 200), content])).rows[0];
-      return row;
-    });
-    res.status(201).json(result);
+  router.get('/automation/knowledge-candidates',async(_req,res)=>{
+    const visible=visibleCandidateQuery(httpPrincipal(res));res.json((await db.query(`SELECT id,run_id AS "runId",document_id AS "documentId",source_version AS "sourceVersion",source_hash AS "sourceHash",space_id AS "spaceId",title,content,status,published_document_id AS "publishedDocumentId",reuse_evidence AS "reuseEvidence",version FROM automation_knowledge_candidates WHERE id IN (SELECT id FROM (${visible.text}) visible) ORDER BY created_at DESC LIMIT 100`,visible.values)).rows);
   });
-  router.put('/automation/knowledge-candidates/:id', async (req, res) => {
-    const input = z.object({ title: z.string().trim().min(1).max(200), content: z.string().trim().min(1).max(250000), version: z.number().int().positive() }).parse(req.body);
-    const result = await db.query("UPDATE automation_knowledge_candidates SET title=$1,content=$2,version=version+1 WHERE id=$3 AND version=$4 AND status='pending'", [input.title, input.content, req.params.id, input.version]);
-    if (!result.rowCount) throw new AppError(409, '候选已变化或已发布'); res.json({ ok: true });
+  router.post('/automation/knowledge-candidates',async(req,res)=>{
+    const input=z.object({runId:z.string().min(1),documentId:z.string().min(1)}).strict().parse(req.body),principal=httpPrincipal(res);
+    const result=await transaction(db,async client=>{
+      await requireRunRoute(client,principal,input.runId,'operator');await lockKnowledgeRuns(client,[input.runId]);
+      const runBounds=await readRunBounds(client,input.runId);await lockDepartmentAuthority(client,principal,runBounds.requiredDepartmentIds,'operator');
+      const source=await authorizedSource(client,input.runId,input.documentId,principal),id=randomUUID();
+      const sourceBounds=combineSourceBounds([runBounds,await readKnowledgeRevisionBounds(client,input.documentId,source.version)]);
+      const content=`# 待审查知识摘录\n\n来源：${source.title}（版本 ${source.version}）\n\n${source.content.slice(0,12000)}${source.content.length>12000?'\n\n[摘录已截断，请核对原文后整理。]':''}`;
+      const row=(await client.query(`INSERT INTO automation_knowledge_candidates(id,run_id,document_id,source_version,source_hash,space_id,title,content,source_bounds) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(document_id,source_hash) DO NOTHING RETURNING id`,[id,input.runId,input.documentId,source.version,source.sha256,source.space_id,('经验整理：'+source.title).slice(0,200),content,sourceBounds])).rows[0];
+      if(!row){const existing=(await client.query('SELECT id,run_id FROM automation_knowledge_candidates WHERE document_id=$1 AND source_hash=$2',[input.documentId,source.sha256])).rows[0];if(existing?.run_id===input.runId){await requireCandidate(client,principal,existing.id,'operator');return {id:existing.id};}throw new AppError(409,'该固定来源已有候选，请刷新可见候选列表');}return row;
+    });res.status(201).json(result);
   });
-  router.post('/automation/knowledge-candidates/:id/publish', async (req, res) => {
-    const input = z.object({ version: z.number().int().positive(), reviewed: z.literal(true) }).parse(req.body);
-    const candidate = (await db.query('SELECT * FROM automation_knowledge_candidates WHERE id=$1', [req.params.id])).rows[0];
-    if (!candidate) throw new AppError(404, '候选不存在');
-    if (candidate.status === 'published') return res.json({ id: candidate.published_document_id });
-    if (candidate.version !== input.version) throw new AppError(409, '候选已变化，请重新审查');
-    await authorizedSource(db, candidate.run_id, candidate.document_id);
-    if(candidate.reuse_evidence)await validateReuseEvidence(db,resolve(process.env.TRACE_ROOT??'.data/runs'),candidate.reuse_evidence);
-    if (!options.publishKnowledge) throw new AppError(503, '知识发布服务未启用');
-    // Stable document identity makes a retry after a lost response recover the same publication.
-    const publicationId = candidate.id;
-    const existing = (await db.query('SELECT d.id,d.space_id,r.content FROM knowledge_documents d JOIN knowledge_revisions r ON r.document_id=d.id AND r.version=d.version WHERE d.id=$1', [publicationId])).rows[0];
-    if (existing && (existing.space_id !== candidate.space_id || hash(existing.content) !== hash(candidate.content))) throw new AppError(409, '已发布文档与当前候选不同，请核对知识库');
-    if (!existing) {
-      const claim = await db.query("UPDATE automation_knowledge_candidates SET status='publishing',publishing_at=now() WHERE id=$1 AND version=$2 AND (status='pending' OR (status='publishing' AND publishing_at<now()-interval '2 minutes')) RETURNING id", [candidate.id, input.version]);
-      if (!claim.rowCount) throw new AppError(409, '候选正在发布或已变化，请稍后刷新；中断的发布可在两分钟后重试');
-      try { await options.publishKnowledge({ spaceId: candidate.space_id, title: candidate.title, content: candidate.content, source: { runId: candidate.run_id, note: `人工审查的知识候选 ${candidate.id}；原文 ${candidate.document_id}:v${candidate.source_version} SHA256 ${candidate.source_hash}` } }, publicationId); }
-      catch (error) { await db.query("UPDATE automation_knowledge_candidates SET status='pending',publishing_at=NULL WHERE id=$1 AND version=$2 AND status='publishing'", [candidate.id, input.version]); throw error; }
-    }
-    await db.query("UPDATE automation_knowledge_candidates SET status='published',published_document_id=$1,version=version+1 WHERE id=$2 AND status IN ('pending','publishing') AND version=$3", [publicationId, candidate.id, input.version]);
-    res.json({ id: publicationId });
+  router.put('/automation/knowledge-candidates/:id',async(req,res)=>{
+    const input=z.object({title:z.string().trim().min(1).max(200),content:z.string().trim().min(1).max(250000),version:z.number().int().positive()}).strict().parse(req.body),principal=httpPrincipal(res);
+    await transaction(db,async client=>{
+      const candidate=await lockCandidate(client,principal,String(req.params.id));
+      if(candidate.version!==input.version||candidate.status!=='pending')throw new AppError(409,'候选已变化或已发布');
+      const sourceBounds=combineSourceBounds([await readCandidateBounds(client,candidate.id),...(administrative(principal)?[rootSourceBounds()]:[])]);
+      await client.query("UPDATE automation_knowledge_candidates SET title=$1,content=$2,version=version+1,source_bounds=$3 WHERE id=$4",[input.title,input.content,sourceBounds,candidate.id]);
+    });res.json({ok:true});
   });
+  router.post('/automation/knowledge-candidates/:id/publish',async(req,res)=>withVaultLock(async()=>{
+    const input=z.object({version:z.number().int().positive(),reviewed:z.literal(true)}).strict().parse(req.body),principal=httpPrincipal(res);
+    if(!options.publishKnowledge)throw new AppError(503,'知识发布服务未启用');
+    const publication=await transaction(db,async client=>{
+      const candidate=await lockCandidate(client,principal,String(req.params.id));
+      if(candidate.status==='published')return {id:candidate.published_document_id};
+      if(candidate.version!==input.version||!['pending','publishing'].includes(candidate.status))throw new AppError(409,'候选已变化，请重新审查');
+      const source=await authorizedSource(client,candidate.run_id,candidate.document_id,principal);
+      if(candidate.reuse_evidence)await validateReuseEvidence(client,resolve(process.env.TRACE_ROOT??'.data/runs'),candidate.reuse_evidence,principal);
+      const sourceBounds=await readCandidateBounds(client,candidate.id);
+      // The real callback writes the revision and audit with this same client; no intermediate published claim.
+      const result=await options.publishKnowledge!({spaceId:candidate.space_id,title:candidate.title,content:candidate.content,source:{runId:candidate.run_id,...(typeof source.source_metadata?.skillName==='string'?{skillName:source.source_metadata.skillName}:{}),note:`人工审查的知识候选 ${candidate.id}；原文 ${candidate.document_id}:v${candidate.source_version} SHA256 ${candidate.source_hash}`}},candidate.id,sourceBounds,{principal,client});
+      await client.query("UPDATE automation_knowledge_candidates SET status='published',published_document_id=$1,version=version+1,publishing_at=NULL WHERE id=$2",[result.id,candidate.id]);return result;
+    });await writeVaultDocument(publication.id);res.json({id:publication.id});
+  }));
   router.get('/automation/improvements', async (_req, res) => res.json((await db.query('SELECT id,title,source_run_id AS "sourceRunId",baseline,proposal,cases,status,version FROM automation_improvements ORDER BY created_at DESC LIMIT 100')).rows));
   router.post('/automation/improvements', async (req, res) => {
     const input = z.object({ title: z.string().trim().min(1).max(200), sourceRunId: z.string().optional(), baseline: z.string().trim().min(1).max(10000), proposal: z.string().trim().min(1).max(10000), cases: z.array(improvementCaseSchema).min(1).max(20) }).parse(req.body);

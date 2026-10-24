@@ -10,7 +10,7 @@ const sameSource=(a,b)=>a.documentId===b.documentId&&a.version===b.version&&a.sh
 const rank=(entries,query)=>searchKnowledge(entries.map(entry=>({...entry,content:entry.name+' '+entry.description})),query,6).map(({content,score,...entry})=>entry);
 
 /** Discovery does not grant execution rights; all results come from the approved employee scope. */
-export function installEmployeeCapabilities(ctx,{employee,agent,manifest,queryKnowledge,archive,activeWork}){
+export function installEmployeeCapabilities(ctx,{employee,agent,manifest,queryKnowledge,beforeKnowledge,archive,activeWork,toolCatalog}){
  const readable=employee.tools.includes('knowledge_search')&&employee.tools.includes('knowledge_read');
  const output={schema:{type:'json'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]};
  const check=exec=>{
@@ -18,6 +18,7 @@ export function installEmployeeCapabilities(ctx,{employee,agent,manifest,queryKn
   exec.signal?.throwIfAborted();
  };
  const query=async(operation,value)=>{
+  await beforeKnowledge?.();
   if(queryKnowledge)return queryKnowledge(manifest,employee.id,operation,value);
   if(manifest?.format==='document-versions-v2'&&manifest.documents?.length)throw Error('KNOWLEDGE_SERVICE_UNAVAILABLE: 知识加载服务不可用');
   const chunks=manifest?.[employee.id]??[];
@@ -30,7 +31,7 @@ export function installEmployeeCapabilities(ctx,{employee,agent,manifest,queryKn
    const knowledge=employee.tools.includes('knowledge_search')?await query('search',value):[];
    const catalog=readable&&ctx.skills?await ctx.skills.list({scope:agent,signal:exec.signal}):[];
    const skills=rank(catalog.filter(skill=>skill.invocation.modelInvocable).map(({name,description})=>({name,description})),value);
-   const tools=rank(ctx.tools.schemas(agent).filter(schema=>employee.tools.includes(schema.name)).map(({name,description})=>({name,description:String(description??'').slice(0,300)})),value);
+   const tools=rank(toolCatalog?.()??[],value);
    check(exec);
    archive?.append('capability/searched',{agentId:employee.id,query:value,knowledge:knowledge.map(chunk=>({chunkId:chunk.id,...sourceIdentity(chunk)})),skills:skills.map(skill=>skill.name),tools:tools.map(tool=>tool.name)},{sessionId:agent.id,callId:exec.callId});
    return {knowledge,skills,tools};

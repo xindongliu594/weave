@@ -6,6 +6,11 @@ import { migrateBrowserMcp } from './work-tools-browser.ts';
 import { migrateWorkFiles } from './work-files.ts';
 import { migrateAutomationLearning } from './automation-learning.ts';
 import {migrateIdentity} from './identity-schema.ts';
+import {migrateProjectRoutes} from './project-route-access.ts';
+import {migrateToolEffectContracts} from './tool-effect-contracts.ts';
+import {migrateToolOperations} from './tool-operations.ts';
+import {migrateHumanApprovals} from './human-audit.ts';
+import {migrateBackupRestoreState} from './backup-restore-state.ts';
 export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL ?? 'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department' });
 export async function migrate() {
   await pool.query(`
@@ -48,7 +53,12 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS usage_project ON usage(project_id);
     CREATE INDEX IF NOT EXISTS project_runs_project ON project_runs(project_id, created_at DESC);
   `);
+  await migrateIdentity(pool);
+  await migrateToolEffectContracts(pool);
   await migrateProduct(pool);
+  await migrateToolOperations(pool);
+  await migrateHumanApprovals(pool);
+  await migrateBackupRestoreState(pool);
   await pool.query(`
     ALTER TABLE request_keys ADD COLUMN IF NOT EXISTS principal_key text;
     UPDATE request_keys SET principal_key='legacy-local' WHERE principal_key IS NULL;
@@ -61,9 +71,9 @@ export async function migrate() {
       END IF;
     END $$;
   `);
-  await migrateIdentity(pool);
   await migrateStorage(pool);
   await migrateManagerChat(pool);
+  await migrateProjectRoutes(pool);
   await migrateBrowserMcp(pool);
   await migrateWorkFiles(pool);
   await migrateAutomationLearning(pool);

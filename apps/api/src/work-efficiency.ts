@@ -1,6 +1,9 @@
 import {createHash} from 'node:crypto';
 import type pg from 'pg';
 import {readRun,type RunDetail,type TraceEvent} from '../../../services/agent-runtime/trace-store.mjs';
+import type {Principal} from './identity-types.ts';
+import {knowledgePrincipal,requireRunRoute,assertRunArchiveBinding} from './project-route-access.ts';
+import {visibleSourceQuery} from './resource-authorization.ts';
 
 const metrics=['wallMs','activeMs','modelMs','inputTokens','outputTokens','totalTokens','modelCalls','cost'] as const;
 type Metric=typeof metrics[number];
@@ -28,7 +31,9 @@ export function compareEfficiency(baseline:Efficiency,current:Efficiency){
 }
 
 /** Read receipts and immutable run inputs; never call a model or infer a missing bill as zero. */
-export async function runEfficiency(db:Pick<pg.Pool,'query'>,run:RunDetail){
+export async function runEfficiency(db:Pick<pg.Pool,'query'>,run:RunDetail,identity?:Principal){
+ const principal=knowledgePrincipal(identity);await requireRunRoute(db,principal,run.id,'viewer');
+ const row=(await db.query('SELECT * FROM project_runs WHERE id=$1',[run.id])).rows[0];assertRunArchiveBinding(principal,row,run);
  const rows=(await db.query('SELECT id,input_tokens,output_tokens,cost,duration_ms FROM usage WHERE run_id=$1 ORDER BY created_at,id',[run.id])).rows;
  const receipts=(await db.query('SELECT id,status FROM model_reservations WHERE run_id=$1',[run.id])).rows;
  const open=receipts.filter(r=>['pending','uncertain'].includes(r.status)).length;
@@ -45,10 +50,10 @@ export async function runEfficiency(db:Pick<pg.Pool,'query'>,run:RunDetail){
  return {runId:run.id,goalHash:hash(s.requirement),acceptanceHash:hash((s.approvedTasks??s.tasks).map((t:any)=>({id:t.id,kind:t.kind,criteria:t.acceptanceCriteria,verify:t.verify,checks:t.acceptanceChecks}))),modelHash:hash({agents:s.agents.map((a:any)=>({id:a.id,model:a.model,modelId:a.modelId})),routes:s.modelRoutes,outputLimits:s.tasks.map((t:any)=>({id:t.id,maxOutputTokens:t.maxOutputTokens}))}),deviceHash:hash(s.executionTarget),initialFilesHash:hash((s.importedFiles??[]).map((f:any)=>({path:f.path,sha256:f.sha256}))),resumed:Boolean(s.resumedFrom||s.completedCheckpoints?.length||s.recovery),usageComplete:complete,wallMs,approvalWaitMs:waitingMs,activeMs:wallMs===null||waitingMs===null?null:wallMs-waitingMs,modelMs:rows.length&&rows.length===requests&&rows.every(r=>Number.isFinite(r.duration_ms)&&r.duration_ms>=0)?sum('duration_ms'):null,inputTokens:complete?sum('input_tokens'):null,outputTokens:complete?sum('output_tokens'):null,totalTokens:complete?sum('input_tokens')+sum('output_tokens'):null,modelCalls:requests,cost:complete?sum('cost'):null,pendingReceipts:open,knowledgeVersions:(s.knowledge?.documents??[]).map((d:any)=>({documentId:d.documentId,version:d.version,sha256:d.sha256})),citations};
 }
 
-export async function workEfficiency(db:Pick<pg.Pool,'query'>,traceRoot:string,run:RunDetail){
- const current=await runEfficiency(db,run);
- const candidates=(await db.query("SELECT id FROM project_runs WHERE status='completed' AND snapshot->>'requirement'=$1 AND snapshot->>'departmentId'=$2 AND created_at<(SELECT created_at FROM project_runs WHERE id=$3) ORDER BY created_at,id",[run.snapshot.requirement,(run.snapshot as any).departmentId,run.id])).rows;
+export async function workEfficiency(db:Pick<pg.Pool,'query'>,traceRoot:string,run:RunDetail,identity?:Principal){
+ const principal=knowledgePrincipal(identity),current=await runEfficiency(db,run,principal),visible=visibleSourceQuery(principal,'run','viewer',{parameterOffset:3});
+ const candidates=(await db.query(`SELECT id FROM project_runs WHERE status='completed' AND snapshot->>'requirement'=$1 AND snapshot->>'departmentId'=$2 AND created_at<(SELECT created_at FROM project_runs WHERE id=$3) AND id IN (${visible.text}) ORDER BY created_at,id LIMIT 100`,[run.snapshot.requirement,(run.snapshot as any).departmentId,run.id,...visible.values])).rows;
  let baseline:Awaited<ReturnType<typeof runEfficiency>>|null=null;
- for(const candidate of candidates){const previous=readRun(traceRoot,candidate.id);if(!previous||previous.status!=='completed'||previous.integrity!=='ok')continue;const value=await runEfficiency(db,previous);if(compareEfficiency(value,current).comparable){baseline=value;break;}}
+ for(const candidate of candidates){await requireRunRoute(db,principal,candidate.id,'viewer');const previous=readRun(traceRoot,candidate.id);if(!previous||previous.status!=='completed'||previous.integrity!=='ok')continue;const value=await runEfficiency(db,previous,principal);if(compareEfficiency(value,current).comparable){baseline=value;break;}}
  return {current,baseline,comparison:baseline?compareEfficiency(baseline,current):null,method:'同部门、同需求、同验收标准、同模型、同初始工作区文件及执行设备的首次完整成功运行；恢复分段不计算收益。仅统计执行阶段，规划对话另记。固定知识版本数量只统计公司 / 部门知识文档，导入工作区资料另见来源运行。净耗时仅扣除审批等待，不代表 CPU 时间。正值为减少，负值为增加；零基准无百分比。此为实测对照，不能单独证明知识复用导致收益。'};
 }

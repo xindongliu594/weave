@@ -4,6 +4,31 @@ import { isDeepStrictEqual } from 'node:util';
 import { z } from 'zod';
 import { normalizeAuditInput, type AuditInput } from './audit-events.ts';
 import { identityText } from './identity-types.ts';
+import {summarizeObservation,type ObservationSummary} from '../../../services/agent-runtime/observation-summary.mjs';
+
+type ProjectionListener={sink:(summary:ObservationSummary)=>unknown;pending:boolean};
+type ProjectionObservers={listeners:Set<ProjectionListener>;emitted:number;dropped:number;failures:number};
+const projectionObservers=new WeakMap<pg.Pool,ProjectionObservers>();let observedPools=0;
+const increment=(value:number)=>Math.min(Number.MAX_SAFE_INTEGER,value+1);
+/** Optional local observation only. No observer participates in the SQL transaction. */
+export function observeAuditProjections(pool:pg.Pool,sink:(summary:ObservationSummary)=>unknown):()=>void{
+  if(!pool||typeof sink!=='function')throw Error('AUDIT_OBSERVER_INVALID');
+  let state=projectionObservers.get(pool);
+  if(!state){if(observedPools>=16)throw Error('AUDIT_OBSERVER_POOL_LIMIT');state={listeners:new Set(),emitted:0,dropped:0,failures:0};projectionObservers.set(pool,state);observedPools++;}
+  if(state.listeners.size>=8)throw Error('AUDIT_OBSERVER_LIMIT');const listener={sink,pending:false};state.listeners.add(listener);let disposed=false;
+  return ()=>{if(disposed)return;disposed=true;state.listeners.delete(listener);if(!state.listeners.size){projectionObservers.delete(pool);observedPools--;}};
+}
+export function auditProjectionObservationHealth(pool:pg.Pool){const state=projectionObservers.get(pool);return {subscribers:state?.listeners.size??0,emitted:state?.emitted??0,dropped:state?.dropped??0,failures:state?.failures??0};}
+function observeCommittedProjections(pool:pg.Pool,projections:unknown[]){
+  const state=projectionObservers.get(pool);if(!state)return;
+  for(const projection of projections){
+    const summary=summarizeObservation({kind:'audit',projection});if(!summary){state.dropped=increment(state.dropped);continue;}state.emitted=increment(state.emitted);
+    for(const listener of [...state.listeners]){if(!state.listeners.has(listener))continue;if(listener.pending){state.dropped=increment(state.dropped);continue;}
+      try{const result=listener.sink(summary);if(result&&typeof (result as PromiseLike<unknown>).then==='function'){listener.pending=true;Promise.resolve(result).then(()=>{listener.pending=false;},()=>{listener.pending=false;state.failures=increment(state.failures);});}}
+      catch{state.failures=increment(state.failures);}
+    }
+  }
+}
 
 const legacyText = z.string().refine(value => identityText(value));
 const legacyActor = z.discriminatedUnion('kind', [
@@ -63,6 +88,12 @@ function summaryFor(row: ClaimedRow) {
     canonicalSha256: createHash('sha256').update(canonicalJson(input)).digest('hex') };
 }
 
+/** Canonical DB reads share the projection's strict parser without requiring an outbox delivery. */
+export function summarizeAuditSource(source: Record<string, any>) {
+  return summaryFor({id:source.id,audit_event_id:source.id,run_id:source.run_id,event_type:source.action,
+    payload:source.canonical_payload,attempts:0,source,projection_id:null});
+}
+
 async function retry(client: pg.PoolClient, row: Pick<ClaimedRow, 'id'>, code: FailureCode, now: Date) {
   await client.query(`UPDATE audit_outbox SET attempts=LEAST(attempts::bigint+1,2147483647),
     next_attempt_at=$2::timestamptz+(ARRAY[1,2,4,8,16,30])[LEAST(attempts,5)+1]*INTERVAL '1 second',last_error_code=$3
@@ -89,6 +120,7 @@ export async function projectAuditOutbox(pool: pg.Pool, options: { limit: number
     claimed = result.rows;
     let count = Number((await client.query('SELECT count(*)::int n FROM audit_run_projection')).rows[0].n);
     const publishedAuditIds: string[] = [];
+    const observationSummaries:unknown[]=[];
     for (const row of claimed) {
       await client.query('SAVEPOINT audit_projection_row');
       try {
@@ -101,7 +133,7 @@ export async function projectAuditOutbox(pool: pg.Pool, options: { limit: number
         const marked = await client.query('UPDATE audit_outbox SET published_at=$2,last_error_code=NULL WHERE id=$1 AND published_at IS NULL RETURNING id', [row.id, options.now]);
         if (marked.rowCount !== 1) throw Error('AUDIT_RELATION_CONFLICT');
         await client.query('RELEASE SAVEPOINT audit_projection_row');
-        count++; publishedAuditIds.push(row.audit_event_id);
+        count++; publishedAuditIds.push(row.audit_event_id);observationSummaries.push(summary);
       } catch (error) {
         await client.query('ROLLBACK TO SAVEPOINT audit_projection_row');
         const message = error instanceof Error ? error.message : '';
@@ -112,6 +144,7 @@ export async function projectAuditOutbox(pool: pg.Pool, options: { limit: number
     }
     const remaining = Number((await client.query('SELECT count(*)::int n FROM audit_outbox WHERE published_at IS NULL')).rows[0].n);
     await client.query('COMMIT');
+    observeCommittedProjections(pool,observationSummaries);
     return { projected: publishedAuditIds.length, remaining, publishedAuditIds };
   } catch {
     if (client) {

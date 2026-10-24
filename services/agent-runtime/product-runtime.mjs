@@ -43,11 +43,14 @@ export function approvedTeamExecutionDescription(snapshot) {
 }
 
 export class ProductDshRuntime {
-  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, externalTool, beforeRequest,onResponse,onCallError,createExecutor }) {
+  constructor({ traceRoot, onUsage, requestApproval, queryKnowledge, externalTool, beforeRequest,beforeTool,beforeKnowledge,onResponse,onCallError,createExecutor,effectAuthority,runtimeBindingsForRun }) {
     this.traceRoot = traceRoot;
     this.jobs = new Map();
     this.queryKnowledge = queryKnowledge; this.onUsage = onUsage; this.requestApproval = requestApproval;
     this.externalTool=externalTool;
+    this.effectAuthority=effectAuthority;
+    this.runtimeBindingsForRun=runtimeBindingsForRun;
+    this.beforeTool=beforeTool;this.beforeKnowledge=beforeKnowledge;
     this.beforeRequest=beforeRequest;this.onResponse=onResponse;this.onCallError=onCallError;this.createExecutor=createExecutor;
   }
 
@@ -212,9 +215,13 @@ export class ProductDshRuntime {
       job.adapter=adapter;
       const workspace = join(archive.dir, 'workspace');
       mkdirSync(workspace, { recursive: true, mode: 0o700 });
+      const runtimeBindings=await this.runtimeBindingsForRun?.(archive.id,snapshot);
+      if(runtimeBindings!==undefined&&(!runtimeBindings||!runtimeBindings.effectAuthority||typeof runtimeBindings.queryKnowledge!=='function'))throw Error('TOOL_EFFECT_RUNTIME_BINDING_INVALID');
+      const effectAuthority=runtimeBindings===undefined?this.effectAuthority:runtimeBindings.effectAuthority;
+      const queryKnowledge=runtimeBindings===undefined?this.queryKnowledge:runtimeBindings.queryKnowledge;
       job.hostCreatePromise = createTeamHost({ adapter, provider, onLifecycle: lifecycle => { job.hostLifecycle=lifecycle; }, sessionRoot: join(archive.dir, 'sessions'), archive, maxMembers: snapshot.agents.length,
         context: employeeContextPolicy(snapshot.policy, routes, provider),
-        product: { snapshot, sandbox, gate, supervisor, goal, requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge: this.queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; supervisor.stop(error); adapter.stopAdmission(error); } } });
+        product: { snapshot, sandbox, gate, supervisor, goal, effectAuthority, beforeTool:this.beforeTool?signal=>this.beforeTool(archive.id,signal):undefined,beforeKnowledge:this.beforeKnowledge?signal=>this.beforeKnowledge(archive.id,signal):undefined,requestApproval: this.requestApproval?(input,signal)=>{assertArchiveCapacity(archive.dir);return this.requestApproval(input,signal);}:undefined, queryKnowledge, externalTool:this.externalTool, onHandoffBlocked: error => { runtimeFailure ??= error; supervisor.stop(error); adapter.stopAdmission(error); } } });
       host = await job.hostCreatePromise;
       job.host = host;
       job.controller.signal.throwIfAborted();

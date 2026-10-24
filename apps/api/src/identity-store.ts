@@ -26,7 +26,8 @@ function fingerprint(config: OidcIdentityConfig): string {
   return createHash('sha256').update(JSON.stringify([config.bootstrapIssuer, config.bootstrapSubject])).digest('hex');
 }
 
-async function lockBootstrap(db: IdentityQueryExecutor): Promise<BootstrapRow> {
+// Every change to the active-administrator set takes this lock before user rows.
+export async function lockIdentityAdministration(db: IdentityQueryExecutor): Promise<BootstrapRow> {
   const { rows } = await db.query<BootstrapRow>('SELECT expected_fingerprint,activated_at,consumed_at,closed_at FROM identity_bootstrap WHERE id=1 FOR UPDATE');
   if (!rows[0]) throw Error('Identity bootstrap state is missing');
   return rows[0];
@@ -64,7 +65,7 @@ async function activateLocked(db: IdentityQueryExecutor, state: BootstrapRow, co
 }
 
 export async function activateIdentityMode(pool: IdentityPool, config: IdentityConfig): Promise<void> {
-  await transaction(pool, async db => activateLocked(db, await lockBootstrap(db), config));
+  await transaction(pool, async db => activateLocked(db, await lockIdentityAdministration(db), config));
 }
 
 function humanUser(row: UserRow): HumanUser {
@@ -79,7 +80,7 @@ export async function upsertOidcIdentity(pool: IdentityPool, config: OidcIdentit
     (claims.displayName !== undefined && !identityText(claims.displayName)) ||
     (claims.email !== undefined && !identityText(claims.email))) throw Error('Invalid verified OIDC identity');
   return transaction(pool, async db => {
-    const state = await lockBootstrap(db);
+    const state = await lockIdentityAdministration(db);
     await activateLocked(db, state, config);
     // All bootstrap candidates use this durable singleton lock, including duplicate callbacks.
     const bootstrap = !state.consumed_at && !state.closed_at

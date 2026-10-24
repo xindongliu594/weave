@@ -33,7 +33,7 @@ before(async () => {
   await pool.query("INSERT INTO departments(id,data) VALUES('department',$1)", [{ name: '研发部', agents: plan.agents }]);
   await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES('project','department',1,'研发部','实现一个具备验收标准的任务',$1,$2,'manual')", [{ maxBudget: 5, allowedModelIds: ['model'] }, plan]);
   service = new module.ManagerChatService(pool);
-  const app = express(); app.use(express.json()); app.use(module.managerChatRouter()); app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message }));
+  const app = express(); app.use(express.json()); app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();}); app.use(module.managerChatRouter()); app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 });
 beforeEach(async () => {

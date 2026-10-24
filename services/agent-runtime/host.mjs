@@ -50,6 +50,7 @@ export function reviewCompletionGuidance(contract, outputLimit) {
 /** Department coordination Host; execution loops live in employee-owned Hosts. */
 export async function createTeamHost({ adapter, provider, sessionRoot, archive, maxMembers = 6, product, context, onLifecycle }) {
   if (!sessionRoot || !isAbsolute(sessionRoot)) throw new Error('An absolute, dedicated sessionRoot is required');
+  await product?.effectAuthority?.assertRuntimeBindings?.({queryKnowledge:product.queryKnowledge,snapshot:product.snapshot});
   const ctx = new Context();
   const nativeTeardown = observeNativeTeardown(ctx);
   const fibers = [];
@@ -277,7 +278,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     await mount('@deepseek-ai/dsh-session-projection');
     await mount('@deepseek-ai/dsh-system-prompt');
     await mount('@deepseek-ai/dsh-tools', { mode: 'native' });
-    if(product?.snapshot.executionProfile==='task-attempt-openshell-v1')taskBoundary=installTaskToolBoundary(ctx);
+    if(product?.snapshot.executionProfile==='task-attempt-openshell-v1'||product?.snapshot.effectContractVersion===1)taskBoundary=installTaskToolBoundary(ctx);
     await mount('@deepseek-ai/dsh-agent');
     if (product) {
       ctx.on('session/event', (session,event) => {
@@ -315,6 +316,8 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
         try { handoff?.assertRunCheckpointReady();product.supervisor?.check(); yield* next(); } finally { release(); }
       });
       ctx.on('tools/pre-execute', async (exec,next) => {
+        await product.beforeTool?.(exec.signal);
+        exec.signal?.throwIfAborted();
         handoff?.assertRunCheckpointReady();
         product.goal?.check('tool');
         product.supervisor?.check();
@@ -409,7 +412,9 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
     };
     employees = new EmployeeHostFactory({ coordinator: ctx, provider, sessionRoot, trace, archive,
       taskToolBoundary:Boolean(taskBoundary),
-      context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge, activeWork:product?activeWork:undefined,
+      effectSnapshot: product && (product.snapshot.effectContractVersion !== undefined || product.snapshot.effectContracts !== undefined) ? product.snapshot : undefined,
+      effectAuthority: product?.effectAuthority,
+      context: employeeContext, skillManifest: product?.snapshot.knowledge, queryKnowledge:product?.queryKnowledge,beforeTool:product?.beforeTool,beforeKnowledge:product?.beforeKnowledge, activeWork:product?activeWork:undefined,
       pendingCompletion,handoffClosure:handoff?handoffClosure:undefined,
       assignmentReports:handoff?agent=>{
         if(agent.id===captainId)return ''; // Coordination has no assigned employee task or native assignment report.
@@ -450,6 +455,7 @@ export async function createTeamHost({ adapter, provider, sessionRoot, archive, 
       } : undefined,
       identify: agent => product ? (agent.session.header.parentSession ? employeeFor(agent, product.snapshot, captainId) : product.snapshot.agents.find(item => item.role === 'manager')) : undefined,
       loadPlugin: name => import(pathToFileURL(baseRequire.resolve(name)).href) });
+    if(product?.effectAuthority?.runtimeOperations)taskBoundary.setBodyPolicy(exec=>employees.checkForwardBody(exec));
     removeFactory = ctx.agents.setFactory(employees);
     archive?.append('runtime/architecture', { version: 'employee-host-v1', isolation: 'host', process: 'shared', coordinatorOwns: ['team', 'budget', 'permissions', 'handoff'] });
     await mount('@deepseek-ai/dsh-subagent');

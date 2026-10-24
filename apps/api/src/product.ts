@@ -85,9 +85,9 @@ export function productRouter(){
       if(input.target){
         currentProject=(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[pId])).rows[0];
         await requireProjectCostReady(client,pId);
-        // Match model admission lock ordering: project, global cost policy, then department.
-        costConfig=await lockCostPolicy(client);
+        // Admission locks department configuration before the global cost policy.
         currentDepartment=(await client.query('SELECT * FROM departments WHERE id=$1 AND deleted_at IS NULL FOR UPDATE',[dId])).rows[0];
+        costConfig=await lockCostPolicy(client);
         if(!currentProject||!currentDepartment||currentProject.department_id!==dId)throw new AppError(404,'原团队或项目不存在，请查看部门与员工');
         if(currentProject.version!==input.target.projectVersion||currentDepartment.version!==input.target.departmentVersion)throw new AppError(409,'团队或项目已在其他页面修改，请查看最新方案后再调整','VERSION_CONFLICT');
         if(currentProject.status!=='DRAFT'||(await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[pId])).rowCount)throw new AppError(409,'该项目已进入执行流程。请在项目页管理后续修改，或开始新需求','PROJECT_ACTIVE');

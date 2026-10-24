@@ -1,2 +1,3 @@
 import type { RunDetail } from './trace-store.mjs';
-export function runTraceVerification(root: string): Promise<RunDetail>;
+import type { ArchiveWriterManager } from './archive-writer-scope.mjs';
+export function runTraceVerification(root: string, options: {writers:ArchiveWriterManager;snapshot?:unknown}): Promise<RunDetail>;
