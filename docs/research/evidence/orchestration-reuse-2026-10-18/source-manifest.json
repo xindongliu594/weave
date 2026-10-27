@@ -1,0 +1,127 @@
+{
+  "recordedAt": "2026-10-18T07:46:11.0288774Z",
+  "method": "read-only source and documentation audit; downloaded sources not executed",
+  "remoteFiles": [
+    {
+      "repository": "toolclub/dsh-agent-team-gui",
+      "revision": "9e952e0681d528975444568b70f3c554ac2984be",
+      "path": "package.json",
+      "url": "https://raw.githubusercontent.com/toolclub/dsh-agent-team-gui/9e952e0681d528975444568b70f3c554ac2984be/package.json",
+      "sha256": "980a4592f37ed256087d8d63764c6ab78ec808f1ccaac07814bc2af2ed525ffc",
+      "bytes": 7033
+    },
+    {
+      "repository": "toolclub/dsh-agent-team-gui",
+      "revision": "9e952e0681d528975444568b70f3c554ac2984be",
+      "path": "src/index.ts",
+      "url": "https://raw.githubusercontent.com/toolclub/dsh-agent-team-gui/9e952e0681d528975444568b70f3c554ac2984be/src/index.ts",
+      "sha256": "7f61a3350d109520a7ed5e00dfb03bbf3ab2ae593322402c4e5896e8112babc8",
+      "bytes": 9296
+    },
+    {
+      "repository": "toolclub/dsh-agent-team-gui",
+      "revision": "9e952e0681d528975444568b70f3c554ac2984be",
+      "path": "src/tools/recipes.ts",
+      "url": "https://raw.githubusercontent.com/toolclub/dsh-agent-team-gui/9e952e0681d528975444568b70f3c554ac2984be/src/tools/recipes.ts",
+      "sha256": "4b37234b3804cf6567c3ecea4d88469905154ca2631bd99d971bf17fe3323a94",
+      "bytes": 5166
+    },
+    {
+      "repository": "toolclub/dsh-agent-team-gui",
+      "revision": "9e952e0681d528975444568b70f3c554ac2984be",
+      "path": "src/tools/application/definition-service.ts",
+      "url": "https://raw.githubusercontent.com/toolclub/dsh-agent-team-gui/9e952e0681d528975444568b70f3c554ac2984be/src/tools/application/definition-service.ts",
+      "sha256": "e19d95f3c97733578d0d71eaacf34a438028a1c1cdff7fb46012b9dd10bec89b",
+      "bytes": 63357
+    },
+    {
+      "repository": "toolclub/dsh-agent-team-gui",
+      "revision": "9e952e0681d528975444568b70f3c554ac2984be",
+      "path": "src/tools/application/execution-service.ts",
+      "url": "https://raw.githubusercontent.com/toolclub/dsh-agent-team-gui/9e952e0681d528975444568b70f3c554ac2984be/src/tools/application/execution-service.ts",
+      "sha256": "962295a4da377f647c80a5347166c66fa76a1aa2e92499b59f9834f4dcd8b2f5",
+      "bytes": 106828
+    },
+    {
+      "repository": "toolclub/dsh-agent-team-gui",
+      "revision": "9e952e0681d528975444568b70f3c554ac2984be",
+      "path": "examples/full-stack-delivery.recipe.json",
+      "url": "https://raw.githubusercontent.com/toolclub/dsh-agent-team-gui/9e952e0681d528975444568b70f3c554ac2984be/examples/full-stack-delivery.recipe.json",
+      "sha256": "da41d682058a7e4c513409bf37d4bdc3b738bf1bc9b960c50ade93925d8c63a4",
+      "bytes": 2662
+    },
+    {
+      "repository": "iguowz/dsh-cortex",
+      "revision": "e2a9acacf7255678220dd927c4348db03851d6d7",
+      "path": "package.json",
+      "url": "https://raw.githubusercontent.com/iguowz/dsh-cortex/e2a9acacf7255678220dd927c4348db03851d6d7/package.json",
+      "sha256": "4e48de1b4ef1e6979c5b881c64d9189a524fab86d7cee6307fb5c45e9198eed6",
+      "bytes": 2161
+    },
+    {
+      "repository": "iguowz/dsh-cortex",
+      "revision": "e2a9acacf7255678220dd927c4348db03851d6d7",
+      "path": "lib/engine/fingerprint.js",
+      "url": "https://raw.githubusercontent.com/iguowz/dsh-cortex/e2a9acacf7255678220dd927c4348db03851d6d7/lib/engine/fingerprint.js",
+      "sha256": "509ffa698a9d6e3fc2026e7d51c53de002c38870fb8cff5354f4328f429392f0",
+      "bytes": 8202
+    },
+    {
+      "repository": "iguowz/dsh-cortex",
+      "revision": "e2a9acacf7255678220dd927c4348db03851d6d7",
+      "path": "lib/engine/router.js",
+      "url": "https://raw.githubusercontent.com/iguowz/dsh-cortex/e2a9acacf7255678220dd927c4348db03851d6d7/lib/engine/router.js",
+      "sha256": "b2bc04e5e128f4abd2c051112a196ff23644a859085e3965d617d759fae1a68b",
+      "bytes": 24728
+    },
+    {
+      "repository": "iguowz/dsh-cortex",
+      "revision": "e2a9acacf7255678220dd927c4348db03851d6d7",
+      "path": "lib/engine/store.js",
+      "url": "https://raw.githubusercontent.com/iguowz/dsh-cortex/e2a9acacf7255678220dd927c4348db03851d6d7/lib/engine/store.js",
+      "sha256": "47d1d4ff3742f42c8627d20e1d05d94ef85506ef291673a4465ab91bd809702b",
+      "bytes": 22989
+    },
+    {
+      "repository": "iguowz/dsh-cortex",
+      "revision": "e2a9acacf7255678220dd927c4348db03851d6d7",
+      "path": "lib/service.js",
+      "url": "https://raw.githubusercontent.com/iguowz/dsh-cortex/e2a9acacf7255678220dd927c4348db03851d6d7/lib/service.js",
+      "sha256": "910040b70d71e5344c59c289e59afa6e616187df8ff56084c45822e1e48d45e9",
+      "bytes": 572027
+    }
+  ],
+  "localInstalledFiles": [
+    {
+      "package": "@nanmicoder/dsh-agent-teams",
+      "version": "0.1.20",
+      "path": "package.json",
+      "sha256": "575fd230cd788e8d4f10dcca40bb88d4ca38c829e580e99af28e2c511770c31a"
+    },
+    {
+      "package": "@nanmicoder/dsh-agent-teams",
+      "version": "0.1.20",
+      "path": "README.md",
+      "sha256": "328c03303ff90f86e5d7ef36989e8f7d289de047c19470584429d0a728667133"
+    },
+    {
+      "package": "@nanmicoder/dsh-agent-teams",
+      "version": "0.1.20",
+      "path": "lib/profiles.js",
+      "sha256": "2d5518efe8547b0485e9542d3b995113113e2f38d9c62733b75a6c95ece8875e"
+    },
+    {
+      "package": "@nanmicoder/dsh-agent-teams",
+      "version": "0.1.20",
+      "path": "lib/types/profiles.d.ts",
+      "sha256": "b9bb251f5f9fa15fc12981518b31841d83c503f11928169d356a9f4b3d6be38f"
+    }
+  ],
+  "unavailable": {
+    "note": "Search/raw package cache exists; current repository API and README unavailable",
+    "githubApiStatus": 404,
+    "repository": "ImMappyJ/dsh-workflow"
+  },
+  "modelCalls": 0,
+  "productChanges": 0
+}

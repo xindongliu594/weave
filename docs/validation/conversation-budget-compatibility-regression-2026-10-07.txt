@@ -1,0 +1,53 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ independent new conversations with identical first prompts have distinct UUIDs and request keys (1562.386ms)
+✔ stored UUID survives reload, consultation, model settings changes and further turns (6.0548ms)
+✔ legacy stored draft gains metadata once while a persisted pending body and idempotency key remain byte-identical (0.9269ms)
+✔ new pending request UUID is authoritative on reload without altering any stored request fields (0.5838ms)
+✔ cancelled reset is immutable; confirmed reset archives original UUID/body before renewing the conversation (3.7473ms)
+✔ failed history persistence cannot replace the active conversation or mutate its pending request (1.3137ms)
+✔ actual API uses UUID attribution on multiple turns; duplicate same-key retrieval neither re-dispatches nor adds cost (258.6349ms)
+✔ two actual conversations with the same prompt remain separately attributed; UUID does not enter model messages (128.2365ms)
+✔ legacy pending same-key request keeps its exact input; invalid UUIDs are rejected before reserve and fetch (132.7528ms)
+✔ Go transport hashes each conversation UUID stably across retrieval, reload and further turns without external traffic (187.7742ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3951.8112
+✔ demand discussion records actual usage without estimating or reserving an execution budget (2321.1661ms)
+✔ usage-only accounting cannot be applied to execution or project identities (32.3553ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (99.1251ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (183.6805ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (247.3381ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (389.3484ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (168.3396ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (230.0109ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (110.1545ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (401.5057ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4681.1019
+✔ confirming a revised proposal updates the same team and draft project, records versions, and never executes (2421.3326ms)
+✔ execution state, archived teams and mismatched project ownership refuse an update without partial writes (153.5371ms)
+✔ all adopted planning charges count toward the updated budget and transfer only after successful confirmation (124.3108ms)
+✔ revisions still require preview identity and explicit tool permissions (75.2359ms)
+✔ pending and uncertain project charges block a revision before any budget or team change (158.6082ms)
+✔ a team participating in another active project cannot be changed through a saved conversation (130.8639ms)
+✔ employee prompt revisions advance role versions while replay and unchanged roles preserve them (139.742ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3655.9483

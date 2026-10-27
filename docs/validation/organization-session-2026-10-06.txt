@@ -1,0 +1,108 @@
+Organization session engineering validation 2026-10-06
+Frozen UTC: 2026-10-06T00:57:34.1410585+00:00
+Working directory: C:/Users/JJ/.codex/worktrees/f57c/agent_department
+Node: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+Isolation: fresh in-memory PGlite; Vite SSR; MemoryStorage; credential-free localhost HTTP fixture; no external gateway traffic.
+
+Command: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --import tsx --test tests/organization-reset-ui.test.ts
+Exit code: 0
+✔ first disconnected request with zero messages exposes an explicit exit and keeps same-request retrieval (1203.6799ms)
+✔ canceling the unknown-request confirmation preserves every byte and the original request key (0.8576ms)
+✔ confirmed reset archives the full original request first and opens an empty conversation without network calls (50.7292ms)
+✔ a stored team remains a history reference and cannot silently bind the next empty requirement (0.923ms)
+✔ archive failure cannot clear the active request; a later retry preserves history and does not duplicate its key (1.4251ms)
+✔ malformed history or inability to store it blocks reset instead of overwriting evidence (0.6257ms)
+✔ an archived key cannot be reused for a different body, and ordinary reset keeps its existing confirmation rules (0.8471ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4052.2759
+
+Command: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe scripts/test-integration.mjs tests/organization-session.test.ts
+Exit code: 0
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ independent new conversations with identical first prompts have distinct UUIDs and request keys (1589.9376ms)
+✔ stored UUID survives reload, consultation, model settings changes and further turns (3.6853ms)
+✔ legacy stored draft gains metadata once while a persisted pending body and idempotency key remain byte-identical (0.5861ms)
+✔ new pending request UUID is authoritative on reload without altering any stored request fields (0.3891ms)
+✔ cancelled reset is immutable; confirmed reset archives original UUID/body before renewing the conversation (2.4406ms)
+✔ failed history persistence cannot replace the active conversation or mutate its pending request (0.8497ms)
+✔ actual API uses UUID attribution on multiple turns; duplicate same-key retrieval neither re-dispatches nor adds cost (223.5902ms)
+✔ two actual conversations with the same prompt remain separately attributed; UUID does not enter model messages (129.5575ms)
+✔ legacy pending same-key request keeps its exact input; invalid UUIDs are rejected before reserve and fetch (133.7582ms)
+✔ Go transport hashes each conversation UUID stably across retrieval, reload and further turns without external traffic (187.6326ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3732.2703
+
+Final API run after explicitly typing the fetch mock parameters:
+Exit code: 0
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ independent new conversations with identical first prompts have distinct UUIDs and request keys (1546.3407ms)
+✔ stored UUID survives reload, consultation, model settings changes and further turns (3.5608ms)
+✔ legacy stored draft gains metadata once while a persisted pending body and idempotency key remain byte-identical (0.5756ms)
+✔ new pending request UUID is authoritative on reload without altering any stored request fields (0.3755ms)
+✔ cancelled reset is immutable; confirmed reset archives original UUID/body before renewing the conversation (2.4283ms)
+✔ failed history persistence cannot replace the active conversation or mutate its pending request (0.8659ms)
+✔ actual API uses UUID attribution on multiple turns; duplicate same-key retrieval neither re-dispatches nor adds cost (212.8742ms)
+✔ two actual conversations with the same prompt remain separately attributed; UUID does not enter model messages (127.4302ms)
+✔ legacy pending same-key request keeps its exact input; invalid UUIDs are rejected before reserve and fetch (133.5116ms)
+✔ Go transport hashes each conversation UUID stably across retrieval, reload and further turns without external traffic (168.8631ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3633.3372
+
+Latest API run after key:string fixes the TypeScript UUID-template inference; initial root typecheck log preserved:
+Exit code: 0
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ independent new conversations with identical first prompts have distinct UUIDs and request keys (1546.2597ms)
+✔ stored UUID survives reload, consultation, model settings changes and further turns (3.6172ms)
+✔ legacy stored draft gains metadata once while a persisted pending body and idempotency key remain byte-identical (0.5754ms)
+✔ new pending request UUID is authoritative on reload without altering any stored request fields (0.3742ms)
+✔ cancelled reset is immutable; confirmed reset archives original UUID/body before renewing the conversation (2.4361ms)
+✔ failed history persistence cannot replace the active conversation or mutate its pending request (0.8318ms)
+✔ actual API uses UUID attribution on multiple turns; duplicate same-key retrieval neither re-dispatches nor adds cost (228.7421ms)
+✔ two actual conversations with the same prompt remain separately attributed; UUID does not enter model messages (129.0987ms)
+✔ legacy pending same-key request keeps its exact input; invalid UUIDs are rejected before reserve and fetch (135.6576ms)
+✔ Go transport hashes each conversation UUID stably across retrieval, reload and further turns without external traffic (202.9245ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3659.0089
+
+Scoped git diff --check: exit 0; only an LF/CRLF Git warning.
+Frozen raw-file SHA256:
+0f9db0577e667d30eb205d0aef6d92ddaf30d03be60e2429b5a9c21c337f6019  apps/web/src/organization-draft.ts
+2192514039ba55c4cd49c036b7b63e143cc9ca1944d91eef5425d64a82b49d9d  apps/web/src/OrganizationChat.tsx
+9a98664eb4aaf09d24e7ce804a7294f6c92757f716db2f5770ddc04be9d8fca5  apps/api/src/organization-chat.ts
+59535c8abff296b43295d61ba43af41184edc5a638c8a1fc3058ca7d484e2200  tests/organization-session.test.ts
+8cb00d37993899e5a0a55080a343fb304f4989a018b0652e11fc00c067540bf1  tests/organization-reset-ui.test.ts
+8267bc2e3926d37e8aa1deabee796160744aa039e4a309b694d7116804eab629  apps/api/src/cost-control.ts
+122c06d2696bd434ead8191596fefeb034b31e1edcf3bb2df30744cd032b46ea  apps/api/src/provider.ts
+c6125121084924b6ae9a3a5a26497e0f8a6b7c0b24b551eaad4761e7fb587478  apps/api/src/idempotency.ts
+d99e21fe185f80fc8e7f4e03e8400151148b5facb77fe4e486f28568b890563d  services/agent-runtime/completion-protocol.mjs
+a244d653800340b1c567c0793650607d6b426ee230499b800486c09411750955  services/agent-runtime/completion-protocol.d.mts
+c00ed62fc7cf3f2c73916ed0d7313f62293efe45e77a0787a67283e5a4be3ad6  scripts/test-integration.mjs
+c6dfd78719309965b83a316dd286379c1eb0750a68f026ebe5793a8cd34eba74  scripts/test-support/pglite-pool.mjs
+

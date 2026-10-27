@@ -1,0 +1,178 @@
+✔ restored budget feedback retains occupied history and call limits without releasing unknown holds (3.0821ms)
+✔ feedback changes after reservation and settlement while preserving the stricter task cap (0.939ms)
+✔ unknown model pricing stays unknown and completed nodes do not inflate remaining estimates (0.3648ms)
+✔ runtime aliases resolve prices by original employee identity, matching real restored snapshots (0.4803ms)
+✔ project occupation bounds a larger task cap and overrun stays visible without increasing limits (1.0809ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (3.3267ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.4188ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.614ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.4874ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (36.2776ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.554ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.4707ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (1.953ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.1853ms)
+✔ execution slots cap concurrency and aborted waiters never start (2.0578ms)
+✔ context reduction retains active request and complete tool call groups (0.8633ms)
+✔ Chinese and English documents produce stable citations and bounded chunks (3.2038ms)
+✔ an abort during durable reservation never dispatches a request or reports an unknown sent call (7.0964ms)
+✔ response metadata is awaited before status handling, JSON parsing or usage settlement (27.8766ms)
+✔ an interruption after headers preserves request IDs without reading JSON or settling usage (1.1178ms)
+✔ absent or unsafe request ID headers are omitted and credentials are never echoed into metadata (4.8199ms)
+✔ failed metadata persistence keeps the sent receipt uncertain and never settles or falls back (4.8276ms)
+✔ an explicit HTTP fallback retains separate provider metadata for both requests (4.7655ms)
+✔ OpenAI compatible adapter translates tool calls, usage, routing and authorization (1.306ms)
+✔ adapter refuses an unaffordable protected request before reserving, persisting or sending it (0.8437ms)
+✔ fallback is explicit, bounded, attributed and never retries ambiguous network failures (2.1256ms)
+✔ summaries read every selected source message and refuse oversized input before dispatch (1.3962ms)
+✔ wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit (1.6917ms)
+✔ financial fitting preserves the full approved contract, checkpoint, older file and knowledge versions, and latest complete tool group (5.7168ms)
+✔ unaffordable protected older evidence and compaction sources block without editing history, taking calls or making durable reservations (13.877ms)
+✔ the original context byte cap and insufficient money produce distinct errors before durable admission or fetch (0.9302ms)
+✔ available finance is the smaller run or assigned task remainder including history and existing reservations (2.5556ms)
+✔ financial fitting cannot bypass identity, restored call caps, exhausted budgets or the 90 percent fallback and rework gates (1.8679ms)
+✔ two concurrent protected requests cannot both fit the same remaining allowance while durable admission awaits (0.9843ms)
+✔ financial admission preserves undefined versus empty tools reservation envelopes and the unchanged route output cap (1.1482ms)
+✔ failure to archive financial clipping evidence releases the synchronous hold and never reaches durable admission or fetch (0.9705ms)
+✔ a structured HTTP 502 exposes diagnostic code and message while retaining one unknown sent receipt (2.39ms)
+✔ error summaries scrub known and typical credentials before clipping and never forward extra provider data (3.9236ms)
+✔ malformed JSON, HTML and oversized bodies keep only the HTTP failure and never leak their contents (2.8365ms)
+✔ provider text remains inert quoted diagnostics with bounded length and unchanged status categories (2.4787ms)
+✔ oversized and endlessly empty error streams cancel without awaiting an untrusted cancel callback (3.3526ms)
+✔ a stalled error body has its own short deadline and cannot hang failure accounting (1510.0252ms)
+✔ user cancellation takes priority over error-body timeout without settling or replaying a sent call (29.9933ms)
+✔ latest host-owned contract and budget survive fitting after a later ordinary user message (35.8767ms)
+✔ an unaffordable current contract is blocked before receipt, fetch, or budget counters instead of dropping it (1.7253ms)
+✔ legacy snapshots preserve pinned route output caps, regardless of cumulative task estimate (35.899ms)
+✔ employees sharing one model keep independent approved per-request caps and the stricter request/route boundary (3.3684ms)
+✔ unattributed captain coordination retains its pinned route even when all employee task caps are smaller (1.0902ms)
+✔ cold recovery preserves task cap, historical fees/calls and counts authorized rework against the original task (1.2434ms)
+✔ an already authorized fallback keeps the original task cap and reserves each request at its actual route rate (4.5284ms)
+✔ unknown or foreign task attribution fails before any receipt, reservation or fetch (1.4177ms)
+✔ explicit cap changes both wire and pre-billing affordability without reducing legacy reservations or fixed evidence (1.5596ms)
+✔ invalid explicit cap fails closed at adapter construction while 1 and 32768 are accepted (1.632ms)
+✔ read-only budget feedback separates cumulative estimate and approved single-call cap, including legacy routes (1.0603ms)
+✔ task schema preserves legacy cumulative estimates and accepts only an explicit bounded integer per-call output cap (7.2774ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 55
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2060.5944
+typecheck exit=0
+Final regression including native first/cold recovery, ReworkGate attribution, and retained task holds:
+✔ restored budget feedback retains occupied history and call limits without releasing unknown holds (3.3089ms)
+✔ feedback changes after reservation and settlement while preserving the stricter task cap (0.862ms)
+✔ unknown model pricing stays unknown and completed nodes do not inflate remaining estimates (0.3631ms)
+✔ runtime aliases resolve prices by original employee identity, matching real restored snapshots (0.412ms)
+✔ project occupation bounds a larger task cap and overrun stays visible without increasing limits (1.0586ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (3.2467ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (2.1546ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (2.466ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.5194ms)
+✖ restored task holds remain occupied without charging the global carryover twice or releasing an older request (2.4656ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (33.6604ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.6509ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.4913ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.0203ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.3438ms)
+✔ execution slots cap concurrency and aborted waiters never start (1.9856ms)
+✔ context reduction retains active request and complete tool call groups (0.953ms)
+✔ Chinese and English documents produce stable citations and bounded chunks (3.2637ms)
+✔ an abort during durable reservation never dispatches a request or reports an unknown sent call (5.8391ms)
+✔ response metadata is awaited before status handling, JSON parsing or usage settlement (28.9759ms)
+✔ an interruption after headers preserves request IDs without reading JSON or settling usage (1.6892ms)
+✔ absent or unsafe request ID headers are omitted and credentials are never echoed into metadata (3.9918ms)
+✔ failed metadata persistence keeps the sent receipt uncertain and never settles or falls back (4.9373ms)
+✔ an explicit HTTP fallback retains separate provider metadata for both requests (4.8301ms)
+✔ OpenAI compatible adapter translates tool calls, usage, routing and authorization (1.32ms)
+✔ adapter refuses an unaffordable protected request before reserving, persisting or sending it (0.8844ms)
+✔ fallback is explicit, bounded, attributed and never retries ambiguous network failures (2.0617ms)
+✔ summaries read every selected source message and refuse oversized input before dispatch (1.4165ms)
+✔ wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit (1.7094ms)
+✔ financial fitting preserves the full approved contract, checkpoint, older file and knowledge versions, and latest complete tool group (5.6983ms)
+✔ unaffordable protected older evidence and compaction sources block without editing history, taking calls or making durable reservations (13.7135ms)
+✔ the original context byte cap and insufficient money produce distinct errors before durable admission or fetch (0.8932ms)
+✔ available finance is the smaller run or assigned task remainder including history and existing reservations (2.7769ms)
+✔ financial fitting cannot bypass identity, restored call caps, exhausted budgets or the 90 percent fallback and rework gates (1.887ms)
+✔ two concurrent protected requests cannot both fit the same remaining allowance while durable admission awaits (1.047ms)
+✔ financial admission preserves undefined versus empty tools reservation envelopes and the unchanged route output cap (1.1487ms)
+✔ failure to archive financial clipping evidence releases the synchronous hold and never reaches durable admission or fetch (0.9424ms)
+✔ a structured HTTP 502 exposes diagnostic code and message while retaining one unknown sent receipt (2.4647ms)
+✔ error summaries scrub known and typical credentials before clipping and never forward extra provider data (4.1347ms)
+✔ malformed JSON, HTML and oversized bodies keep only the HTTP failure and never leak their contents (2.8641ms)
+✔ provider text remains inert quoted diagnostics with bounded length and unchanged status categories (2.4548ms)
+✔ oversized and endlessly empty error streams cancel without awaiting an untrusted cancel callback (3.4785ms)
+✔ a stalled error body has its own short deadline and cannot hang failure accounting (1512.7499ms)
+✔ user cancellation takes priority over error-body timeout without settling or replaying a sent call (30.335ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (8974.831ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (14674.7466ms)
+✔ out-of-scope finding cannot create a repair task (2283.8115ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (2809.3228ms)
+✔ explicit reject stops the loop even with spare rework allowance (2064.1477ms)
+✔ repair model calls share the original task allowance (3133.4842ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (3420.745ms)
+✔ repair cannot overwrite a changed file with a stale hash (3752.975ms)
+✔ duplicate finding IDs cannot authorize a repair graph (1902.9789ms)
+✔ latest host-owned contract and budget survive fitting after a later ordinary user message (41.0761ms)
+✔ an unaffordable current contract is blocked before receipt, fetch, or budget counters instead of dropping it (1.705ms)
+✔ first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch (799.3914ms)
+✔ cold native restore retains completed attempts, fixed SHA, unknown task holds and the original per-call cap without producer replay (632.2158ms)
+✔ legacy snapshots preserve pinned route output caps, regardless of cumulative task estimate (38.3949ms)
+✔ employees sharing one model keep independent approved per-request caps and the stricter request/route boundary (3.3984ms)
+✔ unattributed captain coordination retains its pinned route even when all employee task caps are smaller (1.001ms)
+✔ cold recovery preserves task cap, historical fees/calls and counts authorized rework against the original task (1.2377ms)
+✔ an already authorized fallback keeps the original task cap and reserves each request at its actual route rate (4.5203ms)
+✖ ReworkGate binds generated repair and re-review to the original approved task caps instead of model-proposed limits (1.721ms)
+✔ unknown or foreign task attribution fails before any receipt, reservation or fetch (1.3542ms)
+✔ explicit cap changes both wire and pre-billing affordability without reducing legacy reservations or fixed evidence (1.559ms)
+✔ invalid explicit cap fails closed at adapter construction while 1 and 32768 are accepted (1.6452ms)
+✔ read-only budget feedback separates cumulative estimate and approved single-call cap, including legacy routes (1.2453ms)
+✔ task schema preserves legacy cumulative estimates and accepts only an explicit bounded integer per-call output cap (7.4545ms)
+ℹ tests 68
+ℹ suites 0
+ℹ pass 66
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43862.8611
+
+✖ failing tests:
+
+test at services\agent-runtime\budget.test.mjs:49:1
+✖ restored task holds remain occupied without charging the global carryover twice or releasing an older request (2.4656ms)
+  AssertionError [ERR_ASSERTION]: a new receipt cannot release an older unknown hold
+  + actual - expected
+  
+  + 0.24999999999999997
+  - 0.25
+       ^
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/budget.test.mjs:58:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0.24999999999999997,
+    expected: 0.25,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\task-output-limit.test.mjs:121:1
+✖ ReworkGate binds generated repair and re-review to the original approved task caps instead of model-proposed limits (1.721ms)
+  TypeError: Cannot read properties of undefined (reading 'maxOutputTokens')
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-output-limit.test.mjs:139:47)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)

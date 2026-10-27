@@ -1,0 +1,105 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (13367.0559ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (210.2127ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (305.6606ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (162.4402ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (200.1762ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (89.3048ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (421.6993ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17049.7517
+✔ approval blocks uncertain fees by default and an in-flight call still blocks explicit carryover (2434.2339ms)
+✖ opt-in approval freezes net budget while old unknown plus live reservation cover exact global and departmental daily caps once (220.3847ms)
+✖ insufficient original or daily budget rejects opt-in approval without changing unknown receipts (114.1254ms)
+✔ retry retains the default gate and pending calls cannot be carried over even with explicit opt-in (238.2078ms)
+✔ opt-in checkpoint resume inherits unknown wire calls and dispatches only the unfinished task through the local model (3551.5012ms)
+✔ an unknown wire attempt still exhausts the original retry call cap rather than resetting on carryover (205.0484ms)
+✔ a late bill above its old hold fences every new reservation by total project cost, including parallel admission (257.0633ms)
+✔ ordinary late settlement preserves history and never enlarges an already approved run allocation (209.9093ms)
+✔ readiness and approved carryover expose only bounded receipt identities and amounts, never credentials or original context (212.1585ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8036.6423
+
+✖ failing tests:
+
+test at tests\cost-carryover.test.ts:1:11522
+✖ opt-in approval freezes net budget while old unknown plus live reservation cover exact global and departmental daily caps once (220.3847ms)
+  Error: 已确认费用和未结算预留将超过部门每日预算（UTC）
+      at checkDailyBudget (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\cost-control.ts:46:96)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Module.reserveCall (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\cost-control.ts:119:3)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-carryover.test.ts:151:16)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    status: 422,
+    code: 'DEPARTMENT_DAILY_BUDGET_EXCEEDED',
+    upstreamStatus: undefined
+  }
+
+test at tests\cost-carryover.test.ts:1:13287
+✖ insufficient original or daily budget rejects opt-in approval without changing unknown receipts (114.1254ms)
+  Error: 规划预留超过项目剩余预算
+      at Module.reserveCall (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\cost-control.ts:96:66)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async hold (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-carryover.test.ts:48:11)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\cost-carryover.test.ts:159:58)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    status: 422,
+    code: 'BUDGET_EXCEEDED',
+    upstreamStatus: undefined
+  }
+Final rerun after departmental reservation fix, fixture correction and native-operation coverage; prior failure output preserved above.
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (3346.7873ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (371.7093ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (588.7841ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (245.5553ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (261.5403ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (106.195ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (516.8749ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6242.945
+✔ approval blocks uncertain fees by default and an in-flight call still blocks explicit carryover (2328.7317ms)
+✔ opt-in approval freezes net budget while old unknown plus live reservation cover exact global and departmental daily caps once (206.562ms)
+✔ global live-run coverage still charges uncovered holds to the actual participating department (230.5817ms)
+✔ insufficient original or daily budget rejects opt-in approval without changing unknown receipts (376.556ms)
+✔ retry retains the default gate and pending calls cannot be carried over even with explicit opt-in (285.5424ms)
+✔ opt-in checkpoint resume inherits unknown wire calls and dispatches only the unfinished task through the local model (1910.1967ms)
+✔ an unknown wire attempt still exhausts the original retry call cap rather than resetting on carryover (191.0288ms)
+✔ a late bill above its old hold fences every new reservation by total project cost, including parallel admission (221.7012ms)
+✔ ordinary late settlement preserves history and never enlarges an already approved run allocation (191.2887ms)
+✔ readiness and approved carryover expose only bounded receipt identities and amounts, never credentials or original context (194.0162ms)
+✔ new-plan carryover approval cannot silently replay a prior native operation with an unknown outcome (179.923ms)
+✔ a model-only 403 with a confirmed native operation can retain its hold when a new plan is explicitly approved (209.2714ms)
+✔ new-plan carryover refuses missing or incomplete original run evidence instead of treating it as a known operation outcome (319.3047ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7555.4763
+Final integration exit code: 0
+Latest type check: node node_modules/typescript/bin/tsc --noEmit; exit code 0. Final result: existing cost 7/7 plus carryover 13/13 passed; local engineering fixtures only, no real provider acceptance.

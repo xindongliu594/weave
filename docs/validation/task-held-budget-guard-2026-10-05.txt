@@ -1,0 +1,44 @@
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (2.7565ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.4403ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.6276ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.4594ms)
+✖ restored task holds remain occupied without charging the global carryover twice or releasing an older request (1.8447ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (33.4406ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.5668ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.4413ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.2528ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.2962ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 214.5045
+
+✖ failing tests:
+
+test at services\agent-runtime\budget.test.mjs:49:1
+✖ restored task holds remain occupied without charging the global carryover twice or releasing an older request (1.8447ms)
+  AssertionError [ERR_ASSERTION]: a new receipt cannot release an older unknown hold
+  + actual - expected
+  
+  + 0.24999999999999997
+  - 0.25
+       ^
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/budget.test.mjs:58:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0.24999999999999997,
+    expected: 0.25,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

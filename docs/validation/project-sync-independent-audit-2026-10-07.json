@@ -1,0 +1,93 @@
+{
+  "kind": "independent-project-sync-source-review",
+  "status": "passed-no-blocking-findings",
+  "checkedAt": "2026-10-07T03:06:33.161Z",
+  "sources": [
+    {
+      "path": "docs/test-evidence/project-sync-validation-2026-10-07.json",
+      "bytes": 4202,
+      "sha256": "a8559702ec2064bffbce87c08a47d5acf549ac62e44d569137e63da093c0113c"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "bytes": 66552,
+      "sha256": "f215f8b68d0d6871d83a9ba12d1387d69ef4c302889384f376874d3495079561"
+    },
+    {
+      "path": "apps/web/src/api.ts",
+      "bytes": 2837,
+      "sha256": "8b632ca9e60b9f0d42b0b3f9c03f66c68be51a01e140fe4fb45748970d77fb60"
+    },
+    {
+      "path": "apps/web/src/project-sync.ts",
+      "bytes": 4771,
+      "sha256": "cae8849fde87a7753f99ac1a1e1443231a95f0007e58ed3d0470dd85c22013a7"
+    },
+    {
+      "path": "tests/project-sync.test.ts",
+      "bytes": 7915,
+      "sha256": "48c4cbf5232aed084e8e791a29c5b9604bb029424cfa7a396c528c6db07dba67"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-tests-2026-10-07.txt",
+      "bytes": 2718,
+      "sha256": "ce4e405e93676879b7f3d810657c39fd948ff327deee78dda92e2152073d526b"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-types-2026-10-07.txt",
+      "bytes": 97,
+      "sha256": "a35ccd79e72e3c033f19ab49e93ea31896167e2c337116c9101aeaf27e52db69"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-build-default-failed-2026-10-07.txt",
+      "bytes": 1663,
+      "sha256": "742548a13de887160edef8e1818f11a9fbda5e813ff473700c118907d30fad91"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-build-native-2026-10-07.txt",
+      "bytes": 800,
+      "sha256": "5c8e6cc2db60d8001f211e3536a92742740ca00d83a511fbe64da2eb7a6496eb"
+    },
+    {
+      "path": "dist/web/index.html",
+      "bytes": 563,
+      "sha256": "8ea91b5fcfdca965d5c11dc6d37f12444c6993b562fea605b67caaf1f57ad79f"
+    },
+    {
+      "path": "dist/web/assets/index-B1XElb8I.js",
+      "bytes": 534521,
+      "sha256": "641101e45ffa0af449fdd6d54bc6c8558021ebce39a373fe555b6ee9606b3e6e"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-tests-2026-10-07.txt",
+      "bytes": 2718,
+      "sha256": "ce4e405e93676879b7f3d810657c39fd948ff327deee78dda92e2152073d526b"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-types-2026-10-07.txt",
+      "bytes": 97,
+      "sha256": "a35ccd79e72e3c033f19ab49e93ea31896167e2c337116c9101aeaf27e52db69"
+    },
+    {
+      "path": "docs/test-evidence/project-sync-build-native-2026-10-07.txt",
+      "bytes": 800,
+      "sha256": "5c8e6cc2db60d8001f211e3536a92742740ca00d83a511fbe64da2eb7a6496eb"
+    }
+  ],
+  "reviewed": [
+    "App的项目GET统一通过projectSync；实际ProjectPlanning.onChanged和action完成调用fresh refresh",
+    "fresh GET自增serial、取消旧AbortController；旧serial或abort回执不能publish，低version保留较高已确认缓存",
+    "选中RUNNING/QUEUED项目每完成一次GET后5秒再poll，最多12追加poll；一次进入刷新另计，不伪称总共只有12 GET",
+    "终态不再schedule；leave/hidden/unsubscribe清timer并serial失效+abort在途读取；已入队旧timer检查ticket无效后不发新GET",
+    "api只把caller signal与10秒timeout应用于GET/既有readonly planning-quote；没有新增paid POST retry/cancel，原Idempotency-Key保留",
+    "错误保留缓存/最后更新时间，显式刷新可清除error；实际页面提供刷新状态和失败信息",
+    "manifest十个源码/日志/构建文件SHA相符；23/23 tests、types0、native config loader build0；默认sandbox构建失败原日志保留"
+  ],
+  "limitations": [
+    "本次仅读本地代码和保存日志，无API/模型/Cua/原DB，不替代Root真实浏览器刷新验收",
+    "正常run 88aa22a9-f887-467c-bf12-91bb57d42361终态尚未提供；不宣称模型项目完成",
+    "主动refresh允许App其他页面的概览加载；hidden/leave自动轮询停止，并非禁止所有其他显式只读操作",
+    "已有超过500kB的bundle警告保留，构建仍成功"
+  ],
+  "sourceStableAfterReview": true
+}

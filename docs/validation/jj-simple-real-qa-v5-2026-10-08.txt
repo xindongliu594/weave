@@ -1,0 +1,16 @@
+✔ conversion: 0 -> 32 (33.227438ms)
+✔ conversion: 100 -> 212 (31.624891ms)
+✔ conversion: -40 -> -40 (27.88265ms)
+✔ every conversion case also matches the documented formula F = C * 9 / 5 + 32 (87.101326ms)
+✔ error: missing argument exits non-zero with stderr message (27.058825ms)
+✔ error: non-numeric argument exits non-zero with stderr message (86.68295ms)
+✔ error: more than one argument exits non-zero with stderr message (26.807705ms)
+✔ boundary: decimal and negative decimal inputs follow the formula (89.441625ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 462.975694

@@ -1,0 +1,105 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { chunkDocument } from '../services/agent-runtime/knowledge.mjs';
+import { loadSource } from '../docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-2026-10-06.mjs';
+import { priorKnowledgeSources, recoveryKnowledgeVersions, recoverySearchBoundary, recoveryUpgradeProvenance } from '../docs/test-evidence/helpers/go-final-knowledge-proof-2026-10-06.mjs';
+const hash = value => createHash('sha256').update(value).digest('hex');
+const canonical = value => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object'
+  ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
+const digest = value => hash(JSON.stringify(canonical(value)));
+function versionFixture() {
+  const projectId = 'recovery-fixture', departmentId = 'department-fixture', version = 8;
+  const spaces = [{ id: 'shared', scope: 'company', departmentId: null, agentIds: [] }, { id: 'private', scope: 'employee', departmentId, agentIds: ['qa'] }];
+  const agents = ['developer', 'qa', 'manager'].map(id => ({ id, tools: ['knowledge_search', 'knowledge_read'], knowledgeSpaceIds: id === 'qa' ? ['shared', 'private'] : ['shared'] }));
+  const documents = spaces.map(space => { const content = space.id + ' version-1\n', latest = space.id + ' version-2\n', source = { note: space.id };
+    return { id: space.id + '-doc', spaceId: space.id, title: space.id, version: 2, content: latest, sha256: hash(latest), source,
+      versions: [{ version: 2, content: latest, sha256: hash(latest), source }, { version: 1, content, sha256: hash(content), source }] }; });
+  const manifest = { format: 'document-versions-v2', documents: documents.map(doc => ({ documentId: doc.id, spaceId: doc.spaceId, title: doc.title,
+    version: 1, sha256: doc.versions[1].sha256, source: doc.source, chunkCount: chunkDocument(doc.id, 1, doc.versions[1].content).length })),
+    agentDocuments: Object.fromEntries(agents.map(agent => ['native-' + agent.id, documents.filter(doc => agent.knowledgeSpaceIds.includes(doc.spaceId)).map(doc => doc.id)])) };
+  const native = agents.map(agent => ({ ...structuredClone(agent), id: 'native-' + agent.id, employeeId: agent.id, sourceDepartmentId: departmentId, sourceAgentId: agent.id }));
+  const citations = [];
+  const run = (id, child = false) => {
+    const snapshot = { id, projectId, departmentId, planVersion: version, agents: structuredClone(native), knowledge: structuredClone(manifest) };
+    const events = [{ seq: 1, type: 'run/created', data: { snapshotSha256: hash(JSON.stringify(snapshot)) } }];
+    if (child) for (const pinned of manifest.documents) {
+      const chunk = chunkDocument(pinned.documentId, 1, documents.find(doc => doc.id === pinned.documentId).versions[1].content)[0];
+      const value = { ...chunk, title: pinned.title, spaceId: pinned.spaceId, sha256: pinned.sha256, source: pinned.source }; delete value.tokens;
+      const { content, id: chunkId, ...reference } = value;
+      events.push({ seq: events.length + 1, type: 'knowledge/citation', data: { agentId: 'native-qa', sources: [{ ...reference, chunkId }] } });
+      citations.push({ runId: id, chunkId, value, sha256: digest(value) });
+    }
+    return { archive: { id, snapshot, events, eventCount: events.length, integrity: 'ok' }, state: { id, snapshot: structuredClone(snapshot) } };
+  };
+  const parent = run('parent-fixture'), final = run('child-fixture', true);
+  const facts = [parent, final].flatMap(record => manifest.documents.map(pinned => { const doc = documents.find(doc => doc.id === pinned.documentId);
+    return { runId: record.archive.id, documentId: pinned.documentId, spaceId: pinned.spaceId, pinnedVersion: 1, pinnedSha256: pinned.sha256, currentVersion: 2,
+      currentSha256: doc.sha256, retainedVersions: doc.versions.map(row => ({ version: row.version, sha256: row.sha256 })), expectedV1FixedV2Current: true }; }));
+  const grants = [parent, final].flatMap(record => native.map(agent => ({ runId: record.archive.id, runtimeAgentId: agent.id, employeeId: agent.employeeId, departmentId,
+    snapshotSpaceIds: agent.knowledgeSpaceIds, snapshotDocumentIds: manifest.agentDocuments[agent.id], currentEmployeeSpaceIds: agent.knowledgeSpaceIds,
+    currentEmployeeTools: agent.tools, spaces: spaces.filter(space => agent.knowledgeSpaceIds.includes(space.id)) })));
+  const binding = { projectId, departmentId, version, confirmedPlan: { agents } };
+  const input = { scenario: 'recovery', projectId, parentId: parent.archive.id, project: { id: projectId, departmentId }, parent, final, citations,
+    knowledgeCurrent: { expectedPinnedVersion: 1, expectedCurrentVersion: 2, documents, spaces, departments: [{ id: departmentId, agents }], grants, facts,
+      versionEvidenceStatus: 'captured-v1-fixed-v2-current' } };
+  return { input, binding };
+}
+function reseal(input) { for (const record of [input.parent, input.final]) { record.archive.events[0].data.snapshotSha256 = hash(JSON.stringify(record.archive.snapshot));
+  record.state.snapshot = structuredClone(record.archive.snapshot); } }
+test('pure recovery v1/v2 fixture verifies content, provenance, grants and complete citation readback without becoming acceptance', () => {
+  const f = versionFixture(), result = recoveryKnowledgeVersions(f.input, f.binding); assert.equal(result.documents.length, 4); assert.equal(result.occurrences.length, 2);
+  assert.throws(() => recoveryUpgradeProvenance(f.input, f.binding, [], () => assert.fail('No file should be read')));
+});
+test('v1/v2 flags cannot replace real content, historical source, complete facts, grants or exact citation bodies', () => {
+  for (const mutate of [
+    f => { delete f.input.knowledgeCurrent.documents; },
+    f => { f.input.knowledgeCurrent.documents[0].versions[1].content = 'substituted'; },
+    f => { f.input.knowledgeCurrent.documents[0].versions[1].source = { note: 'substituted' }; },
+    f => { f.input.knowledgeCurrent.documents[0].versions.pop(); },
+    f => { f.input.knowledgeCurrent.documents[0].versions[0].content = 'substituted'; },
+    f => { f.input.knowledgeCurrent.facts[0].expectedV1FixedV2Current = false; },
+    f => { f.input.knowledgeCurrent.grants[0].snapshotSpaceIds = []; },
+    f => { f.input.knowledgeCurrent.departments[0].agents[0].knowledgeSpaceIds.push('private'); },
+    f => { f.input.final.archive.snapshot.knowledge.documents[0].version = 2; },
+    f => { f.input.citations[0].value.content = 'substituted'; f.input.citations[0].sha256 = digest(f.input.citations[0].value); },
+    f => { f.input.citations = []; },
+  ]) { const f = versionFixture(); mutate(f); reseal(f.input); assert.throws(() => recoveryKnowledgeVersions(f.input, f.binding)); }
+});
+const actualSetupPath = 'docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json';
+function originalSearchFixture() {
+  const source = loadSource(actualSetupPath), proof = JSON.parse(source.raw);
+  const binding = { projectId: proof.projectId, departmentId: proof.departmentId, version: 8, confirmedPlan: { agents: structuredClone(proof.after.department.agents) } };
+  const input = { scenario: 'recovery', projectId: proof.projectId, project: { departmentId: proof.departmentId }, parent: { archive: { snapshot: { knowledge: {
+    documents: proof.after.ownDocuments.map(doc => ({ documentId: doc.id, spaceId: doc.spaceId, sha256: doc.sha256, source: doc.source })) } } } },
+    priorKnowledgeAndDenialEvidence: [{ path: source.path, rawPath: 'docs/test-evidence/synthetic-copy-never-written.json', sha256: source.sha256 }] };
+  const read = path => { assert.ok([source.path, input.priorKnowledgeAndDenialEvidence[0].rawPath].includes(path)); return source; };
+  return { input, binding, proof, source, read };
+}
+test('real original setup HTTP QA/private and developer-empty proof is reusable under exact marker/grant/content semantics', () => {
+  const f = originalSearchFixture(), prior = priorKnowledgeSources(f.input, f.read), result = recoverySearchBoundary(f.input, f.binding, prior);
+  assert.equal(result.positive.status, 200); assert.equal(result.denied.returnedChunks, 0); assert.equal(result.fixedVersion, 1);
+  assert.equal(result.denied.employeeId, 'developer'); assert.equal(result.positive.employeeId, 'qa');
+});
+test('empty developer response alone, wrong marker/employee, full-body substitutions and nonexistent read 404 never prove the search boundary', () => {
+  for (const mutate of [
+    p => { p.responses = p.responses.filter(row => row.requests?.[0]?.body?.agentId !== 'qa'); },
+    p => { p.responses.find(row => row.requests?.[0]?.body?.agentId === 'developer').requests[0].body.query = 'unrelated'; },
+    p => { p.responses.find(row => row.requests?.[0]?.body?.agentId === 'qa').response[0].content = 'substituted'; },
+    p => { const denied = p.responses.find(row => row.requests?.[0]?.body?.agentId === 'developer'); denied.path = '/knowledge/read'; denied.status = 404; denied.response = { error: 'route not found' }; },
+    p => { p.requests.find(row => row.body?.agentId === 'developer').body.agentId = 'unrelated'; },
+    p => { p.responses.find(row => row.requests?.[0]?.body?.agentId === 'developer').responseSha256 = hash('substituted'); },
+  ]) {
+    const f = originalSearchFixture(); mutate(f.proof);
+    // Re-sign in-memory fixture bytes to reach semantic predicates, never write them as actual evidence.
+    for (const row of f.proof.responses) if (Object.hasOwn(row, 'response') && row.responseSha256 !== hash('substituted')) row.responseSha256 = hash(JSON.stringify(row.response));
+    const raw = JSON.stringify(f.proof), source = { ...f.source, raw, sha256: hash(raw) }; f.input.priorKnowledgeAndDenialEvidence[0].sha256 = source.sha256;
+    assert.throws(() => recoverySearchBoundary(f.input, f.binding, priorKnowledgeSources(f.input, () => source)));
+  }
+});
+test('prior copied proof is read alongside the original; a caller boolean or mismatched original SHA is insufficient', () => {
+  const f = originalSearchFixture(); let reads = 0;
+  assert.equal(priorKnowledgeSources(f.input, path => { reads++; return f.read(path); }).length, 1); assert.equal(reads, 2);
+  assert.throws(() => priorKnowledgeSources({ ...f.input, priorKnowledgeAndDenialEvidence: [{ passed: true }] }, f.read));
+  assert.throws(() => priorKnowledgeSources(f.input, path => path === f.source.path ? { ...f.source, raw: f.source.raw + ' ' } : f.source));
+});

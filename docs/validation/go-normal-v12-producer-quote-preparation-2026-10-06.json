@@ -1,0 +1,351 @@
+{
+  "checkedAt": "2026-10-06T10:04:15.873Z",
+  "kind": "offline-normal12-producer-and-readonly-post-quote-preparation",
+  "nodeVersion": "v24.19.0",
+  "helperSources": [
+    {
+      "path": "docs/test-evidence/helpers/generate-go-normal12-producer-quote-web-2026-10-06.mjs",
+      "sha256": "10614659f030f731ebb7bf6f5e0c827fd4f60de22948d7a38091edd7d7f5fed9"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-normal12-producer-source-guard-2026-10-06.mjs",
+      "sha256": "84a26b2b256430e498d029a2eb724d5b032d04bc34615fdc26fa79b7257479b0"
+    },
+    {
+      "path": "docs/test-evidence/helpers/prepare-go-normal12-producer-quote-web-2026-10-06.mjs",
+      "sha256": "f0b68156a8cc9d4fc75f64c007f11073a01d4c384b606d08196cab377f20ee73"
+    },
+    {
+      "path": "docs/test-evidence/helpers/check-go-normal12-producer-quote-offline-2026-10-06.mjs",
+      "sha256": "8ebb1e2caaf6bbdfe40fbf0566e43ba160f401ad804c8a899d50df3fab3ccc5e"
+    }
+  ],
+  "sourceEvidence": {
+    "sourceRunId": "9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+    "sourceVersion": 11,
+    "sourceEventCount": 1022,
+    "outcome": "failed",
+    "exactError": "HANDOFF_BLOCKED: qa_verify: VERSION_MISMATCH: server.mjs",
+    "sources": [
+      {
+        "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/sources.json",
+        "sha256": "aa597c629861e7f587534d0994ee029cc0b388768120d74c24b2df118ca8f8cc"
+      },
+      {
+        "path": "docs/validation/go-normal-v11-version-mismatch-failed-2026-10-06.json",
+        "sha256": "24ab5a01a1c9c663c2d452d7c52e838c18ee02766c7613c3e8ccff8d8ed100ef"
+      },
+      {
+        "path": "docs/test-evidence/go-parser-normal-generate-2026-10-06T09-20-27-833Z-aa7ceb9c.json",
+        "sha256": "507c99314975479727f9464a873211d3206b83c499530c668e6fb0b98b2f7ccc"
+      },
+      {
+        "path": "docs/test-evidence/go-parser-normal-confirm-2026-10-06T09-21-35-090Z-5776c2b9.json",
+        "sha256": "2b8f3a93bccc0d24b14d4f8e4ebe7bbde66cfdba32a6971350f7805bd8da6fa6"
+      },
+      {
+        "path": "docs/test-evidence/funded-run-web-normal-approve-2026-10-06T09-48-13-527Z-70028ee4.json",
+        "sha256": "94cd5c05d65d3a9ac40a4ec742cdb65558b44d87ea3e69ee795ec15569a4c7b3"
+      },
+      {
+        "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T09-50-10-265Z-bb7e567a.json",
+        "sha256": "208e5878384bde84d419eae6252370f76c63512e78890d42682b33f30c00bb5e"
+      },
+      {
+        "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T09-51-16-175Z-e76d3bd5.json",
+        "sha256": "135ff9980d2a6bb14b40bcec77613232df643b31ba1857d679f71f9e1d0c740a"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-normal-after-planning-parser-web-2026-10-06.mjs",
+        "sha256": "ec91ec2b21234614cf20ac71e030c1317555da656731e332fe64d9b2feb3f3fe"
+      },
+      {
+        "path": "docs/test-evidence/helpers/operate-go-funded-run-guarded-web-2026-10-06.mjs",
+        "sha256": "ff689045082f817aaab9e115ba3f03a7fe9362505d669bec2cf8dc0acf8be4c9"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/start-4938eab8-26ed-4f60-9413-d979f05fa968-v11.json",
+        "sha256": "c645a75e34106f97c0f7e876df65567a6ecc1045333d7d93039c627d3fd74c0b"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/start-4938eab8-26ed-4f60-9413-d979f05fa968-v11-successor-route-barrier-20261006.json",
+        "sha256": "58f3e7c72219c38ea88a480f56475ecc6874aa512946321028b9a81bd18c177c"
+      }
+    ],
+    "rawSourceIndex": [
+      {
+        "file": "archive.json",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/export",
+        "method": "GET",
+        "status": 200,
+        "bytes": 9859369,
+        "sha256": "f7776699c4d4dab196bb0012939fb8fb2a495828385748f1552c69c6957f39d2"
+      },
+      {
+        "file": "state.json",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+        "method": "GET",
+        "status": 200,
+        "bytes": 5003389,
+        "sha256": "5e0ba21a0b3e0da5aabd403fe8b520362f673c2cb213ab1d532a61d069ce2f19"
+      },
+      {
+        "file": "operations.json",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/local-operations",
+        "method": "GET",
+        "status": 200,
+        "bytes": 38743,
+        "sha256": "c8e5f441d707e73c9a4949002cdc0b1b9522165d90c2290d6bd3140e114e4e30"
+      },
+      {
+        "file": "artifacts.json",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifacts",
+        "method": "GET",
+        "status": 200,
+        "bytes": 334,
+        "sha256": "cadc26d97dd70f325907a1d9e71ab30ab49d117e99cc2c4085eec02cb02c0c19"
+      },
+      {
+        "file": "approvals.json",
+        "endpoint": "/approvals?runId=9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+        "method": "GET",
+        "status": 200,
+        "bytes": 691,
+        "sha256": "7a2920b4a3e28b36402b58a2923ce5d3dae94dab57f1216658eb93462a1a22fd"
+      },
+      {
+        "file": "readiness.json",
+        "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+        "method": "GET",
+        "status": 200,
+        "bytes": 264,
+        "sha256": "781f0d2faa3d74d08711a27c157dd2ead99cded4470a2f174c6896fa09c469d4"
+      },
+      {
+        "file": "usage.json",
+        "endpoint": "/usage",
+        "method": "GET",
+        "status": 200,
+        "bytes": 283614,
+        "sha256": "d37c07fa96eb35b1aed4b7a7e911fb0b73b935618230dfddeba02271d64f968c"
+      },
+      {
+        "file": "projects.json",
+        "endpoint": "/projects",
+        "method": "GET",
+        "status": 200,
+        "bytes": 112738,
+        "sha256": "87e013af3bd14c19702f8adf56f0a48f59cb0ce48781f3a40530948706b69177"
+      },
+      {
+        "file": "README.md",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifact?path=README.md",
+        "method": "GET",
+        "status": 200,
+        "bytes": 4056,
+        "sha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab"
+      },
+      {
+        "file": "server.mjs",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifact?path=server.mjs",
+        "method": "GET",
+        "status": 200,
+        "bytes": 7125,
+        "sha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f"
+      },
+      {
+        "file": "todo.test.mjs",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifact?path=todo.test.mjs",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10037,
+        "sha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71"
+      },
+      {
+        "file": "archive-after.json",
+        "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/export",
+        "method": "GET",
+        "status": 200,
+        "bytes": 9859369,
+        "sha256": "f7776699c4d4dab196bb0012939fb8fb2a495828385748f1552c69c6957f39d2"
+      }
+    ],
+    "oldApproval202Preserved": true,
+    "oldSuccessorIntentSha256": "58f3e7c72219c38ea88a480f56475ecc6874aa512946321028b9a81bd18c177c",
+    "mismatches": [
+      {
+        "path": "server.mjs",
+        "expected": "95e3fa0866da4e5987101759e06a07378a57e95d3070157f6aa38aba715179d2",
+        "actual": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f"
+      },
+      {
+        "path": "todo.test.mjs",
+        "expected": "63857cfeda05ef8a30ca0612a04ed1b6fef4e68bc0638a268a7bb7d33d366227",
+        "actual": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71"
+      },
+      {
+        "path": "README.md",
+        "expected": "091231b1fad2e5fdf604758528d1e1b4c66a5e3571b7ab6a33925ca174683f23",
+        "actual": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab"
+      }
+    ],
+    "devAcceptedSeq": 975,
+    "devTerminals": [
+      {
+        "id": "adbb400f-ee0d-4968-8d20-b6bf849a2fc0",
+        "approvalId": "14fe4c19-2f6a-4fe7-ad3b-b2bfc28c3da4",
+        "exitCode": 1,
+        "started": true,
+        "status": "completed"
+      },
+      {
+        "id": "ccca316a-218c-42e0-baed-f6370a979c9b",
+        "approvalId": "b4f54ae8-de67-42e7-849f-ffd7849f8abc",
+        "exitCode": 0,
+        "started": true,
+        "status": "completed"
+      }
+    ],
+    "hostCalls": 11,
+    "wireCalls": 9,
+    "paidUsageCost": 0.0773679,
+    "historicalReadiness": {
+      "recordedCost": 1.7575817,
+      "reserved": 0.096526,
+      "availableBudget": 2.3255923000000003,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+          "amount": 0.096526,
+          "status": "uncertain",
+          "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+        }
+      ]
+    },
+    "qaExecuted": false,
+    "managerReportExists": false,
+    "oldRunResumed": false,
+    "oldProducerPinsHandRemoved": false,
+    "employeeArtifactsAuthoredByCodex": false
+  },
+  "revisionCharacters": 3656,
+  "checks": [
+    {
+      "name": "exact1022 failed events/gen/confirm/approve202/2terminal sources preserved",
+      "passed": true
+    },
+    {
+      "name": "failed v11 cannot become completed",
+      "passed": true
+    },
+    {
+      "name": "real terminal failure is retained",
+      "passed": true
+    },
+    {
+      "name": "new employee files differ from all three historical pins",
+      "passed": true
+    },
+    {
+      "name": "unchanged original no-pin producer input fixture accepted",
+      "passed": true
+    },
+    {
+      "name": "actual old v11 producer+SHA candidate rejected without editing it",
+      "passed": true
+    },
+    {
+      "name": "external fixed SHA without producer accepted as isolated schema fixture",
+      "passed": true
+    },
+    {
+      "name": "unsealed external fixed file rejected",
+      "passed": true
+    },
+    {
+      "name": "current v11 stored plan/policy accepted independently of refreshed validation",
+      "passed": true
+    },
+    {
+      "name": "original cap cannot expand",
+      "passed": true
+    },
+    {
+      "name": "v12 revision fits4000 and differs from paid v11body",
+      "passed": true
+    },
+    {
+      "name": "producer/external input rules and latest retained budget explicit",
+      "passed": true
+    },
+    {
+      "name": "full-body read-only POST quote accepted and not paid",
+      "passed": true
+    },
+    {
+      "name": "quote request_keys write forbidden",
+      "passed": true
+    },
+    {
+      "name": "query-string GET quote rejected",
+      "passed": true
+    },
+    {
+      "name": "truncated or missing revision body rejected",
+      "passed": true
+    },
+    {
+      "name": "raw quote/gen/confirm response bytes retained with SHA",
+      "passed": true
+    },
+    {
+      "name": "quote POST counted separately from paid idempotent generation",
+      "passed": true
+    },
+    {
+      "name": "maxOutput12000 and no new model format argument",
+      "passed": true
+    },
+    {
+      "name": "GO_QUOTE_POST_FIX_LOADED blocks before APIs without root authorization",
+      "passed": true
+    },
+    {
+      "name": "GO_PRODUCER_PIN_VALIDATION_FIX_LOADED blocks before APIs without root authorization",
+      "passed": true
+    },
+    {
+      "name": "GO_NORMAL12_GENERATION_APPROVED blocks before APIs without root authorization",
+      "passed": true
+    }
+  ],
+  "readonlyQuoteContract": {
+    "method": "POST",
+    "body": "exact generation body without projectId",
+    "idempotencyKey": "absent",
+    "paidRequestsCounted": false,
+    "permanentIntentWritten": false
+  },
+  "requiredNewMarkers": [
+    "GO_QUOTE_POST_FIX_LOADED",
+    "GO_PRODUCER_PIN_VALIDATION_FIX_LOADED",
+    "GO_NORMAL12_GENERATION_APPROVED"
+  ],
+  "scope": {
+    "apiCalls": 0,
+    "browserLaunches": 0,
+    "paidCalls": 0,
+    "confirms": 0,
+    "approvals": 0,
+    "originalDatabaseOpened": false,
+    "keysRead": false,
+    "employeeArtifactsAuthored": false,
+    "oldHelpersChanged": false,
+    "oldCandidateChanged": false,
+    "oldPermanentIntentsRemoved": false,
+    "serviceOperations": 0
+  },
+  "status": "frozen-offline-awaiting-root-loaded-fixes-and-single-normal12-generation-authorization"
+}

@@ -1,0 +1,16 @@
+✔ source whitelist produces identical byte hashes, keeps empty directories and original files, and every copy has a fresh directory (979.858ms)
+✔ node_modules, private data, environment files, credential files and large evidence are excluded without becoming payload (531.6691ms)
+✔ build and documents require explicit selections and are byte-verified, while evidence/private paths and traversal are rejected (558.0968ms)
+✔ links/junctions in source trees, selected documents and the declared root are refused before reading their target (129.4034ms)
+✔ single-file hard links and oversized/unsupported files are refused instead of copying ambiguous or unbounded payloads (201.1146ms)
+✔ same-size source replacement with restored mtime invalidates a supplied frozen inventory, and deletions/additions cannot pass (804.4162ms)
+✔ a real source mutation after copy starts leaves only failed evidence and never a verified manifest (812.6238ms)
+✔ CLI requires an explicit operation, rejects unknown flags and makes no bundle while displaying help (662.7374ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4833.6295

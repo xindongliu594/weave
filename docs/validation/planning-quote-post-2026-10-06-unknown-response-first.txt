@@ -1,0 +1,70 @@
+✔ empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success (34.6567ms)
+✔ planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431 (2.233ms)
+✔ a mutation retains its original key and is never retried after an empty503 response or network loss (1.0989ms)
+✔ real generation precheck/onSubmit preserves the original pending key and parameters on empty or malformed HTTP200 (3.2138ms)
+✔ organization response failures retain the same persisted pending identity unless a structured HTTP refusal is confirmed (2.312ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.3995ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.4933ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.3956ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.1987ms)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Run this fixture with scripts/test-integration.mjs
++ actual - expected
+
++ undefined
+- 'pglite'
+
+    at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-session.test.ts:17:8)
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 'pglite',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+✖ tests\organization-session.test.ts (1418.84ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (3.8771ms)
+✔ the exact user adjustment invalidates an old quote and stays in the locked generation body (2.3515ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (12.3954ms)
+✔ read-only quote performs one POST body with exact explicit parameters and rejects mismatched versions (0.5461ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.4577ms)
+✔ changed or newly blocked quote returns current evidence without a paid generation or reservation callback (0.5656ms)
+✔ unchanged affordable quote generates one candidate after the read-only POST, with no save/approve request or data changes (0.7156ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.5961ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (29.5871ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.9199ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (12.1424ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.3279ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.0979ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.377ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.6074ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without paid generation (0.8541ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.6471ms)
+✔ explicit retention binds quote and generation POST bodies and candidate response, with no implicit true (2.4578ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.3873ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.6983ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.5241ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (2.7343ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.4028ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 32
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1471.0782
+
+✖ failing tests:
+
+test at tests\organization-session.test.ts:1:1
+✖ tests\organization-session.test.ts (1418.84ms)
+  'test failed'

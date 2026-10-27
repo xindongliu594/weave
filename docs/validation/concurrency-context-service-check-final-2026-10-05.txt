@@ -1,0 +1,17 @@
+{
+  "report": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\concurrency-context-service-check-2026-10-05.json",
+  "service": {
+    "launcherPid": 44216,
+    "apiPid": 46548,
+    "apiPort": 64059,
+    "wrapperPid": 44720
+  },
+  "health": {
+    "database": "connected",
+    "runtimeReady": true
+  },
+  "usageRows": 272,
+  "originalLedgerUnchanged": true,
+  "originalArchiveAndEmployeeFilesUnchanged": true,
+  "modelRequestsSent": 0
+}

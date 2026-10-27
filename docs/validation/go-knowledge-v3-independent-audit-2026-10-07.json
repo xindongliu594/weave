@@ -1,0 +1,151 @@
+{
+  "kind": "independent-actual-knowledge-v3-audit",
+  "status": "passed-catalog-and-history",
+  "checkedAt": "2026-10-07T03:31:42.185Z",
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/sources.json",
+      "bytes": 2275,
+      "sha256": "066d9a6438e241480f9f4288cf0d1b829bc4ba0acddd1d2dc41dda2809ec7aa1"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/spaces.json",
+      "bytes": 1033,
+      "sha256": "38b038ff5589171e4146b22d3272ef4a6a51418fa0c2c76d62432e097599e166"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/documents.json",
+      "bytes": 4993,
+      "sha256": "43e6516205b99c07903585d6489392e78c1b37f88ca93e718e65a4eee93aeba9"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/74bcc49b-db5d-4729-9e5d-c430f10d6d5d-versions.json",
+      "bytes": 1321,
+      "sha256": "6e15347826439f942937b885dcc3e7f3c909898b8306ddb526fbbdb388507a70"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/9ae89b98-2eb2-4302-b79b-ea12ae9a2be7-versions.json",
+      "bytes": 1373,
+      "sha256": "bd801df8caf08ff8bafc91435ece560d2f8193f431303636b1d4efd0477aa1d2"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/projects.json",
+      "bytes": 112537,
+      "sha256": "18f91beb87442620839e3f21c20d49ac7896819adbe0db89509f24919600fb49"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/usage.json",
+      "bytes": 353573,
+      "sha256": "785c37437132e0be4d537783fd687de831abd84a24ffa2b9d57582d2242713bf"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/runs.json",
+      "bytes": 17793,
+      "sha256": "f7b2a112de28b9f0affe4d65853684b91b116a8c7ac48541808695a8a7b3e8d3"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-before-2026-10-07/readiness.json",
+      "bytes": 117,
+      "sha256": "6036e96da4b4659bb161d3aefd894a5c0f301d38039304c283134534947a72e8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/sources.json",
+      "bytes": 2275,
+      "sha256": "4bfa9f80d49187ebba9a560652b72aebcf6b3100da4f25a3e3d2b352d0a7ece3"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/spaces.json",
+      "bytes": 1033,
+      "sha256": "38b038ff5589171e4146b22d3272ef4a6a51418fa0c2c76d62432e097599e166"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/documents.json",
+      "bytes": 4950,
+      "sha256": "4d65bf7a387bc2341649b04a06df8df0ca8505df61b7d78314b1905ddba3c17c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/74bcc49b-db5d-4729-9e5d-c430f10d6d5d-versions.json",
+      "bytes": 1966,
+      "sha256": "b91cf270e2f25f9a2b795578450b3848ce3e412df632b9fdb1176d215e656aac"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/9ae89b98-2eb2-4302-b79b-ea12ae9a2be7-versions.json",
+      "bytes": 2045,
+      "sha256": "50da844d26be5c46bb6e3a4f419c95f92f2710c071428c70ed53e7fa5caeb5b5"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/projects.json",
+      "bytes": 112537,
+      "sha256": "18f91beb87442620839e3f21c20d49ac7896819adbe0db89509f24919600fb49"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/usage.json",
+      "bytes": 353573,
+      "sha256": "785c37437132e0be4d537783fd687de831abd84a24ffa2b9d57582d2242713bf"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/runs.json",
+      "bytes": 17793,
+      "sha256": "f7b2a112de28b9f0affe4d65853684b91b116a8c7ac48541808695a8a7b3e8d3"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v3-after-2026-10-07/readiness.json",
+      "bytes": 117,
+      "sha256": "6036e96da4b4659bb161d3aefd894a5c0f301d38039304c283134534947a72e8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery12-cua-parameters-2026-10-07.json",
+      "bytes": 11306,
+      "sha256": "574cf30877ce4a059834591f27a86b4a72b903016a1e71080582072d3613c1bc"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-shared-v3-2026-10-07.txt",
+      "bytes": 1046,
+      "sha256": "f02cc98048e3536b224ddd40d93b6fafa8465b555a1e111bc9b3e3775562ad49"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-qa-v3-2026-10-07.txt",
+      "bytes": 1289,
+      "sha256": "c482977b46689d764dd837bd177818a0b58c2f12dbdce8e7668710cea61838bd"
+    },
+    {
+      "path": "docs/test-evidence/screenshots/go-recovery-knowledge-v3-2026-10-07.jpg",
+      "bytes": 52868,
+      "sha256": "b6b7dff3bf06d81e3023945e4093dacc9147c62faa0b6be59f9d349c8deff55f"
+    }
+  ],
+  "documents": [
+    {
+      "kind": "shared",
+      "id": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+      "version": 3,
+      "sha256": "9d68f0bdb1600dd85b4f2403adff255ff2332f636269ee13f8966acb0824535e",
+      "oldVersionsPreserved": [
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "privateQa",
+      "id": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+      "version": 3,
+      "sha256": "8b871bb3bb80be837265116bce56febbbf083a138bfec783314aee0410704cde",
+      "oldVersionsPreserved": [
+        1,
+        2
+      ]
+    }
+  ],
+  "checks": [
+    "两份现有测试文档实际2→3，正文严格等于参数proposedV3Body，SHA重算相同",
+    "完整v1/v2历史没有变化，仅新增v3",
+    "全部其他文档及spaces/projects/usage/runs/readiness逐字段不变，授权和费用记录保持",
+    "保存资料仍仅验收参考，无员工代码、测试脚本或预写通过结论"
+  ],
+  "limitations": [
+    "共享AX捕获保存busy阶段仍目录2，实际后续version3由强SHA before/after目录及完整histories证实；QA AX已明确3。未伪造HTTP PUT请求/响应编号",
+    "未来批准pin3、目录4后恢复仍pin3须另验",
+    "仅读保存数据，未API/Cua/原DB/模型或员工写入"
+  ],
+  "sourceStableAfterReview": true
+}

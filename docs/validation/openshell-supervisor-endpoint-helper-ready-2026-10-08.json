@@ -1,0 +1,35 @@
+{
+  "kind": "endpoint-helper-upload-and-linux-regression",
+  "location": "/home/jj/.local/share/weiwu/admin/openshell-v012/endpoint-fix-v1",
+  "sha256": {
+    "fix-supervisor-endpoint.py": "612c3fbf00ad7eb9e06e50bfee5c72cd176aa42413012d2a0c4b1c19c40de899",
+    "test-fix-supervisor-endpoint.py": "d2dcecddd7364f3cd233369b126ea9f00578a831fb4458f71103fde48a3db2e2",
+    "preload-node-proxy.py": "20099a1d7ba86a6b09ecb0a12546defb967d12ea724bfc088eaf0355935e2f98",
+    "test-preload-node-proxy.py": "a755fe281bb5fc872dc156885833cc8d0773db2e540207d8baa773ff681fe8ff"
+  },
+  "linuxTests": [
+    {
+      "name": "test-preload-node-proxy.py",
+      "exit": 0,
+      "stdout": "",
+      "stderr": "test_actual_docker29_containerd_manifest_identity_and_classic_config (__main__.PreloadTests.test_actual_docker29_containerd_manifest_identity_and_classic_config) ... ok\ntest_another_admin_proxy_edit_is_preserved (__main__.PreloadTests.test_another_admin_proxy_edit_is_preserved) ... ok\ntest_cached_image_does_not_stop_gateway_or_restart_docker (__main__.PreloadTests.test_cached_image_does_not_stop_gateway_or_restart_docker) ... ok\ntest_database_edit_never_overwrites_backup_or_starts_gateway (__main__.PreloadTests.test_database_edit_never_overwrites_backup_or_starts_gateway) ... ok\ntest_digest_tag_or_platform_mismatch_is_rejected (__main__.PreloadTests.test_digest_tag_or_platform_mismatch_is_rejected) ... ok\ntest_failed_pull_and_timeout_restore_without_retry (__main__.PreloadTests.test_failed_pull_and_timeout_restore_without_retry) ... ok\ntest_live_environment_rejects_proxy_even_if_unit_metadata_is_clean (__main__.PreloadTests.test_live_environment_rejects_proxy_even_if_unit_metadata_is_clean) ... ok\ntest_old_report_recovery_skips_completed_restart_and_keeps_source_report (__main__.PreloadTests.test_old_report_recovery_skips_completed_restart_and_keeps_source_report) ... ok\ntest_real_systemctl_execstart_runtime_fields_do_not_change_config (__main__.PreloadTests.test_real_systemctl_execstart_runtime_fields_do_not_change_config) ... ok\ntest_refuses_other_containers_and_changed_gateway (__main__.PreloadTests.test_refuses_other_containers_and_changed_gateway) ... ok\ntest_success_pulls_once_restores_proxy_and_same_gateway (__main__.PreloadTests.test_success_pulls_once_restores_proxy_and_same_gateway) ... ok\n\n----------------------------------------------------------------------\nRan 11 tests in 0.017s\n\nOK\n"
+    },
+    {
+      "name": "test-fix-supervisor-endpoint.py",
+      "exit": 0,
+      "stdout": "",
+      "stderr": "test_bind_mount_update_preserves_inode_and_cas_refuses_concurrent_edit (__main__.EndpointTests.test_bind_mount_update_preserves_inode_and_cas_refuses_concurrent_edit) ... ok\ntest_cleaned_failure_allowed_but_active_employee_and_changed_gateway_rejected (__main__.EndpointTests.test_cleaned_failure_allowed_but_active_employee_and_changed_gateway_rejected) ... ok\ntest_residual_supervisor_host_and_workload_none_are_strict (__main__.EndpointTests.test_residual_supervisor_host_and_workload_none_are_strict) ... ok\ntest_unique_patch_preserves_all_other_fields_and_rejects_changed_sha (__main__.EndpointTests.test_unique_patch_preserves_all_other_fields_and_rejects_changed_sha) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK\n"
+    }
+  ],
+  "templatePreview": {
+    "oldTemplateSha256": "54d63287df601a4538c842525849d9dd0ca406c8d0e77fc5c8a3448fda41b2ce",
+    "expectedOldSha256": "54d63287df601a4538c842525849d9dd0ca406c8d0e77fc5c8a3448fda41b2ce",
+    "verified": true,
+    "candidateSha256": "8df2029363e77a5da4579c8c89a156522c9921fba7f6bc3c44b0fcd3ff68fb1d"
+  },
+  "administrativeApplyExecuted": false,
+  "rootDockerInspectExecuted": false,
+  "modelCalls": 0,
+  "sandboxOperations": 0,
+  "rawUploadResultSha256": "75028387c5cb35ed6b03e7649c8f0f1a559fc77894a305879b3606b633621749"
+}

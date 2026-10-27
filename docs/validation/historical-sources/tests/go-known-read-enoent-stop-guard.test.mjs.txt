@@ -1,0 +1,63 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { knownEnoentReadProof, rejectedPreflight, rejectedPreflightProof } from '../docs/test-evidence/helpers/go-known-read-enoent-stop-guard-2026-10-06.mjs';
+const hash = value => createHash('sha256').update(value).digest('hex');
+const id = '00000000-0000-4000-8000-000000000001';
+function fixture() {
+  const config = { runId: 'parent', projectId: 'project', departmentId: 'department', version: 8 };
+  const context = { taskId: 'dev', attemptId: 'accepted-attempt', callId: 'read-call', sessionId: 'dev-session', agentId: 'employee-2', employeeId: 'developer' };
+  const argumentsValue = { path: 'server.mjs' }, outputs = ['README.md', 'server.mjs', 'todo.test.mjs'].map(path => ({ path, size: 12, sha256: hash(path) }));
+  const row = { id, status: 'failed', started: true, lateResult: null, payload: { name: 'filesystem', arguments: argumentsValue, context },
+    result: { ok: false, error: { code: 'ENOENT', notExecuted: false, message: 'ENOENT: missing server.mjs' } } };
+  const events = [
+    { type: 'tool/start', callId: context.callId, sessionId: context.sessionId, data: { name: 'filesystem', arguments: argumentsValue } },
+    { type: 'local/operation-queued', data: { operationId: id, name: 'filesystem', ...context } },
+    { type: 'runtime/operation-failed', callId: context.callId, sessionId: context.sessionId, data: { name: 'filesystem', code: 'ENOENT', classification: 'failed' } },
+    { type: 'tool/result', callId: context.callId, sessionId: context.sessionId, data: { name: 'filesystem', result: { isError: true, error: { message: 'HANDOFF_BLOCKED: dev: ' + row.result.error.message } } } },
+    { type: 'tool/start', data: { name: 'artifact_write', arguments: { path: 'server.mjs', content: 'in-memory fixture' } } },
+    { type: 'handoff/accepted', data: { runId: config.runId, taskId: 'dev', attemptId: context.attemptId, outputs } },
+  ].map((event, index) => ({ ...event, seq: index + 1 }));
+  const observation = { localOperations: [row], manifest: structuredClone(outputs), downloads: structuredClone(outputs), archive: { id: config.runId, integrity: 'ok',
+    eventCount: events.length, events, snapshot: { projectId: config.projectId, planVersion: 8,
+      tasks: [{ id: 'dev', kind: 'implementation', assignee: 'employee-2', outputs }], agents: [{ id: 'employee-2', employeeId: 'developer', sourceAgentId: 'developer', sourceDepartmentId: 'department' }] } } };
+  return { row, observation, config };
+}
+test('only known default read ENOENT before first write in the same accepted dev attempt is classified, with original records unchanged', () => {
+  const f = fixture(), before = structuredClone(f); assert.equal(knownEnoentReadProof(f.row, f.observation, f.config).allowed, true); assert.deepEqual(f, before);
+});
+test('active/late/terminal/write/external/other errors, permission ambiguity, incomplete outputs and missing native evidence remain refused', () => {
+  for (const mutate of [
+    f => { f.row.status = 'started'; }, f => { f.row.lateResult = { ok: false }; }, f => { delete f.row.lateResult; },
+    f => { f.row.payload.name = 'terminal_test'; }, f => { f.row.payload.name = 'artifact_write'; }, f => { f.row.payload.name = 'browser_read'; },
+    f => { f.row.payload.arguments.operation = 'write'; }, f => { f.row.result.error.code = 'EACCES'; }, f => { delete f.row.result.error.notExecuted; },
+    f => { f.row.result.ok = true; }, f => { f.row.started = false; }, f => { f.row.payload.context.taskId = 'qa_verify'; },
+    f => { f.row.payload.context.attemptId = 'another'; }, f => { f.row.payload.context.agentId = 'another'; }, f => { delete f.row.payload.context.employeeId; },
+    f => { f.observation.manifest[0].sha256 = hash('modified'); }, f => { f.observation.downloads.pop(); },
+    f => { f.observation.archive.events[1].data.operationId = 'other'; }, f => { f.observation.archive.events[2].data.classification = 'outcome_unknown'; },
+    f => { f.observation.archive.events[3].data.result.isError = false; }, f => { f.observation.archive.events[4].data.arguments.path = 'other'; },
+    f => { f.observation.archive.events[5].data.attemptId = 'another'; }, f => { f.observation.archive.eventCount++; },
+  ]) { const f = fixture(); mutate(f); assert.equal(knownEnoentReadProof(f.row, f.observation, f.config).allowed, false); }
+  const f = fixture(); f.observation.archive.events.unshift({ seq: 0, type: 'tool/start', data: { name: 'artifact_write', arguments: { path: 'server.mjs' } } });
+  f.observation.archive.events.forEach((event, index) => event.seq = index + 1); f.observation.archive.eventCount++; assert.equal(knownEnoentReadProof(f.row, f.observation, f.config).allowed, false);
+});
+test('the exact saved zero-dispatch preflight is bound; an existing action intent or dispatched POST cannot authorize this variant', () => {
+  const bytes = readFileSync(rejectedPreflight.path), value = JSON.parse(bytes), source = { value, sha256: hash(bytes) };
+  const config = { projectId: value.projectId, departmentId: value.departmentId, runId: value.runId, commandId: value.commandId, version: value.version };
+  assert.equal(rejectedPreflightProof(source, config).posts, 0);
+  for (const mutate of [s => { s.sha256 = hash('changed'); }, s => { s.value.failure.dispatchObserved = true; }, s => { s.value.actionReceipt = 'existing-intent'; },
+    s => { s.value.mutationRequests.push({ method: 'POST' }); }, s => { s.value.before = {}; }]) { const changed = structuredClone(source); mutate(changed); assert.throws(() => rejectedPreflightProof(changed, config)); }
+});
+test('actual saved raw archive/operations and current HTTP artifact hashes prove exactly the three original failures without any product request', () => {
+  const root = 'docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/', sources = JSON.parse(readFileSync(root + 'sources.json'));
+  const read = name => { const path = root + name, bytes = readFileSync(path), recorded = sources.sources.find(row => row.path === path);
+    assert.equal(hash(bytes), recorded.sha256); assert.equal(bytes.length, recorded.bytes); return JSON.parse(bytes); };
+  const archive = read('archive.json'), state = read('state.json'), manifest = read('artifacts.json'), localOperations = read('local-operations.json');
+  const downloads = manifest.map(file => { const recorded = sources.sources.find(row => row.endpoint.endsWith('/artifact?path=' + file.path)), bytes = readFileSync(recorded.path);
+    assert.equal(bytes.length, recorded.bytes); assert.equal(hash(bytes), recorded.sha256);
+    return { path: file.path, size: bytes.length, sha256: hash(bytes) }; });
+  const observation = { archive, state, manifest, downloads, localOperations }, config = { runId: sources.runId, projectId: sources.projectId, departmentId: archive.snapshot.departmentId, version: 8 };
+  const failures = localOperations.filter(row => row.status === 'failed'); assert.equal(failures.length, 3);
+  for (const row of failures) { const result = knownEnoentReadProof(row, observation, config); assert.equal(result.allowed, true, result.reason); assert.equal(result.evidence.acceptedSeq, 2241); }
+});

@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { assertRejectedResume } from '../docs/test-evidence/helpers/resume-go-normal-v8-after-blocked-get-2026-10-06.mjs';
+
+// Local saved metadata only; no API, original database, model or employee files.
+const config = { action: 'resume', scenario: 'normal', version: 8, projectId: '4938eab8-26ed-4f60-9413-d979f05fa968', runId: '0947ae05-5c3c-47d0-969b-5c8a739118f1', retained: true };
+const proof = JSON.parse(await readFile(resolve('docs/test-evidence/funded-run-web-normal-resume-2026-10-06T04-51-01-433Z-8c0b9a7e.json')));
+const intent = JSON.parse(await readFile(resolve('.data/funded-acceptance/web-operation-guards/resume-' + config.runId + '.json')));
+test('one actual intercepted pre-dispatch proof permits a distinct successor identity', () => {
+  assert.equal(assertRejectedResume(proof, intent, config), 'resume-' + config.runId + '-after-no-dispatch-04a2ed56ad62');
+});
+test('observed, unknown or response-correlated attempts are never successors', () => {
+  for (const change of [{ failure: { dispatchObserved: true } }, { failure: {} }, { mutationRequests: [{}] }, { response: {} }, { httpStatus: 202 }, { newRunId: config.runId }, { navigationCandidateRunId: config.runId }]) assert.throws(() => assertRejectedResume({ ...proof, ...change }, intent, config));
+});
+test('wrong project, version, run, retain choice or target cannot reuse this proof', () => {
+  for (const change of [{ projectId: config.runId }, { version: 9 }, { runId: config.projectId }, { retained: false }, { action: 'command' }, { scenario: 'recovery' }]) assert.throws(() => assertRejectedResume(proof, intent, { ...config, ...change }));
+});
+test('new child, browser error, side effect or changed interception path is rejected', () => {
+  for (const change of [{ newRunsReadOnly: [{}] }, { pageErrors: ['error'] }, { directModelCallsByHelper: 1 }, { blockedRequests: [] }, { blockedRequests: [{ ...proof.blockedRequests[0], pathSha256: '0'.repeat(64) }] }, { runAfter: { status: 'running' } }]) assert.throws(() => assertRejectedResume({ ...proof, ...change }, intent, config));
+});
+test('original intent and evidence must retain exact path, endpoint and reviewed body', () => {
+  for (const change of [{ actionIdentity: 'different' }, { evidence: 'docs/test-evidence/different.json' }, { endpoint: '/projects/' + config.projectId + '/approve' }, { body: { ...intent.body, acknowledgeUnknownOperations: true } }]) assert.throws(() => assertRejectedResume(proof, { ...intent, ...change }, config));
+});

@@ -1,0 +1,23 @@
+✔ restored budget feedback retains occupied history and call limits without releasing unknown holds (15.3498ms)
+✔ feedback changes after reservation and settlement while preserving the stricter task cap (5.6791ms)
+✔ unknown model pricing stays unknown and completed nodes do not inflate remaining estimates (1.9835ms)
+✔ runtime aliases resolve prices by original employee identity, matching real restored snapshots (1.8867ms)
+✔ project occupation bounds a larger task cap and overrun stays visible without increasing limits (6.6383ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (12.0976ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (2.1167ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (1.051ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (2.0275ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (113.7664ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.8365ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (9.0758ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.9577ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.553ms)
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (256.8617ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 802.9684

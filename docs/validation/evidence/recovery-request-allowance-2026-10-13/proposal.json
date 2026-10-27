@@ -1,0 +1,6 @@
+{
+  "operation": "resource-proposal",
+  "httpStatus": 502,
+  "code": "GATEWAY_REJECTED",
+  "messageChars": 32
+}

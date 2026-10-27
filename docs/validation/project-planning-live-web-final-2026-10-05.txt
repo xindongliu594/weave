@@ -1,0 +1,19 @@
+{
+  "evidence": "docs/test-evidence/project-planning-live-web-2026-10-05.json",
+  "screenshot": "docs/test-evidence/screenshots/project-planning-live-budget-blocked-2026-10-05.png",
+  "service": {
+    "launcherPid": 28380,
+    "apiPid": 12040,
+    "apiPort": 61369,
+    "wrapperPid": 28016
+  },
+  "planningReservation": 0.74799,
+  "inputBytes": 49799,
+  "calls": 21,
+  "completedTaskIds": [
+    "dev"
+  ],
+  "modelRequestsSent": 0,
+  "sourceLedgerAndFilesUnchanged": true,
+  "pageErrors": []
+}

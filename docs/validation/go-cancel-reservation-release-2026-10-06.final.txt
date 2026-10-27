@@ -1,0 +1,15 @@
+✔ only exact one-parent global and department dailyTotals release is admitted without changing any source object (4.3692ms)
+✔ receipt, usage, history, wrong department, any metadata and larger or smaller derived amounts are rejected (5.9045ms)
+✔ open parent receipts, missing usage attribution, multi-department and unknown money never become an inferred release (3.6142ms)
+✔ real captured stop sources pass the entire frozen legacy checkpoint after exact finance validation; source bytes are unchanged (1801.8539ms)
+✔ UI proof requires the exact parent, version, event count, cancelled state and no remaining stop action (3.0538ms)
+✔ NEW knowledge entry recomputes original raw full proof and actual UI sources; a passed report cannot bless altered receipts or proof (1796.8478ms)
+✔ fresh cancelled-parent page checks and readonly route scope precede knowledge PUT, while its exact original update packet stays unchanged (3.7885ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3853.7804

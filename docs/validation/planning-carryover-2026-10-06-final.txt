@@ -1,0 +1,141 @@
+Planning carryover final validation 2026-10-06
+UTC start: 2026-10-06T00:55:52.2793358Z
+Workspace: C:\Users\JJ\.codex\worktrees\f57c\agent_department
+Node: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+Prior failure log SHA256: DB1959B35F83C22312DD3BC5E0E3C3D28A6CBC88C305C7615903924DE459E006
+Sources before validation:
+[
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\project-planning.ts",
+    "Hash": "D3AC7CED1C65DC49DB1E38E5F1EF7F1B66A963E89B705672DA050E99E680A277"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\ProjectPlanning.tsx",
+    "Hash": "863CEE67C97673224169B4BBA50176A3CBEECCE1E2C06309A2195AD8368A3975"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning.test.ts",
+    "Hash": "020067BA29A0FB1FCCFBE1E0366977A7415F27293D25F6505A69EFDCEC1E2C69"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning-ui.test.ts",
+    "Hash": "C1A22C8D3F834CBD27D6A2AD3697C3CA82D9C2AA57A2A276859607F3997F3CD4"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\app.ts",
+    "Hash": "0ADB16AAC41AD785E773B215ADDD8727B91FA54CAA6D5550CCEF80926C8C2928"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\cost-control.ts",
+    "Hash": "8267BC2E3926D37E8AA1DEABEE796160744AA039E4A309B694D7116804EAB629"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\provider.ts",
+    "Hash": "122C06D2696BD434EAD8191596FEFEB034B31E1EDCF3BB2DF30744CD032B46EA"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\packages\\contracts\\index.ts",
+    "Hash": "51676C93A0D341E2BD00FBD6A929E020599BA996BD692481ADDD3002BF897D29"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-protocol.mjs",
+    "Hash": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\planning-execution-context.ts",
+    "Hash": "5FF3865AE61C838C2776F8D5D9BD761E76B32044FE833571913D082E7F57AEDF"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-integration.mjs",
+    "Hash": "C00ED62FC7CF3F2C73916ED0D7313F62293EFE45E77A0787A67283E5A4BE3AD6"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-support\\pglite-pool.mjs",
+    "Hash": "C6DFD78719309965B83A316DD286379C1EB0750A68F026EBE5793A8CD34EBA74"
+  }
+]
+Command: node scripts/test-integration.mjs tests/project-planning.test.ts
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2547.2406ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (173.5418ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (153.5525ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (243.7393ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (200.0343ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (249.0241ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (146.8135ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (226.0634ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (360.5299ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (372.0725ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (187.4128ms)
+✔ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (85.4807ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (178.7687ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (321.0987ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (141.1062ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (307.3663ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6412.5917
+API exit code: 0
+Scoped diff check exit code: 0
+
+Source drift count: 0
+Prior failure log unchanged: True
+UI not rerun: previous 22/22 result retained; owned UI source and test SHA unchanged.
+Sources after validation:
+[
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\project-planning.ts",
+    "Hash": "D3AC7CED1C65DC49DB1E38E5F1EF7F1B66A963E89B705672DA050E99E680A277"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\ProjectPlanning.tsx",
+    "Hash": "863CEE67C97673224169B4BBA50176A3CBEECCE1E2C06309A2195AD8368A3975"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning.test.ts",
+    "Hash": "020067BA29A0FB1FCCFBE1E0366977A7415F27293D25F6505A69EFDCEC1E2C69"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning-ui.test.ts",
+    "Hash": "C1A22C8D3F834CBD27D6A2AD3697C3CA82D9C2AA57A2A276859607F3997F3CD4"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\app.ts",
+    "Hash": "0ADB16AAC41AD785E773B215ADDD8727B91FA54CAA6D5550CCEF80926C8C2928"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\cost-control.ts",
+    "Hash": "8267BC2E3926D37E8AA1DEABEE796160744AA039E4A309B694D7116804EAB629"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\provider.ts",
+    "Hash": "122C06D2696BD434EAD8191596FEFEB034B31E1EDCF3BB2DF30744CD032B46EA"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\packages\\contracts\\index.ts",
+    "Hash": "51676C93A0D341E2BD00FBD6A929E020599BA996BD692481ADDD3002BF897D29"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-protocol.mjs",
+    "Hash": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\planning-execution-context.ts",
+    "Hash": "5FF3865AE61C838C2776F8D5D9BD761E76B32044FE833571913D082E7F57AEDF"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-integration.mjs",
+    "Hash": "C00ED62FC7CF3F2C73916ED0D7313F62293EFE45E77A0787A67283E5A4BE3AD6"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-support\\pglite-pool.mjs",
+    "Hash": "C6DFD78719309965B83A316DD286379C1EB0750A68F026EBE5793A8CD34EBA74"
+  }
+]
+UTC finish: 2026-10-06T00:56:01.5344801Z

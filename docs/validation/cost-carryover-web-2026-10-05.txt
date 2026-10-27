@@ -1,0 +1,32 @@
+Source: saved stdout/exit codes from actual tools.exec_command verification in this agent turn. Saving this text does not rerun tests or query the product API.
+
+Command: node --import tsx --test tests/cost-carryover-ui.test.ts tests/run-cost.test.ts
+Exit code: 0
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (13.5089ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.4674ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (0.995ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (14.1359ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.4056ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.4494ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (0.9936ms)
+✔ normal execution includes the saved planning cost in project spend (1.3464ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (9.5307ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.4418ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1122.0772
+
+Command: npx tsc --noEmit
+Exit code: 0
+Stdout/stderr: empty.
+
+Command: git diff --check -- apps/web/src/App.tsx apps/web/src/RunExtras.tsx apps/web/src/BudgetStatus.tsx apps/web/src/CostCarryoverChoice.tsx apps/web/src/styles.css tests/cost-carryover-ui.test.ts
+Exit code: 0
+Stderr: warning: in the working copy of 'apps/web/src/RunExtras.tsx', LF will be replaced by CRLF the next time Git touches it
+
+Scope: local semantic/static React rendering regression and type checking only. Actual browser approval/recovery, real model execution, and final acceptance remain root-agent responsibilities. No product API request, model call, database edit, or main-service operation was performed by this verification.

@@ -1,0 +1,129 @@
+Local static web fresh upstream fix frozen 2026-10-06T05:04:34Z
+Node C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+
+NEW regression against old shared-upstream keepAlive=true (exit1):
+✖ successive API reads use a fresh upstream socket for every request (73.7786ms)
+✔ upstream disconnect after receiving a GET or mutation dispatches once and never replays an unknown result (188.0189ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 696.8095
+
+✖ failing tests:
+
+test at tests\local-static-web.test.ts:1:6249
+✖ successive API reads use a fresh upstream socket for every request (73.7786ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 8
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-static-web.test.ts:96:43)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+FINAL static web + launcher tests (exit0):
+✔ local launcher documents the explicit data directory (173.0565ms)
+✔ API-only local check cannot be presented as a production static-web check (168.5652ms)
+✔ local check refuses a data directory override before accessing it (174.6714ms)
+✔ local launcher refuses relative and empty data directories (342.0314ms)
+✔ local launcher refuses ambiguous duplicate data directory options (175.2719ms)
+✔ an absolute data directory with spaces retains its existing launch lock (172.0594ms)
+✔ static page, assets and HEAD use correct MIME without a development server (63.5272ms)
+✔ API proxy retains bytes, query, status, end-to-end headers and original idempotency key (12.0496ms)
+✔ upstream permission failure and API 404 remain API responses (7.3359ms)
+✔ successive API reads use a fresh upstream socket for every request (23.1115ms)
+✔ upstream disconnect after receiving a GET or mutation dispatches once and never replays an unknown result (189.1744ms)
+✔ Host and browser Origin guards reject both HTML and API before upstream operations (13.1561ms)
+✔ SPA fallback excludes API, missing assets, encoded traversal and non-read methods (9.3403ms)
+✔ static serving refuses a directory link outside the build root (4.4967ms)
+✔ streamed API response starts before the upstream completes (4.0152ms)
+✔ unavailable API returns an explicit 502 and never falls through to the SPA (8.5755ms)
+✔ closing static host aborts an outstanding API stream, releases the port and is idempotent (8.1766ms)
+✔ missing build fails with a build instruction and does not create a data directory (2.0875ms)
+✔ existing built product index and assets are served unchanged (13.0604ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1597.9657
+
+
+node --check scripts/local-static-web.mjs: exit0
+node node_modules/typescript/bin/tsc --noEmit: exit0
+stdout/stderr: ""
+
+Read-only saved actual second failure and final source hashes:
+{
+  "actualEvidence": {
+    "path": "docs/test-evidence/funded-run-web-normal-resume-2026-10-06T04-57-08-143Z-30061a10.json",
+    "sha256": "d0f555796e0e071d624bd12b9362010915ece23b98bcafd85e50bf17aa79d275",
+    "action": "resume",
+    "runId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+    "version": 8,
+    "mutations": 0,
+    "failure": {
+      "message": "No single reviewed POST was observed; inspect and never replay",
+      "dispatchObserved": false,
+      "result": "Unknown/failed action is not success and must not be replayed."
+    },
+    "blockedRequests": [
+      {
+        "method": "POST",
+        "pathSha256": "d1b94004ac47a299c3841dbaae65580caf25c8ed41df4a20009a86cefa828d4d",
+        "message": "Required product GET was unavailable"
+      }
+    ],
+    "failedGets": [
+      {
+        "endpoint": "/runs/90f0e832-f423-42f3-abc0-c0749a07b90f",
+        "method": "GET",
+        "checkedAt": "2026-10-06T04:57:26.779Z",
+        "status": 502,
+        "available": false
+      }
+    ]
+  },
+  "frozenSources": [
+    {
+      "path": "scripts/local-static-web.mjs",
+      "sha256": "2a75f0666efbc0f8887a267b6cb151be49fa6d2315ec392ec8b86ef186216304"
+    },
+    {
+      "path": "tests/local-static-web.test.ts",
+      "sha256": "17ddfcabd46e9b6c264d3362417efe399f8f0783e10671589bbbf03bb4aed2e0"
+    },
+    {
+      "path": "tests/local-launcher.test.ts",
+      "sha256": "60e6a769b48c75084473010cbb59dc489ed59dc8cd9d1171ae87e8d09c812bff"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+    }
+  ]
+}
+No concrete ECONNRESET root cause is proved. No real API/DB/model/employee-file/browser/reload action performed.

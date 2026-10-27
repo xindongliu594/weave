@@ -1,0 +1,1 @@
+{"passed":6,"evidence":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\production-cmd-failures-2026-10-05T12-42-26.274Z.json","directory":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\production-cmd-check\\isolated-UMZgOR","launcherSha256":"cb93d44b1d98f473b55693affde606e50f60f060227f9add4d366e2b4b0949d8"}

@@ -1,0 +1,62 @@
+NEW Go funded operator pure guard engineering fixtures, 2026-10-06
+Command: node --test tests/go-funded-operator.test.mjs
+No real API or browser action; no employee files; no fee settlement or original helper edits.
+
+✔ an actual-report-shaped 200 replan frame retains the existing project, department, exact new version and supported route (5.2572ms)
+✔ old 201 creation confirmations, failures and cross-scenario/project/version frames are refused (3.4804ms)
+✔ changes to candidate, policy, requirement, preview, base version and retained-fee choice are refused (3.1213ms)
+✔ another route or fallback and another/multiple confirmation mutation are refused (1.4559ms)
+✔ an exact cached generation source chain retains the original positive fee; hash, key, fee and source changes fail closed (6.2082ms)
+✔ approved run binding rejects another gateway, route hash, thinking mode, price tier or role model (3.572ms)
+✔ operator parameters require both source files and the explicitly approved Go route, while retained choice remains explicit (2.6591ms)
+✔ unknown outside-project Go fees remain reserved, require scenario attribution and reduce the original funding allowance (2.1647ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 202.8874
+
+EXIT_CODE=0
+frozenAt=2026-10-06T10:17:46+08:00
+SOURCE_SHA256
+7bf81e4dc81bc9d4c5f8ad23fd6dd81bd98613f501ff29f2bd7c2dae62be7a40  docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs
+29bac218545ff57d311bf7d8e480606f48800f73366a6ef9838c726f290d1dff  tests/go-funded-operator.test.mjs
+6cec0f82df67546c0a165c7c8720c3495bf586bd34b39170555cf300a5f257f2  docs/test-evidence/helpers/operate-funded-run-web-2026-10-05.mjs
+4ba7a557f558a6724f64c10cf5a50552967222bd1e85ee8750ad79db004f5b45  docs/test-evidence/go-normal-confirm-2026-10-06T01-49-58-426Z-78c51eb2.json
+e7d2dd6e110aaa5194bb60e077afca9fc08c8d364d441afd2d2b1e665fd38a59  docs/test-evidence/go-normal-recover-known-2026-10-06T01-48-07-081Z-52ec172c.json
+07f3a9fe80adc36baa2d28ac26346fb0fb053114e2db0bda4cc694d76e1fddb0  docs/test-evidence/go-normal-generate-2026-10-06T01-42-43-163Z-853b3fd0.json
+cc79bc1c9618938fe721420196628c2535443f3f983e6e2faf699b9c9a00c6c7  docs/test-evidence/go-recovery-confirm-2026-10-06T02-00-20-236Z-0e2ec036.json
+5020f28b9579fc5c36a2c9d91b7b45db818ec72752f75dc6241f904a5d54c959  docs/test-evidence/go-recovery-generate-2026-10-06T01-53-14-065Z-827664e3.json
+
+FINAL REFREEZE: approval-card loading wait only, 2026-10-06T10:34:15+08:00
+The actual parent failure report records zero POSTs and no action receipt.
+Card/button/argument display now wait for visibility before strict uniqueness and exact argument checks.
+Durable claims, pending identity, workspace SHA, funding and POST guards were not changed.
+Web base URL correction: http://127.0.0.1:4310/ (60546 is the API).
+Command: node --test tests/go-funded-operator.test.mjs
+No real API/browser/model operation by the validating subagent.
+
+✔ an actual-report-shaped 200 replan frame retains the existing project, department, exact new version and supported route (4.1985ms)
+✔ old 201 creation confirmations, failures and cross-scenario/project/version frames are refused (3.3592ms)
+✔ changes to candidate, policy, requirement, preview, base version and retained-fee choice are refused (3.0851ms)
+✔ another route or fallback and another/multiple confirmation mutation are refused (1.3777ms)
+✔ an exact cached generation source chain retains the original positive fee; hash, key, fee and source changes fail closed (6.0721ms)
+✔ approved run binding rejects another gateway, route hash, thinking mode, price tier or role model (2.354ms)
+✔ operator parameters require both source files and the explicitly approved Go route, while retained choice remains explicit (1.695ms)
+✔ unknown outside-project Go fees remain reserved, require scenario attribution and reduce the original funding allowance (1.881ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 183.9692
+EXIT_CODE=0
+
+FINAL_SOURCE_SHA256
+cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3  docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs
+29bac218545ff57d311bf7d8e480606f48800f73366a6ef9838c726f290d1dff  tests/go-funded-operator.test.mjs

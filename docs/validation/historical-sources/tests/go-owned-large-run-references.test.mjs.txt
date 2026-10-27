@@ -1,0 +1,148 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, symlinkSync, truncateSync, lstatSync } from 'node:fs';
+import { join, resolve, relative, sep } from 'node:path';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
+import { MAX_SOURCE_BYTES, referenceCaptureRuns, hydrateRunReferences, sourcesDirectory } from '../docs/test-evidence/helpers/go-acceptance-run-references-owned-large-2026-10-06.mjs';
+import { hydrateCapture, loadSource, auditGoTodo } from '../docs/test-evidence/helpers/audit-go-todo-acceptance-referenced-2026-10-06.mjs';
+import { hydrateCapture as hydrateOriginal, auditGoTodo as auditOriginal } from '../docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs';
+
+// Temporary synthetic evidence only. These fixtures contain no original
+// employee source, keys, API/database calls or actual model acceptance.
+const workspace = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const evidenceRoot = resolve(workspace, 'docs/test-evidence');
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+const id = n => '00000000-0000-4000-8000-' + String(n).padStart(12, '0');
+const repo = path => relative(workspace, path).split(sep).join('/');
+
+function fixture(padding = 'fixture marker') {
+  const root = mkdtempSync(join(evidenceRoot, '.run-ref-fixture-')), capturePath = join(root, 'capture.json'), bundle = sourcesDirectory(capturePath);
+  mkdirSync(bundle); const sources = [], capture = { kind: 'actual-go-acceptance-capture', engineeringOnly: true,
+    finance: { complete: false, costs: { calls: [{ id: id(99), status: 'uncertain', amount: .25 }] } }, sources };
+  let serial = 0;
+  function run(runId, projectId, departmentId) {
+    const snapshot = { projectId, departmentId, planVersion: 8, mode: 'product', requirement: 'Synthetic fixture', policy: { maxBudget: 1 }, agents: [], tasks: [], modelRoutes: [] };
+    const archive = { id: runId, snapshot, status: 'failed', integrity: 'ok', eventCount: 2, events: [
+      { seq: 1, type: 'run/created', data: { snapshotSha256: sha(JSON.stringify(snapshot)) } },
+      { seq: 2, type: 'session/user/message', data: { message: { content: [{ type: 'text', text: padding }] } } },
+    ] };
+    const state = { id: runId, snapshot, status: 'failed', summaryEvents: [{ type: 'fixture/state', data: { text: 'complete state fixture marker' } }] };
+    for (const [role, value] of Object.entries({ archive, state })) {
+      const path = join(bundle, String(++serial).padStart(4, '0') + '.json'), bytes = Buffer.from(JSON.stringify(value) + '\n'); writeFileSync(path, bytes);
+      sources.push({ endpoint: `/runs/${runId}` + (role === 'archive' ? '/export' : ''), method: 'GET', status: 200, bytes: bytes.length, sha256: sha(bytes), rawPath: repo(path) });
+    }
+    return { archive, state, downloads: [], manifest: [], approvals: [], localOperations: [] };
+  }
+  for (const scenario of ['normal', 'recovery']) {
+    const projectId = id(scenario === 'normal' ? 1 : 2), departmentId = id(scenario === 'normal' ? 101 : 102), runId = id(scenario === 'normal' ? 10 : 12);
+    const proofPath = join(root, scenario + '-proof.json'), proofBytes = Buffer.from('{"kind":"engineering-fixture-missing-confirmation"}\n'); writeFileSync(proofPath, proofBytes);
+    capture[scenario] = { projectId, runId, version: 8, project: { id: projectId, departmentId, version: 8, policy: { maxBudget: 1 } }, models: [], usage: [],
+      confirmation: { path: repo(proofPath), sha256: sha(proofBytes) },
+      ...(scenario === 'recovery' ? { parentId: id(11), parent: run(id(11), projectId, departmentId) } : {}), final: run(runId, projectId, departmentId) };
+  }
+  const summary = referenceCaptureRuns(capture, capturePath); writeFileSync(capturePath, JSON.stringify(summary));
+  return { root, capturePath, bundle, capture, summary, sources, close() {
+    assert.ok(relative(evidenceRoot, root).startsWith('.run-ref-fixture-') && !lstatSync(root).isSymbolicLink(), 'Only this verified temporary evidence directory may be removed');
+    rmSync(root, { recursive: true, force: true });
+  } };
+}
+function modifySource(f, reference, update) {
+  const path = resolve(workspace, reference.path), bytes = Buffer.from(update(readFileSync(path, 'utf8'))); writeFileSync(path, bytes);
+  const source = f.summary.sources.find(row => row.rawPath === reference.path);
+  Object.assign(source, { bytes: bytes.length, sha256: sha(bytes) }); Object.assign(reference, { bytes: bytes.length, sha256: sha(bytes) });
+}
+const withoutClock = value => Array.isArray(value) ? value.map(withoutClock) : value && typeof value === 'object'
+  ? Object.fromEntries(Object.entries(value).filter(([key]) => key !== 'checkedAt').map(([key, item]) => [key, withoutClock(item)])) : value;
+
+test('three complete archive references exceed 50MB in total while each file and the main capture stay bounded', () => {
+  const f = fixture('x'.repeat(18 * 1024 * 1024));
+  try {
+    const archives = f.sources.filter(row => row.endpoint.endsWith('/export'));
+    assert.equal(archives.length, 3); assert.ok(archives.reduce((n, row) => n + row.bytes, 0) > MAX_SOURCE_BYTES);
+    assert.ok(f.sources.every(row => row.bytes < MAX_SOURCE_BYTES)); assert.ok(lstatSync(f.capturePath).size < 10000);
+    const hydrated = hydrateCapture(loadSource(f.capturePath));
+    for (const scenario of ['normal', 'recovery']) for (const slot of ['parent', 'final']) if (f.capture[scenario][slot]) {
+      assert.ok(isDeepStrictEqual(hydrated[scenario][slot].archive, f.capture[scenario][slot].archive));
+      assert.deepEqual(hydrated[scenario][slot].state, f.capture[scenario][slot].state);
+    }
+    assert.deepEqual(hydrated.finance, f.capture.finance);
+  } finally { f.close(); }
+});
+
+test('same-size raw edits and reference byte/SHA substitutions are rejected', () => {
+  const f = fixture();
+  try {
+    const reference = f.summary.normal.final.archive, path = resolve(workspace, reference.path);
+    const original = readFileSync(path); writeFileSync(path, original.toString().replace('fixture marker', 'fixtUre marker'));
+    assert.throws(() => hydrateRunReferences(structuredClone(f.summary), f.capturePath), /SHA changed/);
+    writeFileSync(path, original);
+    const wrongBytes = structuredClone(f.summary); wrongBytes.normal.final.archive.bytes++;
+    assert.throws(() => hydrateRunReferences(wrongBytes, f.capturePath), /raw GET source record/);
+    const wrongSha = structuredClone(f.summary); wrongSha.normal.final.archive.sha256 = 'a'.repeat(64);
+    assert.throws(() => hydrateRunReferences(wrongSha, f.capturePath), /raw GET source record/);
+  } finally { f.close(); }
+});
+
+test('traversal, absolute paths, another capture bundle and unmarked references fail closed', () => {
+  const f = fixture();
+  try {
+    for (const path of ['docs/test-evidence/../capture.json', 'C:/outside/evidence.json', '/outside/evidence.json', 'docs\\test-evidence\\file.json']) {
+      const value = structuredClone(f.summary); value.normal.final.archive.path = path;
+      assert.throws(() => hydrateRunReferences(value, f.capturePath), /normalized relative/);
+    }
+    assert.throws(() => hydrateRunReferences(structuredClone(f.summary), join(f.root, 'another-capture.json')), /dedicated .sources/);
+    const unmarked = structuredClone(f.summary); delete unmarked.runStorage;
+    assert.throws(() => hydrateRunReferences(unmarked, f.capturePath), /Unmarked reference/);
+  } finally { f.close(); }
+});
+
+test('a junction within the otherwise valid bundle cannot redirect a source read', () => {
+  const f = fixture();
+  try {
+    const original = f.summary.normal.final.archive, target = join(f.root, 'junction-target'); mkdirSync(target);
+    writeFileSync(join(target, 'run.json'), readFileSync(resolve(workspace, original.path)));
+    const link = join(f.bundle, 'linked'); symlinkSync(target, link, process.platform === 'win32' ? 'junction' : 'dir');
+    const nextPath = repo(join(link, 'run.json'));
+    f.summary.sources.find(row => row.rawPath === original.path).rawPath = nextPath; original.path = nextPath;
+    assert.throws(() => hydrateRunReferences(structuredClone(f.summary), f.capturePath), /symlink\/junction/i);
+  } finally { f.close(); }
+});
+
+test('both declared overflow and actual oversized files preserve the per-file 50MB limit', () => {
+  const f = fixture();
+  try {
+    const value = structuredClone(f.summary); value.normal.final.archive.bytes = MAX_SOURCE_BYTES + 1;
+    assert.throws(() => hydrateRunReferences(value, f.capturePath), /overflowing/);
+    truncateSync(resolve(workspace, f.summary.normal.final.archive.path), MAX_SOURCE_BYTES + 1);
+    assert.throws(() => hydrateRunReferences(structuredClone(f.summary), f.capturePath), /bounded regular file/);
+  } finally { f.close(); }
+});
+
+test('foreign raw Run ownership cannot be hidden by recomputing file SHA and source metadata', () => {
+  const f = fixture();
+  try {
+    for (const key of ['id', 'projectId', 'departmentId', 'planVersion']) {
+      const value = structuredClone(f.summary), reference = value.normal.final.archive, original = readFileSync(resolve(workspace, reference.path), 'utf8');
+      modifySource({ ...f, summary: value }, reference, text => { const run = JSON.parse(text); if (key === 'id') run.id = id(999); else run.snapshot[key] = key === 'planVersion' ? 99 : id(999); return JSON.stringify(run); });
+      assert.throws(() => hydrateRunReferences(value, f.capturePath), /another run\/project\/department\/version/);
+      writeFileSync(resolve(workspace, reference.path), original);
+    }
+    const crossSlot = structuredClone(f.summary); crossSlot.normal.final.archive = crossSlot.recovery.parent.archive;
+    assert.throws(() => hydrateRunReferences(crossSlot, f.capturePath), /owner\/slot/);
+  } finally { f.close(); }
+});
+
+test('inline legacy hydration and all original audit decisions remain unchanged, including unknown finance blocking', () => {
+  const f = fixture();
+  try {
+    writeFileSync(f.capturePath, JSON.stringify(f.capture)); const source = loadSource(f.capturePath);
+    const original = hydrateOriginal(source), inline = hydrateCapture(source);
+    assert.deepEqual(inline, original);
+    assert.equal(auditGoTodo, auditOriginal, 'use the original acceptance function without a replacement guard');
+    const expected = auditOriginal(original), actual = auditGoTodo(inline);
+    assert.deepEqual(withoutClock(actual), withoutClock(expected)); assert.equal(actual.status, 'blocked'); assert.equal(actual.actualMvpAccepted, false);
+    assert.ok(actual.financial.checks.some(row => row.id === 'finance-provider-bill-and-unknown-costs' && row.status === 'blocked'));
+  } finally { f.close(); }
+});

@@ -1,0 +1,81 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ demand discussion records actual usage without estimating or reserving an execution budget (3843.0483ms)
+✔ usage-only accounting cannot be applied to execution or project identities (24.4501ms)
+✔ missing conversation usage stays unknown without claiming zero supplier charge (91.5448ms)
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (149.0272ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (169.6624ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (284.1911ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (141.3822ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (167.1243ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (91.9565ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (341.8366ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5890.4754
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2193.7859ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (88.2612ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (138.1662ms)
+✖ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (118.9044ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (87.6742ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (143.425ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (393.1133ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (161.3479ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (125.3332ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (128.1551ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (182.1723ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (421.1757ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (64.0972ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (40.9505ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (283.9915ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (280.9354ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5409.6832
+
+✖ failing tests:
+
+test at tests\organization-chat.test.ts:1:12241
+✖ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (118.9044ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'PLAN_NOT_READY'
+  - 'DAILY_BUDGET_EXCEEDED'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\organization-chat.test.ts:104:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PLAN_NOT_READY',
+    expected: 'DAILY_BUDGET_EXCEEDED',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ confirming a revised proposal updates the same team and draft project, records versions, and never executes (2247.7811ms)
+✔ execution state, archived teams and mismatched project ownership refuse an update without partial writes (154.0498ms)
+✔ all adopted planning charges count toward the updated budget and transfer only after successful confirmation (113.8985ms)
+✔ revisions still require preview identity and explicit tool permissions (66.431ms)
+✔ pending and uncertain project charges block a revision before any budget or team change (108.7111ms)
+✔ a team participating in another active project cannot be changed through a saved conversation (138.9926ms)
+✔ employee prompt revisions advance role versions while replay and unchanged roles preserve them (110.4075ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3450.5122

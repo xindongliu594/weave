@@ -1,0 +1,10 @@
+✔ raw-history continuation after truncation rejects a 64000-byte overflow before another dispatch and keeps all source fields (626.419ms)
+✔ soft-pressure continuation leaves the original 64000-byte request boundary in force without extra summary fees (280.0858ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1321.8972

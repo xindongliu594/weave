@@ -1,0 +1,5097 @@
+{
+  "format": "source-delivery-inventory-v1",
+  "sourceRoot": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department",
+  "selection": {
+    "trees": [
+      "apps",
+      "packages",
+      "services/agent-runtime",
+      "scripts",
+      "tests",
+      "dist/web"
+    ],
+    "files": [
+      "README.md",
+      "docs/mvp-acceptance-2026-10-06.md",
+      "docs/mvp-go-quickstart-2026-10-06.md",
+      "package-lock.json",
+      "package.json",
+      "services/embedding/local.d.mts",
+      "services/embedding/local.mjs",
+      "services/embedding/model-lock.json",
+      "start-demo.cmd",
+      "start-local-production.cmd",
+      "start-local.cmd",
+      "start.command",
+      "tsconfig.json",
+      "vite.config.ts"
+    ],
+    "documents": [
+      "docs/mvp-acceptance-2026-10-06.md",
+      "docs/mvp-go-quickstart-2026-10-06.md"
+    ],
+    "includeWebBuild": true
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 16503,
+      "sha256": "af7b30a00a9efa1e8950b3e956ce2d011a74341d7e9e405cb8def9bdaac3d121",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "30399297484771725",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "16503",
+        "mtimeNs": "1791190955634423000",
+        "ctimeNs": "1791190955634423000"
+      }
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "bytes": 54495,
+      "sha256": "03e610b29b1b9cb6635b4010fa9bb42731f36d4425b7fd97ef1c3a1b08f1d153",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "59672695062680190",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "54495",
+        "mtimeNs": "1791280408824552000",
+        "ctimeNs": "1791280408824552000"
+      }
+    },
+    {
+      "path": "apps/api/src/automation-learning.ts",
+      "bytes": 26660,
+      "sha256": "b04bbf4cefc1e652b58c78c5410eea4929504d58d94e87b36db94be221b7cf81",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "79094468455715463",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "26660",
+        "mtimeNs": "1790949252126472700",
+        "ctimeNs": "1790949433729760600"
+      }
+    },
+    {
+      "path": "apps/api/src/backup.ts",
+      "bytes": 11553,
+      "sha256": "9491d8621933864af12d649f972ad0c80a0e1e7b312d9cdfb575c717b17f636d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "36591746972406414",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11553",
+        "mtimeNs": "1791107454681309200",
+        "ctimeNs": "1791107454681309200"
+      }
+    },
+    {
+      "path": "apps/api/src/budget-history.ts",
+      "bytes": 5759,
+      "sha256": "9712b0b8e1c998551cc6eb8b4cb04ca67d83ba290ed66865640f1036b7ec4acd",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421587",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5759",
+        "mtimeNs": "1791262091150916400",
+        "ctimeNs": "1791262091150916400"
+      }
+    },
+    {
+      "path": "apps/api/src/collaboration.ts",
+      "bytes": 5099,
+      "sha256": "ac17831d1c9053d01dc3bff4c12fb3db34d435ae05ca73cb61317fd809a9bc9a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421588",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5099",
+        "mtimeNs": "1790948162425743200",
+        "ctimeNs": "1790949433729760600"
+      }
+    },
+    {
+      "path": "apps/api/src/cost-control.ts",
+      "bytes": 22979,
+      "sha256": "3399569a61869cdfd0bc68b318eb4545d7d792da5734c27a8434643a2c6dff65",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "29836347531350672",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "22979",
+        "mtimeNs": "1791271336387431300",
+        "ctimeNs": "1791271336387431300"
+      }
+    },
+    {
+      "path": "apps/api/src/cost-router.ts",
+      "bytes": 3088,
+      "sha256": "5a1efc98687e69b97d85106c62b53a6d74e48456b0583e284c7941ff35686543",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421590",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3088",
+        "mtimeNs": "1791112376980364900",
+        "ctimeNs": "1791112376980364900"
+      }
+    },
+    {
+      "path": "apps/api/src/db.ts",
+      "bytes": 3219,
+      "sha256": "bd05a16f0b880b49d89745091d851b9fa6c2ff11d28932a6fd755cf98110cd7f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "67835469387289363",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3219",
+        "mtimeNs": "1790949252129481600",
+        "ctimeNs": "1790949433730765300"
+      }
+    },
+    {
+      "path": "apps/api/src/employee-history.ts",
+      "bytes": 3555,
+      "sha256": "4ed17e178636a51b4f7057fa0c82a684bf6b8a3450aae0159c81447fb6f6128e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421592",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3555",
+        "mtimeNs": "1790948162428742800",
+        "ctimeNs": "1790949433730765300"
+      }
+    },
+    {
+      "path": "apps/api/src/execution-policy.ts",
+      "bytes": 2378,
+      "sha256": "a4f1cd806693935f2ea8a3f8391d925e0fbf6f6f566b1d489206de00adb1c34f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421593",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2378",
+        "mtimeNs": "1791271292381010200",
+        "ctimeNs": "1791271292381010200"
+      }
+    },
+    {
+      "path": "apps/api/src/execution-prompt.ts",
+      "bytes": 2340,
+      "sha256": "a1e7a96d0140910db5e8d36d53a4caa29c4430deaedefdd52381eec0cf3ac66e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12947848928905982",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2340",
+        "mtimeNs": "1791178362723385300",
+        "ctimeNs": "1791178362723385300"
+      }
+    },
+    {
+      "path": "apps/api/src/gateway-service.ts",
+      "bytes": 2232,
+      "sha256": "c6ec09612cb1bb1a69d1430944a4686d8d80c4821626e0910bcb8febd9466419",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "22799473113584430",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2232",
+        "mtimeNs": "1790949252130481000",
+        "ctimeNs": "1790949433731765700"
+      }
+    },
+    {
+      "path": "apps/api/src/handoff-checkpoints.ts",
+      "bytes": 5958,
+      "sha256": "84432fac74a50ec59e29a0fca521f67709ded6a167b22d0d848fa44f2402307a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "34621422135432059",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5958",
+        "mtimeNs": "1791280889622306000",
+        "ctimeNs": "1791280889622306000"
+      }
+    },
+    {
+      "path": "apps/api/src/idempotency.ts",
+      "bytes": 2020,
+      "sha256": "8a4a954abb72159ef2f04d002ec1a1924af137ccfef4f330ac5cdc425466a22a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421595",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2020",
+        "mtimeNs": "1791280410689306100",
+        "ctimeNs": "1791280410689306100"
+      }
+    },
+    {
+      "path": "apps/api/src/index.ts",
+      "bytes": 604,
+      "sha256": "e684fe1bfb94e9913a262f2cbce330946f62a999e8ae19cba420c7bed317d10f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "45317471250436999",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "604",
+        "mtimeNs": "1790949252132693000",
+        "ctimeNs": "1790949433732273200"
+      }
+    },
+    {
+      "path": "apps/api/src/knowledge-store.ts",
+      "bytes": 10327,
+      "sha256": "25e8ede7a6537cd9ee943237b6fedfe14e7d181f95887e7883d1965ac5003eeb",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421597",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10327",
+        "mtimeNs": "1790948162433772800",
+        "ctimeNs": "1790949433732273200"
+      }
+    },
+    {
+      "path": "apps/api/src/knowledge-vector.ts",
+      "bytes": 5988,
+      "sha256": "562651ae13568a66c4a13003023626f43e88e3e152f7383fde26fd3b4002c941",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421598",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5988",
+        "mtimeNs": "1790948162434785500",
+        "ctimeNs": "1790949433732273200"
+      }
+    },
+    {
+      "path": "apps/api/src/knowledge.ts",
+      "bytes": 7847,
+      "sha256": "3552848079bcb28787f8b9ad4d6ff7e24bda4a56c54f56ba6e24bbb93ac7f572",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "29273397577929756",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7847",
+        "mtimeNs": "1790949252134205200",
+        "ctimeNs": "1790949433732273200"
+      }
+    },
+    {
+      "path": "apps/api/src/local-admission.ts",
+      "bytes": 977,
+      "sha256": "e7153ee341bdcd04960dac300285342fa05d90d9944c786b3e6b6a1d456ce7d8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024557581768",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "977",
+        "mtimeNs": "1791271288968873000",
+        "ctimeNs": "1791271288968873000"
+      }
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "bytes": 20661,
+      "sha256": "759c14bb9687ae5d9d0b4d22e61394f1e7b4975b4c88685f2dfea5334a81b035",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "28710447624508450",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "20661",
+        "mtimeNs": "1791271338167363100",
+        "ctimeNs": "1791271338167363100"
+      }
+    },
+    {
+      "path": "apps/api/src/manager-chat.ts",
+      "bytes": 9384,
+      "sha256": "56fff0308a8eb2b3070f305b88ee84a6cbd192dc7f0513d50b7950d750798771",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "14073748835554389",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9384",
+        "mtimeNs": "1790949252135746600",
+        "ctimeNs": "1790949433733804500"
+      }
+    },
+    {
+      "path": "apps/api/src/migrate.ts",
+      "bytes": 125,
+      "sha256": "f1e036f41aaa44221717df7fb197ca878295408e2d5734bd00196fe498c761a8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421601",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "125",
+        "mtimeNs": "1790948162437294100",
+        "ctimeNs": "1790949433733804500"
+      }
+    },
+    {
+      "path": "apps/api/src/model-capabilities.ts",
+      "bytes": 5757,
+      "sha256": "107f02b74cb4cfe8f9c1ad9d7d3e23072cb7ca27683afe236c50a70a5d832f8f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421602",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5757",
+        "mtimeNs": "1791249442495061800",
+        "ctimeNs": "1791249442495061800"
+      }
+    },
+    {
+      "path": "apps/api/src/model-catalog.ts",
+      "bytes": 6640,
+      "sha256": "f0e066ac706aa89db65a007c5fe7b4e98e629efdc7ae7f4b9979d14e984914d5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "14073748835554399",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6640",
+        "mtimeNs": "1791100671882264500",
+        "ctimeNs": "1791100671882264500"
+      }
+    },
+    {
+      "path": "apps/api/src/new-api-billing.ts",
+      "bytes": 15652,
+      "sha256": "4cc833c4abec78c95ca000738392ad6b206afaa6ea01c28b2d0692102bdab4e1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "121597189939124039",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15652",
+        "mtimeNs": "1791123761185467600",
+        "ctimeNs": "1791123761185467600"
+      }
+    },
+    {
+      "path": "apps/api/src/obsidian.ts",
+      "bytes": 11966,
+      "sha256": "329941d0830a400a8fc3c53f7602352a3c00707092193ad1e9f89042deace38e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12947848928711918",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11966",
+        "mtimeNs": "1790950813453852300",
+        "ctimeNs": "1790950813453852300"
+      }
+    },
+    {
+      "path": "apps/api/src/official-model-prices.ts",
+      "bytes": 1907,
+      "sha256": "52bb71a0b13ca210ad808fe9b4fe2030c3826d0104f8b5bf5fe585cf431c2afc",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "260927303410799876",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1907",
+        "mtimeNs": "1790949252138844200",
+        "ctimeNs": "1790949433734811400"
+      }
+    },
+    {
+      "path": "apps/api/src/organization-chat.ts",
+      "bytes": 20580,
+      "sha256": "9a98664eb4aaf09d24e7ce804a7294f6c92757f716db2f5770ddc04be9d8fca5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "23362423067006225",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "20580",
+        "mtimeNs": "1791208621167359300",
+        "ctimeNs": "1791208621167359300"
+      }
+    },
+    {
+      "path": "apps/api/src/planning-execution-context.ts",
+      "bytes": 17296,
+      "sha256": "1a981c25b6ec51cea6029d033eb64dfa15820493f502b0e657bc6ffb6fa6b6e0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "88383142687184033",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "17296",
+        "mtimeNs": "1791261359124266300",
+        "ctimeNs": "1791261359124266300"
+      }
+    },
+    {
+      "path": "apps/api/src/planning-output.ts",
+      "bytes": 4127,
+      "sha256": "16c0f0732eef2df641567acfa263b54d3cb55c252e2fda8d014447f6be45d58b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "11540474045217324",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4127",
+        "mtimeNs": "1791273941024053400",
+        "ctimeNs": "1791273941024053400"
+      }
+    },
+    {
+      "path": "apps/api/src/product-schema.ts",
+      "bytes": 8893,
+      "sha256": "9f1506c8b0aad0bb2fbfe45e8dede14f3d9ffd76f9786bd71553f7ca5a351eec",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421604",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8893",
+        "mtimeNs": "1790948162439303100",
+        "ctimeNs": "1790949433734811400"
+      }
+    },
+    {
+      "path": "apps/api/src/product.ts",
+      "bytes": 15826,
+      "sha256": "b44be42ed59e7fa927c46dc079473e7e589ab6f32f78cdb3d2fdaf764c0a5d9a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8725724278052156",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15826",
+        "mtimeNs": "1791192196242746900",
+        "ctimeNs": "1791192196242746900"
+      }
+    },
+    {
+      "path": "apps/api/src/project-planning.ts",
+      "bytes": 11882,
+      "sha256": "ad0a439425e6c7230d02dab7009eb6e7e21095aa894d0f745bd02f18b9bd3b50",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "3659174697314443",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11882",
+        "mtimeNs": "1791280770218195400",
+        "ctimeNs": "1791280770218195400"
+      }
+    },
+    {
+      "path": "apps/api/src/provider-reconciliation.ts",
+      "bytes": 17631,
+      "sha256": "6c22a9559175ffafb0bb3bebeeda149a097a761e74b82478ff19eed633de4995",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "20266198323585673",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "17631",
+        "mtimeNs": "1791124309093185900",
+        "ctimeNs": "1791124309093185900"
+      }
+    },
+    {
+      "path": "apps/api/src/provider.ts",
+      "bytes": 14395,
+      "sha256": "471053409058bcace60e3fd20dec213558e929ea30d6c6ec5b94429082e8c851",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16607023625950562",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14395",
+        "mtimeNs": "1791274341364669600",
+        "ctimeNs": "1791274341364669600"
+      }
+    },
+    {
+      "path": "apps/api/src/recovery-conditions.ts",
+      "bytes": 10374,
+      "sha256": "c2fec6122b0c5d1df5be1312c3e3236f0c7c29d9ffb8a915aa1a65c139f83b1e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "844424930405310",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10374",
+        "mtimeNs": "1791184313631546700",
+        "ctimeNs": "1791184313631546700"
+      }
+    },
+    {
+      "path": "apps/api/src/request-origin.ts",
+      "bytes": 1548,
+      "sha256": "88a3aa4b44c638ebc56e9713b0bd3a4b0615b010f847174295147056ca148f0c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421607",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1548",
+        "mtimeNs": "1790948162441802900",
+        "ctimeNs": "1790949433736143000"
+      }
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "bytes": 13147,
+      "sha256": "2a4e0c6e91e8ca59779ab61600e8e9f8ef978db9d1da8359f912fb00dd5cfb13",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "28428972647798125",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13147",
+        "mtimeNs": "1791271386780522700",
+        "ctimeNs": "1791271386780522700"
+      }
+    },
+    {
+      "path": "apps/api/src/run-management.ts",
+      "bytes": 11673,
+      "sha256": "fc261948672186c431c1cb64a46cef1b52eec221086b909bb2cf8ba03c73ee30",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "26177172834113087",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11673",
+        "mtimeNs": "1791183127853979200",
+        "ctimeNs": "1791183127853979200"
+      }
+    },
+    {
+      "path": "apps/api/src/run-state.ts",
+      "bytes": 2813,
+      "sha256": "f75c650f74b2617af85cbd0200758500fa245bdee62a87f4787f91e164ac3e4d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421610",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2813",
+        "mtimeNs": "1790948162444347700",
+        "ctimeNs": "1790949433737143400"
+      }
+    },
+    {
+      "path": "apps/api/src/vault.ts",
+      "bytes": 1605,
+      "sha256": "ef821ff7b15229e08123f94e958b6ce68b9acf34a98ac243c733b908ef1ba5a6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132267",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1605",
+        "mtimeNs": "1790948162445347300",
+        "ctimeNs": "1790949433737651600"
+      }
+    },
+    {
+      "path": "apps/api/src/work-files.ts",
+      "bytes": 14421,
+      "sha256": "29f6dfc28ac27e7a1bbbbcf9bf57f14a6ec367114b8528408049a92cf890f29c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "20266198323189395",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14421",
+        "mtimeNs": "1790949252144875300",
+        "ctimeNs": "1790949433737651600"
+      }
+    },
+    {
+      "path": "apps/api/src/work-tools-browser.ts",
+      "bytes": 24396,
+      "sha256": "b899cce87e57ff384769c36402a880a9865a382ff28632ba49baf623b8b80684",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "34902897112143558",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "24396",
+        "mtimeNs": "1790949252147016700",
+        "ctimeNs": "1790949433737651600"
+      }
+    },
+    {
+      "path": "apps/desktop/connection.cjs",
+      "bytes": 680,
+      "sha256": "aba4c41fdb024fca6390ad5d2a265903047b9a8363703129c2e86a5955b4573d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421613",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "680",
+        "mtimeNs": "1790948162446347200",
+        "ctimeNs": "1790949433738661700"
+      }
+    },
+    {
+      "path": "apps/desktop/connection.test.cjs",
+      "bytes": 801,
+      "sha256": "277dae437d5002762d570aa0e8924e3cf10e43909bad674b7a2b5cf76853f75a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421614",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "801",
+        "mtimeNs": "1790948162447401800",
+        "ctimeNs": "1790949433739661300"
+      }
+    },
+    {
+      "path": "apps/desktop/desktop.smoke.cjs",
+      "bytes": 2987,
+      "sha256": "fa3c3dfa17fb3ac9c62291a4e0f9f2e54ba0f04ab2eb4ee9f07ac5b37761d919",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421615",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2987",
+        "mtimeNs": "1790948162448405000",
+        "ctimeNs": "1790949433739661300"
+      }
+    },
+    {
+      "path": "apps/desktop/local-client.cjs",
+      "bytes": 7095,
+      "sha256": "5777293d2fadf1210d65d648e4b1d4b52940f8bb33db607db0ae8c100dde39e6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "27584547717666511",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7095",
+        "mtimeNs": "1790952258246963400",
+        "ctimeNs": "1790952258246963400"
+      }
+    },
+    {
+      "path": "apps/desktop/local-executor.cjs",
+      "bytes": 12285,
+      "sha256": "e7ee7bcbfd32c19d6404868ecae3e4efb1373577cf2c7ee5c9e79a927aa2f759",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421617",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12285",
+        "mtimeNs": "1790948162450400700",
+        "ctimeNs": "1790949433739661300"
+      }
+    },
+    {
+      "path": "apps/desktop/local-executor.test.cjs",
+      "bytes": 11172,
+      "sha256": "0fa8d5bd7a8237fc51b6c263b4ce557bb92fd920426b972a3b025adb984329a6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421618",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11172",
+        "mtimeNs": "1790952259889771200",
+        "ctimeNs": "1790952259889771200"
+      }
+    },
+    {
+      "path": "apps/desktop/local.smoke.cjs",
+      "bytes": 7677,
+      "sha256": "0fc27454e870c24af9bd89d95e8a0c92e8a31863a1a866ab1a243e4c54f06145",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421619",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7677",
+        "mtimeNs": "1790948162453474300",
+        "ctimeNs": "1790949433740661600"
+      }
+    },
+    {
+      "path": "apps/desktop/main.cjs",
+      "bytes": 10397,
+      "sha256": "3753e995369f98c3a9d119daba51e46342f736b811bcd489f86b7368ff52eea4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13229323905423166",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10397",
+        "mtimeNs": "1790949252149030300",
+        "ctimeNs": "1790949433740661600"
+      }
+    },
+    {
+      "path": "apps/desktop/package-lock.json",
+      "bytes": 132098,
+      "sha256": "b06d220d4b353787d7c7ed2719241d79841eee98c91756d80d605feb4cdcd03b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421621",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "132098",
+        "mtimeNs": "1790948162458005500",
+        "ctimeNs": "1790949433740661600"
+      }
+    },
+    {
+      "path": "apps/desktop/package.json",
+      "bytes": 1389,
+      "sha256": "cd87e03ed171ae8c165d7317a1ec359e7e218c9e55e663b34704f71d0bf1fdd4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "124974889659553603",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1389",
+        "mtimeNs": "1790949252150026400",
+        "ctimeNs": "1790949433740661600"
+      }
+    },
+    {
+      "path": "apps/desktop/preload.cjs",
+      "bytes": 500,
+      "sha256": "4b1659f665bff67f4cf93b80273f2fb291c5eb2dad6d1af07bd77bc1b712f63f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421623",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "500",
+        "mtimeNs": "1790948162459512000",
+        "ctimeNs": "1790949433741661800"
+      }
+    },
+    {
+      "path": "apps/desktop/settings.css",
+      "bytes": 997,
+      "sha256": "ec1c1225da94c85aaf1f2f33c3804e175de9b82726396c62a26f9f92bf2aec6a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421624",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "997",
+        "mtimeNs": "1790948162460519300",
+        "ctimeNs": "1790949433741661800"
+      }
+    },
+    {
+      "path": "apps/desktop/settings.html",
+      "bytes": 2139,
+      "sha256": "741e595c05353a14399cbfd1d04600d87aa0318bc8a87494aa6dd104f2a5c55e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "73464968921503728",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2139",
+        "mtimeNs": "1790949252151028900",
+        "ctimeNs": "1790949433741661800"
+      }
+    },
+    {
+      "path": "apps/desktop/settings.js",
+      "bytes": 2898,
+      "sha256": "630d0fd0a2dc6cbf0a6a4dc26fc391ac8532bc6c868a779ae70b3b98e504bde5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421626",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2898",
+        "mtimeNs": "1790948162462027000",
+        "ctimeNs": "1790949433741661800"
+      }
+    },
+    {
+      "path": "apps/web/index.html",
+      "bytes": 464,
+      "sha256": "6528c029503e689ec7a98845c79ba0fcd9f493152636074a9f73e881ce1fc34e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "41658296553199693",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "464",
+        "mtimeNs": "1790949252152028400",
+        "ctimeNs": "1790949433742663000"
+      }
+    },
+    {
+      "path": "apps/web/src/AgentAdvanced.tsx",
+      "bytes": 2521,
+      "sha256": "5235ac3793505ef7459c47431e119a6f14855031085b1ba972628bae7a63d5ec",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "33776997205301335",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2521",
+        "mtimeNs": "1790949252154151700",
+        "ctimeNs": "1790949433742663000"
+      }
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "bytes": 65458,
+      "sha256": "d024441ec9a70236a08f4dae67c5f63a22d5c6954064f4be63cb85e25ce3633a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "50102545854519401",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "65458",
+        "mtimeNs": "1791248708045633800",
+        "ctimeNs": "1791248708045633800"
+      }
+    },
+    {
+      "path": "apps/web/src/AutomationLearningCenter.tsx",
+      "bytes": 20890,
+      "sha256": "25ed51597de8b26639b3f5b2dad7ee250556faf000fda6f34042cc3dfa286c53",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "54043195528468587",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "20890",
+        "mtimeNs": "1790949252156217400",
+        "ctimeNs": "1790949433744172100"
+      }
+    },
+    {
+      "path": "apps/web/src/BrowserMcpCenter.tsx",
+      "bytes": 15338,
+      "sha256": "94edbd3d56e82c3e7900e273f9c3a6344ae0754e607a5687a8a6a08fdee8093d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "36310271995697263",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15338",
+        "mtimeNs": "1790949252157617100",
+        "ctimeNs": "1790949433744172100"
+      }
+    },
+    {
+      "path": "apps/web/src/BudgetStatus.tsx",
+      "bytes": 4080,
+      "sha256": "17d05747f9d560eb135f79d9f2ecdeae1089c8a543fd4cae3296178d1b873432",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421632",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4080",
+        "mtimeNs": "1791176306043560600",
+        "ctimeNs": "1791176306043560600"
+      }
+    },
+    {
+      "path": "apps/web/src/ContextPolicy.tsx",
+      "bytes": 918,
+      "sha256": "1ff7d8bf6dda1c437cb8e999a49fb37af831f5a7e9633e569328aa06c5eca3bb",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421633",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "918",
+        "mtimeNs": "1790948162467769400",
+        "ctimeNs": "1790949433745182900"
+      }
+    },
+    {
+      "path": "apps/web/src/CostCarryoverChoice.tsx",
+      "bytes": 7987,
+      "sha256": "75c424bde155088ad955f7fec3f455d7a3d129788119a8dcd4bb5b160bdd4764",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1688849860331481",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7987",
+        "mtimeNs": "1791166256949945200",
+        "ctimeNs": "1791166256949945200"
+      }
+    },
+    {
+      "path": "apps/web/src/CostControl.tsx",
+      "bytes": 11695,
+      "sha256": "8fc8cf9d60c0048fc1e5bdde467eb45e593111f3f208872b979b73417889f638",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421634",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11695",
+        "mtimeNs": "1791112378897314400",
+        "ctimeNs": "1791112378897314400"
+      }
+    },
+    {
+      "path": "apps/web/src/DemoOverview.tsx",
+      "bytes": 1367,
+      "sha256": "97782fad85ff8bdc9d23337b5c80255196d52eb05b8e4b66dfe27ea0467bc9ed",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "20547673299900623",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1367",
+        "mtimeNs": "1790949252158618700",
+        "ctimeNs": "1790949433745690500"
+      }
+    },
+    {
+      "path": "apps/web/src/EmployeeRestore.tsx",
+      "bytes": 3131,
+      "sha256": "fdb816ff70d6f43f1e9f155a3b320394175f9bf1513970047cef3cf610a2603b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421635",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3131",
+        "mtimeNs": "1790948162469774300",
+        "ctimeNs": "1790949433745690500"
+      }
+    },
+    {
+      "path": "apps/web/src/GatewayBilling.tsx",
+      "bytes": 9065,
+      "sha256": "5f52d08151f6ca01ff4144c32811a7047dac0bb71fdfca0ef0d5d46ae753b336",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "17451448556479108",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9065",
+        "mtimeNs": "1791103000433245500",
+        "ctimeNs": "1791103000433245500"
+      }
+    },
+    {
+      "path": "apps/web/src/GatewayCatalog.tsx",
+      "bytes": 5622,
+      "sha256": "e73435dba353c979fb8740af8e091baf1a5ad66fc59fb0a7eeb064e99fb8dbc6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "18014398509504847",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5622",
+        "mtimeNs": "1790949252158618700",
+        "ctimeNs": "1790949433745690500"
+      }
+    },
+    {
+      "path": "apps/web/src/GatewayServiceTest.tsx",
+      "bytes": 2083,
+      "sha256": "283164882316dff40589373ce3ada27671c8df7f16b7617259b8f7aa60a26fed",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "26177172834113892",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2083",
+        "mtimeNs": "1791100997390072100",
+        "ctimeNs": "1791100997390072100"
+      }
+    },
+    {
+      "path": "apps/web/src/KnowledgeCenter.tsx",
+      "bytes": 13841,
+      "sha256": "0fd5f15e1ae53d0f93e5b4e3eb1ab6d7349f5aeb66a2e21f15e75465e86cd7a4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421636",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13841",
+        "mtimeNs": "1791105610219241600",
+        "ctimeNs": "1791105610219241600"
+      }
+    },
+    {
+      "path": "apps/web/src/KnowledgeRetrieval.tsx",
+      "bytes": 2605,
+      "sha256": "7cae91ba03887324ee57b9c568a66f16da6b7c92ff2ddfe41cbbacc031679a2d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421637",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2605",
+        "mtimeNs": "1791102886169548300",
+        "ctimeNs": "1791102886169548300"
+      }
+    },
+    {
+      "path": "apps/web/src/LocalDevices.tsx",
+      "bytes": 3772,
+      "sha256": "a58e93d27bca9108edcef64091f4af487af909af3352460737a741d6b8b29ea8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421638",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3772",
+        "mtimeNs": "1790948162472806600",
+        "ctimeNs": "1790949433747701000"
+      }
+    },
+    {
+      "path": "apps/web/src/ManagerChat.tsx",
+      "bytes": 3294,
+      "sha256": "693cc5367179613915ddd6d1562d6289068f93e017d0d5d9ba83f490fd2264d2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "47006321110702616",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3294",
+        "mtimeNs": "1790949252160616000",
+        "ctimeNs": "1790949433747701000"
+      }
+    },
+    {
+      "path": "apps/web/src/ModelCapabilities.tsx",
+      "bytes": 2384,
+      "sha256": "5c85a43b6fd269ca748638f0a9e8846ba2e5c102eea09c6cef2857317c728b8e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421639",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2384",
+        "mtimeNs": "1790948162472806600",
+        "ctimeNs": "1790949433747701000"
+      }
+    },
+    {
+      "path": "apps/web/src/OrganizationCenter.tsx",
+      "bytes": 7025,
+      "sha256": "b44e06fdbed026977749bc0fa18c41aa383381cb1c37cf4c204688fdf82e5eae",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "24488322973850146",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7025",
+        "mtimeNs": "1790949252161616000",
+        "ctimeNs": "1790949433747701000"
+      }
+    },
+    {
+      "path": "apps/web/src/OrganizationChat.css",
+      "bytes": 12160,
+      "sha256": "c094e5c08d55884129daa32d1c2a71873cf07541eb61a149d4dab632066cb32e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "36028797018987573",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12160",
+        "mtimeNs": "1790950597720663900",
+        "ctimeNs": "1790950597720663900"
+      }
+    },
+    {
+      "path": "apps/web/src/OrganizationChat.tsx",
+      "bytes": 27975,
+      "sha256": "9611489e69dc5969fa5cef2c6dde5eb6e30304ce078e66caed84b508e1015160",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12947848928713988",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "27975",
+        "mtimeNs": "1791281256595589000",
+        "ctimeNs": "1791281256595589000"
+      }
+    },
+    {
+      "path": "apps/web/src/PlanTaskBudget.tsx",
+      "bytes": 3471,
+      "sha256": "9fa963e8ec42f90e1213bbee04e4cbf16bd541bcdcd4f8657f0e9cae89a6c5c2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "19140298416483445",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3471",
+        "mtimeNs": "1791178978551767800",
+        "ctimeNs": "1791178978551767800"
+      }
+    },
+    {
+      "path": "apps/web/src/ProjectPlanning.tsx",
+      "bytes": 33356,
+      "sha256": "98532b13100f2f332b8446c666b9a03799efe92084557e5652c60be9c03039e4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "53480245575039604",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "33356",
+        "mtimeNs": "1791281252893096300",
+        "ctimeNs": "1791281252893096300"
+      }
+    },
+    {
+      "path": "apps/web/src/ProjectPolicy.tsx",
+      "bytes": 3947,
+      "sha256": "fb63d00bd33eef61543f37e60e86159ffb3515ad80d71351a857a5b9e1a4a8c1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16888498602663207",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3947",
+        "mtimeNs": "1790949252164137500",
+        "ctimeNs": "1790949433748854400"
+      }
+    },
+    {
+      "path": "apps/web/src/ProjectRequirement.tsx",
+      "bytes": 601,
+      "sha256": "2ab2d61b4108a89e68b9c4500e5ad42a8e1247f8a70d33b4e85389b819bb361d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074605231141",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "601",
+        "mtimeNs": "1791104510957770800",
+        "ctimeNs": "1791104510957770800"
+      }
+    },
+    {
+      "path": "apps/web/src/RecoveryConditions.tsx",
+      "bytes": 5530,
+      "sha256": "e48b869ba520a9107ca2f82d165889540abc27d53b8518e3f6f0b6e0f70e9314",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1688849860282424",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5530",
+        "mtimeNs": "1791184392702906500",
+        "ctimeNs": "1791184392702906500"
+      }
+    },
+    {
+      "path": "apps/web/src/RecoveryPolicy.tsx",
+      "bytes": 1131,
+      "sha256": "09473a779608946b34f77da7f2033527e10412d5237c4deb174301bcfb307e6f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421642",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1131",
+        "mtimeNs": "1790948162476324800",
+        "ctimeNs": "1790949433748854400"
+      }
+    },
+    {
+      "path": "apps/web/src/RunCenter.tsx",
+      "bytes": 14418,
+      "sha256": "89b8fa13e6c0957fb0be5a29c6f99cff2bae2d214f7b803848d404c5305a155a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7599824371211570",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14418",
+        "mtimeNs": "1791263114716947500",
+        "ctimeNs": "1791263114716947500"
+      }
+    },
+    {
+      "path": "apps/web/src/RunExtras.tsx",
+      "bytes": 22895,
+      "sha256": "ba49cc904db20dcda7bd921c1b89c8641cfdcd287f36ab5ff4ef94dae98c66f0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "86412817850195300",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "22895",
+        "mtimeNs": "1791263016413931000",
+        "ctimeNs": "1791263016413931000"
+      }
+    },
+    {
+      "path": "apps/web/src/RunInputEditor.tsx",
+      "bytes": 5465,
+      "sha256": "2a7c88cfc275ab0c7a6a2ebb1366d91955211d4c9684faa7971859893ff686bc",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421645",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5465",
+        "mtimeNs": "1790948162479335200",
+        "ctimeNs": "1790949433749852700"
+      }
+    },
+    {
+      "path": "apps/web/src/SettingsCenter.tsx",
+      "bytes": 6357,
+      "sha256": "3a87157292278c5c61ebbee0f31780099c90b894b3007829e5939fae15263ec9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "47850746040835852",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6357",
+        "mtimeNs": "1791100738242850500",
+        "ctimeNs": "1791100738242850500"
+      }
+    },
+    {
+      "path": "apps/web/src/TaskContracts.tsx",
+      "bytes": 8510,
+      "sha256": "947a05cdea876742de3ddf4cd0657487b9cc27cd63dad82b050d8f2c10d04b20",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421647",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8510",
+        "mtimeNs": "1790951195200483800",
+        "ctimeNs": "1790951195200483800"
+      }
+    },
+    {
+      "path": "apps/web/src/UsageRefresh.tsx",
+      "bytes": 1163,
+      "sha256": "8563dba019ea2822174f9b3f059ac6863b563c677e8869a139b8898ee25a786f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "27866022694786568",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1163",
+        "mtimeNs": "1791106607891813700",
+        "ctimeNs": "1791106607891813700"
+      }
+    },
+    {
+      "path": "apps/web/src/WorkFilesCenter.tsx",
+      "bytes": 12967,
+      "sha256": "7d779b5dbcf193a0816d3faaa31c1d395c50adca9af94611c53e9980081a4350",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13792273858846795",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12967",
+        "mtimeNs": "1791109405557619100",
+        "ctimeNs": "1791109405557619100"
+      }
+    },
+    {
+      "path": "apps/web/src/api.ts",
+      "bytes": 2750,
+      "sha256": "10bb4d69bbfc4b16b7fd3d71901db50b9142b2df7aed9933ed704aa8c88ededf",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12103423998586674",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2750",
+        "mtimeNs": "1791281251091761500",
+        "ctimeNs": "1791281251091761500"
+      }
+    },
+    {
+      "path": "apps/web/src/health-sync.ts",
+      "bytes": 4479,
+      "sha256": "722d2ecd5d3680e08214bd1cb55362f97977a9b40714ef12d10201eab5e774a4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "24488322974273867",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4479",
+        "mtimeNs": "1791122651241985600",
+        "ctimeNs": "1791122651241985600"
+      }
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "bytes": 166,
+      "sha256": "824805b4757a3f61d6233a159e6febd35b027790238ca7ce3b3153473286dd0b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421649",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "166",
+        "mtimeNs": "1790948162482855900",
+        "ctimeNs": "1790949433747701000"
+      }
+    },
+    {
+      "path": "apps/web/src/organization-draft.ts",
+      "bytes": 4079,
+      "sha256": "714228015cf838c2ceb01d49e50d2c5da024d8cc6075e087e3c70c5795ed5555",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558557256",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4079",
+        "mtimeNs": "1791281254758257900",
+        "ctimeNs": "1791281254758257900"
+      }
+    },
+    {
+      "path": "apps/web/src/run-cost.ts",
+      "bytes": 784,
+      "sha256": "747e874ef98a7388f9b1227c8db822dc20859875c3b4ec266ba5d8ae0a7edd46",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4222124651717055",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "784",
+        "mtimeNs": "1790950936968551800",
+        "ctimeNs": "1790950936968551800"
+      }
+    },
+    {
+      "path": "apps/web/src/run-detail-view.ts",
+      "bytes": 4667,
+      "sha256": "1a003468695cc698511ed4efab57ea94890c7d18b2bdccb54b683bbb90ada8f8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16888498602939581",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4667",
+        "mtimeNs": "1791263336908242800",
+        "ctimeNs": "1791263336908242800"
+      }
+    },
+    {
+      "path": "apps/web/src/run-events.ts",
+      "bytes": 448,
+      "sha256": "83b6046e8a7ef854ae4e5c1bb8a4fce3ff880048e1a198806bebe1db3267b34c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8725724279089099",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "448",
+        "mtimeNs": "1790953841358206800",
+        "ctimeNs": "1790953841358206800"
+      }
+    },
+    {
+      "path": "apps/web/src/run-handoff.ts",
+      "bytes": 1744,
+      "sha256": "7c73523ea0daea8d7ff9274fbf7039ddcdeebc34043ff7c2a80b16b001cb0e18",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "2251799815071849",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1744",
+        "mtimeNs": "1791107567359494900",
+        "ctimeNs": "1791107567359494900"
+      }
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "bytes": 34450,
+      "sha256": "4a8d53944cc54ac829da3de7cac7ee80672828b7f98ce43178db94e09cd773ce",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "51791395714789315",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "34450",
+        "mtimeNs": "1791166081419371000",
+        "ctimeNs": "1791166081419371000"
+      }
+    },
+    {
+      "path": "apps/web/src/usage-sync.ts",
+      "bytes": 3639,
+      "sha256": "9d5064d7085255b8c0f640f14657b060679983c2eff76b12390a803e81b40352",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535559036",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3639",
+        "mtimeNs": "1791106605245697700",
+        "ctimeNs": "1791106605245697700"
+      }
+    },
+    {
+      "path": "dist/web/assets/index-C3Hnf2dw.css",
+      "bytes": 45258,
+      "sha256": "ce55e29c4d12aa0b9ad9d594e186a51e9915b693e7c0eaea139b2c149525edef",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6473924464425414",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "45258",
+        "mtimeNs": "1791281738657919300",
+        "ctimeNs": "1791281738657919300"
+      }
+    },
+    {
+      "path": "dist/web/assets/index-DhjmqXiP.js",
+      "bytes": 531812,
+      "sha256": "df63b5a631aec82ce12f87d2fedb7373fa4e2d7a6ebff416223cc440e8437bb2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4503599627450824",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "531812",
+        "mtimeNs": "1791281738658927600",
+        "ctimeNs": "1791281738658927600"
+      }
+    },
+    {
+      "path": "dist/web/index.html",
+      "bytes": 563,
+      "sha256": "5f4efea2e5bc92964e0ee490d1cdd8f08179ac2125aaefd7ef4862297340b01c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "10977524091795908",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "563",
+        "mtimeNs": "1791281738657919300",
+        "ctimeNs": "1791281738657919300"
+      }
+    },
+    {
+      "path": "docs/mvp-acceptance-2026-10-06.md",
+      "bytes": 8314,
+      "sha256": "f7fcd1d3afd19a2799d8b54f9e1b33e01c4795c6dcb14941f895ad676169bb66",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16607023626232278",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8314",
+        "mtimeNs": "1791279451462788000",
+        "ctimeNs": "1791279451462788000"
+      }
+    },
+    {
+      "path": "docs/mvp-go-quickstart-2026-10-06.md",
+      "bytes": 6831,
+      "sha256": "e212dabf904f27227c671dc13e63162ab8e85759df5c6d4f796a40c5d3daa875",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "15762598696100273",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6831",
+        "mtimeNs": "1791283170009214600",
+        "ctimeNs": "1791283170009214600"
+      }
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 160937,
+      "sha256": "017065ee531426b8ff93e1f33c26a92a3ed6e64dfef3b263ab07d79cbd502ddc",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "19140298416359921",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "160937",
+        "mtimeNs": "1790949252187511300",
+        "ctimeNs": "1790949437410398800"
+      }
+    },
+    {
+      "path": "package.json",
+      "bytes": 1835,
+      "sha256": "1b27ece7356b25fa7bfd1d8e5480ab7032ea7e8c0db0222dd92de6ed17071c80",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "95138542128239879",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1835",
+        "mtimeNs": "1790949252188519100",
+        "ctimeNs": "1790949437410398800"
+      }
+    },
+    {
+      "path": "packages/contracts/index.ts",
+      "bytes": 19972,
+      "sha256": "7492514fa353776afb52367013d14fc61e010fd64197109267584985df74e5b3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13229323905439805",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "19972",
+        "mtimeNs": "1791280834461498200",
+        "ctimeNs": "1791280834461498200"
+      }
+    },
+    {
+      "path": "packages/contracts/organization.ts",
+      "bytes": 1541,
+      "sha256": "4ff8704ce13a0c35fdb41bc4e98e1d6a6cb25ca6c809e7e035701adea7b40889",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421689",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1541",
+        "mtimeNs": "1790948162516248000",
+        "ctimeNs": "1790949437410398800"
+      }
+    },
+    {
+      "path": "packages/contracts/task-contracts.d.mts",
+      "bytes": 261,
+      "sha256": "3e4c6ad6e0d2f4b88bb4b2c9afbadcfc1b248518d45a846211b2ea699573cf42",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421690",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "261",
+        "mtimeNs": "1791280832688263100",
+        "ctimeNs": "1791280832688263100"
+      }
+    },
+    {
+      "path": "packages/contracts/task-contracts.mjs",
+      "bytes": 7815,
+      "sha256": "c903212089a993aa5a57b76197c1c98c27826308ec1b911c8662b30834e66b77",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421691",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7815",
+        "mtimeNs": "1791280830768336700",
+        "ctimeNs": "1791280830768336700"
+      }
+    },
+    {
+      "path": "packages/contracts/templates.ts",
+      "bytes": 2165,
+      "sha256": "02ee65c9659f7a93fa833a0fcdbc10273b5d85c661b0e57e146782adeeb3b532",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421692",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2165",
+        "mtimeNs": "1790948162518766600",
+        "ctimeNs": "1790949437412469600"
+      }
+    },
+    {
+      "path": "scripts/capture-mvp-run.mjs",
+      "bytes": 6556,
+      "sha256": "c01455a53fb84c8f5d445a4ad4c21a72d6f0bc20455fb0ed8021ae2c77f4fd51",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8162774325667796",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6556",
+        "mtimeNs": "1791166947156872100",
+        "ctimeNs": "1791166947156872100"
+      }
+    },
+    {
+      "path": "scripts/demo.mjs",
+      "bytes": 8996,
+      "sha256": "66c3b8d353b5b7b48c7438466632d338ec60b5decc0841f37ac5fa14c675633d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "32369622321770707",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8996",
+        "mtimeNs": "1790949252190523300",
+        "ctimeNs": "1790949437424533800"
+      }
+    },
+    {
+      "path": "scripts/demo/api.ts",
+      "bytes": 4643,
+      "sha256": "bb4ee4122826a5b6e48dae353562f001ae0a5a9e7003665cac5af764e503c16b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "28991922601245194",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4643",
+        "mtimeNs": "1790949252192522000",
+        "ctimeNs": "1790949437422534700"
+      }
+    },
+    {
+      "path": "scripts/demo/assets/README.md",
+      "bytes": 954,
+      "sha256": "57271d8170da39400b1d8f312f83c3381a98ea90718108e7f6d96abe41fde1e4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231500006",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "954",
+        "mtimeNs": "1790949252192522000",
+        "ctimeNs": "1790949437423533100"
+      }
+    },
+    {
+      "path": "scripts/demo/assets/acceptance.test.mjs",
+      "bytes": 2650,
+      "sha256": "120e6600682999473cf2262e9045680674ed8811798a1174c44675380ccde0ae",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "25614222880718096",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2650",
+        "mtimeNs": "1790949252194122600",
+        "ctimeNs": "1790949437423533100"
+      }
+    },
+    {
+      "path": "scripts/demo/assets/smoke.test.mjs",
+      "bytes": 1092,
+      "sha256": "42ff68e2b6535042cd040eace1836d73ffbea6b2ee6732a552c241cdcd3fd55b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "30117822508088930",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1092",
+        "mtimeNs": "1790949252195134600",
+        "ctimeNs": "1790949437423533100"
+      }
+    },
+    {
+      "path": "scripts/demo/assets/todo.mjs",
+      "bytes": 2946,
+      "sha256": "e15f3c33f1cced9f0282268e7dbf18ba3d37bfa9ee48b1494ee7f7e4fcb900c4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "29273397577957230",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2946",
+        "mtimeNs": "1790949252195134600",
+        "ctimeNs": "1790949437424533800"
+      }
+    },
+    {
+      "path": "scripts/demo/support.d.mts",
+      "bytes": 474,
+      "sha256": "8cf3794ab186ab98de9d9a88a5c62dcaff2a258a8a3aac6b34f6b4b352ecdcab",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "19421773393087708",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "474",
+        "mtimeNs": "1790949252196644000",
+        "ctimeNs": "1790949437424533800"
+      }
+    },
+    {
+      "path": "scripts/demo/support.mjs",
+      "bytes": 12738,
+      "sha256": "45ad41eeaa2791dfd8737c905cd82a066a8d05c9c3958e4a1ae960cb4c6076f4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "3659174697309809",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12738",
+        "mtimeNs": "1790949252196644000",
+        "ctimeNs": "1790949437424533800"
+      }
+    },
+    {
+      "path": "scripts/deploy-frontend.py",
+      "bytes": 3500,
+      "sha256": "3e950ef36ce6782a3b7ae4f4e30eefa7a69f69f438324b96bce7f07054db83f8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "27303072741012530",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3500",
+        "mtimeNs": "1790949252198653000",
+        "ctimeNs": "1790949437425539200"
+      }
+    },
+    {
+      "path": "scripts/dev.ts",
+      "bytes": 540,
+      "sha256": "339b7db569add396acc840cc02f360d1e5c055297a1b73e8291b8685912d8bc2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421726",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "540",
+        "mtimeNs": "1790948162547735300",
+        "ctimeNs": "1790949437425539200"
+      }
+    },
+    {
+      "path": "scripts/install-embedding-model.py",
+      "bytes": 1259,
+      "sha256": "4f52693d59c114a0c5e5f9488250f044ea4cfbc480cd6f721c56588cc4442193",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421727",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1259",
+        "mtimeNs": "1790948162549755800",
+        "ctimeNs": "1790949437425539200"
+      }
+    },
+    {
+      "path": "scripts/install-mac-services.py",
+      "bytes": 3454,
+      "sha256": "050170a2d5610bf8b8ab50d95d9de3abe542a66a747f4caa615b52a2b925a811",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421728",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3454",
+        "mtimeNs": "1790948162551746500",
+        "ctimeNs": "1790949437425539200"
+      }
+    },
+    {
+      "path": "scripts/local-api.ts",
+      "bytes": 3380,
+      "sha256": "967a0856c617d002318c205c2ac2edba2eb34577bd4a198458ed603b487b9d6f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "11821949021949577",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3380",
+        "mtimeNs": "1790949252198653000",
+        "ctimeNs": "1790949437426537900"
+      }
+    },
+    {
+      "path": "scripts/local-check.mjs",
+      "bytes": 11007,
+      "sha256": "0123c6e329b78fa1ca069b9e1167d7f21cbc3622ad724fc9922fa63bfa5b6594",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16325548649320220",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11007",
+        "mtimeNs": "1790949252199656700",
+        "ctimeNs": "1790949437426537900"
+      }
+    },
+    {
+      "path": "scripts/local-static-web.d.mts",
+      "bytes": 346,
+      "sha256": "19fa6e115f82f0fbb5986bcacc9490082793baae5e43f44dbec0012e550342ed",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4222124650861995",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "346",
+        "mtimeNs": "1791201611697032600",
+        "ctimeNs": "1791201611697032600"
+      }
+    },
+    {
+      "path": "scripts/local-static-web.mjs",
+      "bytes": 8642,
+      "sha256": "2a75f0666efbc0f8887a267b6cb151be49fa6d2315ec392ec8b86ef186216304",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231652779",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8642",
+        "mtimeNs": "1791263022988922200",
+        "ctimeNs": "1791263022988922200"
+      }
+    },
+    {
+      "path": "scripts/local.mjs",
+      "bytes": 12743,
+      "sha256": "79c9d0dc4b3b5921d4b07c6ccd71fd028b2703370f99f19a55b5d13e36550049",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "26458647810903845",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12743",
+        "mtimeNs": "1791201613462755500",
+        "ctimeNs": "1791201613462755500"
+      }
+    },
+    {
+      "path": "scripts/prepare-source-delivery.mjs",
+      "bytes": 12892,
+      "sha256": "edb0fd296de2334eaf13fc400b0fcc91922a8a1e0105ddfcf5f7fc8d51cdc1be",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "10414574138451778",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12892",
+        "mtimeNs": "1791282713225552300",
+        "ctimeNs": "1791282713225552300"
+      }
+    },
+    {
+      "path": "scripts/publish-desktop.py",
+      "bytes": 1190,
+      "sha256": "9055cc1a17dcc9ba5bab4c9c1efc8c49def2a905a3f29768569bb6cf85aa645c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132385",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1190",
+        "mtimeNs": "1790948162552745000",
+        "ctimeNs": "1790949437426537900"
+      }
+    },
+    {
+      "path": "scripts/runtime-inspect.mjs",
+      "bytes": 1102,
+      "sha256": "dce9a69b5b076947a67c2deeb2d232fd6f6425887b663e8a1ceb0d3e93148bb7",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421730",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1102",
+        "mtimeNs": "1790948162553758000",
+        "ctimeNs": "1790949437427533800"
+      }
+    },
+    {
+      "path": "scripts/server-api.sh",
+      "bytes": 173,
+      "sha256": "cffc4a2c3dad93de87f65378bf178b47e3a4daf826e672acc26f500563a9fbd3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421731",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "173",
+        "mtimeNs": "1790948162555768500",
+        "ctimeNs": "1790949437427533800"
+      }
+    },
+    {
+      "path": "scripts/server-tunnel.sh",
+      "bytes": 604,
+      "sha256": "0ef43ca0cb69219e57abeb219b45a42e43c6f07352a66bdee3b2e6a96433004b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421732",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "604",
+        "mtimeNs": "1790948162556772200",
+        "ctimeNs": "1790949437427533800"
+      }
+    },
+    {
+      "path": "scripts/start-chatgpt-with-proxy.ps1",
+      "bytes": 3237,
+      "sha256": "3e0d973a387e54c70a044cffe9228c19a26e5c9c1571337cd88379cd4a9cfad9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487913273",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3237",
+        "mtimeNs": "1791034086805257900",
+        "ctimeNs": "1791034086805257900"
+      }
+    },
+    {
+      "path": "scripts/test-handoff.mjs",
+      "bytes": 1977,
+      "sha256": "c43fee997243d604c2d3db08b6492ed78d0d55eabd38a5048b9191887131c882",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132389",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1977",
+        "mtimeNs": "1790948162558801500",
+        "ctimeNs": "1790949437428040100"
+      }
+    },
+    {
+      "path": "scripts/test-integration.mjs",
+      "bytes": 3316,
+      "sha256": "c00ed62fc7cf3f2c73916ed0d7313f62293efe45e77a0787a67283e5a4be3ad6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231553830",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3316",
+        "mtimeNs": "1790949252202659800",
+        "ctimeNs": "1790949437428040100"
+      }
+    },
+    {
+      "path": "scripts/test-runtime-portable.mjs",
+      "bytes": 856,
+      "sha256": "10821d289cf4730e93e2783a76824923d3b546d8d69ceb090035f86f7efa9df3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421735",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "856",
+        "mtimeNs": "1790948162560366900",
+        "ctimeNs": "1790949437428040100"
+      }
+    },
+    {
+      "path": "scripts/test-support/mvp-data-fixture.ts",
+      "bytes": 15164,
+      "sha256": "3e38e16405b7d2b88e0a2aad3c4049504906cf79e09d2f47a86b71f61c72e2c7",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8444249302057986",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15164",
+        "mtimeNs": "1790950816683510900",
+        "ctimeNs": "1790950816683510900"
+      }
+    },
+    {
+      "path": "scripts/test-support/pglite-pool.mjs",
+      "bytes": 422,
+      "sha256": "c6dfd78719309965b83a316dd286379c1eb0750a68f026ebe5793a8cd34eba74",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421737",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "422",
+        "mtimeNs": "1790948162561376500",
+        "ctimeNs": "1790949437428040100"
+      }
+    },
+    {
+      "path": "scripts/verify-clean-install.sh",
+      "bytes": 2239,
+      "sha256": "8768b0ed280b258be6bba8bf96ddfe1e0a583a4ae1f624c46cac1dce5be34dfe",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421738",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2239",
+        "mtimeNs": "1790948162562887600",
+        "ctimeNs": "1790949437429588500"
+      }
+    },
+    {
+      "path": "scripts/verify-knowledge-ui.cjs",
+      "bytes": 16787,
+      "sha256": "77e55540c941f4b31071832332f48774a41383f488fe5c619cdd25c01f8d6abd",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421739",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "16787",
+        "mtimeNs": "1790948162563897900",
+        "ctimeNs": "1790949437429588500"
+      }
+    },
+    {
+      "path": "scripts/verify-mvp-backup-real.mjs",
+      "bytes": 35905,
+      "sha256": "eaef8360613d8c19160b9d2cd0f22c495c96c540792fdb906fe95cc716278032",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4503599628716511",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "35905",
+        "mtimeNs": "1791108301343742800",
+        "ctimeNs": "1791108301343742800"
+      }
+    },
+    {
+      "path": "scripts/verify-mvp-data.mjs",
+      "bytes": 3628,
+      "sha256": "fd8ba00e88a65e996d28fa86273aa696078839dd42a782385e2f89ddb512e3b6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8725724278768639",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3628",
+        "mtimeNs": "1790951046584650300",
+        "ctimeNs": "1790951046584650300"
+      }
+    },
+    {
+      "path": "scripts/verify-mvp-full-offline-backup.mjs",
+      "bytes": 21057,
+      "sha256": "d244812c9139e4df270f1f37cf49a2f1f56540c4f62fdb9b9747128709e6a163",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "31806672368306027",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "21057",
+        "mtimeNs": "1791269431653184600",
+        "ctimeNs": "1791269431653184600"
+      }
+    },
+    {
+      "path": "scripts/verify-mvp-recovery.mjs",
+      "bytes": 7987,
+      "sha256": "42e635e1a50498515cb1b28ebf0b55288aab7fde5e4dcf1a17fbc1dda73632c3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "36591746972505966",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7987",
+        "mtimeNs": "1790955504741348200",
+        "ctimeNs": "1790955504741348200"
+      }
+    },
+    {
+      "path": "scripts/verify-public.cjs",
+      "bytes": 4998,
+      "sha256": "a69dbaf1ad76fb11d1949ce9d8dc9c8748bbeada0f73e9203f3368c2fab28698",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421740",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4998",
+        "mtimeNs": "1790948162564898500",
+        "ctimeNs": "1790949437429588500"
+      }
+    },
+    {
+      "path": "scripts/verify-real-recovery.mjs",
+      "bytes": 42095,
+      "sha256": "e1ba07bebb259180abe5ef1a2af9bdaa8d72478b381517ff03f259bbee5a552c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441330113",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "42095",
+        "mtimeNs": "1791166821792522400",
+        "ctimeNs": "1791166821792522400"
+      }
+    },
+    {
+      "path": "services/agent-runtime/adapter.ts",
+      "bytes": 156,
+      "sha256": "8e10d1c3b437b9a74bebdcb8959213e338766b88c1aa4e84be26b76585919ef9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421743",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "156",
+        "mtimeNs": "1790948162565898800",
+        "ctimeNs": "1790949437430601800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/affordable-context.test.mjs",
+      "bytes": 8513,
+      "sha256": "d990e6f3b4476ae85d00081dcf0c62a5ac718f7e80bb87f5c73cfa8290aa727c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7599824371217865",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8513",
+        "mtimeNs": "1791169949507748600",
+        "ctimeNs": "1791169949507748600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/browser-mcp-runtime.test.mjs",
+      "bytes": 5476,
+      "sha256": "00f331b9f771d84f2783a14f2f397610897150333274bab5977c10683f3ecf12",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "21673573206822709",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5476",
+        "mtimeNs": "1790949252202659800",
+        "ctimeNs": "1790949437430601800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/budget-context.mjs",
+      "bytes": 3735,
+      "sha256": "d1ad3d0ccdea2863402e3fc6d0a49071ec998fac620495e998ada5b369c78c05",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231519285",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3735",
+        "mtimeNs": "1791179327476902800",
+        "ctimeNs": "1791179327476902800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/budget-context.test.mjs",
+      "bytes": 5042,
+      "sha256": "70721878322fc33b48f23fb83509cf352529791632e29ca5a1886fd864aca37f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024557570158",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5042",
+        "mtimeNs": "1791172725058180100",
+        "ctimeNs": "1791172725058180100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/budget.mjs",
+      "bytes": 5314,
+      "sha256": "985e5b5436f97826edd7ce6b6ea542b0b0d492c1f4ef0c78423b5cae24027acc",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421744",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5314",
+        "mtimeNs": "1791182805233555400",
+        "ctimeNs": "1791182805233555400"
+      }
+    },
+    {
+      "path": "services/agent-runtime/budget.test.mjs",
+      "bytes": 9518,
+      "sha256": "4c36a1ce4defe93eff8dfc3abfd1b099344673fc9cee02252a4767ace799df1c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421745",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9518",
+        "mtimeNs": "1791179221344073500",
+        "ctimeNs": "1791179221344073500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-context.d.mts",
+      "bytes": 450,
+      "sha256": "49c9d089b0d50bdcf1d19c138449b9e05d0cd58abfbd1f14c25ceb2c2913adaa",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "11821949021949762",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "450",
+        "mtimeNs": "1790949252204312700",
+        "ctimeNs": "1790949437430601800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-context.mjs",
+      "bytes": 11733,
+      "sha256": "3253b0b69ddac479978c6fd63226da469fc1ce72658bf4737d34feec10f55a70",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "17732923532873543",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11733",
+        "mtimeNs": "1791203930468649000",
+        "ctimeNs": "1791203930468649000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-context.test.mjs",
+      "bytes": 4672,
+      "sha256": "fc025fba46cc404ee2a05922ffe2a597f579f9551ed8fee6edcbbc784aad6691",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "10133099161685870",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4672",
+        "mtimeNs": "1790949252205978400",
+        "ctimeNs": "1790949437432109100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-team.mjs",
+      "bytes": 2028,
+      "sha256": "4fc85d2a44e507a89451f33cc83486abf88aff7db0ff61df9c025ad82970298c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "37154696925909618",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2028",
+        "mtimeNs": "1790949252206976600",
+        "ctimeNs": "1790949437432109100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/completion-options.d.mts",
+      "bytes": 215,
+      "sha256": "5ad80aa84e86802268a47d27ae60be5b4e0f16492e2700c17260f65bd3f543e9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "3659174697318955",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "215",
+        "mtimeNs": "1791248698458424500",
+        "ctimeNs": "1791248698458424500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/completion-options.mjs",
+      "bytes": 652,
+      "sha256": "e3426eb9ea0ce7e8ef3a04cd43460871ae079799b00899bafa16d8ce47713165",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "15199648742452004",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "652",
+        "mtimeNs": "1791248696675136100",
+        "ctimeNs": "1791248696675136100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/completion-protocol.d.mts",
+      "bytes": 539,
+      "sha256": "a244d653800340b1c567c0793650607d6b426ee230499b800486c09411750955",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "3659174697502914",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "539",
+        "mtimeNs": "1791208299901683500",
+        "ctimeNs": "1791208299901683500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/completion-protocol.mjs",
+      "bytes": 11567,
+      "sha256": "d99e21fe185f80fc8e7f4e03e8400151148b5facb77fe4e486f28568b890563d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12103423998632710",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11567",
+        "mtimeNs": "1791247326179719500",
+        "ctimeNs": "1791247326179719500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/completion-protocol.test.mjs",
+      "bytes": 10912,
+      "sha256": "5fb83342fbcd80adffd4bb43de3d96b0fc025570f5e06f8f8590958cc8157b1e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441321270",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10912",
+        "mtimeNs": "1791247327847029500",
+        "ctimeNs": "1791247327847029500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/deadline.test.mjs",
+      "bytes": 1929,
+      "sha256": "b7183ee64d1a803d1e638adc62547182b8236f065cbd3a149b4d7a2e488e43af",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9851624185933257",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1929",
+        "mtimeNs": "1790955001238414000",
+        "ctimeNs": "1790955001238414000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/employee-admission-context.test.mjs",
+      "bytes": 9872,
+      "sha256": "b58ed413ce691153e634d4b511f57fa21aed7190440c1dd489de9dfefb4c288b",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9570149208321824",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9872",
+        "mtimeNs": "1791174433155447800",
+        "ctimeNs": "1791174433155447800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/employee-context.mjs",
+      "bytes": 6389,
+      "sha256": "c5a35c1f52d7023b83a6ee3dc54ad11e3281242d9ac3cff7d44c23b7b98db8f2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "41095346599859149",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6389",
+        "mtimeNs": "1791111212721571600",
+        "ctimeNs": "1791111212721571600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/employee-context.test.mjs",
+      "bytes": 24462,
+      "sha256": "2ddec78f8d79504c4497a163470b85ff24e0173cf1eb95d1732bc385f4dbe879",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511027228",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "24462",
+        "mtimeNs": "1791169951307261000",
+        "ctimeNs": "1791169951307261000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "bytes": 10822,
+      "sha256": "1543d40d420d29a171f863cccb00da4885f1fc278ff9937d3b50f3fcbd40b7ca",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421748",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10822",
+        "mtimeNs": "1791205131961755300",
+        "ctimeNs": "1791205131961755300"
+      }
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.test.mjs",
+      "bytes": 16803,
+      "sha256": "14d4c8914dfac8663f99a296b8aa7ec6c6ba5293cb5cc3863f22cea6d1da39c8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421749",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "16803",
+        "mtimeNs": "1791173693372234200",
+        "ctimeNs": "1791173693372234200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/handoff-fixtures.test.mjs",
+      "bytes": 19437,
+      "sha256": "9a63d63bd53edf5789c8e5fe651e75e011c6fcb114ec17fa4ddc2f3eaabe27b4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421750",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "19437",
+        "mtimeNs": "1790948162575316500",
+        "ctimeNs": "1790949437433643500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/handoff.d.mts",
+      "bytes": 420,
+      "sha256": "490a7964e2f3a418b020a67323ee23d27b0acca1262d4d8da166212eb6e784c3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421751",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "420",
+        "mtimeNs": "1790948162576414500",
+        "ctimeNs": "1790949437433643500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/handoff.mjs",
+      "bytes": 12574,
+      "sha256": "bfcd35383e48ee4ef05e77d79751440ca34bdb5bf11f1a082d7f7f375f899cf0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421752",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12574",
+        "mtimeNs": "1791280836343525100",
+        "ctimeNs": "1791280836343525100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/handoff.test.mjs",
+      "bytes": 6529,
+      "sha256": "5d53daaa74dba82095cd03416bfa1ff592eab0b983390cd91c7b1828a961f819",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421753",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6529",
+        "mtimeNs": "1790948162578488400",
+        "ctimeNs": "1790949437433643500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "bytes": 21078,
+      "sha256": "e5b7da3646c0918ffc2b064e54991bed0360afcaa5957832c154ecd94cbafaf3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "37436171902620706",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "21078",
+        "mtimeNs": "1791205133742469800",
+        "ctimeNs": "1791205133742469800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/knowledge.d.mts",
+      "bytes": 223,
+      "sha256": "94e62de4e8904d25c79f91090af38a5729655588151f47fd10accf02f1ac0887",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421755",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "223",
+        "mtimeNs": "1790948162580120300",
+        "ctimeNs": "1790949437434642000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/knowledge.mjs",
+      "bytes": 1943,
+      "sha256": "f2d03dcfcaec64443761e261b30c3ed3d5469877acad6b743327c98605b84d05",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421756",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1943",
+        "mtimeNs": "1790948162580746600",
+        "ctimeNs": "1790949437434642000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/limits.mjs",
+      "bytes": 4952,
+      "sha256": "35b77fdda0df1d0076686079cf9c98fbe8f488cd852dae7eefc3731aa054a57e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421757",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4952",
+        "mtimeNs": "1791169947559951300",
+        "ctimeNs": "1791169947559951300"
+      }
+    },
+    {
+      "path": "services/agent-runtime/limits.test.mjs",
+      "bytes": 1835,
+      "sha256": "2e6635a5a4c1efdafe0734499504a9f528a28b92b2b5f18a24573fb5bef994c3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421758",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1835",
+        "mtimeNs": "1790948162582932600",
+        "ctimeNs": "1790949437435705900"
+      }
+    },
+    {
+      "path": "services/agent-runtime/model-settlement.test.mjs",
+      "bytes": 13237,
+      "sha256": "f181bc77eee00e094b43a9710f8c9d8c1c9eaec9ce31c2490685b08528d736f8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4503599628716485",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13237",
+        "mtimeNs": "1791106261205985000",
+        "ctimeNs": "1791106261205985000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/office-files.d.mts",
+      "bytes": 330,
+      "sha256": "7400415888172119099a9275e959e618a4c27223e2ff81c159e87c44e19997e3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13510798882215150",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "330",
+        "mtimeNs": "1790949252211004500",
+        "ctimeNs": "1790949446463724500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/office-files.mjs",
+      "bytes": 10074,
+      "sha256": "43376d8c068a533d9a4a0533b894cfa01249a89252512d8892380aa58ea45eed",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "15199648742479416",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10074",
+        "mtimeNs": "1790949252212005300",
+        "ctimeNs": "1790949446463724500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.d.mts",
+      "bytes": 2859,
+      "sha256": "c7b9e3558a65c18efdf96d0741a6cc8e72da0631dca4949f9a937347ef4d465e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421759",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2859",
+        "mtimeNs": "1791271391115921800",
+        "ctimeNs": "1791271391115921800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "bytes": 37155,
+      "sha256": "8018295ed1c0dd64beec7ed77d7f467a83057f9be2864f0e3e5a177945eb9a68",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421760",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "37155",
+        "mtimeNs": "1791271388799881100",
+        "ctimeNs": "1791271388799881100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.test.mjs",
+      "bytes": 47858,
+      "sha256": "36fa807d262849a1fb7ad041a43030eaf91b8b883a3fda770e10c3cef3c203c3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421761",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "47858",
+        "mtimeNs": "1791169953018785400",
+        "ctimeNs": "1791169953018785400"
+      }
+    },
+    {
+      "path": "services/agent-runtime/output-truncation.test.mjs",
+      "bytes": 7995,
+      "sha256": "8e079f1d8e3e7eac40f8bef9151b5b6a37d87f42e373ac0129e0fd335b8e44cf",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7318349394557487",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7995",
+        "mtimeNs": "1791254804810616600",
+        "ctimeNs": "1791254804810616600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/package-lock.json",
+      "bytes": 360606,
+      "sha256": "c2e74a3afbc4b844d09da2cbcb75b0cf7a14057a77a40ad90cea97c77fd1bbdf",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421762",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "360606",
+        "mtimeNs": "1790948162590948200",
+        "ctimeNs": "1790949446465230500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/package.json",
+      "bytes": 14486,
+      "sha256": "6c14a3845b8df79bb9468998bbe6fc590c533f5e885c44d9054669239935a994",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421763",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14486",
+        "mtimeNs": "1790948162591943600",
+        "ctimeNs": "1790949446465230500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/product-concurrency.test.mjs",
+      "bytes": 13243,
+      "sha256": "a515b9351a20b08647a81ae14f804f85e0436e1713f89e9313665392353c738d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "2533274790470786",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13243",
+        "mtimeNs": "1791188315944362100",
+        "ctimeNs": "1791188315944362100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.d.mts",
+      "bytes": 1296,
+      "sha256": "5dcf50233539206c5dbf69dabd534f65c50a7916e43fc8fb2c8236aa6a1239ea",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16888498602749695",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1296",
+        "mtimeNs": "1791271394516093200",
+        "ctimeNs": "1791271394516093200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "bytes": 12262,
+      "sha256": "373b33ed7488515642b559a96bce3062335a2b1ea36704f7d7b3e60230df9c34",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "11258999068578960",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12262",
+        "mtimeNs": "1791271392841955600",
+        "ctimeNs": "1791271392841955600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/product-tools.mjs",
+      "bytes": 10098,
+      "sha256": "c6bef2e6b0f6218bd6494a0b9b893aae80de5bf236e378b156e289bd32082957",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "26177172834247660",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10098",
+        "mtimeNs": "1791203926791325800",
+        "ctimeNs": "1791203926791325800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/product-tools.test.mjs",
+      "bytes": 7310,
+      "sha256": "d076c6dbc5ac5ffa712e647ad5454622bf0284afa020198990a6ca2b00c6a20d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421767",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7310",
+        "mtimeNs": "1791173072038321300",
+        "ctimeNs": "1791173072038321300"
+      }
+    },
+    {
+      "path": "services/agent-runtime/quality-handoff.test.mjs",
+      "bytes": 8223,
+      "sha256": "161056c391c57a14159ee8244bb2e138fb1216784be9c84183fbfcad0238bca6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421768",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8223",
+        "mtimeNs": "1790948162597026800",
+        "ctimeNs": "1790949446466232900"
+      }
+    },
+    {
+      "path": "services/agent-runtime/recovery.d.mts",
+      "bytes": 541,
+      "sha256": "98c7b9cf413c8690697989006b6585765d3cefd9b7acb8825bed8f138142bc50",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421769",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "541",
+        "mtimeNs": "1790948162598536000",
+        "ctimeNs": "1790949446467234200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "bytes": 2325,
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16888498602797967",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2325",
+        "mtimeNs": "1790949252216796600",
+        "ctimeNs": "1790949446467234200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/request-context.mjs",
+      "bytes": 7590,
+      "sha256": "6c92e017b13c5a13d2445a287bb13229edf1f0d1126a754b46baf9a59e56b476",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "2251799813704055",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7590",
+        "mtimeNs": "1791188267423165100",
+        "ctimeNs": "1791188267423165100"
+      }
+    },
+    {
+      "path": "services/agent-runtime/request-context.test.mjs",
+      "bytes": 10631,
+      "sha256": "4adda4311cc3a32199fd547e7c10451140c40f0de826c4d10fe1763f26f946c5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "17451448556081401",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10631",
+        "mtimeNs": "1791188291908970400",
+        "ctimeNs": "1791188291908970400"
+      }
+    },
+    {
+      "path": "services/agent-runtime/request-preflight.test.mjs",
+      "bytes": 13402,
+      "sha256": "9b5b2b69b70a6365fed3cb871ef4d984a166d3172eba8a9ca39d20f37da4f052",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "21110623253318281",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13402",
+        "mtimeNs": "1791184920186128000",
+        "ctimeNs": "1791184920186128000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/responses-compatible.test.mjs",
+      "bytes": 31107,
+      "sha256": "91db73be89a24ef470c31ac34bd4c37756201c084e7e00cc327190c496497849",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4503599627636024",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "31107",
+        "mtimeNs": "1791247329623889800",
+        "ctimeNs": "1791247329623889800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/rework.mjs",
+      "bytes": 8770,
+      "sha256": "0a654c56c677ae1c1f867a64dbb7f5e6416f7c699b152a619ab08c12e0f3a55d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7599824371346320",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8770",
+        "mtimeNs": "1790949252217829600",
+        "ctimeNs": "1790949446467234200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/rework.test.mjs",
+      "bytes": 14131,
+      "sha256": "7bc95f6160331b6ebf710a26527c319ae47a1b3681abcce413a4033220ab8ab5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421772",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14131",
+        "mtimeNs": "1790948162601627500",
+        "ctimeNs": "1790949446467234200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/run-evidence-native.test.mjs",
+      "bytes": 14848,
+      "sha256": "68ff092481872f0d5bb6eff1a45681cc5a20f1792e15d5f38f3882acc01fa19f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1970324836975462",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14848",
+        "mtimeNs": "1791205250775624600",
+        "ctimeNs": "1791205250775624600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "bytes": 13074,
+      "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9570149208326665",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13074",
+        "mtimeNs": "1791261360974058000",
+        "ctimeNs": "1791261360974058000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.test.mjs",
+      "bytes": 12871,
+      "sha256": "15e575c6ee7f0a4efc08b28f69d87ccccce6ce58d28af77b84de204876da5fa0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8162774324624649",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12871",
+        "mtimeNs": "1791261807935324500",
+        "ctimeNs": "1791261807935324500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/runtime-budget-prompt.test.mjs",
+      "bytes": 2881,
+      "sha256": "f1de3eace36673daada1ae018a14c8a9ad704a9d8fb2ef788ca97967bfd9b453",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1407374883625732",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2881",
+        "mtimeNs": "1791173487755432500",
+        "ctimeNs": "1791173487755432500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/sandbox.d.mts",
+      "bytes": 572,
+      "sha256": "29f980394410086e38f0597ad00e8f47a287e8245c7b1722f345a5e6a0dd809d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421773",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "572",
+        "mtimeNs": "1790948162603132300",
+        "ctimeNs": "1790949446468233900"
+      }
+    },
+    {
+      "path": "services/agent-runtime/sandbox.mjs",
+      "bytes": 8387,
+      "sha256": "02e44b3a3bf6b1f2fe58357a54e7931bd10be613e2d3a2c1b0aa79c46f4bb48a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421774",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8387",
+        "mtimeNs": "1790948162604653300",
+        "ctimeNs": "1790949446468233900"
+      }
+    },
+    {
+      "path": "services/agent-runtime/sandbox.test.mjs",
+      "bytes": 3747,
+      "sha256": "595a7e73d243b3f42b83c433bea6cbfc0f13ffc6d4fc602d1a7afe2041a1c4a5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421775",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3747",
+        "mtimeNs": "1790948162604653300",
+        "ctimeNs": "1790949446468741600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/smoke.test.mjs",
+      "bytes": 8737,
+      "sha256": "fc19d337259b17d47218a4f2ea0e4f4fa3762b94c405ef334ed36da7d072ab39",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421776",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8737",
+        "mtimeNs": "1790948162606665100",
+        "ctimeNs": "1790949446468741600"
+      }
+    },
+    {
+      "path": "services/agent-runtime/status-lifecycle.test.mjs",
+      "bytes": 12504,
+      "sha256": "e3e40f4e5e25ae07a47301582d83759d99e60f17c85bca75b99f3f88951614fd",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "21392098230309339",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12504",
+        "mtimeNs": "1791261775314722400",
+        "ctimeNs": "1791261775314722400"
+      }
+    },
+    {
+      "path": "services/agent-runtime/supervisor.mjs",
+      "bytes": 8783,
+      "sha256": "87315db39f505620d27bf699c79ec1b153bae899e0251d6002569f1af1013fca",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421777",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8783",
+        "mtimeNs": "1791106394977161300",
+        "ctimeNs": "1791106394977161300"
+      }
+    },
+    {
+      "path": "services/agent-runtime/supervisor.test.mjs",
+      "bytes": 8712,
+      "sha256": "f46b7020cd1a588d06f2801b0d6b420bcc94c42674d131a5757d178de6573d03",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421778",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8712",
+        "mtimeNs": "1791106396850517700",
+        "ctimeNs": "1791106396850517700"
+      }
+    },
+    {
+      "path": "services/agent-runtime/task-attribution.mjs",
+      "bytes": 996,
+      "sha256": "2bc92b6725f7ddbcf7fcb13a39789d3473328d109444db390d8afdff5304970a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421779",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "996",
+        "mtimeNs": "1790948162609373200",
+        "ctimeNs": "1790949446469751000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/task-output-limit-native.test.mjs",
+      "bytes": 9844,
+      "sha256": "1cc380f74772dc2ba6e3db3c209a89591e7fa5d504ffeb8d20d5f607d238dbbd",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1407374883717619",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9844",
+        "mtimeNs": "1791178982079594800",
+        "ctimeNs": "1791178982079594800"
+      }
+    },
+    {
+      "path": "services/agent-runtime/task-output-limit.test.mjs",
+      "bytes": 15131,
+      "sha256": "b764e3628950776ec1d02702c8a34b8142e6013154b51f4a32568b63ba8c3acf",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "18858823439717382",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15131",
+        "mtimeNs": "1791179243420045000",
+        "ctimeNs": "1791179243420045000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/task-plan-context.test.mjs",
+      "bytes": 13160,
+      "sha256": "ccc719b9d243279cb695afb26a163808e56300cef55828785073fc8f2fc10713",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487794269",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13160",
+        "mtimeNs": "1791175926477111900",
+        "ctimeNs": "1791175926477111900"
+      }
+    },
+    {
+      "path": "services/agent-runtime/test-support/handoff-fixtures.mjs",
+      "bytes": 6053,
+      "sha256": "a517fd5d8927cbfe74445f712e05e31efeb7594fb1c3f341aa82d4241906a5ce",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132437",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6053",
+        "mtimeNs": "1790948162610883200",
+        "ctimeNs": "1790949446469751000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/thinking-mode.test.mjs",
+      "bytes": 7585,
+      "sha256": "7373e967d8c2d537090fa1709f650222c11ce0fb3f47a75170a647215d230c2c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "47287796087404270",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7585",
+        "mtimeNs": "1791249053047647000",
+        "ctimeNs": "1791249053047647000"
+      }
+    },
+    {
+      "path": "services/agent-runtime/trace-list-cache.test.mjs",
+      "bytes": 8850,
+      "sha256": "f1362622723feba5acb46c45ddf271c65b3f1cb0ff26862075b4a7f88ca28459",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231528109",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8850",
+        "mtimeNs": "1791279524818677500",
+        "ctimeNs": "1791279524818677500"
+      }
+    },
+    {
+      "path": "services/agent-runtime/trace-store.d.mts",
+      "bytes": 1459,
+      "sha256": "152e1f26260ad18201848a69868fbbaf8f766eea0b38ccb68c82dcc486ac3ca1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231610264",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1459",
+        "mtimeNs": "1790949252218840000",
+        "ctimeNs": "1790949446470751200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/trace-store.mjs",
+      "bytes": 6811,
+      "sha256": "0cf0d4c7a84e689d7d4bd181e6642d99a6611e4ba1a09def7de4cd016d2196ba",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421783",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6811",
+        "mtimeNs": "1791279522972303700",
+        "ctimeNs": "1791279522972303700"
+      }
+    },
+    {
+      "path": "services/agent-runtime/trace.mjs",
+      "bytes": 4302,
+      "sha256": "ddb3ea2f8d1e862983f8861aecba80a79e44e7a1bd67be3c0132d48ce0fd076c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421784",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4302",
+        "mtimeNs": "1790948162613403100",
+        "ctimeNs": "1790949446470751200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/trace.test.mjs",
+      "bytes": 5043,
+      "sha256": "69e7f23a659fb808c6710c0d74449c5d18399cf406b24554e53f2e5c8062f365",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132441",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5043",
+        "mtimeNs": "1790948162614413100",
+        "ctimeNs": "1790949446470751200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/verification.d.mts",
+      "bytes": 126,
+      "sha256": "2061ae0b97e1212cdc9e9142a7fb66bca2da7a20c422f4a9ad1dda3652184ae1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511843098",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "126",
+        "mtimeNs": "1790948162615423100",
+        "ctimeNs": "1790949446470751200"
+      }
+    },
+    {
+      "path": "services/agent-runtime/verification.mjs",
+      "bytes": 6326,
+      "sha256": "8472b359d7e8c3ca1ec10c5d2165ed76550e3c583a67b2b5b514fe1d8fb18a07",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421787",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6326",
+        "mtimeNs": "1790948162615423100",
+        "ctimeNs": "1790949446470751200"
+      }
+    },
+    {
+      "path": "services/embedding/local.d.mts",
+      "bytes": 372,
+      "sha256": "4795564baff3b79af817ee91d025a4bd6778d0690f6c07d6741365df50a6be09",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132445",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "372",
+        "mtimeNs": "1790948162616422200",
+        "ctimeNs": "1790949446472260600"
+      }
+    },
+    {
+      "path": "services/embedding/local.mjs",
+      "bytes": 3441,
+      "sha256": "745c2249c5b8370df74ae5a14ee5e72254b3389216c1b3fa4377b6cf99286149",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449488553758",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3441",
+        "mtimeNs": "1790948162617423200",
+        "ctimeNs": "1790949446472260600"
+      }
+    },
+    {
+      "path": "services/embedding/model-lock.json",
+      "bytes": 651,
+      "sha256": "ed8a213a67a0ac3359e8a400730f02bcd61bd5811f1ff084a8d4b2471883e106",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421791",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "651",
+        "mtimeNs": "1790948162618427700",
+        "ctimeNs": "1790949446472260600"
+      }
+    },
+    {
+      "path": "start-demo.cmd",
+      "bytes": 313,
+      "sha256": "b4a748292d51ae8ccc9273ea47e0f9cd183373d2b07a606cb69440bcd9ce3670",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441214361",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "313",
+        "mtimeNs": "1790949252219838700",
+        "ctimeNs": "1790949446472260600"
+      }
+    },
+    {
+      "path": "start-local-production.cmd",
+      "bytes": 2949,
+      "sha256": "cb93d44b1d98f473b55693affde606e50f60f060227f9add4d366e2b4b0949d8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487650353",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2949",
+        "mtimeNs": "1791203981573200400",
+        "ctimeNs": "1791203981573200400"
+      }
+    },
+    {
+      "path": "start-local.cmd",
+      "bytes": 317,
+      "sha256": "85d0f2569dd1eefa156ec63d8716d9c87e1769439305b23b0578f9057a6a87e0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8444249301478298",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "317",
+        "mtimeNs": "1790958403684868400",
+        "ctimeNs": "1790958403684868400"
+      }
+    },
+    {
+      "path": "start.command",
+      "bytes": 635,
+      "sha256": "865284a819f345106725b2ea8af769164e3c98de67395cb3a8932b9ec0afd415",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7036874417925019",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "635",
+        "mtimeNs": "1790949252222046100",
+        "ctimeNs": "1790949446473795700"
+      }
+    },
+    {
+      "path": "tests/api-response.test.ts",
+      "bytes": 6899,
+      "sha256": "25ab8459a6fdb15b9a7de3797af1da4716cec8dc6801a6ae0e75a85d7006fe2f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "14636698789262558",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6899",
+        "mtimeNs": "1791281459383138400",
+        "ctimeNs": "1791281459383138400"
+      }
+    },
+    {
+      "path": "tests/api.test.ts",
+      "bytes": 39550,
+      "sha256": "9d5ada5f6be9ca5d63a12bc51de49e6bb704427a30fc6556dd6edd392df53ef2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441214367",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "39550",
+        "mtimeNs": "1791192595954028500",
+        "ctimeNs": "1791192595954028500"
+      }
+    },
+    {
+      "path": "tests/automation-learning.test.ts",
+      "bytes": 14848,
+      "sha256": "2407a5823977504a3715e6d57bb31d32b921bf95eb2b91fcb550c0f03a482bf9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441214368",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14848",
+        "mtimeNs": "1790949252225549700",
+        "ctimeNs": "1790949446475315800"
+      }
+    },
+    {
+      "path": "tests/backup-size.test.ts",
+      "bytes": 10493,
+      "sha256": "dcbde8cd2223342e483cb5656e40a57151de43f2d5e7a13c2e914c65a6b46029",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "2251799815137883",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10493",
+        "mtimeNs": "1791107958657701000",
+        "ctimeNs": "1791107958657701000"
+      }
+    },
+    {
+      "path": "tests/browser-mcp.test.ts",
+      "bytes": 14699,
+      "sha256": "b1814f9baf5c3d1a1663959d07bdbb97c9d1bd371ba1fa175bc9b7fdcebdc26a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "17169973579508641",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14699",
+        "mtimeNs": "1790949252226549600",
+        "ctimeNs": "1790949446475315800"
+      }
+    },
+    {
+      "path": "tests/budget-history-admission.test.ts",
+      "bytes": 14406,
+      "sha256": "42416a018419106fa6631a31f07358966051c3e1d5099f60ace3389a13dd4c79",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16325548649516534",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14406",
+        "mtimeNs": "1791262151301270200",
+        "ctimeNs": "1791262151301270200"
+      }
+    },
+    {
+      "path": "tests/capabilities.test.ts",
+      "bytes": 9933,
+      "sha256": "c8311fd2e34cc8cf0eafd2658a1b71d50439ecdf0a38c7639a35dea1d16d22c7",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132451",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9933",
+        "mtimeNs": "1790948162621968200",
+        "ctimeNs": "1790949446475315800"
+      }
+    },
+    {
+      "path": "tests/collaboration.test.ts",
+      "bytes": 8703,
+      "sha256": "4938cc5a6df252d7a7a88f083f64f26fcc02bc6e19646a904b5b5c0a1373fcdc",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421796",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8703",
+        "mtimeNs": "1790948162621968200",
+        "ctimeNs": "1790949446475315800"
+      }
+    },
+    {
+      "path": "tests/completion-protocol-api.test.ts",
+      "bytes": 21570,
+      "sha256": "989da7c9ab100e0dc493d72d6ddacb14fedbf87eac378784bd4fa6a2dd1e3bfc",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "24488322973847098",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "21570",
+        "mtimeNs": "1791248868795881500",
+        "ctimeNs": "1791248868795881500"
+      }
+    },
+    {
+      "path": "tests/cost-carryover-ui.test.ts",
+      "bytes": 6675,
+      "sha256": "e2523c38ee5e948ca11b71b154f24f4d6171e97951b834a97e562b8c2b650d9c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "844424930271829",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6675",
+        "mtimeNs": "1791166263330853500",
+        "ctimeNs": "1791166263330853500"
+      }
+    },
+    {
+      "path": "tests/cost-carryover.test.ts",
+      "bytes": 34560,
+      "sha256": "66dd6f8ef9f1195eb100e2e2ac0a51dcf323b73690a984e2c64c768efaf03289",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "22799473113584413",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "34560",
+        "mtimeNs": "1791179149850774200",
+        "ctimeNs": "1791179149850774200"
+      }
+    },
+    {
+      "path": "tests/cost.test.ts",
+      "bytes": 15824,
+      "sha256": "1f1a0057dc7586fe42ac828c043b261efd8a4638a97225e6ce1ac58f2b9bdaa7",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421797",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15824",
+        "mtimeNs": "1791112538995302600",
+        "ctimeNs": "1791112538995302600"
+      }
+    },
+    {
+      "path": "tests/employee-history.test.ts",
+      "bytes": 7652,
+      "sha256": "525d8f2a21df001309b233a76444470ec43fdfb603bde1ac681a042133647187",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421798",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7652",
+        "mtimeNs": "1790948162623954600",
+        "ctimeNs": "1790949446476326700"
+      }
+    },
+    {
+      "path": "tests/execution-policy.test.ts",
+      "bytes": 24059,
+      "sha256": "cb422195ae5b4e43bb8b3f4356b4170e39b5bcb936d049324650a954681e2366",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421799",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "24059",
+        "mtimeNs": "1791192597539163500",
+        "ctimeNs": "1791192597539163500"
+      }
+    },
+    {
+      "path": "tests/extensions-backup.test.ts",
+      "bytes": 11998,
+      "sha256": "56490d0b6cffc207a21cfdfdf095a92af4c1f30b5323173af9a60541a4c1b695",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487793060",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11998",
+        "mtimeNs": "1790949252227548400",
+        "ctimeNs": "1790949446476326700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/README.md",
+      "bytes": 3843,
+      "sha256": "26e18d37885bb155fc29ef71d171e6f13d715e8db1d17a07d787c05547c07aac",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421802",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3843",
+        "mtimeNs": "1790948162626473800",
+        "ctimeNs": "1790949446480364900"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/candidates/money-broken.mjs",
+      "bytes": 163,
+      "sha256": "9bac70fba72c405dfb43d458ee814e8eaa908a4ca103cbdaf73b5475f61df7b9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421804",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "163",
+        "mtimeNs": "1790948162627473800",
+        "ctimeNs": "1790949446477835700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/candidates/money-fixed.mjs",
+      "bytes": 130,
+      "sha256": "1f059c10916b322a8d6d19b5e34a7af67bff9b9726a17e17ffb70c58e1012775",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421805",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "130",
+        "mtimeNs": "1790948162628475600",
+        "ctimeNs": "1790949446477835700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/candidates/report.mjs",
+      "bytes": 410,
+      "sha256": "1804ef7f40da34926f6afbfe54f3774de7d4bcea98958aff944a9b7d462057b1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511843118",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "410",
+        "mtimeNs": "1790948162628475600",
+        "ctimeNs": "1790949446477835700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/expected/report.json",
+      "bytes": 36,
+      "sha256": "8e66dd231d39e18d69b2c6a14a8fa5d25d58fb50ad670cc99702c6a0f18280c8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132464",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "36",
+        "mtimeNs": "1790948162629982400",
+        "ctimeNs": "1790949446478849700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/inputs/orders.json",
+      "bytes": 121,
+      "sha256": "2ae35114f406c443f85d246d3b1d5e6a9ea77c492f4f9e596d74c18d41cc083e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421810",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "121",
+        "mtimeNs": "1790948162630989400",
+        "ctimeNs": "1790949446479849900"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/plan.json",
+      "bytes": 1515,
+      "sha256": "7260e79e47b58bffa098c508405f835627979ef5fd949ffb01471c89a7a2b82e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421811",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1515",
+        "mtimeNs": "1790948162630989400",
+        "ctimeNs": "1790949446479849900"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/request.md",
+      "bytes": 843,
+      "sha256": "c3b8de4be60db515fbdfc95d6c58ffc3cfc296468ab6c9e6cf9bb51a559da599",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421812",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "843",
+        "mtimeNs": "1790948162631989700",
+        "ctimeNs": "1790949446480364900"
+      }
+    },
+    {
+      "path": "tests/full-offline-backup.test.mjs",
+      "bytes": 17126,
+      "sha256": "514b562a7476231e00c9ae922d2f4c4c0c75056fb4fa3e8b41173c1d06274b6d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6473924464372936",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "17126",
+        "mtimeNs": "1791269584186473700",
+        "ctimeNs": "1791269584186473700"
+      }
+    },
+    {
+      "path": "tests/go-acceptance-run-references-explicit-target-regression.test.mjs",
+      "bytes": 10823,
+      "sha256": "6a8d7d036c6f1bddd6f8302fed08955069d91a6c52f3f6d9c1b3412d4169e199",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9570149208470965",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10823",
+        "mtimeNs": "1791281394366364200",
+        "ctimeNs": "1791281394366364200"
+      }
+    },
+    {
+      "path": "tests/go-acceptance-run-references.test.mjs",
+      "bytes": 10807,
+      "sha256": "6377ff2dd79e4f79023b3fb532e67a10ff9701596237454cfc8c8fd876bc4f10",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "27303072741096633",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10807",
+        "mtimeNs": "1791263000933948300",
+        "ctimeNs": "1791263000933948300"
+      }
+    },
+    {
+      "path": "tests/go-bound-source-identity.test.mjs",
+      "bytes": 1755,
+      "sha256": "699b5d89f74403a7b004911ad6ca5b364e81de481b27a6edc7eed0e41ab7bdf6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511011394",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1755",
+        "mtimeNs": "1791281782136203900",
+        "ctimeNs": "1791281782136203900"
+      }
+    },
+    {
+      "path": "tests/go-controlled-stop-browser-fixture.test.mjs",
+      "bytes": 4517,
+      "sha256": "8d9333164a2c0ac799be98baf9996a76de7c0eb9def722b4ca65f8b26f609f1c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6473924464437850",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4517",
+        "mtimeNs": "1791277844636286000",
+        "ctimeNs": "1791277844636286000"
+      }
+    },
+    {
+      "path": "tests/go-controlled-stop-first-parent.test.mjs",
+      "bytes": 4884,
+      "sha256": "f2ae3e308eb7c582c82a91a04958d0c3ffb928c24d8f7fbf6049904757735a05",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "20266198323471689",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4884",
+        "mtimeNs": "1791277807530810500",
+        "ctimeNs": "1791277807530810500"
+      }
+    },
+    {
+      "path": "tests/go-delivery-web-helper.test.mjs",
+      "bytes": 9610,
+      "sha256": "d842b6ec8fb5eb84f2127c3a4b481faa8f80f383f7c4ee3a35234d0a297425a8",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9570149208318043",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9610",
+        "mtimeNs": "1791266660662128600",
+        "ctimeNs": "1791266660662128600"
+      }
+    },
+    {
+      "path": "tests/go-final-knowledge-proof.test.mjs",
+      "bytes": 10536,
+      "sha256": "4b53c5ce49fe5f2678a6cac2420515e24de301b9bda598341e2bed3f7246636a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499534289948",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10536",
+        "mtimeNs": "1791272002497685100",
+        "ctimeNs": "1791272002497685100"
+      }
+    },
+    {
+      "path": "tests/go-final-knowledge-scope.test.mjs",
+      "bytes": 7745,
+      "sha256": "6dad0d0e2b4735e465997b7e0424e7671d6a9320be0c4c8c7cb3c6af07139874",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231466165",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7745",
+        "mtimeNs": "1791271804011975900",
+        "ctimeNs": "1791271804011975900"
+      }
+    },
+    {
+      "path": "tests/go-final-scope-legacy-regression.test.mjs",
+      "bytes": 33162,
+      "sha256": "196dbd4fba7dc5d968eeb513d1e3313814b470fac1f5d05178d9026dea5cb6ea",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "50384020831511317",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "33162",
+        "mtimeNs": "1791271802241125800",
+        "ctimeNs": "1791271802241125800"
+      }
+    },
+    {
+      "path": "tests/go-first-project-admission-stop-guard.test.mjs",
+      "bytes": 6145,
+      "sha256": "834486bf163909a6193d9214fdac2233afcb3cc3686aac5f9677c12ddb0ebab2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "32369622321725889",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6145",
+        "mtimeNs": "1791276198313722400",
+        "ctimeNs": "1791276198313722400"
+      }
+    },
+    {
+      "path": "tests/go-funded-guarded-operator.test.mjs",
+      "bytes": 11774,
+      "sha256": "2680e388929c9eaf016d823c8b8fa4d4264b189b2ad6ef293734cefda097eb4a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8444249301412684",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11774",
+        "mtimeNs": "1791279957495722200",
+        "ctimeNs": "1791279957495722200"
+      }
+    },
+    {
+      "path": "tests/go-funded-knowledge-upgrade.test.mjs",
+      "bytes": 29305,
+      "sha256": "24d18c2ac45f87e39b8a4d0bef90cf955daeeb072e22831c9a467b4cb137ea63",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12384898975569454",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "29305",
+        "mtimeNs": "1791259731493023800",
+        "ctimeNs": "1791259731493023800"
+      }
+    },
+    {
+      "path": "tests/go-funded-known-read-knowledge-upgrade.test.mjs",
+      "bytes": 29557,
+      "sha256": "1c040529956bcad0ded05022d93717db9065f2d19a0ad37f35e2390f193e13a5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231544322",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "29557",
+        "mtimeNs": "1791275029712015800",
+        "ctimeNs": "1791275029712015800"
+      }
+    },
+    {
+      "path": "tests/go-funded-known-read-stop-legacy-regression.test.mjs",
+      "bytes": 26565,
+      "sha256": "dba94978040f8a2a08a8198755475f418f5a2f13dbbc46f24389f70f27b75378",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441148314",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "26565",
+        "mtimeNs": "1791274852379650200",
+        "ctimeNs": "1791274852379650200"
+      }
+    },
+    {
+      "path": "tests/go-funded-operator.test.mjs",
+      "bytes": 11766,
+      "sha256": "29bac218545ff57d311bf7d8e480606f48800f73366a6ef9838c726f290d1dff",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487714995",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11766",
+        "mtimeNs": "1791252484487373000",
+        "ctimeNs": "1791252484487373000"
+      }
+    },
+    {
+      "path": "tests/go-funded-owned-large-knowledge-upgrade.test.mjs",
+      "bytes": 29897,
+      "sha256": "6a38093c655c95ce580531906f9c258c0e746f6ae2d2e019c50b6954e72414a2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12947848928994538",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "29897",
+        "mtimeNs": "1791276893641172200",
+        "ctimeNs": "1791276893641172200"
+      }
+    },
+    {
+      "path": "tests/go-funded-owned-large-stop-legacy-regression.test.mjs",
+      "bytes": 26585,
+      "sha256": "668dfc624d15e90eb9a7571519a3f6336dba1a4cdf7e59c689b03e66ae1af1a7",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13510798882415849",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "26585",
+        "mtimeNs": "1791276893602909500",
+        "ctimeNs": "1791276893602909500"
+      }
+    },
+    {
+      "path": "tests/go-funded-stop.test.mjs",
+      "bytes": 26554,
+      "sha256": "1a872c6f0a85488a942c141f63b82720b3d3a9cfccbfc78a9c5dcfaacd28dcec",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "18858823439681644",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "26554",
+        "mtimeNs": "1791254255098985300",
+        "ctimeNs": "1791254255098985300"
+      }
+    },
+    {
+      "path": "tests/go-known-read-enoent-stop-guard.test.mjs",
+      "bytes": 7268,
+      "sha256": "5f83d8177fd59004ca78ad16ed172fe5f772092fccec7ab76d86b943222e5f31",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074604173905",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7268",
+        "mtimeNs": "1791275031542150600",
+        "ctimeNs": "1791275031542150600"
+      }
+    },
+    {
+      "path": "tests/go-large-owned-run-bounds.test.mjs",
+      "bytes": 1600,
+      "sha256": "4355934855f54e68053f3b172f47fca179abc0f0f2487429224741aa77a69fbe",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511026570",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1600",
+        "mtimeNs": "1791276327441033700",
+        "ctimeNs": "1791276327441033700"
+      }
+    },
+    {
+      "path": "tests/go-owned-large-run-references.test.mjs",
+      "bytes": 10819,
+      "sha256": "8bfbfb21a2c5369b58bbefa4061d0173faa44cabe26f596e79d28ce3d6aa770a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8162774324685652",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10819",
+        "mtimeNs": "1791276893601119800",
+        "ctimeNs": "1791276893601119800"
+      }
+    },
+    {
+      "path": "tests/go-phase-identity-cache.test.mjs",
+      "bytes": 3951,
+      "sha256": "cb169208523a5397051b9714416967b99c1dd5cc2154fea5b1d5b3e4d0f8fa39",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231528163",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "3951",
+        "mtimeNs": "1791279843494695300",
+        "ctimeNs": "1791279843494695300"
+      }
+    },
+    {
+      "path": "tests/go-proxy-rejected-resume.test.mjs",
+      "bytes": 1610,
+      "sha256": "c9f285ded704df1cf3711faf39a6f4a0826ef83eeb850a0166b8607d1f8cbcdb",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "18014398509782711",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1610",
+        "mtimeNs": "1791262956924412000",
+        "ctimeNs": "1791262956924412000"
+      }
+    },
+    {
+      "path": "tests/go-recovery9-pinned-knowledge.test.mjs",
+      "bytes": 6933,
+      "sha256": "fdf59d43579a47de5239576ce6d2d4f5330b3fc987aaa6e655bd80c26755fb49",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074604157631",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6933",
+        "mtimeNs": "1791278864211209800",
+        "ctimeNs": "1791278864211209800"
+      }
+    },
+    {
+      "path": "tests/go-rejected-resume.test.mjs",
+      "bytes": 2646,
+      "sha256": "9ec8ac46b2ddbae530e9f304f5cf08ca504066d4a31f61a5b8aafb389ae68058",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024557507290",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2646",
+        "mtimeNs": "1791262593265706900",
+        "ctimeNs": "1791262593265706900"
+      }
+    },
+    {
+      "path": "tests/go-thinking-mode.test.ts",
+      "bytes": 10426,
+      "sha256": "225465da4587b507ac2c17bed317894a7fcaf6e43c920d2644fa9d0b475c3c90",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399441136227",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10426",
+        "mtimeNs": "1791249444234000700",
+        "ctimeNs": "1791249444234000700"
+      }
+    },
+    {
+      "path": "tests/go-todo-acceptance-audit.test.mjs",
+      "bytes": 32756,
+      "sha256": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487705205",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "32756",
+        "mtimeNs": "1791255164112819600",
+        "ctimeNs": "1791255164112819600"
+      }
+    },
+    {
+      "path": "tests/go-verified-target-evidence.test.mjs",
+      "bytes": 11970,
+      "sha256": "62faa06b09372c05d0246105a2834c3b87d8fd50e7dca362836ea2bbf7697f31",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "14355223812336416",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "11970",
+        "mtimeNs": "1791281714886012900",
+        "ctimeNs": "1791281714886012900"
+      }
+    },
+    {
+      "path": "tests/handoff-checkpoints.test.ts",
+      "bytes": 7125,
+      "sha256": "243350886a87c8de7bca3ed06414b132bad7ede46e0a0a036a8c4cb60fd82813",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487793061",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7125",
+        "mtimeNs": "1790949252228590100",
+        "ctimeNs": "1790949446480364900"
+      }
+    },
+    {
+      "path": "tests/health-sync.test.ts",
+      "bytes": 10001,
+      "sha256": "e45bc9e72b467e6757c51ee5908ebc5ba11ac47411b735594356d168572d31f5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "22517998137299329",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10001",
+        "mtimeNs": "1791122836073386900",
+        "ctimeNs": "1791122836073386900"
+      }
+    },
+    {
+      "path": "tests/hybrid.test.ts",
+      "bytes": 8891,
+      "sha256": "4bfc2bca01571fd13d5d0dc4b1de93eb8eba69a805580c10dacaf98ee0899bd5",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421814",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8891",
+        "mtimeNs": "1790948162633495200",
+        "ctimeNs": "1790949446481366100"
+      }
+    },
+    {
+      "path": "tests/knowledge.test.ts",
+      "bytes": 8269,
+      "sha256": "84740402b75af00feee3bb569a197bb9fb872ec4b3a61b3607e00e34949ec308",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421815",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8269",
+        "mtimeNs": "1790948162634502800",
+        "ctimeNs": "1790949446481366100"
+      }
+    },
+    {
+      "path": "tests/local-device-admission.test.ts",
+      "bytes": 20125,
+      "sha256": "fec2d6c53add525659d8adeef004773e2b30319216b15bc1d88e32589509c356",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6473924464358540",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "20125",
+        "mtimeNs": "1791271744811583300",
+        "ctimeNs": "1791271744811583300"
+      }
+    },
+    {
+      "path": "tests/local-launcher.test.ts",
+      "bytes": 2758,
+      "sha256": "60e6a769b48c75084473010cbb59dc489ed59dc8cd9d1171ae87e8d09c812bff",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6755399442110525",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2758",
+        "mtimeNs": "1791201840970795100",
+        "ctimeNs": "1791201840970795100"
+      }
+    },
+    {
+      "path": "tests/local-operation-heartbeat.test.ts",
+      "bytes": 18076,
+      "sha256": "9b190c0e09626960c9838157c3cdcb77fb3458e6f687115f0c9035430b147748",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "22236523160443143",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "18076",
+        "mtimeNs": "1791267357778196800",
+        "ctimeNs": "1791267357778196800"
+      }
+    },
+    {
+      "path": "tests/local-static-web.test.ts",
+      "bytes": 14921,
+      "sha256": "17ddfcabd46e9b6c264d3362417efe399f8f0783e10671589bbbf03bb4aed2e0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "3096224744019462",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14921",
+        "mtimeNs": "1791262988637821700",
+        "ctimeNs": "1791262988637821700"
+      }
+    },
+    {
+      "path": "tests/manager-chat.test.ts",
+      "bytes": 12021,
+      "sha256": "e31a32ac2b028bcff689bda6cc5d7283c9af160db9239d9ce43d42412ebf5cca",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487793062",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12021",
+        "mtimeNs": "1790949252229601400",
+        "ctimeNs": "1790949446481366100"
+      }
+    },
+    {
+      "path": "tests/model-catalog.test.ts",
+      "bytes": 9525,
+      "sha256": "f62000f8dad688d772db22271760c473b5c0658bcffcc48bab249614029a9738",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487793063",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9525",
+        "mtimeNs": "1791101240213593200",
+        "ctimeNs": "1791101240213593200"
+      }
+    },
+    {
+      "path": "tests/model-fixture.ts",
+      "bytes": 1175,
+      "sha256": "1f21593246a7131d09b6ef68d7e3bcd22a35c854c9a424ec6432cd38cdeac4b4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421816",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1175",
+        "mtimeNs": "1790948162635513200",
+        "ctimeNs": "1790949446482365400"
+      }
+    },
+    {
+      "path": "tests/multi-agent-operation-concurrency.test.ts",
+      "bytes": 21434,
+      "sha256": "48eea5c2fc1c8cba08daca95bf5dadc8d5edae5a4a802cc20c8ee5b53c8e98c0",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4503599627445322",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "21434",
+        "mtimeNs": "1791188146572182600",
+        "ctimeNs": "1791188146572182600"
+      }
+    },
+    {
+      "path": "tests/new-api-billing.test.ts",
+      "bytes": 26372,
+      "sha256": "c41c05745beb3ed216ef7d18eb087a9320a910964c99a78a8e6dfa9fb22f0e63",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "29836347531747984",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "26372",
+        "mtimeNs": "1791124313051285900",
+        "ctimeNs": "1791124313051285900"
+      }
+    },
+    {
+      "path": "tests/organization-allowed-models-ui.test.ts",
+      "bytes": 9944,
+      "sha256": "dec6d682547a73b68de50902cf440abd082486f33cb7400ad374ad3430c48735",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12384898975344702",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9944",
+        "mtimeNs": "1791196384530250800",
+        "ctimeNs": "1791196384530250800"
+      }
+    },
+    {
+      "path": "tests/organization-chat.test.ts",
+      "bytes": 35545,
+      "sha256": "d9098be8b6a4ced925c0efaec1b18a0003179f9cfc4e0fdb75d0f66577bb984f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "16888498602797992",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "35545",
+        "mtimeNs": "1791201480523146900",
+        "ctimeNs": "1791201480523146900"
+      }
+    },
+    {
+      "path": "tests/organization-draft.test.ts",
+      "bytes": 5197,
+      "sha256": "ebd52bc5f35502015a6c489689592e177a9520b4cb388721f6ceba68fca13f9e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "3659174698294561",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5197",
+        "mtimeNs": "1790950666744144500",
+        "ctimeNs": "1790950666744144500"
+      }
+    },
+    {
+      "path": "tests/organization-reset-ui.test.ts",
+      "bytes": 10823,
+      "sha256": "8cb00d37993899e5a0a55080a343fb304f4989a018b0652e11fc00c067540bf1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8725724278105369",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10823",
+        "mtimeNs": "1791247081710197300",
+        "ctimeNs": "1791247081710197300"
+      }
+    },
+    {
+      "path": "tests/organization-session.test.ts",
+      "bytes": 19853,
+      "sha256": "59535c8abff296b43295d61ba43af41184edc5a638c8a1fc3058ca7d484e2200",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "9288674231522863",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "19853",
+        "mtimeNs": "1791248224770024700",
+        "ctimeNs": "1791248224770024700"
+      }
+    },
+    {
+      "path": "tests/organization-update.test.ts",
+      "bytes": 14323,
+      "sha256": "c88ad48364637bf008fca9fd7546cbae930c887457116affc22706043a5731dd",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7036874417925034",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14323",
+        "mtimeNs": "1790949252231599800",
+        "ctimeNs": "1790949446482365400"
+      }
+    },
+    {
+      "path": "tests/plan-budget-ui.test.ts",
+      "bytes": 5081,
+      "sha256": "430e9a5a11e5d3ac229a346ba619d3b2ad709290f30d15ab67ba328781ae1fd3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13510798882214169",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5081",
+        "mtimeNs": "1791178982763602200",
+        "ctimeNs": "1791178982763602200"
+      }
+    },
+    {
+      "path": "tests/plan-readiness.test.ts",
+      "bytes": 7012,
+      "sha256": "13f74bb2667763da1c0e97566b387815c0a8e3296a5547170c8915a9e6b7f147",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8162774324767659",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "7012",
+        "mtimeNs": "1790949252233242500",
+        "ctimeNs": "1790949446482874400"
+      }
+    },
+    {
+      "path": "tests/planning-execution-context.test.ts",
+      "bytes": 22122,
+      "sha256": "0f1b56457f8947f875ffd5e1ec1e125cd882b2b530455bb359ffcec4c044cf6e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12103423998624609",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "22122",
+        "mtimeNs": "1791261806105789700",
+        "ctimeNs": "1791261806105789700"
+      }
+    },
+    {
+      "path": "tests/planning-output-api.test.ts",
+      "bytes": 12902,
+      "sha256": "32888519f42f947379d48573a69a5a33d46ba440fa6bd9f6f7a388743107e3fa",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "12384898975284278",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12902",
+        "mtimeNs": "1791274395901768900",
+        "ctimeNs": "1791274395901768900"
+      }
+    },
+    {
+      "path": "tests/planning-output.test.ts",
+      "bytes": 4443,
+      "sha256": "f36e7fe9bf52feb5011283b637755a6d352ee61ef2b9e2f84705437f4bc43e3f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074604173786",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4443",
+        "mtimeNs": "1791274030965023100",
+        "ctimeNs": "1791274030965023100"
+      }
+    },
+    {
+      "path": "tests/planning-quote-post.test.ts",
+      "bytes": 9633,
+      "sha256": "0c6de077382ffdd474e3e6ed015c73fa03ce0a83257867d25698b6d468b26c46",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511232239",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "9633",
+        "mtimeNs": "1791280772145909100",
+        "ctimeNs": "1791280772145909100"
+      }
+    },
+    {
+      "path": "tests/policy.test.ts",
+      "bytes": 6027,
+      "sha256": "cbf4e321c6ae35001e7f8b48efc15c2b24a33d1d86b78219cc6647048cba43ec",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487793068",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6027",
+        "mtimeNs": "1790949252234251900",
+        "ctimeNs": "1790949446482874400"
+      }
+    },
+    {
+      "path": "tests/producer-input-admission.test.ts",
+      "bytes": 6291,
+      "sha256": "159437ee3f96e6383f0d5b055f9e1c2ab7d7a0c0e12d123d285195d3da1def7e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487942879",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6291",
+        "mtimeNs": "1791281003875320200",
+        "ctimeNs": "1791281003875320200"
+      }
+    },
+    {
+      "path": "tests/producer-input-validation.test.ts",
+      "bytes": 6306,
+      "sha256": "b52d3f900c9375608cadac16d4ebfdaf00d2682ff5d4a11b861eeed03b09e346",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074604094232",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6306",
+        "mtimeNs": "1791281155251873300",
+        "ctimeNs": "1791281155251873300"
+      }
+    },
+    {
+      "path": "tests/product-flow.test.ts",
+      "bytes": 53766,
+      "sha256": "cfcf780a86e8f677d5382792e1dc568fa41e49f68cc16551932045f5cdc484b9",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8162774324767662",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "53766",
+        "mtimeNs": "1791108591107053500",
+        "ctimeNs": "1791108591107053500"
+      }
+    },
+    {
+      "path": "tests/product.test.ts",
+      "bytes": 15291,
+      "sha256": "9d9d8d44709248e41ef60c95677776fcfa3216791570c3050d1dd09f6e236eff",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7881299348057007",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "15291",
+        "mtimeNs": "1790949252236898900",
+        "ctimeNs": "1790949446482874400"
+      }
+    },
+    {
+      "path": "tests/project-planning-ui.test.ts",
+      "bytes": 36715,
+      "sha256": "abab86305d244a060939dcc25841f96696c3fe0d2ef5f61a969e16d3a04edebd",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1688849860329065",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "36715",
+        "mtimeNs": "1791280620922783200",
+        "ctimeNs": "1791280620922783200"
+      }
+    },
+    {
+      "path": "tests/project-planning.test.ts",
+      "bytes": 36687,
+      "sha256": "cb5294b322be483ed481e385aa786bfb21bcaa64eb7496a2ad6913ce14080f1e",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "1970324837050519",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "36687",
+        "mtimeNs": "1791248815118862300",
+        "ctimeNs": "1791248815118862300"
+      }
+    },
+    {
+      "path": "tests/provider-reconciliation.test.ts",
+      "bytes": 23415,
+      "sha256": "126ba6d428f0133d6e36dffcd85142ce0fde09aa842204f1793f2876777ce6d7",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "21955048183533836",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "23415",
+        "mtimeNs": "1791124673754063000",
+        "ctimeNs": "1791124673754063000"
+      }
+    },
+    {
+      "path": "tests/recovery-conditions-ui.test.ts",
+      "bytes": 6182,
+      "sha256": "8b3369bddf0bb60f00f622301b1c62f4c99a3b33cc72cd13bd0321dbd4d7241d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499534234065",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6182",
+        "mtimeNs": "1791184432465265300",
+        "ctimeNs": "1791184432465265300"
+      }
+    },
+    {
+      "path": "tests/recovery-conditions.test.ts",
+      "bytes": 14277,
+      "sha256": "f838a271d4d813d70cbc8b5344074ee68bcf633338a5867bfaff5fa0c51c11c1",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "33214047251874022",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "14277",
+        "mtimeNs": "1791184320362446700",
+        "ctimeNs": "1791184320362446700"
+      }
+    },
+    {
+      "path": "tests/request-origin.test.ts",
+      "bytes": 580,
+      "sha256": "b68dc8d1be703c1e3772d4122cfd117482bd8daa0b72d6881a29648d60fa342d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421820",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "580",
+        "mtimeNs": "1790948162639513100",
+        "ctimeNs": "1790949446483881400"
+      }
+    },
+    {
+      "path": "tests/run-cost.test.ts",
+      "bytes": 5185,
+      "sha256": "579c7abde86e4f8f572ed497da59c06ac8f7df67e57870cf891673ff7630f391",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "11258999069345285",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "5185",
+        "mtimeNs": "1791176307742733500",
+        "ctimeNs": "1791176307742733500"
+      }
+    },
+    {
+      "path": "tests/run-events.test.ts",
+      "bytes": 791,
+      "sha256": "b3925590b0a1c5e46d69fa254eed3183ed5b42a96124154955cad51923e53b1d",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "13792273858841654",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "791",
+        "mtimeNs": "1790953844735154300",
+        "ctimeNs": "1790953844735154300"
+      }
+    },
+    {
+      "path": "tests/run-handoff-ui.test.ts",
+      "bytes": 2600,
+      "sha256": "6c7b8ead023e4224c9b3dd5fd07ed9b847e81ec028e08e59384bc7bdc0572fa2",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "2251799815073142",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2600",
+        "mtimeNs": "1791107569383298000",
+        "ctimeNs": "1791107569383298000"
+      }
+    },
+    {
+      "path": "tests/run-input.test.ts",
+      "bytes": 8852,
+      "sha256": "f1078aa3a0ab7e97927f7ba18308c1cca7eee667aedf43732343802d4537d876",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421821",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8852",
+        "mtimeNs": "1790950931754691100",
+        "ctimeNs": "1790950931754691100"
+      }
+    },
+    {
+      "path": "tests/run-refresh-mapping.test.ts",
+      "bytes": 12452,
+      "sha256": "90a4c9236bbb0a4b21c4752e8290154a20606c97183f0b4661f20d65459e11b6",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "7599824371202687",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12452",
+        "mtimeNs": "1791263338682051000",
+        "ctimeNs": "1791263338682051000"
+      }
+    },
+    {
+      "path": "tests/run-state.test.ts",
+      "bytes": 8682,
+      "sha256": "26bc5c4f31eed83494762195e24ba03b94b5e64918a754ec3408b4ff267a84c4",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421822",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "8682",
+        "mtimeNs": "1790948162644131900",
+        "ctimeNs": "1790949446483881400"
+      }
+    },
+    {
+      "path": "tests/run-status.test.ts",
+      "bytes": 1555,
+      "sha256": "dac42afb75467114d56b8d55ed1f9326e2c26c81b517d2532af0dca52b2ec707",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "18577348463962063",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1555",
+        "mtimeNs": "1791263228304310000",
+        "ctimeNs": "1791263228304310000"
+      }
+    },
+    {
+      "path": "tests/source-delivery.test.mjs",
+      "bytes": 10631,
+      "sha256": "4d2715daf5b7317094584fc4f9664d7da26866e27a8c01a0287e2d1e64c2d5fa",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6473924464421494",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "10631",
+        "mtimeNs": "1791282773711149200",
+        "ctimeNs": "1791282773711149200"
+      }
+    },
+    {
+      "path": "tests/task-budget-feedback.test.ts",
+      "bytes": 13877,
+      "sha256": "de74916ab1174d331365c1e464c2800fd93f14ad52684db051518716e0284b3a",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487934674",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "13877",
+        "mtimeNs": "1791255848951801900",
+        "ctimeNs": "1791255848951801900"
+      }
+    },
+    {
+      "path": "tests/task-contract-editor.test.ts",
+      "bytes": 2347,
+      "sha256": "a823b49a532dc4f572bd48275044d6e7d8fbbd585f6c397d9b56e5591827c0d3",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "23643898043714684",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "2347",
+        "mtimeNs": "1790951196833618300",
+        "ctimeNs": "1790951196833618300"
+      }
+    },
+    {
+      "path": "tests/task-contracts.test.ts",
+      "bytes": 6635,
+      "sha256": "83d1f67f2f5e06b36881e04c8f1ac5f1802dd955dff7bd1a670049b665ff8558",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421823",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "6635",
+        "mtimeNs": "1790951399292792500",
+        "ctimeNs": "1790951399292792500"
+      }
+    },
+    {
+      "path": "tests/task-output-limit.test.ts",
+      "bytes": 1053,
+      "sha256": "e2e30ade3304cb083bd569a6238acc6350544474bfe6a9e012f6485366c8140c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "2533274790559946",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "1053",
+        "mtimeNs": "1791178614986833800",
+        "ctimeNs": "1791178614986833800"
+      }
+    },
+    {
+      "path": "tests/usage-sync.test.ts",
+      "bytes": 4189,
+      "sha256": "b072bd274666b28834e56313683488df468acf3ab203a6a4534099c152c92265",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074605436248",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "4189",
+        "mtimeNs": "1791106805005806900",
+        "ctimeNs": "1791106805005806900"
+      }
+    },
+    {
+      "path": "tests/work-file-project.test.ts",
+      "bytes": 12213,
+      "sha256": "a6ba484094b16bf744ae0af7a45783fd239b61e26efcbc9625fd31319b22739f",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "8444249301478321",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "12213",
+        "mtimeNs": "1791192599109302900",
+        "ctimeNs": "1791192599109302900"
+      }
+    },
+    {
+      "path": "tests/work-files.test.ts",
+      "bytes": 16294,
+      "sha256": "64b4939c2cbf5b9c66540e56dd26aaecf2020ff791197f510ececc473780f81c",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "6192449487793074",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "16294",
+        "mtimeNs": "1790949252237912900",
+        "ctimeNs": "1790949446484878800"
+      }
+    },
+    {
+      "path": "tsconfig.json",
+      "bytes": 442,
+      "sha256": "5704f5f3e3e6823f1d466f05deb86dcd34e04b9ade7142fac371dc3b24b511ce",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4785074605000512",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "442",
+        "mtimeNs": "1790948162648149000",
+        "ctimeNs": "1790949446484878800"
+      }
+    },
+    {
+      "path": "vite.config.ts",
+      "bytes": 409,
+      "sha256": "bb6ee628ee083e182af02c5311d2cc7282817e6eacc01fd4f51eb57f1e420779",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421825",
+        "mode": "33206",
+        "nlink": "1",
+        "size": "409",
+        "mtimeNs": "1790948162649148400",
+        "ctimeNs": "1790949446485878300"
+      }
+    }
+  ],
+  "directories": [
+    {
+      "path": "apps",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5629499535132238",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162463038000",
+        "ctimeNs": "1790949433750853200"
+      }
+    },
+    {
+      "path": "apps/api",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421583",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162421195600",
+        "ctimeNs": "1790949433738661700"
+      }
+    },
+    {
+      "path": "apps/api/src",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421584",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791273941024053400",
+        "ctimeNs": "1791273941024053400"
+      }
+    },
+    {
+      "path": "apps/desktop",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421612",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790949252151028900",
+        "ctimeNs": "1790949433742663000"
+      }
+    },
+    {
+      "path": "apps/web",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421627",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790949252152028400",
+        "ctimeNs": "1790949433750853200"
+      }
+    },
+    {
+      "path": "apps/web/src",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421629",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791263012384128800",
+        "ctimeNs": "1791263012384128800"
+      }
+    },
+    {
+      "path": "dist/web",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "4222124651715040",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791281738655403500",
+        "ctimeNs": "1791281738655403500"
+      }
+    },
+    {
+      "path": "dist/web/assets",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511000307",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791281738657919300",
+        "ctimeNs": "1791281738657919300"
+      }
+    },
+    {
+      "path": "packages",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421686",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162513725100",
+        "ctimeNs": "1790949437412469600"
+      }
+    },
+    {
+      "path": "packages/contracts",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421687",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790949252189522000",
+        "ctimeNs": "1790949437412469600"
+      }
+    },
+    {
+      "path": "scripts",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421724",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791282477983068900",
+        "ctimeNs": "1791282477983068900"
+      }
+    },
+    {
+      "path": "scripts/demo",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "60517119992836609",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790949252196644000",
+        "ctimeNs": "1790949437424533800"
+      }
+    },
+    {
+      "path": "scripts/demo/assets",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "28428972647824047",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790949252195134600",
+        "ctimeNs": "1790949437424533800"
+      }
+    },
+    {
+      "path": "scripts/test-support",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421736",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790950816683003600",
+        "ctimeNs": "1790950816683003600"
+      }
+    },
+    {
+      "path": "services/agent-runtime",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421742",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791279380762537400",
+        "ctimeNs": "1791279380762537400"
+      }
+    },
+    {
+      "path": "services/agent-runtime/test-support",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421780",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162610883200",
+        "ctimeNs": "1790949446469751000"
+      }
+    },
+    {
+      "path": "tests",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421793",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1791282623756328100",
+        "ctimeNs": "1791282623756328100"
+      }
+    },
+    {
+      "path": "tests/fixtures",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421800",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162625466000",
+        "ctimeNs": "1790949446480364900"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5910974511843113",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162631989700",
+        "ctimeNs": "1790949446480364900"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/candidates",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421803",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162628475600",
+        "ctimeNs": "1790949446477835700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/expected",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421807",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162628475600",
+        "ctimeNs": "1790949446478849700"
+      }
+    },
+    {
+      "path": "tests/fixtures/offline-handoff/inputs",
+      "sourceStat": {
+        "dev": "3323815739",
+        "ino": "5348024558421809",
+        "mode": "16822",
+        "nlink": "1",
+        "size": "0",
+        "mtimeNs": "1790948162629982400",
+        "ctimeNs": "1790949446479849900"
+      }
+    }
+  ],
+  "excludedPaths": [
+    "services/agent-runtime/node_modules"
+  ],
+  "fileCount": 342,
+  "totalBytes": 4423076,
+  "contentSha256": "cdc66cc76eeab669b511a01474e6a4cf32529ff4ec3f9cd87691a76a45b11196"
+}

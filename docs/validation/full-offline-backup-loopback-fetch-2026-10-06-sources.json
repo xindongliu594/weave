@@ -1,0 +1,14 @@
+{
+  "sourceStable": true,
+  "exitCode": 0,
+  "sources": [
+    {
+      "sha256": "d244812c9139e4df270f1f37cf49a2f1f56540c4f62fdb9b9747128709e6a163",
+      "path": "scripts/verify-mvp-full-offline-backup.mjs"
+    },
+    {
+      "sha256": "514b562a7476231e00c9ae922d2f4c4c0c75056fb4fa3e8b41173c1d06274b6d",
+      "path": "tests/full-offline-backup.test.mjs"
+    }
+  ]
+}

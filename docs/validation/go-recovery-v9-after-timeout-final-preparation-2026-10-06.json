@@ -1,0 +1,446 @@
+{
+  "checkedAt": "2026-10-06T09:20:01.078Z",
+  "kind": "offline-recovery-v9-final-timeout-binding-complete",
+  "finalBinding": {
+    "path": "docs/test-evidence/go-recovery-v8-timeout-final-binding-2026-10-06.json",
+    "sha256": "fd11be3d9208dd857144d2f2931ac3e1ccb826dcd88ab810d38c86951f058ece"
+  },
+  "helperSource": {
+    "path": "docs/test-evidence/helpers/generate-go-recovery-after-timeout-web-2026-10-06.mjs",
+    "sha256": "64baaca3b6d4ceb628feecd1f782b0149d24ca27f9b8685283b55ee5cf8f1056"
+  },
+  "guardSource": {
+    "path": "docs/test-evidence/helpers/go-recovery-after-timeout-guard-2026-10-06.mjs",
+    "sha256": "15c1575c894fc39ffa80fd6ea8c919bbfd5d52ef6d56824519c69ce799305446"
+  },
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/archive.json",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/export",
+      "status": 200,
+      "bytes": 58681046,
+      "maxBytes": 134217728,
+      "sha256": "d68cae2e102423b4ee39bba30854dbd797aca811d48f79025e848712928b48ea"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/state.json",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5",
+      "status": 200,
+      "bytes": 20839945,
+      "maxBytes": 134217728,
+      "sha256": "459b64eab975ae9fa9904c76096744ee9a9f056cda5ffbb43961d0095e00ec38"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/local-operations.json",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/local-operations",
+      "status": 200,
+      "bytes": 42825,
+      "maxBytes": 52428800,
+      "sha256": "a830bddcce62f324a5782612dc67af6ed69107706091b70438858e3384af27b0"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/artifacts.json",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/artifacts",
+      "status": 200,
+      "bytes": 453,
+      "maxBytes": 52428800,
+      "sha256": "1a1ed1decbe4f2521bc06efc940ca1c662ca4f79df1d269351d5c9464b571c2c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/approvals.json",
+      "method": "GET",
+      "endpoint": "/approvals?runId=c92961f2-5573-4299-82c2-daa7ee13dca5",
+      "status": 200,
+      "bytes": 692,
+      "maxBytes": 52428800,
+      "sha256": "fe39c1e640ed363afa789f976cf3956dc47eb32dda7fec7fab1e0ffb1ec5b6d4"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/readiness.json",
+      "method": "GET",
+      "endpoint": "/projects/3e101c24-87e6-43ea-80f9-a2c4b0b410f4/cost-readiness",
+      "status": 200,
+      "bytes": 127,
+      "maxBytes": 52428800,
+      "sha256": "d4023969fdf35f7f970f8328fa0a3094a5654be4b1bc29e0cb99ccaed9a416a8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/usage.json",
+      "method": "GET",
+      "endpoint": "/usage",
+      "status": 200,
+      "bytes": 276933,
+      "maxBytes": 52428800,
+      "sha256": "6630a0712b3b1ab575f1d06ec6d8df76ad491b993b254d96c26f11d9b26c9b22"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/projects.json",
+      "method": "GET",
+      "endpoint": "/projects",
+      "status": 200,
+      "bytes": 109896,
+      "maxBytes": 52428800,
+      "sha256": "4021d5893c97c565d0a03af4205402ec86fa2c66c2302d9d52e01af4b7e5a507"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/runs.json",
+      "method": "GET",
+      "endpoint": "/runs",
+      "status": 200,
+      "bytes": 13980,
+      "maxBytes": 52428800,
+      "sha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/acceptance.test.mjs",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/artifact?path=acceptance.test.mjs",
+      "status": 200,
+      "bytes": 16824,
+      "maxBytes": 5242880,
+      "sha256": "579c6d73aa1c3bbeaeddaf44f7debc67f1debdfcf7a3f831fef3dc449b82c8b3"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/README.md",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/artifact?path=README.md",
+      "status": 200,
+      "bytes": 3150,
+      "maxBytes": 5242880,
+      "sha256": "8cf02f75b18f2b5aff0319fc981759f450821cef6afeef0bd98629fd145e3bd5"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/server.mjs",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/artifact?path=server.mjs",
+      "status": 200,
+      "bytes": 5937,
+      "maxBytes": 5242880,
+      "sha256": "18e922e5926e98db36ee6aca698c049a409d112cf13051d0581c8432066e6899"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/todo.test.mjs",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/artifact?path=todo.test.mjs",
+      "status": 200,
+      "bytes": 8447,
+      "maxBytes": 5242880,
+      "sha256": "cb7c7b1f427af43130638ef0fa43eac94a8d9c67d4300dd3b241f3d2d02a0d7b"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/archive-after.json",
+      "method": "GET",
+      "endpoint": "/runs/c92961f2-5573-4299-82c2-daa7ee13dca5/export",
+      "status": 200,
+      "bytes": 58681046,
+      "maxBytes": 134217728,
+      "sha256": "d68cae2e102423b4ee39bba30854dbd797aca811d48f79025e848712928b48ea"
+    }
+  ],
+  "sourceEvidence": {
+    "sourceRunId": "c92961f2-5573-4299-82c2-daa7ee13dca5",
+    "sourceVersion": 8,
+    "fixedSourceBindings": [
+      {
+        "path": "docs/test-evidence/funded-run-web-recovery-approve-2026-10-06T07-52-29-812Z-02bf3e15.json",
+        "sha256": "f2ead2e588742e785875d118256d22de7e940cfc979a0c12dc4ec50fc376ebbf"
+      },
+      {
+        "path": "docs/test-evidence/go-headroom-recovery-generate-2026-10-06T05-27-45-597Z-13764fd5.json",
+        "sha256": "39a4cea8e91e4f5c432512139594ce3869d1ea89198511886070967357837ddf"
+      },
+      {
+        "path": "docs/test-evidence/go-headroom-recovery-confirm-2026-10-06T05-31-56-670Z-220ef22e.json",
+        "sha256": "c243d2efe80dbaca3dc5556ce0cc47fc0ce62f4ce22a033c7ae6286e56058ad5"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-09-12-603Z-2a3af4c2.json",
+        "sha256": "b56ca8fc95b8fc5c17228bdce9e0db05c4f3dfa0ce1a8c0f94f30f96759ba16b"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-25-34-925Z-5b2139e2.json",
+        "sha256": "efe6a6bf7436ccc911877a10e0aad8db95c604cab4fe7a8bd1134c7b1db8dbc5"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-42-57-419Z-81e4fd8a.json",
+        "sha256": "c5a4a7ede1121cb044acc085ab727b6fcf8b8d75abf2afd074ecab5fdf999151"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-48-26-691Z-6449795c.json",
+        "sha256": "a5d7386c194c0134d57bba11e42738ad4b39a5f0fe1eefb048398e4214b5e686"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/start-3e101c24-87e6-43ea-80f9-a2c4b0b410f4-v8.json",
+        "sha256": "4e8775e9f650b52f2882c3cbc8a555967d3a4ca21a7afa76ba87af34ce6a5698"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/stop-c92961f2-5573-4299-82c2-daa7ee13dca5.json",
+        "sha256": "133b57718d863cee2d7a31f617d417c89248ed27c72f38f7cb5e674083840d70"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-normal-after-planning-parser-web-2026-10-06.mjs",
+        "sha256": "ec91ec2b21234614cf20ac71e030c1317555da656731e332fe64d9b2feb3f3fe"
+      },
+      {
+        "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+        "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+      }
+    ],
+    "approvalSourceSha256": "f2ead2e588742e785875d118256d22de7e940cfc979a0c12dc4ec50fc376ebbf",
+    "zeroPostStopAttempts": [
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-09-12-603Z-2a3af4c2.json",
+        "sha256": "b56ca8fc95b8fc5c17228bdce9e0db05c4f3dfa0ce1a8c0f94f30f96759ba16b",
+        "posts": 0,
+        "dispatchObserved": false
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-25-34-925Z-5b2139e2.json",
+        "sha256": "efe6a6bf7436ccc911877a10e0aad8db95c604cab4fe7a8bd1134c7b1db8dbc5",
+        "posts": 0,
+        "dispatchObserved": false
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-42-57-419Z-81e4fd8a.json",
+        "sha256": "c5a4a7ede1121cb044acc085ab727b6fcf8b8d75abf2afd074ecab5fdf999151",
+        "posts": 0,
+        "dispatchObserved": false
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-48-26-691Z-6449795c.json",
+        "sha256": "a5d7386c194c0134d57bba11e42738ad4b39a5f0fe1eefb048398e4214b5e686",
+        "posts": 0,
+        "dispatchObserved": false
+      }
+    ],
+    "permanentStartIntentPreserved": true,
+    "permanentStopIntentPreserved": true,
+    "oldApprovalReplayed": false,
+    "oldStopReplayed": false,
+    "controlledInterruptionSucceeded": false,
+    "finalBindingPath": "docs/test-evidence/go-recovery-v8-timeout-final-binding-2026-10-06.json",
+    "finalBindingSha256": "fd11be3d9208dd857144d2f2931ac3e1ccb826dcd88ab810d38c86951f058ece",
+    "finalSourceBindings": [
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/sources.json",
+        "bytes": 6517,
+        "sha256": "aa3a00e91e3a281e7b30433e343a6685b2010b4d4eaa01e9af76b3d65bf644d7"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/archive.json",
+        "bytes": 58681046,
+        "sha256": "d68cae2e102423b4ee39bba30854dbd797aca811d48f79025e848712928b48ea"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/state.json",
+        "bytes": 20839945,
+        "sha256": "459b64eab975ae9fa9904c76096744ee9a9f056cda5ffbb43961d0095e00ec38"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/local-operations.json",
+        "bytes": 42825,
+        "sha256": "a830bddcce62f324a5782612dc67af6ed69107706091b70438858e3384af27b0"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/artifacts.json",
+        "bytes": 453,
+        "sha256": "1a1ed1decbe4f2521bc06efc940ca1c662ca4f79df1d269351d5c9464b571c2c"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/approvals.json",
+        "bytes": 692,
+        "sha256": "fe39c1e640ed363afa789f976cf3956dc47eb32dda7fec7fab1e0ffb1ec5b6d4"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/readiness.json",
+        "bytes": 127,
+        "sha256": "d4023969fdf35f7f970f8328fa0a3094a5654be4b1bc29e0cb99ccaed9a416a8"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/usage.json",
+        "bytes": 276933,
+        "sha256": "6630a0712b3b1ab575f1d06ec6d8df76ad491b993b254d96c26f11d9b26c9b22"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/projects.json",
+        "bytes": 109896,
+        "sha256": "4021d5893c97c565d0a03af4205402ec86fa2c66c2302d9d52e01af4b7e5a507"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/runs.json",
+        "bytes": 13980,
+        "sha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/archive-after.json",
+        "bytes": 58681046,
+        "sha256": "d68cae2e102423b4ee39bba30854dbd797aca811d48f79025e848712928b48ea"
+      }
+    ],
+    "sourceStatus": "failed",
+    "deadlineSeconds": 3600,
+    "deadlineFailed": true,
+    "sourceEventCount": 6800,
+    "wireCalls": 18,
+    "hostCalls": 18,
+    "usageRows": 18,
+    "devAcceptedSeq": 2241,
+    "devTerminal": {
+      "operationId": "1dd6415e-6ef1-4e2c-9922-7f0434d9e197",
+      "started": true,
+      "status": "completed",
+      "exitCode": 0,
+      "tests": 3,
+      "pass": 3
+    },
+    "qaTerminalExecuted": false,
+    "historicalReadiness": {
+      "recordedCost": 0.45568569999999997,
+      "reserved": 0,
+      "availableBudget": 4.3192043,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    },
+    "oldSuccessfulOutputsInheritedIntoVersion9": false
+  },
+  "deadlineEvidence": {
+    "seq": 6800,
+    "code": "RUN_DEADLINE_EXCEEDED",
+    "status": "failed",
+    "message": "运行达到已批准的 3600 秒时限，已停止。已完成任务和文件保留；先核对待结算调用，再恢复未完成任务。"
+  },
+  "exactStateError": "运行达到已批准的 3600 秒时限，已停止。已完成任务和文件保留；先核对待结算调用，再恢复未完成任务。",
+  "dag": [
+    {
+      "taskId": "dev",
+      "kind": "implementation",
+      "dependencies": [],
+      "status": "completed",
+      "attemptId": "575ba79d-edf8-4115-be36-b8ff2cbced78",
+      "acceptedSeq": 2241
+    },
+    {
+      "taskId": "qa_verify",
+      "kind": "verification",
+      "dependencies": [
+        "dev"
+      ],
+      "status": "in_progress",
+      "attemptId": "82663bef-8d01-49f0-b6fc-3bc0cddc97a1",
+      "acceptedSeq": null
+    },
+    {
+      "taskId": "qa_review",
+      "kind": "review",
+      "dependencies": [
+        "dev",
+        "qa_verify"
+      ],
+      "status": "pending",
+      "attemptId": null,
+      "acceptedSeq": null
+    },
+    {
+      "taskId": "manager_accept",
+      "kind": "work",
+      "dependencies": [
+        "qa_review"
+      ],
+      "status": "pending",
+      "attemptId": null,
+      "acceptedSeq": null
+    }
+  ],
+  "devCommand": {
+    "operationId": "1dd6415e-6ef1-4e2c-9922-7f0434d9e197",
+    "approvalId": "23b0651a-ef05-46d6-acaf-8499d2c3cc51",
+    "command": "node --test todo.test.mjs",
+    "exitCode": 0,
+    "observedSeq": 2172,
+    "outputBytes": 312,
+    "outputSha256": "b27b3a012e1c8d87d6246557b3896000f2bc1050770048ffdc6ac1641832b2ec",
+    "nodeTests": {
+      "status": "available",
+      "format": "spec",
+      "tests": 3,
+      "suites": 0,
+      "pass": 3,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "qaTerminalExecuted": false,
+  "managerReportExists": false,
+  "revisionActualCharacters": 3038,
+  "checks": [
+    {
+      "name": "all14 original GET raw source byte counts/SHA verified",
+      "passed": true
+    },
+    {
+      "name": "6800 sequential events and identical repeated archive verified",
+      "passed": true
+    },
+    {
+      "name": "deadline failure distinct from zeroPOST stop attempts",
+      "passed": true
+    },
+    {
+      "name": "actual18 requests/wires/receipts/host calls retained",
+      "passed": true
+    },
+    {
+      "name": "spec3/3 dev receipt and all4 archived artifact bytes verified",
+      "passed": true
+    },
+    {
+      "name": "fake controlled-success binding rejected",
+      "passed": true
+    },
+    {
+      "name": "QA terminal cannot be fabricated as completed",
+      "passed": true
+    },
+    {
+      "name": "host18 cannot silently become19",
+      "passed": true
+    },
+    {
+      "name": "old dev no lateResult promotion",
+      "passed": true
+    },
+    {
+      "name": "full failed run cannot be promoted completed",
+      "passed": true
+    },
+    {
+      "name": "readiness can only match exact final raw",
+      "passed": true
+    }
+  ],
+  "readiness": {
+    "recordedCost": 0.45568569999999997,
+    "reserved": 0,
+    "availableBudget": 4.3192043,
+    "pendingCount": 0,
+    "uncertainCount": 0,
+    "receipts": []
+  },
+  "paidGenerations": 0,
+  "apiCalls": 0,
+  "browserLaunches": 0,
+  "approvals": 0,
+  "serviceOperations": 0,
+  "originalDatabaseOpened": false,
+  "keysRead": false,
+  "employeeArtifactsAuthored": false,
+  "frozenCoreChanged": false,
+  "status": "ready-offline-awaiting-root-parser-loaded-and-single-recovery9-generation-authorization"
+}

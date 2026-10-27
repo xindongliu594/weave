@@ -1,0 +1,526 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-10-06",
+  "outcome": "normal-v10-failed; not promoted to completed acceptance",
+  "mechanical": {
+    "dir": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4",
+    "sources": [
+      {
+        "file": "archive.json",
+        "endpoint": "/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869/export",
+        "url": "http://127.0.0.1:4310/api/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869/export",
+        "method": "GET",
+        "status": 200,
+        "bytes": 37933017,
+        "sha256": "c5bb7ae427f34bdcde86373dcefdf1604f52dea38b02442d193cc4239f978d49"
+      },
+      {
+        "file": "state.json",
+        "endpoint": "/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869",
+        "url": "http://127.0.0.1:4310/api/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10762633,
+        "sha256": "5bedafde15990a62f1814e6bf3e18641e487d61c73b6275a7a8603d1dcfb1591"
+      },
+      {
+        "file": "local-operations.json",
+        "endpoint": "/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869/local-operations",
+        "url": "http://127.0.0.1:4310/api/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869/local-operations",
+        "method": "GET",
+        "status": 200,
+        "bytes": 51768,
+        "sha256": "ad9cf4ce8f1ed1ae731116d0cccd77e445669db0229e6937ff6480b61d93f534"
+      },
+      {
+        "file": "artifacts.json",
+        "endpoint": "/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869/artifacts",
+        "url": "http://127.0.0.1:4310/api/runs/17af4ec6-379e-47bc-9b6b-0afd16d49869/artifacts",
+        "method": "GET",
+        "status": 200,
+        "bytes": 454,
+        "sha256": "a394b22bf4207859bf8bc47b7cee9b66d37b1ca447a9b3e42b52f45101e1169e"
+      },
+      {
+        "file": "cost-readiness.json",
+        "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+        "url": "http://127.0.0.1:4310/api/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+        "method": "GET",
+        "status": 200,
+        "bytes": 264,
+        "sha256": "cf9ac8f044821cbc86d99bb6208f147e1d69c1cf516c562ab4301b00704db7ba"
+      },
+      {
+        "file": "usage.json",
+        "endpoint": "/usage",
+        "url": "http://127.0.0.1:4310/api/usage",
+        "method": "GET",
+        "status": 200,
+        "bytes": 265225,
+        "sha256": "dad6d148b9fbdd38eb8cb2e16e4333dee61ccd8cd7cc6b202c20d86a6ffd5e57"
+      }
+    ],
+    "sourcesIndexSha256": "05f62a7d4a99be7e700f159d70b236ae2659aaa14dd76ce7cc4c6462ee555be7",
+    "runId": "17af4ec6-379e-47bc-9b6b-0afd16d49869",
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "version": 10,
+    "status": "failed",
+    "eventCount": 3047,
+    "completeSequences": true,
+    "sameConfirmedGoBinding": true,
+    "noParentResume": true,
+    "firstOperationFailure": {
+      "seq": 97,
+      "at": "2026-10-06T06:34:13.169Z",
+      "callId": "call_01_dbwj6rr3g59pa6wnpn4veml6",
+      "data": {
+        "name": "filesystem",
+        "classification": "blocked",
+        "code": "Error",
+        "message": "UNDECLARED_INPUT: ."
+      }
+    },
+    "firstOfflineFailure": {
+      "seq": 2379,
+      "at": "2026-10-06T06:47:10.863Z",
+      "callId": "call_01_bl29qz3fac5ink2h4i1frx3j",
+      "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+      "data": {
+        "name": "filesystem",
+        "classification": "failed",
+        "code": "LOCAL_DEVICE_OFFLINE",
+        "message": "本机设备离线，请打开桌面端并启用本机执行"
+      },
+      "nativeStage": [
+        {
+          "seq": 2369,
+          "at": "2026-10-06T06:47:04.018Z",
+          "type": "session/tool/call",
+          "taskId": "t3",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "callId": "call_01_bl29qz3fac5ink2h4i1frx3j",
+          "name": "filesystem",
+          "arguments": "{\"path\": \"server.mjs\"}"
+        },
+        {
+          "seq": 2370,
+          "at": "2026-10-06T06:47:04.322Z",
+          "type": "tool/start",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "callId": "call_01_bl29qz3fac5ink2h4i1frx3j",
+          "name": "filesystem",
+          "arguments": {
+            "path": "server.mjs"
+          }
+        },
+        {
+          "seq": 2379,
+          "at": "2026-10-06T06:47:10.863Z",
+          "type": "runtime/operation-failed",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "callId": "call_01_bl29qz3fac5ink2h4i1frx3j",
+          "name": "filesystem",
+          "code": "LOCAL_DEVICE_OFFLINE",
+          "classification": "failed",
+          "message": "本机设备离线，请打开桌面端并启用本机执行"
+        },
+        {
+          "seq": 2381,
+          "at": "2026-10-06T06:47:11.498Z",
+          "type": "tool/result",
+          "taskId": "t3",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "callId": "call_01_bl29qz3fac5ink2h4i1frx3j",
+          "name": "filesystem"
+        }
+      ],
+      "matchingQueueOrFinishEvents": 0,
+      "matchingLocalOperationRows": 0,
+      "claimedAndStartedForThisRead": "not-evidenced; no row/queue, not inferred as zero"
+    },
+    "handoffBlocked": {
+      "seq": 2380,
+      "at": "2026-10-06T06:47:11.172Z",
+      "data": {
+        "taskId": "qa_review",
+        "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d",
+        "message": "本机设备离线，请打开桌面端并启用本机执行"
+      }
+    },
+    "terminals": [
+      {
+        "id": "3dede00d-b84a-4b39-901e-9bc3c7b3887a",
+        "status": "completed",
+        "started": true,
+        "context": {
+          "callId": "call_00_q1r51zpmxw7c9zl27gmox5qc",
+          "taskId": "dev",
+          "agentId": "employee-2",
+          "attemptId": "0025a1f4-e000-4508-bce8-46fde4fb3039",
+          "sessionId": "f9871f30-8b51-4b1b-a560-23ca99e883a0",
+          "approvalId": "763fe5d0-4141-4667-a698-97c28b30cf7c",
+          "employeeId": "developer"
+        },
+        "command": "node --test todo.test.mjs",
+        "result": {
+          "exitCode": 0,
+          "bytes": 613,
+          "sha256": "932da245a4c80f6efa95494f28a30d50f3cefb9d46f329ca891aaa509104d1da",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 6,
+            "suites": 0,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        "lateResult": null
+      },
+      {
+        "id": "fcd3836d-9e2b-4ace-a928-432e14682da6",
+        "status": "completed",
+        "started": true,
+        "context": {
+          "callId": "call_00_ukng55bj6v6ypiyykh65k8w8",
+          "taskId": "qa_verify",
+          "agentId": "employee-3",
+          "attemptId": "2412de6b-0dee-4cc0-bcc0-a8c70a764e84",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "approvalId": "91332592-fd12-47da-a7f7-c50ba8cc7846",
+          "employeeId": "qa"
+        },
+        "command": "node --test todo.test.mjs",
+        "result": {
+          "exitCode": 0,
+          "bytes": 611,
+          "sha256": "c065ad74e8b2580c3fa6b7af5e70e85adbabd12a141cf3d0a41304682a484e32",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 6,
+            "suites": 0,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        "lateResult": null
+      },
+      {
+        "id": "71bc95d6-2ce8-4c04-9006-096b820253b3",
+        "status": "completed",
+        "started": true,
+        "context": {
+          "callId": "call_00_8zxejr7q8o5d0lasmc6qr103",
+          "taskId": "qa_verify",
+          "agentId": "employee-3",
+          "attemptId": "2412de6b-0dee-4cc0-bcc0-a8c70a764e84",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "approvalId": "ed2a2fa1-8593-4613-84ec-93bf87f0ab07",
+          "employeeId": "qa"
+        },
+        "command": "node --test acceptance.test.mjs",
+        "result": {
+          "exitCode": 0,
+          "bytes": 483,
+          "sha256": "c4754253a2c0a9977e6a78be04601e3fb014ad73faa7fab6340942f9fe986b2a",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 4,
+            "suites": 0,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        "lateResult": null
+      },
+      {
+        "id": "0d60ab30-c78a-4ea9-95a3-1178e6fded91",
+        "status": "completed",
+        "started": true,
+        "context": {
+          "callId": "call_00_9rwvbhhjoh7bvsl8yl27b0lh",
+          "taskId": "qa_review",
+          "agentId": "employee-3",
+          "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "approvalId": "fc3eb82a-ea27-4f12-9cce-2a164931c0cc",
+          "employeeId": "qa"
+        },
+        "command": "node --test todo.test.mjs",
+        "result": {
+          "exitCode": 0,
+          "bytes": 612,
+          "sha256": "59f8ce99fd21e06bae37524918f444a479ca0303b505e1fc8a8311a6cf253ee7",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 6,
+            "suites": 0,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        "lateResult": null
+      },
+      {
+        "id": "3da22277-75c8-4cf8-8749-9f882ad98c14",
+        "status": "completed",
+        "started": true,
+        "context": {
+          "callId": "call_00_ts5ricbs8hm35aq76f25iakl",
+          "taskId": "qa_review",
+          "agentId": "employee-3",
+          "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d",
+          "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+          "approvalId": "d51504e5-dafa-4acd-be11-84a1e9f4cc56",
+          "employeeId": "qa"
+        },
+        "command": "node --test acceptance.test.mjs",
+        "result": {
+          "exitCode": 0,
+          "bytes": 483,
+          "sha256": "079d910d8a4fe262c9f8b45fd446386ba78771435b1c4a02fe9a93b5cba42209",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 4,
+            "suites": 0,
+            "pass": 4,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        "lateResult": null
+      }
+    ],
+    "completed": [
+      "dev",
+      "qa_verify",
+      "qa_review"
+    ],
+    "taskStates": [
+      {
+        "id": "dev",
+        "status": "completed",
+        "attemptId": "0025a1f4-e000-4508-bce8-46fde4fb3039"
+      },
+      {
+        "id": "qa_verify",
+        "status": "completed",
+        "attemptId": "2412de6b-0dee-4cc0-bcc0-a8c70a764e84"
+      },
+      {
+        "id": "qa_review",
+        "status": "completed",
+        "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d",
+        "verdict": "pass"
+      },
+      {
+        "id": "manager_accept",
+        "status": "failed",
+        "attemptId": "361b214d-e76f-403b-ade1-78c88375433e"
+      }
+    ],
+    "accepted": [
+      {
+        "seq": 1000,
+        "taskId": "dev",
+        "attemptId": "0025a1f4-e000-4508-bce8-46fde4fb3039",
+        "acceptedAt": "2026-10-06T06:37:50.987Z"
+      },
+      {
+        "seq": 2137,
+        "taskId": "qa_verify",
+        "attemptId": "2412de6b-0dee-4cc0-bcc0-a8c70a764e84",
+        "acceptedAt": "2026-10-06T06:45:12.028Z"
+      },
+      {
+        "seq": 2996,
+        "taskId": "qa_review",
+        "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d",
+        "acceptedAt": "2026-10-06T06:53:57.136Z"
+      }
+    ],
+    "manager": {
+      "operations": 0,
+      "modelWireCalls": 0,
+      "reportExists": false,
+      "taskState": "failed"
+    },
+    "unknownOperations": [],
+    "readiness": {
+      "recordedCost": 1.6647368,
+      "reserved": 0.096526,
+      "availableBudget": 2.4184372000000005,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+          "amount": 0.096526,
+          "status": "uncertain",
+          "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+        }
+      ]
+    },
+    "childUsage": {
+      "count": 34,
+      "cost": 0.3499592999999998,
+      "wireCount": 34,
+      "byTask": {
+        "dev": {
+          "calls": 9,
+          "cost": 0.07611689999999999
+        },
+        "qa_verify": {
+          "calls": 9,
+          "cost": 0.10034069999999999
+        },
+        "captain": {
+          "calls": 8,
+          "cost": 0.046166099999999995
+        },
+        "qa_review": {
+          "calls": 8,
+          "cost": 0.1273356
+        }
+      },
+      "idsUnique": true
+    },
+    "unconfirmed": [
+      {
+        "seq": 3037,
+        "data": {
+          "id": "e42313c3-2248-4af7-9abb-46c29ad8ffe8",
+          "dispatched": false,
+          "code": "CALL_INTERRUPTED"
+        }
+      }
+    ],
+    "budgetEvidence": {
+      "status": "available",
+      "sourceRunId": "17af4ec6-379e-47bc-9b6b-0afd16d49869",
+      "checkpointSeq": 3046,
+      "checkpointAt": "2026-10-06T06:54:25.407Z",
+      "capturedAt": "2026-10-06T06:54:24.952Z",
+      "point": "runtime-checkpoint",
+      "subsequentAccountingEvents": 0,
+      "currentAtSourceEnd": true,
+      "project": {
+        "limit": 4.1797,
+        "occupied": 1.7612627999999997,
+        "activeReserved": 0,
+        "available": 2.4184372000000005,
+        "callsUsed": 36,
+        "callLimit": 100,
+        "callsBasis": "host-reserved-model-attempts"
+      },
+      "sourceAdmission": {
+        "basis": "run-admission-snapshot",
+        "recordedCost": 1.3147775,
+        "retainedUnknownReservation": 0.096526,
+        "availableBudget": 2.7683965000000006,
+        "callsUsed": null,
+        "callsBasis": "archived-model-wire-request-count",
+        "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+      }
+    },
+    "admittedExecutionTarget": {
+      "kind": "local",
+      "name": "本机 Node 执行器",
+      "label": "workspaces",
+      "grantId": "1623c09f-f70b-47ad-ac18-dc738c64e2a2",
+      "deviceId": "911a42a6-a0b1-45f8-a2dc-e71e149a4f59",
+      "platform": "win32",
+      "allowCommands": true
+    },
+    "currentDeviceLastSeenCaptured": false
+  },
+  "operationObservationFailure": {
+    "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T06-52-24-306Z-fb280e44.json",
+    "sha256": "fb3bff37abecb4e1180abd09cfcbf5d2f56936f6b0801bf70010c15d4cae9336",
+    "acknowledgedPost": {
+      "endpoint": "/approvals/d51504e5-dafa-4acd-be11-84a1e9f4cc56",
+      "count": 1,
+      "httpStatus": 200
+    },
+    "error": "finally observation generic failure; no failing HTTP status/endpoint was captured",
+    "lastCapturedSources": [
+      "/usage HTTP200",
+      "/projects HTTP200"
+    ],
+    "afterBudgetFrameAvailable": false,
+    "notInferredAsRunFailure": true,
+    "actualTerminalResultSeparatelyVerified": true
+  },
+  "planning": {
+    "generate": {
+      "path": "docs/test-evidence/go-heartbeat-normal-generate-2026-10-06T06-31-05-736Z-a029de67.json",
+      "sha256": "42d99bb8898ac29bedc5e2a76f3fc8eb705d724c34d8b789588a6dad251924e0",
+      "httpStatus": 200,
+      "posts": 1,
+      "valid": true,
+      "fee": 0.0072444,
+      "receiptId": "8d005a44-6159-407c-ba77-37429c43c3d9"
+    },
+    "confirmation": {
+      "path": "docs/test-evidence/go-heartbeat-normal-confirm-2026-10-06T06-32-35-063Z-4926d956.json",
+      "sha256": "dfea86f343c287b83f40eafa3c1eca0d94113acd0e58f6ee69767363ff75d5e1",
+      "httpStatus": 200,
+      "posts": 2,
+      "cachedSameKeySameBody": true,
+      "newUsageOnConfirmation": false
+    },
+    "operatorSource": {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    "generationHelper": {
+      "path": "docs/test-evidence/helpers/generate-go-normal-after-heartbeat-web-2026-10-06.mjs",
+      "sha256": "0c6e0f622b8c02756e21fcbfbc618c9f99aa788cd8a5133c7b3db70bfdae1062"
+    }
+  },
+  "priorOperationIndex": {
+    "path": "docs/validation/go-normal-v10-operation-chain-pending-2026-10-06.json",
+    "sha256": "638b853d0481929781127e1f1befb98233a9b8fb5dccd501e0ed41b89a5f71d9",
+    "historicalPendingRecordPreserved": true
+  },
+  "scope": {
+    "oneAuthorizedPaidPlanningRound": true,
+    "employeeModelsRealGo": true,
+    "employeeFilesEditedByCodex": false,
+    "employeeCommandsExecutedDirectlyByCodex": false,
+    "originalDatabaseOpenedDirectly": false,
+    "keysRead": false,
+    "afterObservationFailureMutations": 0,
+    "authorizedRawReadCaptureCompleted": true,
+    "noApproveResumeGenerateCancelAfterBusinessFailure": true,
+    "noOldOperationReplay": true,
+    "noOldLateResultPromotion": true,
+    "recoveryProjectUnchanged": true,
+    "deliveryCompletedInspectorExecuted": false
+  },
+  "limitations": [
+    "No completed normal or manager acceptance-report exists for this v10 Run.",
+    "Current device.lastSeen/claimed fields were not captured; missing queue/row for the failed read is not a fabricated started=false.",
+    "The v10 read failure occurred before enqueue evidence. Root classified the admission soft-heartbeat gate for source review; this report does not infer a Go provider failure or terminal late-result failure.",
+    "Host callsUsed=36 versus 34 wires is preserved; durable row reconciliation belongs to the root/runtime investigation and is not estimated as zero.",
+    "Earlier tentative sticky-QA interpretation is superseded: QA review was later host accepted; manager final state was failed without a model wire or employee local operation."
+  ]
+}

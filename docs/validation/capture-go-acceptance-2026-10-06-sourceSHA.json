@@ -1,0 +1,62 @@
+{
+  "kind": "unexecuted-Go-capture-helper-engineering-validation",
+  "startedAt": "2026-10-06T04:01:19.0785457Z",
+  "finishedAt": "2026-10-06T04:01:19.3791794Z",
+  "syntaxExit": 0,
+  "pureFixtureExit": 0,
+  "pureChecks": 8,
+  "sourceStable": true,
+  "before": [
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-2026-10-06.mjs",
+      "sha256": "350f9a3c27f121fbfa301a596a730913bf4be6450b242479b6d9de972717cd9e"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs",
+      "sha256": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54"
+    },
+    {
+      "path": "tests/go-todo-acceptance-audit.test.mjs",
+      "sha256": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-funded-todo-acceptance-2026-10-05.mjs",
+      "sha256": "2f2bd665fd98e18d6aaffb09a817e682c31d56311c5cc6281c6237b71dba7dcb"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    }
+  ],
+  "after": [
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-2026-10-06.mjs",
+      "sha256": "350f9a3c27f121fbfa301a596a730913bf4be6450b242479b6d9de972717cd9e"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs",
+      "sha256": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54"
+    },
+    {
+      "path": "tests/go-todo-acceptance-audit.test.mjs",
+      "sha256": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-funded-todo-acceptance-2026-10-05.mjs",
+      "sha256": "2f2bd665fd98e18d6aaffb09a817e682c31d56311c5cc6281c6237b71dba7dcb"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    }
+  ],
+  "scope": "Only node --check and in-memory fake HTTP/predicate checks. Actual capture main, product/API/provider/DB/employee commands were never invoked."
+}

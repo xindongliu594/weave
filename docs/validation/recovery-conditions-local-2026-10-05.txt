@@ -1,0 +1,137 @@
+Recovery conditions local validation — 2026-10-05
+
+Scope: isolated PGlite databases/temporary archives and local React rendering only. No original product database/service mutation, no external provider inference.
+Initial integration attempt: 2 passed / 3 failed because the new test's state() incorrectly ordered request_keys by nonexistent id. The fixture query now orders row JSON. This was a test capture fix, not a product guard failure.
+
+Command: node scripts/test-integration.mjs tests/recovery-conditions.test.ts tests/cost-carryover.test.ts
+Exit code: 0
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1419.1557ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (207.8204ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (177.3726ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (140.0979ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (141.365ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (152.127ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (115.7045ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3098.0629
+✔ approval blocks uncertain fees by default and an in-flight call still blocks explicit carryover (2333.116ms)
+✔ opt-in approval freezes net budget while old unknown plus live reservation cover exact global and departmental daily caps once (224.1744ms)
+✔ global live-run coverage still charges uncovered holds to the actual participating department (248.2025ms)
+✔ insufficient original or daily budget rejects opt-in approval without changing unknown receipts (339.6609ms)
+✔ retry retains the default gate and pending calls cannot be carried over even with explicit opt-in (246.8912ms)
+✔ opt-in checkpoint resume inherits unknown wire calls and dispatches only the unfinished task through the local model (2412.4014ms)
+✔ an unknown task hold exhausts its original cap before retry even when the project still has funds (199.3692ms)
+✔ an unknown wire attempt still exhausts the original retry call cap rather than resetting on carryover (191.2859ms)
+✔ a late bill above its old hold fences every new reservation by total project cost, including parallel admission (223.6097ms)
+✔ ordinary late settlement preserves history and never enlarges an already approved run allocation (188.1067ms)
+✔ readiness and approved carryover expose only bounded receipt identities and amounts, never credentials or original context (210.5421ms)
+✔ new-plan carryover approval cannot silently replay a prior native operation with an unknown outcome (167.5213ms)
+✔ a model-only 403 with a confirmed native operation can retain its hold when a new plan is explicitly approved (175.4029ms)
+✔ new-plan carryover refuses missing or incomplete original run evidence instead of treating it as a known operation outcome (268.818ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7955.4029
+
+Command: node --import tsx --test tests/recovery-conditions-ui.test.ts tests/cost-carryover-ui.test.ts tests/run-cost.test.ts
+Exit code: 0
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (13.5119ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.4695ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.0453ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (14.2719ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.3891ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.5672ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (1.0015ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (26.8448ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (15.773ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.58ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (3.0223ms)
+✔ normal execution includes the saved planning cost in project spend (1.4583ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (11.2341ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.4241ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.4913ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (0.873ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (0.7399ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 557.887
+
+Command: npx tsc --noEmit
+Exit code: 0
+(no diagnostics)
+
+Final source after unknown-operation identity protection:
+
+Command: node scripts/test-integration.mjs tests/recovery-conditions.test.ts
+Exit code: 0
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1448.3039ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (208.5112ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (198.0898ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (153.1728ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (146.496ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (145.3481ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (116.5072ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3170.3596
+
+Command: node --import tsx --test tests/recovery-conditions-ui.test.ts tests/cost-carryover-ui.test.ts tests/run-cost.test.ts
+Exit code: 0
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (22.2708ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.6054ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.0643ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (15.2744ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.4212ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.7105ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (1.0671ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (36.2054ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (20.5549ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (2.0735ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (3.2927ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.6563ms)
+✔ normal execution includes the saved planning cost in project spend (1.6156ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (10.2089ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.6924ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.9336ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (1.7049ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (1.3217ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 626.1123
+
+Command: npx tsc --noEmit
+Exit code: 0
+(no diagnostics)
+
+
+
+

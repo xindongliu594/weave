@@ -1,0 +1,14 @@
+✔ one exact object, one fence, or short surrounding prose preserves the whole candidate (3.3675ms)
+✔ quoted braces, escaped quotes/backslashes/newlines and nested containers never split the object (0.4062ms)
+✔ multiple candidates, alternative scalar values and malformed fence boundaries are rejected (0.9012ms)
+✔ truncated strings/containers, invalid escape/control characters and syntax are never repaired (0.6361ms)
+✔ output byte, nesting depth and outside text ceilings are exact and do not clip data (11.1023ms)
+✔ failure diagnostics contain safe scalars and original SHA without echoing provider text or keys (0.9332ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 426.1939

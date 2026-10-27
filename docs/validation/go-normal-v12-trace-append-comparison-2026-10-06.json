@@ -1,0 +1,519 @@
+{
+  "checkedAt": "2026-10-06T11:19:19.197Z",
+  "kind": "sealed-v12-isolated-trace-append-comparison",
+  "fixture": {
+    "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/archive.json",
+    "sha256": "aee0d4ab736dcb63e463d532b70782756fd2d57a1545e23d7fef79e7af366a2f",
+    "eventCount": 2867,
+    "snapshotSha256": "270b9c248a474450faf9b28c8ab29ed556ca9ce4c709223d65226800df36babc",
+    "fixtureJournalSha256": "343bbfb4cbcea2b0c47132924e0bede6004b0cd19eb568abbb86eb965866b927",
+    "fixtureJournalBytes": 31503327,
+    "note": "Canonical snapshot/events exported from the sealed archive; the complete event content and snapshot hash strictly verified. No original journal was accessed."
+  },
+  "nodeVersion": "v24.19.0",
+  "before": {
+    "reportPath": "docs/test-evidence/go-normal-v12-trace-append-offline-2026-10-06T11-18-10-047Z-bf191b15/performance.json",
+    "reportSha256": "4f85b689bd0ca4e33c2bb55e4cd1dc0fdb049361ae1ad22ae2940f0bfd239ae6",
+    "source": {
+      "path": "docs/test-evidence/helpers/trace-store-before-append-cursor-2026-10-06.mjs",
+      "mode": "baseline",
+      "derivation": {
+        "mode": "parent-frozen-pre-append-source-exact-SHA-verified",
+        "from": "docs/test-evidence/helpers/trace-store-before-append-cursor-2026-10-06.mjs",
+        "manifestPath": "docs/validation/trace-list-cache-2026-10-06-sourceSHA.json",
+        "manifestSha256": "b9ccac283ca9faa37e9e5a755d76cd9584b6ecded38199d973de22e0efccb946",
+        "exactExpectedSourceSha256": "0cf0d4c7a84e689d7d4bd181e6642d99a6611e4ba1a09def7de4cd016d2196ba"
+      },
+      "sha256": "0cf0d4c7a84e689d7d4bd181e6642d99a6611e4ba1a09def7de4cd016d2196ba",
+      "frozenCopy": "docs/test-evidence/go-normal-v12-trace-append-offline-2026-10-06T11-18-10-047Z-bf191b15/trace-store-source.mjs"
+    },
+    "openMs": 345.83889999999997,
+    "fullReadMs": 376.47079999999914,
+    "batch": {
+      "size": 40,
+      "eventType": "benchmark/light-event",
+      "payloadBytes": 35,
+      "totalMs": 15526.008299999998,
+      "minMs": 335.48109999999997,
+      "medianMs": 391.9221000000007,
+      "p95Ms": 416.1407999999992,
+      "maxMs": 425.02900000000045,
+      "timings": [
+        {
+          "index": 0,
+          "seq": 2868,
+          "elapsedMs": 384.19799999999987
+        },
+        {
+          "index": 1,
+          "seq": 2869,
+          "elapsedMs": 381.53229999999985
+        },
+        {
+          "index": 2,
+          "seq": 2870,
+          "elapsedMs": 396.9485999999997
+        },
+        {
+          "index": 3,
+          "seq": 2871,
+          "elapsedMs": 351.9194000000002
+        },
+        {
+          "index": 4,
+          "seq": 2872,
+          "elapsedMs": 391.9304000000002
+        },
+        {
+          "index": 5,
+          "seq": 2873,
+          "elapsedMs": 362.8492000000001
+        },
+        {
+          "index": 6,
+          "seq": 2874,
+          "elapsedMs": 384.7165
+        },
+        {
+          "index": 7,
+          "seq": 2875,
+          "elapsedMs": 384.8296
+        },
+        {
+          "index": 8,
+          "seq": 2876,
+          "elapsedMs": 393.71270000000004
+        },
+        {
+          "index": 9,
+          "seq": 2877,
+          "elapsedMs": 379.39830000000075
+        },
+        {
+          "index": 10,
+          "seq": 2878,
+          "elapsedMs": 390.0723000000007
+        },
+        {
+          "index": 11,
+          "seq": 2879,
+          "elapsedMs": 398.77769999999964
+        },
+        {
+          "index": 12,
+          "seq": 2880,
+          "elapsedMs": 335.48109999999997
+        },
+        {
+          "index": 13,
+          "seq": 2881,
+          "elapsedMs": 391.9221000000007
+        },
+        {
+          "index": 14,
+          "seq": 2882,
+          "elapsedMs": 420.2025999999996
+        },
+        {
+          "index": 15,
+          "seq": 2883,
+          "elapsedMs": 392.22090000000026
+        },
+        {
+          "index": 16,
+          "seq": 2884,
+          "elapsedMs": 414.83820000000014
+        },
+        {
+          "index": 17,
+          "seq": 2885,
+          "elapsedMs": 405.8716000000004
+        },
+        {
+          "index": 18,
+          "seq": 2886,
+          "elapsedMs": 394.8639999999996
+        },
+        {
+          "index": 19,
+          "seq": 2887,
+          "elapsedMs": 352.9367000000002
+        },
+        {
+          "index": 20,
+          "seq": 2888,
+          "elapsedMs": 409.1327999999994
+        },
+        {
+          "index": 21,
+          "seq": 2889,
+          "elapsedMs": 402.8789000000015
+        },
+        {
+          "index": 22,
+          "seq": 2890,
+          "elapsedMs": 394.16150000000016
+        },
+        {
+          "index": 23,
+          "seq": 2891,
+          "elapsedMs": 379.0799999999999
+        },
+        {
+          "index": 24,
+          "seq": 2892,
+          "elapsedMs": 390.9982
+        },
+        {
+          "index": 25,
+          "seq": 2893,
+          "elapsedMs": 370.8076999999994
+        },
+        {
+          "index": 26,
+          "seq": 2894,
+          "elapsedMs": 356.7042000000001
+        },
+        {
+          "index": 27,
+          "seq": 2895,
+          "elapsedMs": 385.4296000000013
+        },
+        {
+          "index": 28,
+          "seq": 2896,
+          "elapsedMs": 379.8824000000004
+        },
+        {
+          "index": 29,
+          "seq": 2897,
+          "elapsedMs": 394.6958000000013
+        },
+        {
+          "index": 30,
+          "seq": 2898,
+          "elapsedMs": 358.419100000001
+        },
+        {
+          "index": 31,
+          "seq": 2899,
+          "elapsedMs": 416.1407999999992
+        },
+        {
+          "index": 32,
+          "seq": 2900,
+          "elapsedMs": 425.02900000000045
+        },
+        {
+          "index": 33,
+          "seq": 2901,
+          "elapsedMs": 368.15660000000025
+        },
+        {
+          "index": 34,
+          "seq": 2902,
+          "elapsedMs": 402.29030000000057
+        },
+        {
+          "index": 35,
+          "seq": 2903,
+          "elapsedMs": 399.0697
+        },
+        {
+          "index": 36,
+          "seq": 2904,
+          "elapsedMs": 401.4994000000006
+        },
+        {
+          "index": 37,
+          "seq": 2905,
+          "elapsedMs": 376.3198999999986
+        },
+        {
+          "index": 38,
+          "seq": 2906,
+          "elapsedMs": 390.67139999999927
+        },
+        {
+          "index": 39,
+          "seq": 2907,
+          "elapsedMs": 412.4251000000004
+        }
+      ],
+      "timersFiredDuringBatch": 0,
+      "timerIntervalMs": 100,
+      "timerObservations": [
+        {
+          "tick": 1,
+          "elapsedMs": 15526.707400000001,
+          "latenessMs": 15426.707400000001
+        },
+        {
+          "tick": 2,
+          "elapsedMs": 15632.9037,
+          "latenessMs": 15432.9037
+        },
+        {
+          "tick": 3,
+          "elapsedMs": 15739.8071,
+          "latenessMs": 15439.8071
+        }
+      ]
+    }
+  },
+  "firstAfter": {
+    "reportPath": "docs/test-evidence/go-normal-v12-trace-append-offline-2026-10-06T11-15-48-245Z-488c2aec/performance.json",
+    "reportSha256": "80b6a18e6ab9dc2cd352b941e0a5177e11f0b9e62ea61e28d8e4c67cb40fe986",
+    "source": {
+      "path": "services/agent-runtime/trace-store.mjs",
+      "sha256": "7a1773a873830c7e0660dcab40dd1332c8d5852902d8284b0831fdcbe5856f25",
+      "frozenCopy": "docs/test-evidence/go-normal-v12-trace-append-offline-2026-10-06T11-15-48-245Z-488c2aec/trace-store-source.mjs"
+    },
+    "openMs": 334.77139999999997,
+    "fullReadMs": 339.64480000000003,
+    "batch": {
+      "size": 40,
+      "eventType": "benchmark/light-event",
+      "payloadBytes": 35,
+      "totalMs": 76.625,
+      "minMs": 1.2212999999999283,
+      "medianMs": 1.3824000000001888,
+      "p95Ms": 1.8366000000000895,
+      "maxMs": 19.52859999999987,
+      "timings": [
+        {
+          "index": 0,
+          "seq": 2868,
+          "elapsedMs": 19.52859999999987
+        },
+        {
+          "index": 1,
+          "seq": 2869,
+          "elapsedMs": 1.8871000000001459
+        },
+        {
+          "index": 2,
+          "seq": 2870,
+          "elapsedMs": 1.5961999999999534
+        },
+        {
+          "index": 3,
+          "seq": 2871,
+          "elapsedMs": 1.4083000000000538
+        },
+        {
+          "index": 4,
+          "seq": 2872,
+          "elapsedMs": 1.5290999999999713
+        },
+        {
+          "index": 5,
+          "seq": 2873,
+          "elapsedMs": 1.3378999999999905
+        },
+        {
+          "index": 6,
+          "seq": 2874,
+          "elapsedMs": 1.3674000000000888
+        },
+        {
+          "index": 7,
+          "seq": 2875,
+          "elapsedMs": 1.6449999999999818
+        },
+        {
+          "index": 8,
+          "seq": 2876,
+          "elapsedMs": 1.8366000000000895
+        },
+        {
+          "index": 9,
+          "seq": 2877,
+          "elapsedMs": 1.5913000000000466
+        },
+        {
+          "index": 10,
+          "seq": 2878,
+          "elapsedMs": 1.7433000000000902
+        },
+        {
+          "index": 11,
+          "seq": 2879,
+          "elapsedMs": 1.376299999999901
+        },
+        {
+          "index": 12,
+          "seq": 2880,
+          "elapsedMs": 1.4545000000000528
+        },
+        {
+          "index": 13,
+          "seq": 2881,
+          "elapsedMs": 1.5036999999999807
+        },
+        {
+          "index": 14,
+          "seq": 2882,
+          "elapsedMs": 1.4636000000000422
+        },
+        {
+          "index": 15,
+          "seq": 2883,
+          "elapsedMs": 1.2673999999999523
+        },
+        {
+          "index": 16,
+          "seq": 2884,
+          "elapsedMs": 1.2288999999998396
+        },
+        {
+          "index": 17,
+          "seq": 2885,
+          "elapsedMs": 1.4297999999998865
+        },
+        {
+          "index": 18,
+          "seq": 2886,
+          "elapsedMs": 1.2508000000000266
+        },
+        {
+          "index": 19,
+          "seq": 2887,
+          "elapsedMs": 1.2523000000001048
+        },
+        {
+          "index": 20,
+          "seq": 2888,
+          "elapsedMs": 1.440499999999929
+        },
+        {
+          "index": 21,
+          "seq": 2889,
+          "elapsedMs": 1.3103000000000975
+        },
+        {
+          "index": 22,
+          "seq": 2890,
+          "elapsedMs": 1.2874000000001615
+        },
+        {
+          "index": 23,
+          "seq": 2891,
+          "elapsedMs": 1.3824000000001888
+        },
+        {
+          "index": 24,
+          "seq": 2892,
+          "elapsedMs": 1.6405999999999494
+        },
+        {
+          "index": 25,
+          "seq": 2893,
+          "elapsedMs": 1.2983000000001539
+        },
+        {
+          "index": 26,
+          "seq": 2894,
+          "elapsedMs": 1.3132000000000517
+        },
+        {
+          "index": 27,
+          "seq": 2895,
+          "elapsedMs": 1.2837999999999283
+        },
+        {
+          "index": 28,
+          "seq": 2896,
+          "elapsedMs": 1.4955999999999676
+        },
+        {
+          "index": 29,
+          "seq": 2897,
+          "elapsedMs": 1.389399999999796
+        },
+        {
+          "index": 30,
+          "seq": 2898,
+          "elapsedMs": 1.291700000000219
+        },
+        {
+          "index": 31,
+          "seq": 2899,
+          "elapsedMs": 1.565900000000056
+        },
+        {
+          "index": 32,
+          "seq": 2900,
+          "elapsedMs": 1.4484999999999673
+        },
+        {
+          "index": 33,
+          "seq": 2901,
+          "elapsedMs": 1.2702999999999065
+        },
+        {
+          "index": 34,
+          "seq": 2902,
+          "elapsedMs": 1.3054999999999382
+        },
+        {
+          "index": 35,
+          "seq": 2903,
+          "elapsedMs": 1.2454000000000178
+        },
+        {
+          "index": 36,
+          "seq": 2904,
+          "elapsedMs": 1.2758000000001175
+        },
+        {
+          "index": 37,
+          "seq": 2905,
+          "elapsedMs": 1.2212999999999283
+        },
+        {
+          "index": 38,
+          "seq": 2906,
+          "elapsedMs": 1.2990000000002055
+        },
+        {
+          "index": 39,
+          "seq": 2907,
+          "elapsedMs": 1.3584999999998217
+        }
+      ],
+      "timersFiredDuringBatch": 0,
+      "timerIntervalMs": 100,
+      "timerObservations": [
+        {
+          "tick": 1,
+          "elapsedMs": 111.62670000000003,
+          "latenessMs": 11.626700000000028
+        },
+        {
+          "tick": 2,
+          "elapsedMs": 220.7251000000001,
+          "latenessMs": 20.72510000000011
+        },
+        {
+          "tick": 3,
+          "elapsedMs": 328.3854000000001,
+          "latenessMs": 28.385400000000118
+        }
+      ]
+    }
+  },
+  "batchSpeedup": 202.62327308319735,
+  "interpretation": "Before: 40 synchronous light appends occupied the event loop for 15.5 seconds, delaying a 100ms timer by 15.4 seconds. First-after: the same batch completed in 76.6ms before the timer was due. Full reads remained strict and took 340-376ms. This supports accumulated synchronous work as a starvation mechanism, but 40 events alone did not exceed the 30-second lease and does not prove the sole live cause.",
+  "scope": {
+    "liveApiCalls": 0,
+    "originalJournalsRead": false,
+    "originalJournalsWritten": false,
+    "originalDatabaseOpened": false,
+    "modelsCalled": false,
+    "serviceOperations": false,
+    "employeeArtifactsAuthored": false,
+    "productSourceChanged": false,
+    "testFixturesRetained": true
+  }
+}

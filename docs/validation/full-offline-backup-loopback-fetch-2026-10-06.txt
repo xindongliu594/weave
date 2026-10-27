@@ -1,0 +1,20 @@
+✔ destinations reject the workspace root, parents, siblings and source data (3.2208ms)
+✔ new destination refuses overwrites, preserving existing files (22.3279ms)
+✔ launcher and database startup markers refuse offline copying (23.5226ms)
+✔ CLI requires explicit shutdown confirmation before accessing a real source (150.4354ms)
+✔ transparent copying excludes startup state, preserves business history and leaves credentials opaque (72.0989ms)
+✔ junctions cannot escape the snapshot, including during the copy filter (13.079ms)
+✔ isolated worker rejects an active model reservation without any business mutation (4915.1512ms)
+✔ validation network guard refuses external and loopback model calls before dispatch (179.0535ms)
+✔ explicit loopback fetch performs real CRUD and passes the guard and clean environment to a native child (504.61ms)
+✔ loopback fetch rejects external, unknown, relative, credentials and encoded provider URLs before socket dispatch (176.4478ms)
+✔ loopback fetch never follows an external or provider redirect even when the caller requests follow or manual (263.6077ms)
+✔ the restore worker overrides the explicit loopback test mode and still rejects every fetch (5174.4789ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11790.101

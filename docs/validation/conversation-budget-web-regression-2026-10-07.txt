@@ -1,0 +1,39 @@
+✔ missing legacy allowlist grants only the current planner and does not mutate policy (652.9219ms)
+✔ switching from an implicit initial planner grants only the explicitly selected planner (0.5337ms)
+✔ changing the planner preserves explicit employee choices and every other authorization and budget (0.329ms)
+✔ real checkboxes explicitly add Luna and Sol while planner removal cannot revoke the mandatory model (1.2482ms)
+✔ the real planner select callback keeps its accessible label and does not offer unavailable models (0.796ms)
+✔ unavailable authorized models are preserved but cannot be newly selected in the catalog (0.5051ms)
+✔ explicit legacy list missing the planner blocks sending until the user authorizes it (26.7906ms)
+✔ actual home renders the new scope explanation and disables model settings for unresolved requests (10.0879ms)
+✔ fresh storage needs no fee limit and home exposes only execution budget and staffing inputs (540.6141ms)
+✔ valid old conversations and previews survive absent, retired or invalid fee metadata without a false settings change (40.7587ms)
+✔ unknown old preview settings keep the dialogue and candidate but remain explicitly unconfirmed (7.2623ms)
+✔ legacy pending key/body/settings remain byte-identical across reload; retrieval and explicit reset are available with no automatic call (8.2161ms)
+✔ new conversation preview keeps its server accounting marker and clearly excludes chat cost from the saved execution budget (7.1389ms)
+✔ real model, budget and permission changes still require another proposal after the fee field is retired (24.8509ms)
+✔ conversation pending and unknown receipt labels never represent an unreserved amount as a zero bill (1.0075ms)
+✔ budgeted and legacy held receipts retain their exact original reserve labels; zero alone cannot classify a conversation (0.9643ms)
+✔ cost totals distinguish actual conversation charges from the amount charged to the execution daily budget (0.8547ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.2594ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5088ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.4609ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.2208ms)
+✔ new conversation requests omit the deprecated fee limit without changing execution policy or legacy metadata (3.8446ms)
+✔ new settings ignore legacy fee fields but preserve model, execution budget and permission changes (1.6093ms)
+✔ retrieving an old pending reply preserves its exact key, body and settings while normalizing only preview comparison (0.397ms)
+✔ first disconnected request with zero messages exposes an explicit exit and keeps same-request retrieval (487.4575ms)
+✔ canceling the unknown-request confirmation preserves every byte and the original request key (0.6957ms)
+✔ confirmed reset archives the full original request first and opens an empty conversation without network calls (35.536ms)
+✔ a stored team remains a history reference and cannot silently bind the next empty requirement (0.6095ms)
+✔ archive failure cannot clear the active request; a later retry preserves history and does not duplicate its key (1.1551ms)
+✔ malformed history or inability to store it blocks reset instead of overwriting evidence (0.4979ms)
+✔ an archived key cannot be reused for a different body, and ordinary reset keeps its existing confirmation rules (0.7658ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2088.3444

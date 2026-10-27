@@ -1,0 +1,105 @@
+✔ restored budget feedback retains occupied history and call limits without releasing unknown holds (3.1029ms)
+✔ feedback changes after reservation and settlement while preserving the stricter task cap (0.8719ms)
+✔ unknown model pricing stays unknown and completed nodes do not inflate remaining estimates (0.4122ms)
+✔ runtime aliases resolve prices by original employee identity, matching real restored snapshots (0.413ms)
+✔ project occupation bounds a larger task cap and overrun stays visible without increasing limits (1.0425ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (2.9071ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (2.0031ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.7644ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.4637ms)
+✔ restored task holds remain occupied without charging the global carryover twice or releasing an older request (2.0533ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (34.357ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.6641ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.5316ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.1318ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.3783ms)
+✔ execution slots cap concurrency and aborted waiters never start (2.098ms)
+✔ context reduction retains active request and complete tool call groups (0.826ms)
+✔ Chinese and English documents produce stable citations and bounded chunks (3.2089ms)
+✔ an abort during durable reservation never dispatches a request or reports an unknown sent call (6.9992ms)
+✔ response metadata is awaited before status handling, JSON parsing or usage settlement (28.7269ms)
+✔ an interruption after headers preserves request IDs without reading JSON or settling usage (1.2053ms)
+✔ absent or unsafe request ID headers are omitted and credentials are never echoed into metadata (3.8106ms)
+✔ failed metadata persistence keeps the sent receipt uncertain and never settles or falls back (4.8615ms)
+✔ an explicit HTTP fallback retains separate provider metadata for both requests (4.8449ms)
+✔ OpenAI compatible adapter translates tool calls, usage, routing and authorization (1.2326ms)
+✔ adapter refuses an unaffordable protected request before reserving, persisting or sending it (0.8908ms)
+✔ fallback is explicit, bounded, attributed and never retries ambiguous network failures (2.1517ms)
+✔ summaries read every selected source message and refuse oversized input before dispatch (1.5484ms)
+✔ wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit (1.7132ms)
+✔ financial fitting preserves the full approved contract, checkpoint, older file and knowledge versions, and latest complete tool group (5.4849ms)
+✔ unaffordable protected older evidence and compaction sources block without editing history, taking calls or making durable reservations (13.3502ms)
+✔ the original context byte cap and insufficient money produce distinct errors before durable admission or fetch (0.952ms)
+✔ available finance is the smaller run or assigned task remainder including history and existing reservations (2.5869ms)
+✔ financial fitting cannot bypass identity, restored call caps, exhausted budgets or the 90 percent fallback and rework gates (1.8874ms)
+✔ two concurrent protected requests cannot both fit the same remaining allowance while durable admission awaits (0.9835ms)
+✔ financial admission preserves undefined versus empty tools reservation envelopes and the unchanged route output cap (1.146ms)
+✔ failure to archive financial clipping evidence releases the synchronous hold and never reaches durable admission or fetch (0.9462ms)
+✔ a structured HTTP 502 exposes diagnostic code and message while retaining one unknown sent receipt (2.722ms)
+✔ error summaries scrub known and typical credentials before clipping and never forward extra provider data (3.9082ms)
+✔ malformed JSON, HTML and oversized bodies keep only the HTTP failure and never leak their contents (2.8021ms)
+✔ provider text remains inert quoted diagnostics with bounded length and unchanged status categories (2.4423ms)
+✔ oversized and endlessly empty error streams cancel without awaiting an untrusted cancel callback (3.4536ms)
+✔ a stalled error body has its own short deadline and cannot hang failure accounting (1506.1591ms)
+✔ user cancellation takes priority over error-body timeout without settling or replaying a sent call (15.9659ms)
+✔ latest host-owned contract and budget survive fitting after a later ordinary user message (36.9487ms)
+✔ an unaffordable current contract is blocked before receipt, fetch, or budget counters instead of dropping it (1.6895ms)
+✔ first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch (805.7824ms)
+✔ cold native restore retains completed attempts, fixed SHA, unknown task holds and the original per-call cap without producer replay (641.5174ms)
+✔ legacy snapshots preserve pinned route output caps, regardless of cumulative task estimate (37.0366ms)
+✔ employees sharing one model keep independent approved per-request caps and the stricter request/route boundary (3.3806ms)
+✔ unattributed captain coordination retains its pinned route even when all employee task caps are smaller (1.0565ms)
+✔ cold recovery preserves task cap, historical fees/calls and counts authorized rework against the original task (1.3435ms)
+✔ an already authorized fallback keeps the original task cap and reserves each request at its actual route rate (4.6061ms)
+✔ ReworkGate binds generated repair and re-review to the original approved task caps instead of model-proposed limits (2.9804ms)
+✔ unknown or foreign task attribution fails before any receipt, reservation or fetch (1.4605ms)
+✔ explicit cap changes both wire and pre-billing affordability without reducing legacy reservations or fixed evidence (1.3726ms)
+✔ invalid explicit cap fails closed at adapter construction while 1 and 32768 are accepted (1.5738ms)
+✔ read-only budget feedback separates cumulative estimate and approved single-call cap, including legacy routes (1.0754ms)
+✔ task schema preserves legacy cumulative estimates and accepts only an explicit bounded integer per-call output cap (7.2248ms)
+ℹ tests 59
+ℹ suites 0
+ℹ pass 59
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2294.6671
+typecheck exit=0
+{
+  "kind": "local-task-output-limit-regression",
+  "date": "2026-10-05",
+  "finalCore": {
+    "skipped": 0,
+    "passed": 59,
+    "failed": 0
+  },
+  "existingNativeRework": {
+    "log": "docs/validation/task-output-limit-separation-initial-2026-10-05.txt",
+    "passed": 9,
+    "failed": 0
+  },
+  "typecheck": "exit 0",
+  "syntaxAndDiff": "exit 0",
+  "paidRequests": 0,
+  "liveProductMutations": 0,
+  "artifact": "docs/validation/task-output-limit-separation-2026-10-05.txt",
+  "initialFailures": [
+    "Currency exact float assertion changed by root to tolerance; prior hold unchanged",
+    "Rework fixture now returns a fresh native state snapshot via structuredClone"
+  ],
+  "limits": [
+    "No taskFunding allocation implemented",
+    "All transport responses are isolated local fixtures; no complete live QA/manager acceptance asserted",
+    "Missing maxOutputTokens preserves original pinned route"
+  ],
+  "sourceSha256": {
+    "packages/contracts/index.ts": "391c39b8bf84c5b859d0eb7a862b7f9456e9dc3093ebe6c1dfa36e1a92e8cd9f",
+    "services/agent-runtime/budget-context.mjs": "d1ad3d0ccdea2863402e3fc6d0a49071ec998fac620495e998ada5b369c78c05",
+    "services/agent-runtime/openai-compatible.d.mts": "7f89356465abd059015f9d4d830cdc967c02f291b41b6830f69ba93e7e8dd3ba",
+    "services/agent-runtime/task-output-limit.test.mjs": "b764e3628950776ec1d02702c8a34b8142e6013154b51f4a32568b63ba8c3acf",
+    "services/agent-runtime/task-output-limit-native.test.mjs": "1cc380f74772dc2ba6e3db3c209a89591e7fa5d504ffeb8d20d5f607d238dbbd",
+    "tests/task-output-limit.test.ts": "e2e30ade3304cb083bd569a6238acc6350544474bfe6a9e012f6485366c8140c",
+    "services/agent-runtime/openai-compatible.mjs": "ad22a7a548d52d79063388291a3d7d90d95409819ef8e2f600a7e8662ef9800a"
+  }
+}

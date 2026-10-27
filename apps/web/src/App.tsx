@@ -128,7 +128,7 @@ function App() {
     const link = document.createElement('a'); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url);
   }
   return <div className="app-shell">
-    <aside className="sidebar"><a className="brand" href="#dashboard" onClick={e => { e.preventDefault(); setPage('dashboard'); }}><span className="brand-mark"><i/><i/><i/><i/></span><span>为伍<small>一个想法，一支团队</small></span></a>
+    <aside className="sidebar"><a className="brand" href="#dashboard" onClick={e => { e.preventDefault(); setPage('dashboard'); }}><span className="brand-mark"><i/><i/><i/><i/></span><span>Weave<small>一个想法，一支团队</small></span></a>
       <button className="new-project" onClick={newRequest}><Plus size={17}/>新建项目 <span>↗</span></button>
       <div className="nav-label">工作空间</div><nav>{navigation.map(([id, label, Icon], i) => <React.Fragment key={id}>{i === 5 && <div className="nav-divider"/>}<button aria-label={label} title={label} className={page === id ? 'active' : ''} onClick={() => { setPage(id); setError(''); }}><Icon size={17}/>{label}{id === 'departments' && departments.length > 0 && <span className="nav-count">{departments.length}</span>}</button></React.Fragment>)}</nav>
       <div className="sidebar-bottom"><div className="local-card"><span className="status-dot"/>{health?.demo?'本机演示空间':health?.workspace?'本机工作空间':'工作空间'}<small>{health?.demo?'演示数据独立保存':health?.workspace?'数据保存在后端所在电脑':'正在连接后端'}</small></div><div className="user"><span className="user-avatar">L</span><span>本地用户<small>个人工作空间</small></span><MoreHorizontal size={17}/></div></div>
@@ -181,7 +181,7 @@ function App() {
       {page === 'settings' && <SettingsCenter localWorkspace={health?.workspace}/>}
       {page === 'people' && <IdentityManagement departments={departments}/>}
       </>}
-      <footer><span><span className="mini-brand">▦</span> 为伍 <span className="footer-separator">/</span> 团队工作台 · v0.2</span><span>一个想法，一支团队</span></footer></main></div>
+      <footer><span><span className="mini-brand">▦</span> Weave · 为伍 <span className="footer-separator">/</span> 团队工作台 · v0.2</span><span>一个想法，一支团队</span></footer></main></div>
     {notice && <div className="toast" role="status"><CheckCircle2 size={17}/>{notice}</div>}
     {departmentModal && <DepartmentEditor department={departmentModal} models={models} close={() => setDepartmentModal(null)} save={async data => { await api(departmentModal === 'new' ? '/departments' : `/departments/${departmentModal.id}`, departmentModal === 'new' ? 'POST' : 'PUT', { ...data, ...(departmentModal !== 'new' ? { version: departmentModal.version } : {}) }); await refresh(); setDepartmentModal(null); setNotice('部门与员工配置已保存'); }}/ >}
     {requestDepartment && <RequestEditor departments={departments} initialId={requestDepartment} close={() => setRequestDepartment(null)} save={async body => { const p = await api<{ id: string }>('/projects', 'POST', body); await refresh(); setRequestDepartment(null); openProject(p.id); }}/ >}

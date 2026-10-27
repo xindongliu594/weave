@@ -1,0 +1,13 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (2012.0115ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (115.7843ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (131.1367ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2966.6955

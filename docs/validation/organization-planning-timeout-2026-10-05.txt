@@ -1,0 +1,43 @@
+RecordedAt: 2026-10-05T18:56:54+08:00
+Workspace: C:\Users\JJ\.codex\worktrees\f57c\agent_department
+Source scope: apps/api/src/organization-chat.ts; tests/organization-chat.test.ts
+No live product service lifecycle, original data/fee mutation, browser operation or paid model request.
+
+Command: node scripts/test-integration.mjs tests/organization-chat.test.ts
+Exit code: 0
+Output:
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (3014.4371ms)
+✔ documented GPT-4.1 JSON mode uses the same budget and makes no repair call or preview on invalid output (119.8598ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (190.3321ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (127.0815ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (66.7357ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (469.9876ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (195.5375ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (168.6713ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (221.5157ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (430.5119ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (142.8037ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (57.3374ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (295.1675ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (283.7278ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6505.7907
+
+Command: npx tsc --noEmit
+Exit code: 0
+Output: empty
+
+Command: git diff --check -- apps/api/src/organization-chat.ts tests/organization-chat.test.ts
+Exit code: 0
+Output: empty
+
+SHA256 organization-chat.ts: A1C43110DC28B3BFBE6477C83A244E1B5E63D39FF7778651DF7C042E84BA8BCC
+SHA256 organization-chat.test.ts: A9BE8522E622B14F636C4E07509F4746A09CEC06FB2741A30E52568217879D9D

@@ -1,0 +1,93 @@
+✔ restored budget feedback retains occupied history and call limits without releasing unknown holds (3.2595ms)
+✔ feedback changes after reservation and settlement while preserving the stricter task cap (1.1963ms)
+✔ unknown model pricing stays unknown and completed nodes do not inflate remaining estimates (0.5013ms)
+✔ runtime aliases resolve prices by original employee identity, matching real restored snapshots (0.576ms)
+✔ project occupation bounds a larger task cap and overrun stays visible without increasing limits (1.4606ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (3.3308ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.5421ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.7657ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.5353ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (51.3743ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.7798ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (3.4107ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.6912ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.577ms)
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (139.3255ms)
+✔ admitted employee step refreshes current task and occupied budget before durable append without changing other messages (311.4807ms)
+✔ rejected native admission cannot refresh a snapshot, dispatch a model or change the occupied budget (93.4696ms)
+✔ cold-resumed employee refreshes the newly admitted contract and remaining calls while retaining the previous archived snapshot (164.882ms)
+✔ default byte policy admits a detailed task with a large fixed prompt and tool schema (358.9509ms)
+✔ automatic employee summaries retain source records, isolate history and survive resume (764.6953ms)
+✔ large structured non-file tool output is reduced without losing hashes or full original evidence (246.855ms)
+✔ structured text below 6000 characters is safely shortened when serialized JSON exceeds the threshold (1.0516ms)
+✔ escaped structured text uses serialized size and retains full metadata without a raw JSON fallback (1.0843ms)
+✔ oversized metadata remains valid and complete and already shortened results do not create repeated replacements (12.572ms)
+✔ mixed structured and plain text preserves JSON, rich block order and explicit omission markers (2.1462ms)
+✔ complete filesystem reads survive the actual employee pruning pipeline and retain original trace evidence (219.6397ms)
+✔ a complete file larger than 192000 context bytes fails before model dispatch and budget reservation (9.0923ms)
+✔ summary admission shares the execution call allowance and rejection preserves source history (128.8828ms)
+✔ cancellation during one employee summary leaves sibling state and original history intact (140.1519ms)
+✔ a nonshrinking summary is rejected without replacing the source history (83.8104ms)
+✔ unknown model capacity uses pruning without inventing a token window or a summary charge (274.8587ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (448.4221ms)
+✔ failed employee setup leaves no published Agent or resident Host (61.995ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (67.5108ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (447.3301ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (29.5633ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (17.0265ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (35.8352ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (49.314ms)
+✔ host file checks reject linked directories before reading their contents (7.7932ms)
+✔ host file checks reject binary content declared as text (6.7115ms)
+✔ optimistic writes reject a second editor using the same observed hash (15.7389ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (13.3983ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.2712ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.8121ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.8777ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.5421ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (3010.8321ms)
+✔ execution and summary requests cannot select a model outside the employee approval (263.9399ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (196.8481ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (291.3134ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (255.1276ms)
+✔ native quality contracts receive actual file and command evidence before independent review (2058.8598ms)
+✔ model claims of a passed command cannot unlock native quality work (931.0832ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (1080.7937ms)
+✔ review revision cannot create an unapproved automatic repair graph (2127.59ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (1970.5948ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (10532.3306ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (13651.5374ms)
+✔ out-of-scope finding cannot create a repair task (1968.9946ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (2829.7656ms)
+✔ explicit reject stops the loop even with spare rework allowance (3398.4533ms)
+✔ repair model calls share the original task allowance (4638.9527ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (3532.2719ms)
+✔ repair cannot overwrite a changed file with a stale hash (3668.9159ms)
+✔ duplicate finding IDs cannot authorize a repair graph (2084.7739ms)
+✔ latest host-owned contract and budget survive fitting after a later ordinary user message (44.9022ms)
+✔ an unaffordable current contract is blocked before receipt, fetch, or budget counters instead of dropping it (1.9695ms)
+✔ compact product mapping changes only duplicated description while generic mapping and immutable contracts retain their complete hashes (8.7523ms)
+✔ compact mapping fails closed without a verified host context instead of producing placeholder contracts (1.2049ms)
+✔ generic native host cannot opt into context-backed descriptions or dispatch before failed assertion (177.9595ms)
+✔ native restored task claim retains canonical file hashes and quality fields without replaying the completed producer or repeating requirement in its receipt (968.3147ms)
+ℹ tests 72
+ℹ suites 0
+ℹ pass 72
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 46944.2616
+
+Validation: node --test (13 named runtime test files) exit 0; 72/72 passed.
+Typecheck: node node_modules/typescript/bin/tsc --noEmit exit 0.
+Syntax: node --check handoff.mjs/product-runtime.mjs/task-plan-context.test.mjs exit 0.
+Scoped git diff --check exit 0.
+Scope: product-only guarded native task description removes duplicated taskPrompt; full inputs/outputs JSON and native quality/DAG fields preserved; generic mapping unchanged.
+Guard: missing/false/undefined/async assertion or thrown assertion fails APPROVED_TASK_CONTEXT_REQUIRED before model dispatch.
+Local restored native QA claim retains canonical hashes and dependency handoff; completed producer is not dispatched; original snapshot hash is unchanged.
+Paid provider requests: 0. Production data/service operations/employee-deliverable edits: 0.
+Source SHA256 handoff.mjs: 3ac6a06abc854b6073b2ed236a6c58564716e9cc823e5c13fd08c51d067a2787
+Source SHA256 product-runtime.mjs: f41ecc91e051800c8a8ff0b8b8fe5e8eacc879f1942ec624c2101687c22caad5
+Source SHA256 task-plan-context.test.mjs: ccc719b9d243279cb695afb26a163808e56300cef55828785073fc8f2fc10713
+

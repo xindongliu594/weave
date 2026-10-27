@@ -1,0 +1,17 @@
+Go model web configuration helper: prepared for root review
+Frozen UTC: 2026-10-06T01:10:57.9094782+00:00
+File: docs/test-evidence/helpers/configure-go-models-web-2026-10-06.mjs
+SHA256: 3f35d72f1499da7f8214fc76f7c4b763d4363498948e216248c8f5ad9551ea97
+Creation: Node writeFile flag wx; no prior file replaced.
+Syntax: node --check exited 0.
+Execution: inspect and save have NOT been run.
+Gateway: ff9080ff-c61a-4449-a360-c5e0662e7c5a; exact Go endpoint https://opencode.ai/zen/go/v1.
+Proposed models: glm-5.2 (Go · GLM 5.2, rates 1.4/4.4); deepseek-v4.1-flash (Go · DeepSeek V4.1 Flash, conservative peak rates .3/1.2).
+Both: protocol chat-completions; thinkingMode disabled; contextWindowTokens 131072 (local cap only).
+Save: only POST /api/models, one per exact wire model, eight exact fields, contextBytes omitted.
+Reads: preserved public gateways/models/projects/departments/usage; explicit UI bootstrap activity/health require root review.
+Blocked: all other mutations, paid test/text/tools, discovery, billing, external browser traffic.
+Checks: duplicate existing wire models refused; old object SHA256 and collection hashes preserved; new models must remain untested with empty capabilities.
+Credential handling: existing Go credential not accessed or changed; screenshots mask password inputs.
+UI: installed Microsoft Edge channel; semantic labels and dialog heading; loaded browser editor not yet verified.
+Initial root TypeScript log go-initial-typecheck-2026-10-06.txt was not overwritten.

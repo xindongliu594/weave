@@ -1,0 +1,43 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2419.2449ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (146.5243ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (81.4929ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (128.8927ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (129.4592ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (127.7634ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (91.2238ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (153.4982ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (455.2659ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (169.8799ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (197.4947ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (155.7149ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (215.8019ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (508.5833ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (91.6548ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (46.6499ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (295.6027ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (295.599ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6338.6897
+✔ confirming a revised proposal updates the same team and draft project, records versions, and never executes (2301.8076ms)
+✔ execution state, archived teams and mismatched project ownership refuse an update without partial writes (139.1745ms)
+✔ all adopted planning charges count toward the updated budget and transfer only after successful confirmation (135.3193ms)
+✔ revisions still require preview identity and explicit tool permissions (61.3072ms)
+✔ pending and uncertain project charges block a revision before any budget or team change (152.8459ms)
+✔ a team participating in another active project cannot be changed through a saved conversation (165.0699ms)
+✔ employee prompt revisions advance role versions while replay and unchanged roles preserve them (137.9356ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3541.5251

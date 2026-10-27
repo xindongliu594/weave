@@ -1,0 +1,19 @@
+✔ resume uses exact accepted attempt and rejects missing evidence or a changed restored file (25.6892ms)
+✔ completed implementation stays in the DAG when its review is pending; inherited seals survive another interruption (10.3737ms)
+✔ authorized later writers retain earlier checkpoints while recovery validates the latest file version (17.7268ms)
+✔ rework recovery uses the newest mapping and requires independent acceptance of the complete pair (15.3188ms)
+✔ approved file contracts survive parsing and valid producer/consumer plans pass (19.4842ms)
+✔ missing source edges, unknown output and unordered writers/readers fail product validation (1.2878ms)
+✔ downstream cannot name an older writer after an upstream replacement (0.5435ms)
+✔ schema rejects unsafe paths, unpinned external files and incompatible JSON checks (4.381ms)
+✔ quality tasks require command grants, scope, valid references and an independent reviewer (1.7331ms)
+✔ declared outputs must fit host file scopes before any employee executes (0.726ms)
+✔ automatic rework is explicit, bounded, read-only in review and gates all consumers (3.4204ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 815.8926

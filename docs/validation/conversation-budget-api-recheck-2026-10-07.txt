@@ -1,0 +1,26 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2229.705ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (100.616ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (124.0475ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (106.4476ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (90.5832ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (128.7757ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (375.7718ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (178.1965ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (155.2487ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (160.9087ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (182.9815ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (401.4025ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (47.9691ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (46.3162ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (284.543ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (281.4227ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5440.7338

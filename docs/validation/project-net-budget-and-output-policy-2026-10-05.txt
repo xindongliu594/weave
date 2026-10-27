@@ -1,0 +1,39 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (2059.1303ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (242.8986ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (94.4335ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (128.521ms)
+✔ approval freezes per-call output limits separately from the cumulative task estimates (82.7359ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (259.2675ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.4535ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.156ms) # requires independent PostgreSQL backends and row locks
+✖ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (82.3926ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 3614.1007
+
+✖ failing tests:
+
+test at tests\execution-policy.test.ts:2:8729
+✖ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (82.3926ms)
+  AssertionError [ERR_ASSERTION]: {"code":"REQUEST_FAILED","message":"请等待正在进行的模型调用结束后再备份"}
+  
+  409 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\execution-policy.test.ts:208:95)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,43 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (2290.4857ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (201.0291ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (278.0488ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (174.9895ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (175.9081ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (81.8165ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (339.8226ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4040.7019
+✔ new and configuration-only placeholder drafts are blocked before enqueue or billing (2281.705ms)
+✔ resume and full retry of a legacy placeholder run cannot enqueue another attempt (56.0404ms)
+✔ concrete implementation assigned to an employee without tools is rejected (58.1524ms)
+✔ a deliberately edited single-person text plan can still be approved (71.2516ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2926.1423
+✔ normal execution includes the saved planning cost in project spend (1.3667ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (9.4709ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.4393ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.6083ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (0.8531ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (0.7548ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 524.9786

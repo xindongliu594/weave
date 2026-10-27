@@ -1,0 +1,17 @@
+✔ an unchanged real 10 MiB journal is parsed once for lists while full reads always bypass the cache (641.4121ms)
+✔ cross-handle appends invalidate summaries and retain all fields, terminal state and descending order (386.4626ms)
+✔ journal truncation, same-size corruption with restored mtime, and repair all invalidate the cached integrity (264.5773ms)
+✔ snapshot replacement and malformed snapshots with equal size/restored mtime never retain the old valid summary (225.9926ms)
+✔ two roots with the same run ID stay independent, deleted entries disappear, and caller mutation cannot poison cache (221.7121ms)
+✔ cache count and per-summary size are bounded without changing returned data (16708.7811ms)
+✔ actual team execution archives prompts, task attempts, messages and results across a new process (15399.6766ms)
+✔ approval and runtime handles share the journal cursor and deduplicate source identities (315.3866ms)
+✔ partial journal is reported as incomplete, snapshots redact known credential fields (173.1602ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19080.8586

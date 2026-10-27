@@ -1,0 +1,92 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (2123.8209ms)
+✖ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (121.4295ms)
+✖ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (74.9284ms)
+✖ request admission fences stale lease owners and rechecks current run authorization transactionally (26.8475ms)
+✖ queue skips locked projects and simultaneous retries create at most one successor (82.132ms)
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (599.3976ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 2
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3801.9452
+
+✖ failing tests:
+
+test at tests\execution-policy.test.ts:1:6059
+✖ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (121.4295ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'PLAN_NOT_READY'
+  - 'POLICY_PERMISSION_DENIED'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\execution-policy.test.ts:62:121)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PLAN_NOT_READY',
+    expected: 'POLICY_PERMISSION_DENIED',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\execution-policy.test.ts:1:8738
+✖ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (74.9284ms)
+  AssertionError [ERR_ASSERTION]: {"code":"PLAN_NOT_READY","message":"当前仍有默认占位任务。请先生成 AI 方案，或编辑任务的具体目标、负责人和验收标准，再批准运行。"}
+  
+  422 !== 202
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\execution-policy.test.ts:79:79)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 422,
+    expected: 202,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\execution-policy.test.ts:1:10513
+✖ request admission fences stale lease owners and rechecks current run authorization transactionally (26.8475ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  422 !== 202
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\execution-policy.test.ts:94:102)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 422,
+    expected: 202,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\execution-policy.test.ts:1:12881
+✖ queue skips locked projects and simultaneous retries create at most one successor (82.132ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  422 !== 202
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\execution-policy.test.ts:119:102)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 422,
+    expected: 202,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

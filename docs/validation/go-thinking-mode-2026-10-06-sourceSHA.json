@@ -1,0 +1,77 @@
+{
+  "frozenAtUtc": "2026-10-06T01:19:34Z",
+  "workspace": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department",
+  "node": "C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "finalApi": {
+    "command": "node scripts/test-integration.mjs tests/go-thinking-mode.test.ts",
+    "pass": 4,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "runtime": {
+    "command": "node --test services/agent-runtime/thinking-mode.test.mjs services/agent-runtime/responses-compatible.test.mjs services/agent-runtime/completion-protocol.test.mjs services/agent-runtime/openai-compatible.test.mjs",
+    "pass": 55,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "sourceHashes": [
+    {
+      "file": "packages/contracts/index.ts",
+      "sha256": "A77639DF16B4E1865222D872D8B1A487BAB19A1B0390AC5FE9E4162543FAF468"
+    },
+    {
+      "file": "apps/web/src/App.tsx",
+      "sha256": "D024441EC9A70236A08F4DAE67C5F63A22D5C6954064F4BE63CB85E25CE3633A"
+    },
+    {
+      "file": "apps/api/src/provider.ts",
+      "sha256": "0DF8D6F69D5098C57FAD947A0B804FECE7C5465A8B49EC15D6EEE84AAD80128A"
+    },
+    {
+      "file": "apps/api/src/cost-control.ts",
+      "sha256": "79FFBB8778B894EB915BF208DE7EF3E448DBFD433051A3A54020297D32144456"
+    },
+    {
+      "file": "apps/api/src/app.ts",
+      "sha256": "75B14EB09723D05A6CC42B4C42840C30F9D07B838137E8B6E3BEA3D3155AC331"
+    },
+    {
+      "file": "apps/api/src/model-capabilities.ts",
+      "sha256": "107F02B74CB4CFE8F9C1AD9D7D3E23072CB7CA27683AFE236C50A70A5D832F8F"
+    },
+    {
+      "file": "services/agent-runtime/openai-compatible.mjs",
+      "sha256": "FDA7C655153EA19A1AB23DBDF6435941E0542B5557A739141B0B002BB358457F"
+    },
+    {
+      "file": "services/agent-runtime/openai-compatible.d.mts",
+      "sha256": "DB18E9A1606D251DD5AD00D0E5A5E4075E64FF0B1916857C94396D4B3D730F68"
+    },
+    {
+      "file": "services/agent-runtime/completion-options.mjs",
+      "sha256": "E3426EB9EA0CE7E8EF3A04CD43460871AE079799B00899BAFA16D8CE47713165"
+    },
+    {
+      "file": "services/agent-runtime/completion-options.d.mts",
+      "sha256": "5AD80AA84E86802268A47D27AE60BE5B4E0F16492E2700C17260F65BD3F543E9"
+    },
+    {
+      "file": "services/agent-runtime/completion-protocol.mjs",
+      "sha256": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+    },
+    {
+      "file": "tests/go-thinking-mode.test.ts",
+      "sha256": "225465DA4587B507AC2C17BED317894A7FCAF6E43C920D2644FA9D0B475C3C90"
+    },
+    {
+      "file": "services/agent-runtime/thinking-mode.test.mjs",
+      "sha256": "7373E967D8C2D537090FA1709F650222C11CE0FB3F47A75170A647215D230C2C"
+    }
+  ],
+  "drift": {
+    "unchangedSourceDrift": [],
+    "finalApiDrift": []
+  }
+}

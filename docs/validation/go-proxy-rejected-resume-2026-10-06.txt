@@ -1,0 +1,15 @@
+✔ both retained no-dispatch proofs and the exact proxy failure permit one successor (2.7921ms)
+✔ changed response, uncertain dispatch, new run, intent or failed GET cannot continue (2.3978ms)
+✔ one actual intercepted pre-dispatch proof permits a distinct successor identity (2.8973ms)
+✔ observed, unknown or response-correlated attempts are never successors (1.5054ms)
+✔ wrong project, version, run, retain choice or target cannot reuse this proof (0.6305ms)
+✔ new child, browser error, side effect or changed interception path is rejected (1.3082ms)
+✔ original intent and evidence must retain exact path, endpoint and reviewed body (0.6921ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 180.5953

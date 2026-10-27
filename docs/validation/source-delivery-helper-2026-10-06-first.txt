@@ -1,0 +1,35 @@
+✔ source whitelist produces identical byte hashes, keeps empty directories and original files, and every copy has a fresh directory (821.4257ms)
+✖ node_modules, private data, environment files, credential files and large evidence are excluded without becoming payload (471.1351ms)
+✔ build and documents require explicit selections and are byte-verified, while evidence/private paths and traversal are rejected (478.4412ms)
+✔ links/junctions in source trees, selected documents and the declared root are refused before reading their target (144.2357ms)
+✔ single-file hard links and oversized/unsupported files are refused instead of copying ambiguous or unbounded payloads (201.4315ms)
+✔ same-size source replacement with restored mtime invalidates a supplied frozen inventory, and deletions/additions cannot pass (432.7324ms)
+✔ a real source mutation after copy starts leaves only failed evidence and never a verified manifest (487.0743ms)
+✔ CLI requires an explicit operation, rejects unknown flags and makes no bundle while displaying help (671.1805ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3861.8005
+
+✖ failing tests:
+
+test at tests\source-delivery.test.mjs:29:1
+✖ node_modules, private data, environment files, credential files and large evidence are excluded without becoming payload (471.1351ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(inv.excludedPaths.includes('tests/api-key.json'))
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/tests/source-delivery.test.mjs:32:96)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

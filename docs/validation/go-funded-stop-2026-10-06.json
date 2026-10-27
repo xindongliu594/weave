@@ -1,0 +1,84 @@
+{
+  "kind": "engineering-only-go-funded-stop-guards",
+  "frozenAt": "2026-10-06T02:38:29.8564037+00:00",
+  "helper": {
+    "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+    "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+  },
+  "tests": {
+    "path": "tests/go-funded-stop.test.mjs",
+    "passed": 58,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "fetchCalls": 0
+  },
+  "syntaxCheckExitCode": 0,
+  "helperMainExecuted": false,
+  "actualRunId": null,
+  "actualControlledStopVerified": false,
+  "actualRestartResumeVerified": false,
+  "actualEmployeeQaVerified": false,
+  "realHttpRequests": 0,
+  "realCostMaintenanceRequests": 0,
+  "originalDatabaseOpenedDirectly": false,
+  "employeeFilesReadOrWritten": false,
+  "originalModelKeysAccessed": false,
+  "paidModelCalls": 0,
+  "actualLocalEvidenceBinding": {
+    "projectId": "3e101c24-87e6-43ea-80f9-a2c4b0b410f4",
+    "departmentId": "f16bb7ee-6868-417d-a9c6-9229d7fa7339",
+    "version": 5,
+    "httpStatus": 200,
+    "planningReceiptId": "c609903e-ab3d-4d3c-b327-b2385953c204",
+    "planningCost": 0.0060192
+  },
+  "dynamicCliVersion": true,
+  "nodeReporterFormats": [
+    "tap",
+    "spec"
+  ],
+  "moneyArithmeticTolerance": 1e-9,
+  "originalReceiptsRemainStrictlyEqual": true,
+  "oldStopPreserved": true,
+  "oldStopSha256": "46b9bc88738e73f600db9862e83127c0079934e3f756019fafeb346ff496f6fe",
+  "sources": [
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    },
+    {
+      "path": "tests/go-funded-stop.test.mjs",
+      "sha256": "1a872c6f0a85488a942c141f63b82720b3d3a9cfccbfc78a9c5dcfaacd28dcec"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-funded-run-web-2026-10-05.mjs",
+      "sha256": "46b9bc88738e73f600db9862e83127c0079934e3f756019fafeb346ff496f6fe"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "3153a172d050a70c83bd9752b1dca8a153acb92abee7c33486c9a264dde60ffb"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    },
+    {
+      "path": "services/agent-runtime/trace-store.mjs",
+      "sha256": "152dc9bbd1a949906452cba7f56d482b34f53e708126d00f42aa816ddcbc7a6f"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-confirm-2026-10-06T02-00-20-236Z-0e2ec036.json",
+      "sha256": "cc79bc1c9618938fe721420196628c2535443f3f983e6e2faf699b9c9a00c6c7"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-generate-2026-10-06T01-53-14-065Z-827664e3.json",
+      "sha256": "5020f28b9579fc5c36a2c9d91b7b45db818ec72752f75dc6241f904a5d54c959"
+    }
+  ]
+}

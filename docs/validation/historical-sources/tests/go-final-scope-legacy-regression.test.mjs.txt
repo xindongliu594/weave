@@ -1,0 +1,286 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { auditGoTodo, sourceDocument, options, parseNodeTestEvidence } from '../docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-2026-10-06.mjs';
+import { goModelConfigHash } from '../docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs';
+
+// In-memory engineering fixtures only. No files, APIs, employee code, processes
+// or model calls are executed or substituted for real product acceptance.
+const id = value => `00000000-0000-4000-8000-${String(value).padStart(12, '0')}`;
+const sha = value => createHash('sha256').update(value).digest('hex');
+const goId = 'fcce40cf-3172-4863-b0bd-776673f499e6', gatewayId = 'ff9080ff-c61a-4449-a360-c5e0662e7c5a';
+const bodyCost = (input = 100, output = 10) => (input * .3 + output * 1.2) / 1e6;
+const source = (path, value) => { const raw = JSON.stringify(value); return { path, raw, sha256: sha(raw) }; };
+const contents = new Map([
+  ['server.mjs', "import { createServer } from 'node:http';\nconst port=Number(process.env.PORT??'3000');\nif(process.argv[1]&&import.meta.url){createServer(()=>{}).listen(port,'127.0.0.1');}\n"],
+  ['todo.test.mjs', "import test from 'node:test';\ntest('engineering fixture',()=>{});\n"],
+  ['README.md', 'Engineering-only PowerShell/CLI fixture, never deployed.\n'],
+  ['acceptance.test.mjs', "import {spawn} from 'node:child_process';\nimport test from 'node:test';\ntest('engineering CLI fixture',async()=>{const child=spawn(process.execPath,['server.mjs'],{env:{...process.env,PORT:'0'}}); await fetch('http://127.0.0.1/fixture'); child.kill();});\n"],
+  ['acceptance-report.md', 'Engineering-only manager acceptance fixture, never a real report.\n'],
+]);
+const file = path => ({ path, sha256: sha(contents.get(path)), size: Buffer.byteLength(contents.get(path)) });
+const paths = [...contents.keys()];
+const shared = { documentId: 'shared', version: 1, title: 'Shared fixture', spaceId: 'company', sha256: sha('shared'), source: { note: 'shared fixed version' } };
+const privateDoc = { documentId: 'private', version: 1, title: 'Private fixture', spaceId: 'employee', sha256: sha('private'), source: { note: 'QA fixed version' } };
+
+function fixture({ normalVersion = 5, recoveryVersion = 5 } = {}) {
+  const model = { id: goId, name: 'Engineering-only Go route fixture', model: 'deepseek-v4.1-flash', gatewayId, protocol: 'chat-completions', thinkingMode: 'disabled',
+    inputRate: .3, outputRate: 1.2, contextWindowTokens: 131072, status: 'available', version: 3, capabilities: { tools: { status: 'supported', testId: id(401) } } };
+  const configHash = goModelConfigHash(model, 1), route = { id: goId, gatewayId, wireModel: model.model, baseUrl: 'https://opencode.ai/zen/go/v1', protocol: 'chat-completions',
+    thinkingMode: 'disabled', configurationHash: configHash, toolCapabilityTestId: id(401), inputRate: .3, outputRate: 1.2, maxOutputTokens: 128, contextWindowTokens: 131072 };
+  const orphanHolds = [{ id: id(901), amount: .37821, status: 'uncertain', projectId: null, runId: null, purpose: 'historic planning', history: [{ source: 'old-A', status: 'uncertain' }] },
+    { id: id(902), amount: .38209, status: 'uncertain', projectId: null, runId: null, purpose: 'historic planning', history: [{ source: 'old-B', status: 'uncertain' }] },
+    { id: id(903), amount: .0016958, status: 'uncertain', projectId: null, runId: null, purpose: 'failed connection', providerStatus: 400, history: [{ source: 'GLM-400', status: 'uncertain' }] }]
+    .map(row => ({ ...row, historySha256: sha(JSON.stringify(row.history)) }));
+  const allUsage = [];
+  function projectFixture(scenario) {
+    const recovery = scenario === 'recovery', projectId = id(recovery ? 2 : 1), departmentId = id(101), runId = id(recovery ? 12 : 10), parentId = recovery ? id(11) : undefined;
+    const version = recovery ? recoveryVersion : normalVersion;
+    const policy = { maxBudget: 3, maxModelCalls: 80, allowedModelIds: [goId], executionTarget: { kind: 'local' } };
+    const employees = [{ id: 'developer', role: 'employee', knowledgeSpaceIds: [] }, { id: 'qa', role: 'employee', knowledgeSpaceIds: ['company', 'employee'] }, { id: 'manager', role: 'manager', knowledgeSpaceIds: ['company'] }]
+      .map(employee => ({ ...employee, name: employee.id, title: employee.id, instructions: 'Engineering-only approved role: ' + employee.id, modelId: goId,
+        tools: employee.id === 'developer' ? ['filesystem', 'artifact_write', 'terminal_test'] : employee.id === 'qa' ? ['filesystem', 'artifact_write', 'terminal_test', 'knowledge_search', 'knowledge_read'] : ['filesystem', 'artifact_write', 'knowledge_search', 'knowledge_read'] }));
+    const savedTasks = [
+      { id: 'dev', kind: 'implementation', assigneeId: 'developer', dependencies: [], inputs: [], outputs: paths.slice(0, 3).map(path => ({ path })), inScope: paths.slice(0, 3), outOfScope: [], verify: ['node --test todo.test.mjs'] },
+      { id: 'qa_verify', kind: 'verification', assigneeId: 'qa', dependencies: ['dev'], inputs: paths.slice(0, 3).map(path => ({ path, producerTaskId: 'dev' })), outputs: [{ path: paths[3] }], inScope: [paths[3]], outOfScope: paths.slice(0, 3), verify: ['node --test todo.test.mjs', 'node --test acceptance.test.mjs'] },
+      { id: 'qa_review', kind: 'review', assigneeId: 'qa', dependencies: ['dev', 'qa_verify'], reviewedTaskId: 'dev', inputs: paths.slice(0, 4).map((path, i) => ({ path, producerTaskId: i < 3 ? 'dev' : 'qa_verify' })), outputs: [], inScope: [], outOfScope: paths.slice(0, 4), verify: ['node --test todo.test.mjs', 'node --test acceptance.test.mjs'] },
+      { id: 'manager_accept', kind: 'work', assigneeId: 'manager', dependencies: ['qa_review'], inputs: paths.slice(0, 4).map((path, i) => ({ path, producerTaskId: i < 3 ? 'dev' : 'qa_verify' })), outputs: [{ path: paths[4] }], inScope: [paths[4]], outOfScope: paths.slice(0, 4), verify: [] },
+    ].map(task => ({ ...task, subject: task.id, objective: 'Engineering-only complete contract', acceptanceCriteria: ['Fixture criterion'], estimatedInputTokens: 100, estimatedOutputTokens: 100, maxOutputTokens: 128, maxBudget: .2, maxModelCalls: 8, maxReworkRounds: 0 }));
+    const plan = { rationale: 'Engineering-only frozen plan', agents: employees, tasks: savedTasks };
+    const project = { id: projectId, departmentId, version, createdAt: '2026-10-05T00:10:00Z', requirement: 'Engineering-only unique Todo requirement', source: 'model', plan, policy };
+    const beforeProject = { ...project, version: version - 1, plan: { previous: true } };
+    const paid = { id: id(recovery ? 702 : 701), projectId, runId: null, modelId: goId, purpose: '组织规划', inputTokens: 100, outputTokens: 20, cost: bodyCost(100, 20), createdAt: '2026-10-06T00:00:00Z' };
+    allUsage.push(paid);
+    const candidate = { projectId, baseVersion: version - 1, previewId: id(recovery ? 802 : 801), usageId: paid.id, plan, policy, retainUncertainCosts: false, revisionRequest: 'Engineering-only explicit Go revision', validation: { valid: true } };
+    const request = { method: 'POST', path: `/api/projects/${projectId}/generate`, requestKey: id(recovery ? 602 : 601), body: { modelId: goId, version: version - 1, maxPlanningCost: .2, maxOutputTokens: 8000, retainUncertainCosts: false, revisionRequest: candidate.revisionRequest } };
+    const budget = { addedUsage: [paid], addedHolds: orphanHolds, baselineHolds: [], authorizedTotal: 10, phaseRecorded: paid.cost,
+      phaseReserved: .7619958, outsideScenarioSpent: 0, outsideScenarioHeld: recovery ? 0 : .7619958 };
+    const generation = { kind: 'actual-go-project-replanning', action: 'generate', observedAction: 'generate', scenario, beforeProject, afterProject: beforeProject,
+      currentModel: model, gatewayVersion: 1, currentModelConfigHash: configHash, parameters: { projectId, ...request.body }, candidate, response: { status: 200, data: candidate }, requests: [request], quote: { allowed: true },
+      inferenceCallsRequested: 1, employeeFilesEdited: false, pageErrors: [], afterBudget: budget };
+    const original = source(`docs/test-evidence/synthetic-${scenario}-paid-never-written.json`, generation);
+    const recovered = source(`docs/test-evidence/synthetic-${scenario}-cache-never-written.json`, { ...generation, observedAction: 'recover-known', inferenceCallsRequested: 0, generationEvidence: original.path, generationEvidenceSha256: original.sha256 });
+    const first = recovery ? original : recovered;
+    const proof = { kind: generation.kind, action: 'confirm', scenario, beforeProject, afterProject: project, currentModel: model, gatewayVersion: 1, currentModelConfigHash: configHash, candidate,
+      requests: [request, { method: 'POST', path: `/api/projects/${projectId}/generated-plan/confirm`, requestKey: id(recovery ? 612 : 611), body: { previewId: candidate.previewId, version: version - 1, retainUncertainCosts: false } }],
+      response: { status: 200, data: { ok: true, version, validation: { valid: true } } }, generationEvidence: first.path, generationEvidenceSha256: first.sha256,
+      inferenceCallsRequested: 0, employeeFilesEdited: false, pageErrors: [], beforeBudget: budget, afterBudget: budget };
+    const nativeAgents = employees.map(employee => ({ ...employee, id: 'native-' + employee.id, employeeId: employee.id, sourceDepartmentId: departmentId, sourceAgentId: employee.id, rolePrompt: employee.instructions }));
+    const nativeTasks = savedTasks.map(task => ({ ...task, assignee: 'native-' + task.assigneeId, taskPrompt: 'Engineering-only runtime task prompt' }));
+    const citations = [], usage = [];
+    function makeRun(idValue, selectedTasks, isParent = false) {
+      const snapshot = { id: idValue, projectId, departmentId, planVersion: version, mode: 'product', requirement: project.requirement, rationale: plan.rationale, policy,
+        agents: nativeAgents, tasks: nativeTasks, modelRoutes: [route], executionTarget: { kind: 'local' }, executionBudget: 3 - paid.cost,
+        costCarryover: { retained: false, recordedCost: paid.cost, reserved: 0, receipts: [] }, approval: { kind: 'project' },
+        knowledge: { format: 'document-versions-v2', documents: [shared, privateDoc], agentDocuments: { 'native-developer': ['shared'], 'native-qa': ['shared', 'private'], 'native-manager': ['shared'] } } };
+      const events = [], append = (type, data, links = {}) => { const event = { ...links, seq: events.length + 1, at: '2026-10-06T00:10:00Z', type, data }; events.push(event); return event; };
+      append('run/created', {}); append('run/task-mapping', { tasks: nativeTasks.map((task, index) => ({ task_id: 't' + index, seed_id: task.id })) });
+      if (recovery && !isParent) {
+        snapshot.resumedFrom = parentId; snapshot.approval = { kind: 'resume', parentRunId: parentId }; snapshot.completedCheckpoints = ['dev'];
+        snapshot.recovery = { sourceRunId: parentId, completed: [{ taskId: 'dev', attemptId: id(501), status: 'completed' }], files: paths.slice(0, 3).map(file) };
+        snapshot.budgetHistory = { calls: 1, tasks: { dev: { calls: 1, cost: bodyCost() } } }; snapshot.costCarryover.recordedCost += bodyCost(); snapshot.executionBudget -= bodyCost();
+        append('recovery/restored', { sourceRunId: parentId, completed: ['dev'], files: snapshot.recovery.files });
+      }
+      for (const task of selectedTasks) {
+        const index = nativeTasks.findIndex(row => row.id === task.id), attemptId = id(501 + index), sessionId = scenario + '-' + task.id, employee = nativeAgents.find(row => row.id === task.assignee), receiptId = id(Number(idValue.slice(-2)) * 100 + index + 1001), links = { sessionId, taskId: task.id, attemptId };
+        append('model/request', {}, links);
+        append('model/wire-request', { taskId: task.id, modelId: goId, agentId: employee.id, employeeId: employee.employeeId, usageId: receiptId, protocol: 'chat-completions', path: '/chat/completions', body: { model: model.model, max_tokens: 128, thinking: { type: 'disabled' } } }, links);
+        append('billing/provider-response', { id: receiptId, providerStatus: 200, providerRequestId: 'engineering-' + receiptId });
+        const row = { id: receiptId, runId: idValue, projectId, taskId: task.id, employeeId: employee.employeeId, modelId: goId, inputTokens: 100, outputTokens: 10, cost: bodyCost(), purpose: '项目执行', createdAt: '2026-10-06T00:10:00Z' };
+        usage.push(row); append('billing/usage', row, links);
+        for (const output of task.outputs) {
+          const callId = task.id + '-write-' + output.path, ref = { ...links, callId };
+          append('tool/start', { name: 'artifact_write', arguments: { path: output.path, content: contents.get(output.path) } }, ref);
+          append('artifact/updated', { agentId: employee.id, files: [file(output.path)] }, ref); append('tool/result', { name: 'artifact_write', result: { value: file(output.path) } }, ref);
+        }
+        if (task.id !== 'dev') for (const name of ['knowledge_search', 'knowledge_read']) {
+          const documents = task.id === 'manager_accept' ? [shared] : [shared, privateDoc], ref = { ...links, callId: task.id + '-' + name };
+          append('tool/start', { name, arguments: { query: 'fixture' } }, ref);
+          append('knowledge/citation', { agentId: employee.id, sources: documents.map(document => ({ ...document, chunkId: document.documentId + ':1', lineStart: 1, lineEnd: 1 })) }, { sessionId });
+          for (const document of documents) if (!citations.some(row => row.runId === idValue && row.chunkId === document.documentId + ':1')) citations.push({ runId: idValue, chunkId: document.documentId + ':1', value: document, sha256: sha(JSON.stringify(document)) });
+          append('tool/result', { name, result: { value: documents } }, ref);
+        }
+        const commands = [];
+        for (const command of task.verify) {
+          const ref = { ...links, callId: task.id + '-test-' + command }, operationId = idValue + ':' + ref.callId, observation = { command, exitCode: 0, workspaceRevision: sha(idValue + task.id) }; commands.push(observation);
+          append('tool/start', { name: 'terminal_test', arguments: { command } }, ref); append('local/operation-queued', { operationId, callId: ref.callId });
+          append('local/operation-finished', { operationId, localWorkspace: 'C:/engineering-only-never-created' }); append('handoff/command-observed', { taskId: task.id, attemptId, ...observation });
+          append('tool/result', { name: 'terminal_test', result: { value: { exitCode: 0, output: '# tests 2\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n' } } }, ref);
+        }
+        if (task.kind === 'review') append('quality/reviewed', { taskId: task.id, attemptId, verdict: 'pass' }, links);
+        append('handoff/accepted', { taskId: task.id, attemptId, inputs: task.inputs.map(input => ({ ...file(input.path), producerTaskId: input.producerTaskId })), outputs: task.outputs.map(output => file(output.path)), commands });
+      }
+      append('team/checkpoint', { tasks: nativeTasks.map((task, index) => ({ id: 't' + index, status: selectedTasks.some(row => row.id === task.id) || recovery && !isParent && task.id === 'dev' ? 'completed' : 'pending', attempt_id: id(501 + index) })) });
+      append('run/finished', { status: isParent ? 'cancelled' : 'completed' }); events[0].data.snapshotSha256 = sha(JSON.stringify(snapshot));
+      return { archive: { id: idValue, snapshot, events, eventCount: events.length, integrity: 'ok', status: isParent ? 'cancelled' : 'completed' }, state: { status: isParent ? 'cancelled' : 'completed' }, downloads: (isParent ? paths.slice(0, 3) : paths).map(file) };
+    }
+    const parent = recovery ? makeRun(parentId, [nativeTasks[0]], true) : undefined, final = makeRun(runId, recovery ? nativeTasks.slice(1) : nativeTasks);
+    allUsage.push(...usage);
+    return { projectId, version, runId, parentId, project, parent, final, confirmation: source(`docs/test-evidence/synthetic-${scenario}-confirm-never-written.json`, proof), generations: recovery ? [original] : [recovered, original], models: [model], citations,
+      readiness: { recordedCost: paid.cost + 4 * bodyCost(), reserved: 0, availableBudget: 3 - paid.cost - 4 * bodyCost(), pendingCount: 0, uncertainCount: 0, receipts: [] },
+      ...(recovery ? { restart: { runId: parentId, status: 'passed', checks: Object.fromEntries(['beforeSafeToStop', 'identityVerified', 'restartedReady', 'sameSnapshot', 'sameEvents', 'sameBudgetsAndCallHistory', 'sameFiles', 'noAutomaticModelRestart'].map(key => [key, true])),
+        stop: { processId: 123, at: '2026-10-06T00:00:00Z', identityVerified: true, stopRequested: true }, launch: { wrapperPid: 456, at: '2026-10-06T00:01:00Z' }, actualNativeExitCodes: [{ processId: 123, event: 'process-exit', exitCode: 0 }] }, restartSha256: sha('engineering-only restart') } : {}) };
+  }
+  const normal = projectFixture('normal'), recovery = projectFixture('recovery'); normal.usage = allUsage; recovery.usage = allUsage;
+  const protectedProject = { id: id(999), version: 6, createdAt: '2026-10-04T00:00:00Z', policy: { maxBudget: .48 } };
+  const finance = { complete: true, intent: { recordedAt: '2026-10-05T00:00:00Z', authorization: { newProjectLimit: 5, newProjectCount: 2, totalAdditionalLimit: 10 }, baselineUsageIds: [], oldProject: { id: id(999), version: 6, limit: .48 } },
+    ledger: { baselineReceiptIds: [], scenarios: { normal: orphanHolds.map(row => row.id), recovery: [] } }, projects: [normal.project, recovery.project, protectedProject], usage: allUsage, usageBefore: structuredClone(allUsage),
+    costs: { calls: orphanHolds }, costsBefore: { calls: structuredClone(orphanHolds) } };
+  return { engineeringOnly: true, normal, recovery, finance };
+}
+function reseal(capture) { for (const scenario of ['normal', 'recovery']) for (const part of [capture[scenario].parent, capture[scenario].final].filter(Boolean)) {
+  part.archive.events.forEach((event, index) => { event.seq = index + 1; }); part.archive.eventCount = part.archive.events.length; part.archive.events[0].data.snapshotSha256 = sha(JSON.stringify(part.archive.snapshot));
+} }
+const find = (result, group, id) => result[group].checks.find(row => row.id === id);
+const newRecoveryChecks = new Set(['recovery-fixed-v1-current-v2-content-and-grants', 'recovery-original-http-private-search-boundary', 'recovery-actual-v2-upgrade-provenance']);
+function legacyPassesWithMissingNewEvidence(result) {
+  assert.ok(result.functional.checks.filter(row => !newRecoveryChecks.has(row.id)).every(row => row.status === 'passed'),
+    JSON.stringify(result.functional.checks.filter(row => !newRecoveryChecks.has(row.id) && row.status !== 'passed')));
+  assert.equal(result.functional.status, 'blocked');
+  assert.equal(result.functional.checks.filter(row => newRecoveryChecks.has(row.id) && row.status === 'blocked').length, 3);
+}
+
+test('complete normal/recovery engineering evidence passes functional predicates while all orphan finance remains blocked', () => {
+  const input = fixture(), result = auditGoTodo(input);
+  legacyPassesWithMissingNewEvidence(result);
+  assert.equal(result.financial.status, 'blocked'); assert.equal(result.status, 'blocked'); assert.equal(result.actualMvpAccepted, false);
+  assert.equal(find(result, 'financial', 'two-five-dollar-projects-and-all-phase-costs-within-ten').status, 'passed', JSON.stringify(result.financial.checks.filter(row => row.id !== 'finance-provider-bill-and-unknown-costs' && row.status !== 'passed')));
+  const retained = find(result, 'financial', 'all-original-unknown-holds-and-history-preserved'); assert.equal(retained.status, 'passed');
+  assert.ok(Math.abs(retained.evidence.retainedTotal - .7619958) < 1e-12);
+  assert.equal(find(result, 'financial', 'finance-provider-bill-and-unknown-costs').status, 'blocked');
+  assert.equal(result.projects[0].binding.generationSources.length, 2); assert.equal(result.projects[1].binding.generationSources.length, 1);
+});
+
+test('native Node spec and TAP counters are equivalent with strict full-count, hash and receipt evidence', () => {
+  const spec = '\u001b[32m✔ real CLI scenario (1ms)\u001b[0m\r\nℹ tests 12\r\nℹ suites 0\r\nℹ pass 12\r\nℹ fail 0\r\nℹ cancelled 0\r\nℹ skipped 0\r\nℹ todo 0\r\nℹ duration_ms 2\r\n';
+  const expected = { tests: 12, pass: 12, fail: 0, cancelled: 0, skipped: 0, todo: 0 };
+  assert.deepEqual(parseNodeTestEvidence(spec), expected);
+  assert.deepEqual(parseNodeTestEvidence(spec.replaceAll('ℹ', '#')), expected);
+  for (const output of [spec + 'ℹ tests 13\n', spec.replace('ℹ pass 12', 'ℹ pass 11'), spec.replace('ℹ skipped 0', 'ℹ skipped 1'), spec.replace('ℹ todo 0\r\n', ''), spec.replaceAll('ℹ', 'echo ℹ')]) assert.throws(() => parseNodeTestEvidence(output));
+  const input = fixture();
+  for (const section of [input.normal.final, input.recovery.parent, input.recovery.final]) for (const event of section.archive.events.filter(row => row.type === 'tool/result' && row.data.name === 'terminal_test')) event.data.result.value.output = spec;
+  reseal(input); const result = auditGoTodo(input);
+  legacyPassesWithMissingNewEvidence(result);
+  const checks = result.functional.checks.filter(row => row.id === 'literal-cli-commands-complete-counts-and-real-cli-source');
+  assert.ok(checks.every(row => row.evidence.observations.every(receipt => receipt.counts.tests === 12 && receipt.outputSha256 === sha(spec))));
+  assert.equal(result.financial.status, 'blocked'); assert.equal(result.actualMvpAccepted, false);
+});
+
+test('explicit distinct confirmed versions bind their own source chains and missing/wrong versions stay blocked', () => {
+  const input = fixture({ normalVersion: 7, recoveryVersion: 8 }), result = auditGoTodo(input);
+  legacyPassesWithMissingNewEvidence(result);
+  assert.deepEqual(result.projects.map(row => row.binding.version), [7, 8]);
+  assert.equal(result.financial.status, 'blocked'); assert.equal(result.actualMvpAccepted, false);
+  for (const version of [undefined, 5, 6, 0, -1, 1.5]) {
+    const changed = structuredClone(input); changed.normal.version = version;
+    assert.equal(find(auditGoTodo(changed), 'functional', 'actual-go-confirmation-paid-generation-and-current-model').status, 'blocked');
+  }
+});
+
+test('CLI version overrides are explicit safe integers and preserve offline evidence-only options', () => {
+  const args = ['--capture=docs/test-evidence/synthetic-capture-never-written.json', '--output=docs/test-evidence/synthetic-output-never-written.json'];
+  assert.deepEqual(options(args).versions, {});
+  assert.deepEqual(options([...args, '--normal-version=7', '--recovery-version=8']).versions, { normal: 7, recovery: 8 });
+  for (const version of ['0', '-1', '1.5', 'NaN', '07', '9007199254740992']) assert.throws(() => options([...args, '--normal-version=' + version]));
+  assert.throws(() => options([...args, '--normal-version=7', '--normal-version=8']));
+});
+
+test('raw generation SHA, 201/failing confirmation, candidate substitution and stale current model cannot become a Go binding', () => {
+  for (const mutate of [
+    input => { input.normal.generations[0].raw += ' '; },
+    input => { const proof = JSON.parse(input.normal.confirmation.raw); proof.response.status = 201; input.normal.confirmation = source(input.normal.confirmation.path, proof); },
+    input => { const proof = JSON.parse(input.normal.confirmation.raw); proof.failure = { code: 'failed' }; input.normal.confirmation = source(input.normal.confirmation.path, proof); },
+    input => { input.normal.project.plan.tasks[1].objective = 'substituted'; },
+    input => { input.normal.models[0].outputRate = .01; },
+  ]) { const input = structuredClone(fixture()); mutate(input); const result = auditGoTodo(input); assert.equal(find(result, 'functional', 'actual-go-confirmation-paid-generation-and-current-model').status, 'blocked'); }
+});
+
+test('fallback, thinking omission, complete task/policy changes and missing approved role permission are blocked', () => {
+  for (const mutate of [
+    input => { input.normal.final.archive.snapshot.modelRoutes[0].thinkingMode = undefined; },
+    input => { input.normal.final.archive.snapshot.agents[0].fallbackModelId = id(555); },
+    input => { input.normal.final.archive.snapshot.policy.maxBudget = 4; },
+    input => { input.normal.final.archive.snapshot.tasks[0].extraPermission = 'changed'; },
+    input => { input.normal.final.archive.snapshot.agents[1].knowledgeSpaceIds = []; },
+    input => { input.normal.final.archive.events.find(row => row.type === 'model/wire-request').data.body.thinking = undefined; },
+  ]) { const input = structuredClone(fixture()); mutate(input); reseal(input); assert.equal(find(auditGoTodo(input), 'functional', 'full-go-approved-contract-role-permissions-and-wire-options').status, 'blocked'); }
+});
+
+test('failed/incomplete manager, missing native exit and missing independent review cannot be accepted', () => {
+  for (const mutate of [
+    input => { input.normal.final.state.status = 'failed'; },
+    input => { input.normal.final.archive.events.find(row => row.type === 'team/checkpoint').data.tasks[3].status = 'pending'; },
+    input => { input.normal.final.archive.events = input.normal.final.archive.events.filter(row => row.type !== 'local/operation-finished'); },
+    input => { input.normal.final.archive.events = input.normal.final.archive.events.filter(row => row.type !== 'quality/reviewed'); },
+  ]) { const input = structuredClone(fixture()); mutate(input); reseal(input); assert.equal(auditGoTodo(input).functional.status, 'blocked'); }
+});
+
+test('CLI counts must all pass without skipped/cancelled/todo and an import-only independent source is insufficient', () => {
+  for (const output of ['# tests 2\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 1\n# todo 0\n', '# tests 2\n# pass 2\n# fail 0\n', '# tests 2\n# pass 2\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 1\n']) {
+    const input = structuredClone(fixture()); input.normal.final.archive.events.find(row => row.type === 'tool/result' && row.data.name === 'terminal_test').data.result.value.output = output;
+    reseal(input); assert.equal(find(auditGoTodo(input), 'functional', 'literal-cli-commands-complete-counts-and-real-cli-source').status, 'blocked');
+  }
+  const input = structuredClone(fixture()), write = input.normal.final.archive.events.find(row => row.type === 'tool/start' && row.data.arguments?.path === 'acceptance.test.mjs');
+  write.data.arguments.content = "import './server.mjs';\n";
+  const changed = { path: 'acceptance.test.mjs', sha256: sha(write.data.arguments.content), size: Buffer.byteLength(write.data.arguments.content) };
+  input.normal.final.downloads[3] = changed;
+  for (const event of input.normal.final.archive.events) for (const rows of [event.data.files, event.data.inputs, event.data.outputs].filter(Array.isArray)) for (const row of rows) if (row.path === changed.path) Object.assign(row, changed);
+  reseal(input); assert.equal(find(auditGoTodo(input), 'functional', 'literal-cli-commands-complete-counts-and-real-cli-source').status, 'blocked');
+});
+
+test('exact file SHA/producer/employee LLM provenance and private fixed KB versions remain mandatory', () => {
+  for (const mutate of [
+    input => { input.normal.final.downloads[0].sha256 = sha('out-of-band'); },
+    input => { input.normal.final.archive.events.find(row => row.type === 'handoff/accepted' && row.data.taskId === 'qa_verify').data.inputs[0].producerTaskId = 'manager_accept'; },
+    input => { input.normal.final.archive.events = input.normal.final.archive.events.filter(row => !(row.type === 'tool/start' && row.data.arguments?.path === 'server.mjs')); },
+    input => { input.normal.final.archive.events.find(row => row.type === 'knowledge/citation').data.sources[0].version = 2; },
+    input => { input.normal.final.archive.snapshot.knowledge.agentDocuments['native-qa'] = ['shared']; },
+    input => { input.normal.citations[0].value.source = { note: 'different fixed provenance' }; },
+  ]) { const input = structuredClone(fixture()); mutate(input); reseal(input); assert.equal(auditGoTodo(input).functional.status, 'blocked'); }
+});
+
+test('recovery must preserve parent/dev checkpoint/native attempts, complete DAG, budget calls and physical restart', () => {
+  for (const mutate of [
+    input => { delete input.recovery.parentId; }, input => { delete input.recovery.restart; },
+    input => { input.recovery.restart.actualNativeExitCodes = []; },
+    input => { input.recovery.final.archive.snapshot.budgetHistory.calls = 0; },
+    input => { input.recovery.final.archive.snapshot.executionBudget = 3; },
+    input => { input.recovery.final.archive.snapshot.completedCheckpoints = []; },
+    input => { input.recovery.final.archive.events.find(row => row.type === 'recovery/restored').data.files[0].sha256 = sha('wrong-restoration'); },
+    input => { input.recovery.final.archive.events.push(structuredClone(input.recovery.parent.archive.events.find(row => row.type === 'model/wire-request'))); },
+  ]) { const input = structuredClone(fixture()); mutate(input); reseal(input); assert.equal(auditGoTodo(input).functional.status, 'blocked'); }
+});
+
+test('finance tampering fails its specific predicate independently of already blocked provider bills', () => {
+  for (const [checkId, mutate] of [
+    ['all-original-unknown-holds-and-history-preserved', input => { input.finance.costs.calls = []; input.finance.costsBefore.calls = []; }],
+    ['all-original-unknown-holds-and-history-preserved', input => { input.finance.costs.calls[2].amount = 0; }],
+    ['all-original-unknown-holds-and-history-preserved', input => { input.finance.costs.calls[2].status = 'settled'; }],
+    ['all-original-unknown-holds-and-history-preserved', input => { input.finance.costs.calls[0].historySha256 = sha('new'); }],
+    ['all-original-unknown-holds-and-history-preserved', input => { input.finance.costs.calls[0].history.push({ source: 'unrecorded change' }); }],
+    ['complete-stable-phase-ledger-capture', input => { input.normal.usage.pop(); }],
+    ['original-recorded-fees-not-removed-or-repriced', input => { input.finance.usage.find(row => row.id === id(701)).cost = 0; }],
+    ['two-five-dollar-projects-and-all-phase-costs-within-ten', input => { input.finance.intent.authorization.totalAdditionalLimit = 20; }],
+    ['two-five-dollar-projects-and-all-phase-costs-within-ten', input => { input.finance.projects[0].policy.maxBudget = 5.1; }],
+    ['complete-project-ledger-and-retained-net-cap', input => { input.normal.readiness.availableBudget = 3; }],
+    ['original-project-version-and-budget-preserved', input => { input.finance.projects[2].version = 7; }],
+    ['original-phase-baselines-and-receipt-allocation-preserved', input => { input.finance.ledger.baselineReceiptIds = input.finance.costs.calls.map(row => row.id); }],
+    ['original-phase-baselines-and-receipt-allocation-preserved', input => { input.finance.intent.baselineUsageIds.push(id(701)); }],
+    ['original-phase-baselines-and-receipt-allocation-preserved', input => { input.finance.intent.baselineUsageIds.push(input.finance.usage.at(-1).id); }],
+    ['original-phase-baselines-and-receipt-allocation-preserved', input => { input.finance.ledger.scenarios.recovery = input.finance.ledger.scenarios.normal; input.finance.ledger.scenarios.normal = []; }],
+  ]) { const input = structuredClone(fixture()); mutate(input); const result = auditGoTodo(input); assert.equal(find(result, 'financial', checkId).status, 'blocked', checkId); assert.equal(result.financial.status, 'blocked'); assert.equal(result.actualMvpAccepted, false); }
+});
+
+test('unknown external operations block functional acceptance independently of already blocked finance', () => {
+  const input = structuredClone(fixture()); input.normal.final.archive.events.push({ type: 'runtime/outcome-unknown', data: { callId: 'unresolved-action', name: 'terminal' } }); reseal(input);
+  const result = auditGoTodo(input); assert.equal(result.functional.status, 'blocked'); assert.equal(result.financial.status, 'blocked');
+  assert.equal(find(result, 'functional', 'no-unknown-external-operation-can-be-hidden-by-finance').status, 'blocked');
+});
+
+test('absence never fabricates successful execution or known-zero financial evidence, and CLI exposes only offline paths', () => {
+  const result = auditGoTodo({ engineeringOnly: true }); assert.equal(result.functional.status, 'blocked'); assert.equal(result.financial.status, 'blocked'); assert.equal(result.status, 'blocked');
+  assert.throws(() => sourceDocument({ path: 'docs/test-evidence/fake.json', raw: '{}', sha256: sha('other') }));
+  assert.throws(() => options(['--capture=C:/Users/JJ/Desktop/la/agent_department/.data/local/fake.json', '--output=docs/test-evidence/fake-output.json']));
+  assert.throws(() => options(['--api=http://127.0.0.1:4310', '--capture=docs/test-evidence/fake.json', '--output=docs/test-evidence/fake-output.json']));
+  assert.throws(() => options(['--capture=https://example.test/fee.json', '--output=docs/test-evidence/fake-output.json']));
+});

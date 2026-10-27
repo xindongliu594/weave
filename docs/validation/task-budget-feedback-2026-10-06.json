@@ -1,0 +1,106 @@
+{
+  "kind": "task-budget-feedback-isolated-validation",
+  "frozenAt": "2026-10-06T03:04:47Z",
+  "worktree": "C:/Users/JJ/.codex/worktrees/f57c/agent_department",
+  "source": {
+    "path": "packages/contracts/index.ts",
+    "priorSha256": "a77639df16b4e1865222d872d8b1a487bab19a1b0390ac5fe9e4162543faf468",
+    "sha256": "f25847d5f909c44805b08f8f52bf9c36d9ee63d056e1c921bff71c4c5c961f56",
+    "ownChange": "validatePlan only: append detailed task-budget errors after the retained generic error; preserve the original comparison and total estimate"
+  },
+  "test": {
+    "path": "tests/task-budget-feedback.test.ts",
+    "sha256": "de74916ab1174d331365c1e464c2800fd93f14ad52684db051518716e0284b3a"
+  },
+  "unchangedObservedFiles": [
+    {
+      "path": "apps/web/src/ProjectPlanning.tsx",
+      "sha256": "34c74aaacb9f1d99e035716042ada9c6c12b841d014e1a0346d929357c43ee36"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    }
+  ],
+  "priorActualCase": {
+    "path": "docs/test-evidence/go-after-truncation-normal-generate-2026-10-06T02-48-08-965Z-98070031.json",
+    "sha256": "886e7cdffb6d6f7387a4bee6ec56094a81d427d936378c1d845d1b772292334e",
+    "httpStatus": 200,
+    "validationValid": false,
+    "taskId": "qa_verify",
+    "estimatedInputTokens": 300000,
+    "estimatedOutputTokens": 30000,
+    "rates": {
+      "inputRate": 0.3,
+      "outputRate": 1.2
+    },
+    "taskCap": 0.15,
+    "rawEstimate": 0.126,
+    "bufferedEstimate": 0.1512,
+    "totalExecutionEstimate": 0.37296,
+    "priorActualCaseWasNotReplayed": true
+  },
+  "testRuns": [
+    {
+      "command": "node scripts/test-integration.mjs tests/task-budget-feedback.test.ts",
+      "phase": "initial",
+      "exitCode": 1,
+      "tests": 8,
+      "pass": 7,
+      "fail": 1,
+      "correction": "Test read error instead of the actual AppError JSON message property; only the test assertion was corrected."
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/task-budget-feedback.test.ts",
+      "phase": "final",
+      "exitCode": 0,
+      "tests": 8,
+      "pass": 8,
+      "fail": 0,
+      "skip": 0
+    },
+    {
+      "command": "node --import tsx --test tests/policy.test.ts tests/project-planning-ui.test.ts",
+      "phase": "existing regressions",
+      "exitCode": 0,
+      "tests": 33,
+      "pass": 33,
+      "fail": 0,
+      "skip": 0
+    }
+  ],
+  "verification": {
+    "retainedGenericError": "任务执行估算（含 20% 预留）超过该任务的费用上限",
+    "appendedError": "任务「独立真实CLI子进程HTTP验收」（qa_verify）：执行估算（含 20% 预留）$0.151200 超过任务费用上限 $0.15。",
+    "retainedStrictFormula": "Math.ceil(cost * 1.2 * 1e6) / 1e6 > task.maxBudget",
+    "exactBoundaryPasses": true,
+    "capIsNotRoundedInFeedback": true,
+    "multipleTaskDetailsInTaskOrder": true,
+    "missingModelStillEstimateNull": true,
+    "planPolicyModelUnchanged": true,
+    "generatedCandidateHttp200ShowsDetail": true,
+    "generationLeavesSavedPlanPolicyVersionStatusUnchanged": true,
+    "blockedApprovalHttpStatus": 422,
+    "blockedApprovalCode": "PLAN_NOT_READY",
+    "blockedApprovalBeforeCallsReceiptsAndEmployeeWork": true,
+    "employeeRunCount": 0,
+    "localOperationCount": 0,
+    "toolApprovalCount": 0,
+    "webCheck": "React GeneratedPlanView static rendering of validation error paragraphs, including HTML escaping; no web source edit required"
+  },
+  "executionBoundaries": {
+    "originalDatabaseOpenedDirectly": false,
+    "originalServiceHttpCalls": 0,
+    "externalPaidApiCalls": 0,
+    "realModelCalls": 0,
+    "credentialReads": 0,
+    "employeeFilesReadOrChanged": 0,
+    "database": "fresh in-memory PGlite supplied by scripts/test-integration.mjs",
+    "api": "temporary loopback product app",
+    "syntheticModelHttpResponses": 1,
+    "outboundHttpOrigins": "only two credential-free 127.0.0.1 fixture origins",
+    "temporaryFileRoots": "guarded task-budget-feedback-* under system temp",
+    "actualBrowserOrProductReload": false,
+    "finalTypecheckBuild": "parent will run after source freeze"
+  }
+}

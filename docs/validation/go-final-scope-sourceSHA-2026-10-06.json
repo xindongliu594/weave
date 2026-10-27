@@ -1,0 +1,121 @@
+{
+  "kind": "offline final-scope engineering verification",
+  "checkedAt": "2026-10-06T07:35:16.802Z",
+  "status": "passed",
+  "actualMvpAccepted": false,
+  "scope": "Only NEW final-scope helpers/tests/report were edited. No real API/DB/model/provider/service/employee action was performed.",
+  "sourceStable": [
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs",
+      "beforeSha256": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54",
+      "afterSha256": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-referenced-2026-10-06.mjs",
+      "beforeSha256": "cb25ee1384f09527406c7b77e00fd5a51f65a130ee11455f021028399fe5a560",
+      "afterSha256": "cb25ee1384f09527406c7b77e00fd5a51f65a130ee11455f021028399fe5a560",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-referenced-2026-10-06.mjs",
+      "beforeSha256": "25402ee4b55339606625cd587f2d75ce297c5635e6b59c179c63d518699dec44",
+      "afterSha256": "25402ee4b55339606625cd587f2d75ce297c5635e6b59c179c63d518699dec44",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-acceptance-run-references-2026-10-06.mjs",
+      "beforeSha256": "dc33a0a7a04afd77949c4fcc83c56094b7708d3009bf2b1e00a60caf50327984",
+      "afterSha256": "dc33a0a7a04afd77949c4fcc83c56094b7708d3009bf2b1e00a60caf50327984",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "beforeSha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3",
+      "afterSha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "beforeSha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7",
+      "afterSha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7",
+      "stable": true
+    },
+    {
+      "path": "tests/go-todo-acceptance-audit.test.mjs",
+      "beforeSha256": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686",
+      "afterSha256": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686",
+      "stable": true
+    }
+  ],
+  "syntax": [
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-referenced-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-final-scope-referenced-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-scope-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-proof-2026-10-06.mjs",
+      "exitCode": 0
+    }
+  ],
+  "tests": {
+    "files": [
+      "tests/go-todo-acceptance-audit.test.mjs",
+      "tests/go-final-scope-legacy-regression.test.mjs",
+      "tests/go-final-knowledge-scope.test.mjs",
+      "tests/go-final-knowledge-proof.test.mjs",
+      "tests/go-acceptance-run-references.test.mjs",
+      "tests/go-funded-knowledge-upgrade.test.mjs"
+    ],
+    "exitCode": 0,
+    "stdoutPath": "docs/validation/go-final-scope-tests-2026-10-06.txt",
+    "stdoutSha256": "bf97b40fcee14f1acc9fb2e5d2aeaa0cc48538944f122bbe1890f94483b72653"
+  },
+  "newSources": [
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-2026-10-06.mjs",
+      "sha256": "db2e0e8c1d0bf1fcb1343b324180c1e3f256871b7d8ebc2efc2117bd7f7e68a4"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-referenced-2026-10-06.mjs",
+      "sha256": "024349561edddeb7fc6d9f361a3cbe8991198ce052145b1a5e827178043722cc"
+    },
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-final-scope-referenced-2026-10-06.mjs",
+      "sha256": "e9b6248848b192e3d093e8f58a3c2c09e1a66d7ae05e781a08dcb9499e5e939c"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-scope-2026-10-06.mjs",
+      "sha256": "1f3935fde7c63475cb9fb8d447c4d894b0dc1fbd3797cdc11a85d850bb6c095f"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-proof-2026-10-06.mjs",
+      "sha256": "a58618e00dd2562c7c4ee57fcf977197d079fba8801c3c73ce45aca90edd6635"
+    },
+    {
+      "path": "tests/go-final-scope-legacy-regression.test.mjs",
+      "sha256": "196dbd4fba7dc5d968eeb513d1e3313814b470fac1f5d05178d9026dea5cb6ea"
+    },
+    {
+      "path": "tests/go-final-knowledge-scope.test.mjs",
+      "sha256": "6dad0d0e2b4735e465997b7e0424e7671d6a9320be0c4c8c7cb3c6af07139874"
+    },
+    {
+      "path": "tests/go-final-knowledge-proof.test.mjs",
+      "sha256": "4b53c5ce49fe5f2678a6cac2420515e24de301b9bda598341e2bed3f7246636a"
+    }
+  ],
+  "actualRecoveryEvidence": "Actual v2 frozen-helper report, original references and current v2/fixed v1/citations must still be supplied; missing evidence is blocked independently of finance."
+}

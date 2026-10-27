@@ -1,0 +1,24 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ approval blocks uncertain fees by default and an in-flight call still blocks explicit carryover (2397.2436ms)
+✔ opt-in approval freezes net budget while old unknown plus live reservation cover exact global and departmental daily caps once (247.8532ms)
+✔ global live-run coverage still charges uncovered holds to the actual participating department (254.2056ms)
+✔ insufficient original or daily budget rejects opt-in approval without changing unknown receipts (351.3334ms)
+✔ retry retains the default gate and pending calls cannot be carried over even with explicit opt-in (252.2604ms)
+✔ opt-in checkpoint resume inherits unknown wire calls and dispatches only the unfinished task through the local model (1901.5905ms)
+✔ an unknown task hold exhausts its original cap before retry even when the project still has funds (208.1938ms)
+✔ an unknown wire attempt still exhausts the original retry call cap rather than resetting on carryover (207.2833ms)
+✔ a late bill above its old hold fences every new reservation by total project cost, including parallel admission (237.5824ms)
+✔ ordinary late settlement preserves history and never enlarges an already approved run allocation (203.5294ms)
+✔ readiness and approved carryover expose only bounded receipt identities and amounts, never credentials or original context (210.9485ms)
+✔ new-plan carryover approval cannot silently replay a prior native operation with an unknown outcome (184.2595ms)
+✔ a model-only 403 with a confirmed native operation can retain its hold when a new plan is explicitly approved (188.9499ms)
+✔ new-plan carryover refuses missing or incomplete original run evidence instead of treating it as a known operation outcome (287.6989ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7810.4973

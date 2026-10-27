@@ -1,0 +1,14 @@
+✔ all explicit efforts are rejected before tool checks, regardless of route name, protocol or thinking flag (338.1831ms)
+✔ model default passes while existing tool permission and budget gates still apply (0.7353ms)
+✔ archived explicit effort is rejected before any database access or dispatch (1.0864ms)
+✔ default archived routes still require current tools and exact approved fingerprints (1.2117ms)
+✔ unset effort renders model default and saved medium remains visible until user changes it (13.7503ms)
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (11.6035ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2819.203

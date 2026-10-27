@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-06T10:29:38.398Z",
+  "kind": "offline-known-zero-paid-normal12-second-readonly-quote-block",
+  "attemptSource": {
+    "path": "docs/test-evidence/go-normal12-normal-generate-2026-10-06T10-22-33-660Z-e73750cd.json",
+    "sha256": "749239ce71259d00020e6551f4c0642fae0f4aa6014e6218cb38e0709b776740"
+  },
+  "firstQuoteSource": {
+    "kind": "quote",
+    "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-normal12-normal-generate-2026-10-06T10-22-33-660Z-e73750cd-quote-response.json",
+    "status": 200,
+    "bytes": 10121,
+    "sha256": "a0e15236d46561417d4ea01824e28fb7c875b8ffa7af1b957ca5b3892846b85d"
+  },
+  "currentClientSource": {
+    "path": "apps/web/src/ProjectPlanning.tsx",
+    "sha256": "98532b13100f2f332b8446c666b9a03799efe92084557e5652c60be9c03039e4"
+  },
+  "finding": "The actual webpage performs an explicit cost check and a second read-only cost recheck immediately before generation. The helper single-quote counter blocked the normal recheck after its full body/keyless guard passed, so no paid generation was forwarded.",
+  "paidRequestsForwarded": 0,
+  "newPaidCalls": 0,
+  "quoteRequestsForwarded": 1,
+  "secondQuoteBlockedBeforeDispatch": true,
+  "modelResponseAvailable": false,
+  "finishReason": "not applicable; no model dispatch",
+  "usageIncrement": [],
+  "phaseBefore": 3.3055394999999983,
+  "phaseAfter": 3.3055394999999983,
+  "projectVersion": 11,
+  "planUnchanged": true,
+  "candidateAvailable": false,
+  "oldComputedPaidClaimPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\funded-acceptance\\web-operation-guards\\go-plan-normal12-5000893b8e7d1ca0c4102a1e2480137c4f4275c20d7fa084ebb769d19ad1d337.json",
+  "oldClaimState": "not-created; actual ENOENT",
+  "oldClaimFabricated": false,
+  "oldClaimDeleted": false,
+  "scope": {
+    "apiCalls": 0,
+    "browserLaunches": 0,
+    "businessPosts": 0,
+    "existingHelpersChanged": false,
+    "employeeArtifactsAuthored": false,
+    "originalDatabaseOpened": false,
+    "keysRead": false
+  },
+  "status": "awaiting-root-direction-for-new-fixed-two-stage-readonly-quote-successor"
+}

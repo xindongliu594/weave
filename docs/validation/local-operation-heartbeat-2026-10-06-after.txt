@@ -1,0 +1,38 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (3178.706ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (546.0352ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (2562.3919ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (349.313ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7347.3049
+COMPETITION {"scenario":"same-operation-claim/start","clients":16,"offers":1,"uniqueTokens":1,"start200":1,"start409":15,"nativeWrites":1,"fileSha256":"547690228c00dbdbab101fe6be7171c57db61feedbb55027b698c42e27e03af7","providerRequests":0}
+✔ 16 clients competing for a claim and start obtain one token and one actual native write (1881.7435ms)
+COMPETITION {"scenario":"two-employees/stale-file","clients":12,"maxActiveClaims":1,"secondStayedQueued":true,"staleCode":"FILE_VERSION_CONFLICT","originalPreserved":true,"freshShaAccepted":true,"providerRequests":0}
+✔ two employees share one device without overlapping claims, and a stale writer cannot overwrite the first file (880.6991ms)
+COMPETITION {"scenario":"duplicate-identical-receipts","clients":16,"result200":16,"durableResultRows":1,"lateResult":false,"providerRequests":0}
+✔ 16 identical competing receipts are idempotent and keep the one real file result (487.0556ms)
+COMPETITION {"scenario":"conflicting-receipts","clients":2,"result200":1,"result409":1,"firstResultPreserved":true,"providerRequests":0}
+✔ two conflicting competing receipts accept one and cannot replace its persisted result (374.5877ms)
+COMPETITION {"scenario":"expired-lease-before-start","clients":12,"start200":0,"start409":12,"started":false,"newEnqueueDenied":true,"providerRequests":0}
+✔ an expired run lease rejects every competing start and forbids new enqueue (432.5886ms)
+COMPETITION {"scenario":"expired-run-lease-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+COMPETITION {"scenario":"replaced-worker-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+COMPETITION {"scenario":"expired-operation-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+✔ expired lease, replaced worker and expired operation keep actual late writes for audit without accepting completion (1156.0492ms)
+COMPETITION {"scenario":"old-claim-token","clients":8,"oldStart409":8,"oldResult403":8,"oldReceiptAdopted":false,"validCurrentResultAccepted":true,"providerRequests":0}
+✔ a real old operation claim token cannot start or submit the next operation (643.1695ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6621.9621

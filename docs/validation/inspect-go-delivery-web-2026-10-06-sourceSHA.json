@@ -1,0 +1,52 @@
+{
+  "capturedAt": "2026-10-06T14:14:33.9001479+08:00",
+  "inputs": [
+    {
+      "path": "docs/test-evidence/helpers/inspect-go-delivery-web-2026-10-06.mjs",
+      "sha256": "2397afde6020adb53a295fc95a2859a2b034b665fa2042a631133d1ae38c4c2f"
+    },
+    {
+      "path": "tests/go-delivery-web-helper.test.mjs",
+      "sha256": "d842b6ec8fb5eb84f2127c3a4b481faa8f80f383f7c4ee3a35234d0a297425a8"
+    },
+    {
+      "path": "docs/test-evidence/helpers/inspect-my-gateway-delivery-web-2026-10-05.mjs",
+      "sha256": "be200f4acb9cd6eb7def064c804314e8b56ee2ff12f4d60fa371d7926ea42bef"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs",
+      "sha256": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-funded-todo-acceptance-2026-10-05.mjs",
+      "sha256": "2f2bd665fd98e18d6aaffb09a817e682c31d56311c5cc6281c6237b71dba7dcb"
+    },
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-2026-10-06.mjs",
+      "sha256": "350f9a3c27f121fbfa301a596a730913bf4be6450b242479b6d9de972717cd9e"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    },
+    {
+      "path": "apps/web/src/RunCenter.tsx",
+      "sha256": "89b8fa13e6c0957fb0be5a29c6f99cff2bae2d214f7b803848d404c5305a155a"
+    },
+    {
+      "path": "apps/web/src/RunExtras.tsx",
+      "sha256": "ba49cc904db20dcda7bd921c1b89c8641cfdcd287f36ab5ff4ef94dae98c66f0"
+    }
+  ],
+  "scope": "Offline syntax/pure checks only; no actual browser/API acceptance",
+  "verifiedAfterTestsAt": "2026-10-06T14:16:46.0102524+08:00",
+  "allInputsUnchanged": true
+}

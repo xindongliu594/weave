@@ -1,0 +1,99 @@
+{
+  "checkedAt": "2026-10-05T04:58:49.910Z",
+  "phase": "claim-source-audit",
+  "parentRunId": "5114bb4f-7ac4-413d-a80f-aceeace8bdec",
+  "projectId": "dde78f91-2a99-4a63-a9fa-5cb7bab2b8f0",
+  "sourceRunArchive": "C:\\Users\\JJ\\Desktop\\la\\agent_department\\.data\\local\\runs\\5114bb4f-7ac4-413d-a80f-aceeace8bdec",
+  "sourceOnly": true,
+  "originalReadiness": {
+    "recordedCost": 0.3664174,
+    "reserved": 0.027869400000000003,
+    "availableBudget": 0.08571319999999998,
+    "pendingCount": 0,
+    "uncertainCount": 2,
+    "receipts": [
+      {
+        "id": "12ebc7bd-bc11-4948-9142-d778f0e22433",
+        "amount": 0.022238400000000002,
+        "status": "uncertain",
+        "runId": "a3ce2f05-9048-4967-9b50-f981fecd24ec"
+      },
+      {
+        "id": "4319725c-c6aa-4401-834d-271fb06d4c9e",
+        "amount": 0.005631,
+        "status": "uncertain",
+        "runId": "03608f5f-5fe1-4f6b-97bf-214a1f00f63f"
+      }
+    ]
+  },
+  "originalLedgerUnchanged": true,
+  "sourceArchiveUnchanged": true,
+  "originalDbQueriesOrWrites": 0,
+  "employeeFilesChanged": false,
+  "productRunsCreated": 0,
+  "realProviderFetches": 0,
+  "realSourceFailure": {
+    "sourceRunId": "5114bb4f-7ac4-413d-a80f-aceeace8bdec",
+    "status": "failed",
+    "sourceParent": "1e6a2c30-3e8c-46fd-9c31-d2557768eb9a",
+    "observedPaidCalls": 1,
+    "observedSettledCalls": 1,
+    "wires": [
+      {
+        "seq": 60,
+        "usageId": "7f882dba-d0c9-40e8-9c14-da54c52b349f",
+        "modelId": "f7092d28-6837-4223-b3d7-73f845cef227",
+        "taskId": "qa_verify",
+        "reservation": 0.073602,
+        "envelopeBytes": 28777
+      }
+    ],
+    "settled": [
+      {
+        "seq": 89,
+        "id": "7f882dba-d0c9-40e8-9c14-da54c52b349f",
+        "inputTokens": 7501,
+        "outputTokens": 54,
+        "cost": 0.015542
+      }
+    ],
+    "claim": {
+      "seq": 95,
+      "name": "agent_teams_claim_task",
+      "status": "claimed",
+      "taskId": "t2",
+      "taskDetailsBytes": 8876,
+      "taskDetailsSha256": "ad22d74080caab7da9cf66a32d121dfaa9858fcb42feaf40ed1fa3cb17279eab",
+      "renderedBytes": 8984,
+      "containsOldPlanning": true,
+      "containsWaitingApproval": true
+    },
+    "nextRequest": {
+      "seq": 101,
+      "envelopeBytes": 67271,
+      "availableBudget": 0.08571319999999998,
+      "maxTokens": 1400,
+      "unfittedReservation": 0.15059,
+      "minimumEnvelopeBytes": 38172,
+      "minimumProtectedReservation": 0.092392,
+      "reproduced": {
+        "blocked": true,
+        "code": "BUDGET_CONTEXT_LIMIT",
+        "details": {
+          "beforeBytes": 67271,
+          "maxMessageBytes": 28411,
+          "availableBudget": 0.08571319999999998,
+          "maxTokens": 1400
+        }
+      }
+    },
+    "finish": {
+      "seq": 111,
+      "status": "failed",
+      "message": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳岗位、当前合同、最新回复与受保护证据；没有发送模型请求；精简前消息与工具 67271 字节，精简前预留 $0.15059000；当前可容纳消息字节 28411；可用预算 $0.08571320；输出上限 1400 tokens 保持不变",
+      "usageCost": 0.015542
+    },
+    "historicalObservationOnly": true,
+    "newProviderCallsByAudit": 0
+  }
+}

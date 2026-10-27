@@ -1,0 +1,75 @@
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {createInterface} from 'node:readline';
+import {writeFileSync, readFileSync, mkdirSync, realpathSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const [repo, base, mode] = process.argv.slice(2);
+assert.ok(['load', 'real', 'real-project'].includes(mode));
+const out = join(base, mode === 'load' ? 'load-' + Date.now() : mode); mkdirSync(out); // Never replay a paid run under the same label.
+const source = join(base, 'dsh-cortex-e2a9acacf7255678220dd927c4348db03851d6d7');
+const report = {mode, maxTrial: 0.04, maxCumulative: 3.41, maxCalls: 2, requests: [], startedAt: new Date().toISOString()};
+const save = () => writeFileSync(join(out, 'broker-result.json'), JSON.stringify(report, null, 2));
+let priorCost = 0, priorCalls = 0;
+if (mode === 'real-project') {
+  const prior = JSON.parse(readFileSync(join(base, 'real/broker-result.json'), 'utf8'));
+  assert.equal(prior.exit.code, 0); assert.equal(prior.requests.length, 1);
+  assert.ok(prior.requests.every(r => r.usageId && typeof r.cost === 'number' && r.returnedAt));
+  priorCost = prior.requests.reduce((a,r) => a+r.cost, 0); priorCalls = prior.requests.length;
+  report.priorTrial = {path: 'real/broker-result.json', cost: priorCost, calls: priorCalls, receiptIds: prior.requests.map(r=>r.usageId)};
+}
+save();
+const api = async path => { const r = await fetch('http://127.0.0.1:4310/api'+path); assert.ok(r.ok); return r.json(); };
+const modelRows = (await api('/models')).filter(m => m.model === 'deepseek-v4.1-flash' && m.status === 'available');
+assert.equal(modelRows.length, 1); const model = modelRows[0];
+let pool, completeBudgeted, budgetedRequestEstimate;
+if (mode !== 'load') {
+  assert.ok(process.env.DATABASE_URL && process.env.DATA_DIR, 'Explicitly approved broker environment required; no process inspection');
+  ({pool} = await import(pathToFileURL(join(repo, 'apps/api/src/db.ts')).href));
+  ({completeBudgeted, budgetedRequestEstimate} = await import(pathToFileURL(join(repo, 'apps/api/src/cost-control.ts')).href));
+}
+const totals = async () => {
+  const spent = (await api('/usage')).reduce((a,r) => a + r.cost, 0);
+  const holds = (await api('/costs')).calls.map(r => ({id:r.id, amount:r.amount, status:r.status})).sort((a,b)=>a.id.localeCompare(b.id));
+  return {spent, reserved: holds.reduce((a,r) => a + Number(r.amount), 0), holds};
+};
+report.before = await totals(); report.model = {id: model.id, model: model.model, inputRate: model.inputRate, outputRate: model.outputRate}; save();
+assert.ok(report.before.spent + report.before.reserved + report.maxTrial <= report.maxCumulative);
+writeFileSync(join(out, 'models.json'), JSON.stringify({models: [{id: model.model, provider: 'weiwu-budgeted-pilot', tier: 'L2', status: 'active', capabilities: ['general', 'planning', 'evaluation'], price: {inputPer1k: model.inputRate/1000, outputPer1k: model.outputRate/1000}, latencyP95Ms: 60000, defaultQuality: 0.8, successRate: 1}]}));
+writeFileSync(join(out, 'settings.yaml'), '{}\n');
+const child = spawn(process.execPath, ['--permission', '--allow-fs-read=' + source, '--allow-fs-read=' + join(repo,'services/agent-runtime/node_modules'), '--allow-fs-read=' + realpathSync(join(repo,'services/agent-runtime/node_modules')), '--allow-fs-read=' + join(repo,'services/agent-runtime/package.json'), '--allow-fs-read=' + join(base,'worker.mjs'), '--allow-fs-read=' + out, '--allow-fs-write=' + out, join(base,'worker.mjs'), repo, source, out, mode],
+  {cwd: out, env: {PATH: '/usr/bin:/bin', HOME: out, LANG: 'C.UTF-8'}, stdio: ['pipe','pipe','pipe']});
+let inFlight = false, stopped = false;
+const timeout = setTimeout(() => {report.timeout = true; save(); child.kill('SIGTERM');}, 300000);
+child.stderr.on('data', b => { process.stderr.write(b); });
+const lines = createInterface({input: child.stdout});
+lines.on('line', async line => {
+  if (!line.startsWith('CORTEX_REQUEST ')) {console.log(line); return;}
+  const request = JSON.parse(line.slice(15));
+  const reply = value => { if (!child.stdin.destroyed) child.stdin.write(JSON.stringify({id: request.id, ...value})+'\n'); };
+  try {
+    assert.notEqual(mode, 'load'); assert.equal(stopped, false); assert.equal(inFlight, false); assert.ok(report.requests.length + priorCalls < report.maxCalls);
+    assert.ok(Number.isInteger(request.maxTokens) && request.maxTokens > 0 && request.maxTokens <= 8192);
+    assert.ok(Array.isArray(request.messages) && request.messages.length <= 3);
+    assert.ok(request.messages.every(m => ['system','user'].includes(m.role) && typeof m.content === 'string'));
+    assert.ok(Buffer.byteLength(JSON.stringify(request.messages)) < 32000);
+    const quote = budgetedRequestEstimate(model, request.messages, request.maxTokens);
+    const used = priorCost + report.requests.reduce((a,r) => a + (r.cost ?? r.reserved),0);
+    assert.ok(used + quote.reservation <= report.maxTrial);
+    const now = await totals(); assert.ok(now.spent + now.reserved + quote.reservation <= report.maxCumulative);
+    inFlight = true;
+    const entry = {id: request.id, reserved: quote.reservation, messages: request.messages, maxTokens: request.maxTokens, dispatchedAt: new Date().toISOString()};
+    report.requests.push(entry); save();
+    const result = await completeBudgeted(model, request.messages, request.maxTokens, {purpose: 'Cortex隔离编排规划试验', maxCost: report.maxTrial-used, timeoutMs: 180000, context: {experiment: 'cortex-planning-20261018', requestId: request.id, limit: report.maxTrial, cumulativeLimit: report.maxCumulative}});
+    const content = result.choices[0].message.content;
+    entry.returnedAt = new Date().toISOString(); entry.usageId = result.usageId; entry.usage = result.usage; entry.content = content;
+    entry.cost = (await api('/usage')).find(r=>r.id===result.usageId).cost; save();
+    reply({result: {content, usage: result.usage, usageId: result.usageId}});
+  } catch (e) {stopped = true; report.error = {message: e.message, code: e.code}; save(); reply({error: e.message});}
+  finally {inFlight = false;}
+});
+const exit = await new Promise(resolve => child.on('exit',(code,signal)=>resolve({code,signal})));
+clearTimeout(timeout); report.exit = exit; report.after = await totals(); report.finishedAt = new Date().toISOString();
+report.costDelta = report.after.spent - report.before.spent; save(); await pool?.end();
+console.log(JSON.stringify({mode, exit, requests: report.requests.length, costDelta: report.costDelta, out}));
+process.exitCode = exit.code ?? 1;

@@ -1,0 +1,80 @@
+✔ restored budget feedback retains occupied history and call limits without releasing unknown holds (3.3447ms)
+✔ feedback changes after reservation and settlement while preserving the stricter task cap (0.9803ms)
+✔ unknown model pricing stays unknown and completed nodes do not inflate remaining estimates (0.5078ms)
+✔ runtime aliases resolve prices by original employee identity, matching real restored snapshots (0.4823ms)
+✔ project occupation bounds a larger task cap and overrun stays visible without increasing limits (1.2978ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (5.1041ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (2.3992ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (1.1499ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.7985ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (57.1658ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.8009ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (4.2502ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (4.4134ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.8944ms)
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (149.2175ms)
+✔ default byte policy admits a detailed task with a large fixed prompt and tool schema (367.2222ms)
+✔ automatic employee summaries retain source records, isolate history and survive resume (720.0681ms)
+✔ large structured non-file tool output is reduced without losing hashes or full original evidence (255.0008ms)
+✔ structured text below 6000 characters is safely shortened when serialized JSON exceeds the threshold (1.1573ms)
+✔ escaped structured text uses serialized size and retains full metadata without a raw JSON fallback (1.0036ms)
+✔ oversized metadata remains valid and complete and already shortened results do not create repeated replacements (10.9281ms)
+✔ mixed structured and plain text preserves JSON, rich block order and explicit omission markers (2.0293ms)
+✔ complete filesystem reads survive the actual employee pruning pipeline and retain original trace evidence (219.7381ms)
+✔ a complete file larger than 192000 context bytes fails before model dispatch and budget reservation (8.9067ms)
+✔ summary admission shares the execution call allowance and rejection preserves source history (141.4144ms)
+✔ cancellation during one employee summary leaves sibling state and original history intact (145.0809ms)
+✔ a nonshrinking summary is rejected without replacing the source history (87.3409ms)
+✔ unknown model capacity uses pruning without inventing a token window or a summary charge (274.2629ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (478.3048ms)
+✔ failed employee setup leaves no published Agent or resident Host (64.9296ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (54.2809ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (398.3731ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (31.0951ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (19.1198ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (40.7265ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (54.0054ms)
+✔ host file checks reject linked directories before reading their contents (6.6021ms)
+✔ host file checks reject binary content declared as text (6.3441ms)
+✔ optimistic writes reject a second editor using the same observed hash (16.0225ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (12.2414ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.4976ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.7547ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.9392ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.5952ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (2958.9061ms)
+✔ execution and summary requests cannot select a model outside the employee approval (264.5763ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (226.2079ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (238.5442ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (238.9481ms)
+✔ native quality contracts receive actual file and command evidence before independent review (2012.0787ms)
+✔ model claims of a passed command cannot unlock native quality work (911.1016ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (1109.0077ms)
+✔ review revision cannot create an unapproved automatic repair graph (2083.6345ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (1969.0106ms)
+✔ approved review creates bounded native repair and independent re-review, then delivers newest sealed files (11428.913ms)
+✔ two failed repair rounds stop at the approved limit with structured escalation (14575.3621ms)
+✔ out-of-scope finding cannot create a repair task (2337.8167ms)
+✔ scope expansion in repair instructions is refused before any generated employee request (2684.8178ms)
+✔ explicit reject stops the loop even with spare rework allowance (1988.2012ms)
+✔ repair model calls share the original task allowance (3240.121ms)
+✔ repair cannot reuse the original implementation command as new verification evidence (4071.1492ms)
+✔ repair cannot overwrite a changed file with a stale hash (4414.1821ms)
+✔ duplicate finding IDs cannot authorize a repair graph (2269.9307ms)
+✔ latest host-owned contract and budget survive fitting after a later ordinary user message (47.6255ms)
+✔ an unaffordable current contract is blocked before receipt, fetch, or budget counters instead of dropping it (2.3926ms)
+ℹ tests 65
+ℹ suites 0
+ℹ pass 65
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47668.1636
+
+Validation: node --test (11 named runtime suites) exit 0; 65/65 passed.
+Typecheck: node node_modules/typescript/bin/tsc --noEmit exit 0.
+Syntax: node --check employee-hosts.mjs/product-tools.mjs exit 0.
+Scoped git diff --check exit 0.
+No paid requests, service operation, production-data change or employee-deliverable edits.
+

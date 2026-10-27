@@ -1,0 +1,341 @@
+{
+  "checkedAt": "2026-10-06T08:11:36.829Z",
+  "kind": "offline-normal-v11-after-planning-parser-preparation",
+  "nodeVersion": "v24.19.0",
+  "helperSources": [
+    {
+      "path": "docs/test-evidence/helpers/generate-go-normal-after-planning-parser-web-2026-10-06.mjs",
+      "sha256": "ec91ec2b21234614cf20ac71e030c1317555da656731e332fe64d9b2feb3f3fe"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-normal-after-planning-parser-guard-2026-10-06.mjs",
+      "sha256": "32058c682412372386a3001114beec3ef0426443056b73148ec233504a2837de"
+    },
+    {
+      "path": "docs/test-evidence/helpers/prepare-go-normal-after-planning-parser-2026-10-06.mjs",
+      "sha256": "cb6c5f56473b37331959f8d9a2c198ff3f15cc492cd5949b60236bf2f827d758"
+    },
+    {
+      "path": "docs/test-evidence/helpers/check-go-normal-after-planning-parser-offline-2026-10-06.mjs",
+      "sha256": "94c04077b6c255609fa950ef894809484e6288f1295506ae79e0de73a39bd2a3"
+    }
+  ],
+  "sourceEvidence": {
+    "sources": [
+      {
+        "path": "docs/test-evidence/go-admission-normal-generate-2026-10-06T07-47-19-645Z-b3726cc6.json",
+        "sha256": "3eceed1b9436b1b925428d3f8581cf28d16ab24071cfedb6da657e3db6e9eae9"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/sources.json",
+        "sha256": "124b63c3e7da9587b74a8541cb74401c2db10ecc181323788ce3d6cbfa1b1ad5"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/projects.json",
+        "sha256": "a0c1dcbb1ce0d959b923b859abbb4df0d29bd6f0c4a9b78aafd94fefbbd0ce65"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/usage.json",
+        "sha256": "c06610cb4e10c43dfd11f0c77aadc2bbc0c3e8ef15458545132ea38ce77a4e61"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/cost-readiness.json",
+        "sha256": "a07f91fac1d3f586f75a01bff8ab23e801ca3540e178ac504ee31d4b99c8d2ca"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/runs.json",
+        "sha256": "784cd2cc10de12d6d160fd79bef0a99d7a8950afce6708c8e6626b2a3ea0de12"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/costs-parser-audit.json",
+        "sha256": "4b4c68f436e7dde63d493b7faec837637bd5f589e45d5e2660b1314f0b28160c"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/go-plan-admission-9ea35e6a97cff47d177a44a38dec68c8db7c62da834564ed6d59880dea70a76d.json",
+        "sha256": "aaac4ea0e2fa2bbac4cf3356fd3a35a852148455813b4c7539a25428d3b94124"
+      },
+      {
+        "path": "docs/validation/go-normal-v11-planning-rejection-2026-10-06.json",
+        "sha256": "06e1c954b31d176112a83b025fb1ab23fd2876d5a2d709efb7556153d22e7067"
+      },
+      {
+        "path": "docs/validation/go-normal-v11-planning-parser-readonly-2026-10-06.json",
+        "sha256": "387cdc1d312f3bc0776cfde594e88133ff760ca6129e26ea56e0878214eb2b17"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-normal-after-admission-web-2026-10-06.mjs",
+        "sha256": "b45e09a3e786474a5390aa2fac02b991ca9b31ebcabd77e490fca1d5b9bc94b0"
+      },
+      {
+        "path": "docs/test-evidence/helpers/go-normal-after-admission-guard-2026-10-06.mjs",
+        "sha256": "db77df0955c181e554c19f623c431f4f05d14248a4c4f415bc3337e9edc7403e"
+      }
+    ],
+    "failedGenerationPath": "docs/test-evidence/go-admission-normal-generate-2026-10-06T07-47-19-645Z-b3726cc6.json",
+    "failedRequestKey": "af5af5a2-3441-4c4b-9c26-e09fcbf2ab1d",
+    "permanentFailureIntent": ".data/funded-acceptance/web-operation-guards/go-plan-admission-9ea35e6a97cff47d177a44a38dec68c8db7c62da834564ed6d59880dea70a76d.json",
+    "httpStatus": 422,
+    "providerStatus": 200,
+    "receipt": {
+      "id": "52a67c7f-5a3f-4c74-b42e-b3ad857bf840",
+      "inputTokens": 10107,
+      "outputTokens": 3845,
+      "cost": 0.0076461,
+      "settled": true
+    },
+    "savedVersion": 10,
+    "savedPlanValid": true,
+    "savedRunStatus": "FAILED",
+    "candidateAvailable": false,
+    "actualOriginalContent": {
+      "empty": "unknown",
+      "truncated": "unknown",
+      "markdown": "unknown",
+      "plainText": "unknown",
+      "finishReason": "unknown"
+    },
+    "historicalReadiness": {
+      "recordedCost": 1.6723829,
+      "reserved": 0.096526,
+      "availableBudget": 2.4107911
+    },
+    "failedRequestReplayed": false,
+    "failedIntentRemoved": false,
+    "failedPlanHandRepaired": false
+  },
+  "admissionEvidence": {
+    "sourceRunId": "17af4ec6-379e-47bc-9b6b-0afd16d49869",
+    "sourceVersion": 10,
+    "sourceEventCount": 3047,
+    "sourceBindings": [
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/sources.json",
+        "sha256": "05f62a7d4a99be7e700f159d70b236ae2659aaa14dd76ce7cc4c6462ee555be7"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/archive.json",
+        "sha256": "c5bb7ae427f34bdcde86373dcefdf1604f52dea38b02442d193cc4239f978d49"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/state.json",
+        "sha256": "5bedafde15990a62f1814e6bf3e18641e487d61c73b6275a7a8603d1dcfb1591"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/local-operations.json",
+        "sha256": "ad9cf4ce8f1ed1ae731116d0cccd77e445669db0229e6937ff6480b61d93f534"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/artifacts.json",
+        "sha256": "a394b22bf4207859bf8bc47b7cee9b66d37b1ca447a9b3e42b52f45101e1169e"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/cost-readiness.json",
+        "sha256": "cf9ac8f044821cbc86d99bb6208f147e1d69c1cf516c562ab4301b00704db7ba"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/usage.json",
+        "sha256": "dad6d148b9fbdd38eb8cb2e16e4333dee61ccd8cd7cc6b202c20d86a6ffd5e57"
+      },
+      {
+        "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/artifact-sources.json",
+        "sha256": "e413d64b1e417b80866d8dfb9aff840cc3c03323a8ff01a2199cd4fcb6dcfb60"
+      },
+      {
+        "path": "docs/validation/go-normal-v10-first-offline-2026-10-06.json",
+        "sha256": "1234ad6acf87a6f430454abe5e76188726f7a1c02067093e5a147c6f9f67d0fd"
+      },
+      {
+        "path": "docs/test-evidence/go-heartbeat-normal-generate-2026-10-06T06-31-05-736Z-a029de67.json",
+        "sha256": "42d99bb8898ac29bedc5e2a76f3fc8eb705d724c34d8b789588a6dad251924e0"
+      },
+      {
+        "path": "docs/test-evidence/go-heartbeat-normal-confirm-2026-10-06T06-32-35-063Z-4926d956.json",
+        "sha256": "dfea86f343c287b83f40eafa3c1eca0d94113acd0e58f6ee69767363ff75d5e1"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-normal-after-heartbeat-web-2026-10-06.mjs",
+        "sha256": "0c6e0f622b8c02756e21fcbfbc618c9f99aa788cd8a5133c7b3db70bfdae1062"
+      },
+      {
+        "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+        "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+      },
+      {
+        "path": "docs/test-evidence/helpers/inspect-go-delivery-web-2026-10-06.mjs",
+        "sha256": "2397afde6020adb53a295fc95a2859a2b034b665fa2042a631133d1ae38c4c2f"
+      }
+    ],
+    "firstOffline": {
+      "seq": 2379,
+      "callId": "call_01_bl29qz3fac5ink2h4i1frx3j",
+      "name": "filesystem",
+      "stage": "before-enqueue-evidence",
+      "operationRow": "not-evidenced"
+    },
+    "terminalOperations": [
+      {
+        "id": "3dede00d-b84a-4b39-901e-9bc3c7b3887a",
+        "taskId": "dev",
+        "command": "node --test todo.test.mjs",
+        "tests": 6,
+        "bytes": 613,
+        "sha256": "932da245a4c80f6efa95494f28a30d50f3cefb9d46f329ca891aaa509104d1da",
+        "completed": true,
+        "started": true,
+        "exitCode": 0,
+        "lateResult": null
+      },
+      {
+        "id": "fcd3836d-9e2b-4ace-a928-432e14682da6",
+        "taskId": "qa_verify",
+        "command": "node --test todo.test.mjs",
+        "tests": 6,
+        "bytes": 611,
+        "sha256": "c065ad74e8b2580c3fa6b7af5e70e85adbabd12a141cf3d0a41304682a484e32",
+        "completed": true,
+        "started": true,
+        "exitCode": 0,
+        "lateResult": null
+      },
+      {
+        "id": "71bc95d6-2ce8-4c04-9006-096b820253b3",
+        "taskId": "qa_verify",
+        "command": "node --test acceptance.test.mjs",
+        "tests": 4,
+        "bytes": 483,
+        "sha256": "c4754253a2c0a9977e6a78be04601e3fb014ad73faa7fab6340942f9fe986b2a",
+        "completed": true,
+        "started": true,
+        "exitCode": 0,
+        "lateResult": null
+      },
+      {
+        "id": "0d60ab30-c78a-4ea9-95a3-1178e6fded91",
+        "taskId": "qa_review",
+        "command": "node --test todo.test.mjs",
+        "tests": 6,
+        "bytes": 612,
+        "sha256": "59f8ce99fd21e06bae37524918f444a479ca0303b505e1fc8a8311a6cf253ee7",
+        "completed": true,
+        "started": true,
+        "exitCode": 0,
+        "lateResult": null
+      },
+      {
+        "id": "3da22277-75c8-4cf8-8749-9f882ad98c14",
+        "taskId": "qa_review",
+        "command": "node --test acceptance.test.mjs",
+        "tests": 4,
+        "bytes": 483,
+        "sha256": "079d910d8a4fe262c9f8b45fd446386ba78771435b1c4a02fe9a93b5cba42209",
+        "completed": true,
+        "started": true,
+        "exitCode": 0,
+        "lateResult": null
+      }
+    ],
+    "accepted": [
+      {
+        "seq": 1000,
+        "taskId": "dev"
+      },
+      {
+        "seq": 2137,
+        "taskId": "qa_verify"
+      },
+      {
+        "seq": 2996,
+        "taskId": "qa_review"
+      }
+    ],
+    "manager": {
+      "status": "failed",
+      "wires": 0,
+      "localOperations": 0,
+      "reportExists": false
+    },
+    "wires": 34,
+    "hostCalls": 36,
+    "oldLateResultPromoted": false,
+    "oldOperationReplayed": false,
+    "oldRunResumed": false
+  },
+  "revisionCharacters": 3084,
+  "checks": [
+    {
+      "name": "known paid HTTP422 evidence accepted with original raw byte hashes",
+      "passed": true
+    },
+    {
+      "name": "complete original v10 admission evidence retained",
+      "passed": true
+    },
+    {
+      "name": "old request identity changed rejected",
+      "passed": true
+    },
+    {
+      "name": "known fee cannot be erased",
+      "passed": true
+    },
+    {
+      "name": "known provider200 cannot be inferred failure",
+      "passed": true
+    },
+    {
+      "name": "old actual Markdown cannot be invented",
+      "passed": true
+    },
+    {
+      "name": "old unknown reservation preserved",
+      "passed": true
+    },
+    {
+      "name": "formal source v10 must remain valid",
+      "passed": true
+    },
+    {
+      "name": "old failed intent exact body preserved",
+      "passed": true
+    },
+    {
+      "name": "new revision differs from old failed body and fits4000",
+      "passed": true
+    },
+    {
+      "name": "planning output limit12000 and no new response_format API argument",
+      "passed": true
+    },
+    {
+      "name": "old request key rejected and permanent intent wx retained",
+      "passed": true
+    },
+    {
+      "name": "parser gate blocks without root signal",
+      "passed": true
+    },
+    {
+      "name": "admission gate still blocks without root signal",
+      "passed": true
+    }
+  ],
+  "scope": {
+    "apiCalls": 0,
+    "browserLaunches": 0,
+    "paidCalls": 0,
+    "confirmations": 0,
+    "approvals": 0,
+    "employeeArtifactsAuthored": 0,
+    "serviceOperations": 0,
+    "originalDatabaseOpened": false,
+    "keysRead": false,
+    "oldHelpersChanged": false,
+    "oldPermanentIntentRemoved": false
+  },
+  "rootSignalsRequired": [
+    "GO_ADMISSION_FIX_LOADED=root-confirmed-2026-10-06",
+    "GO_PLANNING_PARSER_FIX_LOADED=root-confirmed-2026-10-06"
+  ],
+  "parserFixLoadedNow": false,
+  "waitingForRootFormalParserFixLoadedSignal": true
+}

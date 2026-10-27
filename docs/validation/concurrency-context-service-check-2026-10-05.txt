@@ -1,0 +1,21 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: /projects/dde78f91-2a99-4a63-a9fa-5cb7bab2b8f0
+
+404 !== 200
+
+    at get (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/check-concurrency-context-service-2026-10-05.mjs:20:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 5)
+    at async file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/check-concurrency-context-service-2026-10-05.mjs:23:17 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 404,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

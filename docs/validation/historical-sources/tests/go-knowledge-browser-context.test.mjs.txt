@@ -1,0 +1,61 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {chromium} from 'playwright-core';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {freshStoppedPage,stoppedPageRead} from '../docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs';
+
+test('isolated Edge explicit context owns the main and readonly proof pages and closes both; every request is fulfilled or aborted',async()=>{
+ const source=await readFile('docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs','utf8');
+ assert.ok(source.includes('browserContext = await browser.newContext('));assert.ok(source.includes('page = await browserContext.newPage()'));
+ assert.ok(source.includes('const stoppedPage = await browserContext.newPage()'));assert.ok(!source.includes('browser.newPage('));
+ const config={base:'http://knowledge-proof-fixture.invalid',runId:'00000000-1111-4111-8111-111111111111',projectId:'00000000-2222-4222-8222-222222222222',version:10};
+ const html='<!doctype html><meta charset="utf-8"><span>已取消</span><p>Run ID： '+config.runId+'</p><p>方案 v 10 · 2432 条事件</p>';
+ let browser,context,main,proofPage;const handled=[];
+ try{
+  browser=await chromium.launch({channel:'msedge',headless:true});context=await browser.newContext({viewport:{width:1440,height:1050},serviceWorkers:'block'});
+  // A context-wide final abort guarantees no request can escape a page fixture.
+  await context.route('**/*',async route=>{handled.push({method:route.request().method(),action:'abort',scope:'context'});await route.abort('blockedbyclient');});
+  main=await context.newPage();await main.route('**/*',async route=>{handled.push({method:route.request().method(),action:'fulfill',scope:'main'});await route.fulfill({status:200,contentType:'text/html;charset=utf-8',body:html});});
+  await main.goto(config.base+'/#knowledge',{waitUntil:'domcontentloaded'});
+  proofPage=await context.newPage();await proofPage.route('**/*',async route=>{
+   const request=route.request(),allowed=['GET','HEAD'].includes(request.method())&&stoppedPageRead(new URL(request.url()),config);
+   handled.push({method:request.method(),action:allowed?'fulfill':'abort',scope:'proof'});
+   if(!allowed)return route.abort('blockedbyclient');
+   await route.fulfill({status:200,contentType:'text/html;charset=utf-8',body:html});
+  });
+  for(let index=0;index<2;index++)assert.equal((await freshStoppedPage(proofPage,config,2432)).cancelledStatusVisible,true);
+  assert.equal(main.context(),context);assert.equal(proofPage.context(),context);assert.equal(context.pages().length,2);
+  const rejected=await proofPage.evaluate(async base=>{try{await fetch(base+'/api/knowledge/documents/fixture',{method:'PUT',body:'{}'});return false;}catch{return true;}},config.base);
+  assert.equal(rejected,true);assert.ok(handled.some(row=>row.scope==='proof'&&row.method==='PUT'&&row.action==='abort'));
+  assert.ok(handled.filter(row=>row.scope==='proof'&&row.action==='fulfill').every(row=>['GET','HEAD'].includes(row.method)));
+ }finally{
+  try{await context?.close();}finally{await browser?.close();}
+ }
+ assert.equal(main.isClosed(),true);assert.equal(proofPage.isClosed(),true);assert.equal(browser.isConnected(),false);
+});
+
+test('React controlled textarea body uses its accessible textbox name; nested exact label includes existing content',async()=>{
+ const source=await readFile('docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs','utf8');
+ assert.ok(!source.includes("editor.getByLabel('正文', { exact: true })"));
+ const body='为伍验收知识样本（公司共享）\n版本标记：offline-fixture version-1\n仅验证 DOM 定位，不是员工交付物。';
+ const html=renderToStaticMarkup(React.createElement('section',null,
+  React.createElement('h2',null,'编辑资料 · 保存新版本'),
+  React.createElement('label',{className:'field'},'知识空间',React.createElement('select',{required:true,disabled:true,value:'fixture-space',onChange:()=>{}},React.createElement('option',{value:'fixture-space'},'离线空间'))),
+  React.createElement('label',{className:'field'},'标题',React.createElement('input',{required:true,value:'离线资料',onChange:()=>{}})),
+  React.createElement('label',{className:'field'},'正文',React.createElement('textarea',{required:true,rows:10,maxLength:250000,value:body,onChange:()=>{}}))));
+ let browser,context;let externalRequests=0;
+ try{
+  browser=await chromium.launch({channel:'msedge',headless:true});context=await browser.newContext({serviceWorkers:'block'});
+  await context.route('**/*',async route=>{externalRequests++;await route.abort('blockedbyclient');});
+  const page=await context.newPage();await page.setContent(html);
+  const editor=page.locator('section').filter({has:page.getByRole('heading',{name:'编辑资料 · 保存新版本',exact:true})});
+  assert.equal(await editor.getByLabel('标题',{exact:true}).inputValue(),'离线资料');
+  assert.equal(await editor.getByLabel('正文',{exact:true}).count(),0,'Old exact nested-label locator does not match populated React textarea');
+  assert.equal(await editor.getByRole('combobox',{name:/^知识空间/}).inputValue(),'fixture-space','Disabled select is readable and is not the timeout cause');
+  const textarea=editor.getByRole('textbox',{name:'正文',exact:true});assert.equal(await textarea.count(),1);assert.equal(await textarea.inputValue(),body);
+  await textarea.fill(body.replace('version-1','version-2'));assert.equal(await textarea.inputValue(),body.replace('version-1','version-2'));
+ }finally{try{await context?.close();}finally{await browser?.close();}}
+ assert.equal(externalRequests,0,'This DOM regression uses no product, provider, or external request');
+});

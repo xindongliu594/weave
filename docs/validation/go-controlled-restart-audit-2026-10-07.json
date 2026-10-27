@@ -1,0 +1,162 @@
+{
+  "kind": "independent-offline-controlled-restart-audit",
+  "status": "passed",
+  "checkedAt": "2026-10-07T02:05:23.904Z",
+  "runId": "0453cd06-caf6-4fee-91f3-cccb55340a68",
+  "version": 10,
+  "oldApiPid": 46252,
+  "newApiPid": 50380,
+  "oldLauncherPid": 42344,
+  "newLauncherPid": 40800,
+  "serviceStoppedAt": "2026-10-07T01:48:44.1985097Z",
+  "checks": [
+    "Exact process native handle and source closure recorded with zero active runs, native operations, pending calls or approvals",
+    "Actual new launcher/API identities and healthy connected runtime captured",
+    "All 516 usage and all project records preserved; prior uncertain normal fee remains 0.096526",
+    "Stopped v10 full 2432-event archive, snapshot, seals, four-file manifest and fixed v1 knowledge unchanged",
+    "Catalog two actual v2 documents and complete v1/v2 history survived service restart",
+    "Official installed checkpoint policy source hashes match runtime sources and saved 35/35 tests/type check"
+  ],
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/sources.json",
+      "bytes": 3435,
+      "sha256": "d057642fcfd7f697f823c49188e9c8208efb21209e9da13b6fc2d5ff56096f30"
+    },
+    {
+      "path": "docs/test-evidence/go-owned-service-20261007-094835-cfc82f9b.json",
+      "bytes": 1456539,
+      "sha256": "947b48b29bbea258c7f02bd934aea742e8b7bda875988868e15b50c61c4ea829"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/health.json",
+      "bytes": 512,
+      "sha256": "081594346950d5f09c8d8565f43792ba9484c9081d2a9045cea87fd4c9b481e1"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/usage.json",
+      "bytes": 312011,
+      "sha256": "ba794a38377e21f13921d73ad8d31efab1ead0042d42b648b54ae8720a173826"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/projects.json",
+      "bytes": 112586,
+      "sha256": "38d76478b4e4077537a6c84064784967b5257a48604664cb959ff5ea1a6849ed"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/runs.json",
+      "bytes": 15548,
+      "sha256": "94d63b77372ae2ef61c088e7de4143757804c42be73d6491e2c7c0c149b8496f"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/normal-readiness.json",
+      "bytes": 264,
+      "sha256": "c5a38ae488f859ba8dbb95788264420ae8eed4cbf84826fe8cb2b55ff43342f5"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/recovery-readiness.json",
+      "bytes": 115,
+      "sha256": "e7db70c26e2e9fc7f9c654d3f4efb322f021bcfb5b57a0b9d4a62fd45ac2387c"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-proof.json",
+      "bytes": 2028,
+      "sha256": "233c1244fa59e5e98c9e97bd2af7a48399fca98b389e2057e38b369cc3f8348b"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-archive.json",
+      "bytes": 25009920,
+      "sha256": "382f1afea6504218f09fdb56d5bacd837da8755c7781455008fe7ee218e66969"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-documents.json",
+      "bytes": 4993,
+      "sha256": "43e6516205b99c07903585d6489392e78c1b37f88ca93e718e65a4eee93aeba9"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-history-74bcc49b-db5d-4729-9e5d-c430f10d6d5d.json",
+      "bytes": 1321,
+      "sha256": "6e15347826439f942937b885dcc3e7f3c909898b8306ddb526fbbdb388507a70"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-history-9ae89b98-2eb2-4302-b79b-ea12ae9a2be7.json",
+      "bytes": 1373,
+      "sha256": "bd801df8caf08ff8bafc91435ece560d2f8193f431303636b1d4efd0477aa1d2"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-manifest.json",
+      "bytes": 453,
+      "sha256": "d4f49563f045cf450f92e4e90c3e21634366f7b11d12f50faaf31e0be0ec5a94"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-both.json",
+      "bytes": 216488413,
+      "sha256": "c4ea2ec15f3c2e2181288ae3d4bd77453286d5eecdb96007c75522a3ff184d6c"
+    },
+    {
+      "path": "docs/test-evidence/reuse-recovery-checkpoint-manifest-2026-10-07.json",
+      "bytes": 2240,
+      "sha256": "a686bf8ac1c06c840ecfef5cb80bc4eeac518bd213b801175ed86f73063b1f21"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "bytes": 21324,
+      "sha256": "85d7c15004c6bf163a07dfcb1d5d2de9dec483270b3ae4a2e8e97c63a5a4a4a2"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "bytes": 11047,
+      "sha256": "798f9aabbf03708cf9ef41319dac8aac33951c46c467755b18768dca18df5b6e"
+    },
+    {
+      "path": "services/agent-runtime/employee-checkpoint-policy.test.mjs",
+      "bytes": 10124,
+      "sha256": "85a64cb2bd3ce0d62a533fe5a39704b47c0969ab9d7699cae9f9ce384326ca40"
+    },
+    {
+      "path": "services/agent-runtime/node_modules/@deepseek-ai/dsh-base/node_modules/@deepseek-ai/dsh-session-checkpoint-policy/lib/index.js",
+      "bytes": 2666,
+      "sha256": "80a4475de0594399bfdd3203e000cfe0bf1967af163f8747c45b9b80e9549f2a"
+    },
+    {
+      "path": "docs/test-evidence/reuse-recovery-checkpoint-tests-2026-10-07.txt",
+      "bytes": 3908,
+      "sha256": "1b573296dc124b1d87b00f2a5209a3ed8340daca912c2e944fa1e0ad0be33fad"
+    },
+    {
+      "path": "docs/test-evidence/reuse-recovery-checkpoint-types-2026-10-07.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "bytes": 21324,
+      "sha256": "85d7c15004c6bf163a07dfcb1d5d2de9dec483270b3ae4a2e8e97c63a5a4a4a2"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-owned-service-20261007-094835-cfc82f9b.stdout.txt",
+      "bytes": 400,
+      "sha256": "a9637a3b6dc729c5cff0824096b187b297378ca651eaec14e7d2a6d21d378a78"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-owned-service-20261007-094835-cfc82f9b.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/stopped-after-restart-ax.txt",
+      "bytes": 1445,
+      "sha256": "debc2465c0d9ba38fe480a2bfc2e37ab5bcbd5d3dcb1e5c3bdf03165eade9250"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/recovery-conditions-after-restart-ax.txt",
+      "bytes": 77270,
+      "sha256": "6dfccddac028f9d286eeb0412c2380a283b6eb9255f24b2a966e63245d3074a2"
+    }
+  ],
+  "limitations": [
+    "This proves controlled restart and persisted parent/context/catalog; child employee post-restart v1 references and final QA/reviewer/manager still require complete child archive.",
+    "Policy engineering manifest was created before restart and still has serviceReloadConfirmed=false; actual restart is established by separate bound process/reload evidence, without rewriting that historical manifest.",
+    "No build evidence is included in the checkpoint engineering manifest; this independent audit verifies its 35 tests and type check only."
+  ]
+}

@@ -1,0 +1,283 @@
+import { before, after, test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { parameters, material, setupFrame, goKnowledgeStopFrame, pinnedV1, knowledgeBoundary, preserveUpgrade, updatePacket, knowledgePut, persistUpgradeIntent } from '../docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs';
+import { parameters as stopParameters, goStopBinding, stoppedCheckpointProof, executionCounters } from '../docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs';
+import { goGenerationChain, goModelConfigHash, workspaceRevision, fundedBudgetGuard } from '../docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs';
+import { nodeTestCounts } from '../services/agent-runtime/run-evidence.mjs';
+import { chunkDocument } from '../services/agent-runtime/knowledge.mjs';
+
+const id = n => String(n).padStart(8, '0') + '-1111-4111-8111-111111111111';
+const hash = value => createHash('sha256').update(value).digest('hex'), digest = value => hash(JSON.stringify(value));
+const recoveryId = '3e101c24-87e6-43ea-80f9-a2c4b0b410f4', normalId = '4938eab8-26ed-4f60-9413-d979f05fa968';
+const departmentId = 'f16bb7ee-6868-417d-a9c6-9229d7fa7339', goId = 'fcce40cf-3172-4863-b0bd-776673f499e6', gatewayId = 'ff9080ff-c61a-4449-a360-c5e0662e7c5a';
+const setupPath = 'docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json';
+const actualSetup = JSON.parse(readFileSync(setupPath));
+const confirmationPath = 'docs/test-evidence/go-headroom-recovery-confirm-2026-10-06T03-56-22-910Z-d1533bf8.json';
+const generationPath = 'docs/test-evidence/go-headroom-recovery-generate-2026-10-06T03-53-44-337Z-6af3adfa.json';
+const originalFetch = globalThis.fetch; let fetchCalls = 0;
+before(() => { globalThis.fetch = async () => { fetchCalls++; throw Error('HTTP is forbidden in these pure fixtures'); }; });
+after(() => { globalThis.fetch = originalFetch; assert.equal(fetchCalls, 0); });
+const options = (version = 7) => ['update-v2', '--run-id=' + id(1), '--version=' + version, '--confirmed-evidence=' + confirmationPath, '--generation-evidence=' + generationPath, '--setup-evidence=' + setupPath, '--stop-evidence=docs/test-evidence/actual-stop-not-yet-created.json'];
+function stoppedFixture(version = 5, extraDeveloperVerify = false) {
+  const config = stopParameters(['--run-id=' + id(1), '--command-id=' + id(2), '--version=' + version]);
+  const manifest = ['README.md', 'server.mjs', 'todo.test.mjs', 'acceptance.test.mjs'].map(path => ({ path, size: 12, sha256: hash(path) }));
+  const devRevision = workspaceRevision(manifest.slice(0, 3), 'local'), currentRevision = workspaceRevision(manifest, 'local');
+  const tasks = [
+    { id: 'dev', kind: 'implementation', assigneeId: 'developer', outputs: manifest.slice(0, 3).map(row => ({ path: row.path, format: 'text' })), verify: ['node --test todo.test.mjs'], dependencies: [], maxBudget: .5 },
+    { id: 'qa_verify', kind: 'verification', assigneeId: 'qa', inputs: manifest.slice(0, 3).map(row => ({ path: row.path, producerTaskId: 'dev' })), outputs: [{ path: 'acceptance.test.mjs', format: 'text' }], verify: ['node --test todo.test.mjs', 'node --test acceptance.test.mjs'], dependencies: ['dev'], maxBudget: .5 },
+    { id: 'qa_review', kind: 'review', assigneeId: 'qa', verify: ['node --test todo.test.mjs', 'node --test acceptance.test.mjs'], outputs: [], dependencies: ['dev', 'qa_verify'] },
+    { id: 'manager_accept', kind: 'work', assigneeId: 'manager', outputs: [{ path: 'acceptance-report.md', format: 'text' }], verify: [], dependencies: ['qa_review'] },
+  ];
+  const planAgents = ['developer', 'qa', 'manager'].map(seed => ({ id: seed, role: seed === 'manager' ? 'manager' : 'member', modelId: goId,
+    tools: seed === 'manager' ? ['filesystem', 'artifact_write'] : ['filesystem', 'artifact_write', 'terminal_test'] }));
+  if (extraDeveloperVerify) tasks[0].verify.push('node --test todo.test.mjs acceptance.test.mjs');
+  const plan = { agents: planAgents, tasks, rationale: 'Synthetic memory fixture, never an employee plan or real confirmation.' };
+  const policy = { maxBudget: 4, maxAgents: 3, maxConcurrentAgents: 1, maxModelCalls: 100, maxTaskModelCalls: 40 };
+  const currentModel = { id: goId, name: 'Memory fixture Go model', version: 3, status: 'available', model: 'deepseek-v4.1-flash', gatewayId,
+    protocol: 'chat-completions', thinkingMode: 'disabled', inputRate: .3, outputRate: 1.2, contextWindowTokens: 131072, capabilities: { tools: { status: 'supported', testId: id(3) } } };
+  const beforeProject = { id: recoveryId, departmentId, version: version - 1, requirement: 'Synthetic fixed Todo requirement', policy, plan: { previous: true }, createdAt: '2026-10-06T00:00:00Z' };
+  const project = { ...beforeProject, version, plan, source: 'model' };
+  const planningUsage = { id: id(4), projectId: recoveryId, runId: null, modelId: goId, purpose: '组织规划', inputTokens: 100, outputTokens: 20, cost: .000054 };
+  const candidate = { projectId: recoveryId, baseVersion: version - 1, previewId: id(5), usageId: planningUsage.id, plan, policy, retainUncertainCosts: false, revisionRequest: 'Synthetic exact revision', validation: { valid: true } };
+  const generationRequest = { method: 'POST', path: '/api/projects/' + recoveryId + '/generate', body: { modelId: goId, version: version - 1, maxPlanningCost: .2, maxOutputTokens: 8000, retainUncertainCosts: false, revisionRequest: candidate.revisionRequest }, requestKey: id(6) };
+  const generation = { kind: 'actual-go-project-replanning', action: 'generate', observedAction: 'generate', scenario: 'recovery', beforeProject, afterProject: beforeProject, currentModel, gatewayVersion: 1,
+    currentModelConfigHash: goModelConfigHash(currentModel, 1), parameters: { projectId: recoveryId, ...generationRequest.body }, requests: [generationRequest], candidate, response: { status: 200, data: candidate }, quote: { allowed: true },
+    inferenceCallsRequested: 1, employeeFilesEdited: false, pageErrors: [], afterBudget: { addedUsage: [planningUsage] } };
+  const generationInput = { value: generation, path: 'docs/test-evidence/synthetic-go-stop-generation-never-written.json', sha256: digest(generation) };
+  const confirmation = { kind: generation.kind, action: 'confirm', observedAction: 'confirm', scenario: 'recovery', beforeProject, afterProject: project, currentModel, gatewayVersion: 1,
+    currentModelConfigHash: generation.currentModelConfigHash, requests: [generationRequest, { method: 'POST', path: '/api/projects/' + recoveryId + '/generated-plan/confirm', body: { previewId: candidate.previewId, version: version - 1, retainUncertainCosts: false }, requestKey: id(7) }],
+    candidate, response: { status: 200, data: { ok: true, version, validation: { valid: true } } }, inferenceCallsRequested: 0, employeeFilesEdited: false, pageErrors: [],
+    generationEvidence: generationInput.path, generationEvidenceSha256: generationInput.sha256 };
+  const binding = goStopBinding(confirmation, [generationInput], config);
+  const snapshot = { projectId: recoveryId, departmentId, planVersion: version, requirement: project.requirement, mode: 'product', policy,
+    executionBudget: 3.9, costCarryover: { recordedCost: .1, reserved: 0 }, budgetHistory: { calls: 3, tasks: {} },
+    approval: { kind: 'project', projectVersion: version }, executionTarget: { kind: 'local' },
+    tasks: tasks.map(row => ({ ...row, assignee: 'native-' + row.assigneeId })),
+    agents: planAgents.map(row => ({ ...row, id: 'native-' + row.id, employeeId: row.id, sourceDepartmentId: departmentId, sourceAgentId: row.id })),
+    modelRoutes: [{ id: goId, gatewayId, baseUrl: 'https://opencode.ai/zen/go/v1', wireModel: 'deepseek-v4.1-flash', protocol: 'chat-completions', thinkingMode: 'disabled', configurationHash: binding.currentModelConfigHash,
+      toolCapabilityTestId: binding.toolCapabilityTestId, inputRate: .3, outputRate: 1.2, contextWindowTokens: 131072 }] };
+  snapshot.approvedTasks = structuredClone(snapshot.tasks);
+  const output = 'TAP version 13\n1..8\n# tests 8\n# suites 0\n# pass 8\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n';
+  const commandEvidence = { runId: config.runId, approval: { status: 'available', approvalId: id(8) }, operation: { status: 'available', operationId: id(9) },
+    output: { status: 'available', complete: true, sha256: hash(output), bytes: Buffer.byteLength(output), layout: 'combined' }, nodeTests: nodeTestCounts('node --test todo.test.mjs', output, true) };
+  const observed = { taskId: 'dev', attemptId: 'dev-attempt', command: 'node --test todo.test.mjs', exitCode: 0, workspaceRevision: devRevision, evidence: commandEvidence };
+  const seal = { taskId: 'dev', attemptId: 'dev-attempt', runId: config.runId, workspaceRevision: devRevision, outputs: manifest.slice(0, 3), commands: [{ ...observed, observationSeq: 8 }],
+    budgetEvidence: { point: 'node-accepted', occupied: .12, callsUsed: 4 } };
+  const approval = { id: config.commandId, runId: config.runId, status: 'pending', tool: 'terminal_test', agentId: 'native-qa', arguments: { command: 'node --test acceptance.test.mjs', expectedWorkspaceRevision: currentRevision } };
+  const events = [
+    { type: 'run/created', data: {} }, { type: 'runtime/supervision', data: {} },
+    { type: 'run/task-mapping', data: { tasks: tasks.map(row => ({ task_id: 'runtime-' + row.id, seed_id: row.id })) } },
+    { type: 'model/wire-request', data: { usageId: id(10), modelId: goId, taskId: 'dev' } }, { type: 'billing/usage', data: { id: id(10), cost: .02 } },
+    { type: 'local/operation-queued', data: { operationId: id(9), taskId: 'dev' } }, { type: 'local/operation-finished', data: { operationId: id(9) } },
+    { type: 'handoff/command-observed', data: observed }, { type: 'handoff/accepted', data: seal },
+    { type: 'team/checkpoint', data: { tasks: tasks.map(row => ({ id: 'runtime-' + row.id, attempt_id: row.id + '-attempt', status: row.id === 'dev' ? 'completed' : row.id === 'qa_verify' ? 'in_progress' : 'pending' })), budgetEvidence: { version: 1, runId: config.runId, projectId: recoveryId, projectVersion: version, basis: 'host-execution-budget', project: { limit: 4, occupied: .12, activeReserved: 0, available: 3.88, callsUsed: 4, callLimit: 100 } } } },
+    { type: 'model/wire-request', sessionId: 'qa-session', data: { usageId: id(11), modelId: goId, taskId: 'qa_verify', attemptId: 'qa_verify-attempt', agentId: 'native-qa', employeeId: 'qa' } },
+    { type: 'billing/usage', data: { id: id(11), cost: .03 } },
+    { type: 'tool/start', sessionId: 'qa-session', callId: 'qa-call', data: { name: 'terminal_test', arguments: { command: approval.arguments.command } } },
+    { type: 'approval/requested', data: approval },
+  ].map((row, index) => ({ ...row, seq: index + 1 }));
+  const usage = [planningUsage, { id: id(12), projectId: recoveryId, runId: id(90), modelId: goId, cost: .099946 },
+    { id: id(10), projectId: recoveryId, runId: config.runId, modelId: goId, cost: .02 }, { id: id(11), projectId: recoveryId, runId: config.runId, modelId: goId, cost: .03 }];
+  const oldUnknown = { id: id(13), projectId: id(99), amount: .04, status: 'uncertain', history: [{ action: 'retained' }] };
+  const glmUnknown = { id: id(14), projectId: null, runId: null, amount: .0016958, status: 'uncertain', purpose: 'Synthetic outside normal Go GLM probe', history: [{ action: 'retained' }] };
+  const costs = { calls: [oldUnknown, glmUnknown], recent: usage.map(row => ({ ...row, status: 'settled', history: [{ action: 'settled' }] })), spent: .15, reserved: .0416958 };
+  const oldReadiness = { reserved: .04, receipts: [oldUnknown] };
+  const ledger = { baselineReceiptIds: [oldUnknown.id], scenarios: { normal: [glmUnknown.id], recovery: [] } };
+  const projects = [project, { id: normalId, version: 5, createdAt: '2026-10-06T00:00:00Z', policy: { maxBudget: 4 } }, { id: id(99), version: 6, createdAt: '2026-10-01T00:00:00Z', policy: { maxBudget: 1 } }];
+  const intent = { authorization: { newProjectLimit: 5, newProjectCount: 2, totalAdditionalLimit: 10 }, recordedAt: '2026-10-05T00:00:00Z', oldProject: { id: id(99) }, baselineUsageIds: [] };
+  const phaseBudget = fundedBudgetGuard({ intent, ledger, projects, usage, costs, configuredProjects: config.projects, scenario: 'recovery' });
+  const before = { binding, project, state: { id: config.runId, status: 'running', snapshot, recovery: { unknownOperations: [] } },
+    archive: { id: config.runId, snapshot, events, eventCount: events.length, integrity: 'ok', status: 'unfinished' }, manifest, downloads: structuredClone(manifest), approvals: [approval],
+    localOperations: [{ id: id(9), status: 'completed', started: true, result: { ok: true, exitCode: 0, output }, payload: { context: { taskId: 'dev', attemptId: 'dev-attempt', approvalId: id(8) }, arguments: { command: 'node --test todo.test.mjs' } } }],
+    usage, costs, readiness: { recordedCost: .15, reserved: 0, availableBudget: 3.85, pendingCount: 0, uncertainCount: 0, receipts: [] }, oldReadiness, phaseBudget, ledger,
+    models: [currentModel, { id: id(15), model: 'old-model', status: 'available' }], gateways: [{ id: gatewayId, baseUrl: 'https://opencode.ai/zen/go/v1', version: 1, hasCredential: true }] };
+  return { config, before, confirmation, generationInput };
+}
+function finish(before, config) {
+  const after = structuredClone(before), counters = executionCounters(before, config);
+  after.state.status = 'cancelled'; after.archive.status = 'cancelled'; after.approvals = after.approvals.map(row => ({ ...row, status: 'cancelled' }));
+  after.archive.events.push({ seq: after.archive.events.length + 1, type: 'team/checkpoint', data: { tasks: after.archive.events[9].data.tasks,
+    budgetEvidence: { version: 1, runId: config.runId, projectId: recoveryId, projectVersion: config.version, basis: 'host-execution-budget', capturedAt: 'synthetic stop', point: 'runtime-checkpoint', project: counters } } });
+  after.archive.events.push({ seq: after.archive.events.length + 1, type: 'run/finished', data: { status: 'cancelled' } }); after.archive.eventCount = after.archive.events.length;
+  return after;
+}
+
+
+function knowledgeFixture(version = 7) {
+  const value = stoppedFixture(version), { before } = value, config = parameters(options(version));
+  for (const agent of before.project.plan.agents) {
+    agent.tools.push('knowledge_search', 'knowledge_read');
+    agent.knowledgeSpaceIds = actualSetup.spaces.filter(space => space.kind === 'shared' || agent.id === 'qa').map(space => space.id);
+  }
+  before.project.policy.allowedKnowledgeSpaceIds = actualSetup.spaces.map(space => space.id);
+  before.binding.confirmedPlan = structuredClone(before.project.plan);
+  before.binding.confirmedPolicy = structuredClone(before.project.policy);
+  before.binding.projectSignature = digest({ id: before.project.id, version: before.project.version, requirement: before.project.requirement, policy: before.project.policy, plan: before.project.plan });
+  for (const agent of before.archive.snapshot.agents) {
+    const expected = before.project.plan.agents.find(row => row.id === agent.employeeId);
+    agent.tools = structuredClone(expected.tools); agent.knowledgeSpaceIds = structuredClone(expected.knowledgeSpaceIds);
+  }
+  before.archive.snapshot.knowledge = {
+    format: 'document-versions-v2',
+    documents: actualSetup.documents.map(doc => ({ documentId: doc.id, title: doc.title, spaceId: doc.spaceId, version: 1, sha256: doc.sha256,
+      source: {}, chunkCount: chunkDocument(doc.id, 1, doc.content).length })),
+    agentDocuments: Object.fromEntries(before.archive.snapshot.agents.map(agent => [agent.id,
+      actualSetup.documents.filter(doc => doc.kind === 'shared' || agent.employeeId === 'qa').map(doc => doc.id)])),
+    retrieval: { mode: 'keyword' },
+  };
+  const stopAfter = finish(before, value.config), binding = before.binding, proof = stoppedCheckpointProof(before, stopAfter, value.config);
+  const beforeInput = { value: before, path: 'docs/test-evidence/memory-stop-before-never-written.json', sha256: digest(before) };
+  const afterInput = { value: stopAfter, path: 'docs/test-evidence/memory-stop-after-never-written.json', sha256: digest(stopAfter) };
+  const stopReport = { projectId: recoveryId, departmentId, runId: config.runId, version, commandId: value.config.commandId,
+    status: 'controlled-stop-verified; actual service restart/resume and independent QA still unverified',
+    confirmation: { sha256: 'a'.repeat(64), binding }, before: { path: beforeInput.path, sha256: beforeInput.sha256 }, after: { path: afterInput.path, sha256: afterInput.sha256 },
+    mutationRequests: [{ method: 'POST', path: '/api/runs/' + config.runId + '/cancel', body: {} }], response: { status: 202 }, blockedRequests: [], uiAfter: { cancelledStatusVisible: true }, proof };
+  const setup = setupFrame(actualSetup, config, binding), stopped = goKnowledgeStopFrame(stopReport, beforeInput, afterInput, config, binding, 'a'.repeat(64));
+  const context = { config, binding, setup, stopped };
+  const observation = { departments: [{ id: departmentId, version: 2, agents: structuredClone(before.project.plan.agents) }],
+    projects: [structuredClone(stopAfter.project)], project: structuredClone(stopAfter.project),
+    spaces: structuredClone(setup.spaces), documents: setup.documents.map(({ kind, marker, ...doc }) => ({ ...doc, source: {}, vaultPath: 'synthetic-test-vault/' + doc.id })),
+    models: structuredClone(stopAfter.models), gateways: structuredClone(stopAfter.gateways), usage: structuredClone(stopAfter.usage),
+    runSummaries: [{ id: config.runId, status: 'cancelled' }], runStates: [structuredClone(stopAfter.state)],
+    state: structuredClone(stopAfter.state), archive: structuredClone(stopAfter.archive), manifest: structuredClone(stopAfter.manifest),
+    localOperations: structuredClone(stopAfter.localOperations), approvals: structuredClone(stopAfter.approvals),
+    projectReadiness: [{ projectId: recoveryId, value: structuredClone(stopAfter.readiness) }],
+    histories: Object.fromEntries(setup.documents.map(doc => [doc.id, [{ version: 1, sha256: doc.sha256, content: doc.content, source: {}, createdAt: 'memory-v1' }]])) };
+  return { context, observation, stopReport, beforeInput, afterInput };
+}
+function upgraded(value, ids = value.context.setup.documents.map(doc => doc.id)) {
+  const after = structuredClone(value.observation);
+  for (const doc of value.context.setup.documents.filter(doc => ids.includes(doc.id))) {
+    const current = after.documents.find(row => row.id === doc.id), packet = updatePacket(doc);
+    current.version = 2; current.content = packet.content; current.sha256 = hash(packet.content);
+    after.histories[doc.id].unshift({ version: 2, sha256: current.sha256, content: packet.content, source: {}, createdAt: 'memory-v2' });
+  }
+  return after;
+}
+test('actual saved v7 Go confirmation/generation/setup chain is verified locally with no API', () => {
+  const config = parameters(options()), confirmation = JSON.parse(readFileSync(confirmationPath)), bytes = readFileSync(generationPath);
+  const binding = goGenerationChain(confirmation, [{ value: JSON.parse(bytes), path: generationPath, sha256: hash(bytes) }], config);
+  assert.equal(binding.version, 7); assert.equal(binding.projectId, recoveryId);
+  const setup = setupFrame(actualSetup, config, binding);
+  assert.equal(setup.documents.length, 2); assert.equal(binding.retained, false);
+  for (const doc of setup.documents) assert.equal(hash(doc.content), doc.sha256);
+});
+test('strict CLI requires actual dynamic parent/version and all four local proof inputs', () => {
+  assert.equal(parameters(options(8)).version, 8); assert.equal(parameters(options()).runId, id(1));
+  for (const key of ['run-id', 'version', 'confirmed-evidence', 'generation-evidence', 'setup-evidence', 'stop-evidence'])
+    assert.throws(() => parameters(options().filter(option => !option.startsWith('--' + key + '='))));
+  for (const extra of ['--model=paid', '--run-id=' + id(1), '--headed=yes', '--base-url=https://external.example', '--base-url=http://user:secret@127.0.0.1:4310'])
+    assert.throws(() => parameters([...options(), extra]));
+  assert.throws(() => parameters(options().map(option => option.startsWith('--stop-evidence=') ? '--stop-evidence=../original/data.json' : option)));
+  assert.throws(() => parameters(['setup', ...options().slice(1)]));
+});
+test('complete cancelled same-version parent pins both original v1 bodies to exact authorized employees', () => {
+  const { context, observation } = knowledgeFixture(), proof = knowledgeBoundary(observation, context);
+  assert.equal(proof.version, 7); assert.equal(proof.pin.documents.length, 2);
+  assert.equal(proof.parentStopProof.parentCheckpointReady, true);
+  assert.equal(proof.unassignedReceiptsFreshlyQueried, false);
+});
+test('both and partial first-v2 updates preserve complete parent PIN, fees, permission and v1 revisions', () => {
+  for (const version of [7, 8]) {
+    const value = knowledgeFixture(version), before = JSON.stringify(value.observation), ids = value.context.setup.documents.map(doc => doc.id);
+    for (const changed of [[ids[0]], ids]) {
+      const after = upgraded(value, changed), proof = preserveUpgrade(value.observation, after, value.context, changed);
+      assert.equal(proof.snapshotSha256, digest(value.observation.archive.snapshot));
+      assert.equal(JSON.stringify(value.observation), before);
+      for (const doc of value.context.setup.documents) assert.equal(after.histories[doc.id].find(row => row.version === 1).sha256, doc.sha256);
+    }
+  }
+});
+const blocked = [
+  ['failed is not deliberate cancellation', value => { value.observation.state.status = 'failed'; }],
+  ['active parent', value => { value.observation.state.status = 'running'; }],
+  ['wrong current project version', value => { value.observation.project.version++; }],
+  ['implicit child identity', value => { value.observation.state.snapshot.resumedFrom = id(77); }],
+  ['incomplete export', value => { value.observation.archive.eventCount++; }],
+  ['changed snapshot', value => { value.observation.archive.snapshot.executionBudget += .001; }],
+  ['missing native unknown evidence', value => { delete value.observation.state.recovery.unknownOperations; }],
+  ['unknown native operation', value => { value.observation.state.recovery.unknownOperations.push({ callId: 'unknown' }); }],
+  ['same-parent child already exists', value => { const child = structuredClone(value.observation.state); child.id = id(77); child.snapshot.resumedFrom = value.context.config.runId; value.observation.runStates.push(child); value.observation.runSummaries.push({ id: child.id, status: 'cancelled' }); }],
+  ['second same-version full retry', value => { const retry = structuredClone(value.observation.state); retry.id = id(78); value.observation.runStates.push(retry); value.observation.runSummaries.push({ id: retry.id, status: 'failed' }); }],
+  ['run list omits full identity', value => { value.observation.runSummaries.push({ id: id(77) }); }],
+  ['waiting approval', value => { value.observation.approvals[0].status = 'pending'; }],
+  ['changed native result', value => { value.observation.localOperations[0].result.exitCode = 1; }],
+  ['changed employee manifest SHA', value => { value.observation.manifest[0].sha256 = 'f'.repeat(64); }],
+  ['new fee even below floating tolerance', value => { value.observation.usage[0].cost += 1e-12; }],
+  ['changed model rate', value => { value.observation.models[0].inputRate = .15; }],
+  ['changed gateway', value => { value.observation.gateways[0].version++; }],
+  ['pending recovery model cost', value => { value.observation.projectReadiness[0].value.pendingCount = 1; }],
+  ['unknown recovery fee', value => { value.observation.projectReadiness[0].value.uncertainCount = 1; }],
+  ['missing project receipts', value => { value.observation.projectReadiness = []; }],
+  ['private scope changed', value => { value.observation.spaces[1].scope = 'company'; }],
+  ['developer private grant added', value => { value.observation.departments[0].agents.find(row => row.id === 'developer').knowledgeSpaceIds.push(actualSetup.spaces[1].id); }],
+  ['already updated doc must not be replayed', value => { value.observation.documents[0].version = 2; }],
+  ['original v1 body changed', value => { value.observation.histories[actualSetup.documents[0].id][0].content += 'changed'; }],
+  ['non-first version history', value => { value.observation.histories[actualSetup.documents[0].id].push({ version: 3 }); }],
+];
+for (const [name, change] of blocked) test('fails closed: ' + name, () => {
+  const value = knowledgeFixture(); change(value); assert.throws(() => knowledgeBoundary(value.observation, value.context));
+});
+test('full PIN rejects changed SHA, missing chunk, extra document and private employee exposure', () => {
+  for (const change of [
+    pin => { pin.documents[0].sha256 = 'f'.repeat(64); },
+    pin => { pin.documents[0].chunkCount++; },
+    pin => { pin.documents.push({ ...pin.documents[0], documentId: id(99) }); },
+    pin => { pin.agentDocuments['native-developer'].push(actualSetup.documents[1].id); },
+    pin => { delete pin.agentDocuments['native-qa']; },
+  ]) {
+    const { observation, context } = knowledgeFixture(); change(observation.archive.snapshot.knowledge);
+    assert.throws(() => pinnedV1(observation.archive, context.setup, context.binding, observation.histories));
+  }
+});
+test('actual stop proof cannot be fabricated by report status, changed version or changed raw-file SHA', () => {
+  for (const change of [
+    value => { value.stopReport.status = 'passed'; },
+    value => { value.stopReport.version++; },
+    value => { value.stopReport.after.sha256 = 'b'.repeat(64); },
+    value => { value.stopReport.proof.parentCheckpointReady = false; },
+    value => { value.stopReport.confirmation.sha256 = 'c'.repeat(64); },
+  ]) {
+    const value = knowledgeFixture(); change(value);
+    assert.throws(() => goKnowledgeStopFrame(value.stopReport, value.beforeInput, value.afterInput, value.context.config, value.context.binding, 'a'.repeat(64)));
+  }
+});
+test('after update cannot change unrelated documents, old holds, employees, project or original source', () => {
+  for (const change of [
+    after => { after.departments[0].version++; },
+    after => { after.projects[0].policy.maxBudget++; },
+    after => { after.documents.push({ id: id(87), content: 'unrelated' }); },
+    after => { after.histories[actualSetup.documents[0].id].find(row => row.version === 1).source = { replaced: true }; },
+    after => { after.spaces[0].name += '-changed'; },
+  ]) {
+    const value = knowledgeFixture(), after = upgraded(value); change(after);
+    assert.throws(() => preserveUpgrade(value.observation, after, value.context, value.context.setup.documents.map(doc => doc.id)));
+  }
+  const value = knowledgeFixture();
+  value.observation.projects.push({ id: id(99) });
+  value.observation.projectReadiness.push({ projectId: id(99), value: { pendingCount: 0, uncertainCount: 1, reserved: .04, receipts: [{ id: id(98), status: 'uncertain', amount: .04 }] } });
+  const after = upgraded(value); after.projectReadiness[1].value.receipts[0].amount += .001;
+  assert.throws(() => preserveUpgrade(value.observation, after, value.context, value.context.setup.documents.map(doc => doc.id)));
+});
+test('only exact existing-document four-field PUT is accepted; every fee/provider/project/approval action is blocked', () => {
+  const doc = actualSetup.documents[0], packet = { method: 'PUT', path: '/api/knowledge/documents/' + doc.id, body: updatePacket(doc) };
+  knowledgePut(packet, doc, true, false); assert.deepEqual(Object.keys(packet.body).sort(), ['content', 'spaceId', 'title', 'version']);
+  for (const change of [
+    row => { row.method = 'POST'; }, row => { row.path = '/api/knowledge/spaces'; },
+    row => { row.path = '/api/projects/' + recoveryId + '/plan'; }, row => { row.path = '/api/runs/' + id(1) + '/retry'; },
+    row => { row.path = '/api/approvals/' + id(2) + '/approve'; }, row => { row.path = '/api/costs/' + id(3) + '/reconcile'; },
+    row => { row.body.version = 2; }, row => { row.body.spaceId = actualSetup.spaces[1].id; },
+    row => { row.body.content += 'invented'; }, row => { row.body.source = {}; },
+  ]) { const changed = structuredClone(packet); change(changed); assert.throws(() => knowledgePut(changed, doc, true, false)); }
+  assert.throws(() => knowledgePut(packet, doc, false, false)); assert.throws(() => knowledgePut(packet, doc, true, true));
+});
+test('persistent first-update intent uses wx and never overwrites or grants partial replay', async () => {
+  const memory = new Map(), writer = async (path, body, options) => {
+    assert.equal(options.flag, 'wx'); if (memory.has(path)) throw Object.assign(Error('exists'), { code: 'EEXIST' }); memory.set(path, body);
+  };
+  await persistUpgradeIntent(writer, 'memory-only-guard', { runId: id(1), version: 7 });
+  await assert.rejects(persistUpgradeIntent(writer, 'memory-only-guard', { runId: id(2), version: 8 }), { code: 'EEXIST' });
+  assert.deepEqual(JSON.parse(memory.get('memory-only-guard')), { runId: id(1), version: 7 });
+});

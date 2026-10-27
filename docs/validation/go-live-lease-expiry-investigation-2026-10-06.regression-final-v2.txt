@@ -1,0 +1,81 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (2114.9686ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (87.9373ms)
+✔ dead or foreign expired owners remain recoverable and atomic terminal state still closes pending approvals (137.0258ms)
+✔ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (189.1087ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (295.7981ms)
+✔ the real heartbeat timer renews its own fenced lease even while the scheduler remains busy (1064.5055ms)
+✔ caller abort exits immediately while the shared heartbeat waits for the single pool connection (159.8872ms)
+✔ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (147.6894ms)
+✖ terminal persistence rollback is atomic and a recorded completion is reconciled under a fresh recovery owner (90.2103ms)
+ℹ Error: Test hook "before" at tests\run-live-lease.test.ts:1:795 generated asynchronous activity after the test ended. This activity created the error "Error: Received unexpected commandComplete message from backend." and would have caused the test to fail, but instead triggered an uncaughtException event.
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4912.0756
+
+✖ failing tests:
+
+test at tests\run-live-lease.test.ts:1:12621
+✖ terminal persistence rollback is atomic and a recorded completion is reconciled under a fresh recovery owner (90.2103ms)
+  TypeError: Cannot read properties of undefined (reading 'status')
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-live-lease.test.ts:112:115)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+✔ authenticated heartbeat recovery queues and starts one real native command (4558.3935ms)
+✔ model admission waits for authenticated recovery and emits one reservation and one loopback wire (1070.1682ms)
+✔ offline to the bounded deadline leaves both local and model dispatch at zero (10196.0748ms)
+✔ caller cancellation and original deadline abort waiting before any dispatch (1193.7628ms)
+✔ LocalRunExecutor prepare and execute preserve caller abort while heartbeat admission waits (1783.7436ms)
+✔ current hard withdrawal, version, cancel, lease and snapshot failures stop stale admissions promptly (7412.6397ms)
+✔ current model configuration and remaining budget denial outrank a stale heartbeat (1379.8098ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28288.7159
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (3108.2213ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20645.4077ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (2767.343ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (343.092ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27512.8273
+COMPETITION {"scenario":"same-operation-claim/start","clients":16,"offers":1,"uniqueTokens":1,"start200":1,"start409":15,"nativeWrites":1,"fileSha256":"547690228c00dbdbab101fe6be7171c57db61feedbb55027b698c42e27e03af7","providerRequests":0}
+✔ 16 clients competing for a claim and start obtain one token and one actual native write (1968.1932ms)
+COMPETITION {"scenario":"two-employees/stale-file","clients":12,"maxActiveClaims":1,"secondStayedQueued":true,"staleCode":"FILE_VERSION_CONFLICT","originalPreserved":true,"freshShaAccepted":true,"providerRequests":0}
+✔ two employees share one device without overlapping claims, and a stale writer cannot overwrite the first file (971.0859ms)
+COMPETITION {"scenario":"duplicate-identical-receipts","clients":16,"result200":16,"durableResultRows":1,"lateResult":false,"providerRequests":0}
+✔ 16 identical competing receipts are idempotent and keep the one real file result (491.7574ms)
+COMPETITION {"scenario":"conflicting-receipts","clients":2,"result200":1,"result409":1,"firstResultPreserved":true,"providerRequests":0}
+✔ two conflicting competing receipts accept one and cannot replace its persisted result (396.8437ms)
+COMPETITION {"scenario":"expired-lease-before-start","clients":12,"start200":0,"start409":12,"started":false,"newEnqueueDenied":true,"providerRequests":0}
+✔ an expired run lease rejects every competing start and forbids new enqueue (455.1013ms)
+COMPETITION {"scenario":"expired-run-lease-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+COMPETITION {"scenario":"replaced-worker-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+COMPETITION {"scenario":"expired-operation-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+✔ expired lease, replaced worker and expired operation keep actual late writes for audit without accepting completion (1153.1165ms)
+COMPETITION {"scenario":"old-claim-token","clients":8,"oldStart409":8,"oldResult403":8,"oldReceiptAdopted":false,"validCurrentResultAccepted":true,"providerRequests":0}
+✔ a real old operation claim token cannot start or submit the next operation (630.2065ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6755.989

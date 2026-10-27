@@ -1,0 +1,82 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { normalNoKnowledgeScope, scopedKnowledgeCheck, knowledgeEvidenceGaps } from '../docs/test-evidence/helpers/go-final-knowledge-scope-2026-10-06.mjs';
+const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+function fixture() {
+  const projectId = 'normal-fixture', departmentId = 'department-fixture', version = 10, runId = 'run-fixture';
+  const agents = ['developer', 'qa', 'manager'].map(id => ({ id, knowledgeSpaceIds: [], tools: ['filesystem', 'artifact_write'] }));
+  const tasks = ['dev', 'qa_verify', 'qa_review', 'manager_accept'].map(id => ({ id }));
+  const plan = { agents, tasks, rationale: 'In-memory pure fixture' }, policy = { maxBudget: 3 };
+  const project = { id: projectId, departmentId, version, plan, policy, requirement: 'in-memory fixture' };
+  const native = agents.map(agent => ({ ...structuredClone(agent), id: 'native-' + agent.id, employeeId: agent.id, sourceDepartmentId: departmentId, sourceAgentId: agent.id }));
+  const snapshot = { id: runId, projectId, departmentId, planVersion: version, requirement: project.requirement, policy: structuredClone(policy),
+    agents: native, tasks: structuredClone(tasks), knowledge: { format: 'document-versions-v2', documents: [], agentDocuments: Object.fromEntries(native.map(agent => [agent.id, []])) } };
+  const archive = { id: runId, snapshot, integrity: 'ok', events: [{ seq: 1, type: 'run/created', data: { snapshotSha256: hash(snapshot) } }], eventCount: 1 };
+  const input = { scenario: 'normal', projectId, version, runId, project, final: { archive, state: { id: runId, snapshot: structuredClone(snapshot) } }, citations: [],
+    knowledgeCurrent: { documents: [], facts: [], departments: [{ id: departmentId, agents: structuredClone(agents) }], grants: native.map(agent => ({ runId,
+      runtimeAgentId: agent.id, employeeId: agent.employeeId, departmentId, snapshotSpaceIds: [], snapshotDocumentIds: [], currentEmployeeSpaceIds: [],
+      currentEmployeeTools: agent.tools, spaces: [] })) } };
+  const binding = { projectId, departmentId, version, confirmedPlan: structuredClone(plan), confirmedPolicy: structuredClone(policy),
+    confirmedRequirementSha256: createHash('sha256').update(project.requirement).digest('hex') };
+  return { input, binding };
+}
+function reseal(input) {
+  const run = input.final.archive; run.events.forEach((event, index) => { event.seq = index + 1; }); run.eventCount = run.events.length;
+  run.events[0].data.snapshotSha256 = hash(run.snapshot); input.final.state.snapshot = structuredClone(run.snapshot);
+}
+test('normal explicit zero knowledge passes only the original knowledge check and preserves omitted selectors', () => {
+  const { input, binding } = fixture(), before = structuredClone({ input, binding });
+  const scope = normalNoKnowledgeScope(input, binding); assert.equal(scope.allowed, true);
+  assert.equal(scopedKnowledgeCheck({ id: 'fixed-knowledge-authorization-and-citation-readback', status: 'failed', message: 'Legacy requires KB' }, scope).detailStatus, 'passed-no-authorized-knowledge');
+  assert.deepEqual(scopedKnowledgeCheck({ id: 'some-other-guard', status: 'blocked' }, scope), { id: 'some-other-guard', status: 'blocked' });
+  assert.deepEqual(knowledgeEvidenceGaps('normal', input, binding).gaps, []);
+  assert.deepEqual({ input, binding }, before); assert.ok(!Object.hasOwn(input.project.plan, 'knowledgeDocumentIds')); assert.ok(!Object.hasOwn(input.project.plan, 'runInputs'));
+});
+test('any permission, selector, knowledge call, nested citation or fixed document contamination falls back to strict', () => {
+  for (const mutate of [
+    ({ input }) => input.final.archive.snapshot.agents[0].knowledgeSpaceIds.push('private'),
+    ({ input }) => input.knowledgeCurrent.departments[0].agents[0].knowledgeSpaceIds.push('private'),
+    ({ input }) => input.knowledgeCurrent.departments[0].agents[0].tools.push('knowledge_read'),
+    ({ input }) => input.knowledgeCurrent.grants[0].spaces.push({ id: 'private' }),
+    ({ input }) => input.final.archive.snapshot.knowledge.documents.push({ documentId: 'private' }),
+    ({ input }) => input.final.archive.snapshot.knowledge.agentDocuments['native-qa'].push('private'),
+    ({ input }) => { input.project.plan.runInputs = [{ id: 'input' }]; },
+    ({ input }) => input.final.archive.events.push({ type: 'tool/start', data: { payload: { deeply: { name: 'knowledge_read' } } } }),
+    ({ input }) => input.final.archive.events.push({ type: 'citation/readback', data: {} }),
+    ({ input }) => input.final.archive.events.push({ type: 'tool/result', data: { result: { sources: [{ documentId: 'private', chunkId: 'chunk' }] } } }),
+    ({ input }) => input.citations.push({ chunkId: 'chunk' }),
+    ({ input }) => input.knowledgeCurrent.documents.push({ id: 'private' }),
+  ]) {
+    const f = fixture(); mutate(f); reseal(f.input); const scope = normalNoKnowledgeScope(f.input, f.binding); assert.equal(scope.allowed, false);
+    const original = { id: 'fixed-knowledge-authorization-and-citation-readback', status: 'failed' }; assert.deepEqual(scopedKnowledgeCheck(original, scope), original);
+    assert.equal(knowledgeEvidenceGaps('normal', f.input, f.binding).gaps.length, 2);
+  }
+});
+test('required missing fields, wrong run binding and incomplete event sequences never assert no authorization', () => {
+  for (const mutate of [
+    ({ input }) => { delete input.final.archive.snapshot.agents[0].knowledgeSpaceIds; },
+    ({ input }) => { delete input.final.archive.snapshot.agents[0].tools; },
+    ({ input }) => { delete input.final.archive.snapshot.knowledge.agentDocuments['native-manager']; },
+    ({ input }) => { delete input.knowledgeCurrent.grants; },
+    ({ input }) => { delete input.knowledgeCurrent.departments[0].agents[0].knowledgeSpaceIds; },
+    ({ input }) => { delete input.citations; },
+    ({ input }) => { input.runId = 'other'; },
+    ({ binding }) => { delete binding.confirmedPlan.agents[0].knowledgeSpaceIds; },
+  ]) { const f = fixture(); mutate(f); reseal(f.input); assert.equal(normalNoKnowledgeScope(f.input, f.binding).allowed, false); }
+  const f = fixture(); f.input.final.archive.eventCount = 999; assert.equal(normalNoKnowledgeScope(f.input, f.binding).allowed, false);
+});
+test('present empty optional selectors are supported without changing source contracts', () => {
+  const f = fixture();
+  f.input.project.plan.knowledgeDocumentIds = []; f.input.project.plan.runInputs = []; f.input.project.policy.allowedKnowledgeSpaceIds = [];
+  f.binding.confirmedPlan = structuredClone(f.input.project.plan); f.binding.confirmedPolicy = structuredClone(f.input.project.policy);
+  f.input.final.archive.snapshot.policy = structuredClone(f.binding.confirmedPolicy); f.input.final.archive.snapshot.knowledgeDocumentIds = [];
+  f.input.final.archive.snapshot.runInputs = []; f.input.final.archive.snapshot.knowledge.runInputs = []; reseal(f.input);
+  assert.equal(normalNoKnowledgeScope(f.input, f.binding).allowed, true);
+});
+test('recovery without knowledge never skips either knowledge gap or original strict check', () => {
+  const f = fixture(); f.input.scenario = 'recovery'; const scope = normalNoKnowledgeScope(f.input, f.binding); assert.equal(scope.allowed, false);
+  const original = { id: 'fixed-knowledge-authorization-and-citation-readback', status: 'failed' }; assert.deepEqual(scopedKnowledgeCheck(original, scope), original);
+  assert.deepEqual(knowledgeEvidenceGaps('recovery', f.input, f.binding).gaps.map(row => row.evidence),
+    ['actual-fixed-v1/current-v2-documents', 'original-knowledge-grant/denial-HTTP-proof', 'actual-controlled-restart-proof']);
+});

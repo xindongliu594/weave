@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-06T07:33:57.303Z",
+  "source": {
+    "path": "docs/test-evidence/go-normal-v10-failed-2026-10-06T06-57-16-610Z-e635bdb4/archive.json",
+    "bytes": 37933017,
+    "sha256": "c5bb7ae427f34bdcde86373dcefdf1604f52dea38b02442d193cc4239f978d49"
+  },
+  "runId": "17af4ec6-379e-47bc-9b6b-0afd16d49869",
+  "status": "failed",
+  "manager": {
+    "attemptId": "361b214d-e76f-403b-ade1-78c88375433e",
+    "sessionId": "52b7f129-d90f-4969-a1f7-6aaed4cbc520",
+    "requestSeq": 3009,
+    "errorFinishSeq": 3021,
+    "wireCount": 0
+  },
+  "events": [
+    {
+      "seq": 3009,
+      "at": "2026-10-06T06:54:07.660Z",
+      "type": "model/request",
+      "taskId": "t4",
+      "sessionId": "52b7f129-d90f-4969-a1f7-6aaed4cbc520",
+      "attemptId": "361b214d-e76f-403b-ade1-78c88375433e"
+    },
+    {
+      "seq": 3016,
+      "at": "2026-10-06T06:54:10.696Z",
+      "type": "model/request",
+      "taskId": "t3",
+      "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+      "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d"
+    },
+    {
+      "seq": 3021,
+      "at": "2026-10-06T06:54:14.218Z",
+      "type": "model/finish",
+      "taskId": "t4",
+      "sessionId": "52b7f129-d90f-4969-a1f7-6aaed4cbc520",
+      "attemptId": "361b214d-e76f-403b-ade1-78c88375433e",
+      "reason": {
+        "kind": "error",
+        "failure": {
+          "message": "本机设备离线，请打开桌面端并启用本机执行",
+          "code": "LOCAL_DEVICE_OFFLINE"
+        }
+      }
+    },
+    {
+      "seq": 3024,
+      "at": "2026-10-06T06:54:15.584Z",
+      "type": "session/turn/end",
+      "taskId": "t4",
+      "sessionId": "52b7f129-d90f-4969-a1f7-6aaed4cbc520",
+      "attemptId": "361b214d-e76f-403b-ade1-78c88375433e",
+      "reason": {
+        "kind": "error",
+        "error": {
+          "message": "本机设备离线，请打开桌面端并启用本机执行",
+          "code": "LOCAL_DEVICE_OFFLINE"
+        }
+      }
+    },
+    {
+      "seq": 3036,
+      "at": "2026-10-06T06:54:20.971Z",
+      "type": "session/turn/end",
+      "sessionId": "0cfa60b8-95a4-4764-af31-14007d2beee7",
+      "reason": {
+        "kind": "error",
+        "error": {
+          "message": "本机设备离线，请打开桌面端并启用本机执行",
+          "code": "LOCAL_DEVICE_OFFLINE"
+        }
+      }
+    },
+    {
+      "seq": 3037,
+      "at": "2026-10-06T06:54:21.460Z",
+      "type": "billing/unconfirmed",
+      "id": "e42313c3-2248-4af7-9abb-46c29ad8ffe8",
+      "code": "CALL_INTERRUPTED",
+      "dispatched": false
+    },
+    {
+      "seq": 3038,
+      "at": "2026-10-06T06:54:21.912Z",
+      "type": "model/finish",
+      "taskId": "t3",
+      "sessionId": "79593ee8-1bde-4a77-a094-8bfdc05ef0bc",
+      "attemptId": "b8f15cae-4628-41a1-91c3-b550c29ab71d",
+      "reason": {
+        "kind": "aborted",
+        "failure": {
+          "message": "[object Object]",
+          "code": "UNKNOWN"
+        }
+      }
+    },
+    {
+      "seq": 3047,
+      "at": "2026-10-06T06:54:25.849Z",
+      "type": "run/finished",
+      "status": "failed",
+      "message": "本机设备离线，请打开桌面端并启用本机执行"
+    }
+  ],
+  "conclusion": "Manager MODEL request ended LOCAL_DEVICE_OFFLINE before any model/wire-request; source path is beforeRequest -> RunCoordinator.reserve -> reserveCall.authorize -> assertRunAuthorization -> localTarget. QA request 3016 abort and receipt 3037 remain separate. No fee is inferred from the 36 host attempts minus 34 wire requests; no ledger, key, live API, native artifact or model was accessed."
+}

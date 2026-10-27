@@ -1,0 +1,25 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (1959.8648ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (78.8271ms)
+✔ dead or foreign expired owners remain recoverable and atomic terminal state still closes pending approvals (116.4818ms)
+✖ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (65.8651ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (240.5365ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2973.5638
+
+✖ failing tests:
+
+test at tests\run-live-lease.test.ts:1:7199
+✖ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (65.8651ms)
+  TypeError: adapter.complete is not a function
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\run-live-lease.test.ts:67:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

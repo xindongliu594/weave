@@ -1,0 +1,40 @@
+# Budget warning UI regression — 2026-10-05
+Checked at: 2026-10-05 05:01:04 UTC
+Scope: BudgetStatus.tsx plus tests/run-cost.test.ts. Browser reload and verification belong to the parent agent.
+No real model/API requests, product mutations, service starts/stops or employee deliverable edits performed.
+
+$ node --import tsx --test tests/run-cost.test.ts tests/cost-carryover-ui.test.ts
+Exit code: 0
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (14.9626ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.5093ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.0877ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (14.728ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.4009ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.6369ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (1.0087ms)
+✔ normal execution includes the saved planning cost in project spend (1.4279ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (10.5045ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.42ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.4603ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (0.8392ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (0.7478ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 532.7776
+
+$ node node_modules/typescript/bin/tsc --noEmit
+Exit code: 0
+(stdout/stderr empty)
+
+$ git diff --check -- apps/web/src/BudgetStatus.tsx tests/run-cost.test.ts
+Exit code: 0
+warning: in the working copy of 'tests/run-cost.test.ts', LF will be replaced by CRLF the next time Git touches it
+
+Verified: fresh ledger amount remains separate from historical threshold occupancy/calls; captured in-flight reservations included; stopped role/message retained; legacy missing values not invented; pending/uncertain/unknown-operation consent guards unchanged.
+Not verified here: product browser rendering after reload; real QA or manager acceptance; a complete controlled interruption/recovery.
+

@@ -1,0 +1,167 @@
+Budget history durable admission fix frozen 2026-10-06T04:44:51Z
+Node C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+
+NEW admission integration exit0:
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (463.531ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (100.0868ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (379.6265ms)
+✔ other project/version registration cannot leak into this exact version (220.7281ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (232.6163ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (140.0227ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (131.1829ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (69.8542ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (260.0576ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (104.3982ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (131.553ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (34.2129ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3925.1041
+
+
+PRIOR existing planning expectation run exit1 (retain evidence):
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ reads verified completion and current-version wire/ledger evidence without double-counting inherited history or mutating anything (618.8513ms)
+✔ preserves each fixed version and distinct source fingerprint plus exact employee authorization without returning document bodies (267.0782ms)
+✔ a different saved version reports historical provenance but never uses old completion as new-version completion (259.2702ms)
+✔ changed current task contract or requirement cannot silently reuse completed IDs even under the same version (288.7186ms)
+✔ explicit output/call/money limits and artifact/verify/review bindings are part of the frozen task contract (424.189ms)
+✔ interrupted database status is preserved while archive outcome stays separately visible (309.949ms)
+✔ native completed status with changed delivery bytes is not a verified completion or accepted seal (283.8596ms)
+✔ missing/incomplete latest archives preserve explicit unavailable amounts/counters rather than manufactured zero (281.3796ms)
+✔ a foreign project archive cannot supply file/completion/knowledge evidence or current-version counters (311.0928ms)
+✔ no-run history and a proven cancelled-before-start entry are distinguishable from a missing started archive (292.9582ms)
+✔ malformed knowledge grant/citation metadata is explicitly unavailable rather than expanded or defaulted (262.962ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 10
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5335.8205
+
+✖ failing tests:
+
+test at tests\planning-execution-context.test.ts:1:10937
+✖ reads verified completion and current-version wire/ledger evidence without double-counting inherited history or mutating anything (618.8513ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  5 !== 4
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-execution-context.test.ts:133:55)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 5,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+FINAL planning11 + recovery7 integration exit0:
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ reads verified completion and current-version wire/ledger evidence without double-counting inherited history or mutating anything (606.4269ms)
+✔ preserves each fixed version and distinct source fingerprint plus exact employee authorization without returning document bodies (250.0962ms)
+✔ a different saved version reports historical provenance but never uses old completion as new-version completion (267.2798ms)
+✔ changed current task contract or requirement cannot silently reuse completed IDs even under the same version (284.7434ms)
+✔ explicit output/call/money limits and artifact/verify/review bindings are part of the frozen task contract (379.7329ms)
+✔ interrupted database status is preserved while archive outcome stays separately visible (287.4134ms)
+✔ native completed status with changed delivery bytes is not a verified completion or accepted seal (285.7145ms)
+✔ missing/incomplete latest archives preserve explicit unavailable amounts/counters rather than manufactured zero (278.4779ms)
+✔ a foreign project archive cannot supply file/completion/knowledge evidence or current-version counters (300.9246ms)
+✔ no-run history and a proven cancelled-before-start entry are distinguishable from a missing started archive (314.5847ms)
+✔ malformed knowledge grant/citation metadata is explicitly unavailable rather than expanded or defaulted (293.1426ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5207.4668
+✔ HTTP check reads the original cap and current ledger, separates full retry, and performs no mutations or provider calls (1395.7986ms)
+✔ unknown fees require explicit carryover; in-flight fees always block and do not expire during GET (239.8502ms)
+✔ a task hold rejects before retry even with positive project money, and GET agrees with POST (230.9142ms)
+✔ current history and version produce explicit refusals instead of trusting the snapshot or old failure (222.1361ms)
+✔ external operation acknowledgement remains separate from unknown fee carryover (203.3388ms)
+✔ the original 90% retry guard and daily admission stay visible without changing the cap or ledger (194.8953ms)
+✔ model configuration changes are reported by read-only inspection without running a capability probe (176.7358ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3401.6824
+
+
+FINAL run-evidence pure6 exit0:
+✔ source checkpoint retains durable admission call provenance while old inherited snapshots keep the wire basis (2.433ms)
+✔ actual Node test child output yields pass/fail/skip counts and hashes without exposing any terminal body (538.4334ms)
+✔ partial, conflicting, multi-command or repeated Node summaries cannot become verified counts (0.8148ms)
+✔ operation metadata requires one exact completed run/call/attempt/approval chain and never uses a returned claimed ID (68.0105ms)
+✔ downstream evidence is limited to committed ancestors and keeps raw private fields and model claims out (137.065ms)
+✔ recovery seals the actual latest host budget and separates inherited unknown holds from recorded fee; old missing records stay unknown (63.4457ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1015.8781
+
+
+Frozen sources/tests and unchanged helpers:
+[
+  {
+    "path": "apps/api/src/budget-history.ts",
+    "sha256": "6b14d08758d1914377aba4f1d45611c0edbaa60f8cfd134dfaf758bd1fb68adf"
+  },
+  {
+    "path": "apps/api/src/planning-execution-context.ts",
+    "sha256": "1a981c25b6ec51cea6029d033eb64dfa15820493f502b0e657bc6ffb6fa6b6e0"
+  },
+  {
+    "path": "services/agent-runtime/run-evidence.mjs",
+    "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737"
+  },
+  {
+    "path": "tests/budget-history-admission.test.ts",
+    "sha256": "dcd96db26a9a6a5d561910ba658dedacf0068198b0818a96d721e4bd65581fb8"
+  },
+  {
+    "path": "tests/planning-execution-context.test.ts",
+    "sha256": "0f1b56457f8947f875ffd5e1ec1e125cd882b2b530455bb359ffcec4c044cf6e"
+  },
+  {
+    "path": "services/agent-runtime/run-evidence.test.mjs",
+    "sha256": "15e575c6ee7f0a4efc08b28f69d87ccccce6ce58d28af77b84de204876da5fa0"
+  },
+  {
+    "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+    "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+  },
+  {
+    "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+    "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+  },
+  {
+    "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+    "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+  }
+]

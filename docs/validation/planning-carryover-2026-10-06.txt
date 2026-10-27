@@ -1,0 +1,192 @@
+Planning carryover frozen validation 2026-10-06
+UTC start: 
+2026-10-06T00:46:19.6191100Z
+Workspace: 
+C:\Users\JJ\.codex\worktrees\f57c\agent_department
+Node: 
+C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+Sources before validation:
+[
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\project-planning.ts",
+    "Hash": "D3AC7CED1C65DC49DB1E38E5F1EF7F1B66A963E89B705672DA050E99E680A277"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\ProjectPlanning.tsx",
+    "Hash": "863CEE67C97673224169B4BBA50176A3CBEECCE1E2C06309A2195AD8368A3975"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning.test.ts",
+    "Hash": "020067BA29A0FB1FCCFBE1E0366977A7415F27293D25F6505A69EFDCEC1E2C69"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning-ui.test.ts",
+    "Hash": "C1A22C8D3F834CBD27D6A2AD3697C3CA82D9C2AA57A2A276859607F3997F3CD4"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\app.ts",
+    "Hash": "0ADB16AAC41AD785E773B215ADDD8727B91FA54CAA6D5550CCEF80926C8C2928"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\cost-control.ts",
+    "Hash": "FE41830316D3C9A6D23E2165378738F59BA616A034DCABD19F6D7249DC8A0735"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\provider.ts",
+    "Hash": "122C06D2696BD434EAD8191596FEFEB034B31E1EDCF3BB2DF30744CD032B46EA"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\packages\\contracts\\index.ts",
+    "Hash": "51676C93A0D341E2BD00FBD6A929E020599BA996BD692481ADDD3002BF897D29"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-protocol.mjs",
+    "Hash": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\planning-execution-context.ts",
+    "Hash": "5FF3865AE61C838C2776F8D5D9BD761E76B32044FE833571913D082E7F57AEDF"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-integration.mjs",
+    "Hash": "C00ED62FC7CF3F2C73916ED0D7313F62293EFE45E77A0787A67283E5A4BE3AD6"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-support\\pglite-pool.mjs",
+    "Hash": "C6DFD78719309965B83A316DD286379C1EB0750A68F026EBE5793A8CD34EBA74"
+  }
+]
+Command: node scripts/test-integration.mjs tests/project-planning.test.ts
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2430.4528ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (155.0752ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (138.8036ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (214.0425ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (187.9548ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (216.2282ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (133.8784ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (244.2588ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (375.4319ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (358.5764ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (185.6212ms)
+✖ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (81.4012ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (181.7222ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (268.0398ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (118.7567ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (259.3055ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6135.0089
+
+✖ failing tests:
+
+test at tests\project-planning.test.ts:2:17455
+✖ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (81.4012ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\project-planning.test.ts:282:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'COST_PENDING' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+API exit code: 1
+Command: node --import tsx --test tests/project-planning-ui.test.ts
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (3.7938ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (13.2104ms)
+✔ read-only quote performs one GET with exact explicit parameters and rejects mismatched versions (1.4396ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.5078ms)
+✔ changed or newly blocked quote returns current evidence without a POST or reservation callback (0.8493ms)
+✔ unchanged affordable quote generates one candidate after GET, with no save/approve request or data changes (0.9485ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6538ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (30.179ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.2668ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (11.9968ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.2835ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.0631ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.3673ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.5931ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without a POST (0.8875ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.4489ms)
+✔ explicit retention binds quote evidence, GET/POST bodies and candidate response, with no implicit true (2.6864ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.4128ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.6751ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.533ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (2.5976ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.2025ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 553.9105
+UI exit code: 0 Source drift count: 0 Sources after validation: [
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\project-planning.ts",
+    "Hash": "D3AC7CED1C65DC49DB1E38E5F1EF7F1B66A963E89B705672DA050E99E680A277"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\ProjectPlanning.tsx",
+    "Hash": "863CEE67C97673224169B4BBA50176A3CBEECCE1E2C06309A2195AD8368A3975"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning.test.ts",
+    "Hash": "020067BA29A0FB1FCCFBE1E0366977A7415F27293D25F6505A69EFDCEC1E2C69"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning-ui.test.ts",
+    "Hash": "C1A22C8D3F834CBD27D6A2AD3697C3CA82D9C2AA57A2A276859607F3997F3CD4"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\app.ts",
+    "Hash": "0ADB16AAC41AD785E773B215ADDD8727B91FA54CAA6D5550CCEF80926C8C2928"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\cost-control.ts",
+    "Hash": "FE41830316D3C9A6D23E2165378738F59BA616A034DCABD19F6D7249DC8A0735"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\provider.ts",
+    "Hash": "122C06D2696BD434EAD8191596FEFEB034B31E1EDCF3BB2DF30744CD032B46EA"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\packages\\contracts\\index.ts",
+    "Hash": "51676C93A0D341E2BD00FBD6A929E020599BA996BD692481ADDD3002BF897D29"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-protocol.mjs",
+    "Hash": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\planning-execution-context.ts",
+    "Hash": "5FF3865AE61C838C2776F8D5D9BD761E76B32044FE833571913D082E7F57AEDF"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-integration.mjs",
+    "Hash": "C00ED62FC7CF3F2C73916ED0D7313F62293EFE45E77A0787A67283E5A4BE3AD6"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\scripts\\test-support\\pglite-pool.mjs",
+    "Hash": "C6DFD78719309965B83A316DD286379C1EB0750A68F026EBE5793A8CD34EBA74"
+  }
+] UTC finish: 2026-10-06T00:46:29.1679218Z
+
+Final frozen check: API 15/16, one failure; UI 22/22, no failures.
+No skipped or cancelled tests.
+Twelve source hashes were identical before and after the final test runs.
+Owned source hashes still match the Markdown report.
+Scoped git diff --check exit code: 0.
+Trailing-whitespace search: no matches.
+Outstanding root-owned fix: cost-control.ts must reject project planning pending receipts before expiry changes them to uncertain.

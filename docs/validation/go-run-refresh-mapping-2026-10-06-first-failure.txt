@@ -1,0 +1,29 @@
+Original local test failure excerpt, retained after the successful rerun.
+This is an excerpt of the original exec output, not reconstructed full stdout.
+No real API, model, database, browser or employee command was used.
+
+Command:
+C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --import tsx --test tests/run-refresh-mapping.test.ts tests/run-events.test.ts tests/run-handoff-ui.test.ts tests/run-status.test.ts tests/recovery-conditions-ui.test.ts tests/cost-carryover-ui.test.ts
+
+Original exit code: 1
+Original results: tests 30, pass 28, fail 2, cancelled 0, skipped 0, todo 0.
+
+Failure 1:
+the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /前置：<!-- -->开发/.
+Actual renderToStaticMarkup fragment: <p>前置：开发</p>
+Location: tests/run-refresh-mapping.test.ts:142
+Resolution: the NEW test now checks the actual static markup, /前置：开发/.
+
+Failure 2:
+unresolved model charges disable both recovery actions and expose the reconciliation entry
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /href="#settings"/.
+Actual markup fragment: 请先核对供应方账单 <a href="#usage">核对调用费用</a>
+Location: tests/run-status.test.ts:17
+The #usage implementation predates this UI repair. The reviewed pre-repair RunExtras SHA256 was:
+3a79b946978a99f402da79cc0fa54cbd02dfed47d9ceade33357e87e75911672
+Resolution: root expressly authorized updating only the old test's link expectation to #usage.
+Both existing recovery-action disabled assertions remain unchanged.
+
+The first corrected local rerun then passed 30/30 (go-run-refresh-mapping-2026-10-06.txt).
+The final run adds a repeated-recovery fixture; see the separate -final log and source SHA.

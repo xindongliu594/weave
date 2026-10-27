@@ -1,0 +1,94 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {readFileSync, writeFileSync, existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createInterface} from 'node:readline';
+import {randomUUID} from 'node:crypto';
+
+// Isolated probe of the original plugin. No employee execution or production state.
+const [repo, source, out, mode] = process.argv.slice(2);
+assert.ok(process.permission, 'Run with Node permission mode');
+const require = createRequire(join(repo, 'services/agent-runtime/package.json'));
+const load = name => import(pathToFileURL(require.resolve(name)).href);
+const {Context} = await load('@deepseek-ai/cordis');
+const {LlmAdapter} = await load('@deepseek-ai/dsh-llm');
+const cortex = await import(pathToFileURL(join(source, 'lib/index.js')).href);
+const model = 'deepseek-v4.1-flash', provider = 'weiwu-budgeted-pilot';
+const responses = new Map();
+const input = createInterface({input: process.stdin});
+input.on('line', line => { const reply = JSON.parse(line); responses.get(reply.id)?.(reply); });
+const broker = request => new Promise((resolve, reject) => {
+  const id = randomUUID();
+  responses.set(id, value => { responses.delete(id); value.error ? reject(Error(value.error)) : resolve(value.result); });
+  console.log('CORTEX_REQUEST ' + JSON.stringify({id, ...request}));
+});
+const report = {mode, originalPlugin: true, modelCalls: 0, checks: [], tools: [], calls: []};
+const check = (name, detail) => report.checks.push({name, passed: true, detail});
+const ctx = new Context(), fibers = [], handles = [];
+const mount = async (name, config) => {
+  const mod = await load(name), fiber = ctx.plugin(mod.default ?? mod, config);
+  fibers.push(fiber); await fiber.await();
+};
+try {
+  assert.throws(() => readFileSync('/etc/passwd'), {code: 'ERR_ACCESS_DENIED'});
+  assert.throws(() => writeFileSync(join(out, '..', 'outside.txt'), 'denied'), {code: 'ERR_ACCESS_DENIED'});
+  check('outside-read-and-write-denied', 'Node permission boundary; not an OS sandbox acceptance');
+  await mount('@deepseek-ai/dsh-llm');
+  ctx.llm.registerAdapter([provider], new class extends LlmAdapter {
+    async listModels() { return [{id: model, name: model, contextWindow: 262144, maxOutputTokens: 8192}]; }
+    async *stream(options) {
+      assert.ok(['real', 'real-project'].includes(mode), 'Model calls forbidden in load-only probe');
+      assert.equal(options.model, model);
+      assert.equal(options.provider, provider);
+      report.modelCalls++;
+      const messages = [{role: 'system', content: options.system}, ...options.messages.map(m => ({role: m.role, content: m.content.map(b => {assert.equal(b.type, 'text'); return b.text;}).join('\n')}))];
+      const result = await broker({messages, maxTokens: options.maxTokens});
+      report.calls.push({usageId: result.usageId, usage: result.usage});
+      yield {type: 'text-delta', text: result.content};
+      yield {type: 'usage', usage: {inputTokens: result.usage.prompt_tokens, outputTokens: result.usage.completion_tokens}};
+      yield {type: 'finish', reason: 'stop'};
+    }
+  }());
+  for (const name of ['session', 'session-projection', 'system-prompt', 'tools', 'agent', 'commands']) await mount('@deepseek-ai/dsh-' + name, name === 'tools' ? {mode: 'native'} : undefined);
+  await mount('@deepseek-ai/dsh-agent-loop', {agents: []});
+  const plugin = ctx.plugin(cortex, {stateDir: join(out, 'state'), modelsFile: join(out, 'models.json'), settingsFile: join(out, 'settings.yaml'),
+    uiEnabled: false, watchdogTickMs: 0, settleIntervalMs: 0, modelRefreshHours: 0, budgetRebalance: false,
+    eventNotify: 'off', interactionNotify: 'off', strongestModel: model});
+  fibers.push(plugin); await plugin.await();
+  report.tools = ctx.tools.schemas().map(t => t.name).sort();
+  for (const n of ['cortex_start', 'cortex_decompose', 'cortex_strategy_match', 'cortex_execute']) assert.ok(report.tools.includes(n));
+  check('original-plugin-loaded-on-fixed-dsh', {toolCount: report.tools.length, heartbeat: existsSync(join(out, 'state/mounted.json'))});
+  const allowed = ['cortex_start', 'cortex_decompose', 'cortex_strategy_match'];
+  const actor = await ctx.agents.create({sessionId: randomUUID(), meta: {cwd: out}, agentOptions: {provider, model},
+    setup: scope => { scope.tools.restrict({deny: report.tools.filter(n => !allowed.includes(n))}); }});
+  handles.push(actor);
+  const denied = await ctx.tools.execute({name: 'cortex_execute', arguments: {task_id: 'forbidden'}, agent: actor.agent, callId: randomUUID(), signal: AbortSignal.timeout(10000)});
+  assert.equal(denied.isError, true); assert.equal(denied.error?.info?.code, 'UNKNOWN_TOOL');
+  check('execution-tool-denied', {visibleTools: ctx.tools.schemas(actor.agent).map(t => t.name), code: denied.error.info.code});
+  const call = async (name, args) => {
+    assert.ok(allowed.includes(name));
+    const result = await ctx.tools.execute({name, arguments: args, agent: actor.agent, callId: randomUUID(), signal: AbortSignal.timeout(240000)});
+    report.calls.push({name, args, result});
+    assert.equal(result.isError, false, JSON.stringify(result.error));
+    return result.value;
+  };
+  const requirement = mode === 'real-project'
+    ? '开发一个人使用的小型 Todo API。使用 Node.js，支持新增、列表、完成和删除任务，任务用 SQLite 持久化，服务重启后仍能读取。交付源代码、可执行自动测试和简明启动说明。开发之后必须由独立 QA 验证 CRUD、非法输入和重启持久化，再由经理依据需求和真实测试证据验收。暂不需要网页、登录、部署或复杂架构。团队方案必须明确角色分工、交付物、前后依赖、可以并行的工作和验收条件。'
+    : '为一个人使用的小型 Todo API 提出多 Agent 项目方案。使用 Node.js，支持新增、列表、完成和删除任务，任务用 SQLite 持久化，服务重启后仍能读取。交付源代码、可执行自动测试和简明启动说明。开发之后必须由独立 QA 验证 CRUD、非法输入和重启持久化，再由经理依据需求和真实测试证据验收。暂不需要网页、登录、部署或复杂架构。本次仅规划，不执行开发。请明确角色分工、交付物、前后依赖、可以并行的工作和验收条件。';
+  report.requirement = requirement;
+  const profile = {task_type: 'code_change', domain: 'engineering', complexity: 0.4, risk: 0.2, quality_requirement: 0.9, budget_limit: 0.04, language: 'zh', capability: ['general']};
+  report.profileSource = 'Operator-supplied task classification; not model-inferred template routing';
+  const {quality_requirement, budget_limit, ...matchingProfile} = profile;
+  report.match = await call('cortex_strategy_match', {profile: matchingProfile});
+  report.start = await call('cortex_start', {goal: requirement, profile, organization_mode: 'standard'});
+  if (mode !== 'load') report.plan = await call('cortex_decompose', {task_id: report.start.taskId, parent_id: 'T0', auto: true});
+  else assert.equal(report.modelCalls, 0);
+} catch (e) { report.failure = {message: e.message, stack: e.stack}; process.exitCode = 1; }
+finally {
+  for (const item of [...handles.reverse(), ...fibers.reverse()]) try { await item.dispose(); } catch (e) {report.teardownError = e.message; process.exitCode = 1;}
+  input.close(); process.stdin.unref();
+  report.completed = !process.exitCode;
+  writeFileSync(join(out, 'worker-result.json'), JSON.stringify(report, null, 2));
+  console.log('CORTEX_RESULT ' + JSON.stringify({completed: report.completed, modelCalls: report.modelCalls, checks: report.checks.length, failure: report.failure?.message}));
+}

@@ -1,0 +1,58 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { firstProjectApproval, rejectedCounterPreflight, counterPreflightProof, initialProjectAdmission, initialProjectExecutionCounters } from '../docs/test-evidence/helpers/go-first-project-admission-stop-guard-2026-10-06.mjs';
+const root = 'docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/';
+const originalArchive = JSON.parse(readFileSync(root + 'archive.json')), prior = JSON.parse(readFileSync(firstProjectApproval.path)), readiness = JSON.parse(readFileSync(root + 'readiness.json'));
+const source = { ...firstProjectApproval, value: prior }, config = { runId: originalArchive.id, projectId: originalArchive.snapshot.projectId, departmentId: originalArchive.snapshot.departmentId, version: 8 };
+function fixture() {
+  // Retain real identities and host seals; trim only unused message fields in
+  // this in-memory engineering fixture, never alter the original source file.
+  const archive = { ...originalArchive, snapshot: structuredClone(originalArchive.snapshot), events: originalArchive.events.filter(event =>
+    ['model/request', 'model/wire-request', 'billing/usage', 'model/finish', 'team/checkpoint'].includes(event.type)).map(event => ({ ...event,
+      data: event.type === 'model/request' ? {} : event.type === 'model/wire-request' ? { ...event.data, body: undefined } : structuredClone(event.data) })) };
+  return { archive, readiness: structuredClone(readiness), binding: structuredClone(prior.goBinding), initialProjectApproval: structuredClone(source),
+    usage: archive.events.filter(event => event.type === 'billing/usage').map(event => ({ ...event.data, runId: config.runId, projectId: config.projectId })) };
+}
+test('exact original first approval admits absent inherited history without changing the snapshot; real host6 plus settled12 yields18', () => {
+  const f = fixture(), snapshot = structuredClone(f.archive.snapshot); assert.equal(initialProjectAdmission(f, config).inheritedCalls, 0);
+  const counts = initialProjectExecutionCounters(f, config); assert.equal(counts.callsUsed, 18); assert.equal(counts.callLimit, 100);
+  assert.ok(Math.abs(counts.occupied - .4556857) < 1e-9); assert.deepEqual(f.archive.snapshot, snapshot); assert.ok(!Object.hasOwn(f.archive.snapshot, 'budgetHistory'));
+});
+test('history absence never implies zero outside the exact unique first project approval', () => {
+  for (const mutate of [
+    f => { f.archive.snapshot.approval.kind = 'resume'; }, f => { f.archive.snapshot.resumedFrom = 'parent'; },
+    f => { f.archive.snapshot.approval.parentRunId = 'parent'; }, f => { f.archive.snapshot.budgetHistory = undefined; },
+    f => { f.initialProjectApproval.sha256 = '0'.repeat(64); }, f => { f.initialProjectApproval.value.newRunsReadOnly.push({ id: 'another' }); },
+    f => { f.initialProjectApproval.value.newArchive.snapshotSha256 = '0'.repeat(64); }, f => { f.binding.projectSignature = 'substituted'; },
+    f => { f.archive.snapshot.policy.maxModelCalls = 101; },
+  ]) { const f = fixture(); mutate(f); assert.throws(() => initialProjectExecutionCounters(f, config)); }
+});
+test('request36/wire34, unmatched occupied registration, unfinished response and unconfirmed billing remain blocked', () => {
+  const f = fixture(), request = f.archive.events.find(event => event.type === 'model/request'), wire = f.archive.events.find(event => event.type === 'model/wire-request');
+  for (let index = 0; index < 18; index++) f.archive.events.push({ ...request, seq: 6000 + index * 2, requestId: 'new-' + index });
+  for (let index = 0; index < 16; index++) f.archive.events.push({ ...wire, seq: 6001 + index * 2, requestId: 'new-' + index, data: { ...wire.data, usageId: 'new-usage-' + index } });
+  assert.equal(f.archive.events.filter(event => event.type === 'model/request').length, 36); assert.equal(f.archive.events.filter(event => event.type === 'model/wire-request').length, 34);
+  assert.throws(() => initialProjectExecutionCounters(f, config));
+  for (const mutate of [
+    f => { f.archive.events.find(event => event.type === 'model/request').requestId = 'unmatched'; },
+    f => { f.archive.events = f.archive.events.filter(event => event.type !== 'model/finish'); },
+    f => { f.archive.events.push({ type: 'model/call-start', seq: 6000, data: {} }); },
+    f => { f.archive.events.push({ type: 'billing/unconfirmed', seq: 6000, data: {} }); },
+    f => { f.usage.pop(); }, f => { f.archive.events.find(event => event.type === 'billing/usage').data.cost++; },
+  ]) { const changed = fixture(); mutate(changed); assert.throws(() => initialProjectExecutionCounters(changed, config)); }
+});
+test('host checkpoint counts and final stop checkpoint must match all registered attempts, amounts and original100 limit', () => {
+  const f = fixture(), before = initialProjectExecutionCounters(f, config), original = f.archive.events.findLast(event => event.type === 'team/checkpoint');
+  f.archive.events.push({ seq: 6000, type: 'team/checkpoint', data: { budgetEvidence: { ...original.data.budgetEvidence, point: 'runtime-checkpoint', project: before } } });
+  assert.deepEqual(initialProjectExecutionCounters(f, config), before);
+  f.archive.events.at(-1).data.budgetEvidence.project.callsUsed = 17; assert.throws(() => initialProjectExecutionCounters(f, config));
+});
+test('second exact zero-POST preflight is preserved and cannot authorize an existing intent or dispatched cancellation', () => {
+  const bytes = readFileSync(rejectedCounterPreflight.path), proof = { value: JSON.parse(bytes), sha256: createHash('sha256').update(bytes).digest('hex') };
+  const bound = { ...config, commandId: proof.value.commandId }; assert.equal(counterPreflightProof(proof, bound).posts, 0);
+  for (const mutate of [value => { value.value.actionReceipt = 'existing'; }, value => { value.value.failure.dispatchObserved = true; }, value => { value.sha256 = '0'.repeat(64); }]) {
+    const changed = structuredClone(proof); mutate(changed); assert.throws(() => counterPreflightProof(changed, bound));
+  }
+});

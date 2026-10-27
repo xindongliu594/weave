@@ -1,0 +1,288 @@
+{
+  "kind": "primary-docs-and-saved-catalog-readonly",
+  "checked_at_utc": "2026-10-06 01:01:17 UTC",
+  "sources": {
+    "go": "https://opencode.ai/docs/go/",
+    "go_chat_route": "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/console/app/src/routes/zen/go/v1/chat/completions.ts",
+    "go_variant_parser": "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/console/app/src/routes/zen/util/variant.ts",
+    "deepseek_pricing": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "deepseek_thinking": "https://api-docs.deepseek.com/guides/thinking_mode/",
+    "deepseek_chat_reference": "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "glm_flash": "https://docs.z.ai/guides/vlm/glm-5.3-flash",
+    "glm_53": "https://docs.z.ai/guides/llm/glm-5.3",
+    "glm_52": "https://docs.z.ai/guides/llm/glm-5.2",
+    "glm_reasoning_parameters": "https://docs.z.ai/guides/capabilities/thinking",
+    "glm_reasoning_preservation": "https://docs.z.ai/guides/capabilities/thinking-mode",
+    "glm_function_calling": "https://docs.z.ai/guides/capabilities/function-calling"
+  },
+  "scope": {
+    "paid_model_calls": 0,
+    "live_authenticated_catalog_calls": 0,
+    "user_keys_accessed": false,
+    "original_database_accessed": false,
+    "source_modifications": false,
+    "legacy_projection_excludes_credentials": true
+  },
+  "legacy_catalog": {
+    "path": "docs/test-evidence/opencode-go-web-configuration-2026-10-05T13-29-43-137Z-ada61878.json",
+    "sha256": "d46c6062c413954dec6daa360586bc5d9211973732b6c1e22558d2dbc3a46b1f",
+    "kind": "actual-web-gateway-configuration",
+    "endpoint": "https://opencode.ai/zen/go/v1",
+    "inferenceCallsRequested": 0,
+    "directoryStatus": "available",
+    "directoryHttpStatus": 200,
+    "directoryFetchedAt": "2026-10-05T13:30:10.3620000Z",
+    "modelSource": "https://opencode.ai/zen/go/v1/models",
+    "directoryCount": 36,
+    "models": [
+      {
+        "id": "deepseek-flash",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "deepseek-v4-flash",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "deepseek-v4-flash-vision-exp",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "deepseek-v4-pro",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "deepseek-v4.1-flash",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "glm-5.1",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "glm-5.2",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "glm-5.3",
+        "pricingStatus": "missing"
+      },
+      {
+        "id": "glm-5.3-flash",
+        "pricingStatus": "missing"
+      }
+    ]
+  },
+  "go": {
+    "chat_completions_endpoint": "https://opencode.ai/zen/go/v1/chat/completions",
+    "endpoint_documented_ids": [
+      "glm-5.3-flash",
+      "glm-5.3",
+      "glm-5.2",
+      "deepseek-v4.1-flash",
+      "deepseek-v4-pro",
+      "deepseek-v4-flash",
+      "deepseek-v4-flash-vision-exp"
+    ],
+    "saved_catalog_only_ids": [
+      "deepseek-flash",
+      "glm-5.1"
+    ],
+    "rate_unit": "USD per 1 million tokens, Go published rates; actual account charge or quota deduction not tested",
+    "current_published_rates": [
+      {
+        "id": "glm-5.3-flash",
+        "input": 0.15,
+        "output": 0.5,
+        "cache_read": 0.03
+      },
+      {
+        "id": "glm-5.3",
+        "input": 1.4,
+        "output": 4.4,
+        "cache_read": 0.26
+      },
+      {
+        "id": "glm-5.2",
+        "input": 1.4,
+        "output": 4.4,
+        "cache_read": 0.26
+      },
+      {
+        "id": "deepseek-v4.1-flash",
+        "off_peak": {
+          "input": 0.15,
+          "output": 0.6,
+          "cache_read": 0.003
+        },
+        "peak": {
+          "input": 0.3,
+          "output": 1.2,
+          "cache_read": 0.006
+        }
+      },
+      {
+        "id": "deepseek-v4-pro",
+        "off_peak": {
+          "input": 0.66,
+          "output": 1.98,
+          "cache_read": 0.022
+        },
+        "peak": {
+          "input": 1.32,
+          "output": 3.96,
+          "cache_read": 0.044
+        }
+      },
+      {
+        "id": "deepseek-v4-flash",
+        "off_peak": {
+          "input": 0.15,
+          "output": 0.6,
+          "cache_read": 0.003
+        },
+        "peak": {
+          "input": 0.3,
+          "output": 1.2,
+          "cache_read": 0.006
+        }
+      },
+      {
+        "id": "deepseek-v4-flash-vision-exp",
+        "off_peak": {
+          "input": 0.15,
+          "output": 0.6,
+          "cache_read": 0.003
+        },
+        "peak": {
+          "input": 0.3,
+          "output": 1.2,
+          "cache_read": 0.006
+        }
+      }
+    ],
+    "cache_write": "Go table prints '-' for all target IDs; do not infer an actual zero-priced feature",
+    "target_context_price_tiers": "No context-length price split is declared in the target Go rows. Go deployment context/output caps are not confirmed by the target table.",
+    "deepseek_peak_hours": {
+      "utc": "Monday-Friday 01:00-04:00 and 06:00-10:00; other hours/weekends off-peak",
+      "asia_shanghai": "Monday-Friday 09:00-12:00 and 14:00-18:00; other hours/weekends off-peak",
+      "holiday_rule": "Vendor pricing excludes Chinese public holidays; Go text does not explicitly specify the holiday exclusion. Go holiday behavior is unverified."
+    },
+    "request_headers": {
+      "Authorization": "Bearer <configured Go API credential> (placeholder only; official Go route parses authorization token)",
+      "Content_Type": "application/json",
+      "User_Agent": "product-specific coding-agent identity",
+      "x_opencode_session": "one stable ID per conversation"
+    },
+    "code_snapshot": {
+      "format": "oa-compat",
+      "model_list": "lite",
+      "model_field": "body.model",
+      "variant_precedence": [
+        "body.reasoningEffort",
+        "body.reasoning_effort",
+        "body.reasoning.effort"
+      ],
+      "qualification": "Public dev branch snapshot, not proof of deployed upstream defaults or reasoning-state preservation"
+    }
+  },
+  "direct_vendor_facts": {
+    "deepseek": {
+      "current_vendor_ids": [
+        "deepseek-flash",
+        "deepseek-v4-pro"
+      ],
+      "vendor_versions": [
+        "DeepSeek-V4.1-Flash",
+        "DeepSeek-V4-Pro-0813"
+      ],
+      "thinking_default": "enabled",
+      "reasoning_effort_default": "high",
+      "canonical_efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "can_disable_thinking": true,
+      "tools_supported": true,
+      "thinking_tool_choice_allowed": [
+        "none",
+        "auto"
+      ],
+      "thinking_tool_choice_rejected": [
+        "required",
+        "named_function"
+      ],
+      "reasoning_state": "When tools is present, pass back full reasoning_content from every previous turn, including turns without tool calls. Missing content causes 400. Without tools it is unnecessary and ignored if passed.",
+      "context_tokens": "1M",
+      "maximum_output_tokens": "384K",
+      "native_legacy_aliases": "deepseek-v4-flash and deepseek-v4-flash-vision-exp are retired versions routed to V4.1 Flash in native DeepSeek API. Equivalent Go mapping is not established.",
+      "go_transport_status": "Defaults, exact parameter pass-through, reasoning-state preservation and tool continuation are unverified on Go."
+    },
+    "glm": {
+      "forced_thinking_ids": [
+        "glm-5.3",
+        "glm-5.3-flash"
+      ],
+      "thinking_default": "enabled",
+      "reasoning_effort_default": "max",
+      "standard_api_allowed_efforts_for_53": [
+        "low",
+        "high",
+        "max"
+      ],
+      "disabled_thinking_for_53": "rejected by vendor",
+      "glm_52_can_disable": true,
+      "glm_52_effort_aliases": "none/minimal stop thinking; low/medium map high; xhigh maps max",
+      "tools_supported": true,
+      "tool_choice": "auto only in vendor function-calling guide",
+      "interleaved_state": "Preserve and return thinking blocks together with tool results.",
+      "preserved_thinking": "thinking.clear_thinking=false; complete unchanged reasoning_content in original order. Coding Plan default enabled; standard API default disabled.",
+      "context_tokens_for_52_53_flash": "1M",
+      "maximum_output_tokens_for_52_53_flash": "128K",
+      "go_transport_status": "The Go upstream endpoint type, defaults, exact parameter pass-through and reasoning-state preservation are unverified."
+    }
+  },
+  "suggested_candidate_models": [
+    "glm-5.2",
+    "deepseek-v4.1-flash"
+  ],
+  "probe_candidate_policy": {
+    "thinkingMode": "disabled",
+    "protocol": "chat-completions",
+    "glm_53_excluded": "GLM 5.3 and GLM 5.3 Flash cannot disable thinking; neither is a candidate for this disabled-thinking probe.",
+    "contextWindowTokens": 131072,
+    "context_limit_basis": "Conservative local configured cap only; not a confirmed Go capacity or pricing threshold.",
+    "model_configuration": [
+      { "gatewayId": "ff9080ff-c61a-4449-a360-c5e0662e7c5a", "name": "Go · GLM 5.2", "model": "glm-5.2", "protocol": "chat-completions", "thinkingMode": "disabled", "inputRate": 1.4, "outputRate": 4.4, "contextWindowTokens": 131072 },
+      { "gatewayId": "ff9080ff-c61a-4449-a360-c5e0662e7c5a", "name": "Go · DeepSeek V4.1 Flash", "model": "deepseek-v4.1-flash", "protocol": "chat-completions", "thinkingMode": "disabled", "inputRate": 0.3, "outputRate": 1.2, "contextWindowTokens": 131072 }
+    ]
+  },
+  "assignment_scope": "Offer the current disabled-thinking probe candidates to AI; no manual employee roles or team plan were authored.",
+  "prepared_configuration_helper": {
+    "path": "docs/test-evidence/helpers/configure-go-models-web-2026-10-06.mjs",
+    "sha256": "3f35d72f1499da7f8214fc76f7c4b763d4363498948e216248c8f5ad9551ea97",
+    "frozen_at_utc": "2026-10-06T01:10:57.9094782+00:00",
+    "created_with_exclusive_write": true,
+    "syntax_check_exit_code": 0,
+    "executed_inspect": false,
+    "executed_save": false,
+    "review_pending": true,
+    "save_allowlist": "POST /api/models once per exact configured wire model; eight exact fields; no contextBytes",
+    "public_preserved_reads": ["/api/gateways", "/api/models", "/api/projects", "/api/departments", "/api/usage"],
+    "additional_ui_bootstrap_reads_for_review": ["/api/activity", "/api/health"],
+    "blocked": "All other API actions, paid model/text/tool tests, discover, billing, external browser traffic and repeated model POSTs",
+    "old_objects": "Every pre-existing public object's SHA256 must match after inspect/save; models may only gain the two reviewed records.",
+    "credentials": "Existing Go gateway credential is not read or changed; screenshot password inputs are masked.",
+    "actual_edge_ui_execution": "Not executed or verified; loaded-page semantic labels and exact submitted body must be checked at runtime."
+  },
+  "unknowns": [
+    "Current authenticated model availability and tool status on this user's Go account",
+    "Go model-list metadata prices: saved catalog reports all nine target rows missing",
+    "Actual paid tool calls, multi-turn/reload/checkpoint reasoning-state preservation through Go",
+    "Go holiday pricing, actual ledger/quota reconciliation, and any undeclared context-price thresholds",
+    "Current Go price/endpoint/defaults of saved-only glm-5.1 and deepseek-flash",
+    "Whether Go routes retired DeepSeek aliases to the same native replacement"
+  ]
+}
+

@@ -1,0 +1,1226 @@
+Read-only normal-v8 restore audit 2026-10-06 04:29:45 UTC
+No API/DB/model/provider/employee-file action.
+
+Archive checkpoint/accepted/unknown projections:
+{
+  "completeSequences": true,
+  "unknownOperations": [],
+  "sourceCheckpoint": {
+    "status": "available",
+    "sourceRunId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+    "checkpointSeq": 3132,
+    "checkpointAt": "2026-10-06T04:16:06.491Z",
+    "capturedAt": "2026-10-06T04:16:06.124Z",
+    "point": "runtime-checkpoint",
+    "subsequentAccountingEvents": 0,
+    "currentAtSourceEnd": true,
+    "project": {
+      "limit": 4.1797,
+      "occupied": 0.9446729999999998,
+      "activeReserved": 0,
+      "available": 3.2350270000000005,
+      "callsUsed": 24,
+      "callLimit": 100,
+      "callsBasis": "host-reserved-model-attempts"
+    },
+    "sourceAdmission": {
+      "basis": "run-admission-snapshot",
+      "recordedCost": 0.6295451,
+      "retainedUnknownReservation": 0.096526,
+      "availableBudget": 3.4536289000000004,
+      "callsUsed": null,
+      "callsBasis": "archived-model-wire-request-count",
+      "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+    }
+  },
+  "checkpoints": [
+    {
+      "seed": "dev",
+      "id": "t1",
+      "status": "completed",
+      "attemptId": "847386dd-94e0-485d-9ab8-b332981ae06c",
+      "assignee": "employee-2",
+      "verdict": "pass"
+    },
+    {
+      "seed": "qa_verify",
+      "id": "t2",
+      "status": "completed",
+      "attemptId": "2c0dd0e0-1e18-4786-b889-3bc14d497235",
+      "assignee": "employee-3"
+    },
+    {
+      "seed": "qa_review",
+      "id": "t3",
+      "status": "failed",
+      "attemptId": "de202b10-2e7d-4987-b109-db151000da83",
+      "assignee": "employee-3"
+    },
+    {
+      "seed": "manager_accept",
+      "id": "t4",
+      "status": "pending",
+      "assignee": "employee-1"
+    }
+  ],
+  "completed": [
+    "dev",
+    "qa_verify"
+  ],
+  "accepted": [
+    {
+      "seq": 1797,
+      "taskId": "dev",
+      "attemptId": "847386dd-94e0-485d-9ab8-b332981ae06c",
+      "workspaceRevision": "ccd7ceac9957927412b7839a6b2e0cfb820519b03c39488535e792731e0d6a0e",
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "server.mjs",
+          "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+          "size": 8708
+        },
+        {
+          "path": "todo.test.mjs",
+          "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+          "size": 9719
+        },
+        {
+          "path": "README.md",
+          "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+          "size": 3159
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --test todo.test.mjs",
+          "exitCode": 1,
+          "observationSeq": 1016,
+          "workspaceRevision": "2f69a97827d409340645ce9cefc635d4975b0d56794d5aece25a4c6edeee65d9",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 6,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "2cb0cc6ab67b7b13ad2df7351121b4bd5cd9f0db7ca0e419fe04e1c70f3d23b8",
+            "bytes": 1937,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "1d9588d2-70fa-4e00-9bee-b1c8a75f1557"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "5bba1de8-f79c-4226-9295-0a2060b5ee6c",
+            "queuedSeq": 1004,
+            "finishedSeq": 1014
+          }
+        },
+        {
+          "command": "node --test todo.test.mjs",
+          "exitCode": 0,
+          "observationSeq": 1722,
+          "workspaceRevision": "ccd7ceac9957927412b7839a6b2e0cfb820519b03c39488535e792731e0d6a0e",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "2c8dac3b6bf1996f0ce96f8449f29c88bbc5dbd49d0c927322f5249ae99a035b",
+            "bytes": 680,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "fc540c77-f2c7-4341-9b15-69b09761f9cf"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "450f1f3d-c8b7-4387-a214-9fe0cfbee882",
+            "queuedSeq": 1707,
+            "finishedSeq": 1720
+          }
+        }
+      ],
+      "projectBudget": {
+        "limit": 4.1797,
+        "occupied": 0.7959681000000001,
+        "activeReserved": 0,
+        "available": 3.3837319000000003,
+        "callsUsed": 8,
+        "callLimit": 100,
+        "callsBasis": "host-reserved-model-attempts"
+      }
+    },
+    {
+      "seq": 2994,
+      "taskId": "qa_verify",
+      "attemptId": "2c0dd0e0-1e18-4786-b889-3bc14d497235",
+      "workspaceRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+          "size": 8708,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "todo.test.mjs",
+          "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+          "size": 9719,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "README.md",
+          "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+          "size": 3159,
+          "producerTaskId": "dev"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "acceptance.test.mjs",
+          "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+          "size": 23389
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --test todo.test.mjs",
+          "exitCode": 0,
+          "observationSeq": 2492,
+          "workspaceRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "0e497b75b87f02fa461d2895685cce9767ebdfa3c191d1e02a2d66a676c9177d",
+            "bytes": 680,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "fc53df23-5b75-4b48-b165-ee70b021b241"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "088f5ba0-362d-48d1-9c66-55ff890477b4",
+            "queuedSeq": 2474,
+            "finishedSeq": 2490
+          }
+        },
+        {
+          "command": "node --test acceptance.test.mjs",
+          "exitCode": 0,
+          "observationSeq": 2931,
+          "workspaceRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "6edfab2b8d47329c15745dbf65376985f32604589ef0dde010207116f813b2ee",
+            "bytes": 843,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "9c46b46c-ee8c-482c-a655-e94840ffbf14"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "b87503be-e82c-48e5-abef-63ece791c298",
+            "queuedSeq": 2916,
+            "finishedSeq": 2929
+          }
+        }
+      ],
+      "projectBudget": {
+        "limit": 4.1797,
+        "occupied": 0.9009266999999999,
+        "activeReserved": 0,
+        "available": 3.2787733000000006,
+        "callsUsed": 19,
+        "callLimit": 100,
+        "callsBasis": "host-reserved-model-attempts"
+      }
+    }
+  ],
+  "lateAccounting": [
+    {
+      "seq": 3114,
+      "type": "runtime/model-settling",
+      "data": {
+        "maxWaitMs": 30000,
+        "pendingRequests": 1
+      }
+    },
+    {
+      "seq": 3115,
+      "type": "billing/unconfirmed",
+      "data": {
+        "id": "aac77ca0-f367-4a9c-8b4c-b4c3971ecfe6",
+        "dispatched": false,
+        "code": "CALL_INTERRUPTED"
+      }
+    },
+    {
+      "seq": 3126,
+      "type": "runtime/model-settled",
+      "data": {
+        "pendingRequests": 0,
+        "finishedRequests": 1,
+        "timedOut": false,
+        "aborted": false
+      }
+    }
+  ],
+  "queue": [
+    {
+      "seq": 5,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId"
+      ],
+      "data": {
+        "operationId": "1d0b33ee-3e6e-4552-9c55-33177a41f5a2",
+        "name": "prepare"
+      }
+    },
+    {
+      "seq": 122,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "5c5f8394-309c-4c8b-b589-e72e9c41ade4",
+        "name": "filesystem",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 132,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "b984d3a2-b654-4b4c-8fed-02d431745689",
+        "name": "filesystem",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 143,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "8668d8c5-8ebf-4edb-bc1b-78d9ab4d8848",
+        "name": "filesystem",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 276,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "7cb5b201-7fa8-47bd-bf7d-aee35f11a09b",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 289,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "3fbe5c87-2e21-4b46-84ba-60b8ec7a439a",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 356,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "73a519aa-a62b-40a0-a60d-738434271d58",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1004,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "5bba1de8-f79c-4226-9295-0a2060b5ee6c",
+        "name": "terminal_test",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1095,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "e3062f67-ffc6-4579-aca5-35b1666666af",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1707,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "450f1f3d-c8b7-4387-a214-9fe0cfbee882",
+        "name": "terminal_test",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1844,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "6099d3bd-3923-4bdc-bfea-73401a74d191",
+        "name": "filesystem",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 1956,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "d4e6463a-9186-4284-9ce8-d6e2c362a86a",
+        "name": "filesystem",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 1984,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "be782bcf-9200-4150-8574-5b207c710fb7",
+        "name": "filesystem",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 2096,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "311020ee-7cc7-4f57-9528-82d57d898924",
+        "name": "artifact_write",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 2474,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "088f5ba0-362d-48d1-9c66-55ff890477b4",
+        "name": "terminal_test",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 2916,
+      "keys": [
+        "operationId",
+        "name",
+        "deviceId",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId"
+      ],
+      "data": {
+        "operationId": "b87503be-e82c-48e5-abef-63ece791c298",
+        "name": "terminal_test",
+        "taskId": "qa_verify"
+      }
+    }
+  ],
+  "finished": [
+    {
+      "seq": 281,
+      "data": {
+        "operationId": "7cb5b201-7fa8-47bd-bf7d-aee35f11a09b",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 294,
+      "data": {
+        "operationId": "3fbe5c87-2e21-4b46-84ba-60b8ec7a439a",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 357,
+      "data": {
+        "operationId": "73a519aa-a62b-40a0-a60d-738434271d58",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1014,
+      "data": {
+        "operationId": "5bba1de8-f79c-4226-9295-0a2060b5ee6c",
+        "name": "terminal_test",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1096,
+      "data": {
+        "operationId": "e3062f67-ffc6-4579-aca5-35b1666666af",
+        "name": "artifact_write",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1720,
+      "data": {
+        "operationId": "450f1f3d-c8b7-4387-a214-9fe0cfbee882",
+        "name": "terminal_test",
+        "taskId": "dev"
+      }
+    },
+    {
+      "seq": 1873,
+      "data": {
+        "operationId": "6099d3bd-3923-4bdc-bfea-73401a74d191",
+        "name": "filesystem",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 1974,
+      "data": {
+        "operationId": "d4e6463a-9186-4284-9ce8-d6e2c362a86a",
+        "name": "filesystem",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 1988,
+      "data": {
+        "operationId": "be782bcf-9200-4150-8574-5b207c710fb7",
+        "name": "filesystem",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 2100,
+      "data": {
+        "operationId": "311020ee-7cc7-4f57-9528-82d57d898924",
+        "name": "artifact_write",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 2490,
+      "data": {
+        "operationId": "088f5ba0-362d-48d1-9c66-55ff890477b4",
+        "name": "terminal_test",
+        "taskId": "qa_verify"
+      }
+    },
+    {
+      "seq": 2929,
+      "data": {
+        "operationId": "b87503be-e82c-48e5-abef-63ece791c298",
+        "name": "terminal_test",
+        "taskId": "qa_verify"
+      }
+    }
+  ],
+  "latestArtifacts": [
+    {
+      "seq": 283,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 296,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 359,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 1017,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 1098,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 1723,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 1874,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 1975,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 1989,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 2102,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 2493,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    },
+    {
+      "seq": 2932,
+      "keys": [
+        "agentId",
+        "files"
+      ],
+      "data": {}
+    }
+  ]
+}
+
+
+Archived files/actual Go proof binding:
+{
+  "latestFileManifest": {
+    "seq": 2932,
+    "files": [
+      {
+        "path": "README.md",
+        "size": 3159,
+        "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a"
+      },
+      {
+        "path": "acceptance.test.mjs",
+        "size": 23389,
+        "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954"
+      },
+      {
+        "path": "server.mjs",
+        "size": 8708,
+        "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630"
+      },
+      {
+        "path": "todo.test.mjs",
+        "size": 9719,
+        "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b"
+      }
+    ]
+  },
+  "historicalSealsAgreeWithLatest": [
+    {
+      "path": "server.mjs",
+      "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+      "latestMatches": true
+    },
+    {
+      "path": "todo.test.mjs",
+      "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+      "latestMatches": true
+    },
+    {
+      "path": "README.md",
+      "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+      "latestMatches": true
+    },
+    {
+      "path": "acceptance.test.mjs",
+      "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+      "latestMatches": true
+    }
+  ],
+  "taskContractErrors": [],
+  "nativeQueuedWithoutFinished": [
+    {
+      "seq": 5,
+      "id": "1d0b33ee-3e6e-4552-9c55-33177a41f5a2",
+      "name": "prepare"
+    },
+    {
+      "seq": 122,
+      "id": "5c5f8394-309c-4c8b-b589-e72e9c41ade4",
+      "name": "filesystem",
+      "taskId": "dev",
+      "callId": "call_01_w2qtkjfqudi9pvh3571s760j"
+    },
+    {
+      "seq": 132,
+      "id": "b984d3a2-b654-4b4c-8fed-02d431745689",
+      "name": "filesystem",
+      "taskId": "dev",
+      "callId": "call_02_tw474g7fbyybjpo6quga6lo1"
+    },
+    {
+      "seq": 143,
+      "id": "8668d8c5-8ebf-4edb-bc1b-78d9ab4d8848",
+      "name": "filesystem",
+      "taskId": "dev",
+      "callId": "call_03_1gu6hghftys6jm48zsk2a4df"
+    }
+  ],
+  "modelReceiptCompleteness": [
+    {
+      "seq": 56,
+      "id": "8c9071cb-f5dd-47c6-8382-556093049fff",
+      "taskId": "dev",
+      "amount": 0.0196767,
+      "settledSeq": 70
+    },
+    {
+      "seq": 93,
+      "id": "45ac7386-82ee-4fc8-ad58-3b9765b909e3",
+      "taskId": "dev",
+      "amount": 0.0236433,
+      "settledSeq": 107
+    },
+    {
+      "seq": 156,
+      "id": "76fbbd62-0060-4a60-8166-f71ece13bea8",
+      "taskId": "dev",
+      "amount": 0.027210899999999996,
+      "settledSeq": 269
+    },
+    {
+      "seq": 307,
+      "id": "209b0b4b-c708-4391-93e5-1f4db3837d76",
+      "taskId": "dev",
+      "amount": 0.036653399999999996,
+      "settledSeq": 345
+    },
+    {
+      "seq": 370,
+      "id": "b379c838-8e6b-4348-87bd-b59bcdab056c",
+      "taskId": "dev",
+      "amount": 0.0410346,
+      "settledSeq": 381
+    },
+    {
+      "seq": 1028,
+      "id": "72997b8d-49f6-4044-8ad6-31f1b329bc98",
+      "taskId": "dev",
+      "amount": 0.045007799999999994,
+      "settledSeq": 1082
+    },
+    {
+      "seq": 1109,
+      "id": "c18cff0a-a91c-4d86-9bf7-87913021b94b",
+      "taskId": "dev",
+      "amount": 0.0515331,
+      "settledSeq": 1126
+    },
+    {
+      "seq": 1734,
+      "id": "446e960a-855e-4f7f-b1c6-f8876e54fcae",
+      "taskId": "dev",
+      "amount": 0.0551049,
+      "settledSeq": 1781
+    },
+    {
+      "seq": 1817,
+      "id": "64c2c46c-080c-4789-b87e-1dc52b4f7006",
+      "taskId": "qa_verify",
+      "amount": 0.021416699999999997,
+      "settledSeq": 1827
+    },
+    {
+      "seq": 1818,
+      "id": "752e4497-71af-4e78-9195-5b7d7b1175e3",
+      "taskId": "dev",
+      "amount": 0.06181829999999999,
+      "settledSeq": 1849
+    },
+    {
+      "seq": 1872,
+      "id": "d6c64f48-f359-4987-b471-06f9c42600be",
+      "amount": 0.0195555,
+      "settledSeq": 1897
+    },
+    {
+      "seq": 1888,
+      "id": "b14bae93-dda3-4186-9f34-7f76c86f02f8",
+      "taskId": "dev",
+      "amount": 0.066105,
+      "settledSeq": 1917
+    },
+    {
+      "seq": 1916,
+      "id": "ca233987-32b8-4547-854c-b5c7abb78403",
+      "taskId": "qa_verify",
+      "amount": 0.0300258,
+      "settledSeq": 1935
+    },
+    {
+      "seq": 1929,
+      "id": "89f5d656-8333-4957-897c-b3e7d9a3a972",
+      "amount": 0.0238914,
+      "settledSeq": 1960
+    },
+    {
+      "seq": 1973,
+      "id": "c532008e-4e28-4101-80d7-98bb5e75a900",
+      "amount": 0.0267657,
+      "settledSeq": 2007
+    },
+    {
+      "seq": 2001,
+      "id": "0a0b9df1-9fa1-4cf2-b340-7935428d6274",
+      "taskId": "qa_verify",
+      "amount": 0.038838899999999996,
+      "settledSeq": 2083
+    },
+    {
+      "seq": 2113,
+      "id": "89a8c9e4-f4a2-4d96-b989-2dd21a1c6abd",
+      "taskId": "qa_verify",
+      "amount": 0.050629799999999996,
+      "settledSeq": 2125
+    },
+    {
+      "seq": 2507,
+      "id": "eb3a923a-839d-4164-822b-f7ebdcd0bc10",
+      "taskId": "qa_verify",
+      "amount": 0.0552069,
+      "settledSeq": 2519
+    },
+    {
+      "seq": 2943,
+      "id": "20f0cf75-b871-4258-86c8-4bf1610c1213",
+      "taskId": "qa_verify",
+      "amount": 0.0598398,
+      "settledSeq": 2985
+    },
+    {
+      "seq": 3010,
+      "id": "8fdf6b5d-2d9a-4bdc-a2d3-fcf16c8aaf32",
+      "taskId": "qa_verify",
+      "amount": 0.0653451,
+      "settledSeq": 3025
+    },
+    {
+      "seq": 3051,
+      "id": "7a09d7d2-a0b8-486d-a7be-c4a1f43bdd98",
+      "amount": 0.029463899999999998,
+      "settledSeq": 3069
+    },
+    {
+      "seq": 3052,
+      "id": "9138b7a2-9799-45c7-9517-1d509907ec7a",
+      "taskId": "qa_verify",
+      "amount": 0.0666882,
+      "settledSeq": 3072
+    },
+    {
+      "seq": 3112,
+      "id": "8e1cb3bc-5e80-4311-a6c5-c2c11f261db3",
+      "amount": 0.0324117,
+      "settledSeq": 3124
+    }
+  ],
+  "commandResultShapes": [
+    {
+      "command": "node --test todo.test.mjs",
+      "seq": 1720,
+      "keys": [
+        "operationId",
+        "name",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId",
+        "localWorkspace"
+      ],
+      "resultKeys": []
+    },
+    {
+      "command": "node --test todo.test.mjs",
+      "seq": 2490,
+      "keys": [
+        "operationId",
+        "name",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId",
+        "localWorkspace"
+      ],
+      "resultKeys": []
+    },
+    {
+      "command": "node --test acceptance.test.mjs",
+      "seq": 2929,
+      "keys": [
+        "operationId",
+        "name",
+        "agentId",
+        "employeeId",
+        "sessionId",
+        "callId",
+        "approvalId",
+        "taskId",
+        "attemptId",
+        "localWorkspace"
+      ],
+      "resultKeys": []
+    }
+  ]
+}
+{
+  "actualGoBindingPass": true,
+  "confirmPath": "docs/test-evidence/go-headroom-normal-confirm-2026-10-06T03-52-30-038Z-bb3feede.json",
+  "confirmSha256": "bed7dfc9f3b86f77fc51e8fcd727734aa81841b9a119ffdc5241c943a147cbe6",
+  "generationSources": [
+    {
+      "path": "docs/test-evidence/go-headroom-normal-generate-2026-10-06T03-48-40-049Z-2bff7270.json",
+      "sha256": "85415218e56380d40a29b636e4aa1d816d7ceed767cb4c70d04a6605cf134e60"
+    }
+  ],
+  "binding": {
+    "version": 8,
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "departmentId": "9066be93-b669-454c-9fcb-c2327a550ae8",
+    "previewId": "291f6f51-25c6-4680-a6cb-b05eded1e924",
+    "planningReceiptId": "9aad4d3b-6282-4ed4-a423-fc446b70e369",
+    "planningCost": 0.006864299999999999,
+    "retained": true
+  }
+}
+
+
+Archive accounting/source hash projection:
+{
+  "wireCalls": 23,
+  "bills": 23,
+  "uniqueUsage": 23,
+  "allRunCosts": 0.21860189999999996,
+  "tasks": {
+    "dev": {
+      "wireCalls": 10,
+      "settledCost": 0.09918719999999999
+    },
+    "qa_verify": {
+      "wireCalls": 8,
+      "settledCost": 0.0968457
+    },
+    "captain/unattributed": {
+      "wireCalls": 5,
+      "settledCost": 0.022569
+    }
+  },
+  "lateUsage": {
+    "seq": 3124,
+    "id": "8e1cb3bc-5e80-4311-a6c5-c2c11f261db3",
+    "cost": 0.006126,
+    "inputTokens": 18568,
+    "outputTokens": 463,
+    "requestPurpose": "execution"
+  },
+  "failedReviewRequest": [
+    {
+      "seq": 3110,
+      "sessionId": "34e81525-b113-444d-828b-8445f36de765",
+      "maxTokens": 8000
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "apps/api/src/run-management.ts",
+      "sha256": "fc261948672186c431c1cb64a46cef1b52eec221086b909bb2cf8ba03c73ee30"
+    },
+    {
+      "path": "apps/api/src/handoff-checkpoints.ts",
+      "sha256": "7bb36090ec4d758adc3ccfc98fa9577ecfdb53f417b74b04812d0eea546acc9a"
+    },
+    {
+      "path": "apps/api/src/budget-history.ts",
+      "sha256": "0e6a39a01fa43fd968620c1607f805157ab89acb10c0bb86c5d41d7d7bac4bf4"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "3153a172d050a70c83bd9752b1dca8a153acb92abee7c33486c9a264dde60ffb"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-context.mjs",
+      "sha256": "3253b0b69ddac479978c6fd63226da469fc1ce72658bf4737d34feec10f55a70"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "f41ecc91e051800c8a8ff0b8b8fe5e8eacc879f1942ec624c2101687c22caad5"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256": "1543d40d420d29a171f863cccb00da4885f1fc278ff9937d3b50f3fcbd40b7ca"
+    },
+    {
+      "path": "services/agent-runtime/budget.mjs",
+      "sha256": "985e5b5436f97826edd7ce6b6ea542b0b0d492c1f4ef0c78423b5cae24027acc"
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-team.mjs",
+      "sha256": "4fc85d2a44e507a89451f33cc83486abf88aff7db0ff61df9c025ad82970298c"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    }
+  ]
+}
+
+
+Root owns budget-history conservative attempt inheritance repair; this audit does not modify source.
+Host attempts24 vs dispatched wires23 retained as separate actual facts.
+Current native device queue/SDK holds/current DB receipt state not freshly verified.
+Suggested exact operator CLI NOT EXECUTED:
+node docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs resume --scenario=normal --normal-project-id=4938eab8-26ed-4f60-9413-d979f05fa968 --recovery-project-id=3e101c24-87e6-43ea-80f9-a2c4b0b410f4 --version=8 --run-id=0947ae05-5c3c-47d0-969b-5c8a739118f1 --confirmed-evidence=docs/test-evidence/go-headroom-normal-confirm-2026-10-06T03-52-30-038Z-bb3feede.json --generation-evidence=docs/test-evidence/go-headroom-normal-generate-2026-10-06T03-48-40-049Z-2bff7270.json --go-model-id=fcce40cf-3172-4863-b0bd-776673f499e6 --retain-uncertain-costs=true

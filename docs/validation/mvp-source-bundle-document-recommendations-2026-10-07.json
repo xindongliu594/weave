@@ -1,0 +1,141 @@
+{
+  "kind": "source-delivery public documentation recommendation only; no bundle copy",
+  "date": "2026-10-07",
+  "bundleCopyPerformed": false,
+  "readyForFinalCopy": false,
+  "documents": [
+    {
+      "role": "windows-user-guide",
+      "path": "docs/mvp-windows-quickstart-2026-10-07.md",
+      "required": true,
+      "status": "exists-current-finalization-stage",
+      "bytes": 9764,
+      "sha256": "a14ef64c9daab416fe5aa4d704ffa7093b856c25fba1107bc5e2064320b5ac8b",
+      "releaseFreezeStillRequired": false,
+      "documentWithin2MiBLimit": true,
+      "frozenByDocumentationTask": true
+    },
+    {
+      "role": "fixed-issues-and-current-limits",
+      "path": "docs/mvp-fixed-issues-2026-10-07.md",
+      "required": true,
+      "status": "exists-current-finalization-stage",
+      "bytes": 12980,
+      "sha256": "dfe0cb0cd00d6a3420788dea3bcb17f3f83d1c0240139a88e2aecd738dc12fe0",
+      "releaseFreezeStillRequired": false,
+      "documentWithin2MiBLimit": true,
+      "frozenByDocumentationTask": true
+    },
+    {
+      "role": "normal-real-run-evidence",
+      "path": "docs/validation/go-normal-v14-real-acceptance-audit-2026-10-07.md",
+      "required": false,
+      "status": "exists-current-finalization-stage",
+      "bytes": 2375,
+      "sha256": "fe6b8b822d42a033647484801ac2a493edf8a8a42b760f5cafcf049e79d40bda",
+      "releaseFreezeStillRequired": true,
+      "documentWithin2MiBLimit": true
+    },
+    {
+      "role": "normal-real-run-machine-evidence",
+      "path": "docs/validation/go-normal-v14-real-acceptance-audit-2026-10-07.json",
+      "required": false,
+      "status": "exists-current-finalization-stage",
+      "bytes": 44569,
+      "sha256": "b8d6c771dc05bbaa21a016b13a24d005a268c65bc66b84575ce7a4bc65adfd5d",
+      "releaseFreezeStillRequired": true,
+      "documentWithin2MiBLimit": true
+    },
+    {
+      "role": "knowledge-catalog3-permission-history-evidence",
+      "path": "docs/validation/go-knowledge-v3-independent-audit-2026-10-07.md",
+      "required": false,
+      "status": "exists-current-finalization-stage",
+      "bytes": 983,
+      "sha256": "a41a8881c07ddc38ecb966879b4be29f7b7038c3311aae9eb6698bee44d51e2a",
+      "releaseFreezeStillRequired": true,
+      "documentWithin2MiBLimit": true
+    },
+    {
+      "role": "final-controlled-recovery-real-evidence",
+      "path": "docs/validation/go-recovery-v12-final-controlled-audit-2026-10-07.md",
+      "required": true,
+      "status": "exists-current-finalization-stage",
+      "bytes": 2698,
+      "sha256": "11529ba90754c48864b2e8051ecf014157a7a3b3a06fc8ebf39e95b3d98f2dfa",
+      "releaseFreezeStillRequired": true,
+      "documentWithin2MiBLimit": true
+    },
+    {
+      "role": "final-controlled-recovery-machine-evidence",
+      "path": "docs/validation/go-recovery-v12-final-controlled-audit-2026-10-07.json",
+      "required": false,
+      "status": "exists-current-finalization-stage",
+      "bytes": 47468,
+      "sha256": "1c24ca8c09ea06dd7d4d998cc17162cf242c61f798ca84625e9aea1f308e99f6",
+      "releaseFreezeStillRequired": true,
+      "documentWithin2MiBLimit": true
+    }
+  ],
+  "requiredPending": [
+    {
+      "role": "final-mvp-acceptance-report",
+      "path": null,
+      "status": "pending-root-final-report",
+      "required": true,
+      "resolution": "Root must supply the actual final report path after independent backup/cleanup audits and final delivery decision. Never substitute an older draft or this selection list."
+    }
+  ],
+  "copyPolicy": {
+    "helper": "scripts/prepare-source-delivery.mjs",
+    "includeWebBuild": true,
+    "runCopyOnlyAfterFinalSourceBuildDocumentFreeze": true,
+    "sourceTrees": "Use the helper existing whitelist; do not add dependencies or change source selection code for these docs.",
+    "credentialsAndDataExcluded": true,
+    "rawRunArchivesAndEmployeeDeliverables": "Deliver actual trace exports/downloads separately with their acceptance evidence; this source-document list does not copy project data.",
+    "pendingRefusesFinalReady": true
+  },
+  "releaseNotes": [
+    "Normal v14 Run88aa22a9-f887-467c-bf12-91bb57d42361 and controlled v12 child6e860c3c-113c-4245-b400-df85b950769e completed, two independent execution/recovery audits passed.",
+    "Final fresh browsers show manager accepted6999/3441 and COMPLETED lists; relevant63 tests/types/build passed.",
+    "Actual isolated full backup1963files/752356226B/34tables stable reopening, both final runs10files exactSHA, normal isolated todo12/12; independent backup audit is still in progress.",
+    "Success-close cleanup stopAdmission/drain24 tests/types passed and restarted original service loaded the repair; independent cleanup audit is still in progress.",
+    "Receipt c55a3d36-f662-48ef-a69e-baf1ecf26c40 is an extra manager_accept tail request after accepted3441, not captain; .0516951 remains uncertain along with older holds. Supplier invoice is not independently verified.",
+    "Employee reports remain original despite narrative version/read-count/output-length errors; paired host audits document corrections.",
+    "Current Windows user permissions, keyword KB without installed semantic model, opaque-only credentials copy and untested cross-machine migration remain explicit limits.",
+    "Root README/report/progress/phase are owned by Root; this task only froze its two public docs and recommendation JSON.",
+    "Final source bundle has not been copied. Recommendation remains pending only actual Root final report reference, not a claim of delivery."
+  ],
+  "localFileWritesOnly": true,
+  "liveApiCalls": 0,
+  "modelCalls": 0,
+  "originalDatabaseOpened": false,
+  "employeeFileWrites": 0,
+  "externalEvidenceRefs": [
+    {
+      "path": "docs/test-evidence/mvp-full-offline-backup-original-output-2026-10-07.json",
+      "sha256": "9f08435b8c3d780dcce64c62cefdd7e58df1b6df0e5092e2c5960dd9983b808d",
+      "notSelectedAsSourceDocument": true,
+      "reason": "Raw evidence is preserved separately; source helper excludes test-evidence paths."
+    },
+    {
+      "path": "docs/test-evidence/mvp-full-offline-both-runs-restored-2026-10-07.json",
+      "sha256": "1f3401212ea436b8563f34f12b2776b75080b97b74667b44776c889e3454783c",
+      "notSelectedAsSourceDocument": true,
+      "reason": "Raw evidence is preserved separately; source helper excludes test-evidence paths."
+    },
+    {
+      "path": "docs/test-evidence/go-normal14-cua-2026-10-07/final-build-full-ax.txt",
+      "sha256": "3aa86a1e69f8df20341307c9f54b3b5e2517d8921ee867ebfba8b1070e75a2af",
+      "notSelectedAsSourceDocument": true,
+      "reason": "Raw evidence is preserved separately; source helper excludes test-evidence paths."
+    },
+    {
+      "path": "docs/test-evidence/go-recovery12-cua-2026-10-07/final-build-completed-full-ax.txt",
+      "sha256": "150fce2032f99d6917791e08da0b8b0371baabdd239f9a5a12aa25d98ce3c12d",
+      "notSelectedAsSourceDocument": true,
+      "reason": "Raw evidence is preserved separately; source helper excludes test-evidence paths."
+    }
+  ],
+  "documentationFrozenForRootSelection": true
+}

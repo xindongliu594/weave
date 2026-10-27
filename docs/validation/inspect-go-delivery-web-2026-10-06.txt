@@ -1,0 +1,37 @@
+✔ explicit parameters preserve actual version/IDs and choose only a new evidence scope (4.0558ms)
+✔ missing/duplicate/foreign origin/unsafe paths are rejected before any browser or request (2.13ms)
+✔ all mutation/provider/maintenance and unrelated-run GET requests are denied (1.1378ms)
+✔ the reader makes only its allowlisted GET and preserves actual raw bytes/source SHA in memory (31.9823ms)
+✔ non-200 results preserve raw failure without being turned into accepted evidence (1.4248ms)
+✔ delivery expectation derives all five output hashes and both real command counts from memory fixtures (5.0844ms)
+✖ incomplete run/node/seal/bytes/output/test counts cannot be accepted (2.6638ms)
+✔ a newly mapped repair without its own completed checkpoint cannot inherit an old accepted native completion (1.6656ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 216.8917
+
+✖ failing tests:
+
+test at tests\go-delivery-web-helper.test.mjs:88:1
+✖ incomplete run/node/seal/bytes/output/test counts cannot be accepted (2.6638ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/tests/go-delivery-web-helper.test.mjs:97:82)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+pureTestExitCode=1

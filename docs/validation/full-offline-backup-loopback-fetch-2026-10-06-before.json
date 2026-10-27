@@ -1,0 +1,10 @@
+{
+  "script": {
+    "path": "scripts/verify-mvp-full-offline-backup.mjs",
+    "sha256": "edd2e7f549876a471d466562bb78939ab14a8482ff3733468aae9ccf152d824e"
+  },
+  "test": {
+    "path": "tests/full-offline-backup.test.mjs",
+    "sha256": "e54dca544a0c334af79ac09d2f102400de1002e605942734ebf3774554da4fd3"
+  }
+}

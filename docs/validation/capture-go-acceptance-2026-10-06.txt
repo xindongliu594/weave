@@ -1,0 +1,15 @@
+Prepared helper only; actual capture main never run.
+UTC started: 2026-10-06T04:01:19.0785457Z
+node --check exit: 0
+pure validation exit: 0
+Source stable before/after: True
+
+PASS 1: normal-only omits actual recovery run/proof; malformed/remote/duplicate/version options reject
+PASS 2: recovery requires explicit distinct parent/child/version and actual source group
+PASS 3: pending project models and active/unfinished product runs block maintenance before reader calls
+PASS 4: GET allowlist rejects provider/settlement/search/traversal and forged cost gates
+PASS 5: fake memory reader sends GET only and preserves raw entity/status SHA; blocked calls dispatch zero
+PASS 6: manifest path/bytes/SHA/size must match; unsafe/duplicate/changed artifacts reject
+PASS 7: pending/querying costs and incomplete native archives cannot become complete evidence
+PASS 8: v1/v2 content/space/SHA/provenance remains exact; other current versions do not claim v2
+SUMMARY 8/8 pure checks passed; ZERO actual API/provider/DB/employee actions; mock reader only.

@@ -1,0 +1,34 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2247.2301ms)
+✔ documented GPT-4.1 JSON mode uses the same budget and makes no repair call or preview on invalid output (96.1943ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (137.9608ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (87.2373ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (55.1849ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (346.9114ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (157.3964ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (132.8364ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (181.9491ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (383.7057ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (103.1562ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (58.6567ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4504.1119
+✔ new and configuration-only placeholder drafts are blocked before enqueue or billing (2261.9965ms)
+✔ resume and full retry of a legacy placeholder run cannot enqueue another attempt (67.8033ms)
+✔ concrete implementation assigned to an employee without tools is rejected (60.1196ms)
+✔ a deliberately edited single-person text plan can still be approved (72.9171ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2968.3676

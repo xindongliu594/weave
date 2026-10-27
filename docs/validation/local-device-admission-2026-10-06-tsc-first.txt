@@ -1,0 +1,2 @@
+tests/local-device-admission.test.ts(90,47): error TS2322: Type '(event: any) => number' is not assignable to type '(event: RuntimeCallError) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.

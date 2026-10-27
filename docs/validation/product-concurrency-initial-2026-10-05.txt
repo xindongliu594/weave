@@ -1,0 +1,68 @@
+✖ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (826.4227ms)
+✖ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (1155.171ms)
+✖ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (603.1863ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (4.2883ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3151.3329
+
+✖ failing tests:
+
+test at services\agent-runtime\product-concurrency.test.mjs:93:1
+✖ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (826.4227ms)
+  AssertionError [ERR_ASSERTION]: production LocalExecutor read shape must receive complete source-side proofs
+  
+  0 !== 2
+  
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:98:10
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:84:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\product-concurrency.test.mjs:115:1
+✖ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (1155.171ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 2
+  
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:121:10
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:84:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\product-concurrency.test.mjs:130:1
+✖ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (603.1863ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /FILE_VERSION_CONFLICT/. Input:
+  
+  'artifact_write: {"message":"HANDOFF_BLOCKED: work-first: 文件已变化，请重新读取并携带 sha256 写入","info":{"name":"HarnessError","code":"COORDINATOR_TOOL_FAILED"}}'
+  
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:136:81
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:84:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'artifact_write: {"message":"HANDOFF_BLOCKED: work-first: 文件已变化，请重新读取并携带 sha256 写入","info":{"name":"HarnessError","code":"COORDINATOR_TOOL_FAILED"}}',
+    expected: /FILE_VERSION_CONFLICT/,
+    operator: 'match',
+    diff: 'simple'
+  }

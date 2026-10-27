@@ -1,0 +1,28 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ authenticated heartbeat recovery queues and starts one real native command (5026.9752ms)
+✔ model admission waits for authenticated recovery and emits one reservation and one loopback wire (1094.8355ms)
+✔ offline to the bounded deadline leaves both local and model dispatch at zero (10194.0369ms)
+✔ caller cancellation and original deadline abort waiting before any dispatch (1118.9872ms)
+✔ current hard withdrawal, version, cancel, lease, snapshot and budget failures stop stale admissions promptly (6778.3663ms)
+✔ current model configuration and remaining budget denial outrank a stale heartbeat (1350.9912ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26382.875
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (3467.3331ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20685.7393ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (3063.8499ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (388.291ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28255.3983

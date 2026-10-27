@@ -1,0 +1,23 @@
+Command: node --test tests/full-offline-backup.test.mjs
+Date: 2026-10-05 (local Windows, synthetic fixtures only)
+Exit code: 0
+
+✔ destinations reject the workspace root, parents, siblings and source data (2.8442ms)
+✔ new destination refuses overwrites, preserving existing files (9.5549ms)
+✔ launcher and database startup markers refuse offline copying (6.2047ms)
+✔ CLI requires explicit shutdown confirmation before accessing a real source (113.1465ms)
+✔ transparent copying excludes startup state, preserves business history and leaves credentials opaque (67.0013ms)
+✔ junctions cannot escape the snapshot, including during the copy filter (9.8279ms)
+✔ isolated worker rejects an active model reservation without any business mutation (4837.9779ms)
+✔ validation network guard refuses external and loopback model calls before dispatch (147.1658ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5436.0164
+
+This is engineering regression using fresh local fixtures. It does not replace
+real model execution, employee QA acceptance or manager acceptance.

@@ -1,0 +1,103 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { parameters, allowedRequest, createReader, deliveryExpectations } from '../docs/test-evidence/helpers/inspect-go-delivery-web-2026-10-06.mjs';
+
+// Pure memory fixtures only. No main(), browser, HTTP server, filesystem writes,
+// employee code, provider or product data actions are performed by these tests.
+const runId = '11111111-1111-4111-8111-111111111111', projectId = '22222222-2222-4222-8222-222222222222';
+const command = ['node --test todo.test.mjs', 'node --test acceptance.test.mjs'];
+const hash = value => createHash('sha256').update(value).digest('hex');
+const args = [`--run-id=${runId}`, `--project-id=${projectId}`, '--version=9', '--confirmed-evidence=docs/test-evidence/synthetic-confirm.json',
+  '--generation-evidence=docs/test-evidence/synthetic-generate.json', '--base-url=http://127.0.0.1:4310'];
+const config = () => parameters(args);
+const summary = (count = 17) => `✔ synthetic only\nℹ tests ${count}\nℹ suites 0\nℹ pass ${count}\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\n`;
+function fixture() {
+  const paths = ['server.mjs', 'todo.test.mjs', 'README.md', 'acceptance.test.mjs', 'acceptance-report.md'];
+  const manifest = paths.map(path => ({ path, size: 7, sha256: hash('fixture') }));
+  const ids = ['dev', 'qa_verify', 'qa_review', 'manager_accept'];
+  const tasks = ids.map((id, index) => ({ id, outputs: manifest.slice(...[[0, 3], [3, 4], [4, 4], [4, 5]][index]), verify: index === 0 ? [command[0]] : index === 3 ? [] : command }));
+  const events = [], operations = []; const append = (type, data, extra = {}) => { const event = { seq: events.length + 1, type, data, ...extra }; events.push(event); return event; };
+  append('run/task-mapping', { tasks: ids.map((id, index) => ({ seed_id: id, task_id: 't' + (index + 1) })) });
+  const seals = ids.map((id, index) => ({ runId, taskId: id, attemptId: id + '-attempt', outputs: structuredClone(tasks[index].outputs), commands: [] }));
+  for (let index = 0; index < command.length; index++) {
+    const taskId = 'qa_verify', attemptId = taskId + '-attempt', callId = 'call-' + index, sessionId = 'qa-session', operationId = `${index + 3}3333333-3333-4333-8333-333333333333`;
+    const output = summary(index ? 6 : 17), context = { taskId, attemptId, callId, sessionId };
+    const start = append('tool/start', { name: 'terminal_test', arguments: { command: command[index] } }, { taskId, attemptId, callId, sessionId });
+    const queued = append('local/operation-queued', { operationId, name: 'terminal_test', ...context });
+    const finished = append('local/operation-finished', { operationId, name: 'terminal_test', ...context, localWorkspace: 'synthetic-workspace' });
+    const proof = { callId, output: { complete: true, sha256: hash(output), bytes: Buffer.byteLength(output) }, operation: { status: 'available', operationId, queuedSeq: queued.seq, finishedSeq: finished.seq } };
+    const observed = { taskId, attemptId, command: command[index], exitCode: 0, workspaceRevision: hash('fixture revision'), evidence: proof };
+    append('handoff/command-observed', observed, { taskId, attemptId, callId, sessionId }); seals[1].commands.push(observed);
+    append('tool/result', { name: 'terminal_test', result: { value: { exitCode: 0, output } } }, { taskId, attemptId, callId, sessionId });
+    operations.push({ id: operationId, status: 'completed', payload: { name: 'terminal_test', arguments: start.data.arguments, context },
+      result: { ok: true, exitCode: 0, output, localWorkspace: 'synthetic-workspace' } });
+  }
+  for (const seal of seals) append('handoff/accepted', seal);
+  append('team/checkpoint', { tasks: ids.map((id, index) => ({ id: 't' + (index + 1), status: 'completed', attemptId: id + '-attempt' })) });
+  return { archive: { id: runId, status: 'completed', snapshot: { mode: 'product', planVersion: 9, executionTarget: { kind: 'local' }, tasks }, events }, operations, manifest };
+}
+
+test('explicit parameters preserve actual version/IDs and choose only a new evidence scope', () => {
+  const parsed = config(); assert.equal(parsed.runId, runId); assert.equal(parsed.projectId, projectId); assert.equal(parsed.version, 9);
+  assert.equal(parsed.api, 'http://127.0.0.1:4310/api'); assert.match(parsed.output.replaceAll('\\', '/'), /docs\/test-evidence\/go-delivery-web-/);
+  assert.ok(!parsed.output.includes('.data'));
+});
+
+test('missing/duplicate/foreign origin/unsafe paths are rejected before any browser or request', () => {
+  for (const input of [args.slice(1), [...args, '--version=10'], args.map(value => value.startsWith('--version=') ? '--version=0' : value),
+    args.map(value => value.startsWith('--base-url=') ? '--base-url=https://api.deepseek.com:443' : value),
+    args.map(value => value.startsWith('--base-url=') ? '--base-url=http://user:secret@127.0.0.1:4310' : value),
+    args.map(value => value.startsWith('--confirmed-evidence=') ? '--confirmed-evidence=.data/local/db.json' : value),
+    [...args, '--output-dir=docs/test-evidence/helpers/overwrite'], [...args, '--unknown=true']]) assert.throws(() => parameters(input));
+});
+
+test('all mutation/provider/maintenance and unrelated-run GET requests are denied', () => {
+  const cfg = config(), manifest = [{ path: 'README.md' }];
+  assert.equal(allowedRequest('GET', cfg.api + `/runs/${runId}?after=300`, cfg), true);
+  assert.equal(allowedRequest('GET', cfg.api + `/runs/${runId}/artifact?path=README.md`, cfg, manifest), true);
+  assert.equal(allowedRequest('GET', cfg.base + '/assets/index-abcd.js', cfg), true);
+  for (const method of ['POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']) assert.equal(allowedRequest(method, cfg.api + `/runs/${runId}`, cfg), false);
+  for (const endpoint of ['/costs', '/costs?anything=true', `/runs/${projectId}`, `/runs/${runId}/retry`, `/runs/${runId}/artifact?path=secret.env`,
+    `/runs/${runId}/artifact?path=README.md&path=README.md`, '/models/anything/test', '/backup/export']) assert.equal(allowedRequest('GET', cfg.api + endpoint, cfg, manifest), false);
+  assert.equal(allowedRequest('GET', 'https://opencode.ai/zen/go/v1/models', cfg), false);
+});
+
+test('the reader makes only its allowlisted GET and preserves actual raw bytes/source SHA in memory', async () => {
+  const cfg = config(), saved = [], sources = [], requests = [];
+  const read = createReader(cfg, async (bytes, extension) => { saved.push({ bytes, extension }); return 'memory-only-' + extension; }, sources,
+    { fetchImpl: async (url, options) => { requests.push({ url, options }); return new Response('{"pendingCount":0}', { headers: { 'content-type': 'application/json' } }); } });
+  assert.deepEqual(await read(`/projects/${projectId}/cost-readiness`), { pendingCount: 0 });
+  assert.equal(requests[0].options.method, 'GET'); assert.equal(requests[0].options.redirect, 'error'); assert.equal(sources[0].sha256, hash(saved[0].bytes));
+  await assert.rejects(read('/costs')); await assert.rejects(read(`/runs/${projectId}`)); assert.equal(requests.length, 1);
+});
+
+test('non-200 results preserve raw failure without being turned into accepted evidence', async () => {
+  const sources = [], saved = [];
+  const read = createReader(config(), async bytes => { saved.push(bytes); return 'memory-only-failure'; }, sources,
+    { fetchImpl: async () => new Response('{"message":"synthetic unavailable"}', { status: 403, headers: { 'content-type': 'application/json' } }) });
+  await assert.rejects(read(`/runs/${runId}`)); assert.equal(sources[0].status, 403); assert.equal(saved.length, 1);
+});
+
+test('delivery expectation derives all five output hashes and both real command counts from memory fixtures', () => {
+  const input = fixture(), expected = deliveryExpectations(input.archive, input.operations, input.manifest);
+  assert.deepEqual(expected.tasks.map(task => task.id), ['dev', 'qa_verify', 'qa_review', 'manager_accept']);
+  assert.deepEqual(expected.observations.map(row => row.counts.tests), [17, 6]); assert.deepEqual(expected.previewPaths, ['README.md', 'acceptance-report.md']);
+});
+
+test('incomplete run/node/seal/bytes/output/test counts cannot be accepted', () => {
+  const changes = [
+    value => { value.archive.status = 'running'; }, value => { value.archive.snapshot.demo = { fixture: true }; },
+    value => { value.archive.events.at(-1).data.tasks[2].status = 'in_progress'; },
+    value => { value.archive.events = value.archive.events.filter(event => event.type !== 'handoff/accepted'); },
+    value => { value.manifest[0].sha256 = hash('changed'); }, value => { value.operations[0].result.output += 'changed'; },
+    value => { value.archive.events.find(event => event.type === 'handoff/command-observed').data.evidence.output.complete = false; },
+    value => { const event = value.archive.events.find(event => event.type === 'tool/result'); event.data.result.value.output = event.data.result.value.output.replace('ℹ skipped 0', 'ℹ skipped 1'); },
+  ];
+  for (const change of changes) { const input = fixture(); change(input); assert.throws(() => deliveryExpectations(input.archive, input.operations, input.manifest)); }
+});
+
+test('a newly mapped repair without its own completed checkpoint cannot inherit an old accepted native completion', () => {
+  const input = fixture(); input.archive.events.push({ seq: input.archive.events.length + 1, type: 'run/task-mapping', data: { tasks: [{ task_id: 'repair-task', seed_id: 'dev' }] } });
+  assert.throws(() => deliveryExpectations(input.archive, input.operations, input.manifest));
+});

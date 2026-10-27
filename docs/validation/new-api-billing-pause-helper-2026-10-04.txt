@@ -1,0 +1,25 @@
+✔ usage retains explicit quota units and values without assuming money, unlimited usage or a balance (1325.952ms)
+✔ logs preserve missing fields, log types and refunds without leaking display IDs or private content (7.5596ms)
+✔ public billing unit requires explicit compatible status metadata and never defaults to 500000 (1.4349ms)
+✔ queries saved-key endpoints at the same origin, public status without a key and strips private response fields (69.0958ms)
+✔ logs refusal, malformed JSON and oversized responses preserve available usage without exposing provider bodies (123.6056ms)
+✔ only structured permission and fixed endpoint failures pause automatic queries; transient failures keep no permanent classification (45.3746ms)
+✔ read-only routes reject posts and arbitrary paths before querying, never follow redirects and enforce timeout (107.473ms)
+✔ configuration versions are checked before sending and after independent queries finish (5.3439ms)
+✔ completion persists response headers before parsing and preserves evidence callback failures (12.847ms)
+✔ response evidence rejects exact Key, a prefixed Key, secret-like IDs and unsafe headers (5.8727ms)
+✔ compatibility parsers preserve unknown raw units and discard unlimited authorization sentinels (2.0933ms)
+✔ documented compatibility routes use the configured prefix and independent saved-key reads after modern 404 (7.3382ms)
+✔ compatibility failures stay independent and unlimited Key limits never become a displayed balance (18.966ms)
+✔ unsupported endpoint cache avoids repeated probes, expires and is invalidated by configuration version (62.6111ms)
+✔ an explicit user probe bypasses only the unsupported capability cache and preserves safe independent results (18.0701ms)
+✔ authentication/rate denials do not trigger alternate routes or cache permissions; other origins are not guessed (32.6072ms)
+✔ format-only fallback keeps version protection and rejects arbitrary compatibility URLs or posts (13.0806ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2374.8978

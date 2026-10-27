@@ -1,0 +1,88 @@
+Go funded stop engineering fixtures
+Frozen UTC: 2026-10-06T02:38:29.8564037+00:00
+Helper main: NOT executed
+Real HTTP/cost maintenance/model/employee commands: 0
+Actual controlled recovery stop/restart/QA: NOT verified
+Old stop source preserved: 46b9bc88738e73f600db9862e83127c0079934e3f756019fafeb346ff496f6fe
+Initial fixture-only corrections: response.validation.valid added; simulated cancelled approval replaced with a new object so immutable prior history remains unchanged. No production guard relaxed.
+Node reporters: original parser accepts complete TAP/spec; actual output SHA, exit code and all counts remain required.
+Final command: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --test tests/go-funded-stop.test.mjs
+Exit: 0
+✔ pure Go boundary accepts a stale dev checkpoint but uses actual settled fees and inherited call counters (13.4084ms)
+✔ controlled memory cancellation preserves old/normal unknown holds, all receipts/models and exact actual stop counters (19.7916ms)
+✔ all developer verify commands need their own actual accepted operation/TAP proof (3.5199ms)
+✔ complete native Node spec reporter output is valid with the same exact exit/hash/summary/attempt proof (3.89ms)
+✔ coherent but skipped native TAP output cannot substitute for all passing developer tests (1.9027ms)
+✔ host arithmetic rounding cannot change exact receipts or integer calls (4.1577ms)
+✔ boundary refuses wrong run ownership (2.7489ms)
+✔ boundary refuses implicit child run (1.2788ms)
+✔ boundary refuses incomplete archive (1.3453ms)
+✔ boundary refuses changed approved rationale (1.4501ms)
+✔ boundary refuses changed original route (1.1142ms)
+✔ boundary refuses current model price mutation (0.7447ms)
+✔ boundary refuses missing explicit zero native unknown (0.8995ms)
+✔ boundary refuses unknown native outcome (0.8568ms)
+✔ boundary refuses dev not checkpoint-completed (1.1126ms)
+✔ boundary refuses another accepted dev attempt (1.0357ms)
+✔ boundary refuses dev verify exit nonzero (0.8765ms)
+✔ boundary refuses real TAP output tampering (0.8939ms)
+✔ boundary refuses missing TAP output (0.9363ms)
+✔ boundary refuses incomplete output receipt (1.469ms)
+✔ boundary refuses claimed TAP counts differ (1.0743ms)
+✔ boundary refuses changed accepted file SHA (0.8548ms)
+✔ boundary refuses missing actual full artifact download (0.9356ms)
+✔ boundary refuses already completed QA (0.8807ms)
+✔ boundary refuses another pending command (0.9749ms)
+✔ boundary refuses multiple pending approvals (1.0297ms)
+✔ boundary refuses generic terminal (1.0899ms)
+✔ boundary refuses shell injection in exact QA command (0.9166ms)
+✔ boundary refuses prior QA terminal approval (1.1246ms)
+✔ boundary refuses selected operation started (0.8838ms)
+✔ boundary refuses selected operation previously queued (0.9967ms)
+✔ boundary refuses pending model reservation anywhere (1.4587ms)
+✔ boundary refuses provider querying outside target (0.9738ms)
+✔ boundary refuses unknown target recovery fees (0.8892ms)
+✔ boundary refuses unsettled actual wire (0.8778ms)
+✔ boundary refuses changed actual receipt fee (0.8636ms)
+✔ boundary refuses missing inherited counters (1.049ms)
+✔ boundary refuses late result on an apparently completed native operation (0.863ms)
+✔ stop proof refuses failed termination (1.831ms)
+✔ stop proof refuses prior full snapshot changed (1.6206ms)
+✔ stop proof refuses accepted developer seal changed (2.3013ms)
+✔ stop proof refuses artifact bytes changed (1.611ms)
+✔ stop proof refuses old model metadata changed (1.7649ms)
+✔ stop proof refuses settled receipt history changed (1.7379ms)
+✔ stop proof refuses outside normal GLM unknown hold erased (1.8031ms)
+✔ stop proof refuses old unknown receipt history erased (1.8333ms)
+✔ stop proof refuses funded allocation ledger changed (2.2492ms)
+✔ stop proof refuses latest host calls counter changed (1.8439ms)
+✔ stop proof refuses latest host budget unknown (2.2705ms)
+✔ stop proof refuses no final host budget checkpoint (2.3854ms)
+✔ stop proof refuses new accounting after final budget seal (2.1641ms)
+✔ stop proof refuses another native operation (2.6731ms)
+✔ stop proof refuses exact pending approval not cancelled (1.8543ms)
+✔ explicit CLI identities/version are mandatory and dynamic version follows actual same-project confirmation (1.9175ms)
+✔ only one exact armed UI cancellation request is accepted; replay/body/approve/another-run requests are refused (1.2102ms)
+✔ durable exclusive memory guard refuses a second stop intent even after an unknown first result (0.8685ms)
+✔ known pending receipt write race waits boundedly for a fresh clean observation without assuming settlement (2.5373ms)
+✔ local actual cached HTTP200 confirmation source chain binds v5 and its positive fee without any product/API access (26.4603ms)
+ℹ tests 58
+ℹ suites 0
+ℹ pass 58
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 303.8224
+
+Syntax checks: node --check for new helper and new test both exited 0.
+Frozen sources:
+22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf  docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs
+1a872c6f0a85488a942c141f63b82720b3d3a9cfccbfc78a9c5dcfaacd28dcec  tests/go-funded-stop.test.mjs
+cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3  docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs
+46b9bc88738e73f600db9862e83127c0079934e3f756019fafeb346ff496f6fe  docs/test-evidence/helpers/stop-funded-run-web-2026-10-05.mjs
+3153a172d050a70c83bd9752b1dca8a153acb92abee7c33486c9a264dde60ffb  services/agent-runtime/run-evidence.mjs
+aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79  services/agent-runtime/recovery.mjs
+152dc9bbd1a949906452cba7f56d482b34f53e708126d00f42aa816ddcbc7a6f  services/agent-runtime/trace-store.mjs
+cc79bc1c9618938fe721420196628c2535443f3f983e6e2faf699b9c9a00c6c7  docs/test-evidence/go-recovery-confirm-2026-10-06T02-00-20-236Z-0e2ec036.json
+5020f28b9579fc5c36a2c9d91b7b45db818ec72752f75dc6241f904a5d54c959  docs/test-evidence/go-recovery-generate-2026-10-06T01-53-14-065Z-827664e3.json

@@ -1,0 +1,175 @@
+Project AI planning candidate UI local verification
+Captured: 2026-10-05 09:39:44 UTC (17:39:44 Asia/Shanghai)
+Scope: isolated SSR, actual UI callbacks and injected local request transport; no product server, model provider or original data calls.
+New tests: tests/project-planning-ui.test.ts (11).
+Existing consumers: plan-budget-ui, cost-carryover-ui, recovery-conditions-ui, organization-draft, usage-sync, health-sync, run-cost (39).
+api.ts was already modified before this task; this task preserved it without edits.
+
+Command:
+node --import tsx --test tests/project-planning-ui.test.ts tests/plan-budget-ui.test.ts tests/cost-carryover-ui.test.ts tests/recovery-conditions-ui.test.ts tests/organization-draft.test.ts tests/usage-sync.test.ts tests/health-sync.test.ts tests/run-cost.test.ts
+Exit code: 0
+Actual stdout:
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (18.933ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.7127ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.4161ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (15.4914ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.5776ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (4.7445ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (1.0726ms)
+✔ initial health reads share one in-flight request and publish connection independently (3.1799ms)
+✔ transport failure and reconnection retain confirmed workspace configuration until new health succeeds (2.2224ms)
+✔ first failed connection becomes disconnected and retries show reconnecting before any health exists (2.2896ms)
+✔ received HTTP failures are distinct from disconnection but synthetic GET timeouts are not (1.4718ms)
+✔ hidden pages have no periodic checks and becoming visible or focused shares a slow request (4.8617ms)
+✔ visible polling detects a dropped service and later restores connection without a page reset (1.3272ms)
+✔ manual refresh cancels an old poll and only the last subscriber removes wake listeners (0.917ms)
+✔ health and usage refreshes deduplicate independently and cost notifications do not add health calls (1.3538ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.2154ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5456ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.4323ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.2664ms)
+✔ legacy plans keep an empty optional per-request cap and an unchanged serialized contract (40.4037ms)
+✔ explicit per-request output, total estimated output, and task money remain visibly different (1.4103ms)
+✔ editing cumulative output does not silently set a per-request cap, and editing the cap does not change the estimate (1.7054ms)
+✔ clearing the optional cap omits it from a submitted legacy plan instead of inserting a default (0.5559ms)
+✔ the editor explains whole-task accumulation and constrains the optional single-request integer (2.0916ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (2.9721ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (14.3242ms)
+✔ read-only quote performs one GET with exact explicit parameters and rejects mismatched versions (1.3523ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.4557ms)
+✔ changed or newly blocked quote returns current evidence without a POST or reservation callback (0.7448ms)
+✔ unchanged affordable quote generates one candidate after GET, with no save/approve request or data changes (0.9394ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6493ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (29.679ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.0824ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (11.8726ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.3281ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (36.65ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (19.6278ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (2.4774ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (3.0942ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.5408ms)
+✔ normal execution includes the saved planning cost in project spend (1.6253ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (13.8028ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.9891ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.8299ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (1.1757ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (0.8696ms)
+✔ usage refresh shares in-flight reads and publishes the new records (2.2926ms)
+✔ failed local reads keep the previous usage and update time until a successful retry (1.0477ms)
+✔ polling pauses while hidden and refreshes on visibility, focus and cost updates (3.1652ms)
+✔ a focus event shares a slow poll and unsubscription cancels further polling (0.96ms)
+ℹ tests 50
+ℹ suites 0
+ℹ pass 50
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 843.7986
+
+Command:
+npx tsc --noEmit
+Exit code: 0
+Actual stdout: (empty)
+
+Command:
+git diff --check -- apps/web/src/App.tsx apps/web/src/ProjectPlanning.tsx tests/project-planning-ui.test.ts
+Exit code: 0
+Diff-check stdout: (empty)
+Source hashes from Get-FileHash -Algorithm SHA256:
+[{"Path":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\App.tsx","Hash":"80D4D14A6DE7DE5A621EEBBDCB40E4896E2F41EE8FC4BFFF4717451D0932F310"},{"Path":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\ProjectPlanning.tsx","Hash":"9B84D764A3B23ACCAF099ECD93454233FA85EF1F041BCAA6195494A8FE290EE6"},{"Path":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning-ui.test.ts","Hash":"5F0F29854F332E16E298C4CA1C784A07363330A8A80DA7198B116078936BA538"},{"Path":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\api.ts","Hash":"581582B656249F6ED35633D86E29E2411118E92AC0657EE26FF022DE461C385A"}]
+
+Limits:
+No browser mounted-hook/sessionStorage round-trip verification in this task.
+No paid AI generation, original project confirmation, service reload, or employee delivery edits.
+Full build and live browser verification belong to the root agent.
+These local candidate fixtures are not real model acceptance evidence.
+
+Execution-history UI follow-up:
+Captured: 2026-10-05 10:03:23 UTC (18:03:23 Asia/Shanghai)
+Edited only: apps/web/src/ProjectPlanning.tsx; tests/project-planning-ui.test.ts.
+App.tsx, api.ts, planning-execution-context.ts and product data were not edited in this follow-up.
+New total: 15 planning UI cases; previous consumers: 39; combined: 54.
+Added: complete saved-plan inclusion evidence; source run/version/contract/integrity; verified node IDs;
+unknown call counts; complete file SHA/state; explicit issues and unknown external operations.
+Quote identity now includes savedPlanIncluded and all executionHistory, excluding checkedAt.
+Same-cost/same-byte changes of SHA, completed nodes or calls stop before POST in local transport regression.
+
+Command:
+node --import tsx --test tests/project-planning-ui.test.ts tests/plan-budget-ui.test.ts tests/cost-carryover-ui.test.ts tests/recovery-conditions-ui.test.ts tests/organization-draft.test.ts tests/usage-sync.test.ts tests/health-sync.test.ts tests/run-cost.test.ts
+Exit code: 0
+Actual stdout:
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (17.9916ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.694ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.0411ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (15.0613ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.3978ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.6279ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (0.9727ms)
+✔ initial health reads share one in-flight request and publish connection independently (2.1385ms)
+✔ transport failure and reconnection retain confirmed workspace configuration until new health succeeds (1.6063ms)
+✔ first failed connection becomes disconnected and retries show reconnecting before any health exists (1.913ms)
+✔ received HTTP failures are distinct from disconnection but synthetic GET timeouts are not (1.6332ms)
+✔ hidden pages have no periodic checks and becoming visible or focused shares a slow request (4.1309ms)
+✔ visible polling detects a dropped service and later restores connection without a page reset (1.2698ms)
+✔ manual refresh cancels an old poll and only the last subscriber removes wake listeners (0.8585ms)
+✔ health and usage refreshes deduplicate independently and cost notifications do not add health calls (1.6123ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.2437ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5302ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.3557ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.1969ms)
+✔ legacy plans keep an empty optional per-request cap and an unchanged serialized contract (40.2308ms)
+✔ explicit per-request output, total estimated output, and task money remain visibly different (1.3533ms)
+✔ editing cumulative output does not silently set a per-request cap, and editing the cap does not change the estimate (2.8672ms)
+✔ clearing the optional cap omits it from a submitted legacy plan instead of inserting a default (0.8732ms)
+✔ the editor explains whole-task accumulation and constrains the optional single-request integer (3.1143ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (2.7902ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (13.8663ms)
+✔ read-only quote performs one GET with exact explicit parameters and rejects mismatched versions (1.4034ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.4842ms)
+✔ changed or newly blocked quote returns current evidence without a POST or reservation callback (0.7732ms)
+✔ unchanged affordable quote generates one candidate after GET, with no save/approve request or data changes (0.9996ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6028ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (30.6987ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.1293ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (11.6445ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.2728ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.0001ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.3277ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.5732ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without a POST (0.741ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (28.0322ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (15.8777ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.4949ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (2.5719ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.3538ms)
+✔ normal execution includes the saved planning cost in project spend (1.4786ms)
+✔ a resumed run displays inherited spend without counting old model records a second time (10.8611ms)
+✔ legacy archives without execution-budget evidence show only known current spend (1.4519ms)
+✔ historical budget notices do not present their old occupied amount or call count as the latest ledger (1.4916ms)
+✔ a stopped notice includes captured in-flight reservations and keeps the task failure message (0.9649ms)
+✔ legacy notices with incomplete captures never invent zero reservations or current call counts (0.7499ms)
+✔ usage refresh shares in-flight reads and publishes the new records (1.9253ms)
+✔ failed local reads keep the previous usage and update time until a successful retry (1.0909ms)
+✔ polling pauses while hidden and refreshes on visibility, focus and cost updates (3.3384ms)
+✔ a focus event shares a slow poll and unsubscription cancels further polling (0.9723ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 54
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 757.4127
+
+Command:
+npx tsc --noEmit
+Exit code: 0
+Actual stdout: (empty)
+git diff --check: exit 0; stdout empty.
+Source hashes from Get-FileHash -Algorithm SHA256:
+[{"Path":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\ProjectPlanning.tsx","Hash":"FC17356DD14C075BA6312208B0796784A053FD3C1F9EB79178D13231C5E17691"},{"Path":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\project-planning-ui.test.ts","Hash":"D95A937FCC0324FAE6B9A29F54EB6C701FD09500FBAEABE8023F984B3CAC1554"}]
+Still no paid generation, original data mutations, browser mounted-hook checks or service reload by this agent.
+
+

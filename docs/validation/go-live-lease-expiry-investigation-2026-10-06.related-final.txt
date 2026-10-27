@@ -1,0 +1,81 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ own-active run survives expiry inside maintenance after a successful heartbeat; unknown receipts remain unchanged (8333.3641ms)
+✔ standalone heartbeat clocks do not inherit a previous released transaction snapshot (205.3421ms)
+✔ dead or foreign expired owners remain recoverable and atomic terminal state still closes pending approvals (544.3219ms)
+✔ beforeRequest renews only the live active same-owner lease before full native model admission and one fixture wire (774.2809ms)
+✔ fresh heartbeat cannot bypass cancelled run, withdrawn department, changed version, foreign owner or original caller abort (1099.1046ms)
+✔ the real heartbeat timer renews its own fenced lease even while the scheduler remains busy (1187.4227ms)
+✔ caller abort exits immediately while the shared heartbeat waits for the single pool connection (332.6665ms)
+✔ a new active run joining a queued heartbeat gets one covering renewal instead of a false lost-lease result (637.8638ms)
+✔ terminal persistence rollback is atomic and a recorded completion is reconciled under a fresh recovery owner (523.2001ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15484.9198
+✔ terminal state is atomic with project state and closes pending tool approvals (11811.7849ms)
+✔ recovery owns a live lease until reconciliation and rejects expired owners including earlier recovery processes (990.4447ms)
+✔ recovery reconciles a recorded completion and API state remains authoritative over later trace events (891.6017ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15552.0115
+✔ authenticated heartbeat recovery queues and starts one real native command (15360.9522ms)
+✔ model admission waits for authenticated recovery and emits one reservation and one loopback wire (1525.1329ms)
+✔ offline to the bounded deadline leaves both local and model dispatch at zero (10523.3421ms)
+✔ caller cancellation and original deadline abort waiting before any dispatch (1349.1699ms)
+✔ LocalRunExecutor prepare and execute preserve caller abort while heartbeat admission waits (2253.3394ms)
+✔ current hard withdrawal, version, cancel, lease and snapshot failures stop stale admissions promptly (8054.1367ms)
+✔ current model configuration and remaining budget denial outrank a stale heartbeat (1354.187ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43008.3117
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (3753.9491ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20727.4757ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (3403.7172ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (376.1797ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29162.4201
+COMPETITION {"scenario":"same-operation-claim/start","clients":16,"offers":1,"uniqueTokens":1,"start200":1,"start409":15,"nativeWrites":1,"fileSha256":"547690228c00dbdbab101fe6be7171c57db61feedbb55027b698c42e27e03af7","providerRequests":0}
+✔ 16 clients competing for a claim and start obtain one token and one actual native write (2344.4243ms)
+COMPETITION {"scenario":"two-employees/stale-file","clients":12,"maxActiveClaims":1,"secondStayedQueued":true,"staleCode":"FILE_VERSION_CONFLICT","originalPreserved":true,"freshShaAccepted":true,"providerRequests":0}
+✔ two employees share one device without overlapping claims, and a stale writer cannot overwrite the first file (1001.8011ms)
+COMPETITION {"scenario":"duplicate-identical-receipts","clients":16,"result200":16,"durableResultRows":1,"lateResult":false,"providerRequests":0}
+✔ 16 identical competing receipts are idempotent and keep the one real file result (496.5743ms)
+COMPETITION {"scenario":"conflicting-receipts","clients":2,"result200":1,"result409":1,"firstResultPreserved":true,"providerRequests":0}
+✔ two conflicting competing receipts accept one and cannot replace its persisted result (416.6866ms)
+COMPETITION {"scenario":"expired-lease-before-start","clients":12,"start200":0,"start409":12,"started":false,"newEnqueueDenied":true,"providerRequests":0}
+✔ an expired run lease rejects every competing start and forbids new enqueue (521.3805ms)
+COMPETITION {"scenario":"expired-run-lease-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+COMPETITION {"scenario":"replaced-worker-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+COMPETITION {"scenario":"expired-operation-after-start","clients":8,"transport200":8,"completed":false,"status":"cancelled","confirmedResult":false,"lateResult":true,"replayed":false,"providerRequests":0}
+✔ expired lease, replaced worker and expired operation keep actual late writes for audit without accepting completion (1518.2192ms)
+COMPETITION {"scenario":"old-claim-token","clients":8,"oldStart409":8,"oldResult403":8,"oldReceiptAdopted":false,"validCurrentResultAccepted":true,"providerRequests":0}
+✔ a real old operation claim token cannot start or submit the next operation (735.5822ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7812.8317

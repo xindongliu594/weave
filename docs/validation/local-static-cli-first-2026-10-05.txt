@@ -1,0 +1,1 @@
+{"status":"failed","output":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\local-static-cli-2026-10-05T12-11-26.622Z-85d73c0d.json","directory":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\local-static-cli\\isolated-QHMRi5","phases":0,"paidModelCalls":0,"failure":"Expected values to be strictly equal:\n\n200 !== 403\n"}

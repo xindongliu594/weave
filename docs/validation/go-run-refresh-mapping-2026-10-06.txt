@@ -1,0 +1,39 @@
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (15.027ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (1.609ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.0696ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (14.813ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.4266ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.4995ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (0.9835ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (28.5185ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (18.3262ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.878ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (2.6735ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.484ms)
+✔ overlapping polling and manual pagination never duplicate or discard trace events (2.3939ms)
+✔ working tasks retain the earlier failure as history without a current blocker (2.5778ms)
+✔ a currently blocked or failed task shows its latest unresolved handoff failure (0.4446ms)
+✔ later acceptance and completion preserve the original failure without showing it as current (0.357ms)
+✔ a new failure after acceptance remains distinct and task statuses do not leak across tasks (0.5291ms)
+✔ older events without sequence IDs still show only the latest unresolved failure (0.358ms)
+✔ terminal detail refresh replaces full recovery and summary metadata while retaining loaded pages (3.055ms)
+✔ overlapping manual refresh and polling keep the furthest cursor and newer metadata (0.4133ms)
+✔ a stale response from a different run or plan version cannot attach events or completion state (0.3154ms)
+✔ terminal refresh changes the recovery key while the existing cost and acknowledgement checks remain strict (0.5257ms)
+✔ native states use approved task IDs, contracts and dependencies even when summary omits the mapping (1.2431ms)
+✔ the latest rework mapping supersedes an older accepted completion regardless of native array order (0.438ms)
+✔ native completed requires acceptance for this run, plan and exact current attempt (0.6087ms)
+✔ only an explicitly inherited accepted checkpoint may show a parent completion in a child run (0.3575ms)
+✔ seed_id and restored profileSeedId fallback keep unmapped nodes distinct and unapproved (0.4158ms)
+✔ the actual RunExtras render shows mapped task failure, dependencies and unaccepted completion without actions (47.6538ms)
+✔ stopped execution labels refer to the interruption point rather than a live employee (17.8271ms)
+✔ unresolved model charges disable both recovery actions and expose the reconciliation entry (2.4655ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 941.3283
+testExitCode=0

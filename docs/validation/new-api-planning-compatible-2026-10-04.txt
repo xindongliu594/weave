@@ -1,0 +1,45 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (16357.7169ms)
+✔ documented GPT-4.1 JSON mode uses the same budget and makes no repair call or preview on invalid output (113.2511ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (135.3359ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (95.3088ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (81.0004ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (358.197ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (162.1363ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (142.1872ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (185.6935ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (398.7817ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (87.4678ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (50.4116ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20908.1738
+✔ usage retains explicit quota units and values without assuming money, unlimited usage or a balance (1101.2035ms)
+✔ logs preserve missing fields, log types and refunds without leaking display IDs or private content (8.3484ms)
+✔ public billing unit requires explicit compatible status metadata and never defaults to 500000 (10.7241ms)
+✔ queries saved-key endpoints at the same origin, public status without a key and strips private response fields (66.6505ms)
+✔ logs refusal, malformed JSON and oversized responses preserve available usage without exposing provider bodies (101.8464ms)
+✔ read-only routes reject posts and arbitrary paths before querying, never follow redirects and enforce timeout (112.7966ms)
+✔ configuration versions are checked before sending and after independent queries finish (5.1626ms)
+✔ completion persists response headers before parsing and preserves evidence callback failures (13.5618ms)
+✔ response evidence rejects exact Key, a prefixed Key, secret-like IDs and unsafe headers (6.0743ms)
+✔ compatibility parsers preserve unknown raw units and discard unlimited authorization sentinels (1.8991ms)
+✔ documented compatibility routes use the configured prefix and independent saved-key reads after modern 404 (7.1389ms)
+✔ compatibility failures stay independent and unlimited Key limits never become a displayed balance (17.0128ms)
+✔ unsupported endpoint cache avoids repeated probes, expires and is invalidated by configuration version (21.9482ms)
+✔ authentication/rate denials do not trigger alternate routes or cache permissions; other origins are not guessed (29.1849ms)
+✔ format-only fallback keeps version protection and rejects arbitrary compatibility URLs or posts (13.2039ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2028.1032

@@ -1,0 +1,190 @@
+{
+  "checkedAt": "2026-10-06T09:07:31.707Z",
+  "kind": "offline-recovery-v9-timeout-core-preparation",
+  "nodeVersion": "v24.19.0",
+  "helperSources": [
+    {
+      "path": "docs/test-evidence/helpers/generate-go-recovery-after-timeout-web-2026-10-06.mjs",
+      "sha256": "64baaca3b6d4ceb628feecd1f782b0149d24ca27f9b8685283b55ee5cf8f1056"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-recovery-after-timeout-guard-2026-10-06.mjs",
+      "sha256": "15c1575c894fc39ffa80fd6ea8c919bbfd5d52ef6d56824519c69ce799305446"
+    },
+    {
+      "path": "docs/test-evidence/helpers/prepare-go-recovery-after-timeout-2026-10-06.mjs",
+      "sha256": "338ce76c54d59b8e1022f7373cc6544360789b80b6a2f4a473cc60c59eaadb36"
+    },
+    {
+      "path": "docs/test-evidence/helpers/check-go-recovery-after-timeout-core-offline-2026-10-06.mjs",
+      "sha256": "5c8fd02855087de7825fc0402b32be1bf619303ef8bc99e6813272b2b07a7110"
+    }
+  ],
+  "fixedEvidence": {
+    "sourceRunId": "c92961f2-5573-4299-82c2-daa7ee13dca5",
+    "sourceVersion": 8,
+    "fixedSourceBindings": [
+      {
+        "path": "docs/test-evidence/funded-run-web-recovery-approve-2026-10-06T07-52-29-812Z-02bf3e15.json",
+        "sha256": "f2ead2e588742e785875d118256d22de7e940cfc979a0c12dc4ec50fc376ebbf"
+      },
+      {
+        "path": "docs/test-evidence/go-headroom-recovery-generate-2026-10-06T05-27-45-597Z-13764fd5.json",
+        "sha256": "39a4cea8e91e4f5c432512139594ce3869d1ea89198511886070967357837ddf"
+      },
+      {
+        "path": "docs/test-evidence/go-headroom-recovery-confirm-2026-10-06T05-31-56-670Z-220ef22e.json",
+        "sha256": "c243d2efe80dbaca3dc5556ce0cc47fc0ce62f4ce22a033c7ae6286e56058ad5"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-09-12-603Z-2a3af4c2.json",
+        "sha256": "b56ca8fc95b8fc5c17228bdce9e0db05c4f3dfa0ce1a8c0f94f30f96759ba16b"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-25-34-925Z-5b2139e2.json",
+        "sha256": "efe6a6bf7436ccc911877a10e0aad8db95c604cab4fe7a8bd1134c7b1db8dbc5"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-42-57-419Z-81e4fd8a.json",
+        "sha256": "c5a4a7ede1121cb044acc085ab727b6fcf8b8d75abf2afd074ecab5fdf999151"
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-48-26-691Z-6449795c.json",
+        "sha256": "a5d7386c194c0134d57bba11e42738ad4b39a5f0fe1eefb048398e4214b5e686"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/start-3e101c24-87e6-43ea-80f9-a2c4b0b410f4-v8.json",
+        "sha256": "4e8775e9f650b52f2882c3cbc8a555967d3a4ca21a7afa76ba87af34ce6a5698"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/stop-c92961f2-5573-4299-82c2-daa7ee13dca5.json",
+        "sha256": "133b57718d863cee2d7a31f617d417c89248ed27c72f38f7cb5e674083840d70"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-normal-after-planning-parser-web-2026-10-06.mjs",
+        "sha256": "ec91ec2b21234614cf20ac71e030c1317555da656731e332fe64d9b2feb3f3fe"
+      },
+      {
+        "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+        "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+      }
+    ],
+    "approvalSourceSha256": "f2ead2e588742e785875d118256d22de7e940cfc979a0c12dc4ec50fc376ebbf",
+    "zeroPostStopAttempts": [
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-09-12-603Z-2a3af4c2.json",
+        "sha256": "b56ca8fc95b8fc5c17228bdce9e0db05c4f3dfa0ce1a8c0f94f30f96759ba16b",
+        "posts": 0,
+        "dispatchObserved": false
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-25-34-925Z-5b2139e2.json",
+        "sha256": "efe6a6bf7436ccc911877a10e0aad8db95c604cab4fe7a8bd1134c7b1db8dbc5",
+        "posts": 0,
+        "dispatchObserved": false
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-42-57-419Z-81e4fd8a.json",
+        "sha256": "c5a4a7ede1121cb044acc085ab727b6fcf8b8d75abf2afd074ecab5fdf999151",
+        "posts": 0,
+        "dispatchObserved": false
+      },
+      {
+        "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-48-26-691Z-6449795c.json",
+        "sha256": "a5d7386c194c0134d57bba11e42738ad4b39a5f0fe1eefb048398e4214b5e686",
+        "posts": 0,
+        "dispatchObserved": false
+      }
+    ],
+    "permanentStartIntentPreserved": true,
+    "permanentStopIntentPreserved": true,
+    "oldApprovalReplayed": false,
+    "oldStopReplayed": false,
+    "controlledInterruptionSucceeded": false
+  },
+  "checks": [
+    {
+      "name": "v8 actual approval202 and exact generation/confirmation sources accepted",
+      "passed": true
+    },
+    {
+      "name": "all four old stop attempts were0POST",
+      "passed": true
+    },
+    {
+      "name": "old stop attempt cannot be silently labeled dispatched",
+      "passed": true
+    },
+    {
+      "name": "old stop intent exact run preserved",
+      "passed": true
+    },
+    {
+      "name": "recovery v8 original policy/plan preserved",
+      "passed": true
+    },
+    {
+      "name": "recovery cap cannot increase",
+      "passed": true
+    },
+    {
+      "name": "QA private knowledge cannot be granted to manager",
+      "passed": true
+    },
+    {
+      "name": "revision with maximal counter fixture fits4000 and differs from old v8body",
+      "passed": true
+    },
+    {
+      "name": "developer first reads authorized shared and does not read uncreated output",
+      "passed": true
+    },
+    {
+      "name": "AI budgets include QA recovery headroom without hand edits",
+      "passed": true
+    },
+    {
+      "name": "timeouts cannot be treated as controlled recovery success",
+      "passed": true
+    },
+    {
+      "name": "no API format parameter and output12000 preserved",
+      "passed": true
+    },
+    {
+      "name": "GO_ADMISSION_FIX_LOADED blocks without root signal",
+      "passed": true
+    },
+    {
+      "name": "GO_PLANNING_PARSER_FIX_LOADED blocks without root signal",
+      "passed": true
+    },
+    {
+      "name": "GO_RECOVERY9_GENERATION_APPROVED blocks without root signal",
+      "passed": true
+    },
+    {
+      "name": "missing final raw binding blocks before APIs even with all markers",
+      "passed": true
+    }
+  ],
+  "finalBindingPath": "docs/test-evidence/go-recovery-v8-timeout-final-binding-2026-10-06.json",
+  "finalBindingExists": false,
+  "finalRawBindingVerified": false,
+  "revisionSyntheticMaximumFixtureCharacters": 3042,
+  "syntheticCountersAreNotActualEvidence": true,
+  "status": "awaiting-root-final-v8-raw-binding-and-explicit-single-paid-generation-signal",
+  "scope": {
+    "apiCalls": 0,
+    "browserLaunches": 0,
+    "paidCalls": 0,
+    "confirmations": 0,
+    "approvals": 0,
+    "serviceOperations": 0,
+    "originalDatabaseOpened": false,
+    "keysRead": false,
+    "employeeArtifactsAuthored": false,
+    "oldHelpersChanged": false,
+    "permanentIntentsRemoved": false
+  }
+}

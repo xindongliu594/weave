@@ -1,0 +1,12 @@
+{
+  "evidence": "docs/test-evidence/project-planning-isolated-web-final-2026-10-05.json",
+  "screenshots": [
+    "docs/test-evidence/screenshots/project-planning-candidate-unconfirmed-final-2026-10-05.png",
+    "docs/test-evidence/screenshots/project-planning-candidate-confirmed-final-2026-10-05.png",
+    "docs/test-evidence/screenshots/project-planning-invalid-reply-preserved-final-2026-10-05.png"
+  ],
+  "fixtureModelRequests": 3,
+  "realModelRequests": 0,
+  "sourceLedgerAndUsageUnchanged": true,
+  "pageErrors": []
+}

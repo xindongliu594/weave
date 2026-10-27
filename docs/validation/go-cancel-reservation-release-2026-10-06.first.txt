@@ -1,0 +1,13 @@
+✔ only exact one-parent global and department dailyTotals release is admitted without changing any source object (4.2808ms)
+✔ receipt, usage, history, wrong department, any metadata and larger or smaller derived amounts are rejected (5.8668ms)
+✔ open parent receipts, missing usage attribution, multi-department and unknown money never become an inferred release (2.8747ms)
+✔ real captured stop sources pass the entire frozen legacy checkpoint after exact finance validation; source bytes are unchanged (1778.4803ms)
+✔ UI proof requires the exact parent, version, event count, cancelled state and no remaining stop action (3.079ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1992.3093

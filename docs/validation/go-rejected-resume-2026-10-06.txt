@@ -1,0 +1,13 @@
+✔ one actual intercepted pre-dispatch proof permits a distinct successor identity (2.9316ms)
+✔ observed, unknown or response-correlated attempts are never successors (1.4803ms)
+✔ wrong project, version, run, retain choice or target cannot reuse this proof (0.596ms)
+✔ new child, browser error, side effect or changed interception path is rejected (1.2226ms)
+✔ original intent and evidence must retain exact path, endpoint and reviewed body (0.8134ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 161.0723

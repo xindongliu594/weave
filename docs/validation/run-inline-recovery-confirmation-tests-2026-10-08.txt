@@ -1,0 +1,31 @@
+✔ unknown-cost continuation requires explicit consent and never releases its reserved amount (17.4758ms)
+✔ an active request and an exhausted original budget stay blocked even after cost consent (2.1919ms)
+✔ settled projects use their original actions without an unnecessary consent checkbox (1.764ms)
+✔ new receipts, changed amounts, or a different project version invalidate the earlier cost choice (19.455ms)
+✔ recovery uses the archive budget and cost consent does not acknowledge unknown external operations (0.4495ms)
+✔ carried reservation is shown as the approval evidence and never counted as recorded spend or renewed consent (3.8837ms)
+✔ fresh ledger totals update the budget display independently from the immutable archive (1.0966ms)
+✔ an unchecked, loading or failed inspection is distinguishable and never claims a current approval (34.6386ms)
+✔ inspection displays its version, current ledger, complete calls and separate resume/full-retry limits (22.637ms)
+✔ changed receipts, amounts, fee consent, external acknowledgement and plan identity invalidate a previous result (1.7524ms)
+✔ missing history is displayed as unknown rather than zero remaining and failed modes cannot enable continuation (3.8006ms)
+✔ a fresh response containing newly unknown operations cannot reuse consent for the previously shown operation (1.8151ms)
+✔ a temporary missing recovered run clears after a successful poll (2.1074ms)
+✔ successful background refresh cannot erase an approval or recovery operation failure (0.2157ms)
+✔ a new run clears old errors and ignores delayed old-run failures or refresh success (0.2353ms)
+✔ opening and cancelling either confirmation is local and never dispatches a check or retry (2.5671ms)
+✔ run, version, ledger, receipt, fee consent and unknown-operation acknowledgement changes permanently cancel an intent (0.9306ms)
+✔ explicit confirmation rechecks and dispatches the exact mode and choices only once under double click (0.9413ms)
+✔ cancel or changed context while the readonly check is pending prevents the retry POST (0.4152ms)
+✔ a fresh server check with changed fees or rejected mode never dispatches from an old successful check (0.5097ms)
+✔ a delayed submitted response cannot navigate a different run or a cancelled confirmation (0.444ms)
+✔ dispatch failure releases the lock, closes consent and propagates the error without automatic retry (0.9394ms)
+✔ accessible inline panels show identity, preserved budget and mode-specific risks with explicit event callbacks (12.0981ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1319.4837

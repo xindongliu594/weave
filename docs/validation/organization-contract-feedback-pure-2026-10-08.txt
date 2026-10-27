@@ -1,0 +1,17 @@
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.3007ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5122ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.4038ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.2275ms)
+✔ new conversation requests omit the deprecated fee limit without changing execution policy or legacy metadata (3.9515ms)
+✔ new settings ignore legacy fee fields but preserve model, execution budget and permission changes (1.6003ms)
+✔ only an explicit new turn carries bounded validation context, without rewriting user messages or an old pending request (0.7379ms)
+✔ retrieving an old pending reply preserves its exact key, body and settings while normalizing only preview comparison (0.3944ms)
+✔ the planning example is a legal three-person develop, independent verification, existing-manager review DAG (11.268ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 875.4192

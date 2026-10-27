@@ -1,0 +1,31 @@
+{
+  "capturedAt": "2026-10-06T09:30:25.6661167Z",
+  "kind": "new-recovery9-pinned-v1-helper-offline-validation",
+  "sources": [
+    {
+      "path": "docs/test-evidence/helpers/generate-go-recovery-after-timeout-web-2026-10-06.mjs",
+      "sha256": "64baaca3b6d4ceb628feecd1f782b0149d24ca27f9b8685283b55ee5cf8f1056"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-recovery-after-timeout-guard-2026-10-06.mjs",
+      "sha256": "15c1575c894fc39ffa80fd6ea8c919bbfd5d52ef6d56824519c69ce799305446"
+    },
+    {
+      "path": "docs/test-evidence/helpers/generate-go-recovery9-pinned-v1-web-2026-10-06.mjs",
+      "sha256": "63dc27064071083458a565cc545a0748210e6611b95bc99e90d9ab0de29fbc90"
+    },
+    {
+      "path": "tests/go-recovery9-pinned-knowledge.test.mjs",
+      "sha256": "fdf59d43579a47de5239576ce6d2d4f5330b3fc987aaa6e655bd80c26755fb49"
+    }
+  ],
+  "revisionChars": 3200,
+  "testsPassed": 3,
+  "productSourceChanges": 0,
+  "liveApiCalls": 0,
+  "databaseOperations": 0,
+  "browserOperations": 0,
+  "modelRequests": 0,
+  "operatorExecuted": false,
+  "oldHelperAndGuardPreserved": true
+}

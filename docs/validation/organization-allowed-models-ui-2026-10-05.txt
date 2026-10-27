@@ -1,0 +1,59 @@
+RecordedAt: 2026-10-05T18:34:34+08:00
+Workspace: C:\Users\JJ\.codex\worktrees\f57c\agent_department
+Scope: OrganizationChat.tsx; new organization-allowed-models-ui.test.ts
+No product POST, paid model call, browser operation, original database access, or product service lifecycle operation.
+
+Command: node --import tsx --test tests/organization-allowed-models-ui.test.ts tests/organization-draft.test.ts tests/project-planning-ui.test.ts tests/plan-budget-ui.test.ts
+Exit code: 0
+Output:
+✔ missing legacy allowlist grants only the current planner and does not mutate policy (699.5874ms)
+✔ switching from an implicit initial planner grants only the explicitly selected planner (0.4344ms)
+✔ changing the planner preserves explicit employee choices and every other authorization and budget (0.2851ms)
+✔ real checkboxes explicitly add Luna and Sol while planner removal cannot revoke the mandatory model (1.329ms)
+✔ the real planner select callback keeps its accessible label and does not offer unavailable models (0.8294ms)
+✔ unavailable authorized models are preserved but cannot be newly selected in the catalog (0.4937ms)
+✔ explicit legacy list missing the planner blocks sending until the user authorizes it (27.9123ms)
+✔ actual home renders the new scope explanation and disables model settings for unresolved requests (10.6655ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.1133ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5009ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.3669ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.1885ms)
+✔ legacy plans keep an empty optional per-request cap and an unchanged serialized contract (39.1666ms)
+✔ explicit per-request output, total estimated output, and task money remain visibly different (1.4235ms)
+✔ editing cumulative output does not silently set a per-request cap, and editing the cap does not change the estimate (1.6654ms)
+✔ clearing the optional cap omits it from a submitted legacy plan instead of inserting a default (0.6374ms)
+✔ the editor explains whole-task accumulation and constrains the optional single-request integer (2.0542ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (2.7211ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (13.1279ms)
+✔ read-only quote performs one GET with exact explicit parameters and rejects mismatched versions (1.3921ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.471ms)
+✔ changed or newly blocked quote returns current evidence without a POST or reservation callback (0.7446ms)
+✔ unchanged affordable quote generates one candidate after GET, with no save/approve request or data changes (2.1131ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6251ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (29.2614ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.1024ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (12.2667ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.2712ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.0276ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.3829ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.5792ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without a POST (0.8074ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1999.1306
+
+Command: npx tsc --noEmit
+Exit code: 0
+Stdout/stderr: empty
+
+Command: git diff --check -- apps/web/src/OrganizationChat.tsx tests/organization-allowed-models-ui.test.ts
+Exit code: 0
+Output: empty
+
+SHA256 OrganizationChat.tsx: AA905694BE22EC591D2D33848BB9D6307E302187DE21D561BA2815CC87B57601
+SHA256 organization-allowed-models-ui.test.ts: DEC6D682547A73B68DE50902CF440ABD082486F33CB7400AD374AD3430C48735

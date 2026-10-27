@@ -1,0 +1,150 @@
+✖ all explicit efforts are rejected before tool checks, regardless of route name, protocol or thinking flag (471.0874ms)
+✖ model default passes while existing tool permission and budget gates still apply (2.5106ms)
+✖ archived explicit effort is rejected before any database access or dispatch (0.3604ms)
+✖ default archived routes still require current tools and exact approved fingerprints (0.1365ms)
+✖ unset effort renders model default and saved medium remains visible until user changes it (0.1227ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3601.6528
+
+✖ failing tests:
+
+test at tests\agent-reasoning.test.ts:1:1365
+✖ all explicit efforts are rejected before tool checks, regardless of route name, protocol or thinking flag (471.0874ms)
+  Error: Cannot find module 'react/jsx-dev-runtime' imported from 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/web/src/AgentAdvanced.tsx'
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34060:34)
+      at RunnableDevEnvironment.fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34912:10)
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34870:17)
+      at handleInvoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25913:27)
+      at EventEmitter.listenerForInvokeHandler (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25968:19)
+      at EventEmitter.emit (node:events:509:28)
+      at Object.send (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15125:39)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:535:31)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:584:31)
+      at SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:28) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    runnerError: Error: RunnerError
+        at reviveInvokeError (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:476:64)
+        at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:549:11)
+        at async SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:7)
+        at async request (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1103:83)
+        at async eval (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\AgentAdvanced.tsx:9:42)
+        at async ESModulesEvaluator.runInlinedModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:913:3)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1146:59)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15184:22)
+        at async SSRCompatModuleRunner.cachedRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1053:73)
+        at async SSRCompatModuleRunner.import (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1014:10)
+  }
+
+test at tests\agent-reasoning.test.ts:1:2222
+✖ model default passes while existing tool permission and budget gates still apply (2.5106ms)
+  Error: Cannot find module 'react/jsx-dev-runtime' imported from 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/web/src/AgentAdvanced.tsx'
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34060:34)
+      at RunnableDevEnvironment.fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34912:10)
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34870:17)
+      at handleInvoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25913:27)
+      at EventEmitter.listenerForInvokeHandler (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25968:19)
+      at EventEmitter.emit (node:events:509:28)
+      at Object.send (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15125:39)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:535:31)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:584:31)
+      at SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:28) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    runnerError: Error: RunnerError
+        at reviveInvokeError (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:476:64)
+        at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:549:11)
+        at async SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:7)
+        at async request (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1103:83)
+        at async eval (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\AgentAdvanced.tsx:9:42)
+        at async ESModulesEvaluator.runInlinedModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:913:3)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1146:59)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15184:22)
+        at async SSRCompatModuleRunner.cachedRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1053:73)
+        at async SSRCompatModuleRunner.import (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1014:10)
+  }
+
+test at tests\agent-reasoning.test.ts:1:2805
+✖ archived explicit effort is rejected before any database access or dispatch (0.3604ms)
+  Error: Cannot find module 'react/jsx-dev-runtime' imported from 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/web/src/AgentAdvanced.tsx'
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34060:34)
+      at RunnableDevEnvironment.fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34912:10)
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34870:17)
+      at handleInvoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25913:27)
+      at EventEmitter.listenerForInvokeHandler (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25968:19)
+      at EventEmitter.emit (node:events:509:28)
+      at Object.send (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15125:39)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:535:31)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:584:31)
+      at SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:28) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    runnerError: Error: RunnerError
+        at reviveInvokeError (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:476:64)
+        at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:549:11)
+        at async SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:7)
+        at async request (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1103:83)
+        at async eval (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\AgentAdvanced.tsx:9:42)
+        at async ESModulesEvaluator.runInlinedModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:913:3)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1146:59)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15184:22)
+        at async SSRCompatModuleRunner.cachedRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1053:73)
+        at async SSRCompatModuleRunner.import (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1014:10)
+  }
+
+test at tests\agent-reasoning.test.ts:1:3256
+✖ default archived routes still require current tools and exact approved fingerprints (0.1365ms)
+  Error: Cannot find module 'react/jsx-dev-runtime' imported from 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/web/src/AgentAdvanced.tsx'
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34060:34)
+      at RunnableDevEnvironment.fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34912:10)
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34870:17)
+      at handleInvoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25913:27)
+      at EventEmitter.listenerForInvokeHandler (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25968:19)
+      at EventEmitter.emit (node:events:509:28)
+      at Object.send (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15125:39)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:535:31)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:584:31)
+      at SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:28) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    runnerError: Error: RunnerError
+        at reviveInvokeError (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:476:64)
+        at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:549:11)
+        at async SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:7)
+        at async request (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1103:83)
+        at async eval (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\AgentAdvanced.tsx:9:42)
+        at async ESModulesEvaluator.runInlinedModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:913:3)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1146:59)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15184:22)
+        at async SSRCompatModuleRunner.cachedRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1053:73)
+        at async SSRCompatModuleRunner.import (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1014:10)
+  }
+
+test at tests\agent-reasoning.test.ts:1:4490
+✖ unset effort renders model default and saved medium remains visible until user changes it (0.1227ms)
+  Error: Cannot find module 'react/jsx-dev-runtime' imported from 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/web/src/AgentAdvanced.tsx'
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34060:34)
+      at RunnableDevEnvironment.fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34912:10)
+      at fetchModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:34870:17)
+      at handleInvoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25913:27)
+      at EventEmitter.listenerForInvokeHandler (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:25968:19)
+      at EventEmitter.emit (node:events:509:28)
+      at Object.send (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15125:39)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:535:31)
+      at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:584:31)
+      at SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:28) {
+    code: 'ERR_MODULE_NOT_FOUND',
+    runnerError: Error: RunnerError
+        at reviveInvokeError (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:476:64)
+        at Object.invoke (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:549:11)
+        at async SSRCompatModuleRunner.getModuleInformation (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1086:7)
+        at async request (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1103:83)
+        at async eval (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\AgentAdvanced.tsx:9:42)
+        at async ESModulesEvaluator.runInlinedModule (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:913:3)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1146:59)
+        at async SSRCompatModuleRunner.directRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\chunks\config.js:15184:22)
+        at async SSRCompatModuleRunner.cachedRequest (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1053:73)
+        at async SSRCompatModuleRunner.import (C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\vite\dist\node\module-runner.js:1014:10)
+  }

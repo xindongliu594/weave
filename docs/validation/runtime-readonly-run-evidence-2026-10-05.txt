@@ -1,0 +1,60 @@
+node --test --test-concurrency=1 services/agent-runtime/run-evidence.test.mjs services/agent-runtime/run-evidence-native.test.mjs services/agent-runtime/handoff.test.mjs services/agent-runtime/checkpoint-context.test.mjs services/agent-runtime/quality-handoff.test.mjs services/agent-runtime/task-plan-context.test.mjs services/agent-runtime/product-tools.test.mjs services/agent-runtime/product-concurrency.test.mjs services/agent-runtime/employee-hosts.test.mjs services/agent-runtime/employee-admission-context.test.mjs
+
+✔ recovery retains host evidence, bounds bootstrap and pages full own history without exposing sibling/private records (122.8888ms)
+✔ admitted employee step refreshes current task and occupied budget before durable append without changing other messages (282.3354ms)
+✔ rejected native admission cannot refresh a snapshot, dispatch a model or change the occupied budget (66.998ms)
+✔ cold-resumed employee refreshes the newly admitted contract and remaining calls while retaining the previous archived snapshot (128.2371ms)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (338.3756ms)
+✔ failed employee setup leaves no published Agent or resident Host (49.397ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (47.0111ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (337.8358ms)
+✔ host validates actual JSON content and rejects missing, invalid and failed acceptance (22.0074ms)
+✔ consumer binds the accepted producer version and refuses changed or unaccepted inputs (11.0627ms)
+✔ claimed command evidence cannot replace an actual successful check on the current workspace (24.0713ms)
+✔ file contracts prevent undeclared reads/writes and changedPaths must match observed writes (38.018ms)
+✔ host file checks reject linked directories before reading their contents (4.9492ms)
+✔ host file checks reject binary content declared as text (4.3702ms)
+✔ optimistic writes reject a second editor using the same observed hash (12.6708ms)
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (698.5419ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (619.8869ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (613.0951ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.7301ms)
+✔ execution and summary requests cannot select a model outside the employee approval (203.9142ms)
+✔ actual DSH tool pipeline enforces employee grants and waits for explicit terminal approval (181.9751ms)
+✔ DSH knowledge tools bind manifest queries to the executing employee and fail closed without a version service (208.261ms)
+✔ product schema restrictions retain recovery and native collaboration while the coordinator registry remains unchanged (194.4225ms)
+✔ native quality contracts receive actual file and command evidence before independent review (1804.031ms)
+✔ model claims of a passed command cannot unlock native quality work (804.4661ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (1034.0903ms)
+✔ review revision cannot create an unapproved automatic repair graph (1957.8925ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (2040.9105ms)
+✔ native developer → QA → manager sees real command hashes/counts with no private knowledge or extra tools (4407.1482ms)
+✔ native resumed QA/manager inherit source budget and exact developer seal without repeating completed developer execution (4005.4032ms)
+✔ actual Node test child output yields pass/fail/skip counts and hashes without exposing any terminal body (427.4215ms)
+✔ partial, conflicting, multi-command or repeated Node summaries cannot become verified counts (0.7807ms)
+✔ operation metadata requires one exact completed run/call/attempt/approval chain and never uses a returned claimed ID (40.2248ms)
+✔ downstream evidence is limited to committed ancestors and keeps raw private fields and model claims out (51.4292ms)
+✔ recovery seals the actual latest host budget and separates inherited unknown holds from recorded fee; old missing records stay unknown (24.9836ms)
+✔ compact product mapping changes only duplicated description while generic mapping and immutable contracts retain their complete hashes (5.9013ms)
+✔ compact mapping fails closed without a verified host context instead of producing placeholder contracts (1.0936ms)
+✔ generic native host cannot opt into context-backed descriptions or dispatch before failed assertion (130.5606ms)
+✔ native restored task claim retains canonical file hashes and quality fields without replaying the completed producer or repeating requirement in its receipt (712.2123ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24597.5532
+
+
+npx tsc --noEmit
+exitCode=0 (no diagnostics; completion chunk d1a53e)
+
+node --check: run-evidence.mjs, host.mjs, handoff.mjs, product-tools.mjs, checkpoint-context.mjs
+exitCode=0
+
+git diff --check: host.mjs, handoff.mjs, product-tools.mjs, checkpoint-context.mjs, employee-hosts.mjs
+exitCode=0
+

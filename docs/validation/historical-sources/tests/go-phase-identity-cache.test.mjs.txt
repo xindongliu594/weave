@@ -1,0 +1,39 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { phaseIdentityCache, safeOperatorError } from '../docs/test-evidence/helpers/go-phase-identity-cache-2026-10-06.mjs';
+import { normalV11Predecessor, normalV11Intent, normalV11RunList, normalV11SuccessorSources } from '../docs/test-evidence/helpers/go-normal-v11-successor-source-guard-2026-10-06.mjs';
+const id = n => String(n).padStart(8, '0') + '-1111-4111-8111-111111111111';
+test('fresh phase verifies all identity once; exact unchanged complete metadata avoids every historical state refetch', async () => {
+  const cache = phaseIdentityCache(), rows = [1, 2].map(n => ({ id: id(n), createdAt: '2026-10-06T00:00:00Z', status: 'failed', integrity: 'ok', extra: { retained: true } }));
+  const readIds = [], readIdentity = async value => { readIds.push(value); return { id: value, projectId: id(99), planVersion: 11, status: 'failed' }; };
+  const options = { recordedAt: '2026-10-05T00:00:00Z', readIdentity };
+  const first = await cache(rows, options), second = await cache(structuredClone(rows), options);
+  assert.equal(readIds.length, 2); assert.deepEqual(first.rows, second.rows); assert.deepEqual(second.identityVerification.reused, rows.map(row => row.id));
+  const changed = structuredClone(rows); changed[0].extra.retained = false;
+  const third = await cache(changed, options); assert.equal(readIds.length, 3); assert.deepEqual(third.identityVerification.refreshed, [id(1)]);
+});
+test('new or changed metadata must be fully rechecked; absent, duplicate or unverifiable identity cannot be reused', async () => {
+  const cache = phaseIdentityCache(), metadata = [{ id: id(1), createdAt: '2026-10-06T00:00:00Z', status: 'failed' }];
+  const options = { recordedAt: '2026-10-05T00:00:00Z', readIdentity: async value => ({ id: value, projectId: id(99), planVersion: 11, status: 'failed' }) };
+  await cache(metadata, options);
+  await assert.rejects(cache([...metadata, metadata[0]], options));
+  await assert.rejects(cache([{ ...metadata[0], status: 'running' }], { ...options, readIdentity: async () => undefined }));
+  await assert.rejects(cache([...metadata, { id: id(2), createdAt: metadata[0].createdAt }], { ...options, readIdentity: async () => ({ id: id(2), status: 'failed' }) }));
+});
+test('nonassert diagnostics retain safe name/code/stage and never echo supplier/private error text', () => {
+  const error = Object.assign(Error('private supplier token and body must stay hidden'), { name: 'TimeoutError', code: 'ETIMEDOUT', operatorStage: 'GET:/runs/' + id(1) });
+  const result = safeOperatorError(error, 'route-preflight'); assert.equal(result.name, 'TimeoutError'); assert.equal(result.code, 'ETIMEDOUT');
+  assert.ok(!JSON.stringify(result).includes('private')); assert.ok(result.stage.includes('/runs/'));
+});
+test('exact real v11 never-forwarded proof, immutable raw list and preserved original wx authorize only that approve successor', () => {
+  const source = ref => { const bytes = readFileSync(ref.path); return { value: JSON.parse(bytes), sha256: createHash('sha256').update(bytes).digest('hex') }; };
+  const prior = source(normalV11Predecessor), intent = source(normalV11Intent), rows = source(normalV11RunList), config = { action: 'approve', scenario: 'normal',
+    projectId: '4938eab8-26ed-4f60-9413-d979f05fa968', version: 11, retained: true };
+  assert.equal(normalV11SuccessorSources(prior, intent, rows, config).posts, 0);
+  for (const mutate of [p => { p.value.failure.dispatchObserved = true; }, p => { p.value.mutationRequests.push({ method: 'POST' }); }, p => { p.sha256 = '0'.repeat(64); }]) {
+    const changed = structuredClone(prior); mutate(changed); assert.throws(() => normalV11SuccessorSources(changed, intent, rows, config));
+  }
+  assert.throws(() => normalV11SuccessorSources(prior, intent, rows, { ...config, version: 12 }));
+});

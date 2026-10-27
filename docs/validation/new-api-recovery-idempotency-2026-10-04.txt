@@ -1,0 +1,12 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (10759.8027ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (11313.0107ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22801.863

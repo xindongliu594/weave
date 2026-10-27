@@ -1,0 +1,46 @@
+{
+  "capturedAt": "2026-10-06T07:31:02.8981833Z",
+  "status": "frozen-after-local-tests",
+  "sources": [
+    {
+      "path": "apps/api/src/local-admission.ts",
+      "sha256": "e7153ee341bdcd04960dac300285342fa05d90d9944c786b3e6b6a1d456ce7d8"
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256": "759c14bb9687ae5d9d0b4d22e61394f1e7b4975b4c88685f2dfea5334a81b035"
+    },
+    {
+      "path": "apps/api/src/execution-policy.ts",
+      "sha256": "a4f1cd806693935f2ea8a3f8391d925e0fbf6f6f566b1d489206de00adb1c34f"
+    },
+    {
+      "path": "apps/api/src/cost-control.ts",
+      "sha256": "3399569a61869cdfd0bc68b318eb4545d7d792da5734c27a8434643a2c6dff65"
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "sha256": "2a4e0c6e91e8ca59779ab61600e8e9f8ef978db9d1da8359f912fb00dd5cfb13"
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "sha256": "8018295ed1c0dd64beec7ed77d7f467a83057f9be2864f0e3e5a177945eb9a68"
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.d.mts",
+      "sha256": "c7b9e3558a65c18efdf96d0741a6cc8e72da0631dca4949f9a937347ef4d465e"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "373b33ed7488515642b559a96bce3062335a2b1ea36704f7d7b3e60230df9c34"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.d.mts",
+      "sha256": "5dcf50233539206c5dbf69dabd534f65c50a7916e43fc8fb2c8236aa6a1239ea"
+    },
+    {
+      "path": "tests/local-device-admission.test.ts",
+      "sha256": "fec2d6c53add525659d8adeef004773e2b30319216b15bc1d88e32589509c356"
+    }
+  ]
+}

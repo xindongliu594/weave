@@ -1,0 +1,63 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import ts from 'typescript';
+import {loadFrozenRecoveryTimeoutSources,recoveryTimeoutEvidenceGuard} from '../docs/test-evidence/helpers/go-recovery-after-timeout-guard-2026-10-06.mjs';
+
+// Read source/evidence only. Never import the operator (it can issue browser/API
+// calls), evaluate its code, open a DB, or execute any employee artifact.
+const oldPath='docs/test-evidence/helpers/generate-go-recovery-after-timeout-web-2026-10-06.mjs';
+const newPath='docs/test-evidence/helpers/generate-go-recovery9-pinned-v1-web-2026-10-06.mjs';
+const guardPath='docs/test-evidence/helpers/go-recovery-after-timeout-guard-2026-10-06.mjs';
+const oldText=readFileSync(oldPath,'utf8'),newText=readFileSync(newPath,'utf8');
+const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+const oldParagraph='本版目标仍是用户批准的真实受控停止/重启/同版检查点恢复：准备好QA且调用有余量后由用户操作员决定停止；若之后授权资料被更新，恢复后QA需再次真实检索/读取当前新版本，引用真实ID/version/SHA，不把旧知识当已刷新。当前两知识样本仍v1，不声称已更新v2或完成恢复。本候选不自动停服/操作服务/更新资料。';
+const newParagraph='本版目标仍是用户批准的真实受控停止/重启/同版检查点恢复：准备好QA且调用有余量后由用户操作员决定停止。parent9批准snapshot的shared及QAprivate文档固定v1及其原documentId/SHA；若之后资料目录catalog更新v2，恢复运行仍必须真实knowledge_search/knowledge_read/cite原v1，核对原ID/version/SHA，不读取或引用目录v2。QA恢复后再次真实检索/读取固定v1并给真实引用；目录v2不能替换父snapshot或扩大员工授权，经理仍只读shared原v1。当前两知识样本仍v1，不声称目录已更新v2或恢复已完成。本候选不自动停服/操作服务/更新资料。';
+const sf=ts.createSourceFile(newPath,newText,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+function declaration(name){for(const statement of sf.statements)if(ts.isVariableStatement(statement))for(const node of statement.declarationList.declarations)if(node.name.getText(sf)===name)return node.initializer;throw Error('Missing source declaration '+name);}
+function renderRevision(evidence,agents){
+ const node=declaration('revisionRequest');assert.ok(ts.isTemplateExpression(node));let result=node.head.text;
+ for(const span of node.templateSpans){
+  const expression=span.expression.getText(sf);let value;
+  if(expression==='modelId'){const model=declaration('modelId');assert.ok(ts.isStringLiteral(model));value=model.text;}
+  else if(['recoveryTimeoutEvidence.sourceEventCount','recoveryTimeoutEvidence.hostCalls','recoveryTimeoutEvidence.wireCalls'].includes(expression))value=evidence[expression.split('.').at(-1)];
+  else{assert.equal(expression,'JSON.stringify(project.plan.agents.map(agent => ({ id: agent.id, knowledgeSpaceIds: agent.knowledgeSpaceIds ?? [] })))');value=JSON.stringify(agents.map(agent=>({id:agent.id,knowledgeSpaceIds:agent.knowledgeSpaceIds??[]})));}
+  result+=String(value)+span.literal.text;
+ }return result;
+}
+
+test('the immutable old helper and timeout guard remain exact; successor changes only knowledge wording and its own provenance path',()=>{
+ assert.equal(digest(readFileSync(oldPath)),'64baaca3b6d4ceb628feecd1f782b0149d24ca27f9b8685283b55ee5cf8f1056');
+ assert.equal(digest(readFileSync(guardPath)),'15c1575c894fc39ffa80fd6ea8c919bbfd5d52ef6d56824519c69ce799305446');
+ assert.equal(newText,oldText.replace(oldParagraph,newParagraph).replace(`{ path: '${oldPath}', sha256: digest(await readFile(new URL(import.meta.url))) }`,`{ path: '${newPath}', sha256: digest(await readFile(new URL(import.meta.url))) }`));
+ assert.equal(sf.parseDiagnostics.length,0);
+});
+
+test('the actual frozen final binding and source markers are checked without a live read; rendered new revision fits the API',async context=>{
+ const sources=await loadFrozenRecoveryTimeoutSources(),evidence=recoveryTimeoutEvidenceGuard(sources);
+ assert.equal(evidence.sourceRunId,'c92961f2-5573-4299-82c2-daa7ee13dca5');assert.equal(evidence.controlledInterruptionSucceeded,false);assert.equal(evidence.permanentStartIntentPreserved,true);assert.equal(evidence.permanentStopIntentPreserved,true);
+ const revision=renderRevision(evidence,sources.confirmation.afterProject.plan.agents);
+ assert.ok(revision.length<=4000,'actual source-bound revision is '+revision.length+' UTF-16 chars');
+ context.diagnostic('actual source-bound revision: '+revision.length+' UTF-16 chars; no operator execution');
+ assert.match(revision,/parent9批准snapshot.*固定v1/);assert.match(revision,/catalog更新v2.*knowledge_search\/knowledge_read\/cite原v1/);assert.match(revision,/不读取或引用目录v2/);
+ assert.match(revision,/经理仍只读shared原v1/);assert.doesNotMatch(revision,/恢复后QA需再次真实检索\/读取当前新版本|恢复.*(?:读取|检索)(?:当前新版本|最新版本)/);
+ assert.match(revision,/本候选不自动停服\/操作服务\/更新资料/);
+ assert.match(revision,/原cap4\.77489.*新增总10\/每日20.*global100\/task40\/deadline3600\/context192000\/prune/);
+ assert.match(revision,/工具\/知识权限不变/);assert.match(revision,/chat-completions.*thinking disabled/);
+ assert.equal(sources.confirmation.afterProject.policy.maxBudget,4.77489);
+});
+
+test('all approval, budget, Go, old-request, final-binding and one-dispatch fences are unchanged',()=>{
+ for(const marker of ['GO_ADMISSION_FIX_LOADED','GO_PLANNING_PARSER_FIX_LOADED','GO_RECOVERY9_GENERATION_APPROVED']){
+  assert.match(newText,new RegExp(`assert.equal\\(process.env.${marker}, 'root-confirmed-2026-10-06'`));
+ }
+ for(const guard of ['loadFrozenRecoveryTimeoutSources()','recoveryTimeoutEvidenceGuard(recoverySources)','currentRecoveryVersionGuard({ project, currentModelConfigHash, confirmedProject: recoverySources.confirmation.afterProject })',
+  'fundedBudgetGuard({ intent, ledger','assert.equal(gateway.baseUrl, \'https://opencode.ai/zen/go/v1\')','assert.equal(model.thinkingMode, \'disabled\')',
+  'assert.notEqual(key, recoverySources.generation.requests[0].requestKey','assert.deepEqual(candidate.policy, project.policy)',
+  "assert.ok(adjustedRevision.length <= 4000", "{ flag: 'wx' }", "assert.equal(requests.filter(row => row.path === path).length, 0)"]){
+  assert.ok(oldText.includes(guard),guard+' exists in frozen source');assert.ok(newText.includes(guard),guard+' preserved');
+ }
+ const mask=text=>(text.slice(0,text.indexOf('const revisionRequest ='))+text.slice(text.indexOf('const adjustedRevision ='))).replace(oldPath,newPath);
+ assert.equal(mask(newText),mask(oldText),'only the base revision template and self provenance differ');
+});

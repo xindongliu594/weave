@@ -1,0 +1,68 @@
+{
+  "capturedAt": "2026-10-06T10:12:28.6891145Z",
+  "status": "frozen-for-root-idle-formal-build-and-load",
+  "sources": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "03e610b29b1b9cb6635b4010fa9bb42731f36d4425b7fd97ef1c3a1b08f1d153"
+    },
+    {
+      "path": "apps/api/src/idempotency.ts",
+      "sha256": "8a4a954abb72159ef2f04d002ec1a1924af137ccfef4f330ac5cdc425466a22a"
+    },
+    {
+      "path": "apps/api/src/project-planning.ts",
+      "sha256": "ad0a439425e6c7230d02dab7009eb6e7e21095aa894d0f745bd02f18b9bd3b50"
+    },
+    {
+      "path": "apps/web/src/ProjectPlanning.tsx",
+      "sha256": "98532b13100f2f332b8446c666b9a03799efe92084557e5652c60be9c03039e4"
+    },
+    {
+      "path": "apps/web/src/api.ts",
+      "sha256": "10bb4d69bbfc4b16b7fd3d71901db50b9142b2df7aed9933ed704aa8c88ededf"
+    },
+    {
+      "path": "apps/web/src/organization-draft.ts",
+      "sha256": "714228015cf838c2ceb01d49e50d2c5da024d8cc6075e087e3c70c5795ed5555"
+    },
+    {
+      "path": "apps/web/src/OrganizationChat.tsx",
+      "sha256": "9611489e69dc5969fa5cef2c6dde5eb6e30304ce078e66caed84b508e1015160"
+    },
+    {
+      "path": "tests/project-planning-ui.test.ts",
+      "sha256": "abab86305d244a060939dcc25841f96696c3fe0d2ef5f61a969e16d3a04edebd"
+    },
+    {
+      "path": "tests/api-response.test.ts",
+      "sha256": "25ab8459a6fdb15b9a7de3797af1da4716cec8dc6801a6ae0e75a85d7006fe2f"
+    },
+    {
+      "path": "tests/planning-quote-post.test.ts",
+      "sha256": "0c6de077382ffdd474e3e6ed015c73fa03ce0a83257867d25698b6d468b26c46"
+    }
+  ],
+  "tests": {
+    "clientPlanningAndResponseAndProxy": 45,
+    "quoteAndProjectAndOrganizationApi": 30,
+    "organizationUi": 15,
+    "totalUniquePass": 90,
+    "tscExit": 0
+  },
+  "build": {
+    "nativeConfigLoaderEarlierExit": 0,
+    "finalExactSourceFormalBuild": "Root will perform after both P0 source freezes; not claimed by this manifest"
+  },
+  "invariants": {
+    "legacyGetCompatible": true,
+    "postQuoteReadonlyTransaction": true,
+    "quoteNoRequestKeyWrite": true,
+    "maxRevisionChars": 4000,
+    "nodeDefaultMaxHeaderSize": 16384,
+    "mutationBadOrEmptyResponseRemainsUnknown": true,
+    "noAutomaticPostRetry": true,
+    "plannerProducerInputsDoNotCopyHistoricalSha": true
+  },
+  "liveOperations": 0
+}

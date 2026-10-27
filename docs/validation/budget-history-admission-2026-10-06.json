@@ -1,0 +1,134 @@
+{
+  "kind": "budget-history-durable-admission-fix",
+  "frozenAt": "2026-10-06T04:44:51Z",
+  "sources": [
+    {
+      "path": "apps/api/src/budget-history.ts",
+      "sha256": "6b14d08758d1914377aba4f1d45611c0edbaa60f8cfd134dfaf758bd1fb68adf"
+    },
+    {
+      "path": "apps/api/src/planning-execution-context.ts",
+      "sha256": "1a981c25b6ec51cea6029d033eb64dfa15820493f502b0e657bc6ffb6fa6b6e0"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737"
+    }
+  ],
+  "tests": [
+    {
+      "path": "tests/budget-history-admission.test.ts",
+      "sha256": "dcd96db26a9a6a5d561910ba658dedacf0068198b0818a96d721e4bd65581fb8"
+    },
+    {
+      "path": "tests/planning-execution-context.test.ts",
+      "sha256": "0f1b56457f8947f875ffd5e1ec1e125cd882b2b530455bb359ffcec4c044cf6e"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.test.mjs",
+      "sha256": "15e575c6ee7f0a4efc08b28f69d87ccccce6ce58d28af77b84de204876da5fa0"
+    }
+  ],
+  "unchangedHelpers": [
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+    }
+  ],
+  "basis": "durable-admissions-and-archived-wire-requests",
+  "behavior": {
+    "perRunGlobalCalls": "max(archived wire count, registered reservation row count)",
+    "perTaskCalls": "max(same-run same-task archived wire count, same-run same-task registered row count)",
+    "eachRunCountedOnce": true,
+    "snapshotInheritedHistoryNotAdded": true,
+    "releasedAndUndispatchedRegisteredAttemptsCount": true,
+    "receiptProjectRunVersionOwnershipChecked": true,
+    "archiveExplicitOwnerVersionMismatchBlocked": true,
+    "legacyWireOnlyUsageIdOptional": true,
+    "legacyMissingArchivePlanVersionUsesAuthoritativeOwningRunRow": true,
+    "registeredCancelledBeforeStartMissingArchiveBlocked": true,
+    "contradictoryMergedTaskCountExceedingRunGlobalCountBlocked": true,
+    "amountsHoldDailyCapFormulasChanged": false,
+    "planningAndRecoveryShareCounterImplementation": true,
+    "inheritedBasis": "known durable basis propagated; legacy snapshots keep archived-model-wire-request-count fallback"
+  },
+  "reproduction": {
+    "wireCalls": 23,
+    "registeredCalls": 24,
+    "expectedCallsForBothRecoveryAndPlanning": 24,
+    "qaReviewRegisteredUndispatchedAttempts": 1,
+    "qaReviewRestoredCalls": 1,
+    "source": "Isolated credential-free PGlite reconstruction of the known normal-v8 admission pattern; original DB not queried"
+  },
+  "testsRuns": [
+    {
+      "command": "node scripts/test-integration.mjs tests/budget-history-admission.test.ts",
+      "tests": 12,
+      "pass": 12,
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/planning-execution-context.test.ts",
+      "phase": "prior expectation",
+      "tests": 11,
+      "pass": 10,
+      "fail": 1,
+      "exitCode": 1,
+      "reason": "Existing fixture has a registered unattributed attempt without a wire: new total5 vs old expected4."
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/planning-execution-context.test.ts tests/recovery-conditions.test.ts",
+      "tests": 18,
+      "pass": 18,
+      "exitCode": 0
+    },
+    {
+      "command": "node --test services/agent-runtime/run-evidence.test.mjs",
+      "tests": 6,
+      "pass": 6,
+      "exitCode": 0
+    }
+  ],
+  "totalFinalRelatedPass": 36,
+  "existingExpectationUpdate": {
+    "authorizedByRoot": true,
+    "path": "tests/planning-execution-context.test.ts",
+    "old": {
+      "calls": 4,
+      "unattributedCalls": 1
+    },
+    "new": {
+      "calls": 5,
+      "unattributedCalls": 2
+    },
+    "addedBasisAssertion": true,
+    "priorFailureOutputRetained": true,
+    "amountAndOwnershipAssertionsRetained": true
+  },
+  "executionBoundaries": {
+    "originalProductApiCalls": 0,
+    "originalDatabaseOpens": 0,
+    "realModelCalls": 0,
+    "credentialReads": 0,
+    "employeeFilesReadOrWritten": 0,
+    "testDatabase": "new in-memory PGlite per integration file",
+    "newFixtureNetworkFetchCalls": 0,
+    "existingRecoveryApi": "temporary loopback Express test app backed by fresh PGlite; no paid provider",
+    "frozenOperatorAuditKvStopChanged": false,
+    "rootResponsibleForFinalTypeBuildAndServiceReload": true
+  },
+  "limitations": [
+    "This is an isolated engineering fix and test result, not proof that normal-v8 actually resumed or that QA review/manager finished.",
+    "If per-task max attribution exceeds the same-run global max, history fails closed rather than showing negative or fabricated zero unattributed calls.",
+    "Archive cancellation without a file is only zero if no durable registration exists; otherwise recovery blocks for missing history.",
+    "No optional sealed-host delta lower bound was added. Registered admissions plus legacy wire count implement the requested minimum."
+  ]
+}

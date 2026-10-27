@@ -118,7 +118,7 @@ export class HttpMcpClient {
     }
   }
   async initialize() {
-    const result = await this.request('initialize', { protocolVersion, capabilities: {}, clientInfo: { name: 'agent-department', version: '0.2.0' } });
+    const result = await this.request('initialize', { protocolVersion, capabilities: {}, clientInfo: { name: 'weave', version: '0.2.0' } });
     if (result?.protocolVersion !== protocolVersion || !result?.capabilities?.tools) throw new AppError(502, `服务需支持 MCP ${protocolVersion} 的 tools 能力`);
     await this.request('notifications/initialized', undefined, true);
   }

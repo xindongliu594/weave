@@ -1,0 +1,16 @@
+✔ overlapping polling and manual pagination never duplicate or discard trace events (3.4769ms)
+✔ a temporary missing recovered run clears after a successful poll (2.6436ms)
+✔ successful background refresh cannot erase an approval or recovery operation failure (0.2729ms)
+✔ a new run clears old errors and ignores delayed old-run failures or refresh success (0.3973ms)
+✔ hundreds of collapsed events neither serialize giant raw requests nor place their bodies in the DOM (351.2631ms)
+✔ closed body guards serialization; an explicitly opened body renders complete original JSON and attempt identity (5.7219ms)
+✔ main view omits routine status polling but preserves failures, unknown outcomes and accepted state changes (1.715ms)
+✔ closed previews take only a bounded text prefix instead of joining the complete original message (0.4425ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5748.5458

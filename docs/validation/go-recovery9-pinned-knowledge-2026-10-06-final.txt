@@ -1,0 +1,12 @@
+✔ the immutable old helper and timeout guard remain exact; successor changes only knowledge wording and its own provenance path (13.9076ms)
+✔ the actual frozen final binding and source markers are checked without a live read; rendered new revision fits the API (3394.8272ms)
+ℹ actual source-bound revision: 3200 UTF-16 chars; no operator execution
+✔ all approval, budget, Go, old-request, final-binding and one-dispatch fences are unchanged (3.7984ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5487.9541

@@ -1,0 +1,30 @@
+{
+  "actualWorkspaceBundleCreated": false,
+  "status": "prepared-only-frozen-for-root-final-source-copy",
+  "liveOperations": 0,
+  "capturedAt": "2026-10-06T10:34:38.3671590Z",
+  "tests": {
+    "log": "docs/validation/source-delivery-helper-2026-10-06-final-v2.txt",
+    "tscExit": 0,
+    "syntaxExit": 0,
+    "pass": 8,
+    "fail": 0
+  },
+  "dataBackupHelperModified": false,
+  "sources": [
+    {
+      "path": "scripts/prepare-source-delivery.mjs",
+      "sha256": "edb0fd296de2334eaf13fc400b0fcc91922a8a1e0105ddfcf5f7fc8d51cdc1be"
+    },
+    {
+      "path": "tests/source-delivery.test.mjs",
+      "sha256": "4d2715daf5b7317094584fc4f9664d7da26866e27a8c01a0287e2d1e64c2d5fa"
+    },
+    {
+      "path": "docs/validation/source-delivery-helper-2026-10-06.md",
+      "sha256": "f51ef925c5ff6a86cb20f8e635a32b746b17ac786d521b93d84b5eda27a43562"
+    }
+  ],
+  "originalDataOrCredentialReads": 0,
+  "sourceCopies": "synthetic temporary fixture roots only"
+}

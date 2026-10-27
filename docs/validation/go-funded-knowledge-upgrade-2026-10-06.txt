@@ -1,0 +1,107 @@
+NEW knowledge first-v2 preparation frozen 2026-10-06T04:10:07Z
+Node C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+node --check docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs: exit0
+node --check tests/go-funded-knowledge-upgrade.test.mjs: exit0
+
+node --test tests/go-funded-knowledge-upgrade.test.mjs
+✔ actual saved v7 Go confirmation/generation/setup chain is verified locally with no API (10.427ms)
+✔ strict CLI requires actual dynamic parent/version and all four local proof inputs (4.507ms)
+✔ complete cancelled same-version parent pins both original v1 bodies to exact authorized employees (35.5448ms)
+✔ both and partial first-v2 updates preserve complete parent PIN, fees, permission and v1 revisions (25.9867ms)
+✔ fails closed: failed is not deliberate cancellation (6.2748ms)
+✔ fails closed: active parent (6.5207ms)
+✔ fails closed: wrong current project version (5.794ms)
+✔ fails closed: implicit child identity (5.662ms)
+✔ fails closed: incomplete export (5.2338ms)
+✔ fails closed: changed snapshot (9.1549ms)
+✔ fails closed: missing native unknown evidence (5.6032ms)
+✔ fails closed: unknown native operation (5.6856ms)
+✔ fails closed: same-parent child already exists (5.3239ms)
+✔ fails closed: second same-version full retry (4.93ms)
+✔ fails closed: run list omits full identity (4.7087ms)
+✔ fails closed: waiting approval (5.6197ms)
+✔ fails closed: changed native result (6.3327ms)
+✔ fails closed: changed employee manifest SHA (5.5612ms)
+✔ fails closed: new fee even below floating tolerance (5.0778ms)
+✔ fails closed: changed model rate (5.9926ms)
+✔ fails closed: changed gateway (4.838ms)
+✔ fails closed: pending recovery model cost (4.8806ms)
+✔ fails closed: unknown recovery fee (5.5052ms)
+✔ fails closed: missing project receipts (4.7812ms)
+✔ fails closed: private scope changed (4.9312ms)
+✔ fails closed: developer private grant added (5.4123ms)
+✔ fails closed: already updated doc must not be replayed (5.3844ms)
+✔ fails closed: original v1 body changed (4.7876ms)
+✔ fails closed: non-first version history (4.9093ms)
+✔ full PIN rejects changed SHA, missing chunk, extra document and private employee exposure (25.0928ms)
+✔ actual stop proof cannot be fabricated by report status, changed version or changed raw-file SHA (24.2208ms)
+✔ after update cannot change unrelated documents, old holds, employees, project or original source (39.7237ms)
+✔ only exact existing-document four-field PUT is accepted; every fee/provider/project/approval action is blocked (1.9581ms)
+✔ persistent first-update intent uses wx and never overwrites or grants partial replay (0.8492ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 482.8424
+
+
+Offline actual source/binding and source hashes:
+{
+  "offlineActualBinding": {
+    "version": 7,
+    "planningReceiptId": "8d02d818-9599-48df-b3a2-5bb41c4a24bc",
+    "planningCost": 0.0071565,
+    "retained": false,
+    "parentRunVerified": false,
+    "stopVerified": false
+  },
+  "documents": [
+    {
+      "id": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+      "spaceId": "be232aec-3cf7-4f58-a12f-c724bccbd4f8",
+      "oldSha256": "4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650",
+      "newSha256": "cac632f60a9a1cc9ffef3e47ddb06f00efa2dd5558b85f8f2d9105a3673d130b",
+      "expectedVersion": 1,
+      "targetVersion": 2
+    },
+    {
+      "id": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+      "spaceId": "1db04ce1-859d-4520-8b37-2e88dc88c16f",
+      "oldSha256": "77dfac48cfc2a2224906008f3f3246587765031c784a7e59c6a9cb81311eda93",
+      "newSha256": "52231e2e92ceb0600a47b16b9037f4a739c719d21ea050b517c7104363ce0220",
+      "expectedVersion": 1,
+      "targetVersion": 2
+    }
+  ],
+  "frozenSources": [
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+    },
+    {
+      "path": "tests/go-funded-knowledge-upgrade.test.mjs",
+      "sha256": "24d18c2ac45f87e39b8a4d0bef90cf955daeeb072e22831c9a467b4cb137ea63"
+    },
+    {
+      "path": "docs/test-evidence/helpers/drive-funded-knowledge-2026-10-05.mjs",
+      "sha256": "29b8a01b5e3b26eb9cf62d0bfb18bbe526ac5a25de01427c53c1a8a7551e36b8"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    }
+  ]
+}
+
+
+Real API/DB/model/browser/document actions: 0.
+Actual parent UUID/stop/PIN/update/resume/QA remain unverified.
+Future exact CLI:
+node docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs update-v2 --run-id=ACTUAL_PARENT_UUID --version=7 --confirmed-evidence=docs/test-evidence/go-headroom-recovery-confirm-2026-10-06T03-56-22-910Z-d1533bf8.json --generation-evidence=docs/test-evidence/go-headroom-recovery-generate-2026-10-06T03-53-44-337Z-6af3adfa.json --setup-evidence=docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json --stop-evidence=docs/test-evidence/ACTUAL_SUCCESSFUL_GO_STOP.json

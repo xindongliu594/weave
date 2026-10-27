@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { assertRejectedResume } from '../docs/test-evidence/helpers/resume-go-normal-v8-after-proxy-fix-2026-10-06.mjs';
+
+const config = { action: 'resume', scenario: 'normal', version: 8, projectId: '4938eab8-26ed-4f60-9413-d979f05fa968', runId: '0947ae05-5c3c-47d0-969b-5c8a739118f1', retained: true };
+const proof = JSON.parse(await readFile(resolve('docs/test-evidence/funded-run-web-normal-resume-2026-10-06T04-57-08-143Z-30061a10.json')));
+const intent = JSON.parse(await readFile(resolve('.data/funded-acceptance/web-operation-guards/resume-' + config.runId + '-after-no-dispatch-04a2ed56ad62.json')));
+test('both retained no-dispatch proofs and the exact proxy failure permit one successor', () => {
+  assert.equal(assertRejectedResume(proof, intent, config), 'resume-' + config.runId + '-after-no-dispatch-d0f555796e0e');
+});
+test('changed response, uncertain dispatch, new run, intent or failed GET cannot continue', () => {
+  for (const change of [{ failure: { dispatchObserved: true } }, { httpStatus: 202 }, { newRunsReadOnly: [{}] }, { sources: [] }, { sources: [{ method: 'GET', status: 502, endpoint: '/costs' }] }, { interceptedPredecessor: {} }]) assert.throws(() => assertRejectedResume({ ...proof, ...change }, intent, config));
+  assert.throws(() => assertRejectedResume(proof, { ...intent, actionIdentity: 'resume-' + config.runId }, config));
+  assert.throws(() => assertRejectedResume(proof, intent, { ...config, version: 9 }));
+});

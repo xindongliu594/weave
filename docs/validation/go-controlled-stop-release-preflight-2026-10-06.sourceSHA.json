@@ -1,0 +1,151 @@
+{
+  "kind": "offline-controlled-stop-release-preflight-fix",
+  "checkedAt": "2026-10-06T12:49:01.291Z",
+  "runId": "0453cd06-caf6-4fee-91f3-cccb55340a68",
+  "version": 10,
+  "release": 4.150841,
+  "originalFailedUpgradeSourceSHA": "c6c54dc4cae75251add37c9e378bf147f334a702e4ed20789767b96f92441952",
+  "reproducedFailure": {
+    "stage": "reconciled-stop",
+    "assertion": "Actual before/after full proof must be recomputed",
+    "onlyDifference": "49 optional undefined own properties omitted during JSON persistence",
+    "jsonValuesEqual": true
+  },
+  "fix": {
+    "normalizationScope": "only recomputed proof JSON persisted representation",
+    "rawObservationsNormalized": false,
+    "stageCodeDiagnostics": true,
+    "automaticRetry": false
+  },
+  "checks": {
+    "nativeTests": {
+      "passed": 9,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "types": {
+      "exitCode": 0
+    },
+    "exactActualSevenOptionsPreflight": "passed",
+    "guardedFetchCalls": 0,
+    "allListedSourcesStable": true
+  },
+  "operations": {
+    "liveRequests": 0,
+    "browserActions": 0,
+    "providerCalls": 0,
+    "databaseOpened": 0,
+    "originalEvidenceWrites": 0
+  },
+  "knowledgeUpgradeVerified": false,
+  "serviceRestartVerified": false,
+  "recoveryVerified": false,
+  "independentQaVerified": false,
+  "sources": [
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\helpers\\go-cancel-reservation-release-proof-2026-10-06.mjs",
+      "bytes": 9922,
+      "sha256": "7c6b7cd4a93a0f9b55389fa4d634028c842ae99b2e38ceb05c816e7c1986264b"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\helpers\\reconcile-go-controlled-stop-release-readonly-2026-10-06.mjs",
+      "bytes": 8901,
+      "sha256": "3cfffa534bbbf8ee4014cf6ee335f92fa002c99bec8076fcc76eb4ea64cd024c"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\helpers\\upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs",
+      "bytes": 37894,
+      "sha256": "4ab994b594e125516d425691498e7e887ad70d071047c8dcee7b1fd6b6f3919c"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\helpers\\stop-go-funded-run-first-parent-web-2026-10-06.mjs",
+      "bytes": 45105,
+      "sha256": "916bd2856d336edf2e82d9c98777c696f0e03df8a498136070c8b865b2164335"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\helpers\\upgrade-go-funded-knowledge-first-parent-web-2026-10-06.mjs",
+      "bytes": 34452,
+      "sha256": "e4904729ee8b398139121c2e9031f1e4f00e1e4486e6b0782a447a7471d76418"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\go-cancel-reservation-release.test.mjs",
+      "bytes": 14591,
+      "sha256": "1bb84a698b98c6d234d8e3aee550c61885b77c649578b40d12a99fbd987e302d"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-funded-controlled-stop-2026-10-06T12-02-25-461Z-50f1c04b.json",
+      "bytes": 164812,
+      "sha256": "20b1f1f9fa10021f4180feb56cbb32e52ab5d16e234f2aba842e58b8333a8b35"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-funded-controlled-stop-2026-10-06T12-02-25-461Z-50f1c04b-before.json",
+      "bytes": 40230430,
+      "sha256": "a1e9a97bff45c702c43cb39427d0862142a643938263d896ea3527a6c1d6b106"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-funded-controlled-stop-2026-10-06T12-02-25-461Z-50f1c04b-after.json",
+      "bytes": 40483352,
+      "sha256": "3470ca951d849d2afc92051d63f6dbd2df54f37377f17de72a778a462f4b3bff"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-controlled-stop-release-reconciled-2026-10-06T12-33-29-183Z-be369391.json",
+      "bytes": 30199,
+      "sha256": "2a797878dec5c2ef6680d0e7dec45d60ee718c41fb0e918a811dac89afc1c6d3"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-recovery-v10-controlled-stopped-iab-2026-10-06.txt",
+      "bytes": 77349,
+      "sha256": "dacedea0b93b372be182c9b3a73f6baa9169f98ea15cdf61c9f886e78ed8aba7"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\screenshots\\go-recovery-v10-controlled-stopped-iab-2026-10-06.jpg",
+      "bytes": 73470,
+      "sha256": "2093e74d5bf160050ef718f3b24ae6a61c9a4f207dc51f966e1ba7ac4d75d658"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-recovery10-two-stage-recovery-confirm-2026-10-06T11-55-14-154Z-b5afc442.json",
+      "bytes": 325750,
+      "sha256": "11c73378c6bd315613c729c810a10d29be24bc5e34d98ef179d6fafae88a8ca0"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-recovery10-two-stage-recovery-generate-2026-10-06T11-53-11-601Z-0555353b.json",
+      "bytes": 406533,
+      "sha256": "be9485ead8c5822cf74c93b046afdfb959838ce6fc3454b88989adec3fa0b0eb"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738\\result.json",
+      "bytes": 215347,
+      "sha256": "c09d5e29742a8f5fd40c499555103a95d09422b6dad65eddce88063da0aa9693"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-recovery-v10-controlled-stop-reconciliation-2026-10-06.json",
+      "bytes": 165872,
+      "sha256": "8b18bbe449036f481df2d4e956875ddc37ff75888199b3fccb1d33b3a33be35b"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-recovery-v10-controlled-stop-reconciliation-2026-10-06.md",
+      "bytes": 6742,
+      "sha256": "0ca1a920b70dd5b0a9649b0904008abb5a7aa2327b008af40cb02518e6af27c2"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-cancel-reservation-release-2026-10-06.preflight-first-failed.txt",
+      "bytes": 12612,
+      "sha256": "3f2fd27a8bd3a7f5c800f65548e2efde50f91d27e58bfcdc6f669e4f82a9a1ef"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-cancel-reservation-release-2026-10-06.preflight-final.txt",
+      "bytes": 1345,
+      "sha256": "01e22abbbf8b780d717df2649b966ae3dbddabb2fff2e5dce78ed15da33d4758"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-cancel-reservation-release-2026-10-06.preflight-tsc.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\validation\\go-controlled-stop-release-preflight-2026-10-06.md",
+      "bytes": 3870,
+      "sha256": "e35eecb9fd43c1f3e37582c0bceb4c8b4fb2f69b54e7a5ce0339b8e07a25f893"
+    }
+  ]
+}

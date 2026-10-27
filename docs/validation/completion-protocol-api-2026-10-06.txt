@@ -1,0 +1,43 @@
+Completion protocol API local engineering validation, 2026-10-06
+Command: node scripts/test-integration.mjs tests/completion-protocol-api.test.ts
+Fresh in-memory PGlite + new temporary credential/data directory + localhost HTTP fixtures only.
+Go URLs are intercepted and mapped only to the local fixture; other external targets are denied.
+Not employee execution or real model acceptance.
+
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ API stores explicit protocol, keeps omitted legacy Chat fields, and rejects invalid protocol without creating a model (3171.7731ms)
+✔ Responses text API settles the full cached input and reserves captured wire bytes plus 1024 and the output cap (223.2341ms)
+✔ two API tool probes replay call_id history and keep Go session stable within each probe and isolated between probes (462.2346ms)
+✔ actual Responses wire budget and context limits reject before dispatch or a model reservation is inserted (817.2056ms)
+✔ valid usage plus malformed tool output is a settled paid probe failure with safe diagnostics (239.0275ms)
+✔ missing usage and HTTP 502 retain one uncertain fee and one dispatch without retry or synthetic-key leakage (265.6797ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5740.5301
+
+EXIT_CODE=0
+gitHead=f775baa410316527dce54d0560d3a9b9d0f46199
+frozenAt=2026-10-06T09:10:09+08:00
+sourceChangedDuringTest=
+SOURCE_SNAPSHOT_SHA256
+989da7c9ab100e0dc493d72d6ddacb14fedbf87eac378784bd4fa6a2dd1e3bfc  tests/completion-protocol-api.test.ts
+75b14eb09723d05a6cc42b4c42840c30f9d07b838137e8b6e3bea3d3155ac331  apps/api/src/app.ts
+0df8d6f69d5098c57fad947a0b804fece7c5465a8b49ec15d6eee84aad80128a  apps/api/src/provider.ts
+79ffbb8778b894eb915bf208de7ef3e448dbfd433051a3a54020297d32144456  apps/api/src/cost-control.ts
+410ef08350be360390669cb7873d118fb8849e6654bcd52be06dc83c0e1dd9c0  apps/api/src/model-capabilities.ts
+a77639df16b4e1865222d872d8b1a487bab19a1b0390ac5fe9e4162543faf468  packages/contracts/index.ts
+d99e21fe185f80fc8e7f4e03e8400151148b5facb77fe4e486f28568b890563d  services/agent-runtime/completion-protocol.mjs
+a244d653800340b1c567c0793650607d6b426ee230499b800486c09411750955  services/agent-runtime/completion-protocol.d.mts
+c00ed62fc7cf3f2c73916ed0d7313f62293efe45e77a0787a67283e5a4be3ad6  scripts/test-integration.mjs
+c6dfd78719309965b83a316dd286379c1eb0750a68f026ebe5793a8cd34eba74  scripts/test-support/pglite-pool.mjs
+
+FOLLOW_UP_SOURCE_DELTA
+apps/api/src/model-capabilities.ts testedSha256=410ef08350be360390669cb7873d118fb8849e6654bcd52be06dc83c0e1dd9c0 currentSha256=107f02b74cb4cfe8f9c1ad9d7d3e23072cb7ca27683afe236c50a70a5d832f8f
+Change: only thinkingMode=disabled selects tool_choice=auto; legacy missing thinking and Responses fixtures retain forced choice.
+The six-test result above was not rerun or expanded for this follow-up branch. Owner separately reported thinking API 4/4; see go-thinking-mode-2026-10-06.md.

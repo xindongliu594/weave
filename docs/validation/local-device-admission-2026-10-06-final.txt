@@ -1,0 +1,61 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ authenticated heartbeat recovery queues and starts one real native command (4727.2828ms)
+✔ model admission waits for authenticated recovery and emits one reservation and one loopback wire (1054.8857ms)
+✔ offline to the bounded deadline leaves both local and model dispatch at zero (10184.409ms)
+✔ caller cancellation and original deadline abort waiting before any dispatch (1140.9709ms)
+✔ LocalRunExecutor prepare and execute preserve caller abort while heartbeat admission waits (1795.1652ms)
+✔ current hard withdrawal, version, cancel, lease and snapshot failures stop stale admissions promptly (7442.2072ms)
+✔ current model configuration and remaining budget denial outrank a stale heartbeat (1329.5227ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28533.9474
+✔ started native command retains its waiting result after the heartbeat exceeds 15 seconds (3117.5314ms)
+✔ stale heartbeat still rejects enqueue, queued waits, claimed waits, start and default run authorization (20617.6719ms)
+✔ an old heartbeat does not bypass actual withdrawal, cancellation, version, lease or operation deadline checks (2674.8399ms)
+✔ started caller cancellation and wrong claim tokens never adopt or replay an old successful receipt (370.4955ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27413.5067
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (2250.4358ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (185.5978ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (361.1931ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (194.798ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (206.7233ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (97.306ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (389.0597ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4247.2434
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (2151.0153ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (407.1959ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (233.1625ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (271.1724ms)
+✔ approval freezes per-call output limits separately from the cumulative task estimates (134.7486ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (391.9726ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.4376ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.2356ms) # requires independent PostgreSQL backends and row locks
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (798.664ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 5143.7353

@@ -1,0 +1,16 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for getByRole('region', { name: 'AI 方案候选', exact: true }).getByRole('button', { name: '确认保存候选为新版本', exact: true })
+
+    at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\docs\test-evidence\helpers\verify-planning-candidate-web-isolated-2026-10-05.mjs:93:74) {
+  log: [
+    "  - waiting for getByRole('region', { name: 'AI 方案候选', exact: true }).getByRole('button', { name: '确认保存候选为新版本', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.15.0

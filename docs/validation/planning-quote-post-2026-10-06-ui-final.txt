@@ -1,0 +1,47 @@
+✔ empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success (41.1186ms)
+✔ planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431 (2.2598ms)
+✔ a mutation retains its original key and is never retried after an empty503 response or network loss (1.2385ms)
+✔ static page, assets and HEAD use correct MIME without a development server (73.0786ms)
+✔ API proxy retains bytes, query, status, end-to-end headers and original idempotency key (14.0212ms)
+✔ upstream permission failure and API 404 remain API responses (8.3776ms)
+✔ successive API reads use a fresh upstream socket for every request (24.763ms)
+✔ upstream disconnect after receiving a GET or mutation dispatches once and never replays an unknown result (184.746ms)
+✔ Host and browser Origin guards reject both HTML and API before upstream operations (16.4732ms)
+✔ SPA fallback excludes API, missing assets, encoded traversal and non-read methods (10.7243ms)
+✔ static serving refuses a directory link outside the build root (6.8592ms)
+✔ streamed API response starts before the upstream completes (5.8724ms)
+✔ unavailable API returns an explicit 502 and never falls through to the SPA (12.1953ms)
+✔ closing static host aborts an outstanding API stream, releases the port and is idempotent (11.8969ms)
+✔ missing build fails with a build instruction and does not create a data directory (2.6614ms)
+✔ existing built product index and assets are served unchanged (16.4299ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (4.7587ms)
+✔ the exact user adjustment invalidates an old quote and stays in the locked generation body (2.35ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (13.1235ms)
+✔ read-only quote performs one POST body with exact explicit parameters and rejects mismatched versions (0.637ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.5141ms)
+✔ changed or newly blocked quote returns current evidence without a paid generation or reservation callback (0.575ms)
+✔ unchanged affordable quote generates one candidate after the read-only POST, with no save/approve request or data changes (0.7694ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6232ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (31.3368ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (11.2382ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (16.0791ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.3576ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.7369ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (3.882ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.755ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without paid generation (1.0137ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.9992ms)
+✔ explicit retention binds quote and generation POST bodies and candidate response, with no implicit true (2.8973ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.4837ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.8242ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.6895ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (4.0396ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.7973ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 907.9735

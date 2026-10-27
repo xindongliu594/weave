@@ -1,6 +1,6 @@
 <div align="center">
 
-# 为伍 · Weiwu
+# Weave · 为伍
 
 ### 一个想法，一支团队。
 
@@ -8,7 +8,7 @@
 
 **长期部门 · 多 Agent 协作 · 公司知识 · 可验证交付**
 
-[Windows 本机](docs/mvp-windows-quickstart-2026-10-07.md) · [Windows 访问 JJ](docs/jj-web-quickstart-2026-10-18.md) · [Harness 架构](#harness-如何运转) · [当前进度](#当前实现与验证)
+[GitHub 仓库](https://github.com/xindongliu594/agent-department) · [Windows 本机](docs/mvp-windows-quickstart-2026-10-07.md) · [Windows 访问 JJ](docs/jj-web-quickstart-2026-10-18.md) · [Harness 架构](#harness-如何运转) · [当前进度](#当前实现与验证)
 
 </div>
 

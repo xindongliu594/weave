@@ -1,0 +1,7 @@
+正在启动为伍本机真实 API 工作空间…
+
+为伍本机工作台已就绪：http://127.0.0.1:4323/
+一个想法，一支团队。
+从首页描述需求并组建部门；首次使用请在模型目录配置并测试 API。
+数据保存在 C:\Users\JJ\.codex\worktrees\f57c\agent_department\.data\source-startup-smoke-932481b3-ff44-4e9f-ae8b-6e50d00b308b
+项目默认使用本机执行器；每条命令仍需批准。Ctrl+C 停止，重启保留配置。

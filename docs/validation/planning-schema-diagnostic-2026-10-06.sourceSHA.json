@@ -1,0 +1,109 @@
+{
+  "normal13": {
+    "actualFailedField": "unknown-not-recorded",
+    "outputSHA": "2c901a23eaebe0075b6e091c6680ad0b09b57dbdd1d905f23362a549f96582d8",
+    "reason": "PLAN_SCHEMA_INVALID",
+    "path": "docs/test-evidence/go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5.json",
+    "status": 422,
+    "finishReason": "stop",
+    "rewritten": false,
+    "replayed": false,
+    "outputBytes": 13750,
+    "code": "PLANNING_SCHEMA_INVALID"
+  },
+  "preservedSources": [
+    {
+      "sha256": "7492514fa353776afb52367013d14fc61e010fd64197109267584985df74e5b3",
+      "path": "packages/contracts/index.ts"
+    },
+    {
+      "sha256": "ad0a439425e6c7230d02dab7009eb6e7e21095aa894d0f745bd02f18b9bd3b50",
+      "path": "apps/api/src/project-planning.ts"
+    },
+    {
+      "sha256": "471053409058bcace60e3fd20dec213558e929ea30d6c6ec5b94429082e8c851",
+      "path": "apps/api/src/provider.ts"
+    },
+    {
+      "sha256": "10bb4d69bbfc4b16b7fd3d71901db50b9142b2df7aed9933ed704aa8c88ededf",
+      "path": "apps/web/src/api.ts"
+    },
+    {
+      "sha256": "98532b13100f2f332b8446c666b9a03799efe92084557e5652c60be9c03039e4",
+      "path": "apps/web/src/ProjectPlanning.tsx"
+    },
+    {
+      "sha256": "ea9b399ee937c4b54035f3694609df37071744f3e4a3a77e2e3f9cf181d307cf",
+      "path": "apps/api/src/run-coordinator.ts"
+    },
+    {
+      "sha256": "dadf821b6407f552662ffdb9e76ebcd53eb4ab5b22498f4eea6afb043570fcbc",
+      "path": "apps/api/src/run-state.ts"
+    },
+    {
+      "sha256": "201cbbeb241e586f1bd144ade3c663235b2f5929eba8c4f1db0c9beac40bbc01",
+      "path": "services/agent-runtime/trace-store.mjs"
+    }
+  ],
+  "capturedAt": "2026-10-06T11:56:38.3172035Z",
+  "status": "frozen-for-root-formal-build-and-idle-load",
+  "invariants": {
+    "normalCandidateUnchanged": true,
+    "oneSafeDiagnosticHistoryEntry": true,
+    "permissionsBudgetWireUnchanged": true,
+    "receiptStateAndUsageUnchanged": true,
+    "formalSchemaUnchanged": true,
+    "noAutomaticModelRetry": true
+  },
+  "tests": {
+    "tscExit": 0,
+    "tscSession": 47670,
+    "quoteApi": 3,
+    "apiExit": 0,
+    "unitExit": 0,
+    "unitLog": "docs/validation/planning-schema-diagnostic-2026-10-06.unit-first.txt",
+    "originalProjectPlanningApi": 17,
+    "totalUniquePass": 66,
+    "tscLog": "docs/validation/planning-schema-diagnostic-2026-10-06.tsc-first.txt",
+    "unitAndClientAndPlanningUi": 38,
+    "apiLog": "docs/validation/planning-schema-diagnostic-2026-10-06.api-first.txt",
+    "isolatedOutputApi": 8,
+    "tscOutputBytes": 0,
+    "fail": 0
+  },
+  "build": "Root will perform final formal types/build/idle load; not executed by this subtask",
+  "sources": [
+    {
+      "sha256": "e082a40a809b21d4f3bc0fabb7eb4af9c11091b821ba76906a1fe0d2b64d21b6",
+      "path": "apps/api/src/planning-output.ts"
+    },
+    {
+      "sha256": "5a48933cde3bc1fe5e6b1ec68c7c2781606e27e2324d1c27d20b635125a9015a",
+      "path": "apps/api/src/app.ts"
+    },
+    {
+      "sha256": "3e8fd5d1a7b0103fafe105e27ed1d7c43d2bea97d683e2e21aa240107417d48d",
+      "path": "tests/planning-output.test.ts"
+    },
+    {
+      "sha256": "96f6b06a00d6dc2843e0544ee3d265435b8f1d8df6121e15c08493f0c8e6063a",
+      "path": "tests/planning-output-api.test.ts"
+    },
+    {
+      "sha256": "7df348e2291005f2a663af87243e76edeea0f950d6d20bee0e05db8e1b09d483",
+      "path": "docs/validation/planning-schema-diagnostic-2026-10-06.md"
+    }
+  ],
+  "safeBounds": {
+    "maxArrayIndex": 9999,
+    "displayIssues": 3,
+    "rawOutputSaved": false,
+    "issues": 12,
+    "recordKeySaved": false,
+    "rawZodMessageSaved": false,
+    "privateInputSaved": false,
+    "pathSegments": 16
+  },
+  "paidRequests": 0,
+  "liveOperations": 0
+}

@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-10-06T09:41:14.9907978Z",
+  "status": "frozen-after-isolated-list-summary-cache-tests",
+  "sources": [
+    {
+      "path": "services/agent-runtime/trace-store.mjs",
+      "sha256": "0cf0d4c7a84e689d7d4bd181e6642d99a6611e4ba1a09def7de4cd016d2196ba"
+    },
+    {
+      "path": "services/agent-runtime/trace-list-cache.test.mjs",
+      "sha256": "f1362622723feba5acb46c45ddf271c65b3f1cb0ff26862075b4a7f88ca28459"
+    }
+  ],
+  "cache": {
+    "entries": 256,
+    "perSummaryBytes": 65536,
+    "key": "absolute root and run id",
+    "identity": "all snapshot/events BigInt stat own fields",
+    "fullReadRunUnchanged": true,
+    "appendUnchanged": true,
+    "returnFieldsAndSortUnchanged": true
+  },
+  "testsPassed": 10,
+  "tscExit": 0,
+  "unchanged10MiBJournal": {
+    "firstJournalReads": 1,
+    "afterFiveAdditionalLists": 1,
+    "afterDirectReadRun": 2
+  },
+  "liveCalls": 0,
+  "databaseOperations": 0
+}

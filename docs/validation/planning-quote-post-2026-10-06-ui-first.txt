@@ -1,0 +1,34 @@
+✔ empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success (35.4898ms)
+✔ planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431 (1.8888ms)
+✔ a mutation retains its original key and is never retried after an empty503 response or network loss (1.107ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (3.9134ms)
+✔ the exact user adjustment invalidates an old quote and stays in the locked generation body (2.366ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (12.7148ms)
+✔ read-only quote performs one POST body with exact explicit parameters and rejects mismatched versions (0.6166ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.5066ms)
+✔ changed or newly blocked quote returns current evidence without a paid generation or reservation callback (0.5798ms)
+✔ unchanged affordable quote generates one candidate after the read-only POST, with no save/approve request or data changes (0.7131ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6141ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (31.078ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.288ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (12.4283ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.3024ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.2144ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.3808ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.595ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without paid generation (0.8821ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.636ms)
+✔ explicit retention binds quote and generation POST bodies and candidate response, with no implicit true (2.5473ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.6157ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.7019ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.5512ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (3.0636ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.4139ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 669.806

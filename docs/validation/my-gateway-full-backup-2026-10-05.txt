@@ -1,0 +1,30 @@
+restore-open-1: exit=0 timedOut=false
+
+restore-open-2: exit=0 timedOut=false
+
+employee-development-tests: exit=0 timedOut=false
+Listening on http://127.0.0.1:62986
+Listening on http://127.0.0.1:62988
+✔ GET /todos initially empty (43.8854ms)
+Listening on http://127.0.0.1:62990
+✔ POST /todos create and list item (10.5373ms)
+Listening on http://127.0.0.1:62992
+✔ POST malformed and non-object payloads return 400 (9.9227ms)
+Listening on http://127.0.0.1:62994
+✔ PATCH changes completion; invalid bodies return 400 (11.7905ms)
+Listening on http://127.0.0.1:62996
+✔ PATCH and DELETE return 404 for unknown IDs; DELETE removes item (7.0741ms)
+Listening on http://127.0.0.1:62998
+✔ Unknown endpoint returns 404 (4.0399ms)
+Listening on http://127.0.0.1:62999
+✔ ESM import does not start a listener (146.7836ms)
+✔ README CLI command starts on ephemeral port and serves HTTP (173.9313ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3568.6739
+

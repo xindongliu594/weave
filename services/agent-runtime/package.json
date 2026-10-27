@@ -1,5 +1,5 @@
 {
-  "name": "agent-department-runtime",
+  "name": "weave-runtime",
   "private": true,
   "type": "module",
   "dependencies": {

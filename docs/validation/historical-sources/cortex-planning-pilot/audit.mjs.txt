@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {readFileSync, writeFileSync, existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const [base, out] = process.argv.slice(2);
+const read = path => JSON.parse(readFileSync(path, 'utf8'));
+const source = join(base, 'dsh-cortex-e2a9acacf7255678220dd927c4348db03851d6d7');
+const {dependencyLevels} = await import(pathToFileURL(join(source, 'lib/service.js')).href);
+const manifest = read(join(base, 'source-manifest.json'));
+for (const [file, hash] of Object.entries(manifest.sourceHashes)) assert.equal(createHash('sha256').update(readFileSync(join(source,file))).digest('hex'), hash, file);
+const runs = ['real', 'real-project'].map(label => ({label, worker: read(join(base,label,'worker-result.json')), broker: read(join(base,label,'broker-result.json'))}));
+const report = {originalSourceUnchanged: true, sourceFiles: Object.keys(manifest.sourceHashes).length, modelCallsDuringAudit: 0, cases: []};
+for (const {label, worker:w, broker:b} of runs) {
+  assert.equal(w.completed, true); assert.equal(b.exit.code, 0); assert.equal(b.requests.length, 1);
+  assert.equal(w.modelCalls, 1); assert.equal(b.requests[0].usageId, w.calls.find(c=>c.usageId).usageId);
+  assert.ok(b.requests[0].cost > 0);
+  const nodes = w.plan.created;
+  const rows = readFileSync(join(base,label,'state/nodes.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+  const latest = new Map(rows.map(r=>[r.id,r]));
+  for (const node of nodes) { assert.deepEqual(latest.get(node.id), node); assert.equal(node.status, 'pending'); }
+  assert.equal(existsSync(join(base,label,'state/attempts.jsonl')), false);
+  const levels = dependencyLevels(nodes).map(layer=>layer.map(n=>n.id));
+  const request = b.requests[0];
+  report.cases.push({label, taskId: w.start.taskId, persistedNodesMatch: true, executionAttempts: 0, nodeCount: nodes.length,
+    edgeCount: nodes.reduce((n,r)=>n+r.depends_on.length,0), dependencyLevels: levels,
+    explicitEmployeeBindings: nodes.filter(n=>n.employeeId || n.assignee || n.agentId).length,
+    receipt: {id: request.usageId, usage: request.usage, cost: request.cost, elapsedMs: new Date(request.returnedAt)-new Date(request.dispatchedAt)}});
+}
+const first = runs[0].broker, last = runs[1].broker;
+assert.deepEqual(first.before.holds, last.after.holds);
+report.unknownReceiptsUnchanged = first.before.holds.length;
+report.totalCalls = runs.reduce((a,r)=>a+r.broker.requests.length,0);
+report.totalCost = runs.flatMap(r=>r.broker.requests).reduce((a,r)=>a+r.cost,0);
+assert.equal(report.totalCalls, 2); assert.ok(report.totalCost < 0.04);
+assert.ok(Math.abs(last.after.spent-first.before.spent-report.totalCost)<1e-9);
+report.cumulativeOccupied = last.after.spent+last.after.reserved;
+assert.ok(report.cumulativeOccupied <= 3.41);
+// A deterministic, model-free check of the same original dependency function.
+const fixture = [{id:'A',depends_on:[]},{id:'B',depends_on:[]},{id:'C',depends_on:['B']},{id:'D',depends_on:['C']}];
+const actual = dependencyLevels(fixture).map(layer=>layer.map(n=>n.id));
+const expected = [['A','B'],['C'],['D']];
+report.parallelDependencyFixture = {input:fixture, expected, actual, passed: JSON.stringify(expected)===JSON.stringify(actual)};
+report.assessment = {pluginLoading:'passed', budgetedModelPlanning:'passed', projectBreakdown:'partial', executableOrchestration:'failed', productionReady:false,
+  reasons:['No dependency edges were generated in either real planning case.', 'Employee assignment and enforceable QA independence were not produced.', 'Parallel dependency layering must pass the model-free fixture before considering this engine for execution.']};
+writeFileSync(join(out,'audit.json'), JSON.stringify(report,null,2));
+console.log(JSON.stringify(report,null,2));

@@ -1,0 +1,377 @@
+{
+  "kind": "independent-v12-controlled-stop-catalog-v4-restart-partial-audit",
+  "status": "passed-stop-catalog-restart-resume-pending",
+  "checkedAt": "2026-10-07T03:55:09.822Z",
+  "parentRunId": "e789b929-6d6c-4b08-8ff0-d560e69bbc78",
+  "projectId": "3e101c24-87e6-43ea-80f9-a2c4b0b410f4",
+  "version": 12,
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/sources.json",
+      "bytes": 2275,
+      "sha256": "5bae0b805525e25169d312ed9504322fe524a9ab02c6d553d92a454fbf2196c9"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/spaces.json",
+      "bytes": 1033,
+      "sha256": "38b038ff5589171e4146b22d3272ef4a6a51418fa0c2c76d62432e097599e166"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/documents.json",
+      "bytes": 4950,
+      "sha256": "4d65bf7a387bc2341649b04a06df8df0ca8505df61b7d78314b1905ddba3c17c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/74bcc49b-db5d-4729-9e5d-c430f10d6d5d-versions.json",
+      "bytes": 1966,
+      "sha256": "b91cf270e2f25f9a2b795578450b3848ce3e412df632b9fdb1176d215e656aac"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/9ae89b98-2eb2-4302-b79b-ea12ae9a2be7-versions.json",
+      "bytes": 2045,
+      "sha256": "50da844d26be5c46bb6e3a4f419c95f92f2710c071428c70ed53e7fa5caeb5b5"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/projects.json",
+      "bytes": 113922,
+      "sha256": "b86d455066bb91cb86294acf13a8d1322242e250600a940fc3fcef747ca146f8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/usage.json",
+      "bytes": 365601,
+      "sha256": "2924a3c9370fd9b611d4d4ac0454a1bac5b35da90c2da1c1c20aa36118d263bc"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/runs.json",
+      "bytes": 18325,
+      "sha256": "61bdfefd41ad0c887784136a80a865e606d2e559ce016710852cda39b11d7ff8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-before-2026-10-07/readiness.json",
+      "bytes": 126,
+      "sha256": "9698e0ae3e152e510e73d0c5eebb0de0cf07154548ab7cd16d20536ff82b7b3c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/sources.json",
+      "bytes": 2275,
+      "sha256": "e35f9592c3ea2eb38e10ddd9ff5406d400a9bde60ba17f5ffbda87bb736ed4c6"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/spaces.json",
+      "bytes": 1033,
+      "sha256": "38b038ff5589171e4146b22d3272ef4a6a51418fa0c2c76d62432e097599e166"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/documents.json",
+      "bytes": 4899,
+      "sha256": "098401cbf66e022f04a5291b7717ca9c9b0550f32b330318fdded84dffa905a4"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/74bcc49b-db5d-4729-9e5d-c430f10d6d5d-versions.json",
+      "bytes": 2602,
+      "sha256": "33db2929d9e1ccf71f6cd8eb1f0fd7ec92036ea2b2c1350dfc0c9dcd8256ce06"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/9ae89b98-2eb2-4302-b79b-ea12ae9a2be7-versions.json",
+      "bytes": 2675,
+      "sha256": "346633750999e227ea049f42d0adf461a19c284a747ad0fcb7a22c8c8e2e2c76"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/projects.json",
+      "bytes": 113922,
+      "sha256": "b86d455066bb91cb86294acf13a8d1322242e250600a940fc3fcef747ca146f8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/usage.json",
+      "bytes": 365601,
+      "sha256": "2924a3c9370fd9b611d4d4ac0454a1bac5b35da90c2da1c1c20aa36118d263bc"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/runs.json",
+      "bytes": 18325,
+      "sha256": "61bdfefd41ad0c887784136a80a865e606d2e559ce016710852cda39b11d7ff8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v4-after-2026-10-07/readiness.json",
+      "bytes": 126,
+      "sha256": "9698e0ae3e152e510e73d0c5eebb0de0cf07154548ab7cd16d20536ff82b7b3c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery12-cua-parameters-2026-10-07.json",
+      "bytes": 11306,
+      "sha256": "574cf30877ce4a059834591f27a86b4a72b903016a1e71080582072d3613c1bc"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery12-cua-2026-10-07/shared-v4-save-ax.txt",
+      "bytes": 1051,
+      "sha256": "3395a72ccb2fa13d9622477c0e586a583af859e19f1572340ad7146891132a60"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery12-cua-2026-10-07/qa-v4-save-ax.txt",
+      "bytes": 1141,
+      "sha256": "f11a6bb06f7d6cc5917d2a3d28f631d5a4f068850596a3470f90cf1a9ee5fcd6"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery12-cua-2026-10-07/catalog-v4-full-ax.txt",
+      "bytes": 7355,
+      "sha256": "ba91d77256c7d6a5e6695062673245e04ce26f99a80c9747ef7174267dea50f9"
+    },
+    {
+      "path": "docs/test-evidence/screenshots/go-recovery-v12-catalog-v4-2026-10-07.jpg",
+      "bytes": 52835,
+      "sha256": "77d15a348876ac03ba885870c237ef7062804946ccbe2585f34600cc76db640a"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/sources.json",
+      "bytes": 3458,
+      "sha256": "675f1b17f0fe362b937784232ea8890a844440faaa6859181a3a91ce368d30c9"
+    },
+    {
+      "path": "docs/test-evidence/go-owned-service-20261007-115117-a2e184e8.json",
+      "bytes": 1730200,
+      "sha256": "8387b58998a331dd7bbb4c0c30f6e2a6b671b8d6d60b804a2f6bac028e249acf"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/health.json",
+      "bytes": 512,
+      "sha256": "081594346950d5f09c8d8565f43792ba9484c9081d2a9045cea87fd4c9b481e1"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/usage.json",
+      "bytes": 365601,
+      "sha256": "2924a3c9370fd9b611d4d4ac0454a1bac5b35da90c2da1c1c20aa36118d263bc"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/projects.json",
+      "bytes": 113922,
+      "sha256": "b86d455066bb91cb86294acf13a8d1322242e250600a940fc3fcef747ca146f8"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/runs.json",
+      "bytes": 18325,
+      "sha256": "61bdfefd41ad0c887784136a80a865e606d2e559ce016710852cda39b11d7ff8"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/normal-readiness.json",
+      "bytes": 273,
+      "sha256": "2dda0c2f51bcb654ecdf7371d5b494a7e0c20be48f00f8c6f54d7f4d4de06c8d"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T03-51-43-869Z-380b1eef/recovery-readiness.json",
+      "bytes": 126,
+      "sha256": "9698e0ae3e152e510e73d0c5eebb0de0cf07154548ab7cd16d20536ff82b7b3c"
+    },
+    {
+      "path": "services/agent-runtime/handoff.mjs",
+      "bytes": 12624,
+      "sha256": "1ec163216e2f95af20d16153c81d23d47e20e285d3bdacfd3fcb151d6447a135"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/sources.json",
+      "bytes": 4099,
+      "sha256": "f3cbada8ae750865df5c2cbeec3a7881b91d770d23af303bb77e268de66732fa"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/state.json",
+      "bytes": 6497430,
+      "sha256": "827facc1f8e42053f8a4a470e1cde5f7a365061f1fb0c9aa6e2a76ce100a54f8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/archive.json",
+      "bytes": 15508956,
+      "sha256": "9737266655774d3da875fb865a455b5882ed6224b29540c8ddb1fbe6bc7fb0a0"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/operations.json",
+      "bytes": 40364,
+      "sha256": "c9ea7b77ba212416e98ab840e2921bba9bfe1c3e3403a74341c19f007038b5ba"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/artifacts.json",
+      "bytes": 454,
+      "sha256": "fac804bcf0f8579f6dfdff120f855fab91f2c0a36d5b53701d1c0627c151a265"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/approvals.json",
+      "bytes": 1068,
+      "sha256": "9b7ac5d3f7f0037657a643eb10afa30be0e8a34bd4f86124ce8bc9ea8ad66ee7"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/readiness.json",
+      "bytes": 126,
+      "sha256": "9698e0ae3e152e510e73d0c5eebb0de0cf07154548ab7cd16d20536ff82b7b3c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/usage.json",
+      "bytes": 365601,
+      "sha256": "2924a3c9370fd9b611d4d4ac0454a1bac5b35da90c2da1c1c20aa36118d263bc"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/projects.json",
+      "bytes": 113922,
+      "sha256": "b86d455066bb91cb86294acf13a8d1322242e250600a940fc3fcef747ca146f8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/costs.json",
+      "bytes": 18613,
+      "sha256": "abcb5812025a2c3ad2326a6f355040cec8352c67a12975b4023bec8dd24be904"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/acceptance.test.mjs",
+      "bytes": 12913,
+      "sha256": "d76031e39192a05a98742cc595949af05e117875b4efd639cf77811d095402c2"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/README.md",
+      "bytes": 4247,
+      "sha256": "9d947b799f93979553b44fdd6093521248594d54ccefbaf54f024d69dacaa2ff"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/server.mjs",
+      "bytes": 6471,
+      "sha256": "28272315887d234ddaac4767ff0baf5e2849716588c5e9bb3a84e4af9a52705c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/todo.test.mjs",
+      "bytes": 10537,
+      "sha256": "84478b2669325f3568eda78245d09a08e0801fa89154b6292da07a1d4d6f4d44"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-controlled-stopped-2026-10-07/archive-after.json",
+      "bytes": 15508956,
+      "sha256": "9737266655774d3da875fb865a455b5882ed6224b29540c8ddb1fbe6bc7fb0a0"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/sources.json",
+      "bytes": 4099,
+      "sha256": "b7b42d5466448490ed22cab2342eb41a6fd814194629b864acd91b347e0d8b26"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/state.json",
+      "bytes": 6497430,
+      "sha256": "827facc1f8e42053f8a4a470e1cde5f7a365061f1fb0c9aa6e2a76ce100a54f8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/archive.json",
+      "bytes": 15508956,
+      "sha256": "9737266655774d3da875fb865a455b5882ed6224b29540c8ddb1fbe6bc7fb0a0"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/operations.json",
+      "bytes": 40364,
+      "sha256": "c9ea7b77ba212416e98ab840e2921bba9bfe1c3e3403a74341c19f007038b5ba"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/artifacts.json",
+      "bytes": 454,
+      "sha256": "fac804bcf0f8579f6dfdff120f855fab91f2c0a36d5b53701d1c0627c151a265"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/approvals.json",
+      "bytes": 1068,
+      "sha256": "9b7ac5d3f7f0037657a643eb10afa30be0e8a34bd4f86124ce8bc9ea8ad66ee7"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/readiness.json",
+      "bytes": 126,
+      "sha256": "9698e0ae3e152e510e73d0c5eebb0de0cf07154548ab7cd16d20536ff82b7b3c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/usage.json",
+      "bytes": 365601,
+      "sha256": "2924a3c9370fd9b611d4d4ac0454a1bac5b35da90c2da1c1c20aa36118d263bc"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/projects.json",
+      "bytes": 113922,
+      "sha256": "b86d455066bb91cb86294acf13a8d1322242e250600a940fc3fcef747ca146f8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/costs.json",
+      "bytes": 18613,
+      "sha256": "abcb5812025a2c3ad2326a6f355040cec8352c67a12975b4023bec8dd24be904"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/acceptance.test.mjs",
+      "bytes": 12913,
+      "sha256": "d76031e39192a05a98742cc595949af05e117875b4efd639cf77811d095402c2"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/README.md",
+      "bytes": 4247,
+      "sha256": "9d947b799f93979553b44fdd6093521248594d54ccefbaf54f024d69dacaa2ff"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/server.mjs",
+      "bytes": 6471,
+      "sha256": "28272315887d234ddaac4767ff0baf5e2849716588c5e9bb3a84e4af9a52705c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/todo.test.mjs",
+      "bytes": 10537,
+      "sha256": "84478b2669325f3568eda78245d09a08e0801fa89154b6292da07a1d4d6f4d44"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v12-after-restart-2026-10-07/archive-after.json",
+      "bytes": 15508956,
+      "sha256": "9737266655774d3da875fb865a455b5882ed6224b29540c8ddb1fbe6bc7fb0a0"
+    },
+    {
+      "path": "docs/validation/go-recovery-v12-controlled-stop-independent-audit-2026-10-07.json",
+      "bytes": 17998,
+      "sha256": "77d958b36f5833f0d0cf969a906901f4c2b993a6866b75ab597a6308531c87ab"
+    }
+  ],
+  "checks": [
+    "此前真实受控stop证据原样保留，本报告不覆盖partial旧值",
+    "目录两testDoc3→4 body精确proposedV4+SHA；完整v1/v2/v3不变；其他docs/权限spaces/project/usage/runs/readiness不变",
+    "安全停服0active/0pending/0native/0approval、native handle验证、源闭合，48064/36632→30260/47436；健康connected/ready",
+    "603旧usage、全部projects/runs完整相同（仅ISO小数零正规化），历史未知正常费用.096526保留",
+    "重启后父v12原archive全部bytes SHA相同，1391events/17wires/devseal703/四files/nativeops/审批/fees完整相等",
+    "运行PIN仍v3/原SHA，目录v4不会替换批准快照；已完成dev保持"
+  ],
+  "documents": [
+    {
+      "id": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+      "kind": "shared",
+      "version": 4,
+      "sha256": "31d8ce072bd372423b2d45651010ad2ed3b38d2fc1372a75617cb045d3be2a2a",
+      "pinnedVersion": 3,
+      "pinnedSha256": "9d68f0bdb1600dd85b4f2403adff255ff2332f636269ee13f8966acb0824535e"
+    },
+    {
+      "id": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+      "kind": "privateQa",
+      "version": 4,
+      "sha256": "1d6cebc45be1b79a0deb3bdd907e30eead27286eab4cbce946b21627e43dedae",
+      "pinnedVersion": 3,
+      "pinnedSha256": "8b871bb3bb80be837265116bce56febbbf083a138bfec783314aee0410704cde"
+    }
+  ],
+  "restart": {
+    "oldApi": 48064,
+    "newApi": 30260,
+    "oldLauncher": 36632,
+    "newLauncher": 47436,
+    "stoppedAt": "2026-10-07T03:51:22.8028806Z",
+    "reloadCheckedAt": "2026-10-07T03:51:53.322Z"
+  },
+  "remaining": [
+    "同v12真实child恢复与dev零重复",
+    "目录4下员工实际检索读取PIN3与授权边界",
+    "QA、复核、经理全部真实接受",
+    "最终备份恢复与交付"
+  ],
+  "scope": {
+    "liveApi": 0,
+    "Cua": 0,
+    "originalDatabase": 0,
+    "modelCalls": 0,
+    "employeeWrites": 0
+  },
+  "notes": [
+    "Cua save AX有busy阶段；成功持久化由后续完整catalog AX及真实before/after version/history证实，未造HTTP PUTstatus",
+    "本地读取冻结handoff源SHA相符，实际新employee/native/hash流程是否一致由后续child验证，不拿工程预览当运行成功"
+  ],
+  "sourceStableAfterReview": true
+}

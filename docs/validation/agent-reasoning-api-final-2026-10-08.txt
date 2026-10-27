@@ -1,0 +1,28 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2450.2689ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (161.9759ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (138.1695ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (226.2504ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (184.7343ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (236.8245ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (124.2013ms)
+✔ unsupported effort is explicitly invalid in project candidates and cannot launch a confirmed plan (164.0904ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (237.5951ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (306.5027ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (305.1001ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (188.8436ms)
+✔ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (73.4063ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (170.6732ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (281.7037ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (133.7603ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (253.8917ms)
+✔ a new user adjustment is quoted and pinned without editing the saved requirement, grants or prior plan (251.0564ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6462.7198

@@ -1,0 +1,1 @@
+{"passed":5,"evidence":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\production-cmd-failures-2026-10-05T12-40-33.071Z.json","directory":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\production-cmd-check\\isolated-sL5TZi","launcherSha256":"cb93d44b1d98f473b55693affde606e50f60f060227f9add4d366e2b4b0949d8"}

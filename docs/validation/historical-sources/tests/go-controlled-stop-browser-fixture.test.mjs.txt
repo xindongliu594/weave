@@ -1,0 +1,49 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { setTimeout as sleep } from 'node:timers/promises';
+import { chromium } from 'playwright-core';
+import { cancellationRouteBarrier } from '../docs/test-evidence/helpers/go-controlled-stop-route-barrier-2026-10-06.mjs';
+import { persistStopIntent } from '../docs/test-evidence/helpers/stop-go-funded-run-first-parent-web-2026-10-06.mjs';
+import { onePostClaim } from '../docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs';
+
+// Real isolated headless browser; every URL is fulfilled/aborted by Playwright.
+// No product/server/provider/DB API is contacted and no employee file is used.
+const base = 'http://controlled-stop-fixture.invalid';
+async function browserFixture({ delayMs, unknown = false }) {
+  const browser = await chromium.launch({ channel: 'msedge', headless: true }), context = await browser.newContext({ serviceWorkers: 'block' });
+  const page = await context.newPage(), barrier = cancellationRouteBarrier(), claim = onePostClaim(), startedAt = Date.now();
+  let preflightCompleteAt, responseWindowAt, responsePromise, forwarded = 0, closed = false, oldDeadlineObservation;
+  const observer = setTimeout(() => { oldDeadlineObservation = { forwarded, closed, guardComplete: !!preflightCompleteAt }; }, 21000);
+  await context.route('**/*', async route => {
+    const request = route.request();
+    if (request.method() === 'GET' && request.url() === base + '/') return route.fulfill({ status: 200, contentType: 'text/html', body:
+      '<button id="stop">Stop</button><script>document.querySelector("button").onclick=()=>fetch("/api/runs/fixture/cancel",{method:"POST",headers:{"content-type":"application/json"},body:"{}"}).then(r=>r.json()).catch(()=>{});</script>' });
+    if (request.method() === 'POST' && request.url() === base + '/api/runs/fixture/cancel') return barrier.dispatch(async () => {
+      claim(); assert.deepEqual(request.postDataJSON(), {}); await sleep(delayMs); preflightCompleteAt = Date.now();
+      responseWindowAt = Date.now(); responsePromise = page.waitForResponse(response => response.url() === request.url() && response.request().method() === 'POST',
+        { timeout: unknown ? 200 : 120000 }).then(response => response.status()).catch(() => null);
+      forwarded++;
+      if (unknown) return route.abort('failed');
+      return route.fulfill({ status: 202, contentType: 'application/json', body: JSON.stringify({ id: 'fixture', status: 'cancelling' }) });
+    });
+    return route.abort('blockedbyclient');
+  });
+  try {
+    await page.goto(base + '/', { waitUntil: 'domcontentloaded' }); await page.locator('#stop').click(); await barrier.wait();
+    const status = await responsePromise;
+    assert.equal(forwarded, 1); assert.ok(responseWindowAt >= preflightCompleteAt); assert.equal(status, unknown ? null : 202);
+    if (delayMs > 20000) { assert.ok(preflightCompleteAt - startedAt >= 25000); assert.deepEqual(oldDeadlineObservation, { forwarded: 0, closed: false, guardComplete: false }); }
+    assert.throws(() => barrier.dispatch(async () => { forwarded++; })); assert.throws(claim);
+    return { forwarded, status, preflightElapsedMs: preflightCompleteAt - startedAt, responseTimerStartedAfterPreflight: true };
+  } finally { clearTimeout(observer); await barrier.idle(); closed = true; await browser.close(); }
+}
+test('actual isolated browser keeps the pending guard open beyond20s and forwards exactly one202 only after25s preflight', { timeout: 150000 }, async () => {
+  const result = await browserFixture({ delayMs: 25000 }); assert.equal(result.forwarded, 1); assert.equal(result.status, 202);
+  console.log(JSON.stringify({ engineeringBrowserFixture: true, ...result }));
+});
+test('an unknown forwarded browser result cannot dispatch again or replace the permanent stop intent', { timeout: 30000 }, async () => {
+  const entries = new Map(), exclusive = async (path, body, options) => { assert.equal(options.flag, 'wx'); if (entries.has(path)) throw Object.assign(Error('exists'), { code: 'EEXIST' }); entries.set(path, body); };
+  await persistStopIntent(exclusive, 'synthetic-intent-never-written.json', { runId: 'fixture', unknown: true });
+  const result = await browserFixture({ delayMs: 5, unknown: true }); assert.equal(result.forwarded, 1); assert.equal(result.status, null);
+  await assert.rejects(persistStopIntent(exclusive, 'synthetic-intent-never-written.json', { replacement: true }), { code: 'EEXIST' }); assert.equal(entries.size, 1);
+});

@@ -1,0 +1,839 @@
+{
+  "mode": "real",
+  "originalPlugin": true,
+  "modelCalls": 1,
+  "checks": [
+    {
+      "name": "outside-read-and-write-denied",
+      "passed": true,
+      "detail": "Node permission boundary; not an OS sandbox acceptance"
+    },
+    {
+      "name": "original-plugin-loaded-on-fixed-dsh",
+      "passed": true,
+      "detail": {
+        "toolCount": 14,
+        "heartbeat": true
+      }
+    },
+    {
+      "name": "execution-tool-denied",
+      "passed": true,
+      "detail": {
+        "visibleTools": [
+          "cortex_start",
+          "cortex_strategy_match",
+          "cortex_decompose"
+        ],
+        "code": "UNKNOWN_TOOL"
+      }
+    }
+  ],
+  "tools": [
+    "cortex_capabilities",
+    "cortex_decompose",
+    "cortex_eval_cases",
+    "cortex_evaluate",
+    "cortex_execute",
+    "cortex_l0",
+    "cortex_models",
+    "cortex_policy",
+    "cortex_probe",
+    "cortex_recover",
+    "cortex_report",
+    "cortex_review",
+    "cortex_start",
+    "cortex_strategy_match"
+  ],
+  "calls": [
+    {
+      "name": "cortex_strategy_match",
+      "args": {
+        "profile": {
+          "task_type": "code_change",
+          "domain": "engineering",
+          "complexity": 0.4,
+          "risk": 0.2,
+          "language": "zh",
+          "capability": [
+            "general"
+          ]
+        }
+      },
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "未命中策略（best similarity 0 < 0.70）→ 需新规划"
+          }
+        ],
+        "value": {
+          "source": "fresh_plan",
+          "similarity": 0,
+          "policy": null,
+          "fingerprint": {
+            "task_type": "code_change",
+            "domain": "engineering",
+            "capability": [
+              "general"
+            ],
+            "complexity": 0.4,
+            "risk": 0.2,
+            "language": "zh",
+            "input_tokens": 0,
+            "expected_output_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "cortex_start",
+      "args": {
+        "goal": "为一个人使用的小型 Todo API 提出多 Agent 项目方案。使用 Node.js，支持新增、列表、完成和删除任务，任务用 SQLite 持久化，服务重启后仍能读取。交付源代码、可执行自动测试和简明启动说明。开发之后必须由独立 QA 验证 CRUD、非法输入和重启持久化，再由经理依据需求和真实测试证据验收。暂不需要网页、登录、部署或复杂架构。本次仅规划，不执行开发。请明确角色分工、交付物、前后依赖、可以并行的工作和验收条件。",
+        "profile": {
+          "task_type": "code_change",
+          "domain": "engineering",
+          "complexity": 0.4,
+          "risk": 0.2,
+          "quality_requirement": 0.9,
+          "budget_limit": 0.04,
+          "language": "zh",
+          "capability": [
+            "general"
+          ]
+        },
+        "organization_mode": "standard"
+      },
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "✓ 任务已创建: task-mvdkp7kh-ddbd70\n组织模式: 标准（零额外开销）｜来源 主模型选择｜主模型显式声明（常规任务）——声明优先于 auto 判定\n策略匹配: fresh_plan（similarity 0）\n预算: $0.04（规划 10% / 执行 70% / 质量 10% / 应急 10%）\n⚠ 粒度提示: 拆分预估 $0.0057 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度\n下一步: 先 cortex_decompose 拆解根节点 T0"
+          }
+        ],
+        "value": {
+          "taskId": "task-mvdkp7kh-ddbd70",
+          "rootNodeId": "T0",
+          "fingerprint": {
+            "task_type": "code_change",
+            "domain": "engineering",
+            "capability": [
+              "general"
+            ],
+            "complexity": 0.4,
+            "risk": 0.2,
+            "language": "zh",
+            "input_tokens": 0,
+            "expected_output_tokens": 0
+          },
+          "strategy": {
+            "source": "fresh_plan",
+            "similarity": 0,
+            "policy": null
+          },
+          "budget": {
+            "limit": 0.04,
+            "split": {
+              "plan": 0.1,
+              "exec": 0.7,
+              "quality": 0.1,
+              "emergency": 0.1
+            },
+            "pools": {
+              "plan": 0.004,
+              "exec": 0.027999999999999997,
+              "quality": 0.004,
+              "emergency": 0.004
+            },
+            "used": {
+              "plan": 0.00000195,
+              "exec": 0,
+              "quality": 0,
+              "emergency": 0
+            },
+            "currency": "USD"
+          },
+          "model": "A",
+          "organizationMode": {
+            "mode": "standard",
+            "source": "model",
+            "reason": "主模型显式声明（常规任务）——声明优先于 auto 判定"
+          },
+          "suggested_tree": null,
+          "granularity": {
+            "recommendation": "direct",
+            "estDirect": 0.00178665,
+            "estSplit": 0.00572262,
+            "note": "拆分预估 $0.0057 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+          },
+          "organization": null
+        }
+      }
+    },
+    {
+      "usageId": "8bcb99b4-7e23-4199-8d7f-452a82681393",
+      "usage": {
+        "prompt_tokens": 531,
+        "completion_tokens": 714
+      }
+    },
+    {
+      "name": "cortex_decompose",
+      "args": {
+        "task_id": "task-mvdkp7kh-ddbd70",
+        "parent_id": "T0",
+        "auto": true
+      },
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "✓ T0 已拆解为 3 个子节点:\n  T0.1 [planning｜general] pending ← 定义小型 Todo API 的需求规格与验收条件：列出新增、列表、完成、删除四个端点的路径、方法、请\n  T0.2 [planning｜general] pending ← 制定多 Agent 项目方案：明确各 Agent 角色（开发 Agent、独立 QA Agent、经\n  T0.3 [planning｜general] pending ← 设计 Node.js + SQLite 的技术实现方案：选定最小依赖（如 express + bet\n⚠ 粒度警告（拆了更贵）: 拆分预估 $0.0052 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+          }
+        ],
+        "value": {
+          "parentId": "T0",
+          "created": [
+            {
+              "id": "T0.1",
+              "createdAt": "2026-10-18T08:38:22.938Z",
+              "taskId": "task-mvdkp7kh-ddbd70",
+              "parentId": "T0",
+              "path": "T0.1",
+              "depth": 1,
+              "goal": "定义小型 Todo API 的需求规格与验收条件：列出新增、列表、完成、删除四个端点的路径、方法、请求/响应、状态码，明确非法输入范围与重启持久化判定标准，并说明范围外事项（不做网页/登录/部署/复杂架构）。",
+              "taskType": "planning",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.9,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "endpoints": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "type": "string"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "request": {
+                          "type": "string"
+                        },
+                        "response": {
+                          "type": "string"
+                        },
+                        "status_codes": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "method",
+                        "path",
+                        "request",
+                        "response",
+                        "status_codes"
+                      ]
+                    }
+                  },
+                  "invalid_input_cases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "persistence_criteria": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "out_of_scope": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "endpoints",
+                  "invalid_input_cases",
+                  "persistence_criteria",
+                  "out_of_scope"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.2",
+              "createdAt": "2026-10-18T08:38:22.938Z",
+              "taskId": "task-mvdkp7kh-ddbd70",
+              "parentId": "T0",
+              "path": "T0.2",
+              "depth": 1,
+              "goal": "制定多 Agent 项目方案：明确各 Agent 角色（开发 Agent、独立 QA Agent、经理 Agent）的职责边界、交付物、前后依赖、可并行工作、协作与交接方式，以及统一的验收门槛（QA 覆盖 CRUD、非法输入、重启持久化；经理依据需求与真实测试证据做最终验收）。",
+              "taskType": "planning",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.8,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "responsibility": {
+                          "type": "string"
+                        },
+                        "deliverables": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "responsibility",
+                        "deliverables"
+                      ]
+                    }
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "reason"
+                      ]
+                    }
+                  },
+                  "parallel_work": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "acceptance_gates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "roles",
+                  "dependencies",
+                  "parallel_work",
+                  "acceptance_gates"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.3",
+              "createdAt": "2026-10-18T08:38:22.950Z",
+              "taskId": "task-mvdkp7kh-ddbd70",
+              "parentId": "T0",
+              "path": "T0.3",
+              "depth": 1,
+              "goal": "设计 Node.js + SQLite 的技术实现方案：选定最小依赖（如 express + better-sqlite3）、数据表结构、模块划分（路由/数据访问层/启动入口）、自动测试框架与测试文件组织、启动与测试命令，确保重启后仍能读取任务。",
+              "taskType": "planning",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.8,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "stack": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "schema": {
+                    "type": "string"
+                  },
+                  "modules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "purpose": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "purpose"
+                      ]
+                    }
+                  },
+                  "test_plan": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "commands": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "stack",
+                  "schema",
+                  "modules",
+                  "test_plan",
+                  "commands"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            }
+          ],
+          "count": 3,
+          "granularity": {
+            "recommendation": "direct",
+            "estDirect": 0.00178665,
+            "estSplit": 0.00518529,
+            "note": "拆分预估 $0.0052 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+          },
+          "organization": null,
+          "evidenceGaps": [],
+          "source": "plan-agent",
+          "planner": "deepseek-v4.1-flash",
+          "planSource": "configured"
+        }
+      }
+    }
+  ],
+  "requirement": "为一个人使用的小型 Todo API 提出多 Agent 项目方案。使用 Node.js，支持新增、列表、完成和删除任务，任务用 SQLite 持久化，服务重启后仍能读取。交付源代码、可执行自动测试和简明启动说明。开发之后必须由独立 QA 验证 CRUD、非法输入和重启持久化，再由经理依据需求和真实测试证据验收。暂不需要网页、登录、部署或复杂架构。本次仅规划，不执行开发。请明确角色分工、交付物、前后依赖、可以并行的工作和验收条件。",
+  "profileSource": "Operator-supplied task classification; not model-inferred template routing",
+  "match": {
+    "source": "fresh_plan",
+    "similarity": 0,
+    "policy": null,
+    "fingerprint": {
+      "task_type": "code_change",
+      "domain": "engineering",
+      "capability": [
+        "general"
+      ],
+      "complexity": 0.4,
+      "risk": 0.2,
+      "language": "zh",
+      "input_tokens": 0,
+      "expected_output_tokens": 0
+    }
+  },
+  "start": {
+    "taskId": "task-mvdkp7kh-ddbd70",
+    "rootNodeId": "T0",
+    "fingerprint": {
+      "task_type": "code_change",
+      "domain": "engineering",
+      "capability": [
+        "general"
+      ],
+      "complexity": 0.4,
+      "risk": 0.2,
+      "language": "zh",
+      "input_tokens": 0,
+      "expected_output_tokens": 0
+    },
+    "strategy": {
+      "source": "fresh_plan",
+      "similarity": 0,
+      "policy": null
+    },
+    "budget": {
+      "limit": 0.04,
+      "split": {
+        "plan": 0.1,
+        "exec": 0.7,
+        "quality": 0.1,
+        "emergency": 0.1
+      },
+      "pools": {
+        "plan": 0.004,
+        "exec": 0.027999999999999997,
+        "quality": 0.004,
+        "emergency": 0.004
+      },
+      "used": {
+        "plan": 0.00000195,
+        "exec": 0,
+        "quality": 0,
+        "emergency": 0
+      },
+      "currency": "USD"
+    },
+    "model": "A",
+    "organizationMode": {
+      "mode": "standard",
+      "source": "model",
+      "reason": "主模型显式声明（常规任务）——声明优先于 auto 判定"
+    },
+    "suggested_tree": null,
+    "granularity": {
+      "recommendation": "direct",
+      "estDirect": 0.00178665,
+      "estSplit": 0.00572262,
+      "note": "拆分预估 $0.0057 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+    },
+    "organization": null
+  },
+  "plan": {
+    "parentId": "T0",
+    "created": [
+      {
+        "id": "T0.1",
+        "createdAt": "2026-10-18T08:38:22.938Z",
+        "taskId": "task-mvdkp7kh-ddbd70",
+        "parentId": "T0",
+        "path": "T0.1",
+        "depth": 1,
+        "goal": "定义小型 Todo API 的需求规格与验收条件：列出新增、列表、完成、删除四个端点的路径、方法、请求/响应、状态码，明确非法输入范围与重启持久化判定标准，并说明范围外事项（不做网页/登录/部署/复杂架构）。",
+        "taskType": "planning",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.9,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "endpoints": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "request": {
+                    "type": "string"
+                  },
+                  "response": {
+                    "type": "string"
+                  },
+                  "status_codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "method",
+                  "path",
+                  "request",
+                  "response",
+                  "status_codes"
+                ]
+              }
+            },
+            "invalid_input_cases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "persistence_criteria": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "out_of_scope": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "endpoints",
+            "invalid_input_cases",
+            "persistence_criteria",
+            "out_of_scope"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.2",
+        "createdAt": "2026-10-18T08:38:22.938Z",
+        "taskId": "task-mvdkp7kh-ddbd70",
+        "parentId": "T0",
+        "path": "T0.2",
+        "depth": 1,
+        "goal": "制定多 Agent 项目方案：明确各 Agent 角色（开发 Agent、独立 QA Agent、经理 Agent）的职责边界、交付物、前后依赖、可并行工作、协作与交接方式，以及统一的验收门槛（QA 覆盖 CRUD、非法输入、重启持久化；经理依据需求与真实测试证据做最终验收）。",
+        "taskType": "planning",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.8,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "responsibility": {
+                    "type": "string"
+                  },
+                  "deliverables": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "responsibility",
+                  "deliverables"
+                ]
+              }
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to",
+                  "reason"
+                ]
+              }
+            },
+            "parallel_work": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "acceptance_gates": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "roles",
+            "dependencies",
+            "parallel_work",
+            "acceptance_gates"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.3",
+        "createdAt": "2026-10-18T08:38:22.950Z",
+        "taskId": "task-mvdkp7kh-ddbd70",
+        "parentId": "T0",
+        "path": "T0.3",
+        "depth": 1,
+        "goal": "设计 Node.js + SQLite 的技术实现方案：选定最小依赖（如 express + better-sqlite3）、数据表结构、模块划分（路由/数据访问层/启动入口）、自动测试框架与测试文件组织、启动与测试命令，确保重启后仍能读取任务。",
+        "taskType": "planning",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.8,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "stack": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "schema": {
+              "type": "string"
+            },
+            "modules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "purpose"
+                ]
+              }
+            },
+            "test_plan": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "stack",
+            "schema",
+            "modules",
+            "test_plan",
+            "commands"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      }
+    ],
+    "count": 3,
+    "granularity": {
+      "recommendation": "direct",
+      "estDirect": 0.00178665,
+      "estSplit": 0.00518529,
+      "note": "拆分预估 $0.0052 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+    },
+    "organization": null,
+    "evidenceGaps": [],
+    "source": "plan-agent",
+    "planner": "deepseek-v4.1-flash",
+    "planSource": "configured"
+  },
+  "completed": true
+}

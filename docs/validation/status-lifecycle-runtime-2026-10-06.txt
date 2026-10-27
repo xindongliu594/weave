@@ -1,0 +1,92 @@
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (340.2099ms)
+✔ failed employee setup leaves no published Agent or resident Host (50.9259ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (48.6507ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (392.5154ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (12.6927ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.3732ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.8231ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.8446ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.4646ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (3348.1901ms)
+✔ native developer → QA → manager sees real command hashes/counts with no private knowledge or extra tools (6834.4458ms)
+✔ native resumed QA/manager inherit source budget and exact developer seal without repeating completed developer execution (6687.388ms)
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (37196.3255ms)
+✔ user cancellation still aborts native cold resume without executing a later task (8890.8019ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (16332.4184ms)
+✔ approval, model and capacity waits pause progress time without hiding later stalls (4.0347ms)
+✔ coordinator polling and untrusted text do not reset evidence-based progress (0.5266ms)
+✔ identical and alternating read loops stop before another request can be admitted (1.8339ms)
+✔ same error and nonzero command exits are detected, successful changed files reset the window (0.5998ms)
+✔ status with no attempt credential does not discard a known assignment; idle is per employee (0.5767ms)
+✔ idle employees wait for an active coordinator response and receive a full idle window afterward (0.5312ms)
+✔ coordinator model waits cannot hide the approved progress timeout or arbitrary polling (0.6206ms)
+✔ a coordinator handling a real tool reply is distinguished from idle polling (0.484ms)
+✔ transient read retry is bounded and cancellation/mutations never replay (1.316ms)
+✔ waiting for approval is safe; a started mutation without an outcome requires reconciliation (1.3253ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 62929.328
+
+EXIT_CODE=0
+SOURCES_STABLE=False
+frozenAt=2026-10-06T12:36:35+08:00
+9c9747ad48fdd8cacbee02947e04e544c3a69ce0566bde7d6c40e715c550e05b  services/agent-runtime/product-runtime.mjs
+853cf0647cddaa77f3c45b6d865cba721c0c517aae35ce92fa5d31526b2d883a  services/agent-runtime/status-lifecycle.test.mjs
+e5b7da3646c0918ffc2b064e54991bed0360afcaa5957832c154ecd94cbafaf3  services/agent-runtime/host.mjs
+1543d40d420d29a171f863cccb00da4885f1fc278ff9937d3b50f3fcbd40b7ca  services/agent-runtime/employee-hosts.mjs
+6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737  services/agent-runtime/run-evidence.mjs
+
+SCOPE NOTE: the first batch's test exit was 0 (25/25); wrapper exit 3 was source stability after another agent's optional inherited callsBasis change.
+The final recheck has FINAL_EXIT_CODE=0 and FINAL_SOURCES_STABLE=True.
+No vendor patch, budgets/caps/DAG changes, original API/DB/model calls or employee edits in this task.
+Failed actual source archive remains evidence, not acceptance:
+372df14c5430594c6197fc9f26f316ef217f6a62001ce3817b3582e6df9e5889  docs/test-evidence/go-normal-v8-review-abort-20261006-122118.json
+
+FINAL DEPENDENCY RECHECK (after root callsBasis source change)
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (345.5219ms)
+✔ failed employee setup leaves no published Agent or resident Host (50.6162ms)
+✔ closing coordination cancels an unpublished employee setup and drains its Host (49.3695ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (399.9702ms)
+✔ an internal stop settles only its original late response and emits no tool calls or new requests (12.7474ms)
+✔ settlement has a hard 30-second ceiling and an unanswered call remains uncertain without fallback (2.3983ms)
+✔ user cancellation or the approved deadline immediately ends settlement without a new request (1.8398ms)
+✔ a request still persisting admission when stopped never dispatches or pretends it was charged (0.8724ms)
+✔ legacy execution descriptions use the approved task stage and retain the untouched historical requirement (0.4669ms)
+✔ the actual runtime fences failed work while preserving a late original manager receipt (3342.3821ms)
+✔ native developer → QA → manager sees real command hashes/counts with no private knowledge or extra tools (6846.9339ms)
+✔ native resumed QA/manager inherit source budget and exact developer seal without repeating completed developer execution (6304.714ms)
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (38041.3255ms)
+✔ user cancellation still aborts native cold resume without executing a later task (9771.6348ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (16380.9435ms)
+✔ approval, model and capacity waits pause progress time without hiding later stalls (4.0284ms)
+✔ coordinator polling and untrusted text do not reset evidence-based progress (0.4911ms)
+✔ identical and alternating read loops stop before another request can be admitted (1.8552ms)
+✔ same error and nonzero command exits are detected, successful changed files reset the window (0.6378ms)
+✔ status with no attempt credential does not discard a known assignment; idle is per employee (0.5659ms)
+✔ idle employees wait for an active coordinator response and receive a full idle window afterward (0.5509ms)
+✔ coordinator model waits cannot hide the approved progress timeout or arbitrary polling (0.5465ms)
+✔ a coordinator handling a real tool reply is distinguished from idle polling (0.464ms)
+✔ transient read retry is bounded and cancellation/mutations never replay (1.3934ms)
+✔ waiting for approval is safe; a started mutation without an outcome requires reconciliation (1.3937ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64701.1342
+
+FINAL_EXIT_CODE=0
+FINAL_SOURCES_STABLE=True
+finalFrozenAt=2026-10-06T12:44:03+08:00
+9c9747ad48fdd8cacbee02947e04e544c3a69ce0566bde7d6c40e715c550e05b  services/agent-runtime/product-runtime.mjs
+e3e40f4e5e25ae07a47301582d83759d99e60f17c85bca75b99f3f88951614fd  services/agent-runtime/status-lifecycle.test.mjs
+e5b7da3646c0918ffc2b064e54991bed0360afcaa5957832c154ecd94cbafaf3  services/agent-runtime/host.mjs
+1543d40d420d29a171f863cccb00da4885f1fc278ff9937d3b50f3fcbd40b7ca  services/agent-runtime/employee-hosts.mjs
+6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737  services/agent-runtime/run-evidence.mjs

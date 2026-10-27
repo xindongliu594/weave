@@ -1,0 +1,88 @@
+import {test,before,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {cancellationReservationRelease,stoppedCheckpointReleaseProof,stoppedUiProof,ORIGINAL_STOP_SHA,ORIGINAL_UPGRADE_SHA} from '../docs/test-evidence/helpers/go-cancel-reservation-release-proof-2026-10-06.mjs';
+import {configForStop,evidenceInput,reconciliationFrame} from '../docs/test-evidence/helpers/reconcile-go-controlled-stop-release-readonly-2026-10-06.mjs';
+import {RECONCILED_STATUS} from '../docs/test-evidence/helpers/go-cancel-reservation-release-proof-2026-10-06.mjs';
+import {goKnowledgeStopFrame,freshStoppedPage,stoppedPageRead,updatePacket as successorPacket,preflightKnowledgeUpgrade,safePreflightDiagnostic} from '../docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs';
+import {updatePacket as originalPacket} from '../docs/test-evidence/helpers/upgrade-go-funded-knowledge-first-parent-web-2026-10-06.mjs';
+const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+const actualUpgradeArgs=['update-v2','--run-id=0453cd06-caf6-4fee-91f3-cccb55340a68','--version=10',
+ '--confirmed-evidence=docs/test-evidence/go-recovery10-two-stage-recovery-confirm-2026-10-06T11-55-14-154Z-b5afc442.json',
+ '--generation-evidence=docs/test-evidence/go-recovery10-two-stage-recovery-generate-2026-10-06T11-53-11-601Z-0555353b.json',
+ '--setup-evidence=docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json',
+ '--stop-evidence=docs/test-evidence/go-controlled-stop-release-reconciled-2026-10-06T12-33-29-183Z-be369391.json','--base-url=http://127.0.0.1:4310/'];
+let calls=0;const nativeFetch=globalThis.fetch;before(()=>{globalThis.fetch=async()=>{calls++;throw Error('No network in release fixtures');};});after(()=>{globalThis.fetch=nativeFetch;assert.equal(calls,0);});
+function fixture(){
+ const config={runId:'run',projectId:'project',departmentId:'department',version:10},snapshot={projectId:'project',departmentId:'department',departmentIds:['department'],departmentBudgets:{department:4.3},executionBudget:4.3,planVersion:10};
+ const before={state:{status:'running'},archive:{id:'run',snapshot},project:{id:'project',status:'RUNNING',policy:{maxBudget:5},metadata:'unchanged'},usage:[{id:'u1',runId:'run',projectId:'project',departmentId:'department',cost:.1},{id:'u2',runId:'run',projectId:'project',departmentId:'department',cost:.05}],
+  readiness:{pendingCount:0,uncertainCount:0,reserved:0,receipts:[]},oldReadiness:{reserved:.096526,receipts:[{id:'old',status:'uncertain',amount:.096526,historySha:'original'}]},models:[{id:'model'}],gateways:[{id:'gateway'}],ledger:{cap:10},phaseBudget:{phaseReserved:.096526},binding:{id:'fixed'},initialProjectApproval:{id:'same'},
+  costs:{timezone:'UTC',spent:.25,reserved:5.3,calls:[{id:'old',runId:'old-run',status:'uncertain',amount:.096526,history:[{note:'preserve'}]}],recent:[{id:'settled',status:'settled',metadata:'fixed'}],departments:[{id:'other',spent:0,reserved:1.15},{id:'department',spent:.15,reserved:4.15}]}};
+ const after=structuredClone(before);after.state.status='cancelled';after.archive.status='cancelled';after.project.status='CANCELLED';after.costs.reserved=1.15;after.costs.departments[1].reserved=0;return {before,after,config};
+}
+test('only exact one-parent global and department dailyTotals release is admitted without changing any source object',()=>{
+ const f=fixture(),before=digest(f.before),after=digest(f.after),proof=cancellationReservationRelease(f.before,f.after,f.config);assert.equal(proof.global.released,4.15);assert.equal(proof.runUsageCount,2);assert.equal(proof.runUsage,.15);assert.equal(proof.receiptsUsageHistoryModified,false);assert.equal(digest(f.before),before);assert.equal(digest(f.after),after);
+});
+test('receipt, usage, history, wrong department, any metadata and larger or smaller derived amounts are rejected',()=>{
+ const mutations=[f=>f.after.costs.calls[0].amount=0,f=>f.after.costs.calls[0].history[0].note='changed',f=>f.after.costs.recent[0].metadata='changed',f=>f.after.usage[0].cost=.09,f=>f.after.usage[0].departmentId='other',f=>f.config.departmentId='other',
+  f=>f.after.costs.departments[0].reserved=0,f=>f.after.costs.departments[1].id='wrong',f=>f.after.costs.reserved+=1e-12,f=>f.after.costs.reserved-=1e-12,f=>f.after.costs.departments[1].reserved=Number.MIN_VALUE,
+  f=>f.after.oldReadiness.receipts[0].historySha='changed',f=>f.after.readiness.receipts.push({id:'hold'}),f=>f.after.project.policy.maxBudget=6,f=>f.after.project.metadata='changed',f=>f.after.costs.timezone='local',f=>f.after.models[0].id='changed',f=>f.after.phaseBudget.phaseReserved=0];
+ for(const mutate of mutations){const f=fixture();mutate(f);assert.throws(()=>cancellationReservationRelease(f.before,f.after,f.config));}
+});
+test('open parent receipts, missing usage attribution, multi-department and unknown money never become an inferred release',()=>{
+ for(const mutate of [f=>f.before.costs.calls.push({id:'parent',runId:'run',status:'pending'}),f=>{f.before.readiness.pendingCount=1;f.after.readiness.pendingCount=1;},f=>{f.before.usage[0].cost=null;f.after.usage[0].cost=null;},
+  f=>{f.before.usage[0].departmentId=null;f.after.usage[0].departmentId=null;},f=>{f.before.archive.snapshot.departmentIds.push('other');f.after.archive.snapshot.departmentIds.push('other');},f=>f.after.costs.reserved=NaN]){
+  const f=fixture();mutate(f);assert.throws(()=>cancellationReservationRelease(f.before,f.after,f.config));
+ }
+});
+test('real captured stop sources pass the entire frozen legacy checkpoint after exact finance validation; source bytes are unchanged',async()=>{
+ const prefix='docs/test-evidence/go-funded-controlled-stop-2026-10-06T12-02-25-461Z-50f1c04b',original=await evidenceInput(prefix+'.json'),beforeInput=await evidenceInput(prefix+'-before.json'),afterInput=await evidenceInput(prefix+'-after.json'),config=configForStop(original);
+ assert.equal(original.sha256,'20b1f1f9fa10021f4180feb56cbb32e52ab5d16e234f2aba842e58b8333a8b35');assert.equal(beforeInput.sha256,'a1e9a97bff45c702c43cb39427d0862142a643938263d896ea3527a6c1d6b106');assert.equal(afterInput.sha256,'3470ca951d849d2afc92051d63f6dbd2df54f37377f17de72a778a462f4b3bff');
+ const before=digest(beforeInput.value),after=digest(afterInput.value),proof=stoppedCheckpointReleaseProof(beforeInput.value,afterInput.value,config);assert.equal(proof.status,'passed');assert.equal(proof.reserveRelease.global.released,4.150841);assert.equal(proof.reserveRelease.runUsageCount,18);assert.equal(proof.checkpoint.counters.callsUsed,18);assert.deepEqual(proof.checkpoint.completedIds,['dev']);assert.equal(proof.checkpoint.recoveryStillUnverified,true);assert.equal(digest(beforeInput.value),before);assert.equal(digest(afterInput.value),after);
+ const ax=await evidenceInput('docs/test-evidence/go-recovery-v10-controlled-stopped-iab-2026-10-06.txt',{json:false,maxBytes:1024*1024}),image=await evidenceInput('docs/test-evidence/screenshots/go-recovery-v10-controlled-stopped-iab-2026-10-06.jpg',{json:false,maxBytes:5*1024**2});assert.equal(reconciliationFrame(original,beforeInput,afterInput,ax,image,config).ui.cancelledStatusVisible,true);
+ for(const item of [original,beforeInput,afterInput])assert.equal(hash(readFileSync(item.path)),item.sha256);
+ assert.equal(hash(readFileSync('docs/test-evidence/helpers/stop-go-funded-run-first-parent-web-2026-10-06.mjs')),ORIGINAL_STOP_SHA);assert.equal(hash(readFileSync('docs/test-evidence/helpers/upgrade-go-funded-knowledge-first-parent-web-2026-10-06.mjs')),ORIGINAL_UPGRADE_SHA);
+});
+test('UI proof requires the exact parent, version, event count, cancelled state and no remaining stop action',()=>{
+ const config={runId:'0453cd06-caf6-4fee-91f3-cccb55340a68',version:10},text=readFileSync('docs/test-evidence/go-recovery-v10-controlled-stopped-iab-2026-10-06.txt','utf8'),image=readFileSync('docs/test-evidence/screenshots/go-recovery-v10-controlled-stopped-iab-2026-10-06.jpg');assert.equal(stoppedUiProof(text,image,config,2432).cancelledStatusVisible,true);
+ for(const raw of [text.replaceAll(config.runId,'00000000-1111-4111-8111-111111111111'),text.replace('正式项目 已取消','正式项目 执行中'),text.replace('方案 v 10','方案 v 9'),text.replace('2432  条事件','2431  条事件'),text+'\n999 button 停止运行'])assert.throws(()=>stoppedUiProof(raw,image,config,2432));
+});
+
+test('NEW knowledge entry recomputes original raw full proof and actual UI sources; a passed report cannot bless altered receipts or proof',async()=>{
+ const prefix='docs/test-evidence/go-funded-controlled-stop-2026-10-06T12-02-25-461Z-50f1c04b',original=await evidenceInput(prefix+'.json'),beforeInput=await evidenceInput(prefix+'-before.json'),afterInput=await evidenceInput(prefix+'-after.json'),config=configForStop(original),ax=await evidenceInput('docs/test-evidence/go-recovery-v10-controlled-stopped-iab-2026-10-06.txt',{json:false}),image=await evidenceInput('docs/test-evidence/screenshots/go-recovery-v10-controlled-stopped-iab-2026-10-06.jpg',{json:false});
+ const ref=({path,sha256,bytes})=>({path,sha256,bytes}),result=reconciliationFrame(original,beforeInput,afterInput,ax,image,config),report=JSON.parse(JSON.stringify({kind:'readonly-controlled-stop-reservation-release-reconciliation',status:RECONCILED_STATUS,runId:config.runId,projectId:config.projectId,departmentId:config.departmentId,version:config.version,originalStop:ref(original),before:ref(beforeInput),after:ref(afterInput),ui:{ax:ref(ax),image:ref(image),proof:result.ui},proof:result.proof}));
+ const bind=()=>goKnowledgeStopFrame(report,beforeInput,afterInput,config,beforeInput.value.binding,original.value.confirmation.sha256,original,ax,image),frame=bind();assert.equal(frame.proof.status,'passed');assert.equal(frame.after.costs.reserved,1.2706729,'the upgrade receives the actual released frame, never the temporary normalization view');
+ const saved=report.proof;report.proof={status:'passed'};assert.throws(bind);report.proof=saved;
+ const optionalRow=report.proof.checkpoint.eventDelta.find(row=>!Object.hasOwn(row,'taskId'));optionalRow.taskId=null;assert.throws(bind,'A persisted null is not an omitted optional key');delete optionalRow.taskId;
+ const counter=report.proof.checkpoint.counters.callsUsed;report.proof.checkpoint.counters.callsUsed=counter+1;assert.throws(bind);report.proof.checkpoint.counters.callsUsed=counter;
+ const receipt=afterInput.value.costs.calls[0],amount=receipt.amount;receipt.amount=0;assert.throws(bind);receipt.amount=amount;assert.equal(bind().proof.reserveRelease.global.released,4.150841);
+});
+
+test('fresh cancelled-parent page checks and readonly route scope precede knowledge PUT, while its exact original update packet stays unchanged',async()=>{
+ const config={base:'http://127.0.0.1:4310',runId:'0453cd06-caf6-4fee-91f3-cccb55340a68',projectId:'3e101c24-87e6-43ea-80f9-a2c4b0b410f4',version:10};let url='',body='Run ID： '+config.runId+' 正式项目 已取消 方案 v 10 · 2432 条事件',stopButtons=0,gotos=0;
+ const page={goto:async value=>{url=value;gotos++;},url:()=>url,getByText:()=>({first:()=>({waitFor:async()=>{assert.ok(body.includes('已取消'));}})}),getByRole:()=>({count:async()=>stopButtons}),locator:()=>({innerText:async()=>body})};
+ assert.equal((await freshStoppedPage(page,config,2432)).cancelledStatusVisible,true);assert.equal(gotos,1);stopButtons=1;await assert.rejects(freshStoppedPage(page,config,2432));stopButtons=0;body=body.replace('v 10','v 9');await assert.rejects(freshStoppedPage(page,config,2432));
+ for(const path of ['/api/costs','/api/runs/other','/api/local-devices','/api/runs/'+config.runId+'?maintenance=true'])assert.equal(stoppedPageRead(new URL(config.base+path),config),false);assert.equal(stoppedPageRead(new URL('https://outside.invalid/api/runs'),config),false);assert.equal(stoppedPageRead(new URL(config.base+'/api/runs/'+config.runId+'?after=42'),config),true);
+ const doc={id:'74bcc49b-db5d-4729-9e5d-c430f10d6d5d',spaceId:'be232aec-3cf7-4f58-a12f-c724bccbd4f8',sha256:'4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650',version:1,title:'Fixture only',kind:'shared',marker:'Fixture marker'};assert.deepEqual(successorPacket(doc),originalPacket(doc));
+});
+
+test('actual CLI seven options use the full saved-input preflight including the on-disk JSON reconciliation, with no transport',async()=>{
+ const frame=await preflightKnowledgeUpgrade(actualUpgradeArgs);
+ assert.equal(frame.config.runId,'0453cd06-caf6-4fee-91f3-cccb55340a68');assert.equal(frame.config.version,10);
+ assert.equal(frame.stopped.proof.reserveRelease.global.released,4.150841);assert.equal(frame.stopped.proof.checkpoint.counters.callsUsed,18);
+ assert.equal(frame.stopped.after.costs.reserved,1.2706729);assert.equal(frame.setup.documents.length,2);
+ assert.equal(frame.stopInput.sha256,'2a797878dec5c2ef6680d0e7dec45d60ee718c41fb0e918a811dac89afc1c6d3');
+ assert.ok(frame.stopped.proof.checkpoint.eventDelta.some(row=>Object.hasOwn(row,'taskId')&&row.taskId===undefined),'Native optional keys exercise JSON persistence');
+});
+
+test('preflight failures identify only a static stage/code and never expose assertions, causes or supplied secret text',async()=>{
+ const secret='fixture-secret-never-public';let failure;
+ try{await preflightKnowledgeUpgrade([...actualUpgradeArgs,'--private='+secret]);}catch(error){failure=error;}
+ const safe=safePreflightDiagnostic(failure);assert.equal(safe.stage,'parameters');assert.equal(safe.code,'KNOWLEDGE_PREFLIGHT_PARAMETERS');assert.equal(safe.automaticRetry,false);
+ assert.ok(!JSON.stringify(safe).includes(secret));assert.ok(!Object.hasOwn(safe,'cause'));
+ const forged=safePreflightDiagnostic({stage:secret,code:secret,message:secret,cause:new Error(secret)});assert.equal(forged.stage,'preparation');assert.equal(forged.code,'KNOWLEDGE_PREPARATION_REJECTED');assert.ok(!JSON.stringify(forged).includes(secret));
+ const missing=actualUpgradeArgs.map(arg=>arg.startsWith('--setup-evidence=')?'--setup-evidence=docs/test-evidence/nonexistent-fixture-only.json':arg);
+ await assert.rejects(preflightKnowledgeUpgrade(missing),error=>{assert.equal(safePreflightDiagnostic(error).stage,'setup-source');assert.equal(safePreflightDiagnostic(error).code,'KNOWLEDGE_PREFLIGHT_SETUP_SOURCE');assert.ok(!JSON.stringify(safePreflightDiagnostic(error)).includes('nonexistent-fixture'));return true;});
+});

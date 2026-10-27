@@ -1,0 +1,28 @@
+Pure engineering fixtures; not actual product acceptance.
+Started UTC: 2026-10-06T02:55:47.2901761Z
+Node: v24.19.0
+Command: node --test --test-reporter=spec tests/go-todo-acceptance-audit.test.mjs
+Source SHA stable before/after: True
+Exit: 0
+
+✔ complete normal/recovery engineering evidence passes functional predicates while all orphan finance remains blocked (43.6848ms)
+✔ native Node spec and TAP counters are equivalent with strict full-count, hash and receipt evidence (19.4668ms)
+✔ explicit distinct confirmed versions bind their own source chains and missing/wrong versions stay blocked (70.2122ms)
+✔ CLI version overrides are explicit safe integers and preserve offline evidence-only options (5.5428ms)
+✔ raw generation SHA, 201/failing confirmation, candidate substitution and stale current model cannot become a Go binding (60.4295ms)
+✔ fallback, thinking omission, complete task/policy changes and missing approved role permission are blocked (75.1971ms)
+✔ failed/incomplete manager, missing native exit and missing independent review cannot be accepted (52.4853ms)
+✔ CLI counts must all pass without skipped/cancelled/todo and an import-only independent source is insufficient (48.9711ms)
+✔ exact file SHA/producer/employee LLM provenance and private fixed KB versions remain mandatory (72.067ms)
+✔ recovery must preserve parent/dev checkpoint/native attempts, complete DAG, budget calls and physical restart (90.574ms)
+✔ finance tampering fails its specific predicate independently of already blocked provider bills (201.8508ms)
+✔ unknown external operations block functional acceptance independently of already blocked finance (11.5958ms)
+✔ absence never fabricates successful execution or known-zero financial evidence, and CLI exposes only offline paths (1.9237ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 934.1438

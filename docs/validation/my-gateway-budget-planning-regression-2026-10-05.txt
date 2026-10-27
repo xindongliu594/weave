@@ -1,0 +1,37 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (3118.3622ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (482.3114ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (154.1101ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (314.6603ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.2532ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.2159ms) # requires independent PostgreSQL backends and row locks
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (1073.9465ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 6174.4199
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2151.2346ms)
+✔ documented GPT-4.1 JSON mode uses the same budget and makes no repair call or preview on invalid output (85.2638ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (125.2142ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (84.1655ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (50.4556ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (333.9239ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (143.679ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (129.3967ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (176.4241ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (375.2296ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (79.9759ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (63.9181ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4367.0467

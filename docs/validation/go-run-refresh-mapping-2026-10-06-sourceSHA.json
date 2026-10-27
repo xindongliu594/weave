@@ -1,0 +1,67 @@
+{
+  "capturedAt": "2026-10-06T13:09:45.8994503+08:00",
+  "inputs": [
+    {
+      "path": "apps/web/src/RunCenter.tsx",
+      "sha256": "89b8fa13e6c0957fb0be5a29c6f99cff2bae2d214f7b803848d404c5305a155a"
+    },
+    {
+      "path": "apps/web/src/RunExtras.tsx",
+      "sha256": "ba49cc904db20dcda7bd921c1b89c8641cfdcd287f36ab5ff4ef94dae98c66f0"
+    },
+    {
+      "path": "apps/web/src/run-detail-view.ts",
+      "sha256": "1a003468695cc698511ed4efab57ea94890c7d18b2bdccb54b683bbb90ada8f8"
+    },
+    {
+      "path": "apps/web/src/run-events.ts",
+      "sha256": "83b6046e8a7ef854ae4e5c1bb8a4fce3ff880048e1a198806bebe1db3267b34c"
+    },
+    {
+      "path": "apps/web/src/run-handoff.ts",
+      "sha256": "7c73523ea0daea8d7ff9274fbf7039ddcdeebc34043ff7c2a80b16b001cb0e18"
+    },
+    {
+      "path": "apps/web/src/RecoveryConditions.tsx",
+      "sha256": "e48b869ba520a9107ca2f82d165889540abc27d53b8518e3f6f0b6e0f70e9314"
+    },
+    {
+      "path": "apps/web/src/CostCarryoverChoice.tsx",
+      "sha256": "75c424bde155088ad955f7fec3f455d7a3d129788119a8dcd4bb5b160bdd4764"
+    },
+    {
+      "path": "apps/web/src/BudgetStatus.tsx",
+      "sha256": "17d05747f9d560eb135f79d9f2ecdeae1089c8a543fd4cae3296178d1b873432"
+    },
+    {
+      "path": "packages/contracts/index.ts",
+      "sha256": "f25847d5f909c44805b08f8f52bf9c36d9ee63d056e1c921bff71c4c5c961f56"
+    },
+    {
+      "path": "tests/run-refresh-mapping.test.ts",
+      "sha256": "90a4c9236bbb0a4b21c4752e8290154a20606c97183f0b4661f20d65459e11b6"
+    },
+    {
+      "path": "tests/run-status.test.ts",
+      "sha256": "dac42afb75467114d56b8d55ed1f9326e2c26c81b517d2532af0dca52b2ec707"
+    },
+    {
+      "path": "tests/run-events.test.ts",
+      "sha256": "b3925590b0a1c5e46d69fa254eed3183ed5b42a96124154955cad51923e53b1d"
+    },
+    {
+      "path": "tests/run-handoff-ui.test.ts",
+      "sha256": "6c7b8ead023e4224c9b3dd5fd07ed9b847e81ec028e08e59384bc7bdc0572fa2"
+    },
+    {
+      "path": "tests/recovery-conditions-ui.test.ts",
+      "sha256": "8b3369bddf0bb60f00f622301b1c62f4c99a3b33cc72cd13bd0321dbd4d7241d"
+    },
+    {
+      "path": "tests/cost-carryover-ui.test.ts",
+      "sha256": "e2523c38ee5e948ca11b71b154f24f4d6171e97951b834a97e562b8c2b650d9c"
+    }
+  ],
+  "verifiedAfterTestsAt": "2026-10-06T13:10:45.7251135+08:00",
+  "allInputsUnchanged": true
+}

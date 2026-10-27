@@ -1,0 +1,22 @@
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (678.9145ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (701.074ms)
+✔ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (623.4883ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (0.7531ms)
+✔ identical complete reads retain the latest actual call IDs and remap every protected old index without editing original evidence (4.4797ms)
+✔ missing, asynchronous, exceptional, invalid or incomplete host attestations preserve all original groups (2.9099ms)
+✔ a different employee/task/attempt scope cannot collapse byte-identical file results (0.4415ms)
+✔ different paths, complete versions, read arguments and assistant reasoning remain unique evidence (0.9377ms)
+✔ complete local directory metadata qualifies but a different directory or invalid metadata remains distinct (0.8481ms)
+✔ mixed mutations, unmatched responses, missing results, duplicate call IDs and unknown fields never qualify (0.9409ms)
+✔ invalid hash, partial JSON, explicit error and pruned text remain protected even with a positive callback (0.7025ms)
+✔ knowledge deduplication preserves full chunk/version/citation metadata and distinguishes queries, versions and partial content (1.328ms)
+✔ the source result signature prevents unmarked projection changes from becoming proof of a complete knowledge chunk (0.5587ms)
+✔ three complete duplicates map to the newest group and financial fitting still protects the only full file and current contract (2.2809ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2376.2146

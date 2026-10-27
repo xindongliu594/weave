@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { productReadLimit, stageReadLimit, ownedLargeRunId } from '../docs/test-evidence/helpers/go-large-owned-run-bounds-2026-10-06.mjs';
+test('only exact owned state/export JSON permit128MiB; binary stays5 and all otherJSON stays50', () => {
+  const config = { runId: ownedLargeRunId };
+  for (const endpoint of ['/runs/' + ownedLargeRunId, '/runs/' + ownedLargeRunId + '/export']) assert.equal(productReadLimit(endpoint, false, config), 128 * 1024 * 1024);
+  for (const endpoint of ['/runs/other/export', '/usage', '/runs/' + ownedLargeRunId + '/local-operations', '/runs/' + ownedLargeRunId + '/export?extra=1']) assert.equal(productReadLimit(endpoint, false, config), 50 * 1024 * 1024);
+  assert.equal(productReadLimit('/runs/' + ownedLargeRunId + '/export', false, { runId: 'other' }), 50 * 1024 * 1024);
+  assert.equal(productReadLimit('/runs/' + ownedLargeRunId, true, config), 5 * 1024 * 1024);
+});
+test('256MiB local exception is confined to generated own stop before/after frames; ordinary evidence and traversal remain50', () => {
+  const workspace = process.cwd();
+  assert.equal(stageReadLimit('docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-42-57-419Z-81e4fd8a-before.json', workspace), 256 * 1024 * 1024);
+  for (const path of ['docs/test-evidence/some.json', '../outside/go-funded-controlled-stop-test-before.json', '.data/go-funded-controlled-stop-test-after.json',
+    'docs/test-evidence/go-funded-controlled-stop-test.json']) assert.equal(stageReadLimit(path, workspace), 50 * 1024 * 1024);
+});

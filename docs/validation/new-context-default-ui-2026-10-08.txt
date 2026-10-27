@@ -1,0 +1,46 @@
+✔ missing legacy allowlist grants only the current planner and does not mutate policy (677.0165ms)
+✔ switching from an implicit initial planner grants only the explicitly selected planner (0.5389ms)
+✔ changing the planner preserves explicit employee choices and every other authorization and budget (0.2935ms)
+✔ real checkboxes explicitly add Luna and Sol while planner removal cannot revoke the mandatory model (1.2163ms)
+✔ the real planner select callback keeps its accessible label and does not offer unavailable models (0.7716ms)
+✔ unavailable authorized models are preserved but cannot be newly selected in the catalog (0.5094ms)
+✔ explicit legacy list missing the planner blocks sending until the user authorizes it (28.5255ms)
+✔ actual home renders the new scope explanation and disables model settings for unresolved requests (9.9909ms)
+✔ first conversation gets a 128000-byte context policy without changing the execution budget (571.5644ms)
+✔ valid legacy explicit 64000 and absent context policies reload without migration or preview changes (9.7024ms)
+✔ legacy pending policy bytes remain exact when new conversations have a larger default (2.2403ms)
+✔ fresh storage needs no fee limit and home exposes only execution budget and staffing inputs (19.1121ms)
+✔ valid old conversations and previews survive absent, retired or invalid fee metadata without a false settings change (38.1982ms)
+✔ unknown old preview settings keep the dialogue and candidate but remain explicitly unconfirmed (8.862ms)
+✔ legacy pending key/body/settings remain byte-identical across reload; retrieval and explicit reset are available with no automatic call (9.1373ms)
+✔ new conversation preview keeps its server accounting marker and clearly excludes chat cost from the saved execution budget (8.1862ms)
+✔ real model, budget and permission changes still require another proposal after the fee field is retired (28.0437ms)
+✔ conversation pending and unknown receipt labels never represent an unreserved amount as a zero bill (1.2518ms)
+✔ budgeted and legacy held receipts retain their exact original reserve labels; zero alone cannot classify a conversation (0.9878ms)
+✔ cost totals distinguish actual conversation charges from the amount charged to the execution daily budget (0.7993ms)
+✔ consultation without a proposal does not create a confirmable draft or a saved team (2.7827ms)
+✔ additional requirements followed by clarification cannot accidentally confirm the old plan (0.5209ms)
+✔ failed revisions stay blocked through consultation and only a fresh proposal unlocks confirmation (0.4204ms)
+✔ unsent changes and requests with unknown results prevent confirmation even with a valid preview (0.2425ms)
+✔ new conversation requests omit the deprecated fee limit without changing execution policy or legacy metadata (4.5842ms)
+✔ new settings ignore legacy fee fields but preserve model, execution budget and permission changes (2.0729ms)
+✔ only an explicit new turn carries bounded validation context, without rewriting user messages or an old pending request (0.8245ms)
+✔ retrieving an old pending reply preserves its exact key, body and settings while normalizing only preview comparison (0.6393ms)
+✔ single manager is a valid one-agent department (6.0101ms)
+✔ legacy placeholder tasks cannot pass execution validation through configuration-only edits (10.7975ms)
+✔ an explicit one-person text plan remains executable without file tools (0.808ms)
+✔ recovery policy cannot authorize unbounded retries or immediate false stall decisions (3.413ms)
+✔ team protocol capability is required even without workspace tools and for fallback models (1.1394ms)
+✔ cyclic dependencies and missing owners are rejected (0.9049ms)
+✔ unknown model, excessive concurrency and cost cannot pass validation (0.4634ms)
+✔ manager count, duplicate agent IDs and empty acceptance are rejected (1.2398ms)
+✔ task estimates and task turn limits must fit the approved policy (1.2205ms)
+✔ run inputs require valid recipients, bounded text, unique IDs and a retrieval grant (5.0545ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2498.1847

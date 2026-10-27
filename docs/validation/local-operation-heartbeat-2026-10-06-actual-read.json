@@ -1,0 +1,168 @@
+{
+  "kind": "read-only-actual-failed-run-diagnosis",
+  "runId": "1e91d7d2-d99d-45f7-90a8-bb9bb2c80ff0",
+  "planVersion": 9,
+  "status": "failed",
+  "eventCount": 3941,
+  "files": [
+    {
+      "path": "docs/test-evidence/go-normal-v9-outcome-unknown-20261006-135406-aeb07003/archive.json",
+      "bytes": 42457586,
+      "sha256": "72742e86c74988c912de1b88cf045cd1cf09144c2f08ffc8c729e53ffa57cc44"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v9-outcome-unknown-20261006-135406-aeb07003/state.json",
+      "bytes": 14318369,
+      "sha256": "46016ea38024192778031d43031d444ee5c73e9ba79b3f0083d25c6ce0d465ef"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v9-outcome-unknown-20261006-135406-aeb07003/local-operations.json",
+      "bytes": 50400,
+      "sha256": "83dd166344b26abc30ed49155f5189307595dbd3a4fd3c758e6ebed730ede2e2"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v9-outcome-unknown-20261006-135406-aeb07003/artifacts.json",
+      "bytes": 453,
+      "sha256": "972ad118de9a40ce72db9ba75dbca8513548efa602be1ba305cd6a698e191448"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v9-outcome-unknown-20261006-135406-aeb07003/cost-readiness.json",
+      "bytes": 263,
+      "sha256": "2c3e04919e615d06d4c6e2fdb821e05dc0c7c6675b952dd379e9f54b89cb626b"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v9-outcome-unknown-20261006-135406-aeb07003/sources.json",
+      "bytes": 1314,
+      "sha256": "f1600f4454540a974858cadf831b302838e42c11cec08a725645373a96fc9178"
+    }
+  ],
+  "operation": {
+    "id": "2982099d-e930-46d4-8838-7e37cd4d4efb",
+    "status": "cancelled",
+    "started": true,
+    "createdAt": "2026-10-06T05:52:27.781Z",
+    "context": {
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "taskId": "qa_review",
+      "agentId": "employee-3",
+      "attemptId": "9e71e4d7-f9f0-4976-86a8-983eba46b250",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d",
+      "approvalId": "93d78bf9-cfb4-4e4a-bb1f-d9857d8d07f8",
+      "employeeId": "qa"
+    },
+    "arguments": {
+      "command": "node --test acceptance.test.mjs",
+      "expectedWorkspaceRevision": "8e500b5d5ee13189b1b8f122867f81c5a21462504298b996088746bb46fde7eb"
+    },
+    "result": null,
+    "lateResult": {
+      "ok": true,
+      "exitCode": 0,
+      "outputSha256": "1023984c4b6696643853c1288837ff08f68026f72e48a3faa19bda9a6fd87ed1",
+      "outputBytes": 373
+    },
+    "availableProjectionFields": [
+      "id",
+      "status",
+      "started",
+      "payload",
+      "result",
+      "lateResult",
+      "createdAt"
+    ]
+  },
+  "timeline": [
+    {
+      "seq": 3336,
+      "type": "tool/start",
+      "timestamp": "2026-10-06T05:46:02.605Z",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d",
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "name": "terminal_test"
+    },
+    {
+      "seq": 3338,
+      "type": "approval/requested",
+      "timestamp": "2026-10-06T05:46:03.881Z",
+      "approvalId": "93d78bf9-cfb4-4e4a-bb1f-d9857d8d07f8"
+    },
+    {
+      "seq": 3898,
+      "type": "approval/decided",
+      "timestamp": "2026-10-06T05:52:23.289Z",
+      "approvalId": "93d78bf9-cfb4-4e4a-bb1f-d9857d8d07f8"
+    },
+    {
+      "seq": 3901,
+      "type": "runtime/operation-start",
+      "timestamp": "2026-10-06T05:52:24.760Z",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d",
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "name": "terminal_test"
+    },
+    {
+      "seq": 3907,
+      "type": "local/operation-queued",
+      "timestamp": "2026-10-06T05:52:32.577Z",
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "operationId": "2982099d-e930-46d4-8838-7e37cd4d4efb",
+      "approvalId": "93d78bf9-cfb4-4e4a-bb1f-d9857d8d07f8",
+      "name": "terminal_test"
+    },
+    {
+      "seq": 3919,
+      "type": "runtime/operation-failed",
+      "timestamp": "2026-10-06T05:52:49.642Z",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d",
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "name": "terminal_test",
+      "code": "LOCAL_DEVICE_OFFLINE",
+      "message": "本机设备离线，请打开桌面端并启用本机执行",
+      "classification": "outcome_unknown"
+    },
+    {
+      "seq": 3920,
+      "type": "runtime/outcome-unknown",
+      "timestamp": "2026-10-06T05:52:50.137Z",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d",
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "name": "terminal_test",
+      "message": "本机设备离线，请打开桌面端并启用本机执行"
+    },
+    {
+      "seq": 3921,
+      "type": "runtime/anomaly",
+      "timestamp": "2026-10-06T05:52:50.636Z",
+      "code": "OUTCOME_UNKNOWN",
+      "message": "修改操作未取得确认结果，需要核对后再恢复"
+    },
+    {
+      "seq": 3923,
+      "type": "tool/result",
+      "timestamp": "2026-10-06T05:52:51.654Z",
+      "taskId": "t3",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d",
+      "callId": "call_00_8p99lah701924pe7e5y7bjgc",
+      "name": "terminal_test"
+    },
+    {
+      "seq": 3926,
+      "type": "session/turn/end",
+      "timestamp": "2026-10-06T05:52:53.139Z",
+      "taskId": "t3",
+      "sessionId": "d763604f-e8aa-4433-8779-d229d5b0d32d"
+    },
+    {
+      "seq": 3935,
+      "type": "session/turn/end",
+      "timestamp": "2026-10-06T05:52:59.415Z",
+      "sessionId": "b96d87d8-a82e-4a6b-98aa-4cf8d2c729d4"
+    },
+    {
+      "seq": 3941,
+      "type": "run/finished",
+      "timestamp": "2026-10-06T05:53:02.385Z",
+      "message": "OUTCOME_UNKNOWN: 修改操作未取得确认结果，需要核对后再恢复"
+    }
+  ]
+}

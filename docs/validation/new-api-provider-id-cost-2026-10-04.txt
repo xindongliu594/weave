@@ -1,0 +1,17 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (2565.2971ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (237.7841ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (297.8634ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (168.5449ms)
+✔ 403 response identifiers remain public after a failed bill query without releasing fees or replaying the model (188.8276ms)
+✔ cost response selects only safe response fields and preserves absent IDs without exposing reservation context (93.0502ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (411.2397ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4519.6094

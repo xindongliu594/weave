@@ -1,0 +1,181 @@
+{
+  "formatVersion": 1,
+  "archivedAt": "2026-10-27",
+  "files": [
+    {
+      "source": "scripts/validation/cortex-planning-pilot/audit.mjs",
+      "archive": "docs/validation/historical-sources/cortex-planning-pilot/audit.mjs.txt",
+      "sha256": "38883417436b805ca0b15f6aca110b6d40ab1090a6d398ece137fe02153c86d6"
+    },
+    {
+      "source": "scripts/validation/cortex-planning-pilot/broker.mjs",
+      "archive": "docs/validation/historical-sources/cortex-planning-pilot/broker.mjs.txt",
+      "sha256": "9879b33e4c9f3d7844faf51adee38fe3cea99e1e7f2719b7e44194d2529b7ad7"
+    },
+    {
+      "source": "scripts/validation/cortex-planning-pilot/launch-approved-real.py",
+      "archive": "docs/validation/historical-sources/cortex-planning-pilot/launch-approved-real.py.txt",
+      "sha256": "8f3106808af29319ac901c9fa991fec2babc13fdccc46d5ea1c3d762b3ee4389"
+    },
+    {
+      "source": "scripts/validation/cortex-planning-pilot/launch.py",
+      "archive": "docs/validation/historical-sources/cortex-planning-pilot/launch.py.txt",
+      "sha256": "16aa43542892e80b01a1096710c7ab194150c43e20250d3a7607c7199947963a"
+    },
+    {
+      "source": "scripts/validation/cortex-planning-pilot/prepare.py",
+      "archive": "docs/validation/historical-sources/cortex-planning-pilot/prepare.py.txt",
+      "sha256": "707436a3396ace31b3cda1d2e13db3c039627e81e2c8f685811f1945ec9de96a"
+    },
+    {
+      "source": "scripts/validation/cortex-planning-pilot/worker.mjs",
+      "archive": "docs/validation/historical-sources/cortex-planning-pilot/worker.mjs.txt",
+      "sha256": "c22a2f1e151fe3605a90f8b401c1b87bb26b9cb6290751dabc41b0c212d46454"
+    },
+    {
+      "source": "tests/go-acceptance-run-references-explicit-target-regression.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-acceptance-run-references-explicit-target-regression.test.mjs.txt",
+      "sha256": "6a8d7d036c6f1bddd6f8302fed08955069d91a6c52f3f6d9c1b3412d4169e199"
+    },
+    {
+      "source": "tests/go-acceptance-run-references.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-acceptance-run-references.test.mjs.txt",
+      "sha256": "6377ff2dd79e4f79023b3fb532e67a10ff9701596237454cfc8c8fd876bc4f10"
+    },
+    {
+      "source": "tests/go-bound-source-identity.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-bound-source-identity.test.mjs.txt",
+      "sha256": "699b5d89f74403a7b004911ad6ca5b364e81de481b27a6edc7eed0e41ab7bdf6"
+    },
+    {
+      "source": "tests/go-cancel-reservation-release.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-cancel-reservation-release.test.mjs.txt",
+      "sha256": "1bb84a698b98c6d234d8e3aee550c61885b77c649578b40d12a99fbd987e302d"
+    },
+    {
+      "source": "tests/go-controlled-stop-browser-fixture.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-controlled-stop-browser-fixture.test.mjs.txt",
+      "sha256": "8d9333164a2c0ac799be98baf9996a76de7c0eb9def722b4ca65f8b26f609f1c"
+    },
+    {
+      "source": "tests/go-controlled-stop-first-parent.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-controlled-stop-first-parent.test.mjs.txt",
+      "sha256": "f2ae3e308eb7c582c82a91a04958d0c3ffb928c24d8f7fbf6049904757735a05"
+    },
+    {
+      "source": "tests/go-delivery-web-helper.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-delivery-web-helper.test.mjs.txt",
+      "sha256": "d842b6ec8fb5eb84f2127c3a4b481faa8f80f383f7c4ee3a35234d0a297425a8"
+    },
+    {
+      "source": "tests/go-final-knowledge-proof.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-final-knowledge-proof.test.mjs.txt",
+      "sha256": "4b53c5ce49fe5f2678a6cac2420515e24de301b9bda598341e2bed3f7246636a"
+    },
+    {
+      "source": "tests/go-final-knowledge-scope.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-final-knowledge-scope.test.mjs.txt",
+      "sha256": "6dad0d0e2b4735e465997b7e0424e7671d6a9320be0c4c8c7cb3c6af07139874"
+    },
+    {
+      "source": "tests/go-final-scope-legacy-regression.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-final-scope-legacy-regression.test.mjs.txt",
+      "sha256": "196dbd4fba7dc5d968eeb513d1e3313814b470fac1f5d05178d9026dea5cb6ea"
+    },
+    {
+      "source": "tests/go-first-project-admission-stop-guard.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-first-project-admission-stop-guard.test.mjs.txt",
+      "sha256": "834486bf163909a6193d9214fdac2233afcb3cc3686aac5f9677c12ddb0ebab2"
+    },
+    {
+      "source": "tests/go-funded-guarded-operator.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-guarded-operator.test.mjs.txt",
+      "sha256": "2680e388929c9eaf016d823c8b8fa4d4264b189b2ad6ef293734cefda097eb4a"
+    },
+    {
+      "source": "tests/go-funded-knowledge-upgrade.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-knowledge-upgrade.test.mjs.txt",
+      "sha256": "24d18c2ac45f87e39b8a4d0bef90cf955daeeb072e22831c9a467b4cb137ea63"
+    },
+    {
+      "source": "tests/go-funded-known-read-knowledge-upgrade.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-known-read-knowledge-upgrade.test.mjs.txt",
+      "sha256": "1c040529956bcad0ded05022d93717db9065f2d19a0ad37f35e2390f193e13a5"
+    },
+    {
+      "source": "tests/go-funded-known-read-stop-legacy-regression.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-known-read-stop-legacy-regression.test.mjs.txt",
+      "sha256": "dba94978040f8a2a08a8198755475f418f5a2f13dbbc46f24389f70f27b75378"
+    },
+    {
+      "source": "tests/go-funded-operator.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-operator.test.mjs.txt",
+      "sha256": "29bac218545ff57d311bf7d8e480606f48800f73366a6ef9838c726f290d1dff"
+    },
+    {
+      "source": "tests/go-funded-owned-large-knowledge-upgrade.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-owned-large-knowledge-upgrade.test.mjs.txt",
+      "sha256": "6a38093c655c95ce580531906f9c258c0e746f6ae2d2e019c50b6954e72414a2"
+    },
+    {
+      "source": "tests/go-funded-owned-large-stop-legacy-regression.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-owned-large-stop-legacy-regression.test.mjs.txt",
+      "sha256": "668dfc624d15e90eb9a7571519a3f6336dba1a4cdf7e59c689b03e66ae1af1a7"
+    },
+    {
+      "source": "tests/go-funded-stop.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-funded-stop.test.mjs.txt",
+      "sha256": "1a872c6f0a85488a942c141f63b82720b3d3a9cfccbfc78a9c5dcfaacd28dcec"
+    },
+    {
+      "source": "tests/go-knowledge-browser-context.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-knowledge-browser-context.test.mjs.txt",
+      "sha256": "07c4f36d89936f5c93f44661d326d7e489e8ad1e77a80a24f8de425026b8b3c3"
+    },
+    {
+      "source": "tests/go-known-read-enoent-stop-guard.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-known-read-enoent-stop-guard.test.mjs.txt",
+      "sha256": "5f83d8177fd59004ca78ad16ed172fe5f772092fccec7ab76d86b943222e5f31"
+    },
+    {
+      "source": "tests/go-large-owned-run-bounds.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-large-owned-run-bounds.test.mjs.txt",
+      "sha256": "4355934855f54e68053f3b172f47fca179abc0f0f2487429224741aa77a69fbe"
+    },
+    {
+      "source": "tests/go-owned-large-run-references.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-owned-large-run-references.test.mjs.txt",
+      "sha256": "8bfbfb21a2c5369b58bbefa4061d0173faa44cabe26f596e79d28ce3d6aa770a"
+    },
+    {
+      "source": "tests/go-phase-identity-cache.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-phase-identity-cache.test.mjs.txt",
+      "sha256": "cb169208523a5397051b9714416967b99c1dd5cc2154fea5b1d5b3e4d0f8fa39"
+    },
+    {
+      "source": "tests/go-proxy-rejected-resume.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-proxy-rejected-resume.test.mjs.txt",
+      "sha256": "c9f285ded704df1cf3711faf39a6f4a0826ef83eeb850a0166b8607d1f8cbcdb"
+    },
+    {
+      "source": "tests/go-recovery9-pinned-knowledge.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-recovery9-pinned-knowledge.test.mjs.txt",
+      "sha256": "fdf59d43579a47de5239576ce6d2d4f5330b3fc987aaa6e655bd80c26755fb49"
+    },
+    {
+      "source": "tests/go-rejected-resume.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-rejected-resume.test.mjs.txt",
+      "sha256": "9ec8ac46b2ddbae530e9f304f5cf08ca504066d4a31f61a5b8aafb389ae68058"
+    },
+    {
+      "source": "tests/go-todo-acceptance-audit.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-todo-acceptance-audit.test.mjs.txt",
+      "sha256": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686"
+    },
+    {
+      "source": "tests/go-verified-target-evidence.test.mjs",
+      "archive": "docs/validation/historical-sources/tests/go-verified-target-evidence.test.mjs.txt",
+      "sha256": "62faa06b09372c05d0246105a2834c3b87d8fd50e7dca362836ea2bbf7697f31"
+    }
+  ]
+}

@@ -1,0 +1,694 @@
+{
+  "checkedAt": "2026-10-05T04:30:02.281Z",
+  "parentRunId": "1e6a2c30-3e8c-46fd-9c31-d2557768eb9a",
+  "projectId": "dde78f91-2a99-4a63-a9fa-5cb7bab2b8f0",
+  "version": 6,
+  "originalLedgerUnchanged": true,
+  "realProviderFetches": 0,
+  "fakeFetches": 2,
+  "productRunsCreated": 0,
+  "originalDbQueriesOrWrites": 0,
+  "employeeFilesChanged": false,
+  "simulationDirectory": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\fresh-resume-budget-review\\6043ec39-5a05-4b13-a502-55073750fd82",
+  "snapshotSource": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\full-offline-backup\\a6ec3efd-fa23-4a0f-9503-f3f8161ad06c\\snapshot",
+  "originalReadiness": {
+    "recordedCost": 0.3508754,
+    "reserved": 0.027869400000000003,
+    "availableBudget": 0.10125519999999998,
+    "pendingCount": 0,
+    "uncertainCount": 2,
+    "receipts": [
+      {
+        "id": "12ebc7bd-bc11-4948-9142-d778f0e22433",
+        "amount": 0.022238400000000002,
+        "status": "uncertain",
+        "runId": "a3ce2f05-9048-4967-9b50-f981fecd24ec"
+      },
+      {
+        "id": "4319725c-c6aa-4401-834d-271fb06d4c9e",
+        "amount": 0.005631,
+        "status": "uncertain",
+        "runId": "03608f5f-5fe1-4f6b-97bf-214a1f00f63f"
+      }
+    ]
+  },
+  "completedCheckpoints": [
+    "dev"
+  ],
+  "budgetHistory": {
+    "calls": 20,
+    "tasks": {
+      "dev": {
+        "cost": 0.0283341,
+        "calls": 14
+      },
+      "qa_verify": {
+        "cost": 0.068018,
+        "calls": 3
+      }
+    }
+  },
+  "originalPolicy": {
+    "maxBudget": 0.48,
+    "maxModelCalls": 37,
+    "maxTaskModelCalls": 14,
+    "contextBytes": 192000,
+    "maxConcurrentAgents": 1
+  },
+  "configuredModels": [
+    {
+      "id": "87f0a6ab-0c55-4f7c-9326-c5e570edf8a0",
+      "wireModel": "gpt-6-luna",
+      "inputRate": 0.1,
+      "outputRate": 0.5,
+      "maxOutputTokens": 4600
+    },
+    {
+      "id": "f7092d28-6837-4223-b3d7-73f845cef227",
+      "wireModel": "gpt-6-sol",
+      "inputRate": 2,
+      "outputRate": 10,
+      "maxOutputTokens": 1400
+    }
+  ],
+  "nativeCompleted": [
+    "dev"
+  ],
+  "captured": {
+    "modelId": "f7092d28-6837-4223-b3d7-73f845cef227",
+    "wireModel": "gpt-6-sol",
+    "taskId": "qa_verify",
+    "employeeId": "qa",
+    "maxTokens": 1400,
+    "messages": 2,
+    "toolCount": 10,
+    "envelopeBytes": 28777,
+    "reservation": 0.073602,
+    "remainingAfterHold": 0.027653199999999975,
+    "bodySha256": "cac7b2194891278e91e7fb6f79860a5b0cf3b188c39fe03aae6f5ee83dc1ba65",
+    "systemBytes": 8179,
+    "toolNames": [
+      "agent_teams_claim_task",
+      "agent_teams_send_message",
+      "agent_teams_status",
+      "agent_teams_update_task",
+      "artifact_write",
+      "filesystem",
+      "knowledge_read",
+      "knowledge_search",
+      "recovery_read",
+      "terminal_test"
+    ],
+    "messagesByRole": [
+      {
+        "index": 0,
+        "role": "system",
+        "bytes": 8275
+      },
+      {
+        "index": 1,
+        "role": "user",
+        "bytes": 14078
+      }
+    ],
+    "toolsBytes": 6399,
+    "budgetFeedbackPresent": true,
+    "latestApprovedSnapshotRetained": true
+  },
+  "firstNativeApprovedContext": {
+    "present": true,
+    "index": 2,
+    "source": {
+      "kind": "plugin",
+      "plugin": "@deepseek-ai/dsh-system-prompt",
+      "form": "snapshot",
+      "sectionNames": [
+        "department:approved-context",
+        "subagent:delegation"
+      ]
+    },
+    "sectionBytes": 13038,
+    "fields": [
+      "requirement",
+      "tools",
+      "browserOrigins",
+      "mcpConnections",
+      "rule",
+      "budget",
+      "task",
+      "recovery",
+      "runtimeTaskId",
+      "attemptId",
+      "status"
+    ],
+    "taskId": "qa_verify",
+    "status": "claimed",
+    "hasTask": true,
+    "hasRecovery": true,
+    "hasRuntimeTaskId": true,
+    "hasAttemptId": true,
+    "taskContract": {
+      "sha256": "d394d92c45a0644b7aa645736db35b76b8fba0f89e4cc5c1c1b746020c82d61e",
+      "fields": [
+        "id",
+        "kind",
+        "inputs",
+        "verify",
+        "inScope",
+        "outputs",
+        "subject",
+        "assignee",
+        "objective",
+        "assigneeId",
+        "dependencies",
+        "maxReworkRounds",
+        "acceptanceCriteria",
+        "estimatedInputTokens",
+        "estimatedOutputTokens"
+      ],
+      "descriptionBytes": 0,
+      "objectiveBytes": 835,
+      "acceptanceBytes": 357,
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "todo.test.mjs",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "acceptance.test.mjs",
+          "sha256": "509af23a1d5b21f2e8b7f80551a95caee6345b3124c9f686f5b1f4d68905df92"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "acceptance.test.mjs"
+        }
+      ],
+      "dependencies": [
+        "dev"
+      ]
+    },
+    "recovery": {
+      "sourceRunId": "1e6a2c30-3e8c-46fd-9c31-d2557768eb9a",
+      "files": [
+        {
+          "path": "acceptance.test.mjs",
+          "size": 5877,
+          "sha256": "509af23a1d5b21f2e8b7f80551a95caee6345b3124c9f686f5b1f4d68905df92",
+          "state": "fixed_input"
+        },
+        {
+          "path": "README.md",
+          "size": 2079,
+          "sha256": "a29cbd3ab39b804579e8d527b7b329b5220819235039f80f4298d5f97335e1f1",
+          "state": "accepted",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "server.mjs",
+          "size": 4346,
+          "sha256": "109f638d709e33dc3fc2c59b52c9baf3e764bc6e1cee320b38cc1cdda9996708",
+          "state": "accepted",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "todo.test.mjs",
+          "size": 6294,
+          "sha256": "c9f014721736b476abd2a0433b511242f442d132bce52c45aafb147a37b0f90e",
+          "state": "accepted",
+          "producerTaskId": "dev"
+        }
+      ]
+    },
+    "budget": {
+      "currency": "USD",
+      "basis": "configured-rates",
+      "project": {
+        "limit": 0.48,
+        "occupied": 0.3787448,
+        "available": 0.1012552,
+        "callsRemaining": 17
+      },
+      "task": {
+        "id": "qa_verify",
+        "limit": 0.48,
+        "occupied": 0.068018,
+        "available": 0.1012552,
+        "callsRemaining": 11,
+        "recordedTaskCost": 0.068018,
+        "originalEstimate": 0.02184,
+        "estimateExceeded": true,
+        "inputRate": 2,
+        "outputRate": 10
+      },
+      "unfinished": {
+        "count": 3,
+        "originalRemainingEstimate": 0.008136,
+        "exceededEstimates": 1,
+        "unknownEstimates": 0
+      },
+      "rule": "occupied 含历史费用和未知/在途预留；原估算超出的未完成任务仍需费用。按余额和进度重估，合并必要操作，避免重复检索；保留全部验收，不得提高额度或调用上限。"
+    },
+    "sectionSha256": "30f1e262611d6daa05f7e080b3e3075b6815d6114510a4542fb8cd05eda1b215"
+  },
+  "firstContextArchiveProof": {
+    "matches": true,
+    "sessionPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\fresh-resume-budget-review\\6043ec39-5a05-4b13-a502-55073750fd82\\sessions\\--C-Users-JJ-.codex-worktrees-f57c-agent_department-.data-fresh-resume-budget-review-6043ec39-5a05-4b13-a502-55073750fd82-workspace--\\aef20889-cba6-40f0-a12b-028ca3617011\\session.v3.jsonl",
+    "nativeSeq": 7,
+    "traceSeq": 37,
+    "wireRetained": true,
+    "textSha256": "935494711504324010f335ba36ea7f04ab0267c70ce9c50a88d7ce92e939e6b1",
+    "sourceSha256": "226bd006eeb19540f9f9096f70281d0a9f62f533a0b92453dc1e0cd4c2693f93",
+    "sectionSha256": "30f1e262611d6daa05f7e080b3e3075b6815d6114510a4542fb8cd05eda1b215"
+  },
+  "localContextFits": [
+    {
+      "beforeBytes": 43797,
+      "afterBytes": 28777,
+      "reservation": 0.073602,
+      "availableBudget": 0.10125519999999999,
+      "removedGroups": 1,
+      "maxTokens": 1400
+    },
+    {
+      "beforeBytes": 66669,
+      "afterBytes": 37570,
+      "reservation": 0.091188,
+      "availableBudget": 0.10107519999999998,
+      "removedGroups": 2,
+      "maxTokens": 1400
+    }
+  ],
+  "localAdmissions": [
+    {
+      "modelId": "f7092d28-6837-4223-b3d7-73f845cef227",
+      "taskId": "qa_verify",
+      "employeeId": "qa",
+      "reservation": 0.073602
+    },
+    {
+      "modelId": "f7092d28-6837-4223-b3d7-73f845cef227",
+      "taskId": "qa_verify",
+      "employeeId": "qa",
+      "reservation": 0.091188
+    }
+  ],
+  "errors": [
+    {
+      "message": "LOCAL_SIMULATION_FINISHED"
+    }
+  ],
+  "limitations": [
+    "No product run is created; native AgentTeams state/sessions live only in a new scratch directory.",
+    "Fake captain bootstrap usage is zero; optional first-Sol usage 40/10 is a local feedback probe, never a prediction of actual fees or acceptance.",
+    "No device grants, original database, provider credentials, paid models, employee mutations or commands are used.",
+    "Captured scratch cwd may differ in length from the production fresh-run cwd; normalized-envelope variants are reported separately.",
+    "A first request fitting the unchanged cap does not guarantee subsequent file/knowledge reads, QA review or manager completion."
+  ],
+  "contextChecks": {
+    "currentTask": true,
+    "exactApprovedContract": true,
+    "authoritativeNativeSnapshot": true,
+    "archivedFirstContextMatchesWire": true,
+    "recoverySource": true,
+    "recoveryFilesMatch": true,
+    "budgetAvailable": true,
+    "budgetIncludesPriorCostAndHolds": true,
+    "secondCurrentTask": true,
+    "secondExactApprovedContract": true,
+    "secondRecoveryFilesMatch": true,
+    "archivedSecondContextMatchesWire": true,
+    "currentSnapshotRetained": true,
+    "secondRoundExpenseVisible": true,
+    "secondRoundCallsVisible": true
+  },
+  "secondNativeApprovedContext": {
+    "present": true,
+    "index": 5,
+    "source": {
+      "kind": "plugin",
+      "plugin": "@deepseek-ai/dsh-system-prompt",
+      "form": "snapshot",
+      "sectionNames": [
+        "department:approved-context",
+        "subagent:delegation"
+      ]
+    },
+    "sectionBytes": 13038,
+    "fields": [
+      "requirement",
+      "tools",
+      "browserOrigins",
+      "mcpConnections",
+      "rule",
+      "budget",
+      "task",
+      "recovery",
+      "runtimeTaskId",
+      "attemptId",
+      "status"
+    ],
+    "taskId": "qa_verify",
+    "status": "claimed",
+    "hasTask": true,
+    "hasRecovery": true,
+    "hasRuntimeTaskId": true,
+    "hasAttemptId": true,
+    "taskContract": {
+      "sha256": "d394d92c45a0644b7aa645736db35b76b8fba0f89e4cc5c1c1b746020c82d61e",
+      "fields": [
+        "id",
+        "kind",
+        "inputs",
+        "verify",
+        "inScope",
+        "outputs",
+        "subject",
+        "assignee",
+        "objective",
+        "assigneeId",
+        "dependencies",
+        "maxReworkRounds",
+        "acceptanceCriteria",
+        "estimatedInputTokens",
+        "estimatedOutputTokens"
+      ],
+      "descriptionBytes": 0,
+      "objectiveBytes": 835,
+      "acceptanceBytes": 357,
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "todo.test.mjs",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "acceptance.test.mjs",
+          "sha256": "509af23a1d5b21f2e8b7f80551a95caee6345b3124c9f686f5b1f4d68905df92"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "acceptance.test.mjs"
+        }
+      ],
+      "dependencies": [
+        "dev"
+      ]
+    },
+    "recovery": {
+      "sourceRunId": "1e6a2c30-3e8c-46fd-9c31-d2557768eb9a",
+      "files": [
+        {
+          "path": "acceptance.test.mjs",
+          "size": 5877,
+          "sha256": "509af23a1d5b21f2e8b7f80551a95caee6345b3124c9f686f5b1f4d68905df92",
+          "state": "fixed_input"
+        },
+        {
+          "path": "README.md",
+          "size": 2079,
+          "sha256": "a29cbd3ab39b804579e8d527b7b329b5220819235039f80f4298d5f97335e1f1",
+          "state": "accepted",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "server.mjs",
+          "size": 4346,
+          "sha256": "109f638d709e33dc3fc2c59b52c9baf3e764bc6e1cee320b38cc1cdda9996708",
+          "state": "accepted",
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "todo.test.mjs",
+          "size": 6294,
+          "sha256": "c9f014721736b476abd2a0433b511242f442d132bce52c45aafb147a37b0f90e",
+          "state": "accepted",
+          "producerTaskId": "dev"
+        }
+      ]
+    },
+    "budget": {
+      "currency": "USD",
+      "basis": "configured-rates",
+      "project": {
+        "limit": 0.48,
+        "occupied": 0.3789248,
+        "available": 0.1010752,
+        "callsRemaining": 16
+      },
+      "task": {
+        "id": "qa_verify",
+        "limit": 0.48,
+        "occupied": 0.068198,
+        "available": 0.1010752,
+        "callsRemaining": 10,
+        "recordedTaskCost": 0.068198,
+        "originalEstimate": 0.02184,
+        "estimateExceeded": true,
+        "inputRate": 2,
+        "outputRate": 10
+      },
+      "unfinished": {
+        "count": 3,
+        "originalRemainingEstimate": 0.008136,
+        "exceededEstimates": 1,
+        "unknownEstimates": 0
+      },
+      "rule": "occupied 含历史费用和未知/在途预留；原估算超出的未完成任务仍需费用。按余额和进度重估，合并必要操作，避免重复检索；保留全部验收，不得提高额度或调用上限。"
+    },
+    "sectionSha256": "ba70f9ae9e53dca4230f59231be71ccc7de0ce3d63c810ad097b5abc9d40bf2c"
+  },
+  "secondContextArchiveProof": {
+    "matches": true,
+    "sessionPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\fresh-resume-budget-review\\6043ec39-5a05-4b13-a502-55073750fd82\\sessions\\--C-Users-JJ-.codex-worktrees-f57c-agent_department-.data-fresh-resume-budget-review-6043ec39-5a05-4b13-a502-55073750fd82-workspace--\\aef20889-cba6-40f0-a12b-028ca3617011\\session.v3.jsonl",
+    "nativeSeq": 15,
+    "traceSeq": 54,
+    "wireRetained": true,
+    "textSha256": "deb4655b44b74ad230c797ec84a74a14e97a43747677c28c2cde67ed62b0e5b2",
+    "sourceSha256": "f880c94b6b3024a05b9cc5456b3315e7407ee53508e6e0062b81a216b2ae003b",
+    "sectionSha256": "ba70f9ae9e53dca4230f59231be71ccc7de0ce3d63c810ad097b5abc9d40bf2c"
+  },
+  "secondRound": {
+    "fakeFirstSolUsage": {
+      "prompt_tokens": 40,
+      "completion_tokens": 10
+    },
+    "simulatedFirstSolFee": 0.00018,
+    "modelId": "f7092d28-6837-4223-b3d7-73f845cef227",
+    "reservation": 0.091188,
+    "envelopeBytes": 37570,
+    "bodySha256": "e310820a03c8903934d3d7a021be5466cb8720c9870f18a501c00423cc37133a",
+    "originalLedgerOrHoldsChanged": false,
+    "latestSnapshotRetained": true,
+    "projectOccupiedDelta": 0.00018000000000001348,
+    "projectAvailableDelta": -0.0001799999999999996,
+    "taskOccupiedDelta": 0.0001799999999999996,
+    "projectCallsDelta": 1,
+    "taskCallsDelta": 1
+  },
+  "localSimulatedUsage": [
+    {
+      "modelId": "f7092d28-6837-4223-b3d7-73f845cef227",
+      "taskId": "qa_verify",
+      "cost": 0.00018
+    }
+  ],
+  "normalizedProductionCwd": {
+    "pathReplacements": 0,
+    "envelopeBytes": 28777,
+    "reservation": 0.073602,
+    "reason": "Only hypothetical fresh native workspace paths differ; no source path is opened or created."
+  },
+  "optimisticFullFileVariants": [
+    {
+      "paths": [
+        "server.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0,
+      "availableBudget": 0.10125519999999998,
+      "envelopeBytes": 33697,
+      "reservation": 0.083442,
+      "margin": 0.017813199999999973,
+      "removedGroups": 0,
+      "latestApprovedSnapshotProtected": true
+    },
+    {
+      "paths": [
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0,
+      "availableBudget": 0.10125519999999998,
+      "envelopeBytes": 35417,
+      "reservation": 0.086882,
+      "margin": 0.014373199999999975,
+      "removedGroups": 0,
+      "latestApprovedSnapshotProtected": true
+    },
+    {
+      "paths": [
+        "server.mjs",
+        "todo.test.mjs",
+        "README.md",
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0,
+      "availableBudget": 0.10125519999999998,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 49721,
+      "fullReservation": 0.11549
+    }
+  ],
+  "historicalFeeSensitivity": [
+    {
+      "paths": [
+        "server.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.017152,
+      "availableBudget": 0.08410319999999998,
+      "envelopeBytes": 33697,
+      "reservation": 0.083442,
+      "margin": 0.0006611999999999729,
+      "removedGroups": 0,
+      "latestApprovedSnapshotProtected": true
+    },
+    {
+      "paths": [
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.017152,
+      "availableBudget": 0.08410319999999998,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 35417,
+      "fullReservation": 0.086882
+    },
+    {
+      "paths": [
+        "server.mjs",
+        "todo.test.mjs",
+        "README.md",
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.017152,
+      "availableBudget": 0.08410319999999998,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 49721,
+      "fullReservation": 0.11549
+    },
+    {
+      "paths": [
+        "server.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.024954,
+      "availableBudget": 0.07630119999999997,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 33697,
+      "fullReservation": 0.083442
+    },
+    {
+      "paths": [
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.024954,
+      "availableBudget": 0.07630119999999997,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 35417,
+      "fullReservation": 0.086882
+    },
+    {
+      "paths": [
+        "server.mjs",
+        "todo.test.mjs",
+        "README.md",
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.024954,
+      "availableBudget": 0.07630119999999997,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 49721,
+      "fullReservation": 0.11549
+    },
+    {
+      "paths": [
+        "server.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.025912,
+      "availableBudget": 0.07534319999999997,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 33697,
+      "fullReservation": 0.083442
+    },
+    {
+      "paths": [
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.025912,
+      "availableBudget": 0.07534319999999997,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 35417,
+      "fullReservation": 0.086882
+    },
+    {
+      "paths": [
+        "server.mjs",
+        "todo.test.mjs",
+        "README.md",
+        "acceptance.test.mjs"
+      ],
+      "hypotheticalPriorCallCost": 0.025912,
+      "availableBudget": 0.07534319999999997,
+      "blocked": true,
+      "code": "BUDGET_CONTEXT_LIMIT",
+      "envelopeBytes": 49721,
+      "fullReservation": 0.11549
+    }
+  ],
+  "historicalFeeSensitivityMeaning": "Past settled QA amounts are hypothetical sensitivity points, never predictions; each variant omits future manager fees, reasoning, new knowledge and filesystem-result metadata, so fitting is optimistic rather than guaranteed.",
+  "phase": "native-refresh-final",
+  "codeHashes": {
+    "services/agent-runtime/host.mjs": "36999c4543462ac63d9e13d87ed2903555699b777a8a50d3da6ed6c5504e4d0f",
+    "services/agent-runtime/employee-hosts.mjs": "4465d26a2dcb1afb0a1d6af371c9e8aa1e033c0088f65ac3b405861be097ce84",
+    "services/agent-runtime/budget-context.mjs": "c64265f09350ea4ad6292072247180d4e5b9f228adc39a90f572f7a6eb856bff",
+    "services/agent-runtime/limits.mjs": "35b77fdda0df1d0076686079cf9c98fbe8f488cd852dae7eefc3731aa054a57e",
+    "services/agent-runtime/budget.mjs": "780123a17a6cddda9e45ee4716434594deb01d193849dc9490401b8e710a35ad",
+    "services/agent-runtime/openai-compatible.mjs": "74a261af64a95db9f25783c6a8f38144429c71e413befb6fa68c817e8383efb5",
+    "services/agent-runtime/checkpoint-context.mjs": "fb82cd7d16405f2a7bfc21a8efa46a7b9b22358d22282dd618be4dde4ad400a3",
+    "services/agent-runtime/handoff.mjs": "28112a6b986c4ba2ea5b2b2f2495480c82fb88b72c471f190ce1a3268ec90e0e",
+    "services/agent-runtime/product-runtime.mjs": "0f9ad352e42f23426d08a35d2840bbe43222586b5f24000a4a4285a8da2b8f1f",
+    "services/agent-runtime/product-tools.mjs": "6fd0e59c8cf3320640b23840da0c7944e4afcfa209441472e73501f81d9510a8",
+    "services/agent-runtime/employee-context.mjs": "c5a35c1f52d7023b83a6ee3dc54ad11e3281242d9ac3cff7d44c23b7b98db8f2",
+    "services/agent-runtime/rework.mjs": "0a654c56c677ae1c1f867a64dbb7f5e6416f7c699b152a619ab08c12e0f3a55d",
+    "services/agent-runtime/checkpoint-team.mjs": "4fc85d2a44e507a89451f33cc83486abf88aff7db0ff61df9c025ad82970298c",
+    "services/agent-runtime/task-attribution.mjs": "2bc92b6725f7ddbcf7fcb13a39789d3473328d109444db390d8afdff5304970a",
+    "services/agent-runtime/node_modules/@deepseek-ai/dsh-agent-loop/lib/index.js": "257eb83c00a05ee068e9f4ba80ca71ab94e3a1275d24b7a0cf5038ff23dd0fd8",
+    "services/agent-runtime/node_modules/@deepseek-ai/dsh-system-prompt/lib/index.js": "c55121dd92e88783adc37a5f92e6c410304bae39796d1e67218b5fab8712bafc",
+    "services/agent-runtime/node_modules/@nanmicoder/dsh-agent-teams/lib/members.js": "11913193ef56d05faa9ef2660d89a92ca804679776e0515c5fa1d89865e86525",
+    "apps/api/src/handoff-checkpoints.ts": "7bb36090ec4d758adc3ccfc98fa9577ecfdb53f417b74b04812d0eea546acc9a",
+    "apps/api/src/budget-history.ts": "02fccf4df9b8ea8684e864d4dce4340dc2f459eab7d484e3f496856c5ee80d22",
+    "apps/api/src/run-management.ts": "9e51c9930acafb23577ceefdc3cfbafd47e0b8943763254a583677e24eca252c"
+  },
+  "codeUnchangedDuringSimulation": true
+}

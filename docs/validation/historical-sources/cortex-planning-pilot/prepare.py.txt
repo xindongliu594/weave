@@ -1,0 +1,19 @@
+import hashlib,json,pathlib,tarfile,os
+base=pathlib.Path('/home/jj/.local/share/weiwu/validation/cortex-planning-20261018')
+repo=pathlib.Path('/home/jj/.local/share/weiwu/releases/weiwu-native-capabilities-20261018')
+archive=base/'source.tar.gz'
+assert hashlib.sha256(archive.read_bytes()).hexdigest()=='432ae6fe20bd7f7d206800179ab7059f7e325e84e3b8fec5be4ad8618055b0ca'
+with tarfile.open(archive) as t:
+ for m in t.getmembers():
+  assert (base/m.name).resolve().is_relative_to(base) and not m.issym() and not m.islnk()
+ t.extractall(base,filter='data')
+source=base/'dsh-cortex-e2a9acacf7255678220dd927c4348db03851d6d7'
+runtime=repo/'services/agent-runtime/node_modules'
+assert not (source/'node_modules').exists()
+os.symlink(runtime,source/'node_modules',target_is_directory=True)
+packages={}
+for name in ['@deepseek-ai/cordis','@deepseek-ai/dsh-tools','@deepseek-ai/dsh-llm','@deepseek-ai/dsh-agent','@deepseek-ai/dsh-commands','js-yaml']:
+ p=runtime/name/'package.json'; packages[name]=json.loads(p.read_text())['version']
+manifest={'sourceCommit':source.name.removeprefix('dsh-cortex-'),'package':json.loads((source/'package.json').read_text()),'dependenciesReusedFromFixedHost':packages,'sourceHashes':{str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.rglob('*') if p.is_file() and not p.is_symlink()}}
+(base/'source-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+print(json.dumps({'source':str(source),'dependencies':packages,'sourceFiles':len(manifest['sourceHashes']),'modelCalls':0}))

@@ -1,0 +1,10 @@
+"""Load-only launcher. No production process inspection or credentials."""
+import os,pathlib,subprocess,sys
+root=pathlib.Path('/home/jj/.local/share/weiwu')
+repo=root/'releases/weiwu-native-capabilities-20261018'
+base=root/'validation/cortex-planning-20261018'
+assert sys.argv[1]=='load', 'Real planning requires an explicitly approved broker configuration'
+env={'PATH':str(root/'runtime/node-v24.19.0-linux-x64/bin')+':/usr/bin:/bin','HOME':str(pathlib.Path.home())}
+node=root/'runtime/node-v24.19.0-linux-x64/bin/node'
+result=subprocess.run([str(node),'--import',str(repo/'node_modules/tsx/dist/loader.mjs'),str(base/'broker.mjs'),str(repo),str(base),sys.argv[1]],cwd=repo,env=env)
+sys.exit(result.returncode)

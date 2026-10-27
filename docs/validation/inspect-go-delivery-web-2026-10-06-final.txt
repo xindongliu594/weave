@@ -1,0 +1,17 @@
+✔ explicit parameters preserve actual version/IDs and choose only a new evidence scope (4.212ms)
+✔ missing/duplicate/foreign origin/unsafe paths are rejected before any browser or request (2.2382ms)
+✔ all mutation/provider/maintenance and unrelated-run GET requests are denied (1.221ms)
+✔ the reader makes only its allowlisted GET and preserves actual raw bytes/source SHA in memory (32.7821ms)
+✔ non-200 results preserve raw failure without being turned into accepted evidence (1.5711ms)
+✔ delivery expectation derives all five output hashes and both real command counts from memory fixtures (5.1822ms)
+✔ incomplete run/node/seal/bytes/output/test counts cannot be accepted (4.8135ms)
+✔ a newly mapped repair without its own completed checkpoint cannot inherit an old accepted native completion (0.5033ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 226.1
+pureTestExitCode=0

@@ -1,0 +1,78 @@
+Final declaration repair typecheck 2026-10-06T04:49:35Z
+Node C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+Original root failure log preserved: docs/validation/go-lifecycle-final-typecheck-2026-10-06.txt
+SHA256 b7ce1c6dbdd60d8cdb7cd1df116f2c5596475a0753395af7f8692eafacf9dd9c
+
+Intermediate declaration repair tsc --noEmit (exit1):
+tests/budget-history-admission.test.ts(49,43): error TS7022: 'runVersion' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+
+
+Final explicit RunOptions tsc --noEmit:
+command: node node_modules/typescript/bin/tsc --noEmit
+exitCode: 0
+stdout: ""
+No compiler suppression or settings changed.
+
+Final NEW12 isolated regression:
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ one successful wire and matching persisted receipt consume one call, without a second fee or hold (508.3156ms)
+✔ registered undispatched released attempt retains its global and qa_review call with no fee (114.052ms)
+✔ 23 wires plus the registered review abort restore and planning-feedback as 24, including qa_review=1 (399.0392ms)
+✔ other project/version registration cannot leak into this exact version (227.6289ms)
+✔ multiple resumes sum only each run own attempts and never duplicate admission snapshot histories (238.1899ms)
+✔ legacy wire-only without usage IDs or receipts preserves native-session mapping and authoritative row version (162.0359ms)
+✔ old unknown task hold amounts/history remain intact while their registered call is inherited (130.3581ms)
+✔ cancelled-before-start missing archive is zero only when no registration exists (67.0186ms)
+✔ receipt project mismatch and explicit archived owner/version mismatches fail instead of returning zero (279.2144ms)
+✔ contradictory partial legacy task attribution fails closed rather than creating negative unattributed calls (109.9989ms)
+✔ same-task maximum preserves more legacy wires than available receipts without adding them (150.0373ms)
+✔ inherited evidence propagates the durable basis and preserves old snapshot fallback without fabricating missing calls (35.0787ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4071.1517
+
+Final source hashes:
+[
+  {
+    "path": "apps/api/src/budget-history.ts",
+    "sha256": "9712b0b8e1c998551cc6eb8b4cb04ca67d83ba290ed66865640f1036b7ec4acd"
+  },
+  {
+    "path": "apps/api/src/planning-execution-context.ts",
+    "sha256": "1a981c25b6ec51cea6029d033eb64dfa15820493f502b0e657bc6ffb6fa6b6e0"
+  },
+  {
+    "path": "services/agent-runtime/run-evidence.mjs",
+    "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737"
+  },
+  {
+    "path": "tests/budget-history-admission.test.ts",
+    "sha256": "42416a018419106fa6631a31f07358966051c3e1d5099f60ace3389a13dd4c79"
+  },
+  {
+    "path": "tests/planning-execution-context.test.ts",
+    "sha256": "0f1b56457f8947f875ffd5e1ec1e125cd882b2b530455bb359ffcec4c044cf6e"
+  },
+  {
+    "path": "services/agent-runtime/run-evidence.test.mjs",
+    "sha256": "15e575c6ee7f0a4efc08b28f69d87ccccce6ce58d28af77b84de204876da5fa0"
+  },
+  {
+    "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+    "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+  },
+  {
+    "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+    "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+  },
+  {
+    "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+    "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+  }
+]

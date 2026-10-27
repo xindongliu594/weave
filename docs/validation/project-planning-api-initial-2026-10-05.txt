@@ -1,0 +1,18 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2511.191ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (147.9086ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (116.4026ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (197.6774ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (166.6056ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (191.9337ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (110.5996ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (169.9231ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4188.0655

@@ -1,0 +1,127 @@
+{
+  "kind": "local-static-web-fresh-upstream-connection-fix",
+  "frozenAt": "2026-10-06T05:04:34Z",
+  "sources": {
+    "before": {
+      "scriptSha256": "375e7eedbd9ca7b42e2d00111241fc6062c656812c538e2f74215a88ccb281bc",
+      "testSha256": "e574eaa2c4dcc6e08b7fac37eb94c25e6205229ecb05f830be1587a1eec3db8b"
+    },
+    "final": [
+      {
+        "path": "scripts/local-static-web.mjs",
+        "sha256": "2a75f0666efbc0f8887a267b6cb151be49fa6d2315ec392ec8b86ef186216304"
+      },
+      {
+        "path": "tests/local-static-web.test.ts",
+        "sha256": "17ddfcabd46e9b6c264d3362417efe399f8f0783e10671589bbbf03bb4aed2e0"
+      }
+    ]
+  },
+  "unchangedFiles": [
+    {
+      "path": "tests/local-launcher.test.ts",
+      "sha256": "60e6a769b48c75084473010cbb59dc489ed59dc8cd9d1171ae87e8d09c812bff"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+    }
+  ],
+  "sourceChange": "Only upstream http.Agent keepAlive true -> false. No retry, request replay or additional transport behavior added.",
+  "actualStoredObservation": {
+    "path": "docs/test-evidence/funded-run-web-normal-resume-2026-10-06T04-57-08-143Z-30061a10.json",
+    "sha256": "d0f555796e0e071d624bd12b9362010915ece23b98bcafd85e50bf17aa79d275",
+    "action": "resume",
+    "runId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+    "version": 8,
+    "mutations": 0,
+    "failure": {
+      "message": "No single reviewed POST was observed; inspect and never replay",
+      "dispatchObserved": false,
+      "result": "Unknown/failed action is not success and must not be replayed."
+    },
+    "blockedRequests": [
+      {
+        "method": "POST",
+        "pathSha256": "d1b94004ac47a299c3841dbaae65580caf25c8ed41df4a20009a86cefa828d4d",
+        "message": "Required product GET was unavailable"
+      }
+    ],
+    "failedGets": [
+      {
+        "endpoint": "/runs/90f0e832-f423-42f3-abc0-c0749a07b90f",
+        "method": "GET",
+        "checkedAt": "2026-10-06T04:57:26.779Z",
+        "status": 502,
+        "available": false
+      }
+    ]
+  },
+  "actualRootCauseConfirmed": false,
+  "specificEconnresetRootCauseConfirmed": false,
+  "realPostReloadReliabilityVerified": false,
+  "tests": [
+    {
+      "command": "node --import tsx --test --test-name-pattern='successive API|upstream disconnect' tests/local-static-web.test.ts",
+      "phase": "new tests against prior shared keep-alive",
+      "exitCode": 1,
+      "tests": 2,
+      "pass": 1,
+      "fail": 1,
+      "observation": "8 API reads reused 1 upstream socket instead of the required8; disconnect GET/POST/PUT already remained single dispatch."
+    },
+    {
+      "command": "node --import tsx --test tests/local-static-web.test.ts tests/local-launcher.test.ts",
+      "phase": "final",
+      "exitCode": 0,
+      "tests": 19,
+      "pass": 19,
+      "fail": 0,
+      "skip": 0
+    },
+    {
+      "command": "node --check scripts/local-static-web.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "verified": {
+    "eightSequentialApiReadsUseEightFreshUpstreamSockets": true,
+    "unknownMutationBodyConsumedBeforeDisconnect": true,
+    "disconnectEachGetPostPutUpstreamDispatches": 1,
+    "disconnectReturnsExisting502Code": "LOCAL_API_UNAVAILABLE",
+    "originalMethodPathQueryHeadersBytesAndIdempotencyKeyPreserved": true,
+    "noGetPostPutAutomaticReplay": true,
+    "existingOriginHostPathAndHeaderGuardsPass": true,
+    "responseStreamingAndClientShutdownAbortBoundariesPass": true,
+    "staticAssetsAndLaunchLockChecksPass": true
+  },
+  "executionBoundaries": {
+    "originalApiReads": 0,
+    "originalDatabaseOpens": 0,
+    "realModelOrPaidProviderCalls": 0,
+    "credentialReads": 0,
+    "employeeFilesReadOrWritten": 0,
+    "actualBrowserOrServiceReload": false,
+    "httpTests": "temporary credential-free loopback HTTP upstream and static host; no product DB or model service",
+    "launcherTests": "help/invalid-option checks and an existing owned temporary launcher lock; no original data directory"
+  },
+  "limitations": [
+    "The actual saved502 establishes an unavailable local API read through the proxy. The generic proxy response does not disclose a concrete transport root cause.",
+    "Removing shared upstream socket reuse is verified by local regression. Actual post-reload GET/resume reliability remains for root to verify.",
+    "No GET or mutation is retried after an unknown result. Root retains and reviews both original zero-dispatch intent chains before any distinct future operation."
+  ]
+}

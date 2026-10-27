@@ -1,0 +1,11 @@
+file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/8ae853c9-248f-45bb-b0bc-28d62fc85879/server.mjs:139
+if (process.argv[1].endsWith('server.mjs') && !module.parent) {
+                                               ^
+
+ReferenceError: module is not defined in ES module scope
+    at file:///C:/Users/JJ/Desktop/la/agent_department/.data/local/workspaces/8ae853c9-248f-45bb-b0bc-28d62fc85879/server.mjs:139:48
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0

@@ -1,0 +1,26 @@
+✔ local launcher documents the explicit data directory (186.1225ms)
+✔ API-only local check cannot be presented as a production static-web check (181.1752ms)
+✔ local check refuses a data directory override before accessing it (179.0183ms)
+✔ local launcher refuses relative and empty data directories (369.4551ms)
+✔ local launcher refuses ambiguous duplicate data directory options (171.932ms)
+✔ an absolute data directory with spaces retains its existing launch lock (184.6505ms)
+✔ static page, assets and HEAD use correct MIME without a development server (70.9706ms)
+✔ API proxy retains bytes, query, status, end-to-end headers and original idempotency key (10.2736ms)
+✔ upstream permission failure and API 404 remain API responses (5.3548ms)
+✔ Host and browser Origin guards reject both HTML and API before upstream operations (13.6442ms)
+✔ SPA fallback excludes API, missing assets, encoded traversal and non-read methods (9.1911ms)
+✔ static serving refuses a directory link outside the build root (4.9911ms)
+✔ streamed API response starts before the upstream completes (3.8065ms)
+✔ unavailable API returns an explicit 502 and never falls through to the SPA (11.158ms)
+✔ closing static host aborts an outstanding API stream, releases the port and is idempotent (9.2535ms)
+✔ missing build fails with a build instruction and does not create a data directory (2.8317ms)
+✔ existing built product index and assets are served unchanged (251.0192ms)
+✔ public deployment origins must be explicit canonical HTTPS origins (2.6486ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1671.9386

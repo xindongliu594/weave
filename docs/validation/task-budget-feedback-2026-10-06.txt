@@ -1,0 +1,103 @@
+Frozen task-budget-feedback validation 2026-10-06T03:04:47Z
+Node: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+
+INITIAL new integration run (exit 1, assertion used wrong API field; business checks retained):
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ the actual QA estimate/cap gap names its task while retaining the generic error and total (9666.6749ms)
+✔ every over-cap task is identified once in task order (1.347ms)
+✔ an exact task cap and an omitted cap keep the original valid boundary (0.9447ms)
+✔ micro-dollar ceiling remains strict and displays an unrounded cap (0.9665ms)
+✔ missing model prices stay unknown without invented numeric task feedback (0.9097ms)
+✔ the existing candidate page renders the exact task, estimate and cap in error paragraphs (59.9437ms)
+✖ isolated project API returns the detail and rejects approval before calls, receipts or work (480.2678ms)
+✔ isolated HTTP 200 generated candidate carries the task detail to the unchanged page without saving (150.7593ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12428.0441
+
+✖ failing tests:
+
+test at tests\task-budget-feedback.test.ts:1:10867
+✖ isolated project API returns the detail and rejects approval before calls, receipts or work (480.2678ms)
+  TypeError: Cannot read properties of undefined (reading 'includes')
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-budget-feedback.test.ts:180:32)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+
+FINAL new integration run (exit 0):
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ the actual QA estimate/cap gap names its task while retaining the generic error and total (1974.397ms)
+✔ every over-cap task is identified once in task order (1.0756ms)
+✔ an exact task cap and an omitted cap keep the original valid boundary (0.8783ms)
+✔ micro-dollar ceiling remains strict and displays an unrounded cap (0.6029ms)
+✔ missing model prices stay unknown without invented numeric task feedback (0.6368ms)
+✔ the existing candidate page renders the exact task, estimate and cap in error paragraphs (44.4352ms)
+✔ isolated project API returns the detail and rejects approval before calls, receipts or work (97.0063ms)
+✔ isolated HTTP 200 generated candidate carries the task detail to the unchanged page without saving (145.1127ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3105.7763
+
+EXISTING policy + project-planning UI regression (exit 0):
+✔ single manager is a valid one-agent department (4.3349ms)
+✔ legacy placeholder tasks cannot pass execution validation through configuration-only edits (7.2227ms)
+✔ an explicit one-person text plan remains executable without file tools (0.4217ms)
+✔ recovery policy cannot authorize unbounded retries or immediate false stall decisions (2.6172ms)
+✔ team protocol capability is required even without workspace tools and for fallback models (0.9567ms)
+✔ cyclic dependencies and missing owners are rejected (0.4871ms)
+✔ unknown model, excessive concurrency and cost cannot pass validation (0.3774ms)
+✔ manager count, duplicate agent IDs and empty acceptance are rejected (1.1734ms)
+✔ task estimates and task turn limits must fit the approved policy (1.2662ms)
+✔ run inputs require valid recipients, bounded text, unique IDs and a retrieval grant (4.9457ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (4.8071ms)
+✔ the exact user adjustment invalidates an old quote and stays in the locked generation body (3.3632ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (17.5035ms)
+✔ read-only quote performs one GET with exact explicit parameters and rejects mismatched versions (1.1454ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.578ms)
+✔ changed or newly blocked quote returns current evidence without a POST or reservation callback (0.8413ms)
+✔ unchanged affordable quote generates one candidate after GET, with no save/approve request or data changes (0.9065ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.8752ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (49.6602ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (6.8443ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (15.256ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.3492ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.8205ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (3.3442ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.7796ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without a POST (3.3224ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.7877ms)
+✔ explicit retention binds quote evidence, GET/POST bodies and candidate response, with no implicit true (2.7147ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.4744ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.7ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.5338ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (2.8557ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.8449ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3883.1664
+
+
+Final source hashes:
+packages/contracts/index.ts f25847d5f909c44805b08f8f52bf9c36d9ee63d056e1c921bff71c4c5c961f56
+tests/task-budget-feedback.test.ts de74916ab1174d331365c1e464c2800fd93f14ad52684db051518716e0284b3a
+apps/web/src/ProjectPlanning.tsx 34c74aaacb9f1d99e035716042ada9c6c12b841d014e1a0346d929357c43ee36
+docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs 22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf

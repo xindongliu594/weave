@@ -1,0 +1,451 @@
+{
+  "checkedAt": "2026-10-06T10:41:48.053Z",
+  "kind": "actual-client-local-http-two-stage-planning-regression",
+  "nodeVersion": "v24.19.0",
+  "evidenceDirectory": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070",
+  "sources": [
+    {
+      "path": "docs/test-evidence/helpers/planning-two-stage-readonly-guard-2026-10-06.mjs",
+      "sha256": "638ff79981a79fc5467674fb26635f7e298c3a6c6601ba807dd65404eb71508b"
+    },
+    {
+      "path": "docs/test-evidence/helpers/generate-go-normal12-two-stage-web-2026-10-06.mjs",
+      "sha256": "95fcc25c41cc35267ad34d18bd61fcd6d7cef1d7dbd696bbff8ba91fdd729485"
+    },
+    {
+      "path": "docs/test-evidence/helpers/generate-go-recovery10-two-stage-web-2026-10-06.mjs",
+      "sha256": "70692f6897f1978136ddc9638881433f4a6a21e90e53a0f6b9562f0ed4d2d318"
+    },
+    {
+      "path": "docs/test-evidence/helpers/prepare-two-stage-planning-wrappers-2026-10-06.mjs",
+      "sha256": "7c1216d9cf0cc96f998779530c9bd9ac608141a56d583222a4aaed328f19ba66"
+    },
+    {
+      "path": "docs/test-evidence/helpers/check-two-stage-client-http-regression-2026-10-06.ts",
+      "sha256": "90001962df7405859ef057772453a7ab51efa6108431f535ec133d65fe863420"
+    },
+    {
+      "path": "apps/web/src/ProjectPlanning.tsx",
+      "sha256": "98532b13100f2f332b8446c666b9a03799efe92084557e5652c60be9c03039e4"
+    },
+    {
+      "path": "apps/web/src/api.ts",
+      "sha256": "10bb4d69bbfc4b16b7fd3d71901db50b9142b2df7aed9933ed704aa8c88ededf"
+    }
+  ],
+  "results": [
+    {
+      "mode": "stable",
+      "actualClient": "candidate",
+      "operator": "response",
+      "quotePosts": 2,
+      "stubGenerationPosts": 1,
+      "submitCalls": 1,
+      "uiRecheckObserved": false,
+      "serverRequests": [
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/generate",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": "stub-stable-same-key"
+        }
+      ],
+      "state": {
+        "phase": "paid-known-http-result",
+        "requests": [
+          {
+            "stage": "manual-check",
+            "method": "POST",
+            "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+            "body": {
+              "modelId": "22222222-2222-4222-8222-222222222222",
+              "version": 11,
+              "maxPlanningCost": 0.2,
+              "maxOutputTokens": 12000,
+              "retainUncertainCosts": false,
+              "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+            },
+            "readOnly": true,
+            "paidRequest": false
+          },
+          {
+            "stage": "generation-recheck",
+            "method": "POST",
+            "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+            "body": {
+              "modelId": "22222222-2222-4222-8222-222222222222",
+              "version": 11,
+              "maxPlanningCost": 0.2,
+              "maxOutputTokens": 12000,
+              "retainUncertainCosts": false,
+              "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+            },
+            "readOnly": true,
+            "paidRequest": false
+          }
+        ],
+        "sources": [
+          {
+            "stage": "manual-check",
+            "kind": "quote",
+            "path": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070/stable/response-manual-check-quote-response.json",
+            "status": 200,
+            "bytes": 661,
+            "sha256": "37838093f020beeece2f701b3c8d2b10677828ad324d53293e66f90cdc8ff778",
+            "paidRequest": false
+          },
+          {
+            "stage": "generation-recheck",
+            "kind": "quote",
+            "path": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070/stable/response-generation-recheck-quote-response.json",
+            "status": 200,
+            "bytes": 661,
+            "sha256": "6f589f99a42460e1c6dd0e61c2c967e9d062f10270ff7bd5413acc1c35b2b23d",
+            "paidRequest": false
+          }
+        ],
+        "quoteStages": [
+          "manual-check",
+          "generation-recheck"
+        ],
+        "paidKey": "stub-stable-same-key",
+        "paidBodySha256": "9020af7c3f550045fed5fda95cc1097331846a76abd2b2d5c01289710531ef5f",
+        "paidForwarded": true,
+        "resultKnown": true,
+        "paidDispatchLimit": 1,
+        "quoteDispatchLimit": 2
+      },
+      "passed": true,
+      "actualProviderCalls": 0
+    },
+    {
+      "mode": "quote-changed",
+      "actualClient": "recheck",
+      "operator": "recheck",
+      "quotePosts": 2,
+      "stubGenerationPosts": 0,
+      "submitCalls": 0,
+      "uiRecheckObserved": true,
+      "serverRequests": [
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": null
+        }
+      ],
+      "state": {
+        "phase": "quote-changed-no-paid",
+        "requests": [
+          {
+            "stage": "manual-check",
+            "method": "POST",
+            "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+            "body": {
+              "modelId": "22222222-2222-4222-8222-222222222222",
+              "version": 11,
+              "maxPlanningCost": 0.2,
+              "maxOutputTokens": 12000,
+              "retainUncertainCosts": false,
+              "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+            },
+            "readOnly": true,
+            "paidRequest": false
+          },
+          {
+            "stage": "generation-recheck",
+            "method": "POST",
+            "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+            "body": {
+              "modelId": "22222222-2222-4222-8222-222222222222",
+              "version": 11,
+              "maxPlanningCost": 0.2,
+              "maxOutputTokens": 12000,
+              "retainUncertainCosts": false,
+              "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+            },
+            "readOnly": true,
+            "paidRequest": false
+          }
+        ],
+        "sources": [
+          {
+            "stage": "manual-check",
+            "kind": "quote",
+            "path": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070/quote-changed/response-manual-check-quote-response.json",
+            "status": 200,
+            "bytes": 661,
+            "sha256": "37838093f020beeece2f701b3c8d2b10677828ad324d53293e66f90cdc8ff778",
+            "paidRequest": false
+          },
+          {
+            "stage": "generation-recheck",
+            "kind": "quote",
+            "path": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070/quote-changed/response-generation-recheck-quote-response.json",
+            "status": 200,
+            "bytes": 663,
+            "sha256": "b64239d7b2fc29dc637ef09dabfd71a49d3909b664a52d8ec1d3b0e9ac16f388",
+            "paidRequest": false
+          }
+        ],
+        "quoteStages": [
+          "manual-check",
+          "generation-recheck"
+        ],
+        "paidForwarded": false,
+        "resultKnown": false,
+        "paidDispatchLimit": 1,
+        "quoteDispatchLimit": 2
+      },
+      "passed": true,
+      "actualProviderCalls": 0
+    },
+    {
+      "mode": "unknown-result",
+      "actualClient": "unknown transport rejection",
+      "operator": "unknown transport rejection",
+      "quotePosts": 2,
+      "stubGenerationPosts": 1,
+      "submitCalls": 1,
+      "uiRecheckObserved": false,
+      "serverRequests": [
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/projects/11111111-1111-4111-8111-111111111111/generate",
+          "body": {
+            "modelId": "22222222-2222-4222-8222-222222222222",
+            "version": 11,
+            "maxPlanningCost": 0.2,
+            "maxOutputTokens": 12000,
+            "retainUncertainCosts": false,
+            "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+          },
+          "key": "stub-unknown-result-same-key"
+        }
+      ],
+      "state": {
+        "phase": "paid-unknown-no-redispatch",
+        "requests": [
+          {
+            "stage": "manual-check",
+            "method": "POST",
+            "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+            "body": {
+              "modelId": "22222222-2222-4222-8222-222222222222",
+              "version": 11,
+              "maxPlanningCost": 0.2,
+              "maxOutputTokens": 12000,
+              "retainUncertainCosts": false,
+              "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+            },
+            "readOnly": true,
+            "paidRequest": false
+          },
+          {
+            "stage": "generation-recheck",
+            "method": "POST",
+            "path": "/api/projects/11111111-1111-4111-8111-111111111111/planning-quote",
+            "body": {
+              "modelId": "22222222-2222-4222-8222-222222222222",
+              "version": 11,
+              "maxPlanningCost": 0.2,
+              "maxOutputTokens": 12000,
+              "retainUncertainCosts": false,
+              "revisionRequest": "本地HTTP工作流测试，不连接真实项目或模型。"
+            },
+            "readOnly": true,
+            "paidRequest": false
+          }
+        ],
+        "sources": [
+          {
+            "stage": "manual-check",
+            "kind": "quote",
+            "path": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070/unknown-result/response-manual-check-quote-response.json",
+            "status": 200,
+            "bytes": 661,
+            "sha256": "37838093f020beeece2f701b3c8d2b10677828ad324d53293e66f90cdc8ff778",
+            "paidRequest": false
+          },
+          {
+            "stage": "generation-recheck",
+            "kind": "quote",
+            "path": "docs/test-evidence/two-stage-planning-client-http-2026-10-06T10-41-46-749Z-7e9af070/unknown-result/response-generation-recheck-quote-response.json",
+            "status": 200,
+            "bytes": 661,
+            "sha256": "6f589f99a42460e1c6dd0e61c2c967e9d062f10270ff7bd5413acc1c35b2b23d",
+            "paidRequest": false
+          }
+        ],
+        "quoteStages": [
+          "manual-check",
+          "generation-recheck"
+        ],
+        "paidKey": "stub-unknown-result-same-key",
+        "paidBodySha256": "9020af7c3f550045fed5fda95cc1097331846a76abd2b2d5c01289710531ef5f",
+        "paidForwarded": true,
+        "resultKnown": false,
+        "paidDispatchLimit": 1,
+        "quoteDispatchLimit": 2
+      },
+      "passed": true,
+      "actualProviderCalls": 0
+    }
+  ],
+  "normalPredecessor": {
+    "path": "docs/test-evidence/go-normal12-normal-generate-2026-10-06T10-22-33-660Z-e73750cd.json",
+    "sha256": "749239ce71259d00020e6551f4c0642fae0f4aa6014e6218cb38e0709b776740",
+    "auditPath": "docs/validation/go-normal-v12-two-quote-block-2026-10-06.json",
+    "auditSha256": "0f1361553395e0df3a577ad2d5687c6a1f5acb349b872969847725c6b4f6406b",
+    "firstQuote": {
+      "kind": "quote",
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-normal12-normal-generate-2026-10-06T10-22-33-660Z-e73750cd-quote-response.json",
+      "status": 200,
+      "bytes": 10121,
+      "sha256": "a0e15236d46561417d4ea01824e28fb7c875b8ffa7af1b957ca5b3892846b85d"
+    },
+    "priorComputedPaidClaim": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\funded-acceptance\\web-operation-guards\\go-plan-normal12-5000893b8e7d1ca0c4102a1e2480137c4f4275c20d7fa084ebb769d19ad1d337.json",
+    "priorClaimState": "not-created; actual ENOENT",
+    "priorPaidPosts": 0,
+    "priorNewUsage": [],
+    "oldHelperUnchanged": true
+  },
+  "recoveryPredecessor": {
+    "sources": [
+      {
+        "path": "docs/test-evidence/go-recovery10-budget-recovery-generate-2026-10-06T09-45-16-415Z-d055372e.json",
+        "sha256": "c2ec903b609a0d36c9ba480ec7404696c070eae9143a457ec4b06d9584177441"
+      },
+      {
+        "path": "docs/test-evidence/go-long-planning-quote-http-diagnostic-2026-10-06.json",
+        "sha256": "d0c7d12bc45a2f2a1887c8e26704b55795f850d86d6a89b34218aa0f1da83d09"
+      },
+      {
+        "path": "docs/test-evidence/go-long-planning-quote-http-body-2026-10-06.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-recovery10-real-budget-web-2026-10-06.mjs",
+        "sha256": "c0a18c5c97c5852dc03fcf5a7a8de493b732ad7ed012369b6f4c2b8a58c3c3f2"
+      },
+      {
+        "path": "docs/test-evidence/helpers/go-normal12-producer-source-guard-2026-10-06.mjs",
+        "sha256": "84a26b2b256430e498d029a2eb724d5b032d04bc34615fdc26fa79b7257479b0"
+      }
+    ],
+    "oldFailurePath": "docs/test-evidence/go-recovery10-budget-recovery-generate-2026-10-06T09-45-16-415Z-d055372e.json",
+    "forwardedPaidPosts": 0,
+    "paidCalls": 0,
+    "oldQuoteMethod": "GET",
+    "diagnosticHttpStatus": 431,
+    "requestTargetBytes": 16572,
+    "nodeHttpDefaultMaxHeaderSize": 16384,
+    "oldComputedClaimPath": ".data/funded-acceptance/web-operation-guards/go-plan-recovery10-budget-45520bdfc187045235466447c09d710616b7b8206e34c69cae70e5be8a61bd61.json",
+    "oldClaimState": "not-created; actual ENOENT before successor",
+    "oldClaimFabricated": false,
+    "oldClaimDeleted": false,
+    "oldRequestReplayed": false,
+    "oldProjectVersion": 9,
+    "oldPhaseTotalBefore": 3.2281715999999983,
+    "oldPhaseTotalAfter": 3.2281715999999983
+  },
+  "pureGuards": [
+    "third quote",
+    "changed body",
+    "quote key",
+    "wrong method",
+    "unrelated POST",
+    "duplicate paid",
+    "same-key unknown redispatch",
+    "new-key unknown redispatch",
+    "independent live markers"
+  ],
+  "workflowCasesPassed": 3,
+  "actualProviderCalls": 0,
+  "realApplicationApiCalls": 0,
+  "businessMutations": 0,
+  "productServiceOperations": 0,
+  "employeeArtifactsAuthored": false,
+  "keysRead": false,
+  "originalDatabaseOpened": false,
+  "status": "complete-offline-awaiting-root-actual-paid-authorization"
+}

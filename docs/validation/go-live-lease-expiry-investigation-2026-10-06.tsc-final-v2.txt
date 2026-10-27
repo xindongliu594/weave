@@ -1,0 +1,6 @@
+tests/run-transaction-fixture.ts(11,30): error TS2554: Expected 2 arguments, but got 1.
+tests/run-transaction-fixture.ts(11,54): error TS2339: Property 'query' does not exist on type 'void'.
+tests/run-transaction-fixture.ts(11,75): error TS2339: Property 'release' does not exist on type 'void'.
+tests/run-transaction-fixture.ts(16,10): error TS2339: Property 'release' does not exist on type 'void'.
+tests/run-transaction-fixture.ts(16,56): error TS2339: Property 'query' does not exist on type 'void'.
+tests/run-transaction-fixture.ts(16,75): error TS2339: Property 'release' does not exist on type 'void'.

@@ -1,0 +1,13 @@
+
+> agent-department@0.2.0 build
+> tsc --noEmit && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1682 modules transformed.
+rendering chunks...
+computing gzip size...
+../../dist/web/index.html                   0.56 kB │ gzip:   0.42 kB
+../../dist/web/assets/index-dlN7mzFD.css   43.79 kB │ gzip:   9.73 kB
+../../dist/web/assets/index-C67SIsyK.js   483.24 kB │ gzip: 148.23 kB
+✓ built in 5.55s

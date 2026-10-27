@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ exact request identity is required; ambiguous, mismapped, missing and refund records retain unknown fees (2588.7874ms)
+✔ provider charge is settled once from exact log plus verified units; replayed usage preserves authoritative charge (231.1177ms)
+✔ absent logs retain reservation and durable query state until a later exact receipt is found (125.2882ms)
+✔ changed gateway configuration and legacy calls cannot be settled using a replacement connection (84.57ms)
+✔ concurrent query and manual settlement preserve the manual receipt and do not duplicate charges (119.1748ms)
+✔ changed quota conversion and lost query ownership never fabricate a zero settled cost (86.1398ms)
+✔ restart cleanup terminates a stale third query without releasing or repeatedly querying the model (53.1844ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4072.6576
+✔ parallel direct calls reserve globally before fetch and departmental caps cover planning and execution admission (3010.7703ms)
+✔ runtime requests share the run reservation and uncertain costs survive completion and block retry (269.6379ms)
+✔ missing usage and network failures retain a lease until explicit reconciliation using pinned prices (531.1567ms)
+✔ known receipts are recorded despite malformed output or excessive usage; late receipts correct a manual entry once (236.0357ms)
+✔ backup refuses live calls and restores unresolved reservations without inventing a zero charge (448.3844ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5076.8367

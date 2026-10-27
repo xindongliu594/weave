@@ -1,0 +1,255 @@
+✔ only exact one-parent global and department dailyTotals release is admitted without changing any source object (4.4542ms)
+✔ receipt, usage, history, wrong department, any metadata and larger or smaller derived amounts are rejected (5.8363ms)
+✔ open parent receipts, missing usage attribution, multi-department and unknown money never become an inferred release (3.6009ms)
+✔ real captured stop sources pass the entire frozen legacy checkpoint after exact finance validation; source bytes are unchanged (1790.7823ms)
+✔ UI proof requires the exact parent, version, event count, cancelled state and no remaining stop action (3.2999ms)
+✔ NEW knowledge entry recomputes original raw full proof and actual UI sources; a passed report cannot bless altered receipts or proof (1734.3658ms)
+✔ fresh cancelled-parent page checks and readonly route scope precede knowledge PUT, while its exact original update packet stays unchanged (3.3629ms)
+✖ actual CLI seven options use the full saved-input preflight including the on-disk JSON reconciliation, with no transport (764.5684ms)
+✔ preflight failures identify only a static stage/code and never expose assertions, causes or supplied secret text (18.3223ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4560.623
+
+✖ failing tests:
+
+test at tests\go-cancel-reservation-release.test.mjs:68:1
+✖ actual CLI seven options use the full saved-input preflight including the on-disk JSON reconciliation, with no transport (764.5684ms)
+  Error: Knowledge update preflight rejected at reconciled-stop
+      at preflightStage (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs:229:19)
+      at async preflightKnowledgeUpgrade (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs:261:19)
+      ... 2 lines matching cause stack trace ...
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    stage: 'reconciled-stop',
+    code: 'KNOWLEDGE_PREFLIGHT_RECONCILED_STOP',
+    [cause]: AssertionError [ERR_ASSERTION]: Actual before/after full proof must be recomputed
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        checkpoint: {
+          availableBudget: 4.150841,
+          completedIds: [
+            'dev'
+    ...
+              at: '2026-10-06T12:02:32.750Z',
+    -         attemptId: undefined,
+              callId: '401f8980-d948-4545-9feb-5f2565d49c25',
+              dataSha256: 'c11473232569fb67389cc82e5c99b6c27f4136520cecebe28336befd26468a06',
+              seq: 2412,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/result'
+            },
+            {
+              at: '2026-10-06T12:02:32.756Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '667ff0b85f79fb35b193f74681b71d4eb2fd4e99431589d73be5a41b73776593',
+              seq: 2413,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'team/snapshot'
+            },
+            {
+              at: '2026-10-06T12:02:33.433Z',
+    -         attemptId: undefined,
+              callId: '38e0d9c2-6023-4bc2-b2cc-e9b99a1498f2',
+              dataSha256: '9988d1aecf3f3422cbba1e9b0df48bd8d594cd4f7f097c6be78787ebd35bdaa3',
+              seq: 2414,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/start'
+            },
+            {
+              at: '2026-10-06T12:02:33.811Z',
+    -         attemptId: undefined,
+              callId: '38e0d9c2-6023-4bc2-b2cc-e9b99a1498f2',
+              dataSha256: 'c11473232569fb67389cc82e5c99b6c27f4136520cecebe28336befd26468a06',
+              seq: 2415,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/result'
+            },
+            {
+              at: '2026-10-06T12:02:33.851Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '667ff0b85f79fb35b193f74681b71d4eb2fd4e99431589d73be5a41b73776593',
+              seq: 2416,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'team/snapshot'
+            },
+            {
+              at: '2026-10-06T12:02:34.589Z',
+    -         attemptId: undefined,
+              callId: '816f38b5-443a-42ac-a257-d90b9030794b',
+              dataSha256: '9988d1aecf3f3422cbba1e9b0df48bd8d594cd4f7f097c6be78787ebd35bdaa3',
+              seq: 2417,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/start'
+            },
+            {
+              at: '2026-10-06T12:02:35.571Z',
+    -         attemptId: undefined,
+              callId: '816f38b5-443a-42ac-a257-d90b9030794b',
+              dataSha256: 'c11473232569fb67389cc82e5c99b6c27f4136520cecebe28336befd26468a06',
+              seq: 2418,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/result'
+            },
+            {
+              at: '2026-10-06T12:02:35.575Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '667ff0b85f79fb35b193f74681b71d4eb2fd4e99431589d73be5a41b73776593',
+              seq: 2419,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'team/snapshot'
+            },
+            {
+              at: '2026-10-06T12:02:36.371Z',
+    -         attemptId: undefined,
+              callId: '59b24304-7a4d-43fa-b5c6-dfcf378ba283',
+              dataSha256: '9988d1aecf3f3422cbba1e9b0df48bd8d594cd4f7f097c6be78787ebd35bdaa3',
+              seq: 2420,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/start'
+            },
+            {
+              at: '2026-10-06T12:02:36.698Z',
+    -         attemptId: undefined,
+              callId: '59b24304-7a4d-43fa-b5c6-dfcf378ba283',
+              dataSha256: 'c11473232569fb67389cc82e5c99b6c27f4136520cecebe28336befd26468a06',
+              seq: 2421,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'tool/result'
+            },
+            {
+              at: '2026-10-06T12:02:36.737Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '667ff0b85f79fb35b193f74681b71d4eb2fd4e99431589d73be5a41b73776593',
+              seq: 2422,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'team/snapshot'
+            },
+            {
+              at: '2026-10-06T12:02:37.195Z',
+              attemptId: '16b2129c-6455-4bae-b69f-2d1a9e622ef4',
+    ...
+              attemptId: '16b2129c-6455-4bae-b69f-2d1a9e622ef4',
+    -         callId: undefined,
+              dataSha256: '5cf126c9a78e58a445715c109dc793780719195967acd69fb94defb2107e0ccd',
+              seq: 2424,
+              sessionId: 'd7a5dd4c-a35c-46fe-8206-9f64a9e01e48',
+              taskId: 't2',
+              type: 'session/tool/result'
+    ...
+              attemptId: '16b2129c-6455-4bae-b69f-2d1a9e622ef4',
+    -         callId: undefined,
+              dataSha256: '95fc5b829cdca8c675861792aaa7d6953cb8a4d4bfada883bb950d45a09f928d',
+              seq: 2425,
+              sessionId: 'd7a5dd4c-a35c-46fe-8206-9f64a9e01e48',
+              taskId: 't2',
+              type: 'session/step/end'
+    ...
+              attemptId: '16b2129c-6455-4bae-b69f-2d1a9e622ef4',
+    -         callId: undefined,
+              dataSha256: '46bf98168048d48ebbe2994c07ff389c87a3da78fb5d8c83db910e6308a4d2a0',
+              seq: 2426,
+              sessionId: 'd7a5dd4c-a35c-46fe-8206-9f64a9e01e48',
+              taskId: 't2',
+              type: 'session/turn/end'
+    ...
+              at: '2026-10-06T12:02:37.250Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '34c982d13c4388cc8daad98c4dd3c895afbf9b51477091ea2101a878c982c8da',
+              seq: 2427,
+              sessionId: 'd7a5dd4c-a35c-46fe-8206-9f64a9e01e48',
+    -         taskId: undefined,
+              type: 'runtime/disposed'
+            },
+            {
+              at: '2026-10-06T12:02:37.253Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: 'fd377df691d43d6693f12b90d7ef922a86beaacca8b0b16a4e6c1be48b09d7fa',
+              seq: 2428,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'session/agent/inbox/spliced'
+            },
+            {
+              at: '2026-10-06T12:02:37.256Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '33db19cd64eed311c006daa3da63e0abaa5c17740f8b4d4f165df3f91605564f',
+              seq: 2429,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'session/agent/inbox/spliced'
+            },
+            {
+              at: '2026-10-06T12:02:37.265Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: 'b537f62cf10846d9e47f83b5456353d23b165aeab0edc70bca9e937995c3d99c',
+              seq: 2430,
+              sessionId: '7af03af3-66c4-4acb-8957-0a2d258fe527',
+    -         taskId: undefined,
+              type: 'runtime/disposed'
+            },
+            {
+              at: '2026-10-06T12:02:37.272Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: '42b507ad65414689491caf42ad412840ba13e9f0c560ee438db90fc09d3e7a89',
+              seq: 2431,
+    -         sessionId: undefined,
+    -         taskId: undefined,
+              type: 'team/checkpoint'
+            },
+            {
+              at: '2026-10-06T12:02:37.274Z',
+    -         attemptId: undefined,
+    -         callId: undefined,
+              dataSha256: 'f3a9a05e4cfada6a18913103f4b97e019d30a5e50b3bae9a6052ba7a261447b9',
+              seq: 2432,
+    -         sessionId: undefined,
+    -         taskId: undefined,
+              type: 'run/finished'
+            }
+          ],
+          fileCount: 4,
+          knownNativeReadFailures: [],
+    
+        at verifyReconciledStop (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/reconcile-go-controlled-stop-release-readonly-2026-10-06.mjs:41:150)
+        at goKnowledgeStopFrame (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs:83:10)
+        at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs:261:71
+        at async preflightStage (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs:227:16)
+        at async preflightKnowledgeUpgrade (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/upgrade-go-funded-knowledge-release-successor-web-2026-10-06.mjs:261:19)
+        at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/tests/go-cancel-reservation-release.test.mjs:69:14)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: { status: 'passed', reserveRelease: [Object], checkpoint: [Object], serviceRestartVerified: false, recoveryVerified: false, independentQaVerified: false },
+      expected: { status: 'passed', reserveRelease: [Object], checkpoint: [Object], serviceRestartVerified: false, recoveryVerified: false, independentQaVerified: false },
+      operator: 'deepStrictEqual',
+      diff: 'simple'
+    }
+  }

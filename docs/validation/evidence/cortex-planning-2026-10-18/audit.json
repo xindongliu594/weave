@@ -1,0 +1,123 @@
+{
+  "originalSourceUnchanged": true,
+  "sourceFiles": 76,
+  "modelCallsDuringAudit": 0,
+  "cases": [
+    {
+      "label": "real",
+      "taskId": "task-mvdkp7kh-ddbd70",
+      "persistedNodesMatch": true,
+      "executionAttempts": 0,
+      "nodeCount": 3,
+      "edgeCount": 0,
+      "dependencyLevels": [
+        [
+          "T0.1",
+          "T0.2",
+          "T0.3"
+        ]
+      ],
+      "explicitEmployeeBindings": 0,
+      "receipt": {
+        "id": "8bcb99b4-7e23-4199-8d7f-452a82681393",
+        "usage": {
+          "prompt_tokens": 531,
+          "completion_tokens": 714
+        },
+        "cost": 0.0010160999999999998,
+        "elapsedMs": 11375
+      }
+    },
+    {
+      "label": "real-project",
+      "taskId": "task-mvdktv1z-41a061",
+      "persistedNodesMatch": true,
+      "executionAttempts": 0,
+      "nodeCount": 6,
+      "edgeCount": 0,
+      "dependencyLevels": [
+        [
+          "T0.1",
+          "T0.2",
+          "T0.3",
+          "T0.4",
+          "T0.5",
+          "T0.6"
+        ]
+      ],
+      "explicitEmployeeBindings": 0,
+      "receipt": {
+        "id": "b64719b7-b55b-45e7-88c1-1923a9495677",
+        "usage": {
+          "prompt_tokens": 518,
+          "completion_tokens": 592
+        },
+        "cost": 0.0008657999999999999,
+        "elapsedMs": 7510
+      }
+    }
+  ],
+  "unknownReceiptsUnchanged": 6,
+  "totalCalls": 2,
+  "totalCost": 0.0018818999999999997,
+  "cumulativeOccupied": 2.894911500000002,
+  "parallelDependencyFixture": {
+    "input": [
+      {
+        "id": "A",
+        "depends_on": []
+      },
+      {
+        "id": "B",
+        "depends_on": []
+      },
+      {
+        "id": "C",
+        "depends_on": [
+          "B"
+        ]
+      },
+      {
+        "id": "D",
+        "depends_on": [
+          "C"
+        ]
+      }
+    ],
+    "expected": [
+      [
+        "A",
+        "B"
+      ],
+      [
+        "C"
+      ],
+      [
+        "D"
+      ]
+    ],
+    "actual": [
+      [
+        "A",
+        "B"
+      ],
+      [
+        "C",
+        "D"
+      ]
+    ],
+    "passed": false
+  },
+  "assessment": {
+    "pluginLoading": "passed",
+    "budgetedModelPlanning": "passed",
+    "projectBreakdown": "partial",
+    "executableOrchestration": "failed",
+    "productionReady": false,
+    "reasons": [
+      "No dependency edges were generated in either real planning case.",
+      "Employee assignment and enforceable QA independence were not produced.",
+      "Parallel dependency layering must pass the model-free fixture before considering this engine for execution."
+    ]
+  }
+}

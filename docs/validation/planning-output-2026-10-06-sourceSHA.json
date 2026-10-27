@@ -1,0 +1,92 @@
+{
+  "capturedAt": "2026-10-06T08:15:03.0578832Z",
+  "status": "frozen-after-isolated-parser-tests",
+  "sources": [
+    {
+      "path": "apps/api/src/planning-output.ts",
+      "sha256": "16c0f0732eef2df641567acfa263b54d3cb55c252e2fda8d014447f6be45d58b"
+    },
+    {
+      "path": "apps/api/src/provider.ts",
+      "sha256": "471053409058bcace60e3fd20dec213558e929ea30d6c6ec5b94429082e8c851"
+    },
+    {
+      "path": "apps/api/src/project-planning.ts",
+      "sha256": "b4a1a4a109d4835957407080dddd526fa7245b75edf8a1a4833d8407ab581cf0"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "8defcf46df7a52fc9ac1ca1651f210491a76f9d07c245d597089537fdb7cb633"
+    },
+    {
+      "path": "tests/planning-output.test.ts",
+      "sha256": "f36e7fe9bf52feb5011283b637755a6d352ee61ef2b9e2f84705437f4bc43e3f"
+    },
+    {
+      "path": "tests/planning-output-api.test.ts",
+      "sha256": "32888519f42f947379d48573a69a5a33d46ba440fa6bd9f6f7a388743107e3fa"
+    }
+  ],
+  "admissionFreezeAudit": [
+    {
+      "path": "apps/api/src/local-admission.ts",
+      "sha256": "e7153ee341bdcd04960dac300285342fa05d90d9944c786b3e6b6a1d456ce7d8",
+      "unchanged": true
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256": "759c14bb9687ae5d9d0b4d22e61394f1e7b4975b4c88685f2dfea5334a81b035",
+      "unchanged": true
+    },
+    {
+      "path": "apps/api/src/execution-policy.ts",
+      "sha256": "a4f1cd806693935f2ea8a3f8391d925e0fbf6f6f566b1d489206de00adb1c34f",
+      "unchanged": true
+    },
+    {
+      "path": "apps/api/src/cost-control.ts",
+      "sha256": "3399569a61869cdfd0bc68b318eb4545d7d792da5734c27a8434643a2c6dff65",
+      "unchanged": true
+    },
+    {
+      "path": "apps/api/src/run-coordinator.ts",
+      "sha256": "2a4e0c6e91e8ca59779ab61600e8e9f8ef978db9d1da8359f912fb00dd5cfb13",
+      "unchanged": true
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "sha256": "8018295ed1c0dd64beec7ed77d7f467a83057f9be2864f0e3e5a177945eb9a68",
+      "unchanged": true
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.d.mts",
+      "sha256": "c7b9e3558a65c18efdf96d0741a6cc8e72da0631dca4949f9a937347ef4d465e",
+      "unchanged": true
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "373b33ed7488515642b559a96bce3062335a2b1ea36704f7d7b3e60230df9c34",
+      "unchanged": true
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.d.mts",
+      "sha256": "5dcf50233539206c5dbf69dabd534f65c50a7916e43fc8fb2c8236aa6a1239ea",
+      "unchanged": true
+    },
+    {
+      "path": "tests/local-device-admission.test.ts",
+      "sha256": "fec2d6c53add525659d8adeef004773e2b30319216b15bc1d88e32589509c356",
+      "unchanged": true
+    }
+  ],
+  "tests": {
+    "pure": 6,
+    "newApi": 6,
+    "projectPlanning": 17,
+    "organizationChat": 15,
+    "completionProtocolApi": 6,
+    "totalUniquePass": 50,
+    "tscExit": 0
+  },
+  "actualV11Cause": "unknown; no provider content or finish reason was retained; no paid replay"
+}

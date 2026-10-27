@@ -1,0 +1,132 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync, lstatSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve, join, relative, sep } from 'node:path';
+import { verifyTargetAuthorization, targetReadLimit, boundFrameReader } from '../docs/test-evidence/helpers/go-verified-target-evidence-2026-10-06.mjs';
+import { referenceCaptureRuns, hydrateRunReferences, sourcesDirectory } from '../docs/test-evidence/helpers/go-acceptance-run-references-explicit-target-2026-10-06.mjs';
+import { parseParameters, createProductReader } from '../docs/test-evidence/helpers/capture-go-acceptance-final-scope-referenced-explicit-target-2026-10-06.mjs';
+import { loadSource } from '../docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs';
+
+const root = resolve('docs/test-evidence'), workspace = resolve('.');
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const approvalPath = 'docs/test-evidence/funded-run-web-recovery-approve-2026-10-06T07-52-29-812Z-02bf3e15.json';
+const approval = loadSource(approvalPath), actual = JSON.parse(approval.raw);
+const owner = { runId: actual.newRunId, projectId: actual.projectId, departmentId: actual.goBinding.departmentId, version: actual.version, scenario: 'recovery', slot: 'parent' };
+const source = value => { const raw = JSON.stringify(value); return { path: 'docs/test-evidence/synthetic-explicit-target-never-written.json', raw, sha256: hash(raw) }; };
+const repo = path => relative(workspace, path).split(sep).join('/');
+
+test('a dynamic future target requires its complete original approval binding; capability cannot be copied or applied to another endpoint', () => {
+  const proof = structuredClone(actual), nextOwner = { ...owner, runId: '99999999-1111-4111-8111-111111111111', version: 10 };
+  proof.version = proof.goBinding.version = 10; proof.newRunId = proof.response.id = proof.newRunsReadOnly[0].id = nextOwner.runId;
+  proof.newRunsReadOnly[0].planVersion = proof.mutationRequests[0].body.version = 10;
+  const capability = verifyTargetAuthorization(source(proof), nextOwner, proof.goBinding);
+  assert.equal(targetReadLimit('/runs/' + nextOwner.runId + '/export', false, [capability]), 128 * 1024 * 1024);
+  assert.equal(targetReadLimit('/runs/' + nextOwner.runId, false, [capability]), 128 * 1024 * 1024);
+  assert.equal(targetReadLimit('/runs/' + owner.runId + '/export', false, [capability]), 50 * 1024 * 1024);
+  assert.equal(targetReadLimit('/runs/' + nextOwner.runId + '/other', false, [capability]), 50 * 1024 * 1024);
+  assert.equal(targetReadLimit('/runs/' + nextOwner.runId, false, [{ ...capability }]), 50 * 1024 * 1024);
+  assert.equal(targetReadLimit('/runs/' + nextOwner.runId, true, [capability]), 5 * 1024 * 1024);
+});
+
+test('missing HTTP/Run evidence, wrong body/binding/source SHA, and unknown dispatch outcome never grant a large bound', () => {
+  for (const mutate of [
+    value => { delete value.newArchive.snapshotSha256; }, value => { value.newRunsReadOnly.push({ id: 'another' }); },
+    value => { value.response.id = 'unknown'; }, value => { value.failure = { dispatchObserved: true }; },
+    value => { value.httpStatus = 200; }, value => { value.mutationRequests = []; },
+    value => { value.mutationRequests[0].body.retainUncertainCosts = true; }, value => { value.pageErrors = ['transport']; },
+    value => { value.directModelCallsByHelper = 1; },
+  ]) { const value = structuredClone(actual); mutate(value); assert.throws(() => verifyTargetAuthorization(source(value), owner, actual.goBinding)); }
+  assert.throws(() => verifyTargetAuthorization({ ...approval, sha256: 'a'.repeat(64) }, owner, actual.goBinding), /Raw source bytes/);
+  assert.throws(() => verifyTargetAuthorization(approval, owner, { ...actual.goBinding, planningCost: 0 }), /same actual Go/);
+  assert.throws(() => verifyTargetAuthorization(approval, { ...owner, runId: 'bad' }, actual.goBinding), /exact Run/);
+});
+
+test('a resume-shaped engineering source can authorize its child only when the exact parent and unchanged Go source match', () => {
+  const value = structuredClone(actual), child = '99999999-2222-4222-8222-222222222222';
+  value.action = 'resume'; value.newRunId = value.response.id = value.newRunsReadOnly[0].id = child;
+  value.newRunParentId = owner.runId;
+  value.mutationRequests[0] = { method: 'POST', endpoint: '/runs/' + owner.runId + '/retry', body: { resume: true, acknowledgeUnknownOperations: false, retainUncertainCosts: false } };
+  const nextOwner = { ...owner, runId: child, parentId: owner.runId, slot: 'final' };
+  const capability = verifyTargetAuthorization(source(value), nextOwner, actual.goBinding);
+  assert.equal(targetReadLimit('/runs/' + child + '/export', false, [capability]), 128 * 1024 * 1024);
+  assert.equal(targetReadLimit('/runs/' + owner.runId + '/export', false, [capability]), 50 * 1024 * 1024);
+  assert.throws(() => verifyTargetAuthorization(source(value), { ...nextOwner, parentId: child }, actual.goBinding), /parent\/request/);
+  value.mutationRequests[0].body.acknowledgeUnknownOperations = true;
+  assert.throws(() => verifyTargetAuthorization(source(value), nextOwner, actual.goBinding), /parent\/request/);
+});
+
+test('original saved 90MB zero-POST preflight frame is read whole only as the exact owned parent frame; another Run stays blocked', () => {
+  const proof = JSON.parse(readFileSync('docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-48-26-691Z-6449795c.json'));
+  assert.ok(lstatSync(proof.before.path).size > 50 * 1024 * 1024);
+  const frame = boundFrameReader(owner)(proof.before.path);
+  assert.equal(frame.sha256, proof.before.sha256);
+  assert.equal(Buffer.byteLength(frame.raw), lstatSync(proof.before.path).size);
+  assert.throws(() => loadSource(proof.before.path), /bounded regular file/);
+  assert.throws(() => boundFrameReader({ ...owner, runId: '99999999-3333-4333-8333-333333333333' })(proof.before.path), /another Run/);
+});
+
+test('complete over50MB Run references require the actual approval + original Go sources, precise 128 bound metadata and raw snapshot SHA', () => {
+  const directory = mkdtempSync(join(root, '.explicit-target-fixture-')), capturePath = join(directory, 'capture.json'), bundle = sourcesDirectory(capturePath);
+  mkdirSync(bundle);
+  try {
+    const snapshot = JSON.parse(readFileSync('docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/archive.json')).snapshot;
+    assert.equal(hash(JSON.stringify(snapshot)), actual.newArchive.snapshotSha256);
+    const archive = { id: owner.runId, snapshot, integrity: 'ok', status: 'failed', eventCount: 2, events: [
+      { seq: 1, type: 'run/created', data: { snapshotSha256: hash(JSON.stringify(snapshot)) } },
+      { seq: 2, type: 'fixture/engineering-padding', data: { text: 'x'.repeat(51 * 1024 * 1024) } },
+    ] };
+    const state = { id: owner.runId, snapshot, status: 'failed' }, sources = [];
+    for (const [role, value] of Object.entries({ archive, state })) {
+      const path = join(bundle, role + '.json'), bytes = Buffer.from(JSON.stringify(value)); writeFileSync(path, bytes);
+      sources.push({ endpoint: '/runs/' + owner.runId + (role === 'archive' ? '/export' : ''), method: 'GET', status: 200, bytes: bytes.length, sha256: hash(bytes), rawPath: repo(path), maxBytes: 128 * 1024 * 1024 });
+    }
+    const capture = { kind: 'actual-go-acceptance-capture', engineeringOnly: true, sources, largeRunAuthorizations: [{ ...owner, approval: { path: approvalPath, sha256: approval.sha256 } }],
+      recovery: { projectId: owner.projectId, version: owner.version, parentId: owner.runId, runId: '99999999-4444-4444-8444-444444444444', project: { departmentId: owner.departmentId },
+        confirmation: actual.confirmedEvidence, parent: { archive, state, downloads: [], manifest: [], approvals: [], localOperations: [] } } };
+    const referenced = referenceCaptureRuns(capture, capturePath);
+    assert.ok(referenced.recovery.parent.archive.bytes > 50 * 1024 * 1024);
+    const hydrated = hydrateRunReferences(referenced, capturePath);
+    assert.equal(hydrated.recovery.parent.archive.events[1].data.text.length, 51 * 1024 * 1024);
+    const without = { ...capture, largeRunAuthorizations: [] };
+    assert.throws(() => referenceCaptureRuns(without, capturePath), /overflowing/);
+    const missingBound = { ...capture, sources: capture.sources.map(row => ({ ...row, maxBytes: 50 * 1024 * 1024 })) };
+    assert.throws(() => referenceCaptureRuns(missingBound, capturePath), /raw GET bound/);
+    const substituted = { ...capture, largeRunAuthorizations: [{ ...capture.largeRunAuthorizations[0], version: 10 }] };
+    assert.throws(() => referenceCaptureRuns(substituted, capturePath), /identity\/slot differs/);
+    const sourcePath = resolve(workspace, sources[0].rawPath);
+    const bytes = readFileSync(sourcePath); bytes[bytes.length - 10] ^= 1; writeFileSync(sourcePath, bytes);
+    assert.throws(() => referenceCaptureRuns(capture, capturePath), /raw SHA changed|JSON/);
+  } finally {
+    assert.ok(relative(root, directory).startsWith('.explicit-target-fixture-') && !lstatSync(directory).isSymbolicLink());
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('capture CLI requires matching explicit target/path/SHA lists and refuses targets outside captured slots', () => {
+  const runId = '99999999-5555-4555-8555-555555555555';
+  const args = ['--api=http://127.0.0.1:3000/api', '--output=docs/test-evidence/never-written.json', '--normal-project-id=4938eab8-26ed-4f60-9413-d979f05fa968',
+    '--normal-run-id=' + runId, '--normal-version=12', '--normal-confirmed-evidence=docs/test-evidence/confirmed.json', '--normal-generation-evidence=docs/test-evidence/generation.json',
+    '--recovery-project-id=' + owner.projectId, '--authorization-evidence=docs/test-evidence/auth.json', '--budget-ledger=.data/funded-acceptance/budget-ledger.json'];
+  assert.equal(parseParameters(args).largeTargets.length, 0);
+  const flags = ['--large-run-ids=' + runId, '--large-run-approved-evidence=docs/test-evidence/approved.json', '--large-run-approved-sha256=' + 'a'.repeat(64)];
+  assert.equal(parseParameters([...args, ...flags]).largeTargets[0].version, 12);
+  assert.throws(() => parseParameters([...args, flags[0]]), /required together/);
+  assert.throws(() => parseParameters([...args, '--large-run-ids=' + owner.runId, ...flags.slice(1)]), /explicitly captured/);
+  assert.throws(() => parseParameters([...args, flags[0], flags[1], '--large-run-approved-sha256=bad']), /matching explicit approval/);
+});
+
+test('the actual capture stream reader records128 only for a verified target and keeps foreign JSON50 and binary5', async () => {
+  const capability = verifyTargetAuthorization(approval, owner, actual.goBinding), sources = [], writes = [];
+  const bytes = Buffer.from(JSON.stringify({ engineeringOnly: true, text: 'x'.repeat(51 * 1024 * 1024) }));
+  const reader = createProductReader('http://fixture.invalid/api', async value => { writes.push(value.length); return 'docs/test-evidence/never-written-source.json'; }, {
+    sources, targetCapabilities: [capability], fetchImpl: async url => ({ status: 200, url, redirected: false,
+      headers: { get: () => 'application/json' }, body: (async function* () { yield bytes; })() }),
+  });
+  const result = await reader('/runs/' + owner.runId + '/export');
+  assert.equal(result.text.length, 51 * 1024 * 1024); assert.equal(sources[0].maxBytes, 128 * 1024 * 1024);
+  assert.equal(sources[0].sha256, hash(bytes)); assert.equal(writes.length, 1);
+  await assert.rejects(reader('/runs/99999999-6666-4666-8666-666666666666/export'), /exceeded its limit/);
+  await assert.rejects(reader('/runs/' + owner.runId + '/artifact?path=fixture.bin', { binary: true }), /exceeded its limit/);
+  assert.equal(writes.length, 1, 'oversized rejected sources cannot be persisted as successful captures');
+});

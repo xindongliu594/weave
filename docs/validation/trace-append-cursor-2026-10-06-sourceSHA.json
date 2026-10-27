@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-06T11:33:06.833Z",
+  "testsPassed": 45,
+  "failed": 0,
+  "source": [
+    {
+      "path": "services/agent-runtime/trace-store.mjs",
+      "bytes": 10797,
+      "sha256": "201cbbeb241e586f1bd144ade3c663235b2f5929eba8c4f1db0c9beac40bbc01"
+    },
+    {
+      "path": "services/agent-runtime/trace-append-cursor.test.mjs",
+      "bytes": 10598,
+      "sha256": "d5dfea0afbcf3ef3c5697cfa6ddc7c81158719da777a9f41d72958a2d3240b74"
+    },
+    {
+      "path": "services/agent-runtime/trace-list-cache.test.mjs",
+      "bytes": 8850,
+      "sha256": "f1362622723feba5acb46c45ddf271c65b3f1cb0ff26862075b4a7f88ca28459"
+    },
+    {
+      "path": "docs/validation/trace-append-cursor-2026-10-06-final-v2.txt",
+      "bytes": 5165,
+      "sha256": "41f35dc50f0bdb7500e80b2cda64221b1feafb28ae0d360f29a75de6963ddea4"
+    }
+  ],
+  "productionLoaded": false
+}

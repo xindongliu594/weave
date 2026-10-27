@@ -1,0 +1,39 @@
+✔ three complete archive references exceed 50MB in total while each file and the main capture stay bounded (971.8585ms)
+✔ same-size raw edits and reference byte/SHA substitutions are rejected (53.1392ms)
+✔ traversal, absolute paths, another capture bundle and unmarked references fail closed (40.0937ms)
+✔ a junction within the otherwise valid bundle cannot redirect a source read (44.1366ms)
+✔ both declared overflow and actual oversized files preserve the per-file 50MB limit (44.1974ms)
+✔ foreign raw Run ownership cannot be hidden by recomputing file SHA and source metadata (63.2684ms)
+✔ inline legacy hydration and all original audit decisions remain unchanged, including unknown finance blocking (85.0674ms)
+✔ complete normal/recovery engineering evidence passes functional predicates while all orphan finance remains blocked (54.2233ms)
+✔ native Node spec and TAP counters are equivalent with strict full-count, hash and receipt evidence (29.7855ms)
+✔ explicit distinct confirmed versions bind their own source chains and missing/wrong versions stay blocked (86.5825ms)
+✔ CLI version overrides are explicit safe integers and preserve offline evidence-only options (5.94ms)
+✔ raw generation SHA, 201/failing confirmation, candidate substitution and stale current model cannot become a Go binding (69.0504ms)
+✔ fallback, thinking omission, complete task/policy changes and missing approved role permission are blocked (86.8891ms)
+✔ failed/incomplete manager, missing native exit and missing independent review cannot be accepted (53.0479ms)
+✔ CLI counts must all pass without skipped/cancelled/todo and an import-only independent source is insufficient (47.2775ms)
+✔ exact file SHA/producer/employee LLM provenance and private fixed KB versions remain mandatory (76.0839ms)
+✔ recovery must preserve parent/dev checkpoint/native attempts, complete DAG, budget calls and physical restart (97.1471ms)
+✔ finance tampering fails its specific predicate independently of already blocked provider bills (174.9667ms)
+✔ unknown external operations block functional acceptance independently of already blocked finance (13.6669ms)
+✔ absence never fabricates successful execution or known-zero financial evidence, and CLI exposes only offline paths (1.587ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1486.8388
+
+EXIT_CODE=0
+SOURCES_STABLE=True
+frozenAt=2026-10-06T13:06:39+08:00
+dc33a0a7a04afd77949c4fcc83c56094b7708d3009bf2b1e00a60caf50327984  docs/test-evidence/helpers/go-acceptance-run-references-2026-10-06.mjs
+25402ee4b55339606625cd587f2d75ce297c5635e6b59c179c63d518699dec44  docs/test-evidence/helpers/capture-go-acceptance-referenced-2026-10-06.mjs
+cb25ee1384f09527406c7b77e00fd5a51f65a130ee11455f021028399fe5a560  docs/test-evidence/helpers/audit-go-todo-acceptance-referenced-2026-10-06.mjs
+6377ff2dd79e4f79023b3fb532e67a10ff9701596237454cfc8c8fd876bc4f10  tests/go-acceptance-run-references.test.mjs
+350f9a3c27f121fbfa301a596a730913bf4be6450b242479b6d9de972717cd9e  docs/test-evidence/helpers/capture-go-acceptance-2026-10-06.mjs
+70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54  docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs
+edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686  tests/go-todo-acceptance-audit.test.mjs

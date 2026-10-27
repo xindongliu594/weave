@@ -1,0 +1,70 @@
+{
+  "kind": "producer-input-plan-admission-engineering-validation",
+  "at": "2026-10-06T10:06:57.029Z",
+  "sourceStable": [
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "expected": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3",
+      "actual": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-guarded-web-2026-10-06.mjs",
+      "expected": "ff689045082f817aaab9e115ba3f03a7fe9362505d669bec2cf8dc0acf8be4c9",
+      "actual": "ff689045082f817aaab9e115ba3f03a7fe9362505d669bec2cf8dc0acf8be4c9",
+      "stable": true
+    }
+  ],
+  "sourceSHA": [
+    {
+      "path": "packages/contracts/task-contracts.mjs",
+      "sha256": "c903212089a993aa5a57b76197c1c98c27826308ec1b911c8662b30834e66b77"
+    },
+    {
+      "path": "packages/contracts/task-contracts.d.mts",
+      "sha256": "3e4c6ad6e0d2f4b88bb4b2c9afbadcfc1b248518d45a846211b2ea699573cf42"
+    },
+    {
+      "path": "packages/contracts/index.ts",
+      "sha256": "7492514fa353776afb52367013d14fc61e010fd64197109267584985df74e5b3"
+    },
+    {
+      "path": "services/agent-runtime/handoff.mjs",
+      "sha256": "bfcd35383e48ee4ef05e77d79751440ca34bdb5bf11f1a082d7f7f375f899cf0"
+    },
+    {
+      "path": "apps/api/src/handoff-checkpoints.ts",
+      "sha256": "84432fac74a50ec59e29a0fca521f67709ded6a167b22d0d848fa44f2402307a"
+    },
+    {
+      "path": "tests/producer-input-validation.test.ts",
+      "sha256": "b52d3f900c9375608cadac16d4ebfdaf00d2682ff5d4a11b861eeed03b09e346"
+    },
+    {
+      "path": "tests/producer-input-admission.test.ts",
+      "sha256": "159437ee3f96e6383f0d5b055f9e1c2ab7d7a0c0e12d123d285195d3da1def7e"
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/test-evidence/go-producer-input-validation-tests-2026-10-06.txt",
+      "sha256": "7f39ae2c683a9582ed6a59c4807a9b2411377cdd72d1b32382462e240ca31084"
+    },
+    {
+      "path": "docs/test-evidence/go-producer-input-validation-repair-tests-2026-10-06.txt",
+      "sha256": "80807afcc3a84775588f9021a57cbf107a63efb5b1985889d37c82d9b3acc16d"
+    }
+  ],
+  "results": {
+    "pureContractsScopeResume": 18,
+    "isolatedActualHttpAdmission": 1,
+    "nativeQualityHandoff": 5,
+    "failed": 0,
+    "skipped": 0,
+    "syntax": 2,
+    "typescriptExit": 0
+  },
+  "observedActualProductAcceptance": false,
+  "actualApiActions": 0,
+  "actualModelCalls": 0
+}

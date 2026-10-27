@@ -1,0 +1,18 @@
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (2.8346ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.5267ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.6259ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.4701ms)
+✔ restored task holds remain occupied without charging the global carryover twice or releasing an older request (0.7111ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (33.6844ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.6141ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.5383ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.1285ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.24ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 210.4189

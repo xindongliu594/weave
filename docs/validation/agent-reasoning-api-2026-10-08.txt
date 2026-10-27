@@ -1,0 +1,72 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2457.1041ms)
+✔ an explicit next turn sends validation feedback to one model call without saving it as user requirements (172.0734ms)
+✔ client-provided validation feedback cannot grant tools and oversized feedback is rejected before a model call (57.8731ms)
+✔ documented GPT-4.1 JSON mode preserves usage tracking and makes no repair call or preview on invalid output (109.7357ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (134.4185ms)
+✔ explicit employee effort rejects the candidate with no hidden repair, save or execution (67.3806ms)
+✔ legacy per-reply hints and exhausted daily budgets do not stop discussion or charge new execution projects (109.0796ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (91.3013ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (136.2942ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (422.671ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (182.238ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (167.4327ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (187.9813ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (218.1352ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (507.1989ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (93.5327ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (48.7644ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (296.6466ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (307.1461ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6362.5193
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2445.7773ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (166.7101ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (137.7097ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (239.5048ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (199.6467ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (229.7822ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (134.2239ms)
+✖ unsupported effort is explicitly invalid in project candidates and cannot launch a confirmed plan (167.8939ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (239.6471ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (377.7645ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (339.1383ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (159.5144ms)
+✔ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (71.2859ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (170.39ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (269.9164ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (127.0161ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (257.4479ms)
+✔ a new user adjustment is quoted and pinned without editing the saved requirement, grants or prior plan (267.9536ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6583.709
+
+✖ failing tests:
+
+test at tests\project-planning.test.ts:2:9177
+✖ unsupported effort is explicitly invalid in project candidates and cannot launch a confirmed plan (167.8939ms)
+  AssertionError [ERR_ASSERTION]: The "string" argument must be of type string. Received type undefined (undefined)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\project-planning.test.ts:202:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /使用模型默认/,
+    operator: 'match',
+    diff: 'simple'
+  }

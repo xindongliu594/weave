@@ -1,0 +1,395 @@
+{
+  "checkedAt": "2026-10-06T09:55:52.834Z",
+  "kind": "readonly-normal-v11-stale-producer-sha-handoff-failure",
+  "outcome": "failed-not-completed",
+  "runId": "9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+  "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+  "version": 11,
+  "rawDirectory": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431",
+  "sources": [
+    {
+      "file": "archive.json",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/export",
+      "method": "GET",
+      "status": 200,
+      "bytes": 9859369,
+      "sha256": "f7776699c4d4dab196bb0012939fb8fb2a495828385748f1552c69c6957f39d2"
+    },
+    {
+      "file": "state.json",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+      "method": "GET",
+      "status": 200,
+      "bytes": 5003389,
+      "sha256": "5e0ba21a0b3e0da5aabd403fe8b520362f673c2cb213ab1d532a61d069ce2f19"
+    },
+    {
+      "file": "operations.json",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/local-operations",
+      "method": "GET",
+      "status": 200,
+      "bytes": 38743,
+      "sha256": "c8e5f441d707e73c9a4949002cdc0b1b9522165d90c2290d6bd3140e114e4e30"
+    },
+    {
+      "file": "artifacts.json",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifacts",
+      "method": "GET",
+      "status": 200,
+      "bytes": 334,
+      "sha256": "cadc26d97dd70f325907a1d9e71ab30ab49d117e99cc2c4085eec02cb02c0c19"
+    },
+    {
+      "file": "approvals.json",
+      "endpoint": "/approvals?runId=9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+      "method": "GET",
+      "status": 200,
+      "bytes": 691,
+      "sha256": "7a2920b4a3e28b36402b58a2923ce5d3dae94dab57f1216658eb93462a1a22fd"
+    },
+    {
+      "file": "readiness.json",
+      "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+      "method": "GET",
+      "status": 200,
+      "bytes": 264,
+      "sha256": "781f0d2faa3d74d08711a27c157dd2ead99cded4470a2f174c6896fa09c469d4"
+    },
+    {
+      "file": "usage.json",
+      "endpoint": "/usage",
+      "method": "GET",
+      "status": 200,
+      "bytes": 283614,
+      "sha256": "d37c07fa96eb35b1aed4b7a7e911fb0b73b935618230dfddeba02271d64f968c"
+    },
+    {
+      "file": "projects.json",
+      "endpoint": "/projects",
+      "method": "GET",
+      "status": 200,
+      "bytes": 112738,
+      "sha256": "87e013af3bd14c19702f8adf56f0a48f59cb0ce48781f3a40530948706b69177"
+    },
+    {
+      "file": "README.md",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifact?path=README.md",
+      "method": "GET",
+      "status": 200,
+      "bytes": 4056,
+      "sha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab"
+    },
+    {
+      "file": "server.mjs",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifact?path=server.mjs",
+      "method": "GET",
+      "status": 200,
+      "bytes": 7125,
+      "sha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f"
+    },
+    {
+      "file": "todo.test.mjs",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/artifact?path=todo.test.mjs",
+      "method": "GET",
+      "status": 200,
+      "bytes": 10037,
+      "sha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71"
+    },
+    {
+      "file": "archive-after.json",
+      "endpoint": "/runs/9878e368-9ebe-443d-8c2f-59ba3e5b4274/export",
+      "method": "GET",
+      "status": 200,
+      "bytes": 9859369,
+      "sha256": "f7776699c4d4dab196bb0012939fb8fb2a495828385748f1552c69c6957f39d2"
+    }
+  ],
+  "exactError": "HANDOFF_BLOCKED: qa_verify: VERSION_MISMATCH: server.mjs",
+  "eventCount": 1022,
+  "generationSource": {
+    "path": "docs/test-evidence/go-parser-normal-generate-2026-10-06T09-20-27-833Z-aa7ceb9c.json",
+    "sha256": "507c99314975479727f9464a873211d3206b83c499530c668e6fb0b98b2f7ccc"
+  },
+  "inputHashComparisons": [
+    {
+      "taskId": "qa_verify",
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "95e3fa0866da4e5987101759e06a07378a57e95d3070157f6aa38aba715179d2",
+          "actualArtifactSha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "todo.test.mjs",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "63857cfeda05ef8a30ca0612a04ed1b6fef4e68bc0638a268a7bb7d33d366227",
+          "actualArtifactSha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "091231b1fad2e5fdf604758528d1e1b4c66a5e3571b7ab6a33925ca174683f23",
+          "actualArtifactSha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        }
+      ]
+    },
+    {
+      "taskId": "qa_review",
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "95e3fa0866da4e5987101759e06a07378a57e95d3070157f6aa38aba715179d2",
+          "actualArtifactSha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "todo.test.mjs",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "63857cfeda05ef8a30ca0612a04ed1b6fef4e68bc0638a268a7bb7d33d366227",
+          "actualArtifactSha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "091231b1fad2e5fdf604758528d1e1b4c66a5e3571b7ab6a33925ca174683f23",
+          "actualArtifactSha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "acceptance.test.mjs",
+          "producerTaskId": "qa_verify",
+          "pinnedExpectedSha256": "f31db400d88318abb70ce947887d0bbfef9893c6f29f88f63ecb93ebc918676c",
+          "actualArtifactSha256": null,
+          "matching": "not-produced",
+          "beforePlanPinnedSha256": null
+        }
+      ]
+    },
+    {
+      "taskId": "manager_accept",
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "95e3fa0866da4e5987101759e06a07378a57e95d3070157f6aa38aba715179d2",
+          "actualArtifactSha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "todo.test.mjs",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "63857cfeda05ef8a30ca0612a04ed1b6fef4e68bc0638a268a7bb7d33d366227",
+          "actualArtifactSha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "README.md",
+          "producerTaskId": "dev",
+          "pinnedExpectedSha256": "091231b1fad2e5fdf604758528d1e1b4c66a5e3571b7ab6a33925ca174683f23",
+          "actualArtifactSha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab",
+          "matching": false,
+          "beforePlanPinnedSha256": null
+        },
+        {
+          "path": "acceptance.test.mjs",
+          "producerTaskId": "qa_verify",
+          "pinnedExpectedSha256": "f31db400d88318abb70ce947887d0bbfef9893c6f29f88f63ecb93ebc918676c",
+          "actualArtifactSha256": null,
+          "matching": "not-produced",
+          "beforePlanPinnedSha256": null
+        }
+      ]
+    }
+  ],
+  "finding": "AI added historical v10 output SHA256 values to all v11 producerTaskId inputs. The beforeProject inputs had no SHA pin. Real new employee files differ, so QA handoff correctly rejected server.mjs before its execution.",
+  "operatorGuardLimitation": "Candidate guard verified path/producer/dependencies but did not reject static SHA on future producer outputs. Candidate was not hand-edited by Codex; backend structural validation still reports valid.",
+  "accepted": [
+    {
+      "seq": 975,
+      "taskId": "dev"
+    }
+  ],
+  "dag": [
+    {
+      "id": "dev",
+      "dependencies": [],
+      "status": "completed"
+    },
+    {
+      "id": "qa_verify",
+      "dependencies": [
+        "dev"
+      ],
+      "status": "failed"
+    },
+    {
+      "id": "qa_review",
+      "dependencies": [
+        "dev",
+        "qa_verify"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "manager_accept",
+      "dependencies": [
+        "qa_review"
+      ],
+      "status": "pending"
+    }
+  ],
+  "terminalReceipts": [
+    {
+      "id": "adbb400f-ee0d-4968-8d20-b6bf849a2fc0",
+      "status": "completed",
+      "started": true,
+      "taskId": "dev",
+      "command": "node --test todo.test.mjs",
+      "approvalId": "14fe4c19-2f6a-4fe7-ad3b-b2bfc28c3da4",
+      "exitCode": 1,
+      "lateResult": null,
+      "outputBytes": 1235,
+      "outputSha256": "55a055fd98ee0c2e031d992682836d0b93171d6acb9a397d8670f7abb8c01c50",
+      "observedSeq": 653,
+      "nodeTests": {
+        "status": "available",
+        "format": "spec",
+        "tests": 12,
+        "suites": 0,
+        "pass": 11,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "id": "ccca316a-218c-42e0-baed-f6370a979c9b",
+      "status": "completed",
+      "started": true,
+      "taskId": "dev",
+      "command": "node --test todo.test.mjs",
+      "approvalId": "b4f54ae8-de67-42e7-849f-ffd7849f8abc",
+      "exitCode": 0,
+      "lateResult": null,
+      "outputBytes": 1053,
+      "outputSha256": "9229b346b3a6fbcf35e4e89f281c5a73536255c483d37aec75a30086f7a6f4ad",
+      "observedSeq": 909,
+      "nodeTests": {
+        "status": "available",
+        "format": "spec",
+        "tests": 12,
+        "suites": 0,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 4056,
+      "sha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab"
+    },
+    {
+      "path": "server.mjs",
+      "size": 7125,
+      "sha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f"
+    },
+    {
+      "path": "todo.test.mjs",
+      "size": 10037,
+      "sha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71"
+    }
+  ],
+  "managerReportExists": false,
+  "qaTerminalExecuted": false,
+  "childUsage": {
+    "count": 9,
+    "cost": 0.0773679,
+    "wireCount": 9,
+    "modelRequests": 11,
+    "hostCalls": 11,
+    "byTask": {
+      "dev": {
+        "calls": 9,
+        "cost": 0.0773679
+      }
+    }
+  },
+  "budgetEvidence": {
+    "version": 1,
+    "runId": "9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "projectVersion": 11,
+    "capturedAt": "2026-10-06T09:51:55.917Z",
+    "point": "runtime-checkpoint",
+    "basis": "host-execution-budget",
+    "currency": "USD",
+    "project": {
+      "limit": 4.1797,
+      "occupied": 1.8541076999999997,
+      "activeReserved": 0,
+      "available": 2.3255923000000007,
+      "callsUsed": 11,
+      "callLimit": 100,
+      "callsBasis": "host-reserved-model-attempts"
+    },
+    "inherited": {
+      "basis": "run-admission-snapshot",
+      "recordedCost": 1.6802138,
+      "retainedUnknownReservation": 0.096526,
+      "availableBudget": 2.4029602000000008,
+      "callsUsed": null,
+      "callsBasis": "archived-model-wire-request-count",
+      "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+    },
+    "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+  },
+  "readiness": {
+    "recordedCost": 1.7575817,
+    "reserved": 0.096526,
+    "availableBudget": 2.3255923000000003,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+        "amount": 0.096526,
+        "status": "uncertain",
+        "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+      }
+    ]
+  },
+  "pendingApprovals": [],
+  "activeOperations": [],
+  "scope": {
+    "directBusinessPosts": 0,
+    "newPaidCalls": 0,
+    "employeeArtifactsAuthoredByCodex": false,
+    "employeeCommandExecutedDirectlyByCodex": false,
+    "originalDatabaseOpened": false,
+    "keysRead": false,
+    "oldIntentsDeleted": false,
+    "failedRunResumed": false,
+    "oldApprovalsReplayed": false,
+    "completedInspectorIssued": false
+  }
+}

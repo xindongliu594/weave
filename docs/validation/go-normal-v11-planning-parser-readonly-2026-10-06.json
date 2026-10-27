@@ -1,0 +1,141 @@
+{
+  "checkedAt": "2026-10-06T07:51:54.640Z",
+  "kind": "readonly-normal-v11-planning-parser-audit",
+  "sources": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "75b14eb09723d05a6cc42b4c42840c30f9d07b838137e8b6e3bea3d3155ac331"
+    },
+    {
+      "path": "apps/api/src/provider.ts",
+      "sha256": "0df8d6f69d5098c57fad947a0b804fece7c5465a8b49ec15d6eee84aad80128a"
+    },
+    {
+      "path": "apps/api/src/project-planning.ts",
+      "sha256": "f9c64acca728d53bd5877b97334c91afc36561ec1bd44aa63abc03807c1c172c"
+    },
+    {
+      "path": "apps/api/src/cost-control.ts",
+      "sha256": "3399569a61869cdfd0bc68b318eb4545d7d792da5734c27a8434643a2c6dff65"
+    },
+    {
+      "path": "apps/api/src/cost-router.ts",
+      "sha256": "5a1efc98687e69b97d85106c62b53a6d74e48456b0583e284c7941ff35686543"
+    },
+    {
+      "path": "apps/api/src/idempotency.ts",
+      "sha256": "c6125121084924b6ae9a3a5a26497e0f8a6b7c0b24b551eaad4761e7fb587478"
+    },
+    {
+      "path": "services/agent-runtime/completion-protocol.mjs",
+      "sha256": "d99e21fe185f80fc8e7f4e03e8400151148b5facb77fe4e486f28568b890563d"
+    }
+  ],
+  "fixtures": [
+    {
+      "name": "plain JSON",
+      "accepted": true,
+      "observed": "JSON parsed"
+    },
+    {
+      "name": "single surrounding json code fence",
+      "accepted": true,
+      "observed": "JSON parsed"
+    },
+    {
+      "name": "text preamble with otherwise complete JSON",
+      "accepted": false,
+      "observed": "JSON parse rejection"
+    },
+    {
+      "name": "text following otherwise complete JSON",
+      "accepted": false,
+      "observed": "JSON parse rejection"
+    },
+    {
+      "name": "empty/null content",
+      "accepted": false,
+      "observed": "JSON parse rejection"
+    },
+    {
+      "name": "truncated JSON",
+      "accepted": false,
+      "observed": "JSON parse rejection"
+    }
+  ],
+  "publicCostSource": {
+    "path": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38/costs-parser-audit.json",
+    "method": "GET",
+    "endpoint": "/costs",
+    "status": 200,
+    "bytes": 18676,
+    "sha256": "4b4c68f436e7dde63d493b7faec837637bd5f589e45d5e2660b1314f0b28160c",
+    "billingMaintenance": "GET /costs performs expiry maintenance; no pending reservation existed for this paid planning receipt."
+  },
+  "receipt": {
+    "id": "52a67c7f-5a3f-4c74-b42e-b3ad857bf840",
+    "status": "settled",
+    "providerStatus": 200,
+    "providerRequestId": null,
+    "upstreamRequestId": null,
+    "responseRequestId": null,
+    "inputTokens": 10107,
+    "outputTokens": 3845,
+    "recordedCost": 0.0076461
+  },
+  "exactFailureStage": "app.ts JSON.parse(content after stripping only outer json code fence), before planSchema.safeParse and before organization_previews insert",
+  "actualProviderContent": {
+    "publiclyReadable": false,
+    "retainedOnThisFailedPlanningPath": false,
+    "empty": "unknown",
+    "truncated": "unknown",
+    "markdown": "unknown",
+    "plainText": "unknown",
+    "finishReason": "unknown; completionSchema omits/strips finish_reason",
+    "schemaFailure": "not the reported branch; planSchema.safeParse is after the failing JSON.parse"
+  },
+  "cache": {
+    "requestKey": "af5af5a2-3441-4c4b-9c26-e09fcbf2ab1d",
+    "acknowledgedStatus": 422,
+    "persistenceEvidence": "idempotency middleware updates request_keys status/response before returning res.json; actual acknowledged 422 is consistent with that completed write",
+    "publicGetAvailable": false,
+    "tableRead": false,
+    "sameKeyPostReplayed": false,
+    "previewCreated": false,
+    "rawModelContentInCache": false
+  },
+  "implementation": {
+    "planningRequestUsesResponseFormat": false,
+    "rawContentStoredForRejectedJSON": false,
+    "providerResponseMetadataOnly": true,
+    "finishReasonLostBeforePlanningParser": true,
+    "localReproducibleRisk": "A text preamble or trailing prose around a complete JSON object is rejected; only a standalone JSON object or one exact outer fence parses. Actual 422 cause remains unknown without provider content."
+  },
+  "formalProject": {
+    "version": 10,
+    "status": "FAILED",
+    "source": "model",
+    "validationValid": true,
+    "validationErrors": [],
+    "agentIds": [
+      "manager",
+      "developer",
+      "qa"
+    ],
+    "taskIds": [
+      "dev",
+      "qa_verify",
+      "qa_review",
+      "manager_accept"
+    ]
+  },
+  "scope": {
+    "newPaidCalls": 0,
+    "businessPosts": 0,
+    "providerRequests": 0,
+    "databaseReads": 0,
+    "keysRead": false,
+    "sourceChanges": 0,
+    "employeeArtifactsAuthored": 0
+  }
+}

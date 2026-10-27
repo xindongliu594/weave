@@ -1,0 +1,1 @@
+{"status":"passed","output":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\local-static-cli-2026-10-05T12-16-41.835Z-5f47ecb5.json","directory":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\local-static-cli\\isolated-FMs94d","phases":4,"paidModelCalls":0,"failure":null}

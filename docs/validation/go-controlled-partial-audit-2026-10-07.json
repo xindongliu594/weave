@@ -1,0 +1,354 @@
+{
+  "kind": "independent-controlled-stop-restart-resume-partial-audit",
+  "status": "partial-not-accepted",
+  "checkedAt": "2026-10-07T02:09:52.878Z",
+  "parentRunId": "0453cd06-caf6-4fee-91f3-cccb55340a68",
+  "childRunId": "559a026b-804c-48ab-b343-9ec2ed102b15",
+  "version": 10,
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/sources.json",
+      "bytes": 2284,
+      "sha256": "0fb96026f3c309b489eb9384705b8732a9280f4a06c7ae66f72aaede3d180cce"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/archive.json",
+      "bytes": 38989006,
+      "sha256": "0ef8ed9e2318184a4070aff541f72c1b789502718d07eec050a16c5eae34219b"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/state.json",
+      "bytes": 13648060,
+      "sha256": "b3ff5b91bf779f94e4b5b31c676eaa4fa1732eed8fe6fa42039cd3dba942dbf8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/usage.json",
+      "bytes": 321412,
+      "sha256": "14831f44ca3ca4ff607171d76240085df719b7f0b35e08903dd6f690bfdfca48"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/manifest.json",
+      "bytes": 453,
+      "sha256": "82189592865f14a02f1452b63462da4a66298dedf1f47b116b4021aa437434a4"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/operations.json",
+      "bytes": 61379,
+      "sha256": "7afe3d0eeab5b514ccc25c1a63d1cacfae904dd25e60b1d0941e1cb4cdb58f9e"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/approvals.json",
+      "bytes": 2107,
+      "sha256": "ccda9ff95e13260b239e5ffd7783d8e3c0450b6de12b73e1407f8502a1d9008b"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/readiness.json",
+      "bytes": 117,
+      "sha256": "2219ccc28dd7db094ca0645c4a8f7c1b16251418ac97fbf6bdd095feacec49a6"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-archive.json",
+      "bytes": 25009920,
+      "sha256": "382f1afea6504218f09fdb56d5bacd837da8755c7781455008fe7ee218e66969"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-manifest.json",
+      "bytes": 453,
+      "sha256": "d4f49563f045cf450f92e4e90c3e21634366f7b11d12f50faaf31e0be0ec5a94"
+    },
+    {
+      "path": "docs/test-evidence/go-knowledge-manual-2026-10-07-2da72e92/after-restart-documents.json",
+      "bytes": 4993,
+      "sha256": "43e6516205b99c07903585d6489392e78c1b37f88ca93e718e65a4eee93aeba9"
+    },
+    {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-07T01-49-29-086Z-e356cc32/usage.json",
+      "bytes": 312011,
+      "sha256": "ba794a38377e21f13921d73ad8d31efab1ead0042d42b648b54ae8720a173826"
+    },
+    {
+      "path": "docs/validation/go-knowledge-v2-browser-audit-2026-10-07.json",
+      "bytes": 57239,
+      "sha256": "6e2af37afb6e550c09ac267e8fd6eb596b4f8a16d7301ffe61450a3849281d18"
+    },
+    {
+      "path": "docs/validation/go-controlled-restart-audit-2026-10-07.json",
+      "bytes": 7534,
+      "sha256": "2960b914676e1a719a3c684d7c4c13f3decf8516d9c788e2a085d017b63ff0ee"
+    }
+  ],
+  "passed": [
+    "受控停止、目录两份v2与源库关闭后服务重启已绑定独立阶段证据",
+    "同v10 DAG/角色/权限/路由/执行位置及v1知识固定引用保持",
+    "开发原 accepted seal 与三文件SHA精确恢复；子运行dev零模型/工具/本机操作",
+    "未完成QA继续并只修自己文件，最终同版本6/6与8/8真实CLI测试exit0",
+    "两次QA实际knowledge_read及四次引用都是v1，目录为v2",
+    "全部旧usage相等；新增15 settled wire费用0.2151051；持久化累计调用33"
+  ],
+  "failed": [
+    "run终态failed: BUDGET_CONTEXT_LIMIT，最后请求未发送",
+    "QA测试真实通过但没有新增 handoff/accepted seal",
+    "qa_review/manager_accept均pending，没有 acceptance-report.md；完整MVP验收未通过"
+  ],
+  "tests": [
+    {
+      "operationId": "f0fdae45-ced5-4d12-a4c6-96928bdd11ee",
+      "command": "node --test todo.test.mjs",
+      "approvalId": "955c1321-3aa9-401c-a9fa-1849b5948692",
+      "resultSeq": 660,
+      "exitCode": 0,
+      "workspaceRevision": "4d5dd6ac11b8d1440888d7ba6936178834fba8a248bccb8825c49059df88b1b8",
+      "outputSha256": "43a50e00c021ec3cd12f94850b2224defe9b49d35a3ad9f3f85d1e7923fdd61a",
+      "counts": [
+        "ℹ tests 6",
+        "ℹ pass 6",
+        "ℹ fail 0",
+        "ℹ skipped 0"
+      ],
+      "diagnosticOnly": false
+    },
+    {
+      "operationId": "05c7eba6-9507-41a5-82ab-0dd2df3f8cdc",
+      "command": "node --test acceptance.test.mjs",
+      "approvalId": "1145fd1c-5bdd-4dc9-8591-e56f7966212a",
+      "resultSeq": 1316,
+      "exitCode": 1,
+      "workspaceRevision": "4d5dd6ac11b8d1440888d7ba6936178834fba8a248bccb8825c49059df88b1b8",
+      "outputSha256": "5658a6d7a75803b745112b3c27bfb444c6b8de1f26fc00796a7dd5503796ffc6",
+      "counts": [
+        "ℹ tests 8",
+        "ℹ pass 0",
+        "ℹ fail 8",
+        "ℹ skipped 0"
+      ],
+      "diagnosticOnly": false
+    },
+    {
+      "operationId": "f7837758-9c07-4873-9b7a-40cf424df872",
+      "command": "node --test todo.test.mjs",
+      "approvalId": "2bc81bf0-1201-41a4-9155-be445973cf83",
+      "resultSeq": 1888,
+      "exitCode": 1,
+      "workspaceRevision": "5de6f22c955c398e034398fbee472f908b4848da94002af54cdd018378668143",
+      "outputSha256": "eb7e7fe40e7da4881da77dcfaa8958072830437316d6517c721a5c69e8f54ff3",
+      "counts": [
+        "ℹ tests 1",
+        "ℹ pass 0",
+        "ℹ fail 1",
+        "ℹ skipped 0"
+      ],
+      "diagnosticOnly": false
+    },
+    {
+      "operationId": "efc2751a-8de9-4f35-b8d4-7f59e8c455b9",
+      "command": "node todo.test.mjs 2>&1 | Select-Object -First 40",
+      "approvalId": "84f4790d-3f9f-4b4e-8667-5aa014c1b477",
+      "resultSeq": 2280,
+      "exitCode": 0,
+      "workspaceRevision": "5de6f22c955c398e034398fbee472f908b4848da94002af54cdd018378668143",
+      "outputSha256": "6ff37361a4ef400d856f4616947207c4de33d34131195b8e19a93a4b8b39baed",
+      "counts": [
+        "ℹ tests 6\r",
+        "ℹ pass 6\r",
+        "ℹ fail 0\r",
+        "ℹ skipped 0\r"
+      ],
+      "diagnosticOnly": true
+    },
+    {
+      "operationId": "a281d407-dc89-40ee-bd54-3ced96fff3dc",
+      "command": "node --test todo.test.mjs",
+      "approvalId": "c461a41d-8014-4cc1-959b-b8ab288b178e",
+      "resultSeq": 2739,
+      "exitCode": 0,
+      "workspaceRevision": "5de6f22c955c398e034398fbee472f908b4848da94002af54cdd018378668143",
+      "outputSha256": "6e966b68bc37990995e6f71c71b1bfa4a23d12ff6e98d6d12733828a08915a4d",
+      "counts": [
+        "ℹ tests 6",
+        "ℹ pass 6",
+        "ℹ fail 0",
+        "ℹ skipped 0"
+      ],
+      "diagnosticOnly": false
+    },
+    {
+      "operationId": "b9622e9d-0e78-4f8e-a1c5-e199721d81f9",
+      "command": "node --test acceptance.test.mjs",
+      "approvalId": "e36d1edd-bcb1-425c-bf9f-2e7b45240d5b",
+      "resultSeq": 3104,
+      "exitCode": 0,
+      "workspaceRevision": "5de6f22c955c398e034398fbee472f908b4848da94002af54cdd018378668143",
+      "outputSha256": "f916c6f48fa562002599d54f020ed6aaa9de4cbcc6ec564438d71a8e58f183fd",
+      "counts": [
+        "ℹ tests 8",
+        "ℹ pass 8",
+        "ℹ fail 0",
+        "ℹ skipped 0"
+      ],
+      "diagnosticOnly": false
+    }
+  ],
+  "knowledgeReads": [
+    {
+      "startSeq": 207,
+      "resultSeq": 210,
+      "documentId": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+      "version": 1,
+      "sha256": "4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650",
+      "chunkId": "8f46cc2c13655e0e9ed17844cd9662aa6bf4a68b72daa95477d56c45bf696e08"
+    },
+    {
+      "startSeq": 213,
+      "resultSeq": 216,
+      "documentId": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+      "version": 1,
+      "sha256": "77dfac48cfc2a2224906008f3f3246587765031c784a7e59c6a9cb81311eda93",
+      "chunkId": "1ae08ffae2c23f7f2cfff746fe7310d2bbea7f2ca94516bb2a702c7808de31ae"
+    }
+  ],
+  "citations": [
+    {
+      "seq": 141,
+      "agentId": "employee-3",
+      "sources": [
+        {
+          "documentId": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+          "version": 1,
+          "chunkId": "8f46cc2c13655e0e9ed17844cd9662aa6bf4a68b72daa95477d56c45bf696e08",
+          "title": "为伍验收·recovery·共享·1c82046ab0f842b9·验收说明",
+          "lineStart": 7,
+          "lineEnd": 11,
+          "sha256": "4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650",
+          "source": {
+            "vaultPath": "company/为伍验收·recovery·共享·1c82046ab0f842b9-be232aec/为伍验收·recovery·共享·1c82046ab0f842b9·验收说明-74bcc49b.md"
+          }
+        },
+        {
+          "documentId": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+          "version": 1,
+          "chunkId": "1ae08ffae2c23f7f2cfff746fe7310d2bbea7f2ca94516bb2a702c7808de31ae",
+          "title": "为伍验收·recovery·QA私有·1c82046ab0f842b9·验收说明",
+          "lineStart": 7,
+          "lineEnd": 11,
+          "sha256": "77dfac48cfc2a2224906008f3f3246587765031c784a7e59c6a9cb81311eda93",
+          "source": {
+            "vaultPath": "employee/为伍验收·recovery·QA私有·1c82046ab0f842b9-1db04ce1/为伍验收·recovery·QA私有·1c82046ab0f842b9·验收说明-9ae89b98.md"
+          }
+        }
+      ]
+    },
+    {
+      "seq": 147,
+      "agentId": "employee-3",
+      "sources": [
+        {
+          "documentId": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+          "version": 1,
+          "chunkId": "8f46cc2c13655e0e9ed17844cd9662aa6bf4a68b72daa95477d56c45bf696e08",
+          "title": "为伍验收·recovery·共享·1c82046ab0f842b9·验收说明",
+          "lineStart": 7,
+          "lineEnd": 11,
+          "sha256": "4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650",
+          "source": {
+            "vaultPath": "company/为伍验收·recovery·共享·1c82046ab0f842b9-be232aec/为伍验收·recovery·共享·1c82046ab0f842b9·验收说明-74bcc49b.md"
+          }
+        },
+        {
+          "documentId": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+          "version": 1,
+          "chunkId": "1ae08ffae2c23f7f2cfff746fe7310d2bbea7f2ca94516bb2a702c7808de31ae",
+          "title": "为伍验收·recovery·QA私有·1c82046ab0f842b9·验收说明",
+          "lineStart": 7,
+          "lineEnd": 11,
+          "sha256": "77dfac48cfc2a2224906008f3f3246587765031c784a7e59c6a9cb81311eda93",
+          "source": {
+            "vaultPath": "employee/为伍验收·recovery·QA私有·1c82046ab0f842b9-1db04ce1/为伍验收·recovery·QA私有·1c82046ab0f842b9·验收说明-9ae89b98.md"
+          }
+        }
+      ]
+    },
+    {
+      "seq": 208,
+      "agentId": "employee-3",
+      "sources": [
+        {
+          "documentId": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+          "version": 1,
+          "chunkId": "8f46cc2c13655e0e9ed17844cd9662aa6bf4a68b72daa95477d56c45bf696e08",
+          "title": "为伍验收·recovery·共享·1c82046ab0f842b9·验收说明",
+          "lineStart": 7,
+          "lineEnd": 11,
+          "sha256": "4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650",
+          "source": {
+            "vaultPath": "company/为伍验收·recovery·共享·1c82046ab0f842b9-be232aec/为伍验收·recovery·共享·1c82046ab0f842b9·验收说明-74bcc49b.md"
+          }
+        }
+      ]
+    },
+    {
+      "seq": 214,
+      "agentId": "employee-3",
+      "sources": [
+        {
+          "documentId": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+          "version": 1,
+          "chunkId": "1ae08ffae2c23f7f2cfff746fe7310d2bbea7f2ca94516bb2a702c7808de31ae",
+          "title": "为伍验收·recovery·QA私有·1c82046ab0f842b9·验收说明",
+          "lineStart": 7,
+          "lineEnd": 11,
+          "sha256": "77dfac48cfc2a2224906008f3f3246587765031c784a7e59c6a9cb81311eda93",
+          "source": {
+            "vaultPath": "employee/为伍验收·recovery·QA私有·1c82046ab0f842b9-1db04ce1/为伍验收·recovery·QA私有·1c82046ab0f842b9·验收说明-9ae89b98.md"
+          }
+        }
+      ]
+    }
+  ],
+  "manifest": [
+    {
+      "path": "acceptance.test.mjs",
+      "size": 19073,
+      "sha256": "cc657b56573c641374b567d88447e94bd41980dc1bc8ede4d2917c8b71beeb31"
+    },
+    {
+      "path": "README.md",
+      "size": 2495,
+      "sha256": "70b7f757914f7113ee313abe5a38e96d8cc89ceda530c842a2cbb0594d42354e"
+    },
+    {
+      "path": "server.mjs",
+      "size": 7179,
+      "sha256": "c4e4d6f44314b14c184f78635c3622821617c4182a9c683b9aa4babd4fb72203"
+    },
+    {
+      "path": "todo.test.mjs",
+      "size": 7434,
+      "sha256": "86896f1cf7fab8a8055b21fccc4e8541dbadcd0f418ec239a57f1a7e1f6ba156"
+    }
+  ],
+  "accounting": {
+    "inheritedCalls": 18,
+    "newLogicalRequests": 16,
+    "newWireSettledCalls": 15,
+    "cumulativeDurableCalls": 33,
+    "newCost": 0.2151051,
+    "projectReadiness": {
+      "recordedCost": 0.8391541,
+      "reserved": 0,
+      "availableBudget": 3.9357359,
+      "pendingCount": 0,
+      "uncertainCount": 0,
+      "receipts": []
+    }
+  },
+  "failure": {
+    "seq": 3193,
+    "message": "BUDGET_CONTEXT_LIMIT: 原预算无法容纳 Chat Completions 完整受保护请求；没有发送模型请求；精简前实际 Chat Completions 请求 463491 字节，精简前预留 $0.15135450；当前请求字节上限 192000；可用预算 $0.04527690；输出上限 10000 tokens 保持不变；单次完整上下文最低预留 $0.05251560，至少另需 $0.00723870"
+  },
+  "cautions": [
+    "保留初次QA 8失败、一次开发回归1失败，不以最终通过认定未查明的首次失败原因",
+    "FILE_VERSION_CONFLICT notExecuted=true；员工实际重新读取后携带SHA修自己的文件",
+    "管道诊断命令不代替最终完整字面 node --test 回执",
+    "仅读本地保存数据，没有live API/原DB/模型/员工文件写入，不削弱原必须项"
+  ]
+}

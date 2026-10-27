@@ -1,0 +1,684 @@
+{
+  "kind": "independent-readonly-normal-v12-interrupted-audit",
+  "at": "2026-10-06T11:19:53.288Z",
+  "runId": "566c813d-6fc9-409a-b945-ec9d5afea4fe",
+  "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+  "version": 12,
+  "sourceSHA": [
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/sources.json",
+      "sha256": "d9456669b4cdd99a834a49b318945694a058aa6b8a61a8701a859c31cf9cec6d"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-watch-2026-10-06T11-08-46-228Z-395f0aac/sources.json",
+      "sha256": "516cb57529f6091410bd83801ec4fe3b099348be54503727188fc1151e09ffb2"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-approve-2026-10-06T10-47-53-478Z-a849eb89.json",
+      "sha256": "e2fafdd696405e71d6b0f15442211f366e45e14b50a776e6e012b04b381595d2"
+    },
+    {
+      "path": "docs/test-evidence/go-normal12-two-stage-normal-confirm-2026-10-06T10-46-46-978Z-a3c8b4d6.json",
+      "sha256": "c96ba64d264dea6c4719791ca4eef5feb6f46f2d54439c72d3be7e7eb0ba0367"
+    },
+    {
+      "path": "docs/test-evidence/go-normal12-two-stage-normal-generate-2026-10-06T10-45-42-927Z-2ff16201.json",
+      "sha256": "3ec13b5a76ef767508b90f35efa6ff40847addcbb96983d31df039da0c1c99e0"
+    },
+    {
+      "path": "apps/api/src/handoff-checkpoints.ts",
+      "sha256": "84432fac74a50ec59e29a0fca521f67709ded6a167b22d0d848fa44f2402307a"
+    },
+    {
+      "path": "apps/api/src/budget-history.ts",
+      "sha256": "9712b0b8e1c998551cc6eb8b4cb04ca67d83ba290ed66865640f1036b7ec4acd"
+    },
+    {
+      "path": "apps/api/src/recovery-conditions.ts",
+      "sha256": "c2fec6122b0c5d1df5be1312c3e3236f0c7c29d9ffb8a915aa1a65c139f83b1e"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    }
+  ],
+  "rawSourcesVerified": [
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/archive.json",
+      "file": "archive.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/export",
+      "method": "GET",
+      "status": 200,
+      "bytes": 31604398,
+      "sha256": "aee0d4ab736dcb63e463d532b70782756fd2d57a1545e23d7fef79e7af366a2f"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/state.json",
+      "file": "state.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe",
+      "method": "GET",
+      "status": 200,
+      "bytes": 10749231,
+      "sha256": "27190b6de0a3d41477f9e7ddc1c40ce00ef6b36bcfee5ac7b2c2984b97e8fc9d"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/health.json",
+      "file": "health.json",
+      "endpoint": "/health",
+      "method": "GET",
+      "status": 200,
+      "bytes": 512,
+      "sha256": "081594346950d5f09c8d8565f43792ba9484c9081d2a9045cea87fd4c9b481e1"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/operations.json",
+      "file": "operations.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/local-operations",
+      "method": "GET",
+      "status": 200,
+      "bytes": 67079,
+      "sha256": "3b51cd39c70c6ab8694d7bcfce81b5da9dd7bb460010cf9e6d2d11721ba002e6"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/artifacts.json",
+      "file": "artifacts.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/artifacts",
+      "method": "GET",
+      "status": 200,
+      "bytes": 453,
+      "sha256": "22c863fd43e366090fd4cd37bc7d276b6d0e92085442bddd4ea88e60b6da08ff"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/approvals.json",
+      "file": "approvals.json",
+      "endpoint": "/approvals?runId=566c813d-6fc9-409a-b945-ec9d5afea4fe",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1738,
+      "sha256": "a21f24d31090bc1f765caeeb6a023465e4e659008f755206716f00741ea91cd6"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/readiness.json",
+      "file": "readiness.json",
+      "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+      "method": "GET",
+      "status": 200,
+      "bytes": 263,
+      "sha256": "540f21f59e4cc9b4af8cfd35c42803c257afa3639e1733403d7918d03e5fe2e6"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/usage.json",
+      "file": "usage.json",
+      "endpoint": "/usage",
+      "method": "GET",
+      "status": 200,
+      "bytes": 299826,
+      "sha256": "9f4566b751e99f20df1403663baa79f8f884a703a6b9c595d3109ddeda480cb0"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/projects.json",
+      "file": "projects.json",
+      "endpoint": "/projects",
+      "method": "GET",
+      "status": 200,
+      "bytes": 112045,
+      "sha256": "91348bdd34e0f47a86b5406ce0b2497e07df1b056ed93d2e1b0c355e05ba9d5a"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/acceptance.test.mjs",
+      "file": "acceptance.test.mjs",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/artifact?path=acceptance.test.mjs",
+      "method": "GET",
+      "status": 200,
+      "bytes": 16377,
+      "sha256": "7a8ee9a982310926b612b72db6a4c5989f335d7719f39f96ddf1bebf9a081dde"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/README.md",
+      "file": "README.md",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/artifact?path=README.md",
+      "method": "GET",
+      "status": 200,
+      "bytes": 4083,
+      "sha256": "2f71672418bfd98eca3433bedd683c477c4122da30c341a2794a5dfc03b6e174"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/server.mjs",
+      "file": "server.mjs",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/artifact?path=server.mjs",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6970,
+      "sha256": "73be51c504558414f06b8176b240861eedf3b4bbba785ffce0b0744804b3f91f"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/todo.test.mjs",
+      "file": "todo.test.mjs",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/artifact?path=todo.test.mjs",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6928,
+      "sha256": "d9c459ed56ab16765908c7e03ae5becbd6d4f023ad9afb7fbcd3be947a30b1c1"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/archive-after.json",
+      "file": "archive-after.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/export",
+      "method": "GET",
+      "status": 200,
+      "bytes": 31604398,
+      "sha256": "aee0d4ab736dcb63e463d532b70782756fd2d57a1545e23d7fef79e7af366a2f"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-watch-2026-10-06T11-08-46-228Z-395f0aac/state.json",
+      "file": "state.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe?after=2671",
+      "method": "GET",
+      "status": 200,
+      "bytes": 11725659,
+      "sha256": "ee73b518e33982de16dd0dbac1a93fedb62efac962caeefc61674a35c54d3186"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-watch-2026-10-06T11-08-46-228Z-395f0aac/approvals.json",
+      "file": "approvals.json",
+      "endpoint": "/approvals?runId=566c813d-6fc9-409a-b945-ec9d5afea4fe",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1738,
+      "sha256": "a21f24d31090bc1f765caeeb6a023465e4e659008f755206716f00741ea91cd6"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-watch-2026-10-06T11-08-46-228Z-395f0aac/operations.json",
+      "file": "operations.json",
+      "endpoint": "/runs/566c813d-6fc9-409a-b945-ec9d5afea4fe/local-operations",
+      "method": "GET",
+      "status": 200,
+      "bytes": 67079,
+      "sha256": "3b51cd39c70c6ab8694d7bcfce81b5da9dd7bb460010cf9e6d2d11721ba002e6"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v12-watch-2026-10-06T11-08-46-228Z-395f0aac/readiness.json",
+      "file": "readiness.json",
+      "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+      "method": "GET",
+      "status": 200,
+      "bytes": 263,
+      "sha256": "540f21f59e4cc9b4af8cfd35c42803c257afa3639e1733403d7918d03e5fe2e6"
+    }
+  ],
+  "archive": {
+    "integrity": "ok",
+    "eventCount": 2867,
+    "snapshotSha256": "270b9c248a474450faf9b28c8ab29ed556ca9ce4c709223d65226800df36babc",
+    "repeatedOriginalBytesIdentical": true,
+    "publicStatus": "interrupted",
+    "archiveStatus": "cancelled",
+    "timeline": [
+      {
+        "seq": 2848,
+        "at": "2026-10-06T11:05:40.962Z",
+        "type": "model/finish",
+        "data": {
+          "reason": {
+            "kind": "error",
+            "failure": {
+              "message": "工作进程已失去运行租约",
+              "code": "LEASE_LOST"
+            }
+          },
+          "durationMs": 5104
+        }
+      },
+      {
+        "seq": 2856,
+        "at": "2026-10-06T11:05:46.132Z",
+        "type": "run/finished",
+        "data": {
+          "status": "interrupted",
+          "message": "服务租约过期，运行已停止；可从已记录的任务结果恢复。"
+        }
+      },
+      {
+        "seq": 2861,
+        "at": "2026-10-06T11:05:49.615Z",
+        "type": "model/finish",
+        "data": {
+          "reason": {
+            "kind": "aborted",
+            "failure": {
+              "message": "工作进程已失去运行租约",
+              "code": "LEASE_LOST"
+            }
+          },
+          "durationMs": 58650
+        }
+      },
+      {
+        "seq": 2866,
+        "at": "2026-10-06T11:05:51.708Z",
+        "type": "team/checkpoint",
+        "data": {
+          "budgetEvidence": {
+            "version": 1,
+            "runId": "566c813d-6fc9-409a-b945-ec9d5afea4fe",
+            "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+            "projectVersion": 12,
+            "capturedAt": "2026-10-06T11:05:51.351Z",
+            "point": "runtime-checkpoint",
+            "basis": "host-execution-budget",
+            "currency": "USD",
+            "project": {
+              "limit": 4.1797,
+              "occupied": 2.095023,
+              "activeReserved": 1.3877787807814457e-17,
+              "available": 2.0846770000000006,
+              "callsUsed": 26,
+              "callLimit": 100,
+              "callsBasis": "host-reserved-model-attempts"
+            },
+            "inherited": {
+              "basis": "run-admission-snapshot",
+              "recordedCost": 1.765031,
+              "retainedUnknownReservation": 0.096526,
+              "availableBudget": 2.3181430000000005,
+              "callsUsed": null,
+              "callsBasis": "archived-model-wire-request-count",
+              "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+            },
+            "note": "这是宿主执行预算，不是实时费用账本。occupied 含入场占用、已结算执行费用和在途预留；新增未知费用须另核对账本，不能把占用当已确认费用。null 为未知。"
+          }
+        }
+      },
+      {
+        "seq": 2867,
+        "at": "2026-10-06T11:05:52.114Z",
+        "type": "run/finished",
+        "data": {
+          "status": "cancelled",
+          "message": "工作进程已失去运行租约",
+          "usageCost": 0.233466
+        }
+      }
+    ]
+  },
+  "goBinding": {
+    "projectSignature": "e1b01df3b6994d5eeea8094720cd48e4e210b623b98a04ef6b4a759588807639",
+    "confirmedSha256": "c96ba64d264dea6c4719791ca4eef5feb6f46f2d54439c72d3be7e7eb0ba0367",
+    "planningReceiptId": "97392bdc-f3b5-460b-85b8-cde909174285",
+    "planningCost": 0.007449299999999999
+  },
+  "seals": [
+    {
+      "seq": 726,
+      "at": "2026-10-06T10:50:20.083Z",
+      "acceptedAt": "2026-10-06T10:50:18.818Z",
+      "taskId": "dev",
+      "attemptId": "c839ed4a-07cd-4473-b3c9-666c7563b088",
+      "workspaceRevision": "112b8bedf0123334201cda2494e0a3814cfd5ef40bcea6fc77d168e9490b56f0"
+    },
+    {
+      "seq": 2720,
+      "at": "2026-10-06T11:04:00.632Z",
+      "acceptedAt": "2026-10-06T11:03:59.053Z",
+      "taskId": "qa_verify",
+      "attemptId": "78a7f09a-98cc-4c87-9755-692dbba8aea3",
+      "workspaceRevision": "22c863fd43e366090fd4cd37bc7d276b6d0e92085442bddd4ea88e60b6da08ff"
+    }
+  ],
+  "files": [
+    {
+      "path": "server.mjs",
+      "sha256": "73be51c504558414f06b8176b240861eedf3b4bbba785ffce0b0744804b3f91f",
+      "size": 6970,
+      "producerTaskId": "dev",
+      "acceptedSeq": 726,
+      "matchingNativeWriteIds": [
+        "b67a1ca8-8e37-4e70-b916-d5d1193f2828"
+      ]
+    },
+    {
+      "path": "todo.test.mjs",
+      "sha256": "d9c459ed56ab16765908c7e03ae5becbd6d4f023ad9afb7fbcd3be947a30b1c1",
+      "size": 6928,
+      "producerTaskId": "dev",
+      "acceptedSeq": 726,
+      "matchingNativeWriteIds": [
+        "a8414e9a-5289-4745-8797-42e8fcfdca91"
+      ]
+    },
+    {
+      "path": "README.md",
+      "sha256": "2f71672418bfd98eca3433bedd683c477c4122da30c341a2794a5dfc03b6e174",
+      "size": 4083,
+      "producerTaskId": "dev",
+      "acceptedSeq": 726,
+      "matchingNativeWriteIds": [
+        "e48ed8cc-8c59-42d1-b673-745e2bf36c87"
+      ]
+    },
+    {
+      "path": "acceptance.test.mjs",
+      "sha256": "7a8ee9a982310926b612b72db6a4c5989f335d7719f39f96ddf1bebf9a081dde",
+      "size": 16377,
+      "producerTaskId": "qa_verify",
+      "acceptedSeq": 2720,
+      "matchingNativeWriteIds": [
+        "da85db30-53f5-4f35-8bf8-53773c2ff46c"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "taskId": "dev",
+      "attemptId": "c839ed4a-07cd-4473-b3c9-666c7563b088",
+      "acceptedSeq": 726,
+      "operationId": "8c814408-f143-4a0a-9e37-6c063860bafe",
+      "approvalId": "0aec8f35-9d20-4eb0-a930-1d6691442cdd",
+      "sessionId": "7f09ab81-3822-4e38-85b5-289fc7da5e7f",
+      "callId": "call_00_pmsstjhu5xxowkix2j5s91p5",
+      "approvalRequestedSeq": 344,
+      "approvalDecidedSeq": 609,
+      "queuedSeq": 614,
+      "finishedSeq": 623,
+      "observationSeq": 625,
+      "command": "node --test todo.test.mjs",
+      "exitCode": 0,
+      "counts": {
+        "status": "available",
+        "format": "spec",
+        "tests": 9,
+        "suites": 0,
+        "pass": 9,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputSha256": "2628520942ca3525457f33bab0102addf44092bf9792a5d8479c189e9db9c817",
+      "outputBytes": 756,
+      "hostWorkspaceRevision": "112b8bedf0123334201cda2494e0a3814cfd5ef40bcea6fc77d168e9490b56f0",
+      "nativeWorkspaceRevision": "112b8bedf0123334201cda2494e0a3814cfd5ef40bcea6fc77d168e9490b56f0",
+      "validAtAccepted": true
+    },
+    {
+      "taskId": "qa_verify",
+      "attemptId": "78a7f09a-98cc-4c87-9755-692dbba8aea3",
+      "acceptedSeq": 2720,
+      "operationId": "ff3eff57-c691-4c10-8fb0-40cd1870a839",
+      "approvalId": "522f5992-8058-4899-956f-6fb5114ed60b",
+      "sessionId": "3d73e90a-70f0-4cab-8f01-de63831b93e5",
+      "callId": "call_00_e339ht45vrd0y34beb3yhjra",
+      "approvalRequestedSeq": 1118,
+      "approvalDecidedSeq": 1444,
+      "queuedSeq": 1452,
+      "finishedSeq": 1462,
+      "observationSeq": 1464,
+      "command": "node --test todo.test.mjs",
+      "exitCode": 0,
+      "counts": {
+        "status": "available",
+        "format": "spec",
+        "tests": 9,
+        "suites": 0,
+        "pass": 9,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputSha256": "d7b601093ba1a4f24a745029c49d32a8adb565902fbc71ee07503a063b4af34c",
+      "outputBytes": 755,
+      "hostWorkspaceRevision": "95e38c7a39dab83da90e1291a7f51e6d5495fc68fd7d3667eb3ae2279d9652fe",
+      "nativeWorkspaceRevision": "b02d189cffc592645c8d6931e7bbddc3314ea48dbabdcf71e654e5f05172df76",
+      "validAtAccepted": false
+    },
+    {
+      "taskId": "qa_verify",
+      "attemptId": "78a7f09a-98cc-4c87-9755-692dbba8aea3",
+      "acceptedSeq": 2720,
+      "operationId": "181a4e23-c9d3-40cb-a7ad-7125ab7d8801",
+      "approvalId": "6d7505da-61f8-4776-a623-d7757d9f826a",
+      "sessionId": "3d73e90a-70f0-4cab-8f01-de63831b93e5",
+      "callId": "call_00_3ol9q9q9giqgx5ivuaod7loh",
+      "approvalRequestedSeq": 1497,
+      "approvalDecidedSeq": 1724,
+      "queuedSeq": 1731,
+      "finishedSeq": 1754,
+      "observationSeq": 1756,
+      "command": "node --test acceptance.test.mjs",
+      "exitCode": 1,
+      "counts": {
+        "status": "available",
+        "format": "spec",
+        "tests": 11,
+        "suites": 0,
+        "pass": 10,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputSha256": "ae964f7946c29aadcc43eaed6ea817edf269e85d016182ce22762e3d5dcc66c8",
+      "outputBytes": 2220,
+      "hostWorkspaceRevision": "95e38c7a39dab83da90e1291a7f51e6d5495fc68fd7d3667eb3ae2279d9652fe",
+      "nativeWorkspaceRevision": "b02d189cffc592645c8d6931e7bbddc3314ea48dbabdcf71e654e5f05172df76",
+      "validAtAccepted": false
+    },
+    {
+      "taskId": "qa_verify",
+      "attemptId": "78a7f09a-98cc-4c87-9755-692dbba8aea3",
+      "acceptedSeq": 2720,
+      "operationId": "aa1a01dd-f3ef-4032-aa85-2f91ad8bf887",
+      "approvalId": "50e2e69b-224e-4442-8cab-a4b15f1db35e",
+      "sessionId": "3d73e90a-70f0-4cab-8f01-de63831b93e5",
+      "callId": "call_00_5zzgm8yb1uyrd4iv7kzyac48",
+      "approvalRequestedSeq": 1879,
+      "approvalDecidedSeq": 2297,
+      "queuedSeq": 2306,
+      "finishedSeq": 2322,
+      "observationSeq": 2324,
+      "command": "node --test acceptance.test.mjs",
+      "exitCode": 0,
+      "counts": {
+        "status": "available",
+        "format": "spec",
+        "tests": 11,
+        "suites": 0,
+        "pass": 11,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputSha256": "914671b8420d7d86e8c8cb96d0c6f9bf26bb5f278fab6d6808b09f15a571ea21",
+      "outputBytes": 1150,
+      "hostWorkspaceRevision": "22c863fd43e366090fd4cd37bc7d276b6d0e92085442bddd4ea88e60b6da08ff",
+      "nativeWorkspaceRevision": "54593b08cd0acc4e81a95abeae35fa1bc98055a03733fa59947beeaa36609d6a",
+      "validAtAccepted": true
+    },
+    {
+      "taskId": "qa_verify",
+      "attemptId": "78a7f09a-98cc-4c87-9755-692dbba8aea3",
+      "acceptedSeq": 2720,
+      "operationId": "31adcd87-2326-4aa9-88b4-e3b8deaa1f37",
+      "approvalId": "b4697b19-646c-4621-b433-ce5e7072e1e2",
+      "sessionId": "3d73e90a-70f0-4cab-8f01-de63831b93e5",
+      "callId": "call_00_3ydyy7k3p28ocd07vd94to4l",
+      "approvalRequestedSeq": 2361,
+      "approvalDecidedSeq": 2633,
+      "queuedSeq": 2641,
+      "finishedSeq": 2658,
+      "observationSeq": 2660,
+      "command": "node --test todo.test.mjs",
+      "exitCode": 0,
+      "counts": {
+        "status": "available",
+        "format": "spec",
+        "tests": 9,
+        "suites": 0,
+        "pass": 9,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "outputSha256": "992be29813ef6ca79190210785bbe5358deb677b1bab566a08d189cbdb0d1902",
+      "outputBytes": 757,
+      "hostWorkspaceRevision": "22c863fd43e366090fd4cd37bc7d276b6d0e92085442bddd4ea88e60b6da08ff",
+      "nativeWorkspaceRevision": "54593b08cd0acc4e81a95abeae35fa1bc98055a03733fa59947beeaa36609d6a",
+      "validAtAccepted": true
+    }
+  ],
+  "firstFailedQaCommandRetained": true,
+  "budget": {
+    "snapshot": {
+      "receipts": [
+        {
+          "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+          "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af",
+          "amount": 0.096526
+        }
+      ],
+      "reserved": 0.096526,
+      "retained": true,
+      "recordedCost": 1.765031,
+      "availableBudget": 2.3181430000000005
+    },
+    "policyLimit": 4.1797,
+    "readiness": {
+      "recordedCost": 1.998497,
+      "reserved": 0.096526,
+      "availableBudget": 2.0846770000000006,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+          "amount": 0.096526,
+          "status": "uncertain",
+          "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+        }
+      ]
+    },
+    "currentHostCheckpoint": {
+      "status": "available",
+      "sourceRunId": "566c813d-6fc9-409a-b945-ec9d5afea4fe",
+      "checkpointSeq": 2866,
+      "checkpointAt": "2026-10-06T11:05:51.708Z",
+      "capturedAt": "2026-10-06T11:05:51.351Z",
+      "point": "runtime-checkpoint",
+      "subsequentAccountingEvents": 0,
+      "currentAtSourceEnd": true,
+      "project": {
+        "limit": 4.1797,
+        "occupied": 2.095023,
+        "activeReserved": 1.3877787807814457e-17,
+        "available": 2.0846770000000006,
+        "callsUsed": 26,
+        "callLimit": 100,
+        "callsBasis": "host-reserved-model-attempts"
+      },
+      "sourceAdmission": {
+        "basis": "run-admission-snapshot",
+        "recordedCost": 1.765031,
+        "retainedUnknownReservation": 0.096526,
+        "availableBudget": 2.3181430000000005,
+        "callsUsed": null,
+        "callsBasis": "archived-model-wire-request-count",
+        "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+      }
+    },
+    "requests": 26,
+    "wire": 25,
+    "usage": 25,
+    "newRecordedCost": 0.23346599999999995,
+    "perTask": {
+      "dev": {
+        "requests": 9,
+        "wires": 9,
+        "cost": 0.072477
+      },
+      "qa_verify": {
+        "requests": 11,
+        "wires": 11,
+        "cost": 0.1387263
+      },
+      "captain": {
+        "requests": 5,
+        "wires": 5,
+        "cost": 0.022262700000000003
+      },
+      "qa_review": {
+        "requests": 1,
+        "wires": 0,
+        "cost": 0
+      }
+    },
+    "undispatchedRegisteredRequest": {
+      "seq": 2840,
+      "requestId": "2a3e4dff-5779-4098-99fb-5da8f283e048",
+      "sessionId": "3d73e90a-70f0-4cab-8f01-de63831b93e5",
+      "nativeTaskId": "t3",
+      "attemptId": "dcc86cb0-2736-44a7-9fa0-6028e54ed456",
+      "finishSeq": 2848,
+      "reason": {
+        "kind": "error",
+        "failure": {
+          "message": "工作进程已失去运行租约",
+          "code": "LEASE_LOST"
+        }
+      },
+      "noWireOrBillingInArchive": true,
+      "mustRetainHostQuota": 1,
+      "durableReservationEvidenceAvailable": false
+    }
+  },
+  "nativeOperations": {
+    "total": 14,
+    "allCompletedStartedNoLate": true,
+    "unknownFromPublicState": 0,
+    "unknownFromArchive": 0,
+    "pendingApprovals": 0
+  },
+  "checkpointRecovery": {
+    "localPureResumeGateAgainstCapturedBytes": "passed",
+    "exactRestoredTasks": [
+      "dev",
+      "qa_verify"
+    ],
+    "fullAdmissionProved": false,
+    "missing": [
+      "Actual current recovery-conditions/durable admission history preserving total26 and qa_review1",
+      "Current authorization/model/device/daily admission and no competing Run/child",
+      "Lease failure handling/root cause readiness before paid continuation"
+    ],
+    "retainUncertainCostsRequired": true,
+    "requiresCurrentLiveAdmissionByRoot": true
+  },
+  "readmeFinding": {
+    "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/README.md",
+    "line": 60,
+    "sha256": "2f71672418bfd98eca3433bedd683c477c4122da30c341a2794a5dfc03b6e174",
+    "command": "Get-Process node | Stop-Process",
+    "scope": "All accessible processes named node; no current-session or Todo PID filter",
+    "observedExecutionInSavedNativeCommands": false,
+    "leaseCauseProved": false,
+    "existingScopedStopOption": "Ctrl+C in the PowerShell window running Todo",
+    "employeeArtifactChanged": false
+  },
+  "normalFreshSucceeded": false,
+  "qaReviewAccepted": false,
+  "managerAccepted": false,
+  "controlledRecoveryProved": false,
+  "actualMvpAccepted": false,
+  "actualApiActions": 0,
+  "actualModelCalls": 0,
+  "sourceDatabaseOpened": false,
+  "originalEmployeeFilesRead": false,
+  "employeeCommandsExecuted": 0,
+  "originalSourceOrSharedReportWrites": 0
+}

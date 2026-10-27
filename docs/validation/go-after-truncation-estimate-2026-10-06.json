@@ -1,0 +1,233 @@
+{
+  "kind": "offline-invalid-go-candidate-estimate-inspection",
+  "checkedAt": "2026-10-06T02:54:15.494Z",
+  "candidateSource": {
+    "path": "docs/test-evidence/go-after-truncation-normal-generate-2026-10-06T02-48-08-965Z-98070031.json",
+    "sha256": "886e7cdffb6d6f7387a4bee6ec56094a81d427d936378c1d845d1b772292334e"
+  },
+  "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+  "beforeVersion": 6,
+  "afterVersion": 6,
+  "savedRequirementPlanPolicyUnchanged": true,
+  "responseStatus": 200,
+  "validation": {
+    "valid": false,
+    "errors": [
+      "任务执行估算（含 20% 预留）超过该任务的费用上限"
+    ],
+    "estimate": 0.37296,
+    "checks": [
+      {
+        "label": "任务已规划",
+        "pass": true
+      },
+      {
+        "label": "策略允许的模型",
+        "pass": true
+      },
+      {
+        "label": "策略允许的工具",
+        "pass": true
+      },
+      {
+        "label": "策略允许的知识空间",
+        "pass": true
+      },
+      {
+        "label": "策略允许的参与部门",
+        "pass": true
+      },
+      {
+        "label": "组织与人数",
+        "pass": true
+      },
+      {
+        "label": "并发上限",
+        "pass": true
+      },
+      {
+        "label": "模型可用性",
+        "pass": true
+      },
+      {
+        "label": "备用模型可用性",
+        "pass": true
+      },
+      {
+        "label": "团队工具协议能力",
+        "pass": true
+      },
+      {
+        "label": "本次资料授权",
+        "pass": true
+      },
+      {
+        "label": "导入资料授权",
+        "pass": true
+      },
+      {
+        "label": "任务负责人和引用",
+        "pass": true
+      },
+      {
+        "label": "任务依赖无环",
+        "pass": true
+      },
+      {
+        "label": "文件交接与质量合同",
+        "pass": true
+      },
+      {
+        "label": "任务费用上限",
+        "pass": false
+      },
+      {
+        "label": "员工每任务调用上限",
+        "pass": true
+      },
+      {
+        "label": "预估执行费用",
+        "pass": true
+      }
+    ]
+  },
+  "rates": {
+    "input": 0.3,
+    "output": 1.2
+  },
+  "formula": "ceil(((estimatedInputTokens*inputRate+estimatedOutputTokens*outputRate)/1000000)*1.2*1000000)/1000000",
+  "tasks": [
+    {
+      "id": "dev",
+      "estimatedInputTokens": 200000,
+      "estimatedOutputTokens": 26000,
+      "maxOutputTokens": 10000,
+      "maxModelCalls": 14,
+      "baseCost": 0.0912,
+      "requiredIncluding20Percent": 0.10944,
+      "maxBudget": 0.11,
+      "spareOrDeficit": 0.00056,
+      "passes": true
+    },
+    {
+      "id": "qa_verify",
+      "estimatedInputTokens": 300000,
+      "estimatedOutputTokens": 30000,
+      "maxOutputTokens": 12000,
+      "maxModelCalls": 16,
+      "baseCost": 0.126,
+      "requiredIncluding20Percent": 0.1512,
+      "maxBudget": 0.15,
+      "spareOrDeficit": -0.0012,
+      "passes": false
+    },
+    {
+      "id": "qa_review",
+      "estimatedInputTokens": 150000,
+      "estimatedOutputTokens": 10000,
+      "maxOutputTokens": 6000,
+      "maxModelCalls": 10,
+      "baseCost": 0.057,
+      "requiredIncluding20Percent": 0.0684,
+      "maxBudget": 0.07,
+      "spareOrDeficit": 0.0016,
+      "passes": true
+    },
+    {
+      "id": "manager_accept",
+      "estimatedInputTokens": 90000,
+      "estimatedOutputTokens": 8000,
+      "maxOutputTokens": 6000,
+      "maxModelCalls": 8,
+      "baseCost": 0.0366,
+      "requiredIncluding20Percent": 0.04392,
+      "maxBudget": 0.05,
+      "spareOrDeficit": 0.00608,
+      "passes": true
+    }
+  ],
+  "baseTotal": 0.3108,
+  "totalIncluding20Percent": 0.37296,
+  "totalTaskCaps": 0.38,
+  "planningPaidReceipt": {
+    "id": "dafacdb8-2286-487e-b871-4724421ab194",
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "runId": null,
+    "modelId": "fcce40cf-3172-4863-b0bd-776673f499e6",
+    "cost": 0.0064986,
+    "inputTokens": 8918,
+    "outputTokens": 3186,
+    "purpose": "组织规划",
+    "createdAt": "2026-10-06T02:48:30.839Z"
+  },
+  "quoteCostReadiness": {
+    "recordedCost": 0.366872,
+    "reserved": 0.096526,
+    "availableBudget": 3.7163020000000007,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+        "amount": 0.096526,
+        "status": "uncertain",
+        "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+      }
+    ]
+  },
+  "failedNativeSource": {
+    "path": "docs/test-evidence/go-normal-failed-20261006-104010-90f0e832.json",
+    "sha256": "97eea22dd3cb0ded07d31a0f3f0e50380cfa5b7972e7dfa9e2530fbdffd3c52f",
+    "id": "90f0e832-f423-42f3-abc0-c0749a07b90f",
+    "status": "failed",
+    "planVersion": 5,
+    "eventCount": 2868,
+    "lastFinished": {
+      "seq": 2868,
+      "at": "2026-10-06T02:38:23.928Z",
+      "type": "run/finished",
+      "data": {
+        "status": "failed",
+        "message": "前置任务失败，相关下游未执行；请检查记录后重新制定方案",
+        "usageCost": 0.1163127
+      }
+    },
+    "nativeCommandSummaries": [
+      {
+        "startSeq": 435,
+        "resultSeq": 2456,
+        "command": "node --test todo.test.mjs",
+        "taskId": "t1",
+        "exitCode": 0,
+        "counts": {
+          "tests": 12,
+          "pass": 12,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "outputSha256": "0031dfd2853c25c971bf739c2cf295de9a6f130f1ccc5d80452045ad59e3bc36"
+      }
+    ]
+  },
+  "sourceSHA": [
+    {
+      "path": "packages/contracts/index.ts",
+      "sha256": "a77639df16b4e1865222d872d8b1a487bab19a1b0390ac5fe9e4162543faf468"
+    },
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256": "75b14eb09723d05a6cc42b4c42840c30f9d07b838137e8b6e3bea3d3155ac331"
+    },
+    {
+      "path": "apps/api/src/project-planning.ts",
+      "sha256": "f9c64acca728d53bd5877b97334c91afc36561ec1bd44aa63abc03807c1c172c"
+    },
+    {
+      "path": "apps/api/src/cost-control.ts",
+      "sha256": "79ffbb8778b894eb915bf208de7ef3e448dbfd433051a3a54020297d32144456"
+    }
+  ],
+  "scope": "Only saved JSON/source were read. No candidate, plan, employee file, model, API, fee or product process was changed or executed."
+}

@@ -1,0 +1,209 @@
+{
+  "checkedAt": "2026-10-06T11:47:51.361Z",
+  "kind": "known-http422-normal-v13-schema-rejection",
+  "outcome": "no-valid-candidate-no-v13-no-new-run",
+  "generationEvidence": {
+    "path": "docs/test-evidence/go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5.json",
+    "sha256": "aff0916e280d759c885a53c785ca2ed0293925cba0534f84a791993c9f651967",
+    "httpStatus": 422,
+    "posts": 1,
+    "quotes": 2,
+    "requestKey": "628d6345-cb1c-4280-b665-114520982b91",
+    "claimPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\funded-acceptance\\web-operation-guards\\go-plan-normal13-twoquote-lease-successor-20261006-608d3de93c19a54f8f77e1235b48d515b4dd7433f6de54e7e94a14e56b9a48a1.json",
+    "claimSha256": "7e4bf134ef3fcf1b691c37a4b30137fb4e7e3c8f00b34813fe32d0dcd19d35b5",
+    "screenshotPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\screenshots\\go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5.png",
+    "rawResponseSources": [
+      {
+        "stage": "manual-check",
+        "kind": "quote",
+        "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5-manual-check-quote-response.json",
+        "status": 200,
+        "bytes": 9437,
+        "sha256": "936fbf7e5c59d90099da59f54c3a46bf25d97eff5a73ebfd0055ef604e179986",
+        "paidRequest": false
+      },
+      {
+        "stage": "generation-recheck",
+        "kind": "quote",
+        "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5-generation-recheck-quote-response.json",
+        "status": 200,
+        "bytes": 9437,
+        "sha256": "442ffb6758b33e344a5ae2f0d9f6856dd6cf47ed19869d32f6d71232e1c0cfd4",
+        "paidRequest": false
+      },
+      {
+        "kind": "generation",
+        "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5-generation-response.json",
+        "status": 422,
+        "bytes": 322,
+        "sha256": "f2235bf2ba24fc30b13c34e078d634578ee443d8f9e1b48d959a017c9c3ea2f2"
+      }
+    ],
+    "freshGlobalPendingEvidence": {
+      "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-normal13-two-stage-normal-generate-2026-10-06T11-41-30-743Z-cc95b1a5-global-pending-before-paid.json",
+      "method": "GET",
+      "status": 200,
+      "bytes": 18763,
+      "sha256": "26b97546ebb41c73d55c7e19d754c45cab1d869f60eea6b5aba84d0f39e0fe64",
+      "checkedAt": "2026-10-06T11:41:35.670Z",
+      "pendingCount": 0
+    }
+  },
+  "loadedProof": {
+    "path": "docs/test-evidence/go-idle-reload-verified-2026-10-06T11-39-52-339Z-1076fcdc/sources.json",
+    "sha256": "b8edba5867c31424248c2b0087c3ccc61a5092802d57bacd3fb9630a0ca15ebf",
+    "apiPid": 47712,
+    "launcherPid": 49916,
+    "beforeRuns": {
+      "path": "docs/test-evidence/go-idle-reload-verified-2026-10-06T11-39-52-339Z-1076fcdc/runs.json",
+      "method": "GET",
+      "endpoint": "/runs",
+      "status": 200,
+      "bytes": 15016,
+      "sha256": "664adb81f1272886ec85332cfd3f9332a7fcd575130a8c99ab9f0b481d8ca40c"
+    }
+  },
+  "rawDirectory": "docs/test-evidence/go-normal-v13-schema-rejection-2026-10-06T11-47-51-026Z-fb3853e6",
+  "sources": [
+    {
+      "method": "GET",
+      "endpoint": "/projects",
+      "status": 200,
+      "bytes": 112046,
+      "sha256": "335d0b111611bab4a7a7d53f4d856dc04a4f97de1f53a53a7655aab3e50643d9",
+      "file": "projects.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/usage",
+      "status": 200,
+      "bytes": 300293,
+      "sha256": "e4b878a7bd5e681c2f1f00b4be05d4aab43a242374dfe6d294fb3b5ce96624cd",
+      "file": "usage.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/costs",
+      "status": 200,
+      "bytes": 18720,
+      "sha256": "382037c52cea37397f0afc8c5f4570ba5358beee6749550e979f6db84b252e5d",
+      "file": "costs.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+      "status": 200,
+      "bytes": 264,
+      "sha256": "c5a38ae488f859ba8dbb95788264420ae8eed4cbf84826fe8cb2b55ff43342f5",
+      "file": "readiness.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/runs",
+      "status": 200,
+      "bytes": 15016,
+      "sha256": "664adb81f1272886ec85332cfd3f9332a7fcd575130a8c99ab9f0b481d8ca40c",
+      "file": "runs.json"
+    }
+  ],
+  "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+  "savedVersion": 12,
+  "savedStatus": "INTERRUPTED",
+  "savedPlanUnchanged": true,
+  "policyUnchanged": true,
+  "receipt": {
+    "id": "90991a1b-d069-432a-a5bd-80c678069599",
+    "modelId": "fcce40cf-3172-4863-b0bd-776673f499e6",
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "departmentId": "9066be93-b669-454c-9fcb-c2327a550ae8",
+    "runId": null,
+    "agentId": null,
+    "employeeId": null,
+    "sessionId": null,
+    "taskId": null,
+    "attemptId": null,
+    "requestId": null,
+    "durationMs": null,
+    "inputTokens": 10559,
+    "outputTokens": 3534,
+    "cost": 0.0074085,
+    "purpose": "组织规划",
+    "createdAt": "2026-10-06T11:41:58.589Z",
+    "agentName": null
+  },
+  "reservation": {
+    "id": "90991a1b-d069-432a-a5bd-80c678069599",
+    "status": "settled",
+    "amount": 0.027364199999999998,
+    "providerStatus": 200,
+    "history": [
+      {
+        "at": "2026-10-06T11:41:58.599Z",
+        "cost": 0.0074085,
+        "source": "provider",
+        "inputTokens": 10559,
+        "outputTokens": 3534
+      }
+    ],
+    "note": "Public costs.recent includes settled receipts and provider history; reservation context diagnostics are not exposed by this GET."
+  },
+  "diagnostic": {
+    "finishReason": "stop",
+    "originalOutputSHA": "2c901a23eaebe0075b6e091c6680ad0b09b57dbdd1d905f23362a549f96582d8",
+    "outputBytes": 13750,
+    "reason": "PLAN_SCHEMA_INVALID",
+    "position": null
+  },
+  "interpretation": {
+    "confirmed": [
+      "One real generation returned known HTTP422 after the two unchanged read-only quote stages.",
+      "The app branch for PLANNING_SCHEMA_INVALID runs after extractPlanningObject returns and planSchema.safeParse rejects the extracted object.",
+      "Recorded finishReason is stop and original output is non-empty (13750 bytes); usage is settled and retained."
+    ],
+    "unknown": [
+      "Actual model output bytes are not exposed/preserved here; their digest is diagnostic evidence, not the output itself.",
+      "Which schema fields/types/constraints failed is unknown because this rejection branch does not preserve parsed.error issues.",
+      "Markdown or explanatory perimeter, exact JSON content and actual failing field values are unknown."
+    ],
+    "source": {
+      "path": "apps/api/src/app.ts",
+      "sha256": "03e610b29b1b9cb6635b4010fa9bb42731f36d4425b7fd97ef1c3a1b08f1d153",
+      "extractionBeforeSchema": true,
+      "schemaIssuesOmitted": true
+    }
+  },
+  "readiness": {
+    "recordedCost": 2.0059055,
+    "reserved": 0.096526,
+    "availableBudget": 2.0772685000000006,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+        "amount": 0.096526,
+        "status": "uncertain",
+        "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+      }
+    ]
+  },
+  "beforePhaseTotal": 3.546454799999999,
+  "afterPhaseTotal": 3.553863299999999,
+  "runsUnchanged": true,
+  "scope": {
+    "generationPaidCalls": 1,
+    "capturePaidCalls": 0,
+    "confirms": 0,
+    "projectApprovals": 0,
+    "commandApprovals": 0,
+    "newRuns": 0,
+    "serviceOperations": 0,
+    "originalDatabaseOpenedDirectly": false,
+    "keysRead": false,
+    "employeeArtifactsAuthored": false,
+    "candidateHandEdited": false,
+    "unknownFeesCleared": false,
+    "paidRequestReplayed": false,
+    "permanentWxIntentPreserved": true
+  }
+}

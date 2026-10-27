@@ -1,0 +1,22 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 0.08571319999999998
+- 0.0857132
+          ^
+
+    at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/docs/test-evidence/helpers/check-concurrency-context-service-2026-10-05.mjs:31:8
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 0.08571319999999998,
+  expected: 0.0857132,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-08",
+  "scope": "local launcher socket shutdown only",
+  "host": "Windows",
+  "node": "24.19.0",
+  "dependency": "@electric-sql/pglite-socket@0.2.11",
+  "linuxRetest": "Root follow-up; not established by this report",
+  "regressionBefore": { "status": "failed", "message": "stop must await cleanup of an already disconnected handler", "actual": true, "expected": false, "exitCode": 1 },
+  "regressionAfter": { "realSocketCasesPassed": 2, "combinedPassed": 21, "combinedFailed": 0, "combinedSkipped": 0, "exitCode": 0, "typesExitCode": 0 },
+  "fullLocalCheck": {
+    "exitCode": 0,
+    "log": "docs/validation/pglite-socket-close-local-check-2026-10-08.txt",
+    "directory": ".data/local-check/6396a084-b7d6-4b27-937e-66d84e5eb19a",
+    "runId": "ec717d3b-4251-4681-821c-a0c53911eeb2",
+    "approvals": 1,
+    "nativeOperations": 4,
+    "persistedAfterApiRestart": true,
+    "disabledAfterApiRestart": true,
+    "launcherStopped": true,
+    "launcherExitCode": 0,
+    "launcherLockPresentAfterExit": false,
+    "fixtureModel": true,
+    "paidModelCalled": false
+  },
+  "changedSources": [
+    { "path": "scripts/local.mjs", "sha256": "970365e6a6aadd63333ecf906facf3655693dbe2ff716073c81e887e03c42319" },
+    { "path": "scripts/local-database-socket.mjs", "sha256": "382270b9155f8228a84bb45751c65079318ff0a761e508743a25d6e26db4bd01" },
+    { "path": "tests/local-database-socket.test.ts", "sha256": "83f3ff491edbafdc134f942697a841c433b51c9dbb27c36945d9ff0f427106cb" }
+  ],
+  "limits": ["Pinned dependency private JavaScript integration must be reviewed on upgrade", "Synthetic model regression is engineering validation, not new real-model acceptance", "No original business data accessed"],
+  "finalRevision": {
+    "changes": ["Shutdown failure retains lock, emits launcher-shutdown-failed, preserves original error and never records a clean stop", "Regression child independently times out after 25 seconds and finally kills/waits only when necessary"],
+    "helperChanged": false,
+    "tests": { "passed": 21, "failed": 0, "skipped": 0, "exitCode": 0, "typesExitCode": 0, "log": "docs/validation/pglite-socket-close-final-tests-2026-10-08.txt" },
+    "localCheck": { "exitCode": 0, "directory": ".data/local-check/0abfa46f-9f5d-45ec-99a8-256d2c516a03", "runId": "f0a9b3c4-beaa-4bb4-8405-5d8ef2f21c15", "approvals": 1, "nativeOperations": 4, "disabledAfterRestart": true, "paidModelCalled": false, "launcherStopped": true, "launcherExitCode": 0, "launcherLockPresentAfterExit": false, "log": "docs/validation/pglite-socket-close-local-check-final-2026-10-08.txt" },
+    "changedSources": [
+      { "path": "scripts/local.mjs", "sha256": "955635d69f0eeb8f9fe2fea9313ffc05686e7dbb1b687ffa17ef369733660de8" },
+      { "path": "scripts/local-database-socket.mjs", "sha256": "382270b9155f8228a84bb45751c65079318ff0a761e508743a25d6e26db4bd01" },
+      { "path": "tests/local-database-socket.test.ts", "sha256": "b8998575ab808ead75ae2bc691a189b4863ae90c6205e6930e8230631a15a05b" }
+    ]
+  }
+}

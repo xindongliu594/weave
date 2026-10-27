@@ -1,0 +1,88 @@
+✔ installed DSH discards a known-fee truncated checkpoint and continues with complete original history without a paid summary retry (672.8644ms)
+✔ a discarded checkpoint suppresses repeated summary fees and restores its confirmed failure gate on a cold Host (889.3289ms)
+✔ raw-history continuation after truncation rejects a 64000-byte overflow before another dispatch and keeps all source fields (487.4036ms)
+✔ raw-history continuation cannot shorten source to spend an existing retained budget hold (338.7756ms)
+✔ missing summary usage, failed fee persistence and an unknown fallback hop never enable truncated-checkpoint degradation (1072.6004ms)
+✔ known-fee truncation still requires the official original-request flush before execution dispatch (344.2961ms)
+✔ a complete checkpoint above the soft pressure target continues execution and waits for new history before paying again (779.9491ms)
+✔ a cold resumed employee reconstructs its successful checkpoint gate and retains the original source (655.6442ms)
+✔ soft-pressure continuation leaves the original 64000-byte request boundary in force without extra summary fees (500.6686ms)
+✔ installed DSH completes a checkpoint using the existing approved 2048 cap and retains durable original evidence (511.1265ms)
+✔ default context initialization uses the official summary allowance while the adapter clamps it to the approved task cap (655.4346ms)
+✔ a lower approved task cap still rejects the truncated checkpoint while safe original-history execution keeps that cap (575.3117ms)
+✔ the larger checkpoint allowance cannot spend a retained task/project reservation or dispatch a budget-blocked summary (493.9486ms)
+✔ default byte policy admits a detailed task with a large fixed prompt and tool schema (341.8575ms)
+✔ automatic employee summaries retain source records, isolate history and survive resume (867.4889ms)
+✔ large structured non-file tool output is reduced without losing hashes or full original evidence (282.1895ms)
+✔ structured text below 6000 characters is safely shortened when serialized JSON exceeds the threshold (1.1036ms)
+✔ escaped structured text uses serialized size and retains full metadata without a raw JSON fallback (1.274ms)
+✔ oversized metadata remains valid and complete and already shortened results do not create repeated replacements (10.83ms)
+✔ mixed structured and plain text preserves JSON, rich block order and explicit omission markers (2.8533ms)
+✔ complete filesystem reads survive the actual employee pruning pipeline and retain original trace evidence (245.6335ms)
+✔ a complete file larger than 192000 context bytes fails before model dispatch and budget reservation (13.1174ms)
+✔ summary admission shares the execution call allowance and rejection preserves source history (179.9089ms)
+✔ cancellation during one employee summary leaves sibling state and original history intact (230.829ms)
+✔ a nonshrinking summary is rejected without replacing the source history (146.3889ms)
+✔ unknown model capacity uses pruning without inventing a token window or a summary charge (281.2733ms)
+✔ a capped incomplete tool call awaits its paid fee, emits no native call and never retries or falls back (108.2358ms)
+✔ valid JSON exactly at the cap remains a tool call for explicit and legacy Chat configurations (32.4111ms)
+✔ execution text length failure settles known usage before MAX_TOKENS and never emits partial work or fallback (18.383ms)
+✔ length text cannot bypass the gate through an apparently complete tool JSON or smaller reported output (12.3384ms)
+✔ compaction retains native max-tokens signalling and normal stop text never implies task completion (26.3013ms)
+✔ invalid JSON below the cap or without upstream tool_calls does not invent a truncation diagnosis (31.1676ms)
+✔ missing usage keeps the single dispatched call uncertain and never claims output truncation or a paid fee (14.866ms)
+✔ native quality contracts receive actual file and command evidence before independent review (1798.3626ms)
+✔ model claims of a passed command cannot unlock native quality work (763.6653ms)
+✔ failed native acceptance rolls back the provisional host seal and leaves downstream pending (814.9613ms)
+✔ review revision cannot create an unapproved automatic repair graph (1634.5235ms)
+✔ stale attempt cannot publish a seal; the current attempt can still complete (1952.2141ms)
+✔ a manager-owned worker review receives compact guidance and completes only through the unchanged native quality gate (2081.2474ms)
+✔ review and requirements have a compact native completion guide while all contracts remain unchanged (3.2536ms)
+✔ the guide invents no numeric output cap and unrelated task kinds receive no review instructions (0.3472ms)
+✖ first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch (972.9938ms)
+✔ cold native restore retains completed attempts, fixed SHA, unknown task holds and the original per-call cap without producer replay (965.7974ms)
+✖ an independently owned employee capped final text records MAX_TOKENS and known fees without a handoff or automatic continuation (575.442ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 42
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11310.6188
+
+✖ failing tests:
+
+test at services\agent-runtime\task-output-limit-native.test.mjs:127:1
+✖ first native employee turn persists the explicit cap and full contract before deterministic fee reservation and wire dispatch (972.9938ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  3 !== 2
+  
+      at nativeScenario (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-output-limit-native.test.mjs:112:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\task-output-limit-native.test.mjs:129:1
+✖ an independently owned employee capped final text records MAX_TOKENS and known fees without a handoff or automatic continuation (575.442ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(run.events.some(event=>event.type==='model/error'&&event.data.message.includes('截断')))
+  
+      at nativeScenario (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/task-output-limit-native.test.mjs:106:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,0 +1,33 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ started native command retains its waiting result after the heartbeat exceeds 15 seconds (2423.9431ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3140.2268
+
+✖ failing tests:
+
+test at tests\local-operation-heartbeat.test.ts:1:8601
+✖ started native command retains its waiting result after the heartbeat exceeds 15 seconds (2423.9431ms)
+  AssertionError [ERR_ASSERTION]: a soft heartbeat expiry cannot cancel an already-started command
+  + actual - expected
+  
+  + 'cancelled'
+  - 'started'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-operation-heartbeat.test.ts:131:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'cancelled',
+    expected: 'started',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

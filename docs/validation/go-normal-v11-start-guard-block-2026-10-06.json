@@ -1,0 +1,108 @@
+{
+  "checkedAt": "2026-10-06T09:27:58.813Z",
+  "kind": "offline-known-web-guard-blocked-normal-v11-start",
+  "operationEvidence": {
+    "path": "docs/test-evidence/funded-run-web-normal-approve-2026-10-06T09-22-33-260Z-9145f2ca.json",
+    "sha256": "1a5d7c7e75e5e5bd897d045d902882caa5a0f4816120fac401f701b5db5f48e7"
+  },
+  "confirmationEvidence": {
+    "path": "docs/test-evidence/go-parser-normal-confirm-2026-10-06T09-21-35-090Z-5776c2b9.json",
+    "sha256": "2b8f3a93bccc0d24b14d4f8e4ebe7bbde66cfdba32a6971350f7805bd8da6fa6"
+  },
+  "readonlyRawDirectory": "docs/test-evidence/go-normal-v11-approve-blocked-readonly-2026-10-06T09-24",
+  "readonlySources": [
+    {
+      "file": "projects.json",
+      "path": "/projects",
+      "status": 200,
+      "bytes": 110626,
+      "sha256": "e6e7a06b7542ebfdc89b6af6e1a3f51d944ff02aa2068339bc684a71a1d513f1"
+    },
+    {
+      "file": "runs.json",
+      "path": "/runs",
+      "status": 200,
+      "bytes": 13980,
+      "sha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157"
+    },
+    {
+      "file": "readiness.json",
+      "path": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+      "status": 200,
+      "bytes": 264,
+      "sha256": "0d241ad97dc4134565284b17198c0ab00699ae3582dda379838514f7d139b607"
+    },
+    {
+      "file": "usage.json",
+      "path": "/usage",
+      "status": 200,
+      "bytes": 277400,
+      "sha256": "93a6d8f8d4e09adbe7bdeb05e69b6b21439bd88fdf0ef033ea8a3b97648a431a"
+    }
+  ],
+  "readonlySourcesIndexSha256": "7ff78ac57628692b7434e134f564571c42a374bcf6d7f7fddacc1e1544151438",
+  "permanentIntent": {
+    "path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\funded-acceptance\\web-operation-guards\\start-4938eab8-26ed-4f60-9413-d979f05fa968-v11.json",
+    "sha256": "c645a75e34106f97c0f7e876df65567a6ecc1045333d7d93039c627d3fd74c0b",
+    "actionIdentity": "start-4938eab8-26ed-4f60-9413-d979f05fa968-v11",
+    "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/approve",
+    "body": {
+      "version": 11,
+      "retainUncertainCosts": true
+    },
+    "retained": true
+  },
+  "knownGateResult": {
+    "forwardedPosts": 0,
+    "routeBlockedPosts": 1,
+    "dispatchObserved": false,
+    "httpResponse": "not available because no mutation was forwarded",
+    "exactCaughtError": "unknown; frozen safeError intentionally did not retain non-assertion error details",
+    "sourceStage": "asynchronous route preflight before sent=true and route.continue()",
+    "replayed": false
+  },
+  "noNewRunEvidence": {
+    "beforeRunsSha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157",
+    "afterRunsSha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157",
+    "laterReadonlyRunsSha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157",
+    "byteHashesIdentical": true,
+    "operatorFullPhasePerRunIdentityCheckNewOwnedRuns": [],
+    "metadataAloneNotUsedForProjectVersionInference": true
+  },
+  "formalProject": {
+    "version": 11,
+    "status": "DRAFT",
+    "validationValid": true,
+    "planEqualActualConfirmation": true,
+    "policyEqualActualConfirmation": true
+  },
+  "readiness": {
+    "recordedCost": 1.6802138,
+    "reserved": 0.096526,
+    "availableBudget": 2.4029602000000008,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+        "amount": 0.096526,
+        "status": "uncertain",
+        "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+      }
+    ]
+  },
+  "phaseTotal": 3.219787499999998,
+  "scope": {
+    "newPaidCalls": 0,
+    "newRuns": 0,
+    "forwardedBusinessPosts": 0,
+    "commandApprovals": 0,
+    "originalDatabaseOpened": false,
+    "keysRead": false,
+    "permanentIntentDeleted": false,
+    "oldOperatorModified": false,
+    "employeeArtifactsAuthored": false,
+    "serviceOperations": 0
+  },
+  "status": "paused-at-known-operator-guard-block-awaiting-root-direction-for-a-new-safely-bound-operator-path"
+}

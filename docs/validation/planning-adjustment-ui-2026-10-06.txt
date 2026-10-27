@@ -1,0 +1,31 @@
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (3.8122ms)
+✔ the exact user adjustment invalidates an old quote and stays in the locked generation body (2.5473ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (12.6926ms)
+✔ read-only quote performs one GET with exact explicit parameters and rejects mismatched versions (0.6944ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.4703ms)
+✔ changed or newly blocked quote returns current evidence without a POST or reservation callback (0.5797ms)
+✔ unchanged affordable quote generates one candidate after GET, with no save/approve request or data changes (0.7286ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6404ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (29.4805ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.0874ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (12.008ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.247ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.0342ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.3252ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.6675ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without a POST (0.944ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.6233ms)
+✔ explicit retention binds quote evidence, GET/POST bodies and candidate response, with no implicit true (2.6807ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.4576ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.6874ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.4956ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (2.718ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.3763ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 621.3341

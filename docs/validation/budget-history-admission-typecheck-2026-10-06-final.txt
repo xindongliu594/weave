@@ -1,0 +1,14 @@
+Final declaration repair typecheck 2026-10-06T04:49:35Z
+Node C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+Original root failure log preserved: docs/validation/go-lifecycle-final-typecheck-2026-10-06.txt
+SHA256 b7ce1c6dbdd60d8cdb7cd1df116f2c5596475a0753395af7f8692eafacf9dd9c
+
+Intermediate declaration repair tsc --noEmit (exit1):
+tests/budget-history-admission.test.ts(49,43): error TS7022: 'runVersion' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+
+
+Final explicit RunOptions tsc --noEmit:
+command: node node_modules/typescript/bin/tsc --noEmit
+exitCode: 0
+stdout: ""
+No compiler suppression or settings changed.

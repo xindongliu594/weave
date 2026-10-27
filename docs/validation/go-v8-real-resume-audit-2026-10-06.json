@@ -1,0 +1,678 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-10-06",
+  "result": "passed-with-report-wording-and-test-strength-observations",
+  "scope": {
+    "mode": "read-only-local-evidence-audit",
+    "liveHttpRequests": 0,
+    "databaseOpenedDirectly": false,
+    "modelCalls": 0,
+    "employeeWorkspaceFilesOpened": false,
+    "employeeCommandsExecuted": false,
+    "sourceEdits": 0,
+    "employeeReportEdited": false
+  },
+  "claim": {
+    "established": "Real same-version Go normal-v8 resume completed after the earlier uncontrolled runtime failure was repaired.",
+    "notEstablished": [
+      "Uninterrupted normal run from approval to completion",
+      "Recovery-v7 controlled stop/restart",
+      "Pinned knowledge-v2 update verification",
+      "Backup/restore scenario"
+    ],
+    "accountingFrame": "Saved capture batch ending at child sequence 1548; later project activity is outside this evidence."
+  },
+  "checks": {
+    "graphCallsCostsAndSourceIntegrity": {
+      "exitCode": 0,
+      "result": "graph-calls-costs-source-integrity-passed"
+    },
+    "approvalNativeOutputAndManagerWrite": {
+      "exitCode": 0,
+      "result": "qa-approval-native-byte-output-and-manager-write-passed"
+    },
+    "frozenPureCode": {
+      "operator": {
+        "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+        "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+      },
+      "runEvidence": {
+        "path": "services/agent-runtime/run-evidence.mjs",
+        "sha256": "6985ab3fd12379f2022c46d7e230f85dcc899d9b61e5c6ad2405a24a2bce7737"
+      }
+    }
+  },
+  "mechanical": {
+    "status": "graph-calls-costs-source-integrity-passed",
+    "sources": [
+      {
+        "file": "archive.json",
+        "method": "GET",
+        "endpoint": "/runs/f0f68b82-eeaf-493f-9f54-c932504e430a/export",
+        "status": 200,
+        "bytes": 22272595,
+        "sha256": "35438a3ff1ef5bc4835ebc3a053c8daac18d0c877c704d015c1770fca2e9e057"
+      },
+      {
+        "file": "state.json",
+        "method": "GET",
+        "endpoint": "/runs/f0f68b82-eeaf-493f-9f54-c932504e430a",
+        "status": 200,
+        "bytes": 9556564,
+        "sha256": "8d42c00ed2946b91c0d61514bf610404fce5889d8736981ee7e1b5d5cb55b840"
+      },
+      {
+        "file": "artifacts.json",
+        "method": "GET",
+        "endpoint": "/runs/f0f68b82-eeaf-493f-9f54-c932504e430a/artifacts",
+        "status": 200,
+        "bytes": 574,
+        "sha256": "a261a2575cb5978ebd2f60688c10554e2b00b93845a4fb3f2085311d9c0f137d"
+      },
+      {
+        "file": "local-operations.json",
+        "method": "GET",
+        "endpoint": "/runs/f0f68b82-eeaf-493f-9f54-c932504e430a/local-operations",
+        "status": 200,
+        "bytes": 21340,
+        "sha256": "90edf440bb92d18b1c0d895c7ef668d30cbe08046db637274042f4d5dca55a7b"
+      },
+      {
+        "file": "manager-report.md",
+        "method": "GET",
+        "endpoint": "/runs/f0f68b82-eeaf-493f-9f54-c932504e430a/artifact?path=acceptance-report.md",
+        "status": 200,
+        "bytes": 12475,
+        "sha256": "24095c10a7adedaf730309b2830b6a23d3ef1643d7dcf06478672979c827293e"
+      },
+      {
+        "file": "cost-readiness.json",
+        "method": "GET",
+        "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+        "status": 200,
+        "bytes": 263,
+        "sha256": "aaf97cdd3c6986df4f6a7503b0f43ae1490ea1bf9057cdb824b24081743c64b8"
+      }
+    ],
+    "sourcesIndexSha256": "978f187fe44a8ff0364df9b30338fd627caa096a6c996c0668913456f51016d5",
+    "parent": {
+      "path": "docs/test-evidence/go-normal-v8-resumed-20261006-131623-7dfd8f29/parent-original-export.json",
+      "method": "GET",
+      "status": "failed",
+      "bytes": 31767832,
+      "sha256": "6433cbc973775f49fc3751ba19df3eac1aaceaec0ca34e39c522e9d2c099770d",
+      "literalHandoffSealsExactlyEqual": true,
+      "id": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+      "eventCount": 3133,
+      "sourceCheckpoint": {
+        "status": "available",
+        "sourceRunId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+        "checkpointSeq": 3132,
+        "checkpointAt": "2026-10-06T04:16:06.491Z",
+        "capturedAt": "2026-10-06T04:16:06.124Z",
+        "point": "runtime-checkpoint",
+        "subsequentAccountingEvents": 0,
+        "currentAtSourceEnd": true,
+        "project": {
+          "limit": 4.1797,
+          "occupied": 0.9446729999999998,
+          "activeReserved": 0,
+          "available": 3.2350270000000005,
+          "callsUsed": 24,
+          "callLimit": 100,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "sourceAdmission": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.6295451,
+          "retainedUnknownReservation": 0.096526,
+          "availableBudget": 3.4536289000000004,
+          "callsUsed": null,
+          "callsBasis": "archived-model-wire-request-count",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        }
+      },
+      "undispatchedReviewReceipt": {
+        "id": "aac77ca0-f367-4a9c-8b4c-b4c3971ecfe6",
+        "dispatched": false,
+        "code": "CALL_INTERRUPTED"
+      },
+      "httpStatus": 200,
+      "httpStatusBasis": "Root-provided raw GET capture metadata; the export payload itself describes the failed Run, not HTTP status."
+    },
+    "child": {
+      "id": "f0f68b82-eeaf-493f-9f54-c932504e430a",
+      "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+      "version": 8,
+      "status": "completed",
+      "events": 1548,
+      "completeSequences": true,
+      "pagedStateEvents": 300,
+      "stateHasMore": true,
+      "approval": {
+        "kind": "resume",
+        "approvedAt": "2026-10-06T05:06:46.377Z",
+        "parentRunId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+        "retainUncertainCosts": true
+      },
+      "completed": [
+        {
+          "id": "dev",
+          "attemptId": "847386dd-94e0-485d-9ab8-b332981ae06c",
+          "status": "completed",
+          "verdict": "pass"
+        },
+        {
+          "id": "qa_verify",
+          "attemptId": "2c0dd0e0-1e18-4786-b889-3bc14d497235",
+          "status": "completed"
+        },
+        {
+          "id": "qa_review",
+          "attemptId": "4278eb99-2399-451b-8e51-c9365bdc0dc8",
+          "status": "completed",
+          "verdict": "pass"
+        },
+        {
+          "id": "manager_accept",
+          "attemptId": "1d93f0a5-20ba-4249-a762-bf669ec103c7",
+          "status": "completed",
+          "verdict": "pass"
+        }
+      ],
+      "restoredSeq": 30,
+      "originalFourFiles": [
+        {
+          "path": "server.mjs",
+          "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+          "size": 8708
+        },
+        {
+          "path": "todo.test.mjs",
+          "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+          "size": 9719
+        },
+        {
+          "path": "README.md",
+          "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+          "size": 3159
+        },
+        {
+          "path": "acceptance.test.mjs",
+          "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+          "size": 23389
+        }
+      ],
+      "sealTimestampTextDifferences": []
+    },
+    "goBinding": {
+      "confirmedPath": "docs/test-evidence/go-headroom-normal-confirm-2026-10-06T03-52-30-038Z-bb3feede.json",
+      "confirmedSha256": "bed7dfc9f3b86f77fc51e8fcd727734aa81841b9a119ffdc5241c943a147cbe6",
+      "generationSources": [
+        {
+          "path": "docs/test-evidence/go-headroom-normal-generate-2026-10-06T03-48-40-049Z-2bff7270.json",
+          "sha256": "85415218e56380d40a29b636e4aa1d816d7ceed767cb4c70d04a6605cf134e60"
+        }
+      ],
+      "goModelId": "fcce40cf-3172-4863-b0bd-776673f499e6",
+      "currentModelConfigHash": "b0d6126cc6974d01d1df1a3eac88b4fb047496f7d0743b4f938a92352f9cf4a9",
+      "planningReceiptId": "9aad4d3b-6282-4ed4-a423-fc446b70e369",
+      "planningCost": 0.006864299999999999
+    },
+    "calls": {
+      "prior": 24,
+      "child": 18,
+      "total": 42,
+      "childByTask": {
+        "qa_review": 9,
+        "manager_accept": 6,
+        "captain": 3
+      },
+      "newDev": 0,
+      "newQaVerify": 0,
+      "priorReviewRegisteredUndispatched": 1
+    },
+    "costs": {
+      "childFee": 0.200091,
+      "childByTask": {
+        "qa_review": 0.1151883,
+        "manager_accept": 0.074013,
+        "captain": 0.0108897
+      },
+      "parentFee": 0.21860189999999996,
+      "carryover": {
+        "receipts": [
+          {
+            "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+            "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af",
+            "amount": 0.096526
+          }
+        ],
+        "reserved": 0.096526,
+        "retained": true,
+        "recordedCost": 0.848147,
+        "availableBudget": 3.2350270000000005
+      },
+      "readiness": {
+        "recordedCost": 1.048238,
+        "reserved": 0.096526,
+        "availableBudget": 3.0349360000000005,
+        "pendingCount": 0,
+        "uncertainCount": 1,
+        "receipts": [
+          {
+            "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+            "amount": 0.096526,
+            "status": "uncertain",
+            "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+          }
+        ]
+      },
+      "finalSourceCheckpoint": {
+        "status": "available",
+        "sourceRunId": "f0f68b82-eeaf-493f-9f54-c932504e430a",
+        "checkpointSeq": 1540,
+        "checkpointAt": "2026-10-06T05:13:53.438Z",
+        "capturedAt": "2026-10-06T05:13:53.206Z",
+        "point": "runtime-checkpoint",
+        "subsequentAccountingEvents": 0,
+        "currentAtSourceEnd": true,
+        "project": {
+          "limit": 4.1797,
+          "occupied": 1.1447640000000001,
+          "activeReserved": 1.3877787807814457e-17,
+          "available": 3.034936,
+          "callsUsed": 42,
+          "callLimit": 100,
+          "callsBasis": "host-reserved-model-attempts"
+        },
+        "sourceAdmission": {
+          "basis": "run-admission-snapshot",
+          "recordedCost": 0.848147,
+          "retainedUnknownReservation": 0.096526,
+          "availableBudget": 3.2350270000000005,
+          "callsUsed": 24,
+          "callsBasis": "durable-admissions-and-archived-wire-requests",
+          "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+        }
+      },
+      "uniqueParentAndChildUsageIds": true,
+      "floatingResidualWithinExistingTolerance": true
+    },
+    "unknowns": {
+      "native": [],
+      "projectModelPending": 0,
+      "projectModelUncertain": 1,
+      "allLocalOperationsCompleted": true,
+      "localOperationCount": 12
+    }
+  },
+  "handoffAndEmployeeOutput": {
+    "status": "qa-approval-native-byte-output-and-manager-write-passed",
+    "dag": [
+      {
+        "id": "dev",
+        "dependencies": [],
+        "assignee": "employee-2",
+        "assigneeId": "developer"
+      },
+      {
+        "id": "qa_verify",
+        "dependencies": [
+          "dev"
+        ],
+        "assignee": "employee-3",
+        "assigneeId": "qa"
+      },
+      {
+        "id": "qa_review",
+        "dependencies": [
+          "dev",
+          "qa_verify"
+        ],
+        "assignee": "employee-3",
+        "assigneeId": "qa"
+      },
+      {
+        "id": "manager_accept",
+        "dependencies": [
+          "qa_review"
+        ],
+        "assignee": "employee-1",
+        "assigneeId": "manager"
+      }
+    ],
+    "parentCompletedBoundInputs": [
+      {
+        "path": "acceptance.test.mjs",
+        "size": 23389,
+        "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954"
+      },
+      {
+        "path": "README.md",
+        "size": 3159,
+        "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a"
+      },
+      {
+        "path": "server.mjs",
+        "size": 8708,
+        "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630"
+      },
+      {
+        "path": "todo.test.mjs",
+        "size": 9719,
+        "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b"
+      }
+    ],
+    "qaAccepted": {
+      "seq": 1108,
+      "attemptId": "4278eb99-2399-451b-8e51-c9365bdc0dc8",
+      "acceptedAt": "2026-10-06T05:11:51.948Z",
+      "outputs": [],
+      "commands": [
+        {
+          "command": "node --test todo.test.mjs",
+          "attemptId": "4278eb99-2399-451b-8e51-c9365bdc0dc8",
+          "sessionId": "425f5ff9-4cff-4292-b999-265e78b95763",
+          "callId": "call_00_ztjgsk9u3v9gk26hamtntrjx",
+          "approvalId": "b9f33a5c-3a67-4359-8e58-01938a4bb099",
+          "operationId": "fff9ebc5-cb9c-4421-85b0-2538ef099c5d",
+          "exitCode": 0,
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "5a9805e8b5a6429deeba019843ded0997b0c7adb3542a026687c02c1d6e7ac42",
+            "bytes": 679,
+            "complete": true,
+            "layout": "combined"
+          },
+          "stdout": {
+            "status": "unknown",
+            "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+          },
+          "stderr": {
+            "status": "unknown",
+            "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+          },
+          "approvedExpectedLocalRevision": "d5603683eead68458894d554db0f01058d73921adfef029246fc93b8f4c208c2",
+          "acceptedHostRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+          "sequence": {
+            "toolCall": 270,
+            "requested": 272,
+            "approved": 535,
+            "queued": 540,
+            "finished": 551,
+            "observed": 553,
+            "accepted": 1108
+          }
+        },
+        {
+          "command": "node --test acceptance.test.mjs",
+          "attemptId": "4278eb99-2399-451b-8e51-c9365bdc0dc8",
+          "sessionId": "425f5ff9-4cff-4292-b999-265e78b95763",
+          "callId": "call_00_vdvgm8tontr0p85tac7sqdp8",
+          "approvalId": "3d8a4c69-eb8d-447d-b0b3-e22dd5b47d3d",
+          "operationId": "d29f50ad-d2cc-41bf-8291-9f8512c09a23",
+          "exitCode": 0,
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "66f537c600ad98d76177d61c095497930f215a0281da03963071969d5e1b107a",
+            "bytes": 842,
+            "complete": true,
+            "layout": "combined"
+          },
+          "stdout": {
+            "status": "unknown",
+            "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+          },
+          "stderr": {
+            "status": "unknown",
+            "reason": "EXECUTOR_STREAM_NOT_SEPARATE"
+          },
+          "approvedExpectedLocalRevision": "d5603683eead68458894d554db0f01058d73921adfef029246fc93b8f4c208c2",
+          "acceptedHostRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+          "sequence": {
+            "toolCall": 662,
+            "requested": 665,
+            "approved": 988,
+            "queued": 992,
+            "finished": 1012,
+            "observed": 1014,
+            "accepted": 1108
+          }
+        }
+      ]
+    },
+    "manager": {
+      "acceptedSeq": 1536,
+      "acceptedAt": "2026-10-06T05:13:51.380Z",
+      "attemptId": "1d93f0a5-20ba-4249-a762-bf669ec103c7",
+      "operationId": "21714187-7b3e-4bbd-92e0-d145d8807b63",
+      "context": {
+        "callId": "call_00_4wzyjvqd6e9vpheo4sdoo55y",
+        "taskId": "manager_accept",
+        "agentId": "employee-1",
+        "attemptId": "1d93f0a5-20ba-4249-a762-bf669ec103c7",
+        "sessionId": "03077f04-336c-4145-ab16-82a7e7ed57ed",
+        "employeeId": "manager"
+      },
+      "sequence": {
+        "toolCall": 1467,
+        "queued": 1474,
+        "finished": 1478,
+        "accepted": 1536
+      },
+      "file": {
+        "path": "acceptance-report.md",
+        "sha256": "24095c10a7adedaf730309b2830b6a23d3ef1643d7dcf06478672979c827293e",
+        "size": 12475
+      },
+      "contentExactlyMatchesEmployeeWrite": true,
+      "manifestMatchesHostSeal": true,
+      "commands": []
+    },
+    "archivedFileReadCopies": [
+      {
+        "seq": 139,
+        "path": "server.mjs",
+        "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+        "size": 8708,
+        "sessionId": "425f5ff9-4cff-4292-b999-265e78b95763"
+      },
+      {
+        "seq": 183,
+        "path": "todo.test.mjs",
+        "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+        "size": 9719,
+        "sessionId": "425f5ff9-4cff-4292-b999-265e78b95763"
+      },
+      {
+        "seq": 194,
+        "path": "README.md",
+        "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+        "size": 3159,
+        "sessionId": "425f5ff9-4cff-4292-b999-265e78b95763"
+      },
+      {
+        "seq": 234,
+        "path": "acceptance.test.mjs",
+        "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+        "size": 23389,
+        "sessionId": "425f5ff9-4cff-4292-b999-265e78b95763"
+      },
+      {
+        "seq": 1168,
+        "path": "README.md",
+        "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+        "size": 3159,
+        "sessionId": "03077f04-336c-4145-ab16-82a7e7ed57ed"
+      },
+      {
+        "seq": 1263,
+        "path": "todo.test.mjs",
+        "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+        "size": 9719,
+        "sessionId": "03077f04-336c-4145-ab16-82a7e7ed57ed"
+      },
+      {
+        "seq": 1333,
+        "path": "server.mjs",
+        "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+        "size": 8708,
+        "sessionId": "03077f04-336c-4145-ab16-82a7e7ed57ed"
+      },
+      {
+        "seq": 1378,
+        "path": "acceptance.test.mjs",
+        "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+        "size": 23389,
+        "sessionId": "03077f04-336c-4145-ab16-82a7e7ed57ed"
+      }
+    ],
+    "hashDomains": {
+      "hostFour": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+      "localFour": "d5603683eead68458894d554db0f01058d73921adfef029246fc93b8f4c208c2",
+      "hostFive": "a261a2575cb5978ebd2f60688c10554e2b00b93845a4fb3f2085311d9c0f137d",
+      "localFive": "70414e846905d5cd8160a7951c107615b4b6136583c051373d797029a0c07488",
+      "devThree": "ccd7ceac9957927412b7839a6b2e0cfb820519b03c39488535e792731e0d6a0e",
+      "qaFour": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+      "failedD1": "2f69a97827d409340645ce9cefc635d4975b0d56794d5aece25a4c6edeee65d9"
+    },
+    "weakImportProbeSourceLines": [
+      {
+        "line": 431,
+        "text": "    assert.equal(result.signal, null, `import child must not be killed by a signal, got ${result.signal}`);"
+      },
+      {
+        "line": 432,
+        "text": "    assert.equal(result.code, 0, `import child must exit naturally with code 0, got ${result.code} (stdout=${JSON.stringify(stdout)}, stderr=${JSON.stringify(stderr)})`);"
+      },
+      {
+        "line": 498,
+        "text": "    assert.equal(result.code, 0, `import probe must exit 0, got ${result.code} (stdout=${JSON.stringify(stdout)})`);"
+      },
+      {
+        "line": 451,
+        "text": "The independent acceptance probe sends fetch to fixed 127.0.0.1:3000 and exits 0 on success or 7 on rejection."
+      },
+      {
+        "line": 455,
+        "text": "assert.ok([0, 7].includes(probe.status), `liveness probe should resolve to 0 or 7, got ${probe.status}`);"
+      }
+    ]
+  },
+  "observations": [
+    {
+      "id": "manager-workspace-revision-wording",
+      "location": "manager-report.md section 6.2",
+      "severity": "precision",
+      "fact": "Developer final tests used a three-file host revision ccd7ceac...d6a0e; independent QA and resumed review used a four-file host revision 671a9b9c...50f3a after acceptance.test.mjs was added. The original three file hashes match exactly, but the complete workspace revisions differ.",
+      "effect": "The claim that developer and independent QA each passed at one identical complete workspace revision is imprecise; all accepted file inputs and both review commands remain exactly bound."
+    },
+    {
+      "id": "failed-d1-revision-abbreviation",
+      "location": "manager-report.md D1 table row",
+      "severity": "precision",
+      "fact": "The report abbreviates failed D1 as 2f69a978...d6a0e, but its actual full host revision is 2f69a97827d409340645ce9cefc635d4975b0d56794d5aece25a4c6edeee65d9.",
+      "effect": "The obsolete failed test is still correctly excluded from final acceptance; this is an inaccurate suffix in the report."
+    },
+    {
+      "id": "workspace-hash-domains",
+      "location": "manager-report.md header and QA approval arguments",
+      "severity": "interpretation",
+      "fact": "d5603683...208c2 is the pre-report four-file local executor manifest hash (ordinal path order). Host handoff uses localeCompare ordering, giving 671a9b9c...50f3a for the same four files. The report addition changes final manifest revisions to local 70414e84...7488 / host a261a257...137d.",
+      "effect": "Do not treat these complete-manifest hashes as a file SHA or claim the pre-report four-file revision is the final five-file revision. File SHA 24095c10...293e is the actual acceptance report digest."
+    },
+    {
+      "id": "import-negative-probe-weakness",
+      "location": "archived acceptance.test.mjs lines 451-455; manager-report.md sections 3.2/4.3",
+      "severity": "test-strength",
+      "fact": "A fixed-port negative probe accepts both success exit 0 and failure exit 7, so that assertion alone cannot prove absence of a listener. The separate import-child checks require natural exit 0, signal null and no address/listening text. The employee report already names this limitation.",
+      "effect": "Recorded seven-test passes are real; the weak assertion must not be described as a strong negative network test. No employee code/report was altered."
+    },
+    {
+      "id": "combined-vs-separated-output",
+      "location": "manager-report.md sections 3/4.1",
+      "severity": "scope",
+      "fact": "The manager described the metadata available in its protected context and did not see terminal prose. This saved local-operations batch contains the complete combined review outputs, whose UTF-8 bytes and SHA were independently checked. Separate stdout/stderr remain unknown (EXECUTOR_STREAM_NOT_SEPARATE).",
+      "effect": "The audit verifies complete combined output; it does not fabricate separately captured streams."
+    },
+    {
+      "id": "parent-wrapper-timestamp-format",
+      "location": "old 122118 parent wrapper versus new raw export",
+      "severity": "representation",
+      "fact": "PowerShell JSON reserialization shortened .930Z to .93Z and .490Z to .49Z in four fields. The added raw parent export exactly matches inherited seals including these timestamp strings.",
+      "effect": "No product timestamp mutation or broken seal inheritance is observed."
+    }
+  ],
+  "oldParentWrapper": {
+    "path": "docs/test-evidence/go-normal-v8-review-abort-20261006-122118.json",
+    "sha256": "372df14c5430594c6197fc9f26f316ef217f6a62001ce3817b3582e6df9e5889",
+    "usedAsAuthoritativeParent": false,
+    "timestampRepresentationDifferences": [
+      {
+        "taskId": "dev",
+        "field": "acceptedAt",
+        "parent": "2026-10-06T04:05:36.93Z",
+        "child": "2026-10-06T04:05:36.930Z",
+        "sameInstant": true
+      },
+      {
+        "taskId": "dev",
+        "field": "capturedAt",
+        "parent": "2026-10-06T04:05:36.93Z",
+        "child": "2026-10-06T04:05:36.930Z",
+        "sameInstant": true
+      },
+      {
+        "taskId": "qa_verify",
+        "field": "acceptedAt",
+        "parent": "2026-10-06T04:14:41.49Z",
+        "child": "2026-10-06T04:14:41.490Z",
+        "sameInstant": true
+      },
+      {
+        "taskId": "qa_verify",
+        "field": "capturedAt",
+        "parent": "2026-10-06T04:14:41.49Z",
+        "child": "2026-10-06T04:14:41.490Z",
+        "sameInstant": true
+      }
+    ]
+  },
+  "sourceIndexPreserved": {
+    "path": "docs/test-evidence/go-normal-v8-resumed-20261006-131623-7dfd8f29/sources.json",
+    "originalSixItemsUnchanged": true,
+    "extraRawParentListedIndependently": true
+  },
+  "managerMajorClaimsAssessment": {
+    "acceptedPassMatchesCompletedDag": true,
+    "originalFilesUntouched": true,
+    "realRecordedReviewTests": true,
+    "cliPortZeroAndInertImportSupportedByArchivedSourceAndRecordedTests": true,
+    "memoryOnlyDataLifetimeSupportedByArchivedSourceAndReadme": true,
+    "knowledgeUnverifiedAsEmployeeDisclosed": true,
+    "unverifiedCrossPlatformStressAndSecurityNotClaimedAsProven": true
+  }
+}

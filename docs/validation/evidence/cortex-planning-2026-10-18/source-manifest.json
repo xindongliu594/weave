@@ -1,0 +1,181 @@
+{
+  "sourceCommit": "e2a9acacf7255678220dd927c4348db03851d6d7",
+  "package": {
+    "name": "dsh-cortex",
+    "description": "Cortex — 低成本高质量多模型递归任务编排、模型评测与智能路由平台（DSH 插件）：任务画像/策略匹配/递归拆解/动态路由/四级质量门控/批量监督/恢复引擎/预算控制/策略沉淀/KPI",
+    "version": "0.3.0",
+    "type": "module",
+    "engines": {
+      "node": ">=20"
+    },
+    "dsh": {
+      "bundle": {
+        "patch": "cordis.patch.yml"
+      },
+      "client": {
+        "platform": "web",
+        "inject": [
+          "@deepseek-ai/dsh-client-runtime"
+        ]
+      }
+    },
+    "scripts": {
+      "test": "node --test"
+    },
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./lib/index.d.ts",
+        "default": "./lib/index.js"
+      },
+      "./engine": {
+        "default": "./lib/engine/index.js"
+      },
+      "./client": "./app-pkg/client.js",
+      "./package.json": "./package.json"
+    },
+    "files": [
+      "lib/**/*.js",
+      "lib/**/*.d.ts",
+      "config",
+      "app-pkg",
+      "cordis.patch.yml"
+    ],
+    "license": "MIT",
+    "keywords": [
+      "dsh-plugin",
+      "dsh",
+      "cordis",
+      "cortex",
+      "multi-model",
+      "orchestration",
+      "router",
+      "quality-gate",
+      "cost-optimization"
+    ],
+    "dependencies": {
+      "js-yaml": "^4.2.0"
+    },
+    "devDependencies": {
+      "@deepseek-ai/cordis": "^4.0.1",
+      "@deepseek-ai/dsh-tools": "^0.1.1-rc.2"
+    },
+    "peerDependencies": {
+      "@deepseek-ai/cordis": "^4.0.1",
+      "@deepseek-ai/dsh-tools": "^0.1.1-rc.2",
+      "@deepseek-ai/dsh-subagent": "^0.1.1-rc.2",
+      "@deepseek-ai/dsh-llm": "^0.1.1-rc.2",
+      "@deepseek-ai/dsh-agent": "^0.1.1-rc.2",
+      "@deepseek-ai/dsh-client-runtime": "^0.1.1-rc.2"
+    },
+    "peerDependenciesMeta": {
+      "@deepseek-ai/dsh-llm": {
+        "optional": true
+      },
+      "@deepseek-ai/dsh-tools": {
+        "optional": true
+      }
+    },
+    "directories": {
+      "doc": "docs",
+      "lib": "lib",
+      "test": "test"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/iguowz/dsh-cortex.git"
+    },
+    "author": "iguowz",
+    "bugs": {
+      "url": "https://github.com/iguowz/dsh-cortex/issues"
+    },
+    "homepage": "https://github.com/iguowz/dsh-cortex#readme"
+  },
+  "dependenciesReusedFromFixedHost": {
+    "@deepseek-ai/cordis": "4.0.2",
+    "@deepseek-ai/dsh-tools": "0.1.5-rc.1",
+    "@deepseek-ai/dsh-llm": "0.1.5-rc.1",
+    "@deepseek-ai/dsh-agent": "0.1.5-rc.1",
+    "@deepseek-ai/dsh-commands": "0.1.5-rc.1",
+    "js-yaml": "4.3.2"
+  },
+  "sourceHashes": {
+    "README.md": "f90b235774e791b690a1799378fecad23d475332f744db69949d37c41831f838",
+    "LICENSE": "df0a3dfb63f2331fb837da9edd24e22d5c3ec32e26c1046f09ba8ae4458b57a9",
+    "cordis.patch.yml": "f8c3ccaae50cf3c59db739b09835c75793360db1036aa9ee70d8cf6fb41f8014",
+    ".gitignore": "741c1956a3a6dc3a7d71dacea15bcb50e01d9b2819a15908ee0830b562299fb7",
+    ".gitattributes": "23302dd90b8bb74b44d365fafef8df20f809b61cb347023951ecf60a88a29651",
+    "rollout.json": "39a891c56e333de19b14dddbd05dd0ac0f449dd647433ba33dd12aab2aba6c4f",
+    "package.json": "4e48de1b4ef1e6979c5b881c64d9189a524fab86d7cee6307fb5c45e9198eed6",
+    "README.zh-CN.md": "a4a4f6585b877d14cc2e2efeb654bdb39e616d7da7d409443e93c94a8ac6ee86",
+    "app-pkg/index.js": "051383d8533a85cca253d98d2ee19a6a8de595c00ac806e4172e7511cd332189",
+    "app-pkg/package.json": "039e8dcb0b9ab49a04c0428b2bca30aa1df6148daf174c9badd8e776c339e284",
+    "app-pkg/client.js": "70f21a87cd6fb2565223ac755b5aa837657b870aed01f1a7e50676d6ba98d6a9",
+    "scripts/verify-http-org.mjs": "41213e452796dc905f0abb0fd204761788e2260c87eb3d46b51ffb18c1ffa095",
+    "scripts/phase3-scenario.mjs": "220b0ad266bb14cdb62442351fad42be3f547ee965d67bb6b75524ca4c23c9fa",
+    "scripts/org-scenario.mjs": "eff30ddb8c9f88a12094ac28c8756efba709d76e7e32d8a261bd6e1767af0f20",
+    "scripts/mock-host.mjs": "73199ad55d779deb8a22d350746e004a8e3a88dfd6a161b3d6279e50c66e741b",
+    "scripts/verify-server.mjs": "9bbf23fcdd9869a67dbd784e7f696650732c2cad11c892ade0dc3539abfbef6c",
+    "scripts/mock-flow-scenario.mjs": "b586560e78bd3c0053299582e0228762baf1a8e65130eacda6c9d0f34f266d91",
+    "tools/verify-post-restart.mjs": "14974b83ef217f29b51af73d605eb80e500d485a9ce9b057eafd7855be98347e",
+    "tools/verify-live.mjs": "3f533075f7b4eb5072cc7cd3960719dc153cd110cc9b84c44b0c8a14b5aa78f1",
+    "tools/smoke-ui.mjs": "bb9353add1b6a09875c08840c27f7e1081f33d8cf5872ebe0633428479a5bf0f",
+    "tools/continuable-smoke.mjs": "6fe3b7b4e2e3717469d4fa721a919a4fcfd21891f4bbb2400b8581c954063d6c",
+    "config/models.yaml": "98ca64522d2acf1d6dc6aca1d14988be9eff6aceeec52214051c9ce26f50c2f7",
+    "test/task-panel.test.js": "6324e296569d88972370186458c9cbc6cb7854bc32b7c34e2fcc4e30f9af9096",
+    "test/bus.test.js": "89bea9945958665e98b077536b071fe2ea44ff35b54d101e0fb5ed46d58a07fd",
+    "test/engine.test.js": "063f4f487adcaf8bad6cd2fd9f345db003f1fc0b845853aac2a3abab341d6b8a",
+    "test/probe.test.js": "95107c9b2258cf5acabd5ba7d0c065c97898d4e37cdc1326e7eb51c2cc096a84",
+    "test/governance.test.js": "1352cff2478e290c064814657a60cd2e02a0d03c33581c5bf29247dcaf54d107",
+    "test/load.test.js": "c05b83c43c0162143e191e9328ebbe239ff6a655d6feb8fef91d2d345e18084b",
+    "test/phase3.test.js": "229d70a7db267002da0ae2a34aecec2edaaa635d216beb5acb20f0c3b84c7213",
+    "test/queue.test.js": "09ee06a5db0695ff70ece318e560740320176112c7a9fc058f759add2b3f61d4",
+    "test/service.test.js": "bfb45ebf0da3b627384a76a3b63755cf29f2cd0c445dfc6db044c2b58ab5706e",
+    "test/rate.test.js": "449c9f98d700262b29a1279162f87fcb2ad7219fbd8e64174d820e1400f8b62f",
+    "test/protocols.test.js": "d46258797095f615aa067bcdd83c7b1c44ef942c83f1afff0c439e01f489b00b",
+    "test/task-view.test.js": "8baca834ba050b18722db2ccec7e62de32cf4da5141d2539cf5672ac499c8245",
+    "test/interaction.test.js": "74e5fe585006463295ea5be41d98ac390b30948a5f1e26fdac22751ac9988bb1",
+    "test/organization.test.js": "4341a5a8f56c48622e7588964b3ae9c83fb08f55b7ee3cf2e710baeb1eecae63",
+    "test/watchdog.test.js": "70d3e5c3a47d808e76fd0348c245360f3a37a72385fce32472ba189c16e41932",
+    "test/peak.test.js": "c28a912e88dd60641cfd0e550d850a43b8ffcfc23438fe543018279b7ee415bb",
+    "test/self-tune.test.js": "7c0cad612d194f9b866a904094f883534c1856b5c600bb50374ee5247bd6e5f5",
+    "test/mock-flow.test.js": "65b2c6ffc6875ebd95929693549e2dc2c52c3cd5bc3a5c65f057b3621e9e1afc",
+    "lib/service.js": "910040b70d71e5344c59c289e59afa6e616187df8ff56084c45822e1e48d45e9",
+    "lib/watchdog-cli.js": "cd09c30dde52eb64626f4be37682a70cc411e0e18a22f68e44623f86c4c3d566",
+    "lib/tools.js": "e02c8afb36f433a513c7e12a0ec39304dd299cd3c637ef4f34de3363df314462",
+    "lib/cli.js": "499a87afcb63848fe046b5c937309bfca2d8d3197c291c66e0e1d64ea1f4bf4a",
+    "lib/index.js": "fe6d74a853539d2a7d5ebd53337802cdf831b67e58c594f812c403a0a4ac465f",
+    "lib/index.d.ts": "e48ee3afe3aa83bdda3b93b818408abb45c1fe9e7fcedd10758a6f5084e136de",
+    "lib/watchdog.js": "ada4bf6051051aa74d6e5e179dd1721444b25fdcc3ca755fcabacaecbcc192de",
+    "lib/ui-server.js": "f2808be8c5ff13333ab72aca8b7a8f917ef83e403b0222f805c05d4c7de25f6f",
+    "lib/rate.js": "84b0f0992cda9337d9aaff24783de4b666a7aff3b47d1fff56753db8ae4c2347",
+    "lib/locale.js": "c14ed34d05ae83f4c2c3c7c28dba843bedcbe2f96b6fad8360da3adc48b9a83e",
+    "lib/engine/executor.js": "8aa2d00a6c7af7fdd8a9a272907382d2bbeee02c3411a0a98ef067ce6107cf6d",
+    "lib/engine/self-tune.js": "81121e66dd60a49b9dfa20509af4d24dfbdece1cdcb6ddf0f2487ea05204a5da",
+    "lib/engine/kpi.js": "826ca73ab7ddf4e56821b6916ffe5d9a4ef1e6d31dae81e9c5b0d9caa2452791",
+    "lib/engine/util.js": "eb6d3069e578214ed1e781fa39580835afb56633cff93806593f07d8f87317cf",
+    "lib/engine/weight-learn.js": "4081751f06a53a79daa3094b0d06ef99556113bf3577e7d905d67348e95f8cf0",
+    "lib/engine/router.js": "b2bc04e5e128f4abd2c051112a196ff23644a859085e3965d617d759fae1a68b",
+    "lib/engine/task-view.js": "34672e2080ac411cca88dc7db0c0054218f64d4f5a568f7ea92db5ff26426984",
+    "lib/engine/queue.js": "e700f5e4d463994cbed1323b97cbe9a938afae41c742a49569ee61044051a190",
+    "lib/engine/quality.js": "0556e9ca1b9722f7f3240bd1deadecadcc3ed51a53bdde1a7d72aaca515a80b3",
+    "lib/engine/bus.js": "dab7d178556c563d66277617b09b48594f5feaf5fe06752216ab156b691511d9",
+    "lib/engine/budget.js": "e4f3f861126f24f43b2898fcb2f8bc13d6bec14d7a28cd2eadc806a70b124c94",
+    "lib/engine/compute.js": "e61bcddb671d8976e5c6f9726826d0bfacda9019c0de55be84ff84a1c009b728",
+    "lib/engine/state-reset.js": "066066b67b3bf159127bbc36443bcc2eee64480a4e9a6e67736e184f583c53a2",
+    "lib/engine/governance.js": "9aa0ad77af52ff432d716763f5578416f6413e56572cfe804a1fa4343faf362c",
+    "lib/engine/calibration.js": "0795ccb01847d132c2f3a29a3d406ff319d29f931a33b932553a555c61a87ee2",
+    "lib/engine/store.js": "47d1d4ff3742f42c8627d20e1d05d94ef85506ef291673a4465ab91bd809702b",
+    "lib/engine/index.js": "e64d83a84d59b256f30c7103cc77cebcfc00a0b6d2b83a3a35d702b97eceb15b",
+    "lib/engine/fingerprint.js": "509ffa698a9d6e3fc2026e7d51c53de002c38870fb8cff5354f4328f429392f0",
+    "lib/engine/interaction.js": "30a4c968079d12a23f1107e0179f7e89b5192e099ced066f5de85904485dcaae",
+    "lib/engine/l0.js": "f22b6d8d11c449771fc7f1312cfb68a5546324b7bd912caa8a86cd3ae0235f13",
+    "lib/engine/protocols.js": "1387895f555b15e8e7767b083708dbad3efb566a95e282f4191f82f9b0911daa",
+    "lib/engine/probe.js": "7c842182cd64e0bffd4b3da058e7c49c6372d26474f981e6a81eebd73c746bee",
+    "lib/engine/granularity.js": "908ea6492122833189fe7ed7012e8e459c5954ec119d255cf1051b35b3eb61ef",
+    "lib/engine/peak.js": "a4d332aa74d5b98c19302864720f83403b96676bb1779306ccfb0179f1061356",
+    "lib/engine/recovery.js": "1f52dc5054856544af0bed30950a576c8a66205707cc6c937daf75093a3d4289",
+    ".github/workflows/ci.yml": "1a82b6982c22543f05afbfe26144804db730612500299150897c291e4bd00724"
+  }
+}

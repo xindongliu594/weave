@@ -1,0 +1,1 @@
+本机 API 意外退出（退出码 4294967295，信号 无），工作台已停止。诊断记录：C:\Users\JJ\.codex\worktrees\f57c\agent_department\.data\source-startup-smoke-932481b3-ff44-4e9f-ae8b-6e50d00b308b\launcher-events.jsonl

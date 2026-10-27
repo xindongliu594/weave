@@ -1,0 +1,34 @@
+2026-10-06 local-operation heartbeat engineering validation
+
+Final: 18/18 passed, 0 failed; sourceStable=true.
+NEW integration: 4/4. Existing native operation concurrency: 7/7. Existing desktop native: 7/7.
+Before fix: one expected regression failure (started operation became cancelled when last_seen was 20 seconds old).
+Intermediate fixture-only recursive node:test failure is preserved separately; it was resolved by isolating the native child test environment.
+
+Actual failed Run: 1e91d7d2-d99d-45f7-90a8-bb9bb2c80ff0, planVersion9, 3941 events.
+Critical op: 2982099d-e930-46d4-8838-7e37cd4d4efb.
+callId: call_00_8p99lah701924pe7e5y7bjgc.
+approvalId: 93d78bf9-cfb4-4e4a-bb1f-d9857d8d07f8.
+First proven error: seq3919 at 2026-10-06T05:52:49.642Z, LOCAL_DEVICE_OFFLINE / outcome_unknown.
+Path: wait -> executable -> assertRunAuthorization -> localTarget (15-second soft heartbeat check).
+Old op remains cancelled/started=true/result=null/lateResult.ok=true/exitCode=0; no replay or promotion.
+Native late output: pass3/fail0, duration5535.5279ms, UTF-8 bytes373, SHA2561023984c4b6696643853c1288837ff08f68026f72e48a3faa19bda9a6fd87ed1.
+Actual archive bytes42457586 SHA25672742e86c74988c912de1b88cf045cd1cf09144c2f08ffc8c729e53ffa57cc44.
+Missing actual projection evidence: device last_seen, exact claim/start/finish/result arrival timestamps. No claimed cause for the heartbeat request delay.
+
+Fix: only already-started operations keep their authenticated result channel while heartbeat is old and all hard authorization/lease/deadline conditions are still valid.
+Qualified started receipt updates last_seen in the same transaction as durable result; late/cancelled/expired/malformed/wrong-token branches do not refresh it.
+Queued/claimed/start and default run/model authorization keep the strict online requirement; no TTL changes.
+9 hard guard counterexamples, wrong claim, caller Abort and old cancelled late success remain rejected. Real approved native child executed once with exit0/pass1.
+No real API/database/model/Key/employee file access, command replay or restart. Fresh PGlite + local HTTP + temporary native fixtures only; usage/reservations zero, cap remains1.
+PGlite row-lock concurrency and exact production heartbeat delay remain unverified; this is not real-model or employee acceptance.
+
+Frozen SHA256:
+apps/api/src/local-execution.ts 0eb45d9c496a556f6b9ce7985a33a7869311823daf8d4005ccb6915ac5cbda64
+apps/api/src/execution-policy.ts b394f89a26369bb87ff4b4cfaa35ec673c2fde57cca89336bf8b57a20319689f
+tests/local-operation-heartbeat.test.ts 9b190c0e09626960c9838157c3cdcb77fb3458e6f687115f0c9035430b147748
+services/agent-runtime/product-runtime.mjs (unchanged) 9c9747ad48fdd8cacbee02947e04e544c3a69ce0566bde7d6c40e715c550e05b
+
+Final logs: local-operation-heartbeat-2026-10-06-after.txt, -desktop.txt.
+Stable source manifest: -sources-before.json, -sources.json.
+Full bounded read-only actual source manifest/timeline: -actual-read.json.

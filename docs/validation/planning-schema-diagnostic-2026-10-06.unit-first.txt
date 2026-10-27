@@ -1,0 +1,46 @@
+✔ empty/non-JSON HTTP failures preserve status and never echo raw bodies or masquerade as success (34.9363ms)
+✔ planning quote POST carries the complete JSON body, no mutation key, and makes one request on HTTP431 (2.0502ms)
+✔ a mutation retains its original key and is never retried after an empty503 response or network loss (1.0563ms)
+✔ real generation precheck/onSubmit preserves the original pending key and parameters on empty or malformed HTTP200 (3.0022ms)
+✔ organization response failures retain the same persisted pending identity unless a structured HTTP refusal is confirmed (2.1424ms)
+✔ one exact object, one fence, or short surrounding prose preserves the whole candidate (3.5984ms)
+✔ actual plan schema issues retain field, expected type, length, enum and numeric constraint without received values (6.899ms)
+✔ record keys, unknown fields and nested union input never enter a safe schema diagnostic (3.3226ms)
+✔ multiple issue summaries are capped and only schema fields, bounded array indexes and safe constraints survive (0.526ms)
+✔ normal candidate parsing and accepted unknown-field stripping retain original schema behavior (1.0953ms)
+✔ quoted braces, escaped quotes/backslashes/newlines and nested containers never split the object (0.3635ms)
+✔ multiple candidates, alternative scalar values and malformed fence boundaries are rejected (0.8651ms)
+✔ truncated strings/containers, invalid escape/control characters and syntax are never repaired (0.6823ms)
+✔ output byte, nesting depth and outside text ceilings are exact and do not clip data (9.91ms)
+✔ failure diagnostics contain safe scalars and original SHA without echoing provider text or keys (0.5962ms)
+✔ original defaults remain 10% capped at $1 and 5000 output, without changing any project data (3.9722ms)
+✔ the exact user adjustment invalidates an old quote and stays in the locked generation body (1.9427ms)
+✔ actual parameter controls require explicit choices and keep planning output separate from task estimates (12.3963ms)
+✔ read-only quote performs one POST body with exact explicit parameters and rejects mismatched versions (0.6591ms)
+✔ model, output, limit and version changes invalidate old quote; receipt changes cannot reuse old consent (0.4916ms)
+✔ changed or newly blocked quote returns current evidence without a paid generation or reservation callback (0.6129ms)
+✔ unchanged affordable quote generates one candidate after the read-only POST, with no save/approve request or data changes (0.7442ms)
+✔ interrupted generation is never automatically retried and explicit continuation retains its original key/body (0.6412ms)
+✔ candidate visibly preserves full role/task/hash/outputs, static budget and explicit save/discard controls (29.9788ms)
+✔ stale candidates cannot confirm; saving an invalid candidate is explicitly a draft and never approves it (5.6192ms)
+✔ blocked quote and initial screen clearly distinguish fees, unknown holds, checks and actual execution (11.9724ms)
+✔ confirmation feedback uses fresh server validation rather than the earlier candidate estimate (0.288ms)
+✔ quote shows the included saved plan, verified source/version/contracts/nodes and complete file hashes separately from inheritance (3.136ms)
+✔ unavailable calls never become zero or a stale count; old contracts, integrity failures and issues stay explicit (2.3575ms)
+✔ absent history or saved-plan proof is shown as unknown instead of claiming no previous execution (0.6193ms)
+✔ same-cost and same-size SHA, completed-node or call-history changes recheck without paid generation (0.8909ms)
+✔ retaining unknown fees starts unchecked; its actual checkbox invalidates prior consent and respects locking (1.6537ms)
+✔ explicit retention binds quote and generation POST bodies and candidate response, with no implicit true (2.4547ms)
+✔ a new retained receipt or changed reconciliation evidence requires another visible quote before any POST (0.4016ms)
+✔ legacy browser storage preserves omitted choice and original request keys when generation or confirmation is reread (0.7078ms)
+✔ retained confirmation pins its original choice for explicit reread; corrupted stored choices cannot grant consent (0.5308ms)
+✔ retention does not bypass pending or Responses context reasons and the visible output choice stays unchanged (2.7025ms)
+✔ restoring a locked request uses its original true choice even when the current editable draft stores false (2.3605ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1023.7607

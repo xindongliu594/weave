@@ -1,0 +1,91 @@
+{
+  "checkedAt": "2026-10-06T06:56:10.287Z",
+  "runId": "17af4ec6-379e-47bc-9b6b-0afd16d49869",
+  "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+  "version": 10,
+  "status": "final-read-observation-blocked-after-acknowledged-fifth-approval; not-completed-proof",
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-heartbeat-normal-generate-2026-10-06T06-31-05-736Z-a029de67.json",
+      "bytes": 247020,
+      "sha256": "42d99bb8898ac29bedc5e2a76f3fc8eb705d724c34d8b789588a6dad251924e0",
+      "action": "generate",
+      "httpStatus": 200,
+      "posts": 1
+    },
+    {
+      "path": "docs/test-evidence/go-heartbeat-normal-confirm-2026-10-06T06-32-35-063Z-4926d956.json",
+      "bytes": 210749,
+      "sha256": "dfea86f343c287b83f40eafa3c1eca0d94113acd0e58f6ee69767363ff75d5e1",
+      "action": "confirm",
+      "httpStatus": 200,
+      "posts": 2
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-approve-2026-10-06T06-33-37-751Z-986d6325.json",
+      "bytes": 221604,
+      "sha256": "a98eaac764f8e6fbae45ca0060333464cd084cfb00c91571cdf1210708e950b2",
+      "action": "approve",
+      "httpStatus": 202,
+      "posts": 1,
+      "operationStatus": "new-run-creation-correlated; real employee acceptance remains unverified"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T06-36-57-207Z-5d85389e.json",
+      "bytes": 248726,
+      "sha256": "a25c93692604b8744b51b8571cf590141ee09dd2f1740141747f12b0a96b3acc",
+      "action": "command",
+      "httpStatus": 200,
+      "posts": 1,
+      "approvalId": "763fe5d0-4141-4667-a698-97c28b30cf7c",
+      "operationStatus": "command-approval-acknowledged; employee execution remains unverified"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T06-41-02-219Z-4a0457f9.json",
+      "bytes": 264572,
+      "sha256": "b028e8043fc3aa7858e4c3296c7a7346c5b430e23324c7d69c95a996b3834a99",
+      "action": "command",
+      "httpStatus": 200,
+      "posts": 1,
+      "approvalId": "91332592-fd12-47da-a7f7-c50ba8cc7846",
+      "operationStatus": "command-approval-acknowledged; employee execution remains unverified"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T06-43-56-953Z-faad8da9.json",
+      "bytes": 265867,
+      "sha256": "fd0305d5919decac6a84561e921d88acc11f3e0b55d3d2cb3fa9440ac2671907",
+      "action": "command",
+      "httpStatus": 200,
+      "posts": 1,
+      "approvalId": "ed2a2fa1-8593-4613-84ec-93bf87f0ab07",
+      "operationStatus": "command-approval-acknowledged; employee execution remains unverified"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T06-50-19-178Z-9f2894b0.json",
+      "bytes": 282855,
+      "sha256": "063c270962f9b2496b0a3d67babce29701c1a6df704d381421ae8b80e9fab205",
+      "action": "command",
+      "httpStatus": 200,
+      "posts": 1,
+      "approvalId": "fc3eb82a-ea27-4f12-9cce-2a164931c0cc",
+      "operationStatus": "command-approval-acknowledged; employee execution remains unverified"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-command-2026-10-06T06-52-24-306Z-fb280e44.json",
+      "bytes": 205676,
+      "sha256": "fb3bff37abecb4e1180abd09cfcbf5d2f56936f6b0801bf70010c15d4cae9336",
+      "action": "command",
+      "httpStatus": 200,
+      "posts": 1,
+      "approvalId": "d51504e5-dafa-4acd-be11-84a1e9f4cc56",
+      "operationStatus": "command-approval-acknowledged; employee execution remains unverified",
+      "finalObservationFailure": "UI/API operation was unavailable or not safely correlated; inspect evidence before any further action."
+    }
+  ],
+  "employeeFilesEditedByCodex": false,
+  "employeeCommandsExecutedDirectlyByCodex": false,
+  "paidPlanningRounds": 1,
+  "replayedOldOperations": false,
+  "replayedApprovedPost": false,
+  "continuedRealActionsAfterFailure": false
+}

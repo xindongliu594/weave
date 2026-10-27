@@ -1,0 +1,13 @@
+{
+  "typeExit": 0,
+  "buildExit": 0,
+  "typeLog": "docs/validation/go-lease-append-final-20261006-193807-ec23d58b-types.txt",
+  "node": "v24.19.0",
+  "checkedAt": "2026-10-06T11:38:39.4065067Z",
+  "buildLog": "docs/validation/go-lease-append-final-20261006-193807-ec23d58b-build.txt",
+  "sources": {
+    "apps/api/src/run-coordinator.ts": "ea9b399ee937c4b54035f3694609df37071744f3e4a3a77e2e3f9cf181d307cf",
+    "services/agent-runtime/trace-store.mjs": "201cbbeb241e586f1bd144ade3c663235b2f5929eba8c4f1db0c9beac40bbc01",
+    "apps/api/src/run-state.ts": "dadf821b6407f552662ffdb9e76ebcd53eb4ab5b22498f4eea6afb043570fcbc"
+  }
+}

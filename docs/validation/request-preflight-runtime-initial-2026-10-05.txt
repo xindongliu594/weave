@@ -1,0 +1,133 @@
+✔ affordable fitting drops old complete groups while retaining the canonical contract and latest knowledge result intact (9.8044ms)
+✔ every protected full file read and its assistant call survive even when a later user message exists (6.1177ms)
+✔ an unaffordable protected file and pinned knowledge fail without truncating or silently dropping the evidence (2.8045ms)
+✔ an earlier protected source contract cannot be sacrificed for a cheaper request (1.6109ms)
+✔ tools undefined and an empty tools array keep their actual distinct envelope and original output reservation (0.4581ms)
+✔ the exact UTF-8 byte boundary is enforced and output-only excess cannot be solved by dropping instructions (0.5061ms)
+✔ invalid finance values and invalid protected indexes reject rather than bypassing a guard (0.452ms)
+✔ the original byte guard and the financial guard have independent accurate failure codes (0.5013ms)
+✔ task attribution follows host-owned assignments and retains the completed task for final reporting (3.0777ms)
+✔ concurrent reservations share both the project and task caps without leaking rejected reservations (1.4189ms)
+✔ warnings include prior spend and block fallback and further calls at the defined thresholds (0.6541ms)
+✔ retry counters are retained and a task cannot exceed the policy turn cap (0.5541ms)
+✔ restored task holds remain occupied without charging the global carryover twice or releasing an older request (0.7589ms)
+✔ adapter counts fallback against the same task and refuses it before a second fetch (34.9639ms)
+✔ automatic rework is refused at 90 percent of the original task budget before dispatch (0.6523ms)
+✔ adapter persists an excessive actual receipt before stopping and does not emit its tool call (2.6513ms)
+✔ persistent reservations precede dispatch, and fallback preserves the first uncertain request identity (2.2321ms)
+✔ admission rejection never dispatches; archive failure after reservation releases an unsent call (1.3232ms)
+✔ an abort during durable reservation never dispatches a request or reports an unknown sent call (5.8326ms)
+✔ response metadata is awaited before status handling, JSON parsing or usage settlement (30.5885ms)
+✔ an interruption after headers preserves request IDs without reading JSON or settling usage (1.3114ms)
+✔ absent or unsafe request ID headers are omitted and credentials are never echoed into metadata (4.7044ms)
+✔ failed metadata persistence keeps the sent receipt uncertain and never settles or falls back (4.9594ms)
+✔ an explicit HTTP fallback retains separate provider metadata for both requests (6.3129ms)
+✔ OpenAI compatible adapter translates tool calls, usage, routing and authorization (1.4704ms)
+✔ adapter refuses an unaffordable protected request before reserving, persisting or sending it (1.2994ms)
+✔ fallback is explicit, bounded, attributed and never retries ambiguous network failures (2.5033ms)
+✔ summaries read every selected source message and refuse oversized input before dispatch (1.6069ms)
+✔ wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit (1.601ms)
+✔ financial fitting preserves the full approved contract, checkpoint, older file and knowledge versions, and latest complete tool group (4.3215ms)
+✔ unaffordable protected older evidence and compaction sources block without editing history, taking calls or making durable reservations (53.1407ms)
+✔ the original context byte cap and insufficient money produce distinct errors before durable admission or fetch (1.2972ms)
+✔ available finance is the smaller run or assigned task remainder including history and existing reservations (2.583ms)
+✔ financial fitting cannot bypass identity, restored call caps, exhausted budgets or the 90 percent fallback and rework gates (1.9264ms)
+✔ two concurrent protected requests cannot both fit the same remaining allowance while durable admission awaits (1.0848ms)
+✔ financial admission preserves undefined versus empty tools reservation envelopes and the unchanged route output cap (1.1233ms)
+✔ failure to archive financial clipping evidence releases the synchronous hold and never reaches durable admission or fetch (1.0246ms)
+✔ a structured HTTP 502 exposes diagnostic code and message while retaining one unknown sent receipt (2.4134ms)
+✔ error summaries scrub known and typical credentials before clipping and never forward extra provider data (3.9077ms)
+✔ malformed JSON, HTML and oversized bodies keep only the HTTP failure and never leak their contents (2.8514ms)
+✔ provider text remains inert quoted diagnostics with bounded length and unchanged status categories (2.4778ms)
+✔ oversized and endlessly empty error streams cancel without awaiting an untrusted cancel callback (3.3013ms)
+✔ a stalled error body has its own short deadline and cannot hang failure accounting (1511.4714ms)
+✔ user cancellation takes priority over error-body timeout without settling or replaying a sent call (30.304ms)
+✖ repeated preview is read-only even at warning thresholds and cannot expose credentials or mutate schemas (5.7009ms)
+✔ successful stream uses the exact prepared body and amount, while real admission still emits warnings (35.3604ms)
+✔ preview checks owner, task, project/task calls and retained holds without stopped events (2.4662ms)
+✖ preview reports the true single-request protected minimum, retaining full file evidence, tools and output (1.2092ms)
+✖ a stale successful preview cannot admit a later request after another employee holds the allowance (0.545ms)
+✔ fallback and rework previews keep the approved 90% stop gate and never alter warning sets (0.6052ms)
+✔ compaction cannot preview a shortened source, and stopped, unknown and aborted previews fail without dispatch (0.7263ms)
+✔ legacy snapshots preserve pinned route output caps, regardless of cumulative task estimate (40.6048ms)
+✔ employees sharing one model keep independent approved per-request caps and the stricter request/route boundary (3.5475ms)
+✔ unattributed captain coordination retains its pinned route even when all employee task caps are smaller (1.1515ms)
+✔ cold recovery preserves task cap, historical fees/calls and counts authorized rework against the original task (1.4825ms)
+✔ an already authorized fallback keeps the original task cap and reserves each request at its actual route rate (4.4424ms)
+✔ ReworkGate binds generated repair and re-review to the original approved task caps instead of model-proposed limits (5.1294ms)
+✔ unknown or foreign task attribution fails before any receipt, reservation or fetch (1.7886ms)
+✔ explicit cap changes both wire and pre-billing affordability without reducing legacy reservations or fixed evidence (2.1243ms)
+✔ invalid explicit cap fails closed at adapter construction while 1 and 32768 are accepted (1.7103ms)
+✔ read-only budget feedback separates cumulative estimate and approved single-call cap, including legacy routes (1.2385ms)
+ℹ tests 61
+ℹ suites 0
+ℹ pass 58
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1899.1386
+
+✖ failing tests:
+
+test at services\agent-runtime\request-preflight.test.mjs:25:1
+✖ repeated preview is read-only even at warning thresholds and cannot expose credentials or mutate schemas (5.7009ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 0.30000000000000004
+  - 0.3
+       ^
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/request-preflight.test.mjs:28:41)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.30000000000000004,
+    expected: 0.3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\request-preflight.test.mjs:70:1
+✖ preview reports the true single-request protected minimum, retaining full file evidence, tools and output (1.2092ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'TASK_BUDGET_EXCEEDED'
+  - 'BUDGET_CONTEXT_LIMIT'
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/request-preflight.test.mjs:81:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'TASK_BUDGET_EXCEEDED',
+    expected: 'BUDGET_CONTEXT_LIMIT',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\request-preflight.test.mjs:93:1
+✖ a stale successful preview cannot admit a later request after another employee holds the allowance (0.545ms)
+  Error [LlmError]: 本次请求预留将超过任务费用上限
+      at reject (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/budget.mjs:28:89)
+      at ExecutionBudget.checkAvailable (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/budget.mjs:37:94)
+      at ExecutionBudget.peekAvailable (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/budget.mjs:25:62)
+      at #prepareRequest (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/openai-compatible.mjs:257:105)
+      at OpenAiCompatibleAdapter.prepareRequest (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/openai-compatible.mjs:239:56)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/request-preflight.test.mjs:94:82)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19) {
+    code: 'TASK_BUDGET_EXCEEDED',
+    failure: { message: '本次请求预留将超过任务费用上限', code: 'TASK_BUDGET_EXCEEDED' }
+  }

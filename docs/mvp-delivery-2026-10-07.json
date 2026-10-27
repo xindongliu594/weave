@@ -1,0 +1,154 @@
+{
+  "kind": "verified-Windows-web-MVP-delivery",
+  "checkedAt": "2026-10-07T05:20:45.255Z",
+  "mandatoryAcceptance": "passed-with-documented-limitations",
+  "source": {
+    "codeRoot": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T06-06-08-032Z-eda2cdaf-790d-48eb-ac39-38485b99226d\\code",
+    "manifest": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T06-06-08-032Z-eda2cdaf-790d-48eb-ac39-38485b99226d\\code-manifest.json",
+    "manifestSHA": "d840448597a3d0f58e9d6866d4933f8c18a96f116f36e9b9b73296fe61517096",
+    "fileCount": 377,
+    "bytes": 4782705,
+    "contentSHA": "0bb8ef5537529cc43a70ac1ad00976fbfdfd9f8137983d30062210fe9a6f2c6d",
+    "zip": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T06-06-08-032Z-eda2cdaf-790d-48eb-ac39-38485b99226d\\weiwu-windows-mvp-conversation-update-2026-10-07.zip",
+    "zipBytes": 1567521,
+    "zipSHA": "51d3e3fc7281c6e911b311b3e567c48fefafbd23e22cfedb470ba4963287672e",
+    "zipEntries": 379,
+    "allSourceAndZipBytesRechecked": true,
+    "dependencies": "Excluded; run both locked npm ci commands in the Windows guide. Original live service retains installed dependencies."
+  },
+  "originalService": {
+    "url": "http://127.0.0.1:4310/",
+    "healthy": true,
+    "activeRuns": 0,
+    "dataDirectory": "C:\\Users\\JJ\\Desktop\\la\\agent_department\\.data\\local",
+    "proof": "docs/test-evidence/conversation-budget-reload-2026-10-07/sources.json",
+    "launcherPid": 3452,
+    "apiPid": 29692
+  },
+  "sourceStartup": {
+    "proof": "docs/test-evidence/mvp-source-isolated-startup-completed-2026-10-07.json",
+    "node": "24.15.0",
+    "productionBuildExit": 0,
+    "healthReady": true,
+    "paidModelCalls": 0,
+    "isolatedDataClosed": true,
+    "helperFailureRetained": "docs/test-evidence/mvp-source-isolated-startup-2026-10-07.json",
+    "independentAudit": "docs/validation/mvp-source-startup-independent-audit-2026-10-07.json",
+    "independentAuditSHA": "34ab78752c9651d2a217c6d684785c47d9456ead462357189d09a209bb1e33ea",
+    "appliesToPriorVerifiedSource": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T05-01-26-702Z-c635ca83-8f97-4535-93e2-0fa1ecb3a095\\code"
+  },
+  "normal": {
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "runId": "88aa22a9-f887-467c-bf12-91bb57d42361",
+    "version": 14,
+    "status": "completed",
+    "managerAcceptedSeq": 6999,
+    "tests": "dev12/12, QA12/12+8/8, review12/12+8/8; all exit0",
+    "raw": "docs/test-evidence/go-normal-v14-completed-2026-10-07",
+    "audit": "docs/validation/go-normal-v14-real-acceptance-audit-2026-10-07.json"
+  },
+  "recovery": {
+    "projectId": "3e101c24-87e6-43ea-80f9-a2c4b0b410f4",
+    "parentRunId": "e789b929-6d6c-4b08-8ff0-d560e69bbc78",
+    "childRunId": "6e860c3c-113c-4245-b400-df85b950769e",
+    "version": 12,
+    "status": "completed",
+    "managerAcceptedSeq": 3441,
+    "inheritedCalls": 17,
+    "cumulativeCalls": 52,
+    "completedDeveloperRepeated": false,
+    "knowledgePin": 3,
+    "catalogAfterEdit": 4,
+    "tests": "parentdev6/6; childQA6/6+4/4, review6/6+4/4; all exit0",
+    "raw": "docs/test-evidence/go-recovery-v12-completed-2026-10-07",
+    "audit": "docs/validation/go-recovery-v12-final-controlled-audit-2026-10-07.json"
+  },
+  "backup": {
+    "audit": "docs/validation/mvp-full-offline-backup-independent-audit-2026-10-07.json",
+    "directory": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\final-full-backup-audit-20261007-162f4895\\.data\\full-offline-backup\\b265480e-c7a8-47bc-8054-9804c2191cee",
+    "files": 1963,
+    "bytes": 752356226,
+    "tables": 34,
+    "usageRecords": 637,
+    "restoredFinalFiles": 10,
+    "originalDataOverwritten": false,
+    "credentialFilesCopiedOpaque": 2
+  },
+  "documents": {
+    "guide": "docs/mvp-windows-quickstart-2026-10-07.md",
+    "report": "docs/mvp-acceptance-2026-10-07.md",
+    "fixes": "docs/mvp-fixed-issues-2026-10-07.md",
+    "sourceAudit": "docs/validation/mvp-source-delivery-independent-audit-2026-10-07.json",
+    "startupAudit": "docs/validation/mvp-source-startup-independent-audit-2026-10-07.json"
+  },
+  "limits": [
+    "Supplier actual billing remains unconfirmed: retained recovery receipt c55a3d36-f662-48ef-a69e-baf1ecf26c40 $0.0516951 and older holds; no zero settlement or blind replay",
+    "Original employee report narrative errors preserved; independent audit is precise evidence",
+    "Command approvals and file CAS do not provide OS sandbox; local single user",
+    "Keyword knowledge retrieval, in-memory Todo, cross-machine credential migration and long-term soak not validated",
+    "Source ZIP contains selected audits, not complete raw evidence; raw links refer to original workspace"
+  ],
+  "employeeDeliverablesWrittenByCodex": false,
+  "budgetAuthorization": {
+    "totalAdditionalLimit": 10,
+    "perScenario": 5,
+    "daily": 20,
+    "increased": false
+  },
+  "finalAuditCheckedAt": "2026-10-07T05:22:56.612Z",
+  "developmentCleanup": {
+    "checkedAt": "2026-10-07T05:38:55.608Z",
+    "removedDirectories": 11,
+    "removedFiles": 58144,
+    "removedBytes": 2026371711,
+    "serviceHealthy": true,
+    "usageLedgerUnchanged": true,
+    "sourceFilesUnchanged": 373,
+    "zipUnchanged": true,
+    "reports": [
+      "docs/test-evidence/dev-file-cleanup-2026-10-07.json",
+      "docs/test-evidence/dev-synthetic-link-fixture-cleanup-2026-10-07.json"
+    ],
+    "historicalProofNotes": "Original regression reports retained; explicitly deleted fixture directory references are historical, not live reproducible paths."
+  },
+  "previousSourceDeliveries": [
+    {
+      "codeRoot": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T05-01-26-702Z-c635ca83-8f97-4535-93e2-0fa1ecb3a095\\code",
+      "manifest": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T05-01-26-702Z-c635ca83-8f97-4535-93e2-0fa1ecb3a095\\code-manifest.json",
+      "manifestSHA": "e02109fc007d6e44b7c282040b8356652955fc36e5ae76f5907521fea24015f2",
+      "fileCount": 373,
+      "bytes": 4744460,
+      "contentSHA": "14b09d91ea6a4b9569ef88ac0306263133493dde155eca81b9db1775bcdca75e",
+      "zip": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T05-01-26-702Z-c635ca83-8f97-4535-93e2-0fa1ecb3a095\\weiwu-windows-mvp-2026-10-07.zip",
+      "zipBytes": 1552364,
+      "zipSHA": "50d923bbde72038a44245ce8dd2c002e8442daef17552cc9a7ef92b0cae791ea",
+      "zipEntries": 375,
+      "allSourceAndZipBytesRechecked": true,
+      "dependencies": "Root/runtime dependencies installed for isolated verification, then redundant copies removed in authorized cleanup; source ZIP excludes dependencies; run the two npm ci commands in the guide before starting a new copy."
+    }
+  ],
+  "conversationBudgetUpdate": {
+    "checkedAt": "2026-10-07T06:07:35.244Z",
+    "report": "docs/validation/conversation-budget-2026-10-07.md",
+    "audit": "docs/validation/conversation-budget-independent-stage-audit-2026-10-07.json",
+    "testsPassed": 74,
+    "tscExit": 0,
+    "buildExit": 0,
+    "paidModelRequests": 0,
+    "actualWebVerified": true,
+    "reloadProof": "docs/test-evidence/conversation-budget-reload-2026-10-07/sources.json",
+    "source": {
+      "status": "verified-source-copy",
+      "destination": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T06-06-08-032Z-eda2cdaf-790d-48eb-ac39-38485b99226d",
+      "manifest": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T06-06-08-032Z-eda2cdaf-790d-48eb-ac39-38485b99226d\\code-manifest.json",
+      "files": 377,
+      "bytes": 4782705,
+      "contentSha256": "0bb8ef5537529cc43a70ac1ad00976fbfdfd9f8137983d30062210fe9a6f2c6d"
+    },
+    "zip": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\source-delivery-2026-10-07T06-06-08-032Z-eda2cdaf-790d-48eb-ac39-38485b99226d\\weiwu-windows-mvp-conversation-update-2026-10-07.zip",
+    "zipBytes": 1567521,
+    "zipSHA": "51d3e3fc7281c6e911b311b3e567c48fefafbd23e22cfedb470ba4963287672e",
+    "zipEntries": 379,
+    "roundtripSourceHashesVerified": true
+  }
+}

@@ -1,0 +1,20 @@
+✔ initial health reads share one in-flight request and publish connection independently (4.3207ms)
+✔ transport failure and reconnection retain confirmed workspace configuration until new health succeeds (2.6585ms)
+✔ first failed connection becomes disconnected and retries show reconnecting before any health exists (3.2527ms)
+✔ received HTTP failures are distinct from disconnection but synthetic GET timeouts are not (2.1968ms)
+✔ hidden pages have no periodic checks and becoming visible or focused shares a slow request (3.9617ms)
+✔ visible polling detects a dropped service and later restores connection without a page reset (0.8987ms)
+✔ manual refresh cancels an old poll and only the last subscriber removes wake listeners (1.0477ms)
+✔ health and usage refreshes deduplicate independently and cost notifications do not add health calls (1.8176ms)
+✔ usage refresh shares in-flight reads and publishes the new records (3.8265ms)
+✔ failed local reads keep the previous usage and update time until a successful retry (1.7547ms)
+✔ polling pauses while hidden and refreshes on visibility, focus and cost updates (5.6326ms)
+✔ a focus event shares a slow poll and unsubscription cancels further polling (1.5196ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 935.1621

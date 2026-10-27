@@ -1,0 +1,33 @@
+✔ real local file reads create Host-owned evidence and only identical current-scope reads deduplicate (917.5963ms)
+✔ two actual employee Hosts read the same pinned file without exchanging task proofs or knowledge grants (720.6096ms)
+✖ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (556.9633ms)
+✔ unsafe two-employee writer/writer and writer/reader plans are rejected before creating a worker or dispatching a model (1.6398ms)
+✔ identical complete reads retain the latest actual call IDs and remap every protected old index without editing original evidence (4.5139ms)
+✔ missing, asynchronous, exceptional, invalid or incomplete host attestations preserve all original groups (2.9029ms)
+✔ a different employee/task/attempt scope cannot collapse byte-identical file results (0.4412ms)
+✔ different paths, complete versions, read arguments and assistant reasoning remain unique evidence (0.9197ms)
+✔ complete local directory metadata qualifies but a different directory or invalid metadata remains distinct (2.5047ms)
+✔ mixed mutations, unmatched responses, missing results, duplicate call IDs and unknown fields never qualify (1.9482ms)
+✔ invalid hash, partial JSON, explicit error and pruned text remain protected even with a positive callback (0.7283ms)
+✔ knowledge deduplication preserves full chunk/version/citation metadata and distinguishes queries, versions and partial content (1.372ms)
+✔ the source result signature prevents unmarked projection changes from becoming proof of a complete knowledge chunk (0.5401ms)
+✔ three complete duplicates map to the newest group and financial fitting still protects the only full file and current contract (2.2993ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 13
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2694.0154
+
+✖ failing tests:
+
+test at services\agent-runtime\product-concurrency.test.mjs:130:1
+✖ overlapping current-task writes use the real local executor: one old SHA commits, the second is rejected, then explicit merge succeeds (556.9633ms)
+  Error: agent_teams_update_task: {"message":"task status cannot move from \"claimed\" to \"completed\"","info":{"name":"HarnessError","code":"COORDINATOR_TOOL_FAILED"}}
+      at Object.call (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/host.mjs:285:35)
+      at async file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:150:3
+      at async fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/product-concurrency.test.mjs:84:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7)

@@ -1,0 +1,30 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ short prose and one fence produce a paid candidate; only explicit confirmation saves it once (3118.9938ms)
+✔ ambiguous, malformed, oversized and schema-invalid output retains known fees and safe diagnostics without preview (716.6095ms)
+✔ length and content_filter fail after usage settlement even when their visible JSON is complete (306.9075ms)
+✔ wrapped candidates still require allowed models and available project budget (191.6697ms)
+✔ a malformed completion envelope records paid failure diagnostics before any candidate parse (154.1753ms)
+✔ normal completion preserves safe finish reason as metadata and keeps the wire envelope unchanged (107.5874ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5196.5141
+✔ API stores explicit protocol, keeps omitted legacy Chat fields, and rejects invalid protocol without creating a model (2479.8231ms)
+✔ Responses text API settles the full cached input and reserves captured wire bytes plus 1024 and the output cap (164.9388ms)
+✔ two API tool probes replay call_id history and keep Go session stable within each probe and isolated between probes (369.0707ms)
+✔ actual Responses wire budget and context limits reject before dispatch or a model reservation is inserted (655.021ms)
+✔ valid usage plus malformed tool output is a settled paid probe failure with safe diagnostics (168.357ms)
+✔ missing usage and HTTP 502 retain one uncertain fee and one dispatch without retry or synthetic-key leakage (278.33ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4615.2918

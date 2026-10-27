@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve, relative, sep } from 'node:path';
+import { equalBoundSource } from '../docs/test-evidence/helpers/go-bound-source-identity-2026-10-06.mjs';
+
+const binding = JSON.parse(readFileSync('docs/test-evidence/funded-run-web-recovery-approve-2026-10-06T07-52-29-812Z-02bf3e15.json')).goBinding;
+test('the same original source bytes may use absolute or workspace-relative file spelling without mutating signed binding fields', () => {
+  const other = structuredClone(binding), before = structuredClone(binding);
+  other.generationSources = other.generationSources.map(row => ({ ...row, path: relative(resolve('.'), row.path).split(sep).join('/') }));
+  assert.equal(equalBoundSource(binding, other), true);
+  assert.deepEqual(binding, before);
+});
+test('file SHA, another source path and every requirement/plan/policy/model/fee binding difference remain unequal', () => {
+  for (const mutate of [
+    value => { value.generationSources[0].sha256 = 'a'.repeat(64); },
+    value => { value.generationSources[0].path = 'docs/test-evidence/another-source.json'; },
+    value => { value.projectSignature = 'a'.repeat(64); }, value => { value.planningCost = 0; },
+    value => { value.confirmedRequirementSha256 = 'a'.repeat(64); }, value => { value.currentModelConfigHash = 'a'.repeat(64); },
+    value => { value.confirmedPlan.tasks[0].objective += ' changed'; }, value => { value.confirmedPolicy.maxModelCalls = 99; },
+    value => { value.confirmedPlan.agents[0].tools = []; }, value => { value.retained = true; },
+  ]) { const other = structuredClone(binding); mutate(other); assert.equal(equalBoundSource(binding, other), false); }
+});

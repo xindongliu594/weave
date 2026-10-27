@@ -1,0 +1,37 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ default-limit real HTTP rejects long GET431 but readonly POST preserves full3840/4000 Chinese through the static proxy (2539.8389ms)
+✔ short legacy GET and POST share the same quote while strict body schema, permissions and original budgets remain enforced (194.5185ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3375.006
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2385.9683ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (152.2045ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (154.839ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (244.5699ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (224.2293ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (228.3848ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (135.8979ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (224.9809ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (387.6884ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (402.2604ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (186.0706ms)
+✔ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (73.3171ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (172.213ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (294.4893ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (124.0502ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (259.3203ms)
+✔ a new user adjustment is quoted and pinned without editing the saved requirement, grants or prior plan (285.0118ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6442.2816

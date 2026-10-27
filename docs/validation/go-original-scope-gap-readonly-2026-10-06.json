@@ -1,0 +1,343 @@
+{
+  "kind": "read-only-original-six-item-scope-gap-audit",
+  "at": "2026-10-06T10:46:41.232Z",
+  "mainReportOrPhaseStateWrites": 0,
+  "liveApiActions": 0,
+  "browserActions": 0,
+  "actualModelCalls": 0,
+  "sourceDatabaseOpened": false,
+  "originalEmployeeFilesRead": false,
+  "sourceSHA": [
+    {
+      "path": "docs/test-evidence/new-api-unconfirmed-team-2026-10-04.json",
+      "sha256": "d2072d5226671c0b50beba62c19b3c4d3e03a3061102abd9e94f17ba5386c10c"
+    },
+    {
+      "path": "docs/test-evidence/new-api-before-confirm-2026-10-04.json",
+      "sha256": "a1e2764508f650c3948f45d34889254d114997b0a2afba9d367915fd011913a8"
+    },
+    {
+      "path": "docs/test-evidence/new-api-confirmed-team-2026-10-04.json",
+      "sha256": "a8d8ebac2fac5e5fdbf029f1e12ab5e81c8992903e6983749545f69c18f74f4a"
+    },
+    {
+      "path": "docs/test-evidence/screenshots/new-api-draft-failure-2026-10-04.png",
+      "sha256": "7e4417d858ea4e8e89230c727d04e155757e7fc846b4bdf3a508d484164281e2"
+    },
+    {
+      "path": "docs/test-evidence/screenshots/new-api-team-preview-2026-10-04.png",
+      "sha256": "56e93f2448b890931532b7b10c0c991d0667bdf11f35bad1e4b7e32be95c78ab"
+    },
+    {
+      "path": "docs/test-evidence/screenshots/new-api-team-revised-2026-10-04.png",
+      "sha256": "0124c527fa1ac5c8630f8cdf143a9cda40c73c9344969f3e48906e0a86e5c8ed"
+    },
+    {
+      "path": "docs/test-evidence/funded-normal-send-2026-10-05T12-30-35-475Z-901d9177.json",
+      "sha256": "86c81cbef434c67d642474a8f2632df6de5179a5f30c54eef922ea01736bf983"
+    },
+    {
+      "path": "docs/test-evidence/funded-recovery-send-2026-10-05T11-40-45-728Z-8abc2de2.json",
+      "sha256": "90b6fdeca0e81699f25362b26e1221c2456dc4a69e7f0ce9beefb50243b9dcd7"
+    },
+    {
+      "path": "docs/test-evidence/funded-recovery-send-2026-10-05T12-26-24-602Z-772be376.json",
+      "sha256": "47e0f7e90bef736d7dc8a5820701a25d9f783f3fff913ad9858b63ee8875d30e"
+    },
+    {
+      "path": "docs/test-evidence/funded-normal-confirm-2026-10-05T12-35-46-626Z-5bfc26b6.json",
+      "sha256": "b7a188c37d5b8e4d308f875e92597c633d718fcb3ef135e905af943541c80fb6"
+    },
+    {
+      "path": "docs/test-evidence/funded-recovery-confirm-2026-10-05T12-30-00-700Z-6093fcc2.json",
+      "sha256": "d1432748dcdbfc058c9134dc9197d48fd7b4a6904753a388f454d8e3801f5996"
+    },
+    {
+      "path": "docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json",
+      "sha256": "c09d5e29742a8f5fd40c499555103a95d09422b6dad65eddce88063da0aa9693"
+    },
+    {
+      "path": "docs/test-evidence/new-api-knowledge-preflight-2026-10-04.json",
+      "sha256": "6e58a454aa71901f13b40c7963b2cabb6527e06859cfb605dff97c6e361d28ac"
+    },
+    {
+      "path": "docs/test-evidence/new-api-knowledge-recovered-v1-2026-10-04.json",
+      "sha256": "b4fd84b4021de20e219522ffab7f72ea0b826d4f8f7576141713c9c4c8c22503"
+    },
+    {
+      "path": "docs/test-evidence/mvp-preserved-real-todo.json",
+      "sha256": "44235c46a529d9f96b4904e46b0644b94131cefa34bc711db5453052950bbe93"
+    },
+    {
+      "path": "docs/test-evidence/mvp-backup-real-2026-10-04-99551bf3.json",
+      "sha256": "e42bcfac960b82174188d2a2925ba49df6a24fcfdcb55e36895c3b7a58962b27"
+    },
+    {
+      "path": "docs/test-evidence/my-gateway-full-backup-2026-10-05.json",
+      "sha256": "fbb39974b4f22756247aca843ecf0e712b41b0462478b9930e846fb26853da83"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-binding-2026-10-06.json",
+      "sha256": "fd11be3d9208dd857144d2f2931ac3e1ccb826dcd88ab810d38c86951f058ece"
+    },
+    {
+      "path": "docs/mvp-acceptance-2026-10-04.md",
+      "sha256": "37206f2225c81685ba95510e7285ebb910aa0c1eeaebe9e839263fa189c88fde"
+    },
+    {
+      "path": "docs/mvp-acceptance-2026-10-02.md",
+      "sha256": "bfae4b038e0ba8badcfd6413d703ce915db71980e87d8defb2e3b2016650e5e4"
+    },
+    {
+      "path": "docs/validation/go-mvp-fixed-issues-2026-10-06.md",
+      "sha256": "c28a32d8f2316f2fdb6195cf5b4cf2274bc85cd2cd7506dabd9364b29b5e44a3"
+    },
+    {
+      "path": "docs/validation/go-v8-real-resume-audit-2026-10-06.md",
+      "sha256": "042bccdbca67691f89059fab7bbc7123b6d8178fcd4c705f480f030c855d85f6"
+    },
+    {
+      "path": "docs/validation/mvp-backup-business-2026-10-04.md",
+      "sha256": "836d943a1311a79121e7e022aaabcac78c2439167b58dfacc1c7a53257acfbd5"
+    },
+    {
+      "path": "docs/validation/final-go-offline-backup-plan-2026-10-06.md",
+      "sha256": "cf88cab2f07e8d88d3c545d9c7ce461359ae980bc6a1637cd41291790c666478"
+    },
+    {
+      "path": "apps/web/src/OrganizationChat.tsx",
+      "sha256": "9611489e69dc5969fa5cef2c6dde5eb6e30304ce078e66caed84b508e1015160"
+    },
+    {
+      "path": "apps/api/src/organization-chat.ts",
+      "sha256": "9a98664eb4aaf09d24e7ce804a7294f6c92757f716db2f5770ddc04be9d8fca5"
+    },
+    {
+      "path": "apps/api/src/backup.ts",
+      "sha256": "9491d8621933864af12d649f972ad0c80a0e1e7b312d9cdfb575c717b17f636d"
+    }
+  ],
+  "rawSourcesVerified": [
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/archive.json",
+      "bytes": 9859369,
+      "sha256": "f7776699c4d4dab196bb0012939fb8fb2a495828385748f1552c69c6957f39d2"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/state.json",
+      "bytes": 5003389,
+      "sha256": "5e0ba21a0b3e0da5aabd403fe8b520362f673c2cb213ab1d532a61d069ce2f19"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/operations.json",
+      "bytes": 38743,
+      "sha256": "c8e5f441d707e73c9a4949002cdc0b1b9522165d90c2290d6bd3140e114e4e30"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/artifacts.json",
+      "bytes": 334,
+      "sha256": "cadc26d97dd70f325907a1d9e71ab30ab49d117e99cc2c4085eec02cb02c0c19"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/approvals.json",
+      "bytes": 691,
+      "sha256": "7a2920b4a3e28b36402b58a2923ce5d3dae94dab57f1216658eb93462a1a22fd"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/readiness.json",
+      "bytes": 264,
+      "sha256": "781f0d2faa3d74d08711a27c157dd2ead99cded4470a2f174c6896fa09c469d4"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/usage.json",
+      "bytes": 283614,
+      "sha256": "d37c07fa96eb35b1aed4b7a7e911fb0b73b935618230dfddeba02271d64f968c"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/projects.json",
+      "bytes": 112738,
+      "sha256": "87e013af3bd14c19702f8adf56f0a48f59cb0ce48781f3a40530948706b69177"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/README.md",
+      "bytes": 4056,
+      "sha256": "74fd5c34dcf10a5d70a9f5ae3f9671f170748ef50dc268ec5d80706bda5f0fab"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/server.mjs",
+      "bytes": 7125,
+      "sha256": "846c64ddb5fcd0c2c276c471195f74dad08e7fa8b31188fe06d505d11bba805f"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/todo.test.mjs",
+      "bytes": 10037,
+      "sha256": "bbf5aad3665f304221d3f7b566fef56f387aabde8e8e395eed4ef6c00bb38f71"
+    },
+    {
+      "path": "docs/test-evidence/go-normal-v11-version-mismatch-failed-2026-10-06T09-55-51-245Z-8893f431/archive-after.json",
+      "bytes": 9859369,
+      "sha256": "f7776699c4d4dab196bb0012939fb8fb2a495828385748f1552c69c6957f39d2"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/sources.json",
+      "bytes": 6517,
+      "sha256": "aa3a00e91e3a281e7b30433e343a6685b2010b4d4eaa01e9af76b3d65bf644d7"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/archive.json",
+      "bytes": 58681046,
+      "sha256": "d68cae2e102423b4ee39bba30854dbd797aca811d48f79025e848712928b48ea"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/state.json",
+      "bytes": 20839945,
+      "sha256": "459b64eab975ae9fa9904c76096744ee9a9f056cda5ffbb43961d0095e00ec38"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/local-operations.json",
+      "bytes": 42825,
+      "sha256": "a830bddcce62f324a5782612dc67af6ed69107706091b70438858e3384af27b0"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/artifacts.json",
+      "bytes": 453,
+      "sha256": "1a1ed1decbe4f2521bc06efc940ca1c662ca4f79df1d269351d5c9464b571c2c"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/approvals.json",
+      "bytes": 692,
+      "sha256": "fe39c1e640ed363afa789f976cf3956dc47eb32dda7fec7fab1e0ffb1ec5b6d4"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/readiness.json",
+      "bytes": 127,
+      "sha256": "d4023969fdf35f7f970f8328fa0a3094a5654be4b1bc29e0cb99ccaed9a416a8"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/usage.json",
+      "bytes": 276933,
+      "sha256": "6630a0712b3b1ab575f1d06ec6d8df76ad491b993b254d96c26f11d9b26c9b22"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/projects.json",
+      "bytes": 109896,
+      "sha256": "4021d5893c97c565d0a03af4205402ec86fa2c66c2302d9d52e01af4b7e5a507"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/runs.json",
+      "bytes": 13980,
+      "sha256": "8b7dfe99770d629e4ff6a601f70af377df6c5094a91564601810a8aa37c4a157"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/archive-after.json",
+      "bytes": 58681046,
+      "sha256": "d68cae2e102423b4ee39bba30854dbd797aca811d48f79025e848712928b48ea"
+    }
+  ],
+  "historicalHome": {
+    "countBefore": {
+      "department": 2,
+      "project": 6
+    },
+    "countAfter": {
+      "department": 3,
+      "project": 7
+    },
+    "actualModification": "QA title and independent responsibilities before confirmation",
+    "currentFundedProjectsCreatedByActualHome": true,
+    "planner": "Astra bf7da7b1-d8bb-489b-aee5-3d90ed1195a4; not Go",
+    "homeGoRepetitionRequired": false,
+    "postConfirmationTeamUpdateAddedRequirement": false,
+    "initialCurrentUiReadonlyScreenshotPending": true
+  },
+  "normal": {
+    "runId": "9878e368-9ebe-443d-8c2f-59ba3e5b4274",
+    "version": 11,
+    "status": "failed",
+    "eventCount": 1022,
+    "error": "HANDOFF_BLOCKED: qa_verify: VERSION_MISMATCH: server.mjs",
+    "accepted": [
+      {
+        "seq": 975,
+        "taskId": "dev",
+        "attemptId": "ee48f117-acc9-4bdd-bdb5-2c964e8c078f"
+      }
+    ],
+    "terminals": [
+      {
+        "id": "adbb400f-ee0d-4968-8d20-b6bf849a2fc0",
+        "status": "completed",
+        "exitCode": 1,
+        "counts": {
+          "status": "available",
+          "format": "spec",
+          "tests": 12,
+          "suites": 0,
+          "pass": 11,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      },
+      {
+        "id": "ccca316a-218c-42e0-baed-f6370a979c9b",
+        "status": "completed",
+        "exitCode": 0,
+        "counts": {
+          "status": "available",
+          "format": "spec",
+          "tests": 12,
+          "suites": 0,
+          "pass": 12,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "qaCommandExecuted": false,
+    "managerAccepted": false,
+    "readiness": {
+      "recordedCost": 1.7575817,
+      "reserved": 0.096526,
+      "availableBudget": 2.3255923000000003,
+      "pendingCount": 0,
+      "uncertainCount": 1,
+      "receipts": [
+        {
+          "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+          "amount": 0.096526,
+          "status": "uncertain",
+          "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "runId": "c92961f2-5573-4299-82c2-daa7ee13dca5",
+    "version": 8,
+    "status": "failed",
+    "eventCount": 6800,
+    "lastEvent": {
+      "seq": 6800,
+      "type": "run/finished",
+      "data": {
+        "status": "failed",
+        "message": "运行达到已批准的 3600 秒时限，已停止。已完成任务和文件保留；先核对待结算调用，再恢复未完成任务。",
+        "code": "RUN_DEADLINE_EXCEEDED",
+        "usageCost": 0.14352449999999997
+      }
+    },
+    "controlledInterruptionSucceeded": false,
+    "requestCount": 18,
+    "wireCount": 18,
+    "sourceBudgetHostCalls": 18,
+    "latestSavedCurrentProjectVersion": 9,
+    "latestSavedCurrentProjectStatus": "DRAFT",
+    "subsequentVersion10RunProved": false
+  },
+  "latestWholeCodeAndDataBackupProved": false,
+  "actualMvpAccepted": false
+}

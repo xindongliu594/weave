@@ -1,0 +1,247 @@
+Go thinking mode local engineering validation, frozen 2026-10-06T01:19:34Z
+Node: C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe
+Original API run before automatic tool-choice compatibility and type-inference fix:
+Command: node scripts/test-integration.mjs tests/go-thinking-mode.test.ts
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ explicit thinking disable persists and reaches API text plus complete synthetic tool roundtrip with exact wire reservations (2415.2643ms)
+✔ missing thinking config preserves the legacy Chat body and reservation even for a DeepSeek model name (93.207ms)
+✔ ignored disabled thinking rejects API tool state after settling known usage without a second probe request (219.7319ms)
+✔ unsupported thinking values and Responses combinations cannot persist or dispatch (78.1569ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3326.577
+
+Initial API exit code: 0
+Original runtime source snapshot:
+[
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\packages\\contracts\\index.ts",
+    "Hash": "A77639DF16B4E1865222D872D8B1A487BAB19A1B0390AC5FE9E4162543FAF468"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\web\\src\\App.tsx",
+    "Hash": "D024441EC9A70236A08F4DAE67C5F63A22D5C6954064F4BE63CB85E25CE3633A"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\provider.ts",
+    "Hash": "0DF8D6F69D5098C57FAD947A0B804FECE7C5465A8B49EC15D6EEE84AAD80128A"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\cost-control.ts",
+    "Hash": "79FFBB8778B894EB915BF208DE7EF3E448DBFD433051A3A54020297D32144456"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\app.ts",
+    "Hash": "75B14EB09723D05A6CC42B4C42840C30F9D07B838137E8B6E3BEA3D3155AC331"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\openai-compatible.mjs",
+    "Hash": "FDA7C655153EA19A1AB23DBDF6435941E0542B5557A739141B0B002BB358457F"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\openai-compatible.d.mts",
+    "Hash": "DB18E9A1606D251DD5AD00D0E5A5E4075E64FF0B1916857C94396D4B3D730F68"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-options.mjs",
+    "Hash": "E3426EB9EA0CE7E8EF3A04CD43460871AE079799B00899BAFA16D8CE47713165"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-options.d.mts",
+    "Hash": "5AD80AA84E86802268A47D27AE60BE5B4E0F16492E2700C17260F65BD3F543E9"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\completion-protocol.mjs",
+    "Hash": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\go-thinking-mode.test.ts",
+    "Hash": "6108B37E91CC03DF491B3B26D9F9AAE6AEB9CC10327449A585A5D36F469178AC"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\services\\agent-runtime\\thinking-mode.test.mjs",
+    "Hash": "7373E967D8C2D537090FA1709F650222C11CE0FB3F47A75170A647215D230C2C"
+  }
+]
+Command: node --test services/agent-runtime/thinking-mode.test.mjs services/agent-runtime/responses-compatible.test.mjs services/agent-runtime/completion-protocol.test.mjs services/agent-runtime/openai-compatible.test.mjs
+✔ legacy Chat request and response are returned unchanged, with no protocol inference from the model name (2.6357ms)
+✔ stateless Responses maps the complete multi-function history using call_id and preserves full file/knowledge JSON (1.993ms)
+✔ tool choice and JSON text format are explicit while unsupported options, built-ins and multimodal input fail (1.9797ms)
+✔ non-none or historical reasoning is never silently converted into plain text (0.5383ms)
+✔ malformed, duplicated or unfinished historical calls fail locally rather than replaying external operations (0.5754ms)
+✔ Responses uses call_id rather than output-item id, preserving cached and reasoning usage within total tokens (0.5231ms)
+✔ incomplete or invalid function output is rejected after usage remains independently readable (0.5982ms)
+✔ only a provably empty none-effort reasoning container is accepted; encrypted or unknown state is rejected (0.5611ms)
+✔ Go headers use this product and hashed stable conversation ID, without spoofing or leaking IDs to unrelated URLs (1.6819ms)
+✔ an abort during durable reservation never dispatches a request or reports an unknown sent call (7.9048ms)
+✔ response metadata is awaited before status handling, JSON parsing or usage settlement (35.0614ms)
+✔ an interruption after headers preserves request IDs without reading JSON or settling usage (1.3848ms)
+✔ absent or unsafe request ID headers are omitted and credentials are never echoed into metadata (6.0313ms)
+✔ failed metadata persistence keeps the sent receipt uncertain and never settles or falls back (5.1737ms)
+✔ an explicit HTTP fallback retains separate provider metadata for both requests (4.9127ms)
+✔ OpenAI compatible adapter translates tool calls, usage, routing and authorization (1.5255ms)
+✔ adapter refuses an unaffordable protected request before reserving, persisting or sending it (1.3558ms)
+✔ fallback is explicit, bounded, attributed and never retries ambiguous network failures (2.3114ms)
+✔ summaries read every selected source message and refuse oversized input before dispatch (1.6017ms)
+✔ wire clipping protects the most recent durable checkpoint and rejects when protected context cannot fit (1.6838ms)
+✔ financial fitting preserves the full approved contract, checkpoint, older file and knowledge versions, and latest complete tool group (5.553ms)
+✔ unaffordable protected older evidence and compaction sources block without editing history, taking calls or making durable reservations (63.9301ms)
+✔ the original context byte cap and insufficient money produce distinct errors before durable admission or fetch (1.3086ms)
+✔ available finance is the smaller run or assigned task remainder including history and existing reservations (3.3446ms)
+✔ financial fitting cannot bypass identity, restored call caps, exhausted budgets or the 90 percent fallback and rework gates (2.6159ms)
+✔ two concurrent protected requests cannot both fit the same remaining allowance while durable admission awaits (1.5856ms)
+✔ financial admission preserves undefined versus empty tools reservation envelopes and the unchanged route output cap (1.3863ms)
+✔ failure to archive financial clipping evidence releases the synchronous hold and never reaches durable admission or fetch (1.2606ms)
+✔ a structured HTTP 502 exposes diagnostic code and message while retaining one unknown sent receipt (3.5956ms)
+✔ error summaries scrub known and typical credentials before clipping and never forward extra provider data (5.5077ms)
+✔ malformed JSON, HTML and oversized bodies keep only the HTTP failure and never leak their contents (3.2576ms)
+✔ provider text remains inert quoted diagnostics with bounded length and unchanged status categories (2.6806ms)
+✔ oversized and endlessly empty error streams cancel without awaiting an untrusted cancel callback (3.7688ms)
+✔ a stalled error body has its own short deadline and cannot hang failure accounting (1507.8777ms)
+✔ user cancellation takes priority over error-body timeout without settling or replaying a sent call (15.6263ms)
+✔ real local HTTP Responses exchange persists the actual path/body and replays complete call/output history without remote conversation (84.6917ms)
+✔ actual Responses envelope expansion is checked before taking calls, reserving or dispatching (8.2052ms)
+✔ context window guards include actual wire bytes, the 1024 guard and unchanged output, at the exact boundary (4.7042ms)
+✔ financial fitting preserves the latest contract, old full SHA file and pinned knowledge groups while removing old discussion (29.5306ms)
+✔ per-task max output cap remains distinct from whole-task estimates and is honored on Responses wire (16.5351ms)
+✔ HTTP failures and missing or invalid usage retain one run/task hold despite a configured fallback, with no retry or tool execution (83.3743ms)
+✔ invalid, incomplete, unapproved and nonempty reasoning outputs settle actual usage but yield no executable calls (27.4425ms)
+✔ reasoning policy refusal and malformed native history occur before any durable receipt or HTTP request (3.6597ms)
+✔ legacy Chat route keeps its endpoint and body despite a Responses-named wire model (5.7771ms)
+✔ multiple tool rounds replay every text, parallel call and full file/knowledge result with stable call IDs (16.4951ms)
+✔ unknown dispatched fees stay held even without durable callbacks or when success JSON is malformed (12.0024ms)
+✔ metadata, usage or unknown-fee persistence failures retain the sent hold and never yield executable output (16.7103ms)
+✔ the run/task reservation remains held while known usage persists, then settles before invalid output is rejected (7.5446ms)
+✔ a cancellation before dispatch releases the local hold, while cancellation after headers retains it (9.0391ms)
+✔ Go identity is stable across previews and requires a local session before reservation; unrelated routes receive no Go identity (2.2826ms)
+✔ an internal stop settles only the late original Responses receipt and never executes its tool call or sends another request (8.1641ms)
+✔ explicit thinking disable reaches real local runtime HTTP and uses full wire reservations while retaining existing reasoning tool history (79.8983ms)
+✔ legacy runtime routes never infer thinking from a DeepSeek wire name and keep their original Chat estimate (20.4532ms)
+✔ explicit Chat configuration counts the protected whole envelope and rejects insufficient funds without lowering output or changing state (2.6718ms)
+✔ invalid thinking configuration and Responses combination are refused before runtime admission or dispatch (1.1869ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 55
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1911.1855
+
+Runtime exit code: 0
+Final API run after explicit disabled auto probe and typed spread fixture:
+Command: node scripts/test-integration.mjs tests/go-thinking-mode.test.ts
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ explicit thinking disable persists and reaches API text plus complete synthetic tool roundtrip with exact wire reservations (2493.0181ms)
+✔ missing thinking config preserves the legacy Chat body and reservation even for a DeepSeek model name (213.8676ms)
+✔ ignored disabled thinking rejects API tool state after settling known usage without a second probe request (190.117ms)
+✔ unsupported thinking values and Responses combinations cannot persist or dispatch (94.7039ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3530.1247
+
+Final API exit code: 0
+Final two-file API snapshot before rerun:
+[
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\apps\\api\\src\\model-capabilities.ts",
+    "Hash": "107F02B74CB4CFE8F9C1AD9D7D3E23072CB7CA27683AFE236C50A70A5D832F8F"
+  },
+  {
+    "Path": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\tests\\go-thinking-mode.test.ts",
+    "Hash": "225465DA4587B507AC2C17BED317894A7FCAF6E43C920D2644FA9D0B475C3C90"
+  }
+]
+Final source manifest:
+{
+  "frozenAtUtc": "2026-10-06T01:19:34Z",
+  "workspace": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department",
+  "node": "C:/Users/JJ/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "finalApi": {
+    "command": "node scripts/test-integration.mjs tests/go-thinking-mode.test.ts",
+    "pass": 4,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "runtime": {
+    "command": "node --test services/agent-runtime/thinking-mode.test.mjs services/agent-runtime/responses-compatible.test.mjs services/agent-runtime/completion-protocol.test.mjs services/agent-runtime/openai-compatible.test.mjs",
+    "pass": 55,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "sourceHashes": [
+    {
+      "file": "packages/contracts/index.ts",
+      "sha256": "A77639DF16B4E1865222D872D8B1A487BAB19A1B0390AC5FE9E4162543FAF468"
+    },
+    {
+      "file": "apps/web/src/App.tsx",
+      "sha256": "D024441EC9A70236A08F4DAE67C5F63A22D5C6954064F4BE63CB85E25CE3633A"
+    },
+    {
+      "file": "apps/api/src/provider.ts",
+      "sha256": "0DF8D6F69D5098C57FAD947A0B804FECE7C5465A8B49EC15D6EEE84AAD80128A"
+    },
+    {
+      "file": "apps/api/src/cost-control.ts",
+      "sha256": "79FFBB8778B894EB915BF208DE7EF3E448DBFD433051A3A54020297D32144456"
+    },
+    {
+      "file": "apps/api/src/app.ts",
+      "sha256": "75B14EB09723D05A6CC42B4C42840C30F9D07B838137E8B6E3BEA3D3155AC331"
+    },
+    {
+      "file": "apps/api/src/model-capabilities.ts",
+      "sha256": "107F02B74CB4CFE8F9C1AD9D7D3E23072CB7CA27683AFE236C50A70A5D832F8F"
+    },
+    {
+      "file": "services/agent-runtime/openai-compatible.mjs",
+      "sha256": "FDA7C655153EA19A1AB23DBDF6435941E0542B5557A739141B0B002BB358457F"
+    },
+    {
+      "file": "services/agent-runtime/openai-compatible.d.mts",
+      "sha256": "DB18E9A1606D251DD5AD00D0E5A5E4075E64FF0B1916857C94396D4B3D730F68"
+    },
+    {
+      "file": "services/agent-runtime/completion-options.mjs",
+      "sha256": "E3426EB9EA0CE7E8EF3A04CD43460871AE079799B00899BAFA16D8CE47713165"
+    },
+    {
+      "file": "services/agent-runtime/completion-options.d.mts",
+      "sha256": "5AD80AA84E86802268A47D27AE60BE5B4E0F16492E2700C17260F65BD3F543E9"
+    },
+    {
+      "file": "services/agent-runtime/completion-protocol.mjs",
+      "sha256": "D99E21FE185F80FC8E7F4E03E8400151148B5FACB77FE4E486F28568B890563D"
+    },
+    {
+      "file": "tests/go-thinking-mode.test.ts",
+      "sha256": "225465DA4587B507AC2C17BED317894A7FCAF6E43C920D2644FA9D0B475C3C90"
+    },
+    {
+      "file": "services/agent-runtime/thinking-mode.test.mjs",
+      "sha256": "7373E967D8C2D537090FA1709F650222C11CE0FB3F47A75170A647215D230C2C"
+    }
+  ],
+  "drift": {
+    "unchangedSourceDrift": [],
+    "finalApiDrift": []
+  }
+}
+Scoped git diff --check: exit code 0 (Git emitted only an LF-to-CRLF informational warning for app.ts).
+Runtime-related source and test hashes unchanged after its 55 passing checks; runtime was not rerun.
+Original production directory and real gateways were not accessed.

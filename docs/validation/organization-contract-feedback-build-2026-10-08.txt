@@ -1,0 +1,16 @@
+[36mvite v7.3.6 [32mbuilding client environment for production...[36m[39m
+[32m✓[39m 0 modules transformed.
+✗ Build failed in 47ms
+error during build:
+[vite:build-html] EPERM: operation not permitted, realpath 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\web\src\main.tsx'
+file: C:/Users/JJ/.codex/worktrees/f57c/agent_department/apps/web/index.html
+    at node:fs:2910:18
+    at getRealPath (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/vite/dist/node/chunks/config.js:33013:36)
+    at tryResolveRealFileOrType (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/vite/dist/node/chunks/config.js:33007:9)
+    at tryCleanFsResolve (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/vite/dist/node/chunks/config.js:32731:21)
+    at tryFsResolve (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/vite/dist/node/chunks/config.js:32724:14)
+    at Object.handler (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/vite/dist/node/chunks/config.js:32581:16)
+    at Object.handler (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/vite/dist/node/chunks/config.js:33786:13)
+    at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/rollup/dist/es/shared/node-entry.js:23046:40
+    at async PluginDriver.hookFirstAndGetPlugin (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/rollup/dist/es/shared/node-entry.js:22928:28)
+    at async resolveId (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/node_modules/rollup/dist/es/shared/node-entry.js:21390:26)

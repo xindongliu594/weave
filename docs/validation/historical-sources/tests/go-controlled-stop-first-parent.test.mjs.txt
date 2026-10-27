@@ -1,0 +1,50 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { verifyInitialApproval, controlledProductReadLimit, controlledFirstParentCounters } from '../docs/test-evidence/helpers/go-controlled-stop-first-parent-guard-2026-10-06.mjs';
+import { parameters } from '../docs/test-evidence/helpers/stop-go-funded-run-first-parent-web-2026-10-06.mjs';
+const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const root = 'docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/';
+function fixture() {
+  const archive = JSON.parse(readFileSync(root + 'archive.json')), readiness = JSON.parse(readFileSync(root + 'readiness.json'));
+  const prior = JSON.parse(readFileSync('docs/test-evidence/funded-run-web-recovery-approve-2026-10-06T07-52-29-812Z-02bf3e15.json'));
+  const runId = '99999999-1111-4111-8111-111111111111'; archive.id = runId; archive.snapshot.planVersion = 9; archive.snapshot.approval.projectVersion = 9;
+  for (const event of archive.events) if (event.type === 'team/checkpoint' && event.data.budgetEvidence) {
+    event.data.budgetEvidence.runId = runId; event.data.budgetEvidence.projectVersion = 9;
+  }
+  prior.version = 9; prior.newRunId = runId; prior.response.id = runId; prior.goBinding.version = 9;
+  prior.mutationRequests[0].body.version = 9; prior.newRunsReadOnly[0].id = runId; prior.newRunsReadOnly[0].planVersion = 9; prior.newArchive.snapshotSha256 = hash(archive.snapshot);
+  const source = { path: 'docs/test-evidence/synthetic-v9-approval-never-written.json', value: prior, sha256: hash(prior) };
+  const config = { runId, projectId: archive.snapshot.projectId, departmentId: archive.snapshot.departmentId, version: 9, initialApprovalSha256: source.sha256, largeRunId: runId };
+  const usage = archive.events.filter(event => event.type === 'billing/usage').map(event => ({ ...event.data, runId, projectId: config.projectId }));
+  return { observation: { archive, readiness, usage, binding: prior.goBinding, initialProjectApproval: source }, config, source };
+}
+test('a different explicit v9 first Parent binds its approved source and retains all18 host-reserved calls without adding history', () => {
+  const f = fixture(), before = structuredClone(f.observation.archive.snapshot);
+  const result = controlledFirstParentCounters(f.observation, f.config); assert.equal(result.callsUsed, 18); assert.equal(result.callLimit, 100);
+  assert.deepEqual(f.observation.archive.snapshot, before); assert.ok(!Object.hasOwn(before, 'budgetHistory'));
+});
+test('large128 capability requires verified explicit matching target; unrelated Run or fabricated flags remain50 and binary5', () => {
+  const f = fixture(), capability = verifyInitialApproval(f.source, f.config, f.observation.binding);
+  assert.equal(controlledProductReadLimit('/runs/' + f.config.runId + '/export', false, capability), 128 * 1024 * 1024);
+  assert.equal(controlledProductReadLimit('/runs/other/export', false, capability), 50 * 1024 * 1024);
+  assert.equal(controlledProductReadLimit('/runs/' + f.config.runId, true, capability), 5 * 1024 * 1024);
+  assert.equal(controlledProductReadLimit('/runs/' + f.config.runId, false, { runId: f.config.runId, large: true }), 50 * 1024 * 1024);
+});
+test('world0, absent approved source, wrong version/SHA, resume parent and nonzero inherited counts cannot reset tozero', () => {
+  assert.throws(() => verifyInitialApproval({}, {}, {}));
+  for (const mutate of [
+    f => { f.config.initialApprovalSha256 = '0'.repeat(64); }, f => { f.config.version = 10; },
+    f => { f.observation.archive.snapshot.resumedFrom = 'old'; }, f => { f.observation.archive.snapshot.budgetHistory = { calls: 1, tasks: {} }; },
+    f => { f.source.value.newRunsReadOnly.push({ id: 'other' }); },
+  ]) { const f = fixture(); mutate(f); assert.throws(() => controlledFirstParentCounters(f.observation, f.config)); }
+});
+test('generic CLI requires source identities explicitly and refuses expiredc929 and mismatched large owner', () => {
+  const f = fixture(), args = ['--run-id=' + f.config.runId, '--command-id=11111111-1111-4111-8111-111111111111', '--version=9',
+    '--confirmed-evidence=docs/test-evidence/actual-confirm.json', '--generation-evidence=docs/test-evidence/actual-generate.json',
+    '--initial-approval-evidence=' + f.source.path, '--initial-approval-sha256=' + f.source.sha256, '--large-run-id=' + f.config.runId];
+  assert.equal(parameters(args).version, 9); assert.throws(() => parameters(args.slice(0, -2)));
+  assert.throws(() => parameters(args.map(arg => arg.startsWith('--run-id=') ? '--run-id=c92961f2-5573-4299-82c2-daa7ee13dca5' : arg)));
+  assert.throws(() => parameters(args.map(arg => arg.startsWith('--large-run-id=') ? '--large-run-id=22222222-1111-4111-8111-111111111111' : arg)));
+});

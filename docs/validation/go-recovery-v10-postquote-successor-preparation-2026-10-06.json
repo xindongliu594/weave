@@ -1,0 +1,271 @@
+{
+  "checkedAt": "2026-10-06T10:12:22.534Z",
+  "kind": "offline-recovery10-fixed-postquote-producer-successor-preparation",
+  "nodeVersion": "v24.19.0",
+  "helperSources": [
+    {
+      "path": "docs/test-evidence/helpers/generate-go-recovery10-postquote-successor-web-2026-10-06.mjs",
+      "sha256": "d32887f67c758fe553702be2e9522bce690d60ee2b3e01c602697f8185dbec86"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-recovery10-quote-successor-guard-2026-10-06.mjs",
+      "sha256": "0514f911b59ce24d2cc8d59d23f6c221a20d04593c839a6aa98d4a68f437fcfa"
+    },
+    {
+      "path": "docs/test-evidence/helpers/prepare-go-recovery10-postquote-successor-2026-10-06.mjs",
+      "sha256": "cd40ec66e1cff3a00d9f08eabc8e4e4f5fb56c9538266e885c3e95d0f3f9772f"
+    },
+    {
+      "path": "docs/test-evidence/helpers/check-go-recovery10-postquote-successor-offline-2026-10-06.mjs",
+      "sha256": "e188c193368da375b56369a9557925031d021c90d32bfe43a5dc667d8956576a"
+    }
+  ],
+  "oldQuoteFailureEvidence": {
+    "sources": [
+      {
+        "path": "docs/test-evidence/go-recovery10-budget-recovery-generate-2026-10-06T09-45-16-415Z-d055372e.json",
+        "sha256": "c2ec903b609a0d36c9ba480ec7404696c070eae9143a457ec4b06d9584177441"
+      },
+      {
+        "path": "docs/test-evidence/go-long-planning-quote-http-diagnostic-2026-10-06.json",
+        "sha256": "d0c7d12bc45a2f2a1887c8e26704b55795f850d86d6a89b34218aa0f1da83d09"
+      },
+      {
+        "path": "docs/test-evidence/go-long-planning-quote-http-body-2026-10-06.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-recovery10-real-budget-web-2026-10-06.mjs",
+        "sha256": "c0a18c5c97c5852dc03fcf5a7a8de493b732ad7ed012369b6f4c2b8a58c3c3f2"
+      },
+      {
+        "path": "docs/test-evidence/helpers/go-normal12-producer-source-guard-2026-10-06.mjs",
+        "sha256": "84a26b2b256430e498d029a2eb724d5b032d04bc34615fdc26fa79b7257479b0"
+      }
+    ],
+    "oldFailurePath": "docs/test-evidence/go-recovery10-budget-recovery-generate-2026-10-06T09-45-16-415Z-d055372e.json",
+    "forwardedPaidPosts": 0,
+    "paidCalls": 0,
+    "oldQuoteMethod": "GET",
+    "diagnosticHttpStatus": 431,
+    "requestTargetBytes": 16572,
+    "nodeHttpDefaultMaxHeaderSize": 16384,
+    "oldComputedClaimPath": ".data/funded-acceptance/web-operation-guards/go-plan-recovery10-budget-45520bdfc187045235466447c09d710616b7b8206e34c69cae70e5be8a61bd61.json",
+    "oldClaimState": "not-created; actual ENOENT before successor",
+    "oldClaimFabricated": false,
+    "oldClaimDeleted": false,
+    "oldRequestReplayed": false,
+    "oldProjectVersion": 9,
+    "oldPhaseTotalBefore": 3.2281715999999983,
+    "oldPhaseTotalAfter": 3.2281715999999983
+  },
+  "historicalBudgetEvidence": {
+    "sources": [
+      {
+        "path": "docs/test-evidence/go-recovery9-recovery-generate-2026-10-06T09-30-36-230Z-64c861ab.json",
+        "sha256": "1268344c38f0b8f64f8a35143ab1c1aaa9a2ba5f71060e8babd5e25af855745f"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery9-recovery-confirm-2026-10-06T09-32-37-706Z-dc811da2.json",
+        "sha256": "64cca6774f331533a736f8da6c2254ab7bfc2b6e9b0f101afc1cd7bad296ff27"
+      },
+      {
+        "path": "docs/test-evidence/go-recovery-v8-timeout-final-2026-10-06T09-15-52-032Z-a0c56f97/usage.json",
+        "sha256": "6630a0712b3b1ab575f1d06ec6d8df76ad491b993b254d96c26f11d9b26c9b22"
+      },
+      {
+        "path": "docs/test-evidence/helpers/generate-go-recovery9-pinned-v1-web-2026-10-06.mjs",
+        "sha256": "63dc27064071083458a565cc545a0748210e6611b95bc99e90d9ab0de29fbc90"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/go-plan-recovery9-07e7d5f977fad359217426390e868ece43a5aae4b997cbb5cc377592e2b60a5c.json",
+        "sha256": "7228cb13039e01ad23ff526d6fc6430889db31a02a4531723cd7af5d766c5ad5"
+      },
+      {
+        "path": ".data/funded-acceptance/web-operation-guards/go-plan-recovery9-4f6998eed5871e1aff3ea965f3d7492740f67b5809d8abec52fb6bbf4f42d6dc.json",
+        "sha256": "82a6586d3adc49f641ef90197d2fb46319eb01f37fcce9d48dc30b79a406234d"
+      }
+    ],
+    "baselines": {
+      "recoveredReview": {
+        "runId": "f0f68b82-eeaf-493f-9f54-c932504e430a",
+        "taskId": "qa_review",
+        "calls": 9,
+        "inputTokens": 369161,
+        "outputTokens": 3700,
+        "cost": 0.1151883,
+        "maximumCallCost": 0.019631399999999997,
+        "receiptIds": [
+          "5501205a-1242-4ddd-b6ab-7fdc9358323d",
+          "89cfe88b-a7b4-4c82-8c1c-18b08995e76e",
+          "5472a745-1336-4dce-b8f0-ae5e0e318a02",
+          "72aa5f3e-b524-4916-af88-1591c36b92b1",
+          "ae6d61c4-fbd9-4843-b9d0-3d3e3c0ad285",
+          "73193399-e4bb-4485-899d-713a625a3570",
+          "b513d3cd-1cee-4788-bae1-8af854e7ae42",
+          "4c98aa8f-e6a3-431a-a9d1-bd605c928074",
+          "2415604a-c962-402d-ae09-2908ca764eda"
+        ]
+      },
+      "recoveredManager": {
+        "runId": "f0f68b82-eeaf-493f-9f54-c932504e430a",
+        "taskId": "manager_accept",
+        "calls": 6,
+        "inputTokens": 222458,
+        "outputTokens": 6063,
+        "cost": 0.074013,
+        "maximumCallCost": 0.021347699999999997,
+        "receiptIds": [
+          "5fb3df88-a14b-4f1a-a194-5e8f280f2ce6",
+          "54dae2b7-7ab8-4737-8d4f-aa098bbb4aab",
+          "7c43abac-9417-414c-8ade-3c1bf1127544",
+          "446296a7-2843-4c75-98b7-affe8de58e85",
+          "90dc331e-b0b5-4ec1-a933-7b2b240c08e7",
+          "53c1b534-f3aa-44d6-808f-e23e0cbbe937"
+        ]
+      },
+      "normalReview": {
+        "runId": "17af4ec6-379e-47bc-9b6b-0afd16d49869",
+        "taskId": "qa_review",
+        "calls": 8,
+        "inputTokens": 410752,
+        "outputTokens": 3425,
+        "cost": 0.12733559999999997,
+        "maximumCallCost": 0.0188652,
+        "receiptIds": [
+          "a2c7e8f6-60a1-4579-bbfe-8044a50ddf09",
+          "61cf8e96-ebc7-4775-846f-925235420ecf",
+          "8ee4a1e3-6293-4844-9e06-9aeb46f38b67",
+          "3b98f89d-fc44-4f95-8c21-a97bde036076",
+          "6e2ab7cf-4d35-4b14-906d-53f5b44d8d50",
+          "aeae4335-c1fb-4a11-a92f-63473b382446",
+          "b264c76e-0946-49ee-8c05-fc076bfed2b1",
+          "45047007-f3cf-468d-9327-1bec3b13e65b"
+        ]
+      }
+    },
+    "sourceVersion": 9,
+    "oldSavedPlanValid": true,
+    "oldSavedPlanApproved": false,
+    "v9PlanningReceipt": {
+      "id": "a322ee73-ec5e-4043-8373-27a44f9aa594",
+      "cost": 0.0083841,
+      "inputTokens": 11879,
+      "outputTokens": 4017
+    },
+    "oldTaskEstimates": [
+      {
+        "taskId": "qa_review",
+        "maxBudget": 0.11,
+        "estimatedInputTokens": 200000,
+        "estimatedOutputTokens": 16000
+      },
+      {
+        "taskId": "manager_accept",
+        "maxBudget": 0.09,
+        "estimatedInputTokens": 160000,
+        "estimatedOutputTokens": 12000
+      }
+    ],
+    "oldRequestsReplayed": false,
+    "oldPermanentIntentsRemoved": false,
+    "oldCandidateHandEdited": false
+  },
+  "revisionCharacters": 3951,
+  "checks": [
+    {
+      "name": "actual0POST/unchanged v9/phase/no fee source accepted",
+      "passed": true
+    },
+    {
+      "name": "actual431 with16572 URL exceeding16384 bound preserved",
+      "passed": true
+    },
+    {
+      "name": "computed old claim honestly remains absent",
+      "passed": true
+    },
+    {
+      "name": "invented old paid POST makes successor proof invalid",
+      "passed": true
+    },
+    {
+      "name": "old candidate cannot be invented",
+      "passed": true
+    },
+    {
+      "name": "unknown old claim state blocks new successor",
+      "passed": true
+    },
+    {
+      "name": "complete contract revision fits4000 and differs from old longURL body",
+      "passed": true
+    },
+    {
+      "name": "all real budget baselines preserved",
+      "passed": true
+    },
+    {
+      "name": "independent shared/QAprivate and pinned parent10 v1 preserved",
+      "passed": true
+    },
+    {
+      "name": "actual current v9 producer inputs without SHA accepted",
+      "passed": true
+    },
+    {
+      "name": "future producer copying any old SHA rejected",
+      "passed": true
+    },
+    {
+      "name": "historical task budgets guard still active and rejects old insufficient v9",
+      "passed": true
+    },
+    {
+      "name": "exact POST quote is read-only/not paid/not intent",
+      "passed": true
+    },
+    {
+      "name": "quote with key or truncated body blocked",
+      "passed": true
+    },
+    {
+      "name": "fixed unique successor and no paid correction variants",
+      "passed": true
+    },
+    {
+      "name": "quote/gen/confirm raw bytes retained",
+      "passed": true
+    },
+    {
+      "name": "GO_QUOTE_POST_FIX_LOADED prevents any API without root authorization",
+      "passed": true
+    },
+    {
+      "name": "GO_PRODUCER_PIN_VALIDATION_FIX_LOADED prevents any API without root authorization",
+      "passed": true
+    },
+    {
+      "name": "GO_RECOVERY10_POST_QUOTE_GENERATION_APPROVED prevents any API without root authorization",
+      "passed": true
+    }
+  ],
+  "independentPaidMarker": "GO_RECOVERY10_POST_QUOTE_GENERATION_APPROVED=root-confirmed-2026-10-06",
+  "fixedPermanentSuccessorPrefix": "go-plan-recovery10-budget-postquote-producer-successor-20261006-",
+  "scope": {
+    "apiCalls": 0,
+    "browserLaunches": 0,
+    "paidCalls": 0,
+    "confirms": 0,
+    "approvals": 0,
+    "serviceOperations": 0,
+    "originalDatabaseOpened": false,
+    "keysRead": false,
+    "employeeArtifactsAuthored": false,
+    "existingCandidateChanged": false,
+    "oldHelpersChanged": false,
+    "oldAbsentClaimFabricated": false,
+    "actualOldIntentsRemoved": false
+  },
+  "status": "frozen-offline-awaiting-root-loaded-fixes-and-explicit-recovery10-successor-paid-authorization"
+}

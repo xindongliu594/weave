@@ -1,0 +1,163 @@
+{
+  "kind": "go-funded-knowledge-first-v2-helper-preparation",
+  "frozenAt": "2026-10-06T04:10:07Z",
+  "helper": {
+    "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+    "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+  },
+  "pureTest": {
+    "path": "tests/go-funded-knowledge-upgrade.test.mjs",
+    "sha256": "24d18c2ac45f87e39b8a4d0bef90cf955daeeb072e22831c9a467b4cb137ea63"
+  },
+  "unchangedDependencies": [
+    {
+      "path": "docs/test-evidence/helpers/drive-funded-knowledge-2026-10-05.mjs",
+      "sha256": "29b8a01b5e3b26eb9cf62d0bfb18bbe526ac5a25de01427c53c1a8a7551e36b8"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    }
+  ],
+  "actualSources": [
+    {
+      "path": "docs/test-evidence/go-headroom-recovery-confirm-2026-10-06T03-56-22-910Z-d1533bf8.json",
+      "sha256": "bc495d90069378832e7106495e308068daf28b5698062fe7ac22c716d9ce971f",
+      "httpStatus": 200
+    },
+    {
+      "path": "docs/test-evidence/go-headroom-recovery-generate-2026-10-06T03-53-44-337Z-6af3adfa.json",
+      "sha256": "1524484f225d6cb3dcee6c5e7cf41370f37abb89b35507b68581b6974a8be151",
+      "httpStatus": 200
+    },
+    {
+      "path": "docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json",
+      "sha256": "c09d5e29742a8f5fd40c499555103a95d09422b6dad65eddce88063da0aa9693",
+      "status": "passed",
+      "action": "finish-setup"
+    }
+  ],
+  "offlineActualBinding": {
+    "version": 7,
+    "planningReceiptId": "8d02d818-9599-48df-b3a2-5bb41c4a24bc",
+    "planningCost": 0.0071565,
+    "retained": false,
+    "parentRunVerified": false,
+    "stopVerified": false
+  },
+  "documents": [
+    {
+      "id": "74bcc49b-db5d-4729-9e5d-c430f10d6d5d",
+      "spaceId": "be232aec-3cf7-4f58-a12f-c724bccbd4f8",
+      "oldSha256": "4978203d4ba0eb49f45d998c3772b22fdc707fddea6cb6b21f92652ab51f7650",
+      "newSha256": "cac632f60a9a1cc9ffef3e47ddb06f00efa2dd5558b85f8f2d9105a3673d130b",
+      "expectedVersion": 1,
+      "targetVersion": 2
+    },
+    {
+      "id": "9ae89b98-2eb2-4302-b79b-ea12ae9a2be7",
+      "spaceId": "1db04ce1-859d-4520-8b37-2e88dc88c16f",
+      "oldSha256": "77dfac48cfc2a2224906008f3f3246587765031c784a7e59c6a9cb81311eda93",
+      "newSha256": "52231e2e92ceb0600a47b16b9037f4a739c719d21ea050b517c7104363ce0220",
+      "expectedVersion": 1,
+      "targetVersion": 2
+    }
+  ],
+  "projectId": "3e101c24-87e6-43ea-80f9-a2c4b0b410f4",
+  "departmentId": "f16bb7ee-6868-417d-a9c6-9229d7fa7339",
+  "grants": {
+    "manager": [
+      "be232aec-3cf7-4f58-a12f-c724bccbd4f8"
+    ],
+    "developer": [
+      "be232aec-3cf7-4f58-a12f-c724bccbd4f8"
+    ],
+    "qa": [
+      "be232aec-3cf7-4f58-a12f-c724bccbd4f8",
+      "1db04ce1-859d-4520-8b37-2e88dc88c16f"
+    ]
+  },
+  "testRuns": [
+    {
+      "command": "node --check docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node --check tests/go-funded-knowledge-upgrade.test.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node --test tests/go-funded-knowledge-upgrade.test.mjs",
+      "exitCode": 0,
+      "tests": 34,
+      "pass": 34,
+      "fail": 0,
+      "skip": 0
+    }
+  ],
+  "preparationBoundaries": {
+    "realProductApiCalls": 0,
+    "directOriginalDatabaseOpens": 0,
+    "realModelCalls": 0,
+    "paidProviderCalls": 0,
+    "credentialReads": 0,
+    "employeeDeliverableReadsOrWrites": 0,
+    "realDocumentUpdates": 0,
+    "networkFetchCallsInFixtures": 0,
+    "browserMainExecuted": false
+  },
+  "futureGuard": {
+    "exactExplicitDynamicRunVersionRequired": true,
+    "confirmationAndGenerationChainRequired": true,
+    "actualSuccessfulStopReportRequired": true,
+    "stopFullBeforeAfterRawFileShaVerified": true,
+    "stopProofRecomputedWithFrozenHelper": true,
+    "freshCancelledParentSameGoPlanVersion": true,
+    "completeOriginalTwoDocumentPinsRequired": true,
+    "chunkCountAndOriginalSourceRequired": true,
+    "exactNativeEmployeeDocumentAuthorization": true,
+    "noChildOrSecondSameVersionRun": true,
+    "noActiveRuns": true,
+    "parentNativeUnknownCountMustBeExplicitZero": true,
+    "noPendingProjectModelCalls": true,
+    "recoveryUnknownFeeCountZero": true,
+    "allUsageAndAllProjectReadinessUnchanged": true,
+    "modelsGatewaysPlanPermissionsEventsNativeOperationsAndEmployeeManifestUnchanged": true,
+    "firstUpdateExactlyTwoExistingDocumentPuts": true,
+    "eachPutExpectedVersion": 1,
+    "eachResponseRequiredVersion": 2,
+    "bodyFields": [
+      "spaceId",
+      "title",
+      "content",
+      "version"
+    ],
+    "noOtherMutationAllowed": true,
+    "noFeeMaintenanceOrProviderQueries": true,
+    "persistentProjectFirstUpdateIntentWx": true,
+    "noRetryAfterPartialOrUnknownOutcome": true,
+    "unassignedReceiptsFreshlyQueried": false
+  },
+  "liveVerification": {
+    "parentRunId": null,
+    "stopEvidence": null,
+    "parentPin": false,
+    "childAbsence": false,
+    "documentVersion2Update": false,
+    "parentPinPreservedAfterUpdate": false,
+    "restartResumeOrQA": false
+  },
+  "cli": "node docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs update-v2 --run-id=ACTUAL_PARENT_UUID --version=7 --confirmed-evidence=docs/test-evidence/go-headroom-recovery-confirm-2026-10-06T03-56-22-910Z-d1533bf8.json --generation-evidence=docs/test-evidence/go-headroom-recovery-generate-2026-10-06T03-53-44-337Z-6af3adfa.json --setup-evidence=docs/test-evidence/funded-knowledge-recovery-finish-setup-2026-10-05T12-57-22-336Z-a97d6738/result.json --stop-evidence=docs/test-evidence/ACTUAL_SUCCESSFUL_GO_STOP.json",
+  "limitations": [
+    "Prepared only; no live product/API/browser or document action was executed.",
+    "ACTUAL_PARENT_UUID and actual successful stop report must come from root; parser fixtures are not real run identities.",
+    "Confirmed version7 can change only with a new exact confirmation/generation chain; actual parent/current project/stop report must match that explicit version.",
+    "Future public GET APIs read the product database through the application; helper never opens it directly.",
+    "No GET /costs: fresh global unassigned reservations are not queried, and outside-project GLM/old unknown fees are not asserted zero. Full actual stop receipts are retained offline; usage and every existing project ledger are compared live.",
+    "Catalog v2 updates preserve approved v1 references and old revisions. They do not themselves resume a run or prove employee retrieval, QA or recovery."
+  ]
+}

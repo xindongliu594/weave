@@ -1,0 +1,1 @@
+{"status":"controlled-stop-checkpoint-and-derived-release-verified; service/recovery/QA still unverified","report":"C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\go-controlled-stop-release-reconciled-2026-10-06T12-33-29-183Z-be369391.json","proofStatus":"passed","released":4.150841,"liveOperations":0}

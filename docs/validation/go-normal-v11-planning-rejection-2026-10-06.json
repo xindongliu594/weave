@@ -1,0 +1,94 @@
+{
+  "checkedAt": "2026-10-06T07:49:39.297Z",
+  "kind": "known-http422-normal-v11-planning-rejection",
+  "outcome": "no-valid-candidate-no-v11-no-new-run",
+  "generationEvidence": {
+    "path": "docs/test-evidence/go-admission-normal-generate-2026-10-06T07-47-19-645Z-b3726cc6.json",
+    "sha256": "3eceed1b9436b1b925428d3f8581cf28d16ab24071cfedb6da657e3db6e9eae9",
+    "httpStatus": 422,
+    "posts": 1,
+    "requestKey": "af5af5a2-3441-4c4b-9c26-e09fcbf2ab1d",
+    "claimPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.data\\funded-acceptance\\web-operation-guards\\go-plan-admission-9ea35e6a97cff47d177a44a38dec68c8db7c62da834564ed6d59880dea70a76d.json",
+    "screenshotPath": "C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\docs\\test-evidence\\screenshots\\go-admission-normal-generate-2026-10-06T07-47-19-645Z-b3726cc6.png"
+  },
+  "rawDirectory": "docs/test-evidence/go-normal-v11-planning-rejection-2026-10-06T07-49-35-319Z-f3e18e38",
+  "sources": [
+    {
+      "method": "GET",
+      "endpoint": "/projects",
+      "status": 200,
+      "bytes": 109895,
+      "sha256": "a0c1dcbb1ce0d959b923b859abbb4df0d29bd6f0c4a9b78aafd94fefbbd0ce65",
+      "file": "projects.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/usage",
+      "status": 200,
+      "bytes": 265692,
+      "sha256": "c06610cb4e10c43dfd11f0c77aadc2bbc0c3e8ef15458545132ea38ce77a4e61",
+      "file": "usage.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/projects/4938eab8-26ed-4f60-9413-d979f05fa968/cost-readiness",
+      "status": 200,
+      "bytes": 263,
+      "sha256": "a07f91fac1d3f586f75a01bff8ab23e801ca3540e178ac504ee31d4b99c8d2ca",
+      "file": "cost-readiness.json"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/runs",
+      "status": 200,
+      "bytes": 13323,
+      "sha256": "784cd2cc10de12d6d160fd79bef0a99d7a8950afce6708c8e6626b2a3ea0de12",
+      "file": "runs.json"
+    }
+  ],
+  "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+  "savedVersion": 10,
+  "savedPlanUnchanged": true,
+  "policyUnchanged": true,
+  "receipt": {
+    "id": "52a67c7f-5a3f-4c74-b42e-b3ad857bf840",
+    "cost": 0.0076461,
+    "inputTokens": 10107,
+    "outputTokens": 3845,
+    "modelId": "fcce40cf-3172-4863-b0bd-776673f499e6"
+  },
+  "readiness": {
+    "recordedCost": 1.6723829,
+    "reserved": 0.096526,
+    "availableBudget": 2.410791100000001,
+    "pendingCount": 0,
+    "uncertainCount": 1,
+    "receipts": [
+      {
+        "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+        "amount": 0.096526,
+        "status": "uncertain",
+        "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af"
+      }
+    ]
+  },
+  "beforePhaseTotal": 3.060785999999998,
+  "afterPhaseTotal": 3.068432099999998,
+  "scope": {
+    "paidCalls": 1,
+    "confirms": 0,
+    "projectApprovals": 0,
+    "commandApprovals": 0,
+    "newRuns": 0,
+    "serviceOperations": 0,
+    "originalDatabaseOpenedDirectly": false,
+    "keysRead": false,
+    "employeeArtifactsAuthoredByCodex": false,
+    "unknownCostsWaived": false,
+    "paidRequestReplayed": false,
+    "permanentWxIntentPreserved": true,
+    "oldRunFailedPreserved": true,
+    "deliveryInspectorIssued": false
+  },
+  "limitation": "Model returned invalid JSON. No candidate was modified by Codex; a further paid request requires root direction under the original funded scope."
+}

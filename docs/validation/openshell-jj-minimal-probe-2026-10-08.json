@@ -1,0 +1,280 @@
+{
+  "date": "2026-10-08",
+  "stage": "blocked: official image pull failed before workload activation",
+  "name": "weiwu-probe-0e69d0d",
+  "gateway": "weiwu-openshell-v012",
+  "officialNode": {
+    "tag": "node:24.19.0-bookworm-slim",
+    "indexDigest": "sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df",
+    "amd64Digest": "sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+    "configDigest": "sha256:622f209f6c16ba5af4d9a337cae6577d096f17174b904cfc6a5b0c81a2679c24",
+    "user": null,
+    "workdir": null,
+    "layersPulledDuringRegistryCheck": false
+  },
+  "image": "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+  "policySha256": "ccce5f475c9418dd2450219f72dc3bc887e8f91a377c97651c2cb786d1d870c1",
+  "resources": {
+    "cpu": "1",
+    "memory": "512Mi"
+  },
+  "providerAttachments": [],
+  "createCount": 2,
+  "modelCalls": 0,
+  "policy": "# Minimal zero-model probe on stock node:24.19.0-bookworm-slim.\nversion: 1\nfilesystem_policy:\n  include_workdir: false\n  read_only: [/bin, /usr, /lib, /lib64, /etc, /proc, /dev/urandom, /var/tmp, /sandbox]\n  read_write: [/tmp, /dev/null]\nlandlock:\n  compatibility: hard_requirement\nprocess:\n  run_as_user: \"1000\"\n  run_as_group: \"1000\"\nnetwork_policies: {}\nnetwork_middlewares: {}\n",
+  "sources": [
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/docs/how-it-works/policies/schema.mdx",
+    "https://github.com/NVIDIA/OpenShell/blob/v0.1.2/crates/openshell-driver-docker/src/lib.rs#L582-L653",
+    "https://github.com/nodejs/docker-node"
+  ],
+  "sandboxId": "297d673e-400e-4e3f-9c73-fc4fe474964a",
+  "admittedSandboxCreates": 1,
+  "preflightNotFound": {
+    "name": "weiwu-probe-0e69d0d",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "Error:   × code: 'Some requested entity was not found', message: \"sandbox not found\"\n\n"
+  },
+  "rawEvidence": {
+    "priorRejectedCreate": {
+      "name": "weiwu-probe-0e69d0d5-5f20-46a5-b05a-a107d43fc9bd",
+      "remoteEvidenceDir": "/home/jj/.local/share/weiwu/probes/weiwu-probe-0e69d0d5-5f20-46a5-b05a-a107d43fc9bd",
+      "createCount": 1,
+      "sentAtUtc": "2026-10-08T08:29:27.440407+00:00",
+      "command": [
+        "/home/jj/.local/share/weiwu/runtime/openshell-v0.1.2/openshell",
+        "--gateway",
+        "weiwu-openshell-v012",
+        "sandbox",
+        "create",
+        "--name",
+        "weiwu-probe-0e69d0d5-5f20-46a5-b05a-a107d43fc9bd",
+        "--from",
+        "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "--policy",
+        "/home/jj/.local/share/weiwu/probes/weiwu-probe-0e69d0d5-5f20-46a5-b05a-a107d43fc9bd/policy.yaml",
+        "--cpu",
+        "1",
+        "--memory",
+        "512Mi",
+        "--no-auto-providers",
+        "--approval-mode",
+        "manual",
+        "--detach",
+        "--no-tty",
+        "--output",
+        "json",
+        "--",
+        "/bin/sleep",
+        "infinity"
+      ],
+      "stage": "create returned",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Error:   × code: 'Client specified an invalid argument', message: \"name exceeds\n  │ maximum length (48 > 19)\"\n\n"
+    },
+    "correctedCreate": {
+      "name": "weiwu-probe-0e69d0d",
+      "remoteEvidenceDir": "/home/jj/.local/share/weiwu/probes/weiwu-probe-0e69d0d",
+      "createCount": 1,
+      "priorInvalidLongName": "weiwu-probe-0e69d0d5-5f20-46a5-b05a-a107d43fc9bd",
+      "sentAtUtc": "2026-10-08T08:30:46.773609+00:00",
+      "command": [
+        "/home/jj/.local/share/weiwu/runtime/openshell-v0.1.2/openshell",
+        "--gateway",
+        "weiwu-openshell-v012",
+        "sandbox",
+        "create",
+        "--name",
+        "weiwu-probe-0e69d0d",
+        "--from",
+        "docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+        "--policy",
+        "/home/jj/.local/share/weiwu/probes/weiwu-probe-0e69d0d/policy.yaml",
+        "--cpu",
+        "1",
+        "--memory",
+        "512Mi",
+        "--no-auto-providers",
+        "--approval-mode",
+        "manual",
+        "--detach",
+        "--no-tty",
+        "--output",
+        "json",
+        "--",
+        "/bin/sleep",
+        "infinity"
+      ],
+      "stage": "corrected create returned",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Provisioning sandbox (structured output on stdout)...\nError:   × sandbox entered error phase while provisioning: ImagePullFailed: pull\n  │ Docker image failed: Docker responded with status code 500: failed to\n  │ resolve reference \"docker.io/library/node:24.19.0-bookworm-\n  │ slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f1\n  │ 74\": failed to do request: Head \"https://registry-1.docker.io/v2/library/\n  │ node/manifests/\n  │ sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174\":\n  │ dial tcp 202.160.129.6:443: i/o timeout\n\n"
+    },
+    "actualGet": {
+      "name": "weiwu-probe-0e69d0d",
+      "exitCode": 0,
+      "stdout": "{\n  \"annotations\": {\n    \"internal.openshell.ai/auth-epoch\": \"1\",\n    \"internal.openshell.ai/gateway-token-id\": \"99c4ad99-aa26-4eb6-b01c-587059c44374\",\n    \"internal.openshell.ai/runtime-generation\": \"cd68349a-659e-477f-b29f-bdec7902f4fa\"\n  },\n  \"conditions\": [\n    {\n      \"last_transition_time\": \"\",\n      \"message\": \"pull Docker image failed: Docker responded with status code 500: failed to resolve reference \\\"docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174\\\": failed to do request: Head \\\"https://registry-1.docker.io/v2/library/node/manifests/sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174\\\": dial tcp 202.160.129.6:443: i/o timeout\",\n      \"reason\": \"ImagePullFailed\",\n      \"status\": \"False\",\n      \"type\": \"Ready\"\n    },\n    {\n      \"last_transition_time\": \"\",\n      \"message\": \"Waiting for effective configuration validation before workload activation\",\n      \"reason\": \"ConfigurationPending\",\n      \"status\": \"False\",\n      \"type\": \"ConfigurationReady\"\n    }\n  ],\n  \"configuration_admission\": {\n    \"config_revision\": 0,\n    \"error\": \"\",\n    \"policy_hash\": \"\",\n    \"policy_version\": 0,\n    \"provider_env_revision\": 0,\n    \"state\": \"pending\"\n  },\n  \"created_at\": \"2026-10-08 08:30:46\",\n  \"created_from_workload_template\": null,\n  \"current_policy_version\": 0,\n  \"endpoint_statuses\": [],\n  \"exit_code\": null,\n  \"id\": \"297d673e-400e-4e3f-9c73-fc4fe474964a\",\n  \"labels\": {},\n  \"name\": \"weiwu-probe-0e69d0d\",\n  \"phase\": \"Error\",\n  \"policy\": {\n    \"filesystem_policy\": {\n      \"include_workdir\": false,\n      \"read_only\": [\n        \"/bin\",\n        \"/usr\",\n        \"/lib\",\n        \"/lib64\",\n        \"/etc\",\n        \"/proc\",\n        \"/dev/urandom\",\n        \"/var/tmp\",\n        \"/sandbox\"\n      ],\n      \"read_write\": [\n        \"/tmp\",\n        \"/dev/null\"\n      ]\n    },\n    \"landlock\": {\n      \"compatibility\": \"hard_requirement\"\n    },\n    \"process\": {\n      \"run_as_group\": \"1000\",\n      \"run_as_user\": \"1000\"\n    },\n    \"version\": 1\n  },\n  \"policy_source\": \"sandbox\",\n  \"provisioning\": {\n    \"attempt_id\": \"0e1df276-1784-4872-aa6d-69a5c29a9772\",\n    \"cleanup_completed_time\": null,\n    \"cleanup_error\": \"\",\n    \"cleanup_retry_time\": null,\n    \"configuration_change_id\": \"46cb8863263e7cbfe0f923b0769955160e8a856aa078ec1911d5b02185c6d6dc\",\n    \"configuration_change_time\": \"2026-10-08T08:30:46.818Z\",\n    \"deadline\": \"2026-10-08T08:35:46.818Z\",\n    \"first_rejection_time\": null,\n    \"timeout_time\": null\n  },\n  \"resource_version\": 6,\n  \"revision\": 1,\n  \"workspace\": \"default\"\n}\n",
+      "stderr": ""
+    },
+    "actualPolicyGet": {
+      "command": [
+        "/home/jj/.local/share/weiwu/runtime/openshell-v0.1.2/openshell",
+        "--gateway",
+        "weiwu-openshell-v012",
+        "policy",
+        "get",
+        "weiwu-probe-0e69d0d",
+        "--full",
+        "--output",
+        "json"
+      ],
+      "exitCode": 0,
+      "stdout": "{\n  \"active_version\": 1,\n  \"config_revision\": 14748517472038726401,\n  \"hash\": \"a130dc461b446b99b9d8505c1433d1703ba80863ca092a7720f36c06cf1dabf6\",\n  \"policy\": {\n    \"filesystem_policy\": {\n      \"include_workdir\": false,\n      \"read_only\": [\n        \"/bin\",\n        \"/usr\",\n        \"/lib\",\n        \"/lib64\",\n        \"/etc\",\n        \"/proc\",\n        \"/dev/urandom\",\n        \"/var/tmp\",\n        \"/sandbox\"\n      ],\n      \"read_write\": [\n        \"/tmp\",\n        \"/dev/null\"\n      ]\n    },\n    \"landlock\": {\n      \"compatibility\": \"hard_requirement\"\n    },\n    \"process\": {\n      \"run_as_group\": \"1000\",\n      \"run_as_user\": \"1000\"\n    },\n    \"version\": 1\n  },\n  \"policy_source\": \"sandbox\",\n  \"sandbox\": \"weiwu-probe-0e69d0d\",\n  \"scope\": \"sandbox\",\n  \"status\": \"effective\",\n  \"version\": 1\n}\n",
+      "stderr": ""
+    }
+  },
+  "policyGet": {
+    "active_version": 1,
+    "config_revision": 14748517472038726000,
+    "hash": "a130dc461b446b99b9d8505c1433d1703ba80863ca092a7720f36c06cf1dabf6",
+    "policy": {
+      "filesystem_policy": {
+        "include_workdir": false,
+        "read_only": [
+          "/bin",
+          "/usr",
+          "/lib",
+          "/lib64",
+          "/etc",
+          "/proc",
+          "/dev/urandom",
+          "/var/tmp",
+          "/sandbox"
+        ],
+        "read_write": [
+          "/tmp",
+          "/dev/null"
+        ]
+      },
+      "landlock": {
+        "compatibility": "hard_requirement"
+      },
+      "process": {
+        "run_as_group": "1000",
+        "run_as_user": "1000"
+      },
+      "version": 1
+    },
+    "policy_source": "sandbox",
+    "sandbox": "weiwu-probe-0e69d0d",
+    "scope": "sandbox",
+    "status": "effective",
+    "version": 1
+  },
+  "actualGet": {
+    "annotations": {
+      "internal.openshell.ai/auth-epoch": "1",
+      "internal.openshell.ai/gateway-token-id": "99c4ad99-aa26-4eb6-b01c-587059c44374",
+      "internal.openshell.ai/runtime-generation": "cd68349a-659e-477f-b29f-bdec7902f4fa"
+    },
+    "conditions": [
+      {
+        "last_transition_time": "",
+        "message": "pull Docker image failed: Docker responded with status code 500: failed to resolve reference \"docker.io/library/node:24.19.0-bookworm-slim@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174\": failed to do request: Head \"https://registry-1.docker.io/v2/library/node/manifests/sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174\": dial tcp 202.160.129.6:443: i/o timeout",
+        "reason": "ImagePullFailed",
+        "status": "False",
+        "type": "Ready"
+      },
+      {
+        "last_transition_time": "",
+        "message": "Waiting for effective configuration validation before workload activation",
+        "reason": "ConfigurationPending",
+        "status": "False",
+        "type": "ConfigurationReady"
+      }
+    ],
+    "configuration_admission": {
+      "config_revision": 0,
+      "error": "",
+      "policy_hash": "",
+      "policy_version": 0,
+      "provider_env_revision": 0,
+      "state": "pending"
+    },
+    "created_at": "2026-10-08 08:30:46",
+    "created_from_workload_template": null,
+    "current_policy_version": 0,
+    "endpoint_statuses": [],
+    "exit_code": null,
+    "id": "297d673e-400e-4e3f-9c73-fc4fe474964a",
+    "labels": {},
+    "name": "weiwu-probe-0e69d0d",
+    "phase": "Error",
+    "policy": {
+      "filesystem_policy": {
+        "include_workdir": false,
+        "read_only": [
+          "/bin",
+          "/usr",
+          "/lib",
+          "/lib64",
+          "/etc",
+          "/proc",
+          "/dev/urandom",
+          "/var/tmp",
+          "/sandbox"
+        ],
+        "read_write": [
+          "/tmp",
+          "/dev/null"
+        ]
+      },
+      "landlock": {
+        "compatibility": "hard_requirement"
+      },
+      "process": {
+        "run_as_group": "1000",
+        "run_as_user": "1000"
+      },
+      "version": 1
+    },
+    "policy_source": "sandbox",
+    "provisioning": {
+      "attempt_id": "0e1df276-1784-4872-aa6d-69a5c29a9772",
+      "cleanup_completed_time": null,
+      "cleanup_error": "",
+      "cleanup_retry_time": null,
+      "configuration_change_id": "46cb8863263e7cbfe0f923b0769955160e8a856aa078ec1911d5b02185c6d6dc",
+      "configuration_change_time": "2026-10-08T08:30:46.818Z",
+      "deadline": "2026-10-08T08:35:46.818Z",
+      "first_rejection_time": null,
+      "timeout_time": null
+    },
+    "resource_version": 6,
+    "revision": 1,
+    "workspace": "default"
+  },
+  "checks": {
+    "registryDigestVerification": "passed through existing explicitly configured proxy; no layers downloaded by this check",
+    "gatewayAuthentication": "Root independently verified connected and authenticated after port repair",
+    "creation": "one length validation rejection, then one admitted named sandbox",
+    "workloadActivation": "blocked by Docker Hub daemon pull timeout",
+    "nonRootUidGid": "not run",
+    "workspaceWrite": "not run",
+    "worldWritableOutsideWriteDenial": "not run",
+    "networkDenial": "not run",
+    "stopRestart": "not run",
+    "cpuMemoryEnforcement": "not verified; only request values recorded",
+    "modelRequestsIssuedByProbe": 0,
+    "mvpLedgerDelta": "not audited by this subtask; Root owns ledger audit"
+  },
+  "preserved": {
+    "failedSandbox": true,
+    "originalMvpFiles": true,
+    "databaseOrCredentialReads": false,
+    "dockerGroupOrProxyChanges": false,
+    "sudoUsed": false
+  },
+  "nextStep": "Administrator-controlled preload of this exact official amd64 image into existing daemon using a reviewed proxy/archive route; retain failed sandbox and evidence. Do not create a new sandbox or replay unknown external operations."
+}

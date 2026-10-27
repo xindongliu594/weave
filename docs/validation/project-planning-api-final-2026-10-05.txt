@@ -1,0 +1,101 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2622.5064ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (153.2679ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (154.5539ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (232.0283ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (186.3377ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (209.4848ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (135.2583ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (184.75ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4488.8195
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (2314.9612ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (318.2727ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (174.5722ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (162.8929ms)
+✔ approval freezes per-call output limits separately from the cumulative task estimates (102.8818ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (303.1973ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.3991ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.2572ms) # requires independent PostgreSQL backends and row locks
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (812.9372ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 5000.2451
+✔ gateway discovery, formal execution, versioned plans and deletion preserve history (5296.5966ms)
+✔ organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost (450.2058ms)
+✔ model planning preserves user input scope and refuses to remove an input recipient (258.6964ms)
+✔ dynamic loopback preview can save a gateway through the local proxy (18.8549ms)
+✔ cross-origin mutations, remote host headers, and malformed data fail closed (29.625ms)
+✔ trace verification API persists a run and serves history after recreating the app (2131.5556ms)
+✔ one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings (145.8792ms)
+✔ catalog refuses quotes fetched across a concurrent gateway edit (20.7585ms)
+✔ text replies accept null tool calls but reject malformed non-null calls and retain usage (169.4982ms)
+✔ gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes (86.6709ms)
+✔ gateway service checks reject results from a changed connection and diagnose a closed port (34.228ms)
+✔ official pricing is the default, matches exact models, and does not fetch relay public prices (12.7859ms)
+✔ planning timeouts preserve the saved plan and keep unresolved billing without automatic retries (636.5922ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9828.5625
+✔ selected imports reach planning and approval with exact path/SHA while unselected and private references stay isolated (2619.8972ms)
+✔ approval rejects a shared workspace import missing any file-tool employee grant (76.6362ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3212.395
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2191.9429ms)
+✔ documented GPT-4.1 JSON mode uses the same budget and makes no repair call or preview on invalid output (78.3714ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (95.3043ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (82.6845ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (41.4595ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (302.5066ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (139.4085ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (135.9123ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (168.1663ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (357.1416ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (88.5101ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (42.6888ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4217.9619
+✔ confirming a revised proposal updates the same team and draft project, records versions, and never executes (2233.2616ms)
+✔ execution state, archived teams and mismatched project ownership refuse an update without partial writes (102.9962ms)
+✔ all adopted planning charges count toward the updated budget and transfer only after successful confirmation (88.2003ms)
+✔ revisions still require preview identity and explicit tool permissions (46.969ms)
+✔ pending and uncertain project charges block a revision before any budget or team change (89.3404ms)
+✔ a team participating in another active project cannot be changed through a saved conversation (100.5326ms)
+✔ employee prompt revisions advance role versions while replay and unchanged roles preserve them (115.9885ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3236.3894

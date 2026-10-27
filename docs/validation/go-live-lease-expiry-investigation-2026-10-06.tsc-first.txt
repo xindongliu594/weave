@@ -1,0 +1,10 @@
+tests/run-live-lease.test.ts(60,24): error TS2345: Argument of type '"foreign-dead-worker"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.
+tests/run-live-lease.test.ts(66,49): error TS2322: Type '{ inputRate: number; outputRate: number; baseUrl: string; wireModel: string; maxOutputTokens: number; id: string; configurationHash: string; }[]' is not assignable to type 'RelayRoute[]'.
+  Type '{ inputRate: number; outputRate: number; baseUrl: string; wireModel: string; maxOutputTokens: number; id: string; configurationHash: string; }' is missing the following properties from type 'RelayRoute': name, apiKey
+tests/run-live-lease.test.ts(77,32): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(block: Promise<unknown> | (() => Promise<unknown>), message?: string | Error | undefined): Promise<void>', gave the following error.
+    Argument of type '((error: unknown) => boolean) | undefined' is not assignable to parameter of type 'string | Error | undefined'.
+      Type '(error: unknown) => boolean' is not assignable to type 'string | Error | undefined'.
+  Overload 2 of 2, '(block: Promise<unknown> | (() => Promise<unknown>), error: AssertPredicate, message?: string | Error | undefined): Promise<void>', gave the following error.
+    Argument of type '((error: unknown) => boolean) | undefined' is not assignable to parameter of type 'AssertPredicate'.
+      Type 'undefined' is not assignable to type 'AssertPredicate'.

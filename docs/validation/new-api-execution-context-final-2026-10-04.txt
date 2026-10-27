@@ -1,0 +1,28 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (2205.768ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (290.6827ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (325.0099ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.4536ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.2041ms) # requires independent PostgreSQL backends and row locks
+✔ legacy projects inherit only their existing scope; backup restores policy and historical policy versions (847.7785ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 4423.6376
+✔ new and configuration-only placeholder drafts are blocked before enqueue or billing (2320.4616ms)
+✔ resume and full retry of a legacy placeholder run cannot enqueue another attempt (77.6988ms)
+✔ concrete implementation assigned to an employee without tools is rejected (62.8681ms)
+✔ a deliberately edited single-person text plan can still be approved (88.4034ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3017.4984

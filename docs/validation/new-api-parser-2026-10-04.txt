@@ -1,0 +1,26 @@
+✔ catalog converts actual per-token prices, retains explicit free quotes and validates metadata (23.8428ms)
+✔ missing, blank, negative, nonfinite, partial and ambiguous quotes never become zero (0.9111ms)
+✔ fixed-call, tiered, unknown-currency, unit and out-of-range prices require manual reconciliation (2.3902ms)
+✔ New API returns group-specific quotes only for accessible models, without guessing this key's group (0.7343ms)
+✔ New API rejects incomplete ratios, duplicate quotes, fixed-call and missing group billing (1.2957ms)
+✔ unavailable price metadata cannot erase direct quotes or add unauthorised models (0.8677ms)
+✔ old gateways still validate and explicit price source is stored without accepting arbitrary URLs (1.9804ms)
+✔ New API deployments exposing enable_groups retain their group-specific prices (0.3268ms)
+✔ official quotes match exact IDs, carry their verification date, and never borrow a similar model price (0.6467ms)
+✔ usage retains explicit quota units and values without assuming money, unlimited usage or a balance (2185.7693ms)
+✔ logs preserve missing fields, log types and refunds without leaking display IDs or private content (30.6823ms)
+✔ public billing unit requires explicit compatible status metadata and never defaults to 500000 (2.0224ms)
+✔ queries saved-key endpoints at the same origin, public status without a key and strips private response fields (102.2635ms)
+✔ logs refusal, malformed JSON and oversized responses preserve available usage without exposing provider bodies (134.6963ms)
+✔ read-only routes reject posts and arbitrary paths before querying, never follow redirects and enforce timeout (150.3771ms)
+✔ configuration versions are checked before sending and after independent queries finish (5.6928ms)
+✔ completion persists response headers before parsing and preserves evidence callback failures (16.4186ms)
+✔ response evidence rejects exact Key, a prefixed Key, secret-like IDs and unsafe headers (13.3681ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3381.4244

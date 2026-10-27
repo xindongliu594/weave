@@ -1,0 +1,26 @@
+restore-open-1: exit=0 timedOut=false
+
+restore-open-2: exit=0 timedOut=false
+
+employee-development-tests: exit=0 timedOut=false
+✔ GET /todos 返回 200 与列表 (178.7165ms)
+✔ POST /todos 创建成功返回 201 与 {id,title,completed:false} (13.8385ms)
+✔ 创建的 ID 唯一且可用于后续路由 (48.7433ms)
+✔ GET /todos/:id 返回 200 与对应记录 (6.4608ms)
+✔ PATCH 更新 title 返回 200 与更新后记录 (34.7579ms)
+✔ PATCH 更新 completed 返回 200 与更新后记录 (31.803ms)
+✔ DELETE 返回 204 且无正文，之后 404 (46.2743ms)
+✔ 未知 ID 的 GET/PATCH/DELETE 返回 404 (34.0905ms)
+✔ POST 无效 body 返回 400 (60.5511ms)
+✔ PATCH 无效 JSON / 无效 title / 非布尔 completed / 空修改返回 400 (75.5567ms)
+✔ 无效更新不改变原记录（含混合合法与非法字段） (30.6981ms)
+✔ import server.mjs 不自动监听、不遗留活动服务 (4.9867ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 746.8275
+

@@ -1,0 +1,3 @@
+apps/api/src/budget-history.ts(33,46): error TS2339: Property 'projectId' does not exist on type '{ requirement: string; planVersion: number; templateVersion: string; agents: TraceAgent[]; tasks: TraceTask[]; approvedTasks?: TraceTask[] | undefined; approval: unknown; knowledge?: any; }'.
+tests/budget-history-admission.test.ts(11,41): error TS7016: Could not find a declaration file for module '../services/agent-runtime/run-evidence.mjs'. 'C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/run-evidence.mjs' implicitly has an 'any' type.
+tests/budget-history-admission.test.ts(49,34): error TS7022: 'version' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.

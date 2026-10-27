@@ -1,0 +1,98 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ short prose and one fence produce a paid candidate; only explicit confirmation saves it once (2441.8722ms)
+✔ ambiguous, malformed, oversized and schema-invalid output retains known fees and safe diagnostics without preview (656.0276ms)
+✔ length and content_filter fail after usage settlement even when their visible JSON is complete (313.2056ms)
+✔ wrapped candidates still require allowed models and available project budget (171.9363ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4156.7616
+
+✖ failing tests:
+
+test at tests\planning-output-api.test.ts:1:5761
+✖ short prose and one fence produce a paid candidate; only explicit confirmation saves it once (2441.8722ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-output-api.test.ts:67:139)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+✔ HTTP quote is read-only, uses the exact generation body and shares its reservation formula (2433.7975ms)
+✔ Astra-rate quote exposes both planning and net-budget limits without lowering output or making a call (154.5945ms)
+✔ a quote is not a ticket: a new pending hold blocks generation and stays unchanged (133.9467ms)
+✔ generation leaves the saved team and plan untouched; confirmation versions once and never starts a run (247.9379ms)
+✔ wrong project, stale version and same-version source changes cannot confirm a candidate (226.5025ms)
+✔ active runs block quotes, generation and candidate confirmation before any added call or plan write (235.6399ms)
+✔ invalid replies retain their fee receipt and cannot replace the original plan (135.7547ms)
+✔ explicit output bounds are quoted and sent unchanged; foreign preview kinds and invalid inputs are rejected (244.403ms)
+✔ quote retention parses only literal true/false and omitted or false choices keep unknown fees blocked (341.5168ms)
+✔ explicit retention generates and confirms within the net budget while old receipts, runs and unknown operations remain intact (343.3014ms)
+✔ retention never admits a pending receipt or changes its expired lease through read-only preflight (173.2922ms)
+✔ locked planning admission refuses expired pending fees before converting them into opt-in unknown fees (63.4107ms)
+✔ opt-in planning subtracts every unknown hold and rechecks a reduced net budget before another reservation (166.3752ms)
+✔ generation and confirmation keys retain legacy omitted bodies and reject a changed retention choice (308.1948ms)
+✔ Responses quotes expose context and net-budget failures read-only while keeping the explicit output bound (123.9433ms)
+✔ Responses quote and reservation count the full stateless wire envelope and reject one-byte context overflow before dispatch (278.1267ms)
+✔ a new user adjustment is quoted and pinned without editing the saved requirement, grants or prior plan (278.7402ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6482.1485
+✔ clarification replies retain global billed usage and do not create departments, previews or runs (2236.1098ms)
+✔ documented GPT-4.1 JSON mode uses the same budget and makes no repair call or preview on invalid output (124.9495ms)
+✔ second round uses conversation context but only user messages become the saved requirement; preview saves idempotently (151.045ms)
+✔ only explicitly granted filesystem tools produce a valid implementation and independent review draft (116.7669ms)
+✔ missing/unavailable models, malformed histories and insufficient request budget fail before provider dispatch (169.3785ms)
+✔ tool, hidden identity, external scopes and out-of-whitelist model proposals never overwrite existing drafts (484.5208ms)
+✔ the planner is separate from authorized Luna/Sol employee models while unavailable and ungranted IDs remain excluded (212.2666ms)
+✔ invalid JSON, task DAG, assigned file tools and automatic rework retain replies and billed usage without publishing drafts (246.5285ms)
+✔ revision context includes stored employee IDs and task DAG without inheriting old permissions (171.4229ms)
+✔ natural consultation, fenced replies and explicit null candidates continue without a draft or extra calls (310.7049ms)
+✔ partial candidates preserve useful replies, never render JSON fragments, and remain idempotent (616.9783ms)
+✔ long conversations retain all user requirements but send bounded recent context and earlier user excerpts (97.0497ms)
+✔ oversized prior previews use a marked bounded reference without sending truncated JSON to the model (56.653ms)
+✔ organization planning headers timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (311.426ms)
+✔ organization planning body timeout uses 180 seconds, preserves unknown cost and replays only the failed HTTP receipt (290.9265ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6179.225
+✔ API stores explicit protocol, keeps omitted legacy Chat fields, and rejects invalid protocol without creating a model (2323.5604ms)
+✔ Responses text API settles the full cached input and reserves captured wire bytes plus 1024 and the output cap (143.1214ms)
+✔ two API tool probes replay call_id history and keep Go session stable within each probe and isolated between probes (371.8224ms)
+✔ actual Responses wire budget and context limits reject before dispatch or a model reservation is inserted (656.1914ms)
+✔ valid usage plus malformed tool output is a settled paid probe failure with safe diagnostics (139.5296ms)
+✔ missing usage and HTTP 502 retain one uncertain fee and one dispatch without retry or synthetic-key leakage (240.9846ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4391.6764

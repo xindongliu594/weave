@@ -1,0 +1,121 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { goConfirmationFrame, goGenerationChain, goModelConfigHash, assertGoApprovedRun, parameters, fundedBudgetGuard, onePostClaim } from '../docs/test-evidence/helpers/operate-go-funded-run-guarded-web-2026-10-06.mjs';
+
+// Engineering-only in-memory guard inputs. They never become real confirmation
+// files, call product APIs, approve work, or substitute for employee acceptance.
+const id = value => `${String(value).padStart(8, '0')}-1111-4111-8111-111111111111`;
+const goId = 'fcce40cf-3172-4863-b0bd-776673f499e6';
+function fixture() {
+  const plan = { agents: [{ id: 'developer', role: 'member', tools: [], modelId: goId }, { id: 'qa', role: 'member', tools: [], modelId: goId }, { id: 'manager', role: 'manager', tools: [], modelId: goId }], tasks: ['dev', 'qa_verify', 'qa_review', 'manager_accept'].map(id => ({ id })) };
+  const policy = { maxBudget: 4, allowedModelIds: [goId] };
+  const beforeProject = { id: id(1), departmentId: id(2), version: 4, requirement: 'synthetic approved Todo requirement', plan: { previous: true }, policy };
+  const afterProject = { ...beforeProject, version: 5, plan, source: 'model' };
+  const candidate = { projectId: id(1), baseVersion: 4, previewId: id(3), usageId: id(4), plan, policy, retainUncertainCosts: true, revisionRequest: 'synthetic exact revision', validation: { valid: true } };
+  const currentModel = { name: 'Engineering fixture', model: 'deepseek-v4.1-flash', gatewayId: 'ff9080ff-c61a-4449-a360-c5e0662e7c5a', protocol: 'chat-completions', thinkingMode: 'disabled', inputRate: .3, outputRate: 1.2, contextWindowTokens: 131072,
+    id: goId, version: 3, status: 'available', capabilities: { tools: { status: 'supported', testId: id(5) } } };
+  const body = { modelId: goId, version: 4, maxPlanningCost: .2, maxOutputTokens: 8000, retainUncertainCosts: true, revisionRequest: candidate.revisionRequest };
+  return { config: { projectId: id(1), scenario: 'normal', version: 5, goModelId: goId },
+    proof: { kind: 'actual-go-project-replanning', action: 'confirm', scenario: 'normal', beforeProject, afterProject, candidate,
+      response: { status: 200, data: { ok: true, version: 5, validation: { valid: true } } }, currentModel, gatewayVersion: 1, currentModelConfigHash: goModelConfigHash(currentModel, 1), inferenceCallsRequested: 0, employeeFilesEdited: false, pageErrors: [],
+      requests: [{ method: 'POST', path: `/api/projects/${id(1)}/generate`, body, requestKey: id(6) },
+        { method: 'POST', path: `/api/projects/${id(1)}/generated-plan/confirm`, body: { previewId: id(3), version: 4, retainUncertainCosts: true }, requestKey: id(7) }] } };
+}
+const refusal = mutate => { const input = structuredClone(fixture()); mutate(input); assert.throws(() => goConfirmationFrame(input.proof, input.config)); };
+
+test('an actual-report-shaped 200 replan frame retains the existing project, department, exact new version and supported route', () => {
+  const input = fixture(), bound = goConfirmationFrame(input.proof, input.config);
+  assert.equal(bound.projectId, id(1)); assert.equal(bound.departmentId, id(2)); assert.equal(bound.version, 5);
+  assert.equal(bound.previewId, id(3)); assert.equal(bound.retained, true); assert.equal(bound.goModelId, goId);
+});
+
+test('old 201 creation confirmations, failures and cross-scenario/project/version frames are refused', () => {
+  for (const mutate of [
+    input => { input.proof.response.status = 201; }, input => { input.proof.kind = 'actual-new-department-confirmation'; },
+    input => { input.proof.failure = { code: 'synthetic failure' }; }, input => { input.proof.scenario = 'recovery'; },
+    input => { input.proof.afterProject.id = id(9); }, input => { input.proof.afterProject.departmentId = id(9); },
+    input => { input.config.version = 4; }, input => { input.proof.response.data.version = 6; },
+  ]) refusal(mutate);
+});
+
+test('changes to candidate, policy, requirement, preview, base version and retained-fee choice are refused', () => {
+  for (const mutate of [
+    input => { input.proof.afterProject.plan = { substituted: true }; }, input => { input.proof.afterProject.policy = { maxBudget: 5 }; },
+    input => { input.proof.afterProject.requirement += ' replaced'; }, input => { input.proof.requests[1].body.previewId = id(9); },
+    input => { input.proof.requests[1].body.version = 5; }, input => { input.proof.requests[1].body.retainUncertainCosts = false; },
+    input => { input.proof.requests[1].body.extraPermission = true; }, input => { input.proof.currentModelConfigHash = ''; },
+  ]) refusal(mutate);
+});
+
+test('another route or fallback and another/multiple confirmation mutation are refused', () => {
+  for (const mutate of [
+    input => { input.proof.afterProject.plan.agents[0].modelId = id(9); },
+    input => { input.proof.afterProject.plan.agents[0].fallbackModelId = id(9); },
+    input => { input.proof.requests[1].method = 'PUT'; }, input => { input.proof.requests[1].path = `/api/projects/${id(9)}/generated-plan/confirm`; },
+    input => { input.proof.requests.push(structuredClone(input.proof.requests[0])); },
+  ]) refusal(mutate);
+});
+
+function sourceChainFixture() {
+  const input = structuredClone(fixture()), proof = input.proof, sha = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+  const original = { kind: proof.kind, action: 'generate', scenario: proof.scenario, beforeProject: proof.beforeProject, afterProject: proof.beforeProject,
+    currentModel: proof.currentModel, gatewayVersion: 1, currentModelConfigHash: proof.currentModelConfigHash,
+    parameters: { projectId: id(1), ...proof.requests[0].body }, requests: [proof.requests[0]], candidate: proof.candidate,
+    response: { status: 200, data: proof.candidate }, quote: { allowed: true }, failure: { code: 'GO_PLANNING_UNCONFIRMED', status: 200, message: 'synthetic historical derived-cost comparison' },
+    pageErrors: [], employeeFilesEdited: false, afterBudget: { addedUsage: [{ id: id(4), projectId: id(1), runId: null, modelId: goId, purpose: '组织规划', inputTokens: 100, outputTokens: 20, cost: (100 * .3 + 20 * 1.2) / 1e6 }] } };
+  const recovered = { ...structuredClone(original), failure: undefined, observedAction: 'recover-known', inferenceCallsRequested: 0,
+    generationEvidence: 'docs/test-evidence/synthetic-original-paid-never-written.json', generationEvidenceSha256: sha(original) };
+  proof.generationEvidence = 'docs/test-evidence/synthetic-recovered-never-written.json'; proof.generationEvidenceSha256 = sha(recovered);
+  return { ...input, inputs: [{ path: proof.generationEvidence, sha256: sha(recovered), value: recovered }, { path: recovered.generationEvidence, sha256: sha(original), value: original }] };
+}
+
+test('an exact cached generation source chain retains the original positive fee; hash, key, fee and source changes fail closed', () => {
+  const positive = sourceChainFixture(), binding = goGenerationChain(positive.proof, positive.inputs, positive.config);
+  assert.equal(binding.planningReceiptId, id(4)); assert.equal(binding.planningCost, .000054); assert.equal(binding.generationSources.length, 2);
+  for (const mutate of [
+    input => { input.inputs[0].sha256 = 'f'.repeat(64); },
+    input => { input.inputs[0].value.requests[0].requestKey = id(99); },
+    input => { input.inputs[1].value.afterBudget.addedUsage[0].cost = 0; },
+    input => { input.inputs[1].value.response.status = 502; },
+    input => { input.inputs[1].value.currentModelConfigHash = 'f'.repeat(64); },
+    input => { input.inputs[1].value.failure.status = 502; },
+  ]) { const input = sourceChainFixture(); mutate(input); assert.throws(() => goGenerationChain(input.proof, input.inputs, input.config)); }
+});
+
+test('approved run binding rejects another gateway, route hash, thinking mode, price tier or role model', () => {
+  const input = fixture(), bound = goConfirmationFrame(input.proof, input.config);
+  const archive = { snapshot: { projectId: id(1), departmentId: id(2), planVersion: 5, mode: 'product', requirement: input.proof.afterProject.requirement, policy: input.proof.afterProject.policy, tasks: input.proof.afterProject.plan.tasks,
+    agents: input.proof.afterProject.plan.agents.map((agent, index) => ({ ...agent, id: 'employee-' + (index + 1), employeeId: agent.id, sourceAgentId: agent.id, sourceDepartmentId: id(2) })),
+    modelRoutes: [{ id: goId, gatewayId: 'ff9080ff-c61a-4449-a360-c5e0662e7c5a', baseUrl: 'https://opencode.ai/zen/go/v1', wireModel: 'deepseek-v4.1-flash', protocol: 'chat-completions', thinkingMode: 'disabled',
+      configurationHash: bound.currentModelConfigHash, toolCapabilityTestId: id(5), inputRate: .3, outputRate: 1.2, contextWindowTokens: 131072 }] } };
+  assertGoApprovedRun(archive, bound);
+  for (const mutate of [
+    value => { value.snapshot.modelRoutes[0].gatewayId = id(99); }, value => { value.snapshot.modelRoutes[0].baseUrl = 'https://old.invalid/v1'; },
+    value => { value.snapshot.modelRoutes[0].configurationHash = 'f'.repeat(64); }, value => { value.snapshot.modelRoutes[0].thinkingMode = undefined; },
+    value => { value.snapshot.modelRoutes[0].outputRate = .6; }, value => { value.snapshot.agents[0].modelId = id(99); },
+  ]) { const bad = structuredClone(archive); mutate(bad); assert.throws(() => assertGoApprovedRun(bad, bound)); }
+});
+
+test('operator parameters require both source files and the explicitly approved Go route, while retained choice remains explicit', () => {
+  const args = ['inspect', '--scenario=normal', `--normal-project-id=${id(1)}`, '--version=5', '--confirmed-evidence=docs/test-evidence/synthetic-confirm-never-written.json',
+    '--generation-evidence=docs/test-evidence/synthetic-generation-never-written.json', `--go-model-id=${goId}`, '--retain-uncertain-costs=true'];
+  assert.equal(parameters(args).retained, true); assert.equal(parameters(args).goModelId, goId);
+  assert.throws(() => parameters(args.filter(arg => !arg.startsWith('--generation-evidence='))));
+  assert.throws(() => parameters(args.map(arg => arg.startsWith('--go-model-id=') ? '--go-model-id=' + id(9) : arg)));
+  assert.throws(() => parameters([...args, '--base-url=https://external.invalid/']));
+  assert.throws(() => parameters([...args, '--version=5']));
+  const claim = onePostClaim(); claim(); assert.throws(claim);
+});
+
+test('unknown outside-project Go fees remain reserved, require scenario attribution and reduce the original funding allowance', () => {
+  const project = { id: id(1), createdAt: '2026-10-06T00:00:00.000Z', policy: { maxBudget: 4 } };
+  const other = { id: id(2), createdAt: '2026-10-06T00:00:00.000Z', policy: { maxBudget: 5 } };
+  const receipt = { id: id(10), projectId: null, runId: null, amount: .0016958, status: 'uncertain', purpose: 'synthetic Go connection test', history: [] };
+  const input = { intent: { authorization: { newProjectLimit: 5, newProjectCount: 2, totalAdditionalLimit: 10 }, recordedAt: '2026-10-05T00:00:00.000Z', oldProject: { id: id(99) }, baselineUsageIds: [] },
+    ledger: { baselineReceiptIds: [], scenarios: { normal: [receipt.id], recovery: [] } }, projects: [project, other], usage: [], costs: { calls: [receipt] }, configuredProjects: { normal: project.id, recovery: other.id }, scenario: 'normal' };
+  const checked = fundedBudgetGuard(input);
+  assert.equal(checked.phaseReserved, receipt.amount); assert.equal(checked.allowedProjectCap, 5 - receipt.amount);
+  const unassigned = structuredClone(input); unassigned.ledger.scenarios.normal = []; assert.throws(() => fundedBudgetGuard(unassigned));
+  const exhausted = structuredClone(input); exhausted.projects[0].policy.maxBudget = 5; assert.throws(() => fundedBudgetGuard(exhausted));
+});

@@ -1,0 +1,47 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (14292.0986ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (10889.0396ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (2798.1085ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (5055.3744ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (6253.5398ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (9898.6625ms)
+✖ approved API rework repairs, independently re-reviews and bills the original task buckets (19092.9174ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (9361.8103ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (37055.9568ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (3986.4651ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (3400.1142ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (2124.1915ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (7291.7074ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (6893.257ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (9118.4221ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (14747.3248ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (31947.0297ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 16
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 195010.0667
+
+✖ failing tests:
+
+test at tests\product-flow.test.ts:1:31133
+✖ approved API rework repairs, independently re-reviews and bills the original task buckets (19092.9174ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(requests.every((e:any)=>wire.some((w:any)=>w.requestId===e.requestId&&w.data.taskId===binding.seed_id&&w.data.attemptId===e.attemptId)))
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\product-flow.test.ts:374:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

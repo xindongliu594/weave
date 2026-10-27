@@ -1,0 +1,78 @@
+{
+  "tests": {
+    "log": "docs/validation/go-live-lease-expiry-investigation-2026-10-06.related-final.txt",
+    "originalOperationCompetition": 7,
+    "tscOutputBytes": 0,
+    "totalFail": 0,
+    "originalDeviceAdmission": 7,
+    "originalState": 3,
+    "tscEmptyLogNote": "Tee-Object did not create an empty output file; saved after the actual session exit0 was confirmed",
+    "excludedPostgreSQLOnlyTest": "late worker waiting on the project lock",
+    "runnerExit": 0,
+    "new": 9,
+    "originalOperationHeartbeat": 4,
+    "totalPass": 30,
+    "tscSession": 58718,
+    "tscLog": "docs/validation/go-live-lease-expiry-investigation-2026-10-06.tsc-final-v3.txt",
+    "tscExit": 0
+  },
+  "sources": [
+    {
+      "sha256": "ea9b399ee937c4b54035f3694609df37071744f3e4a3a77e2e3f9cf181d307cf",
+      "path": "apps/api/src/run-coordinator.ts"
+    },
+    {
+      "sha256": "dadf821b6407f552662ffdb9e76ebcd53eb4ab5b22498f4eea6afb043570fcbc",
+      "path": "apps/api/src/run-state.ts"
+    },
+    {
+      "sha256": "ac30b21c21a442c1d6bf12ad264ffb576f5008acd7b1c66a89e374278767d08e",
+      "path": "tests/run-live-lease.test.ts"
+    },
+    {
+      "sha256": "67b5ae0ccfc2b0721c8694172d1b7f070bd09d4136a9e616fbc2ea79669ecd31",
+      "path": "tests/run-state.test.ts"
+    },
+    {
+      "sha256": "931b748de87d414063f66f353e1d20eb8b9dab3c5318ee761b8735a1f3906911",
+      "path": "tests/run-transaction-fixture.ts"
+    },
+    {
+      "sha256": "9835da595286b2d30763c8f773c0ac4104b2d6115e0f3898787ec79f15c274ed",
+      "path": "docs/validation/go-live-lease-expiry-investigation-2026-10-06.md"
+    }
+  ],
+  "capturedAt": "2026-10-06T11:37:35.7529427Z",
+  "status": "frozen-for-root-formal-build-and-idle-load",
+  "reproduction": {
+    "afterPass": true,
+    "beforeExpected": "running",
+    "log": "docs/validation/go-live-lease-expiry-investigation-2026-10-06.repro-before.txt",
+    "beforeObserved": "interrupted while same owner remained active"
+  },
+  "liveOperations": 0,
+  "baselineSourceSHA": {
+    "traceStore": "0cf0d4c7a84e689d7d4bd181e6642d99a6611e4ba1a09def7de4cd016d2196ba",
+    "runCoordinator": "2a4e0c6e91e8ca59779ab61600e8e9f8ef978db9d1da8359f912fb00dd5cfb13",
+    "runState": "f75c650f74b2617af85cbd0200758500fa245bdee62a87f4787f91e164ac3e4d"
+  },
+  "invariants": {
+    "heartbeatRenewalBeforeModelFullAdmission": true,
+    "ownActiveExcludeUnderOriginalLocks": true,
+    "modelRetryAdded": false,
+    "leaseSeconds": 30,
+    "singlePGliteConnectionUnchanged": true,
+    "newRunUncoveredHeartbeatSingleExtraRenewal": true,
+    "originalSignalAbortPreserved": true,
+    "unknownCostOrOriginalRunRewrite": false
+  },
+  "sealedArchive": {
+    "path": "docs/test-evidence/go-normal-v12-lease-interrupted-2026-10-06T11-11-46-796Z-fdac107a/archive.json",
+    "sha256": "aee0d4ab736dcb63e463d532b70782756fd2d57a1545e23d7fef79e7af366a2f",
+    "events": 2867,
+    "recordedSeedReplayGapMs": 30427,
+    "bytes": 31604398,
+    "oldDuplicateSourceRecords": 82
+  },
+  "build": "Root will perform formal final types/build/load after both source freezes; not executed by this subtask"
+}

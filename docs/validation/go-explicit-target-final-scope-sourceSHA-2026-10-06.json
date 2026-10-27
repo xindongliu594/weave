@@ -1,0 +1,200 @@
+{
+  "kind": "explicit-target-bounded-capture-and-controlled-stop-engineering",
+  "at": "2026-10-06T10:17:27.074Z",
+  "sourceStable": [
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-2026-10-06.mjs",
+      "expected": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54",
+      "actual": "70a884709b69c5057ec6ed577fa5e6edc0dd7186337708e252ea59e45550ca54",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-referenced-2026-10-06.mjs",
+      "expected": "cb25ee1384f09527406c7b77e00fd5a51f65a130ee11455f021028399fe5a560",
+      "actual": "cb25ee1384f09527406c7b77e00fd5a51f65a130ee11455f021028399fe5a560",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-referenced-2026-10-06.mjs",
+      "expected": "25402ee4b55339606625cd587f2d75ce297c5635e6b59c179c63d518699dec44",
+      "actual": "25402ee4b55339606625cd587f2d75ce297c5635e6b59c179c63d518699dec44",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-acceptance-run-references-2026-10-06.mjs",
+      "expected": "dc33a0a7a04afd77949c4fcc83c56094b7708d3009bf2b1e00a60caf50327984",
+      "actual": "dc33a0a7a04afd77949c4fcc83c56094b7708d3009bf2b1e00a60caf50327984",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "expected": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3",
+      "actual": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "expected": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf",
+      "actual": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "expected": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7",
+      "actual": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-guarded-web-2026-10-06.mjs",
+      "expected": "ff689045082f817aaab9e115ba3f03a7fe9362505d669bec2cf8dc0acf8be4c9",
+      "actual": "ff689045082f817aaab9e115ba3f03a7fe9362505d669bec2cf8dc0acf8be4c9",
+      "stable": true
+    },
+    {
+      "path": "tests/go-todo-acceptance-audit.test.mjs",
+      "expected": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686",
+      "actual": "edf43be619ac8d63bb70d082be6dd2122195946737484ba778eee5ced6770686",
+      "stable": true
+    }
+  ],
+  "sourceSHA": [
+    {
+      "path": "docs/test-evidence/helpers/go-controlled-stop-route-barrier-2026-10-06.mjs",
+      "sha256": "35a9fd2ad0bc5fd500ca57cae08de34e3d08084062be307bd98c1f0c80ce9f9d"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-controlled-stop-first-parent-guard-2026-10-06.mjs",
+      "sha256": "0d500ada5b9c71a56b4f4cc437945aec290a3082999ed8adb0ef46bfccbef723"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-known-read-enoent-stop-guard-2026-10-06.mjs",
+      "sha256": "4df2fcd715c7bb89bacd51f3d6e3153a1e3c35fbc00376983de314d0d11890d3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-bound-source-identity-2026-10-06.mjs",
+      "sha256": "56863a817480a226cd0494a62ae5a6b13c6e36ce2609c4f2d9de508ed3db04ec"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-first-parent-web-2026-10-06.mjs",
+      "sha256": "916bd2856d336edf2e82d9c98777c696f0e03df8a498136070c8b865b2164335"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-first-parent-web-2026-10-06.mjs",
+      "sha256": "e4904729ee8b398139121c2e9031f1e4f00e1e4486e6b0782a447a7471d76418"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-scope-2026-10-06.mjs",
+      "sha256": "1f3935fde7c63475cb9fb8d447c4d894b0dc1fbd3797cdc11a85d850bb6c095f"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-proof-2026-10-06.mjs",
+      "sha256": "cbbf010e160c726c661e7ac05179b85c728b0b5ef6fe7dc84d2bdeeb176115d1"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-2026-10-06.mjs",
+      "sha256": "db2e0e8c1d0bf1fcb1343b324180c1e3f256871b7d8ebc2efc2117bd7f7e68a4"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-verified-target-evidence-2026-10-06.mjs",
+      "sha256": "e04194c0b893e345b9b98126c4fe836bf01fb73a88a90a676cc5bd9a521915ba"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-acceptance-run-references-explicit-target-2026-10-06.mjs",
+      "sha256": "312f8077dd0c315f3d8d4342303bb06585a9ca43f6ab001c8e9e2edb6aa83e60"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-explicit-target-2026-10-06.mjs",
+      "sha256": "6ec7b0a72f8cf2819753706319cf0e181a41fc7dae5ef8b5ef756e9f92311956"
+    },
+    {
+      "path": "docs/test-evidence/helpers/audit-go-todo-acceptance-final-scope-referenced-explicit-target-2026-10-06.mjs",
+      "sha256": "345083cb77a847d6df71c903d17483fbd17715e6ab06d6e646e5c349eeb59bb5"
+    },
+    {
+      "path": "docs/test-evidence/helpers/capture-go-acceptance-final-scope-referenced-explicit-target-2026-10-06.mjs",
+      "sha256": "7770fa0224083254156734cf7b98121ab6d113693d46ff4f778a985130e8a2a1"
+    }
+  ],
+  "testSHA": [
+    {
+      "path": "tests/go-controlled-stop-browser-fixture.test.mjs",
+      "sha256": "8d9333164a2c0ac799be98baf9996a76de7c0eb9def722b4ca65f8b26f609f1c"
+    },
+    {
+      "path": "tests/go-controlled-stop-first-parent.test.mjs",
+      "sha256": "f2ae3e308eb7c582c82a91a04958d0c3ffb928c24d8f7fbf6049904757735a05"
+    },
+    {
+      "path": "tests/go-verified-target-evidence.test.mjs",
+      "sha256": "62faa06b09372c05d0246105a2834c3b87d8fd50e7dca362836ea2bbf7697f31"
+    },
+    {
+      "path": "tests/go-acceptance-run-references-explicit-target-regression.test.mjs",
+      "sha256": "6a8d7d036c6f1bddd6f8302fed08955069d91a6c52f3f6d9c1b3412d4169e199"
+    },
+    {
+      "path": "tests/go-bound-source-identity.test.mjs",
+      "sha256": "699b5d89f74403a7b004911ad6ca5b364e81de481b27a6edc7eed0e41ab7bdf6"
+    },
+    {
+      "path": "tests/go-final-knowledge-scope.test.mjs",
+      "sha256": "6dad0d0e2b4735e465997b7e0424e7671d6a9320be0c4c8c7cb3c6af07139874"
+    },
+    {
+      "path": "tests/go-final-knowledge-proof.test.mjs",
+      "sha256": "4b53c5ce49fe5f2678a6cac2420515e24de301b9bda598341e2bed3f7246636a"
+    },
+    {
+      "path": "tests/go-final-scope-legacy-regression.test.mjs",
+      "sha256": "196dbd4fba7dc5d968eeb513d1e3313814b470fac1f5d05178d9026dea5cb6ea"
+    }
+  ],
+  "logs": [
+    {
+      "path": "docs/test-evidence/go-explicit-target-final-scope-tests-2026-10-06.txt",
+      "sha256": "8f12c52ba0367204ec597cd0308dab606442509f4cd035bc5a0007c9634d4a1c"
+    },
+    {
+      "path": "docs/test-evidence/go-explicit-target-final-scope-supplement-tests-2026-10-06.txt",
+      "sha256": "f767ec9c307b94f1cbf41c2488468c69d48e54db09b5d405670d5965051b0b90"
+    }
+  ],
+  "preservedProofsAndIntents": [
+    {
+      "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-48-26-691Z-6449795c.json",
+      "sha256": "a5d7386c194c0134d57bba11e42738ad4b39a5f0fe1eefb048398e4214b5e686"
+    },
+    {
+      "path": "docs/test-evidence/funded-run-web-normal-approve-2026-10-06T09-22-33-260Z-9145f2ca.json",
+      "sha256": "1a5d7c7e75e5e5bd897d045d902882caa5a0f4816120fac401f701b5db5f48e7"
+    },
+    {
+      "path": ".data/funded-acceptance/web-operation-guards/stop-c92961f2-5573-4299-82c2-daa7ee13dca5.json",
+      "sha256": "133b57718d863cee2d7a31f617d417c89248ed27c72f38f7cb5e674083840d70"
+    },
+    {
+      "path": ".data/funded-acceptance/web-operation-guards/start-4938eab8-26ed-4f60-9413-d979f05fa968-v11.json",
+      "sha256": "c645a75e34106f97c0f7e876df65567a6ecc1045333d7d93039c627d3fd74c0b"
+    }
+  ],
+  "engineeringResults": {
+    "primary": 89,
+    "supplement": 9,
+    "overlap": 6,
+    "distinctPassed": 92,
+    "failed": 0,
+    "skipped": 0,
+    "syntax": 9,
+    "browser": {
+      "engineeringBrowserFixture": true,
+      "forwarded": 1,
+      "status": 202,
+      "preflightElapsedMs": 25395,
+      "responseTimerStartedAfterPreflight": true
+    }
+  },
+  "actualMvpAccepted": false,
+  "liveApiActions": 0,
+  "actualModelCalls": 0,
+  "productServiceActions": 0
+}

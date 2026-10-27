@@ -1,0 +1,216 @@
+{
+  "kind": "offline strict known developer read ENOENT stop compatibility verification",
+  "checkedAt": "2026-10-06T08:24:51.511Z",
+  "status": "passed",
+  "actualMvpAccepted": false,
+  "productRequestsSent": 0,
+  "employeeOperationsReplayed": 0,
+  "operationRecordsChanged": 0,
+  "sourceStable": [
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "beforeSha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf",
+      "afterSha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "beforeSha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7",
+      "afterSha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-funded-controlled-stop-2026-10-06T08-09-12-603Z-2a3af4c2.json",
+      "beforeSha256": "b56ca8fc95b8fc5c17228bdce9e0db05c4f3dfa0ce1a8c0f94f30f96759ba16b",
+      "afterSha256": "b56ca8fc95b8fc5c17228bdce9e0db05c4f3dfa0ce1a8c0f94f30f96759ba16b",
+      "stable": true
+    }
+  ],
+  "actualSourceChecks": [
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/archive.json",
+      "expectedSha256": "6aaf11d40f32ca93f5b0188bd857d6801e154fda48b817fb392b83be480dd067",
+      "actualSha256": "6aaf11d40f32ca93f5b0188bd857d6801e154fda48b817fb392b83be480dd067",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/state.json",
+      "expectedSha256": "d4c684e5d2e686b57d0c6718e44eacc367890b6aa72fcbf3aced7328232b0e3b",
+      "actualSha256": "d4c684e5d2e686b57d0c6718e44eacc367890b6aa72fcbf3aced7328232b0e3b",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/local-operations.json",
+      "expectedSha256": "a830bddcce62f324a5782612dc67af6ed69107706091b70438858e3384af27b0",
+      "actualSha256": "a830bddcce62f324a5782612dc67af6ed69107706091b70438858e3384af27b0",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/artifacts.json",
+      "expectedSha256": "1a1ed1decbe4f2521bc06efc940ca1c662ca4f79df1d269351d5c9464b571c2c",
+      "actualSha256": "1a1ed1decbe4f2521bc06efc940ca1c662ca4f79df1d269351d5c9464b571c2c",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/readiness.json",
+      "expectedSha256": "d4023969fdf35f7f970f8328fa0a3094a5654be4b1bc29e0cb99ccaed9a416a8",
+      "actualSha256": "d4023969fdf35f7f970f8328fa0a3094a5654be4b1bc29e0cb99ccaed9a416a8",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/server.mjs",
+      "expectedSha256": "18e922e5926e98db36ee6aca698c049a409d112cf13051d0581c8432066e6899",
+      "actualSha256": "18e922e5926e98db36ee6aca698c049a409d112cf13051d0581c8432066e6899",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/todo.test.mjs",
+      "expectedSha256": "cb7c7b1f427af43130638ef0fa43eac94a8d9c67d4300dd3b241f3d2d02a0d7b",
+      "actualSha256": "cb7c7b1f427af43130638ef0fa43eac94a8d9c67d4300dd3b241f3d2d02a0d7b",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/README.md",
+      "expectedSha256": "8cf02f75b18f2b5aff0319fc981759f450821cef6afeef0bd98629fd145e3bd5",
+      "actualSha256": "8cf02f75b18f2b5aff0319fc981759f450821cef6afeef0bd98629fd145e3bd5",
+      "stable": true
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-known-read-boundary-20261006-161501-65c7efbc/acceptance.test.mjs",
+      "expectedSha256": "579c6d73aa1c3bbeaeddaf44f7debc67f1debdfcf7a3f831fef3dc449b82c8b3",
+      "actualSha256": "579c6d73aa1c3bbeaeddaf44f7debc67f1debdfcf7a3f831fef3dc449b82c8b3",
+      "stable": true
+    }
+  ],
+  "actualReadProofs": [
+    {
+      "allowed": true,
+      "evidence": {
+        "operationId": "472efe7d-9c48-4ad5-80d8-a6f26cbbaed7",
+        "taskId": "dev",
+        "attemptId": "575ba79d-edf8-4115-be36-b8ff2cbced78",
+        "employeeId": "developer",
+        "agentId": "employee-2",
+        "path": "server.mjs",
+        "startSeq": 124,
+        "queuedSeq": 125,
+        "failureSeq": 126,
+        "resultSeq": 128,
+        "firstWriteSeq": 210,
+        "acceptedSeq": 2241,
+        "operationRecordSha256": "1cec84d5740d4ad18d0dfac5807f62643905af63ce49dface92cdef78a4cf3e1",
+        "classification": "known-read-ENOENT-before-first-write",
+        "originalStatus": "failed",
+        "originalStarted": true
+      }
+    },
+    {
+      "allowed": true,
+      "evidence": {
+        "operationId": "a4b9fac8-4106-4000-949c-3fb81c790d33",
+        "taskId": "dev",
+        "attemptId": "575ba79d-edf8-4115-be36-b8ff2cbced78",
+        "employeeId": "developer",
+        "agentId": "employee-2",
+        "path": "todo.test.mjs",
+        "startSeq": 131,
+        "queuedSeq": 135,
+        "failureSeq": 136,
+        "resultSeq": 138,
+        "firstWriteSeq": 312,
+        "acceptedSeq": 2241,
+        "operationRecordSha256": "eabbec6cb81948d9ae17f02d9a24ebb86dea2a51d98d695995bfcf9e477196a1",
+        "classification": "known-read-ENOENT-before-first-write",
+        "originalStatus": "failed",
+        "originalStarted": true
+      }
+    },
+    {
+      "allowed": true,
+      "evidence": {
+        "operationId": "92e876f1-7586-4c11-ade7-75f544ced860",
+        "taskId": "dev",
+        "attemptId": "575ba79d-edf8-4115-be36-b8ff2cbced78",
+        "employeeId": "developer",
+        "agentId": "employee-2",
+        "path": "README.md",
+        "startSeq": 141,
+        "queuedSeq": 142,
+        "failureSeq": 146,
+        "resultSeq": 148,
+        "firstWriteSeq": 325,
+        "acceptedSeq": 2241,
+        "operationRecordSha256": "5d4cff91ab67056026bbdea2ce09691ebe07a4a2e3da32f68f6881103df409b1",
+        "classification": "known-read-ENOENT-before-first-write",
+        "originalStatus": "failed",
+        "originalStarted": true
+      }
+    }
+  ],
+  "syntax": [
+    {
+      "path": "docs/test-evidence/helpers/go-known-read-enoent-stop-guard-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-known-read-web-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-known-read-web-2026-10-06.mjs",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-proof-2026-10-06.mjs",
+      "exitCode": 0
+    }
+  ],
+  "tests": {
+    "files": [
+      "tests/go-funded-stop.test.mjs",
+      "tests/go-funded-known-read-stop-legacy-regression.test.mjs",
+      "tests/go-known-read-enoent-stop-guard.test.mjs",
+      "tests/go-funded-known-read-knowledge-upgrade.test.mjs",
+      "tests/go-todo-acceptance-audit.test.mjs",
+      "tests/go-final-scope-legacy-regression.test.mjs",
+      "tests/go-final-knowledge-scope.test.mjs",
+      "tests/go-final-knowledge-proof.test.mjs",
+      "tests/go-acceptance-run-references.test.mjs",
+      "tests/go-funded-knowledge-upgrade.test.mjs"
+    ],
+    "exitCode": 0,
+    "outputPath": "docs/validation/go-known-read-stop-tests-2026-10-06.txt",
+    "outputSha256": "9d13e3e9e04a940154ac3a65807a434899f600a73d4ef1e5cca9e5c3977c3bf5"
+  },
+  "newSources": [
+    {
+      "path": "docs/test-evidence/helpers/go-known-read-enoent-stop-guard-2026-10-06.mjs",
+      "sha256": "4df2fcd715c7bb89bacd51f3d6e3153a1e3c35fbc00376983de314d0d11890d3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-known-read-web-2026-10-06.mjs",
+      "sha256": "dc92e5993e1900941e8afea1354565b5b8803cf961dbd8cf8169839c2d729ddc"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-known-read-web-2026-10-06.mjs",
+      "sha256": "6e8c37ec223a83370e8552a5ec664102295ea999d3640b0fad9bebcc05aecaf1"
+    },
+    {
+      "path": "docs/test-evidence/helpers/go-final-knowledge-proof-2026-10-06.mjs",
+      "sha256": "125df50163e85d45767af1af34b84c3b9ea196bd50e4344bc0b2f5990fc0db94"
+    },
+    {
+      "path": "tests/go-funded-known-read-stop-legacy-regression.test.mjs",
+      "sha256": "dba94978040f8a2a08a8198755475f418f5a2f13dbbc46f24389f70f27b75378"
+    },
+    {
+      "path": "tests/go-known-read-enoent-stop-guard.test.mjs",
+      "sha256": "5f83d8177fd59004ca78ad16ed172fe5f772092fccec7ab76d86b943222e5f31"
+    },
+    {
+      "path": "tests/go-funded-known-read-knowledge-upgrade.test.mjs",
+      "sha256": "1c040529956bcad0ded05022d93717db9065f2d19a0ad37f35e2390f193e13a5"
+    }
+  ],
+  "compatibility": "NEW upgrade adapter recomputes NEW stoppedCheckpointProof; original setupFrame/knowledgeBoundary/preserveUpgrade conditions retained. Exact real cancel endpoint field is accepted. NEW final audit chooses this adapter only under explicit known-read variant and re-reads the exact original zero-POST predecessor."
+}

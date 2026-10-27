@@ -1,0 +1,909 @@
+{
+  "mode": "real-project",
+  "originalPlugin": true,
+  "modelCalls": 1,
+  "checks": [
+    {
+      "name": "outside-read-and-write-denied",
+      "passed": true,
+      "detail": "Node permission boundary; not an OS sandbox acceptance"
+    },
+    {
+      "name": "original-plugin-loaded-on-fixed-dsh",
+      "passed": true,
+      "detail": {
+        "toolCount": 14,
+        "heartbeat": true
+      }
+    },
+    {
+      "name": "execution-tool-denied",
+      "passed": true,
+      "detail": {
+        "visibleTools": [
+          "cortex_start",
+          "cortex_strategy_match",
+          "cortex_decompose"
+        ],
+        "code": "UNKNOWN_TOOL"
+      }
+    }
+  ],
+  "tools": [
+    "cortex_capabilities",
+    "cortex_decompose",
+    "cortex_eval_cases",
+    "cortex_evaluate",
+    "cortex_execute",
+    "cortex_l0",
+    "cortex_models",
+    "cortex_policy",
+    "cortex_probe",
+    "cortex_recover",
+    "cortex_report",
+    "cortex_review",
+    "cortex_start",
+    "cortex_strategy_match"
+  ],
+  "calls": [
+    {
+      "name": "cortex_strategy_match",
+      "args": {
+        "profile": {
+          "task_type": "code_change",
+          "domain": "engineering",
+          "complexity": 0.4,
+          "risk": 0.2,
+          "language": "zh",
+          "capability": [
+            "general"
+          ]
+        }
+      },
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "未命中策略（best similarity 0 < 0.70）→ 需新规划"
+          }
+        ],
+        "value": {
+          "source": "fresh_plan",
+          "similarity": 0,
+          "policy": null,
+          "fingerprint": {
+            "task_type": "code_change",
+            "domain": "engineering",
+            "capability": [
+              "general"
+            ],
+            "complexity": 0.4,
+            "risk": 0.2,
+            "language": "zh",
+            "input_tokens": 0,
+            "expected_output_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "cortex_start",
+      "args": {
+        "goal": "开发一个人使用的小型 Todo API。使用 Node.js，支持新增、列表、完成和删除任务，任务用 SQLite 持久化，服务重启后仍能读取。交付源代码、可执行自动测试和简明启动说明。开发之后必须由独立 QA 验证 CRUD、非法输入和重启持久化，再由经理依据需求和真实测试证据验收。暂不需要网页、登录、部署或复杂架构。团队方案必须明确角色分工、交付物、前后依赖、可以并行的工作和验收条件。",
+        "profile": {
+          "task_type": "code_change",
+          "domain": "engineering",
+          "complexity": 0.4,
+          "risk": 0.2,
+          "quality_requirement": 0.9,
+          "budget_limit": 0.04,
+          "language": "zh",
+          "capability": [
+            "general"
+          ]
+        },
+        "organization_mode": "standard"
+      },
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "✓ 任务已创建: task-mvdktv1z-41a061\n组织模式: 标准（零额外开销）｜来源 主模型选择｜主模型显式声明（常规任务）——声明优先于 auto 判定\n策略匹配: fresh_plan（similarity 0）\n预算: $0.04（规划 10% / 执行 70% / 质量 10% / 应急 10%）\n⚠ 粒度提示: 拆分预估 $0.0057 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度\n下一步: 先 cortex_decompose 拆解根节点 T0"
+          }
+        ],
+        "value": {
+          "taskId": "task-mvdktv1z-41a061",
+          "rootNodeId": "T0",
+          "fingerprint": {
+            "task_type": "code_change",
+            "domain": "engineering",
+            "capability": [
+              "general"
+            ],
+            "complexity": 0.4,
+            "risk": 0.2,
+            "language": "zh",
+            "input_tokens": 0,
+            "expected_output_tokens": 0
+          },
+          "strategy": {
+            "source": "fresh_plan",
+            "similarity": 0,
+            "policy": null
+          },
+          "budget": {
+            "limit": 0.04,
+            "split": {
+              "plan": 0.1,
+              "exec": 0.7,
+              "quality": 0.1,
+              "emergency": 0.1
+            },
+            "pools": {
+              "plan": 0.004,
+              "exec": 0.027999999999999997,
+              "quality": 0.004,
+              "emergency": 0.004
+            },
+            "used": {
+              "plan": 0.00000195,
+              "exec": 0,
+              "quality": 0,
+              "emergency": 0
+            },
+            "currency": "USD"
+          },
+          "model": "A",
+          "organizationMode": {
+            "mode": "standard",
+            "source": "model",
+            "reason": "主模型显式声明（常规任务）——声明优先于 auto 判定"
+          },
+          "suggested_tree": null,
+          "granularity": {
+            "recommendation": "direct",
+            "estDirect": 0.00178665,
+            "estSplit": 0.00572262,
+            "note": "拆分预估 $0.0057 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+          },
+          "organization": null
+        }
+      }
+    },
+    {
+      "usageId": "b64719b7-b55b-45e7-88c1-1923a9495677",
+      "usage": {
+        "prompt_tokens": 518,
+        "completion_tokens": 592
+      }
+    },
+    {
+      "name": "cortex_decompose",
+      "args": {
+        "task_id": "task-mvdktv1z-41a061",
+        "parent_id": "T0",
+        "auto": true
+      },
+      "result": {
+        "isError": false,
+        "content": [
+          {
+            "type": "text",
+            "text": "✓ T0 已拆解为 6 个子节点:\n  T0.1 [planning｜general] pending ← 制定团队方案并明确角色分工、交付物、依赖关系、可并行工作和验收条件\n  T0.2 [general｜general] pending ← 编写 Node.js + SQLite 的 Todo API 源代码，实现新增、列表、完成和删除任务\n  T0.3 [general｜general] pending ← 编写可执行自动测试，覆盖 CRUD、非法输入和服务重启持久化\n  T0.4 [rewrite｜general] pending ← 编写简明启动说明，包含安装依赖、启动服务和运行测试的步骤\n  T0.5 [evaluation｜general] pending ← 独立 QA 验证 CRUD、非法输入和重启持久化，并依据真实测试证据记录结果\n  T0.6 [evaluation｜general] pending ← 经理依据需求和真实测试证据进行最终验收\n⚠ 粒度警告（拆了更贵）: 拆分预估 $0.0068 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+          }
+        ],
+        "value": {
+          "parentId": "T0",
+          "created": [
+            {
+              "id": "T0.1",
+              "createdAt": "2026-10-18T08:41:56.119Z",
+              "taskId": "task-mvdktv1z-41a061",
+              "parentId": "T0",
+              "path": "T0.1",
+              "depth": 1,
+              "goal": "制定团队方案并明确角色分工、交付物、依赖关系、可并行工作和验收条件",
+              "taskType": "planning",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.85,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "plan": {
+                    "type": "string"
+                  },
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "deliverables": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "parallel_work": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "acceptance_criteria": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "plan",
+                  "roles",
+                  "deliverables",
+                  "dependencies",
+                  "parallel_work",
+                  "acceptance_criteria"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.2",
+              "createdAt": "2026-10-18T08:41:56.119Z",
+              "taskId": "task-mvdktv1z-41a061",
+              "parentId": "T0",
+              "path": "T0.2",
+              "depth": 1,
+              "goal": "编写 Node.js + SQLite 的 Todo API 源代码，实现新增、列表、完成和删除任务，服务重启后仍能读取",
+              "taskType": "general",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.9,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "source_code": {
+                    "type": "string"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "source_code",
+                  "files"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.3",
+              "createdAt": "2026-10-18T08:41:56.127Z",
+              "taskId": "task-mvdktv1z-41a061",
+              "parentId": "T0",
+              "path": "T0.3",
+              "depth": 1,
+              "goal": "编写可执行自动测试，覆盖 CRUD、非法输入和服务重启持久化",
+              "taskType": "general",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.9,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "test_code": {
+                    "type": "string"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "test_commands": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "test_code",
+                  "files",
+                  "test_commands"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.4",
+              "createdAt": "2026-10-18T08:41:56.128Z",
+              "taskId": "task-mvdktv1z-41a061",
+              "parentId": "T0",
+              "path": "T0.4",
+              "depth": 1,
+              "goal": "编写简明启动说明，包含安装依赖、启动服务和运行测试的步骤",
+              "taskType": "rewrite",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.85,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "readme": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "readme"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.5",
+              "createdAt": "2026-10-18T08:41:56.128Z",
+              "taskId": "task-mvdktv1z-41a061",
+              "parentId": "T0",
+              "path": "T0.5",
+              "depth": 1,
+              "goal": "独立 QA 验证 CRUD、非法输入和重启持久化，并依据真实测试证据记录结果",
+              "taskType": "evaluation",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.9,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "qa_report": {
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "passed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "qa_report",
+                  "evidence",
+                  "passed"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            },
+            {
+              "id": "T0.6",
+              "createdAt": "2026-10-18T08:41:56.128Z",
+              "taskId": "task-mvdktv1z-41a061",
+              "parentId": "T0",
+              "path": "T0.6",
+              "depth": 1,
+              "goal": "经理依据需求和真实测试证据进行最终验收",
+              "taskType": "evaluation",
+              "capabilities": [
+                "general"
+              ],
+              "type": "executor",
+              "status": "pending",
+              "quality_requirement": 0.9,
+              "budget": null,
+              "risk": 0.2,
+              "input": null,
+              "input_refs": null,
+              "execution_mode": null,
+              "output_schema": {
+                "type": "object",
+                "properties": {
+                  "acceptance_report": {
+                    "type": "string"
+                  },
+                  "passed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "acceptance_report",
+                  "passed"
+                ]
+              },
+              "tool_allow": null,
+              "compute_spec": null,
+              "compute_input": null,
+              "l0": null,
+              "auto_l0": true,
+              "depends_on": []
+            }
+          ],
+          "count": 6,
+          "granularity": {
+            "recommendation": "direct",
+            "estDirect": 0.00178665,
+            "estSplit": 0.006797280000000001,
+            "note": "拆分预估 $0.0068 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+          },
+          "organization": null,
+          "evidenceGaps": [],
+          "source": "plan-agent",
+          "planner": "deepseek-v4.1-flash",
+          "planSource": "configured"
+        }
+      }
+    }
+  ],
+  "requirement": "开发一个人使用的小型 Todo API。使用 Node.js，支持新增、列表、完成和删除任务，任务用 SQLite 持久化，服务重启后仍能读取。交付源代码、可执行自动测试和简明启动说明。开发之后必须由独立 QA 验证 CRUD、非法输入和重启持久化，再由经理依据需求和真实测试证据验收。暂不需要网页、登录、部署或复杂架构。团队方案必须明确角色分工、交付物、前后依赖、可以并行的工作和验收条件。",
+  "profileSource": "Operator-supplied task classification; not model-inferred template routing",
+  "match": {
+    "source": "fresh_plan",
+    "similarity": 0,
+    "policy": null,
+    "fingerprint": {
+      "task_type": "code_change",
+      "domain": "engineering",
+      "capability": [
+        "general"
+      ],
+      "complexity": 0.4,
+      "risk": 0.2,
+      "language": "zh",
+      "input_tokens": 0,
+      "expected_output_tokens": 0
+    }
+  },
+  "start": {
+    "taskId": "task-mvdktv1z-41a061",
+    "rootNodeId": "T0",
+    "fingerprint": {
+      "task_type": "code_change",
+      "domain": "engineering",
+      "capability": [
+        "general"
+      ],
+      "complexity": 0.4,
+      "risk": 0.2,
+      "language": "zh",
+      "input_tokens": 0,
+      "expected_output_tokens": 0
+    },
+    "strategy": {
+      "source": "fresh_plan",
+      "similarity": 0,
+      "policy": null
+    },
+    "budget": {
+      "limit": 0.04,
+      "split": {
+        "plan": 0.1,
+        "exec": 0.7,
+        "quality": 0.1,
+        "emergency": 0.1
+      },
+      "pools": {
+        "plan": 0.004,
+        "exec": 0.027999999999999997,
+        "quality": 0.004,
+        "emergency": 0.004
+      },
+      "used": {
+        "plan": 0.00000195,
+        "exec": 0,
+        "quality": 0,
+        "emergency": 0
+      },
+      "currency": "USD"
+    },
+    "model": "A",
+    "organizationMode": {
+      "mode": "standard",
+      "source": "model",
+      "reason": "主模型显式声明（常规任务）——声明优先于 auto 判定"
+    },
+    "suggested_tree": null,
+    "granularity": {
+      "recommendation": "direct",
+      "estDirect": 0.00178665,
+      "estSplit": 0.00572262,
+      "note": "拆分预估 $0.0057 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+    },
+    "organization": null
+  },
+  "plan": {
+    "parentId": "T0",
+    "created": [
+      {
+        "id": "T0.1",
+        "createdAt": "2026-10-18T08:41:56.119Z",
+        "taskId": "task-mvdktv1z-41a061",
+        "parentId": "T0",
+        "path": "T0.1",
+        "depth": 1,
+        "goal": "制定团队方案并明确角色分工、交付物、依赖关系、可并行工作和验收条件",
+        "taskType": "planning",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.85,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "plan": {
+              "type": "string"
+            },
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deliverables": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "parallel_work": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "acceptance_criteria": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "plan",
+            "roles",
+            "deliverables",
+            "dependencies",
+            "parallel_work",
+            "acceptance_criteria"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.2",
+        "createdAt": "2026-10-18T08:41:56.119Z",
+        "taskId": "task-mvdktv1z-41a061",
+        "parentId": "T0",
+        "path": "T0.2",
+        "depth": 1,
+        "goal": "编写 Node.js + SQLite 的 Todo API 源代码，实现新增、列表、完成和删除任务，服务重启后仍能读取",
+        "taskType": "general",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.9,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "source_code": {
+              "type": "string"
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "source_code",
+            "files"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.3",
+        "createdAt": "2026-10-18T08:41:56.127Z",
+        "taskId": "task-mvdktv1z-41a061",
+        "parentId": "T0",
+        "path": "T0.3",
+        "depth": 1,
+        "goal": "编写可执行自动测试，覆盖 CRUD、非法输入和服务重启持久化",
+        "taskType": "general",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.9,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "test_code": {
+              "type": "string"
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "test_commands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "test_code",
+            "files",
+            "test_commands"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.4",
+        "createdAt": "2026-10-18T08:41:56.128Z",
+        "taskId": "task-mvdktv1z-41a061",
+        "parentId": "T0",
+        "path": "T0.4",
+        "depth": 1,
+        "goal": "编写简明启动说明，包含安装依赖、启动服务和运行测试的步骤",
+        "taskType": "rewrite",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.85,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "readme": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "readme"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.5",
+        "createdAt": "2026-10-18T08:41:56.128Z",
+        "taskId": "task-mvdktv1z-41a061",
+        "parentId": "T0",
+        "path": "T0.5",
+        "depth": 1,
+        "goal": "独立 QA 验证 CRUD、非法输入和重启持久化，并依据真实测试证据记录结果",
+        "taskType": "evaluation",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.9,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "qa_report": {
+              "type": "string"
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "passed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "qa_report",
+            "evidence",
+            "passed"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      },
+      {
+        "id": "T0.6",
+        "createdAt": "2026-10-18T08:41:56.128Z",
+        "taskId": "task-mvdktv1z-41a061",
+        "parentId": "T0",
+        "path": "T0.6",
+        "depth": 1,
+        "goal": "经理依据需求和真实测试证据进行最终验收",
+        "taskType": "evaluation",
+        "capabilities": [
+          "general"
+        ],
+        "type": "executor",
+        "status": "pending",
+        "quality_requirement": 0.9,
+        "budget": null,
+        "risk": 0.2,
+        "input": null,
+        "input_refs": null,
+        "execution_mode": null,
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "acceptance_report": {
+              "type": "string"
+            },
+            "passed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "acceptance_report",
+            "passed"
+          ]
+        },
+        "tool_allow": null,
+        "compute_spec": null,
+        "compute_input": null,
+        "l0": null,
+        "auto_l0": true,
+        "depends_on": []
+      }
+    ],
+    "count": 6,
+    "granularity": {
+      "recommendation": "direct",
+      "estDirect": 0.00178665,
+      "estSplit": 0.006797280000000001,
+      "note": "拆分预估 $0.0068 ≥ 主模型直接 $0.0018×0.9——拆了更贵，建议主模型直接完成或减少粒度"
+    },
+    "organization": null,
+    "evidenceGaps": [],
+    "source": "plan-agent",
+    "planner": "deepseek-v4.1-flash",
+    "planSource": "configured"
+  },
+  "completed": true
+}

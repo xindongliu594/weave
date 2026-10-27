@@ -1,0 +1,567 @@
+{
+  "kind": "go-normal-v8-readonly-resume-eligibility",
+  "checkedAt": "2026-10-06 04:29:45 UTC",
+  "archive": {
+    "path": "docs/test-evidence/go-normal-v8-review-abort-20261006-122118.json",
+    "sha256": "372df14c5430594c6197fc9f26f316ef217f6a62001ce3817b3582e6df9e5889",
+    "runId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+    "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+    "departmentId": "9066be93-b669-454c-9fcb-c2327a550ae8",
+    "version": 8,
+    "status": "failed",
+    "integrity": "ok",
+    "eventCount": 3133,
+    "completeSequences": true
+  },
+  "classification": {
+    "archiveSkipEligible": [
+      "dev",
+      "qa_verify"
+    ],
+    "remainingNodes": [
+      {
+        "id": "qa_review",
+        "status": "failed"
+      },
+      {
+        "id": "manager_accept",
+        "status": "pending"
+      }
+    ],
+    "actualResumeAdmissionVerified": false,
+    "currentDiskFilesVerified": false,
+    "currentDbLedgerVerified": false,
+    "freshLocalQueueVerified": false,
+    "currentSameVersionRunHistoryVerified": false,
+    "noChildVerified": false,
+    "currentModelConfigurationVerified": false,
+    "reason": "Full archived seals/contracts support skipping the two completed nodes. Actual resumeHandoff, cost/model/authorization/child gates must still be checked by the product after runtime fix."
+  },
+  "sourceCheckpoint": {
+    "status": "available",
+    "sourceRunId": "0947ae05-5c3c-47d0-969b-5c8a739118f1",
+    "checkpointSeq": 3132,
+    "checkpointAt": "2026-10-06T04:16:06.491Z",
+    "capturedAt": "2026-10-06T04:16:06.124Z",
+    "point": "runtime-checkpoint",
+    "subsequentAccountingEvents": 0,
+    "currentAtSourceEnd": true,
+    "project": {
+      "limit": 4.1797,
+      "occupied": 0.9446729999999998,
+      "activeReserved": 0,
+      "available": 3.2350270000000005,
+      "callsUsed": 24,
+      "callLimit": 100,
+      "callsBasis": "host-reserved-model-attempts"
+    },
+    "sourceAdmission": {
+      "basis": "run-admission-snapshot",
+      "recordedCost": 0.6295451,
+      "retainedUnknownReservation": 0.096526,
+      "availableBudget": 3.4536289000000004,
+      "callsUsed": null,
+      "callsBasis": "archived-model-wire-request-count",
+      "note": "这些是入场时继承的账本与调用数；null 表示没有封存值，不代表零。"
+    }
+  },
+  "unknownOperationsByDurableClassifier": [],
+  "taskStates": [
+    {
+      "seed": "dev",
+      "id": "t1",
+      "status": "completed",
+      "attemptId": "847386dd-94e0-485d-9ab8-b332981ae06c",
+      "assignee": "employee-2",
+      "verdict": "pass"
+    },
+    {
+      "seed": "qa_verify",
+      "id": "t2",
+      "status": "completed",
+      "attemptId": "2c0dd0e0-1e18-4786-b889-3bc14d497235",
+      "assignee": "employee-3"
+    },
+    {
+      "seed": "qa_review",
+      "id": "t3",
+      "status": "failed",
+      "attemptId": "de202b10-2e7d-4987-b109-db151000da83",
+      "assignee": "employee-3"
+    },
+    {
+      "seed": "manager_accept",
+      "id": "t4",
+      "status": "pending",
+      "assignee": "employee-1"
+    }
+  ],
+  "accepted": [
+    {
+      "seq": 1797,
+      "taskId": "dev",
+      "attemptId": "847386dd-94e0-485d-9ab8-b332981ae06c",
+      "workspaceRevision": "ccd7ceac9957927412b7839a6b2e0cfb820519b03c39488535e792731e0d6a0e",
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "server.mjs",
+          "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+          "size": 8708
+        },
+        {
+          "path": "todo.test.mjs",
+          "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+          "size": 9719
+        },
+        {
+          "path": "README.md",
+          "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+          "size": 3159
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --test todo.test.mjs",
+          "exitCode": 1,
+          "observationSeq": 1016,
+          "workspaceRevision": "2f69a97827d409340645ce9cefc635d4975b0d56794d5aece25a4c6edeee65d9",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 6,
+            "fail": 1,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "2cb0cc6ab67b7b13ad2df7351121b4bd5cd9f0db7ca0e419fe04e1c70f3d23b8",
+            "bytes": 1937,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "1d9588d2-70fa-4e00-9bee-b1c8a75f1557"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "5bba1de8-f79c-4226-9295-0a2060b5ee6c",
+            "queuedSeq": 1004,
+            "finishedSeq": 1014
+          }
+        },
+        {
+          "command": "node --test todo.test.mjs",
+          "exitCode": 0,
+          "observationSeq": 1722,
+          "workspaceRevision": "ccd7ceac9957927412b7839a6b2e0cfb820519b03c39488535e792731e0d6a0e",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "2c8dac3b6bf1996f0ce96f8449f29c88bbc5dbd49d0c927322f5249ae99a035b",
+            "bytes": 680,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "fc540c77-f2c7-4341-9b15-69b09761f9cf"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "450f1f3d-c8b7-4387-a214-9fe0cfbee882",
+            "queuedSeq": 1707,
+            "finishedSeq": 1720
+          }
+        }
+      ],
+      "projectBudget": {
+        "limit": 4.1797,
+        "occupied": 0.7959681000000001,
+        "activeReserved": 0,
+        "available": 3.3837319000000003,
+        "callsUsed": 8,
+        "callLimit": 100,
+        "callsBasis": "host-reserved-model-attempts"
+      }
+    },
+    {
+      "seq": 2994,
+      "taskId": "qa_verify",
+      "attemptId": "2c0dd0e0-1e18-4786-b889-3bc14d497235",
+      "workspaceRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+      "inputs": [
+        {
+          "path": "server.mjs",
+          "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+          "size": 8708,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "todo.test.mjs",
+          "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+          "size": 9719,
+          "producerTaskId": "dev"
+        },
+        {
+          "path": "README.md",
+          "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+          "size": 3159,
+          "producerTaskId": "dev"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "acceptance.test.mjs",
+          "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+          "size": 23389
+        }
+      ],
+      "commands": [
+        {
+          "command": "node --test todo.test.mjs",
+          "exitCode": 0,
+          "observationSeq": 2492,
+          "workspaceRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "0e497b75b87f02fa461d2895685cce9767ebdfa3c191d1e02a2d66a676c9177d",
+            "bytes": 680,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "fc53df23-5b75-4b48-b165-ee70b021b241"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "088f5ba0-362d-48d1-9c66-55ff890477b4",
+            "queuedSeq": 2474,
+            "finishedSeq": 2490
+          }
+        },
+        {
+          "command": "node --test acceptance.test.mjs",
+          "exitCode": 0,
+          "observationSeq": 2931,
+          "workspaceRevision": "671a9b9c1c1e9465f7921deed9bd4e92437c8beab2882c0ff24dfea559850f3a",
+          "nodeTests": {
+            "status": "available",
+            "format": "spec",
+            "tests": 7,
+            "suites": 0,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "output": {
+            "status": "available",
+            "sha256": "6edfab2b8d47329c15745dbf65376985f32604589ef0dde010207116f813b2ee",
+            "bytes": 843,
+            "complete": true,
+            "layout": "combined"
+          },
+          "approval": {
+            "status": "available",
+            "approvalId": "9c46b46c-ee8c-482c-a655-e94840ffbf14"
+          },
+          "operation": {
+            "status": "available",
+            "operationId": "b87503be-e82c-48e5-abef-63ece791c298",
+            "queuedSeq": 2916,
+            "finishedSeq": 2929
+          }
+        }
+      ],
+      "projectBudget": {
+        "limit": 4.1797,
+        "occupied": 0.9009266999999999,
+        "activeReserved": 0,
+        "available": 3.2787733000000006,
+        "callsUsed": 19,
+        "callLimit": 100,
+        "callsBasis": "host-reserved-model-attempts"
+      }
+    }
+  ],
+  "latestArchivedFileManifest": {
+    "seq": 2932,
+    "files": [
+      {
+        "path": "README.md",
+        "size": 3159,
+        "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a"
+      },
+      {
+        "path": "acceptance.test.mjs",
+        "size": 23389,
+        "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954"
+      },
+      {
+        "path": "server.mjs",
+        "size": 8708,
+        "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630"
+      },
+      {
+        "path": "todo.test.mjs",
+        "size": 9719,
+        "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b"
+      }
+    ]
+  },
+  "historicalSealsAgreeWithLatest": [
+    {
+      "path": "server.mjs",
+      "sha256": "088dca7377c931f45881fe5f3e06a19c50192c1d6847c96576c94514eba12630",
+      "latestMatches": true
+    },
+    {
+      "path": "todo.test.mjs",
+      "sha256": "53fa4d170b0c1efe7181b104345cfe5cf50e759b624ca9ddde6a66bff933aa3b",
+      "latestMatches": true
+    },
+    {
+      "path": "README.md",
+      "sha256": "776e688a8c76c97b95659f162e77a5ca34781d44cfd53601f9d96a40bdca838a",
+      "latestMatches": true
+    },
+    {
+      "path": "acceptance.test.mjs",
+      "sha256": "71677ecd31d4ad927921f4af7067649c7d3bb05d3e72e52c2a2eb1d7d59d3954",
+      "latestMatches": true
+    }
+  ],
+  "pureTaskContractErrors": [],
+  "queuedWithoutLocalFinished": [
+    {
+      "seq": 5,
+      "id": "1d0b33ee-3e6e-4552-9c55-33177a41f5a2",
+      "name": "prepare"
+    },
+    {
+      "seq": 122,
+      "id": "5c5f8394-309c-4c8b-b589-e72e9c41ade4",
+      "name": "filesystem",
+      "taskId": "dev",
+      "callId": "call_01_w2qtkjfqudi9pvh3571s760j"
+    },
+    {
+      "seq": 132,
+      "id": "b984d3a2-b654-4b4c-8fed-02d431745689",
+      "name": "filesystem",
+      "taskId": "dev",
+      "callId": "call_02_tw474g7fbyybjpo6quga6lo1"
+    },
+    {
+      "seq": 143,
+      "id": "8668d8c5-8ebf-4edb-bc1b-78d9ab4d8848",
+      "name": "filesystem",
+      "taskId": "dev",
+      "callId": "call_03_1gu6hghftys6jm48zsk2a4df"
+    }
+  ],
+  "actualGoConfirmationBinding": {
+    "actualGoBindingPass": true,
+    "confirmPath": "docs/test-evidence/go-headroom-normal-confirm-2026-10-06T03-52-30-038Z-bb3feede.json",
+    "confirmSha256": "bed7dfc9f3b86f77fc51e8fcd727734aa81841b9a119ffdc5241c943a147cbe6",
+    "generationSources": [
+      {
+        "path": "docs/test-evidence/go-headroom-normal-generate-2026-10-06T03-48-40-049Z-2bff7270.json",
+        "sha256": "85415218e56380d40a29b636e4aa1d816d7ceed767cb4c70d04a6605cf134e60"
+      }
+    ],
+    "binding": {
+      "version": 8,
+      "projectId": "4938eab8-26ed-4f60-9413-d979f05fa968",
+      "departmentId": "9066be93-b669-454c-9fcb-c2327a550ae8",
+      "previewId": "291f6f51-25c6-4680-a6cb-b05eded1e924",
+      "planningReceiptId": "9aad4d3b-6282-4ed4-a423-fc446b70e369",
+      "planningCost": 0.006864299999999999,
+      "retained": true
+    }
+  },
+  "accounting": {
+    "parentArchiveSettledCalls": 23,
+    "parentArchiveWireCalls": 23,
+    "uniqueSettledUsageIds": 23,
+    "parentArchiveSettledFee": 0.21860189999999996,
+    "attributedParentArchiveCallsAndFees": {
+      "dev": {
+        "wireCalls": 10,
+        "settledCost": 0.09918719999999999
+      },
+      "qa_verify": {
+        "wireCalls": 8,
+        "settledCost": 0.0968457
+      },
+      "captain/unattributed": {
+        "wireCalls": 5,
+        "settledCost": 0.022569
+      }
+    },
+    "lateUsage": {
+      "seq": 3124,
+      "id": "8e1cb3bc-5e80-4311-a6c5-c2c11f261db3",
+      "cost": 0.006126,
+      "inputTokens": 18568,
+      "outputTokens": 463,
+      "requestPurpose": "execution"
+    },
+    "archivedHostReservedAttemptCalls": 24,
+    "archivedWireCalls": 23,
+    "requestWithoutWire": [
+      {
+        "seq": 3110,
+        "sessionId": "34e81525-b113-444d-828b-8445f36de765",
+        "maxTokens": 8000
+      }
+    ],
+    "undispatchedReviewReceipt": {
+      "seq": 3115,
+      "id": "aac77ca0-f367-4a9c-8b4c-b4c3971ecfe6",
+      "dispatched": false,
+      "code": "CALL_INTERRUPTED"
+    },
+    "settledAfterWait": {
+      "seq": 3126,
+      "pendingRequests": 0,
+      "finishedRequests": 1,
+      "timedOut": false,
+      "aborted": false
+    },
+    "inheritedRetainedUnknown": {
+      "id": "4c46dd1b-d172-4044-8ba8-ff4e45343f8c",
+      "runId": "8d5b4848-1f57-491f-9647-80ff3ed577af",
+      "amount": 0.096526
+    },
+    "inheritedRecordedCost": 0.6295451,
+    "expectedRecordedFromArchiveOnly": 0.848147,
+    "expectedOccupiedFromArchiveOnly": 0.9446729999999999,
+    "feeOrReservationWasNotChanged": true,
+    "nativeSdkBudgetHoldAvailable": false,
+    "note": "sourceCheckpoint activeReserved=0 refers to the host project bucket. Native SDK holds/current receipt states are not independently available from this audit; unknown/missing values are never asserted zero.",
+    "historyBaseline": "As-read budget-history counted actual model/wire-request events. With this sole same-version parent archive it yields 23, not the sealed host 24 reserved attempts.",
+    "rootCounterFix": "Root explicitly owns the budget-history change to conservatively retain actual model/request attempts, including the dispatched:false attempt; this report makes no source edits or post-fix pass claim."
+  },
+  "recoverySourceBehavior": {
+    "route": "/api/runs/0947ae05-5c3c-47d0-969b-5c8a739118f1/retry",
+    "body": {
+      "resume": true,
+      "acknowledgeUnknownOperations": false,
+      "retainUncertainCosts": true
+    },
+    "exactVersion": 8,
+    "approvedTasksArePreserved": true,
+    "resumeHandoffSealsCurrentArtifactShaCheckedAtAdmission": true,
+    "sourceBudgetEvidenceIncludedInRecoveryContext": true,
+    "stagedCompletedAttemptsRestoredBeforeNativeStart": true,
+    "completedDevAndQaVerifyMustNotRerun": true,
+    "reviewAndManagerRemainUncompleted": true,
+    "currentProjectCarryoverRecomputedFromRealLedger": true,
+    "taskCallsFeesHoldsReadFromSameVersionHistory": true,
+    "restoreChildMustBindExactParent": true,
+    "fullRetryMustNotBeUsed": true
+  },
+  "operatorCli": "node docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs resume --scenario=normal --normal-project-id=4938eab8-26ed-4f60-9413-d979f05fa968 --recovery-project-id=3e101c24-87e6-43ea-80f9-a2c4b0b410f4 --version=8 --run-id=0947ae05-5c3c-47d0-969b-5c8a739118f1 --confirmed-evidence=docs/test-evidence/go-headroom-normal-confirm-2026-10-06T03-52-30-038Z-bb3feede.json --generation-evidence=docs/test-evidence/go-headroom-normal-generate-2026-10-06T03-48-40-049Z-2bff7270.json --go-model-id=fcce40cf-3172-4863-b0bd-776673f499e6 --retain-uncertain-costs=true",
+  "operatorCliNotExecuted": true,
+  "sourceHashesAsRead": [
+    {
+      "path": "apps/api/src/run-management.ts",
+      "sha256": "fc261948672186c431c1cb64a46cef1b52eec221086b909bb2cf8ba03c73ee30"
+    },
+    {
+      "path": "apps/api/src/handoff-checkpoints.ts",
+      "sha256": "7bb36090ec4d758adc3ccfc98fa9577ecfdb53f417b74b04812d0eea546acc9a"
+    },
+    {
+      "path": "apps/api/src/budget-history.ts",
+      "sha256": "0e6a39a01fa43fd968620c1607f805157ab89acb10c0bb86c5d41d7d7bac4bf4"
+    },
+    {
+      "path": "services/agent-runtime/run-evidence.mjs",
+      "sha256": "3153a172d050a70c83bd9752b1dca8a153acb92abee7c33486c9a264dde60ffb"
+    },
+    {
+      "path": "services/agent-runtime/recovery.mjs",
+      "sha256": "aa2866bb3d472f8fe4db94881b3be1e9225b1866949370630dd4d14645271e79"
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-context.mjs",
+      "sha256": "3253b0b69ddac479978c6fd63226da469fc1ce72658bf4737d34feec10f55a70"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256": "f41ecc91e051800c8a8ff0b8b8fe5e8eacc879f1942ec624c2101687c22caad5"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256": "1543d40d420d29a171f863cccb00da4885f1fc278ff9937d3b50f3fcbd40b7ca"
+    },
+    {
+      "path": "services/agent-runtime/budget.mjs",
+      "sha256": "985e5b5436f97826edd7ce6b6ea542b0b0d492c1f4ef0c78423b5cae24027acc"
+    },
+    {
+      "path": "services/agent-runtime/checkpoint-team.mjs",
+      "sha256": "4fc85d2a44e507a89451f33cc83486abf88aff7db0ff61df9c025ad82970298c"
+    },
+    {
+      "path": "docs/test-evidence/helpers/operate-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "cdb9e26f85dad3e25f9edf9d303365818b5004af3cf52d049d5277c5f57d52c3"
+    },
+    {
+      "path": "docs/test-evidence/helpers/upgrade-go-funded-knowledge-web-2026-10-06.mjs",
+      "sha256": "2465ef87c93615edf709adb945895915a04591fca92358a6dc320de60b7886f7"
+    },
+    {
+      "path": "docs/test-evidence/helpers/stop-go-funded-run-web-2026-10-06.mjs",
+      "sha256": "22f928e9262c34b86971b07891e20adfa06457a7500f762ec6db0da2dfa37baf"
+    }
+  ],
+  "boundaries": {
+    "realApiCalls": 0,
+    "databaseOpens": 0,
+    "modelCalls": 0,
+    "providerQueries": 0,
+    "employeeFilesReadOrWritten": 0,
+    "sourceFilesModified": 0,
+    "dagChanges": 0,
+    "newKvStopOperatorHelpersModified": 0
+  },
+  "limitations": [
+    "Archive-derived eligibility is conditional, not a successful resume or a fresh DB/file verification.",
+    "No current device queue or local operation DB rows were read; four archived prepare/filesystem queues lack local-finished events. Durable supervised modifying-operation unknown count0 does not prove every native queue finished.",
+    "Fresh cost readiness, retained unknown receipt states, same-version task fee/hold attribution and whole funded budget guard must be inspected at actual admission. Archived activeReserved0 is not a native/DB/global unknown0 claim.",
+    "Root owns conservative attempt-count carryover repair; sibling owns runtime abort repair. As-read source hashes identify the audit basis, not a freeze of those ongoing repairs.",
+    "Operator retains exact Go/proof/one-POST guards and no full retry. Explicit true requires current unknown receipts; if fresh ledger has none, the helper rejects stale true and root must use actual fresh choice."
+  ]
+}

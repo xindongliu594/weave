@@ -1,0 +1,115 @@
+{
+  "kind": "independent-context-repair-source-and-real-request-review",
+  "status": "passed-no-p0-found",
+  "checkedAt": "2026-10-07T02:24:19.174Z",
+  "sources": [
+    {
+      "path": "docs/test-evidence/go-recovery-v10-context-repair-manifest-2026-10-07.json",
+      "bytes": 2462,
+      "sha256": "c8cf9ef5d6d2300f0dc2132f175c4bf6981afaea3f71ad33b0f00bd3c3eb8111"
+    },
+    {
+      "path": "services/agent-runtime/request-context.mjs",
+      "bytes": 10317,
+      "sha256": "c87def1cc00ab144ff6e3ddf4ae323df765764ee1f875fe38a7aa5885de7065b"
+    },
+    {
+      "path": "services/agent-runtime/openai-compatible.mjs",
+      "bytes": 40077,
+      "sha256": "e86e14d5f7e456f1119ac5469e607a90cf9e28615cd05d131a746b068e814510"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "bytes": 23186,
+      "sha256": "b4aea9d49ff858e772aebc7847752f5527712519226ad7e181a15e220a6e9cfc"
+    },
+    {
+      "path": "services/agent-runtime/product-tools.mjs",
+      "bytes": 10364,
+      "sha256": "171375266ef7c705703ee5ef27e335d8fb9a40b59722b82133e679bc092e325c"
+    },
+    {
+      "path": "services/agent-runtime/request-context.test.mjs",
+      "bytes": 11814,
+      "sha256": "f6e53ab120b071cbe1ddd0a50e325d4ef3ed50d21fd8dc6247ae205170dd6a76"
+    },
+    {
+      "path": "services/agent-runtime/request-preflight.test.mjs",
+      "bytes": 16026,
+      "sha256": "6494cb1def008d605b718a319feaeec23e81fccb2305a0d61e21fa96f2f6f3a1"
+    },
+    {
+      "path": "services/agent-runtime/product-concurrency.test.mjs",
+      "bytes": 15552,
+      "sha256": "fd52c1cdf7b952f59508880cecc9c18ff9aa867b27a6d2fa7589fa7de99daf47"
+    },
+    {
+      "path": "services/agent-runtime/task-output-limit-native.test.mjs",
+      "bytes": 9962,
+      "sha256": "1d8a69ebf23987ae7e76ff3b6dc9b8e33b03b1a3b5e4550b09ae082046bc0610"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-context-repair-tests-2026-10-07-final.txt",
+      "bytes": 8210,
+      "sha256": "8749ccc04fdcbab0e5decc9a4f128c043f5bfe0aa4cc7a7d681eda0e6bfb5675"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-context-repair-types-2026-10-07.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-context-repair-readonly-2026-10-07.json",
+      "bytes": 1760,
+      "sha256": "29e88051c63b99321bff52811f4c1b43cb561c6bc3996b3ba44925d8d1c4c64f"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-context-analysis-2026-10-07.json",
+      "bytes": 13903,
+      "sha256": "2d675382b064bb1899f3adbd3db99852f6070b91c3099960df59ede8897f4794"
+    },
+    {
+      "path": "docs/test-evidence/helpers/verify-go-recovery-v10-context-repair-readonly-2026-10-07.mjs",
+      "bytes": 6236,
+      "sha256": "65e6fbb6939788e66d50c1a901bb7541bf1a4b475bd38a2608d4519f1c1b1266"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-context-repair-independent-preview-2026-10-07.json",
+      "bytes": 1760,
+      "sha256": "29e88051c63b99321bff52811f4c1b43cb561c6bc3996b3ba44925d8d1c4c64f"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/operations.json",
+      "bytes": 61379,
+      "sha256": "7afe3d0eeab5b514ccc25c1a63d1cacfae904dd25e60b1d0941e1cb4cdb58f9e"
+    },
+    {
+      "path": "docs/test-evidence/go-recovery-v10-resume-budget-failed-2026-10-07/archive.json",
+      "bytes": 38989006,
+      "sha256": "0ef8ed9e2318184a4070aff541f72c1b789502718d07eec050a16c5eae34219b"
+    }
+  ],
+  "checks": [
+    "生产Host proof来自封闭Map与executor已知成功回执，不依赖模型自称成功",
+    "同run/version/session/employee/task/attempt/scope及完整args/result hash；重复call失去资格",
+    "native user+source tool唯一call/result配对、成功完整值；跨batch只移精确读pair，说明和其他pair保留",
+    "只有当前非input可写output的已知成功CAS解除旧读保护，新write完整代码/回执保持",
+    "fixed inputs、knowledge PIN、最新批准上下文保持；失败/未知/错scope/hash/未配对write不解除保护",
+    "冷Host Map默认空，不凭旧模型上下文或未重建证明提权",
+    "manifest全部source/log SHA相符，69/69及types0；强核对真实operations和全部actor字段后独立复算原真实request92403B/预留.0400281/输出10000/原cap192000/QA可用.0452769，0wire"
+  ],
+  "preview": {
+    "path": "docs/test-evidence/go-recovery-v10-context-repair-independent-preview-2026-10-07.json",
+    "bytes": 92403,
+    "reservation": 0.0400281,
+    "maxOutputTokens": 10000,
+    "wireCalls": 0
+  },
+  "limitations": [
+    "本次为代码和本地预览验收，尚未证明reload后的真实员工运行成功",
+    "single-call可入场不保证剩余任务预算足够持续多轮",
+    "工程manifest只有tests/types，没有独立build原日志，不补造证明",
+    "独立预览复用原冻结验证源码在内存执行，只增加真实operations/actor/SHA核对并写新结果；未创建新helper或改原冻结source"
+  ],
+  "sourceStableAfterReview": true
+}
