@@ -1,0 +1,179 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ gateway discovery, formal execution, versioned plans and deletion preserve history (5059.918443ms)
+✔ organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost (487.496071ms)
+✔ model planning preserves user input scope and refuses to remove an input recipient (410.256489ms)
+✔ dynamic loopback preview can save a gateway through the local proxy (9.699914ms)
+✔ cross-origin mutations, remote host headers, and malformed data fail closed (13.503397ms)
+✔ small trace pages preserve every complete event and do not change the full export (218.620439ms)
+✔ trace verification API persists a run and serves history after recreating the app (777.994268ms)
+✔ one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings (88.655167ms)
+✔ catalog refuses quotes fetched across a concurrent gateway edit (11.401779ms)
+✔ text replies accept null tool calls but reject malformed non-null calls and retain usage (142.236669ms)
+✔ gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes (77.21717ms)
+✔ gateway service checks reject results from a changed connection and diagnose a closed port (16.427621ms)
+✔ official pricing is the default, matches exact models, and does not fetch relay public prices (7.418378ms)
+✔ planning timeouts preserve the saved plan and keep unresolved billing without automatic retries (708.824376ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8383.37275
+✔ 31MiB archives below the total plaintext limit survive real encrypted export/restore/export (7032.627126ms)
+✔ plaintext above 50MiB is rejected before replacing target data or files (1186.592716ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8751.912577
+✔ project and run scope follows durable participating departments instead of a trace snapshot (321.245592ms)
+✔ a principal with only the primary department cannot read a cross-department object (117.370548ms)
+✔ tool approval requires operator or manager and approval permission in every department (86.934865ms)
+✔ current user status role issuer subject and epoch override trusted but stale identity snapshots (96.816836ms)
+✔ malformed or inconsistent project ownership stays admin-only without granting empty scopes (174.803332ms)
+✔ runs with empty duplicate or conflicting department sets do not inherit primary access (169.10008ms)
+✔ every resolved project department must exist and remain unarchived even when membership is retained (70.600889ms)
+✔ partial or malformed employee provenance cannot create a member-readable project scope (63.003831ms)
+✔ approvals and work files inherit the complete run scope while unbound old files stay private (160.573821ms)
+✔ knowledge only grants current department scope and does not treat AI employee grants as human membership (99.034944ms)
+✔ company revision scopes omit an absent department without widening member access (294.779134ms)
+✔ cost provenance checks every nonempty anchor and rejects missing or ambiguous links (325.832126ms)
+✔ settleCall preserves receipt visibility for matching reservation and usage anchors without duplicating list rows (282.693827ms)
+✔ duplicate cost IDs remain concealed when settlement state identity or any nullable anchor differs (455.717517ms)
+✔ shared SQL visibility filters before pagination and count without per-row authorization queries (81.7857ms)
+✔ revocation affects the next detail and list read without relying on session expiration (93.842225ms)
+✔ invalid resource kinds levels identifiers and forged principals fail closed (43.888957ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4183.409419
+✔ company methods are explicit, lazy, authorized and retain the original revision on recovery (2784.803776ms)
+✔ method publication rejects unsafe names and oversized bodies while ordinary documents remain usable (49.888207ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3100.04009
+✔ knowledge HTTP lists search and versions filter before pagination and never inherit private AI grants (2788.483524ms)
+✔ knowledge target bounds reject B to A before chunk or Skill body reads and permit fixed AB approval (604.329548ms)
+✔ department authoring preserves audit and source restrictions and cannot replay a revoked cached write (87.724272ms)
+✔ work reuse and efficiency exclude inaccessible historical AB runs before archive cost reads and metadata counts (556.485849ms)
+✔ real work candidate edit and publication retain every source and refuse a narrower destination (966.133043ms)
+API failure: Error
+✔ candidate publication audit failure rolls back the actual revision and candidate state (542.313755ms)
+✔ all reuse work references restrict candidate list and edits even when the primary run is local (258.668676ms)
+✔ native metadata exposes only enabled fixed tools granted to visible department employees (59.47363ms)
+✔ fixed citations require every source department before archive and chunk reads (255.385496ms)
+✔ document edit and withdrawal keep version CAS role checks provenance and transactional audit (284.428143ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6797.713063
+✔ source unions preserve every department restriction and fixed reference across two derivations (256.564223ms)
+✔ shared targets cannot drop a source department private flag or administrator-only restriction (48.49461ms)
+✔ malformed and conflicting immutable source references cannot become valid bounds (42.938196ms)
+✔ complete migration is repeatable and adds nullable authority/source fields with real identity foreign keys (83.937951ms)
+✔ durable run and revision readers retain legacy admin-only bounds and immutable references without backfill (52.445377ms)
+✔ reference validation binds existing fixed versions and hashes and restores omitted inherited restrictions (64.853252ms)
+✔ linked file provenance cannot discard the source run or disguise legacy uploads (58.065844ms)
+✔ corrupt provenance and cycles fail closed while unavailable database errors propagate (86.832605ms)
+✔ upload and generation persist server bounds and selected files carry their immutable provenance (124.834769ms)
+✔ knowledge writes reject B to A and private sharing and preserve prior revisions and admin-only flags (240.034804ms)
+✔ candidate creation persists pinned sources and publish forwards all work references without losing restrictions (167.446759ms)
+✔ manual candidate editing preserves inherited provenance and adds the unknown-content admin restriction (135.840045ms)
+✔ fixed file and revision hashes, source links and ancestry stay bound across two database derivations (98.486262ms)
+✔ HTTP candidate publication reaches the real knowledge writer and persists verified source bounds (201.272438ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2911.007059
+✔ API stores explicit protocol, keeps omitted legacy Chat fields, and rejects invalid protocol without creating a model (2691.280946ms)
+✔ Responses text API settles the full cached input and reserves captured wire bytes plus 1024 and the output cap (80.834698ms)
+✔ two API tool probes replay call_id history and keep Go session stable within each probe and isolated between probes (133.562332ms)
+✔ actual Responses wire budget and context limits reject before dispatch or a model reservation is inserted (227.175426ms)
+✔ valid usage plus malformed tool output is a settled paid probe failure with safe diagnostics (51.405231ms)
+✔ missing usage and HTTP 502 retain one uncertain fee and one dispatch without retry or synthetic-key leakage (90.299232ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3578.764903
+✔ identity initialization and request admission wait for the restore barrier (707.212993ms)
+✔ failed restore barrier preserves its error and never activates identity or prunes sessions (2.977696ms)
+✔ closing before restore readiness prevents a late identity activation (0.51377ms)
+✔ close drains identity initialization that has already entered SQL (1.94532ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1477.788471
+✔ real IDs and current plan versions isolate departments, pending approvals and costs (260.825194ms)
+✔ completed history never masks the latest failure or invents a delivery from a project label (26.144211ms)
+✔ bounded pages retain department-wide counts and deterministic ordering (44.868283ms)
+✔ empty departments load, archived or absent departments and invalid bounds are rejected (48.395554ms)
+✔ reads preserve pending approvals, run outcomes and the billing ledger (33.260164ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1659.992891
+✔ department, project pagination and workbench counts filter the whole collaboration scope before LIMIT (2962.927597ms)
+✔ creating a real project checks every department and assigned budget before writing (111.811924ms)
+✔ project creation locks every authorized department before reading the team, and rejects missing or archived configuration (85.728926ms)
+✔ plan writes reject budget increases and recheck revoked collaboration before same-key cached success (391.775291ms)
+✔ human managers may edit local descriptions but cannot add budget or model/tool grants (78.261197ms)
+✔ approval checks every can_approve and persists the actual human authority plus same-transaction audit (380.201524ms)
+API failure: Error
+API failure: Error
+✔ failed business audit rolls back approval and source-free plan updates (470.092661ms)
+✔ unknown run lineage and input-bearing historical plans cannot leak through project lists or versions (467.80541ms)
+✔ queued manager messages retain current authority and a revoked sender cannot replay or trigger a model call (249.425984ms)
+✔ member run list and cancellation use durable source bounds and current operator authority (485.351767ms)
+✔ owned planning quotes and confirmation are scoped and audit the human, without a model request (590.504959ms)
+✔ planning admission rejects an epoch revoked after preparation before reserving or dispatching to the provider (66.015511ms)
+✔ AI employee history restore is manager-scoped, does not create human membership and cannot revive additional grants (79.802162ms)
+✔ project and run reservations acquire authority before the cost-policy lock, using the single locked resource row (47.474236ms)
+✔ retry creates a new human approval and inherited source record, leaving the original authorization immutable (748.618258ms)
+✔ cancellation rechecks revoked authority, rolls back and releases its writer so a valid actor can cancel (401.27911ms)
+✔ a cancellation rollback failure preserves the authorization error and keeps the writer fenced (154.342431ms)
+✔ organization updates lock project then department then cost policy and still reject active collaboration (73.708017ms)
+✔ member plan edits cannot add or borrow another employee browser, MCP or model grants (1236.60719ms)
+✔ fixed historical plan and run departments constrain versions, pagination and workbench before current scope can shrink (701.048158ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10099.299827

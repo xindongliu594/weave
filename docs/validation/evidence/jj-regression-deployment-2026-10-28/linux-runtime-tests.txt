@@ -1,0 +1,41 @@
+✔ employee Hosts isolate registries, cancellation, failures and resumed history (204.013038ms)
+✔ failed employee setup leaves no published Agent and retains unproven native resources (28.94936ms)
+✔ closing coordination retains original unpublished native setup and latches unproven cleanup (35.9885ms)
+✔ approved domain schemas are scoped to each employee before a model request and are reapplied on cold resume (217.729994ms)
+✔ Host stopAdmission synchronously fences the real model adapter and employee creation (91.437955ms)
+✔ Host stopAdmission rejects coordinator tool held after DSH final guard (107.26367ms)
+✔ Host stopAdmission rejects employee local capability held after DSH final guard (76.935998ms)
+✔ Host close retains the coordinator wrapper during pending plugin teardown (56.933056ms)
+✔ Host close retains the employee wrapper during pending plugin teardown (57.124552ms)
+✔ Host close retains the coordinator fence after Cordis swallows a real disposer failure (64.737284ms)
+✔ Host close retains the employee fence after Cordis swallows a real disposer failure (54.540905ms)
+✔ employee materialization stopped before tool mounting cannot commit a late Host (29.130256ms)
+✔ employee materialization stopped during setup cannot commit an already mounted Host (33.688424ms)
+✔ legacy Host can fence model and employee admission without a task boundary (46.709723ms)
+✔ native same-QA verification then review survives a cold resume longer than the old status deadline (18535.892141ms)
+✔ user cancellation still aborts native cold resume without executing a later task (1285.91898ms)
+✔ missing formal QA handoff stops product admission before a coordinator or manager can take over (1867.128367ms)
+✔ a formal negative QA verdict remains a failed review and never unlocks manager acceptance (1823.853375ms)
+✔ the approved run deadline still aborts native cold resume and preserves accepted predecessors (15052.023652ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-287jxn","pid":2612105}
+✔ verification waits for root admission before allocating archive or DSH sessions (818.034624ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-iS00aS","pid":2612105}
+✔ verification retains original delayed close (772.469737ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-PhBA1f","pid":2612105}
+✔ verification retains original delayed close failure (794.712805ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-ddX0Dp","pid":2612105}
+✔ known verification business rejection releases after original successful cleanup and failed terminal (118.125354ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-Fp770z","pid":2612105}
+✔ verification requires the same explicit application manager before any archive write (3.290502ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-FjWJhX","pid":2612105}
+✔ failed terminal append preserves the original cleanup failure and latched writer (606.78565ms)
+VERIFICATION_WRITER_EXIT_CLEANUP={"root":"/home/jj/.local/share/weiwu/validation/regression-b37d00a-20261028/tmp/verification-writer-y5S3C7","pid":2612105}
+✔ unpublished actual employee setup keeps verification source unavailable (204.485286ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43952.631223

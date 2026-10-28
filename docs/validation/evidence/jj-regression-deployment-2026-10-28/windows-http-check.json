@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "url": "http://127.0.0.1:4312/",
+  "method": "HTTP via SSH, local proxy bypassed",
+  "browserInteraction": false,
+  "checks": [
+    {
+      "path": "/healthz",
+      "status": 200,
+      "milliseconds": 1418
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "milliseconds": 1648,
+      "database": "connected",
+      "runtimeReady": true,
+      "targetVerified": true
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "milliseconds": 1128
+    }
+  ]
+}

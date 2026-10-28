@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "release": "/home/jj/.local/share/weiwu/releases/weave-b37d00a-20261028",
+  "baseRelease": "/home/jj/.local/share/weiwu/releases/weiwu-plugin-install-full-d4c5eca-20261023",
+  "sourceCommit": "b37d00a",
+  "backup": "/home/jj/.local/share/weiwu/backups/regression-b37d00a-predeploy-v2-20261028",
+  "archiveSha256": "2f539f48fe587be685c3beb78b56132924465fdab6ad6147d88f3c5c79bcfb55",
+  "before": {
+    "runCount": 65,
+    "usageCount": 732,
+    "unknownHolds": 7,
+    "runDigest": "5b4d81d5e7beb63f94d44dd83224f8e4972181e9a52c3125586fbc9edde7397f",
+    "usageDigest": "cb1a9053ab3672b97990682caecb36eb2f855a7380eadf4737e2b670d8870f6f",
+    "holdDigest": "932a3257f1ea25618e1972de3403fa1e3417d2e42c53c1514e7043dbd97e7ebd",
+    "deviceGrantsDigest": "ea0fa3259e6a2fc248b3fdb8e4a2b77f47b42a1d8b7b3203e0eeda303abb3836",
+    "settingsDigest": "d4cf24bc5bd1ebd52d8c11f035cbe8eaabff23f17c1a0452c514c05fc6392a53"
+  },
+  "after": {
+    "runCount": 65,
+    "usageCount": 732,
+    "unknownHolds": 7,
+    "runDigest": "5b4d81d5e7beb63f94d44dd83224f8e4972181e9a52c3125586fbc9edde7397f",
+    "usageDigest": "cb1a9053ab3672b97990682caecb36eb2f855a7380eadf4737e2b670d8870f6f",
+    "holdDigest": "932a3257f1ea25618e1972de3403fa1e3417d2e42c53c1514e7043dbd97e7ebd",
+    "deviceGrantsDigest": "ea0fa3259e6a2fc248b3fdb8e4a2b77f47b42a1d8b7b3203e0eeda303abb3836",
+    "settingsDigest": "d4cf24bc5bd1ebd52d8c11f035cbe8eaabff23f17c1a0452c514c05fc6392a53"
+  },
+  "migrationPasses": 2,
+  "protectedTables": 19,
+  "backupFiles": 2500,
+  "modelCalls": 0,
+  "runtimeReady": true,
+  "openrig": {
+    "cleanDrain": true,
+    "noKernel": true,
+    "sameHost": true
+  }
+}

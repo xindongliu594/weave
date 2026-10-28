@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "path": "/assets/index-CaN5IZnQ.js",
+      "status": 200,
+      "sha256": "645bb308e4c263c01aa31d6029a000d015503c855c09e0dd281aa5314ee38745"
+    },
+    {
+      "path": "/assets/index-BW_TH37B.css",
+      "status": 200,
+      "sha256": "8441f4e6cbe6bb8bc4b7d8863dbbade258675bce6387974555126e83a1ec92d0"
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "title": "Weave \u4e3a\u4f0d \u00b7 \u4e00\u4e2a\u60f3\u6cd5\uff0c\u4e00\u652f\u56e2\u961f"
+    },
+    {
+      "path": "/healthz",
+      "status": 200
+    },
+    {
+      "path": "/auth/session",
+      "status": 200,
+      "mode": "legacy-local",
+      "authenticated": true
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "database": "connected",
+      "runtimeReady": true
+    },
+    {
+      "path": "/api/departments",
+      "status": 200,
+      "count": 3
+    },
+    {
+      "path": "/api/projects",
+      "status": 200,
+      "count": 15
+    },
+    {
+      "path": "/api/runs",
+      "status": 200,
+      "count": 65
+    },
+    {
+      "path": "/api/usage",
+      "status": 200,
+      "count": 732
+    },
+    {
+      "path": "/api/costs",
+      "status": 200
+    },
+    {
+      "path": "/api/knowledge/spaces",
+      "status": 200,
+      "count": 3
+    },
+    {
+      "path": "/api/capabilities/plugins",
+      "status": 200,
+      "count": 1
+    },
+    {
+      "path": "/api/department-workbench",
+      "status": 200,
+      "items": 2
+    }
+  ],
+  "modelCalls": 0,
+  "browserInteraction": false
+}
