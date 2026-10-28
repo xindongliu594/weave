@@ -29,7 +29,7 @@ test('company methods are explicit, lazy, authorized and retain the original rev
  assert.deepEqual(companySkills(snapshot,other),[]);assert.deepEqual(companySkills(snapshot,{...reader,tools:['knowledge_search']}),[]);
  const loaded=await store.queryKnowledge(snapshot,reader.id,'skill',created.data.id);assert.equal(loaded.content,body.content);
  assert.equal(await store.queryKnowledge(snapshot,other.id,'skill',created.data.id),undefined);
- const edited=await api('/knowledge/documents/'+created.data.id,{...body,content:'新的方法',version:1},'PUT');assert.equal(edited.status,200);
+ const edited=await api('/knowledge/documents/'+created.data.id,{...body,content:'新的方法',version:1},'PUT');assert.equal(edited.status,200,JSON.stringify(edited.data));
  assert.equal((await store.queryKnowledge(JSON.parse(JSON.stringify(snapshot)),reader.id,'skill',created.data.id)).content,body.content);
  const ordinary=await api('/knowledge/documents',{spaceId:'company',title:'普通资料',content:'资料不是指令。'});assert.equal(ordinary.status,201);
  const fresh=await store.knowledgeSnapshot([reader],'department');assert.equal(companySkills(fresh,reader).length,1);

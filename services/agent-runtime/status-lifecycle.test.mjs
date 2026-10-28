@@ -100,7 +100,11 @@ async function lifecycle(t, { resumeDelayMs = 0, cancelOnResume = false, deadlin
   try {
     const start = await runtime.start({ runId: id, approvedSnapshot: snapshot, routes: snapshot.agents.map(agent => ({ id: agent.modelId, wireModel: agent.modelId, name: agent.modelId,
       baseUrl: `http://127.0.0.1:${server.address().port}/v1`, inputRate: 1, outputRate: 2, maxOutputTokens: 512 })) });
-    if (cancelOnResume) { await Promise.race([resumed.promise, start.completion.then(result => { throw Error('Fixture stopped before native resume: ' + result.message); })]); const cancellation = runtime.cancel(id); releaseResume(); await cancellation; }
+    if (cancelOnResume) {
+      await Promise.race([resumed.promise, start.completion.then(result => { throw Error('Fixture stopped before native resume: ' + result.message); })]);
+      const cancellation = assert.rejects(runtime.cancel(id), { code: 'RUNTIME_WRITER_DRAIN_UNPROVEN' });
+      releaseResume(); await cancellation;
+    }
     if (deadlineDuringResume) {
       await Promise.race([resumed.promise, start.completion.then(result => { throw Error('Fixture stopped before native resume: ' + result.message); })]);
       // The production deadline closes Hosts and cancels unpublished setup.
@@ -108,11 +112,24 @@ async function lifecycle(t, { resumeDelayMs = 0, cancelOnResume = false, deadlin
       while (!readRun(root, id).events.some(e => e.type === 'run/deadline-exceeded')) await new Promise(resolve => setTimeout(resolve, 10));
       releaseResume();
     }
-    const outcome = await start.completion, archive = readRun(root, id);
+    const outcome = await start.completion;
+    if (cancelOnResume || deadlineDuringResume) {
+      // Unpublished native setup cannot prove teardown; keep its writer latched.
+      await assert.rejects(start.writerDrained, { code: 'RUNTIME_WRITER_DRAIN_UNPROVEN' });
+      assert.deepEqual(await runtime.inspect(), { ready: false, reason: 'RUNTIME_WRITER_DRAIN_UNPROVEN' });
+    } else await start.writerDrained;
+    const archive = readRun(root, id);
     return { outcome, archive, wires, usage, resumeCount };
   } finally {
-    clearTimeout(resumeTimer); releaseResume(); await runtime.cancel(id); t.mock.restoreAll();
-    server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await rm(root, { recursive: true, force: true });
+    clearTimeout(resumeTimer); releaseResume();
+    try {
+      if (cancelOnResume || deadlineDuringResume) await assert.rejects(runtime.cancel(id), { code: 'RUNTIME_WRITER_DRAIN_UNPROVEN' });
+      else await runtime.cancel(id);
+    } finally {
+      t.mock.restoreAll(); server.closeAllConnections();
+      try { await new Promise(resolve => server.close(resolve)); }
+      finally { await rm(root, { recursive: true, force: true }); }
+    }
   }
 }
 

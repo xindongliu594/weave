@@ -149,6 +149,25 @@ test('knowledge only grants current department scope and does not treat AI emplo
   await denied(requireResource('knowledgeDocument','missing',actor('admin')));
 });
 
+test('company revision scopes omit an absent department without widening member access', async () => {
+  const {requireKnowledgeDocument} = await import('../apps/api/src/resource-authorization.ts');
+  await grant('A','operator');
+  await db.query("INSERT INTO knowledge_spaces(id,name,scope) VALUES('company','Company fixture','company')");
+  for (const [id,departments] of [['company-root',[]],['company-derived',['A']]] as const) {
+    await db.query("INSERT INTO knowledge_documents(id,space_id,title) VALUES($1,'company','Fixture')",[id]);
+    await db.query(`INSERT INTO knowledge_revisions(document_id,version,content,sha256,source_bounds)
+      VALUES($1,1,'Synthetic company method',encode(sha256(convert_to('Synthetic company method','UTF8')),'hex'),$2)`,
+      [id,{requiredDepartmentIds:departments,adminOnly:true,private:false,refs:[]}]);
+    for (const principal of [{kind:'local-owner'} as const,actor('admin')]) {
+      assert.deepEqual((await requireKnowledgeDocument(db,principal,id,'operator')).departments,[...departments]);
+    }
+    for (const principal of [actor(),actor('auditor'),{kind:'device',deviceId:'d'},{kind:'system',service:'worker'}] as Principal[]) {
+      await denied(requireKnowledgeDocument(db,principal,id,'viewer'));
+      await denied(requireKnowledgeDocument(db,principal,id,'operator'));
+    }
+  }
+});
+
 test('cost provenance checks every nonempty anchor and rejects missing or ambiguous links', async () => {
   await cost('usage-run','r-ab','p-ab','A'); await cost('reservation-run','r-ab','p-ab','B',true);
   for (const id of ['usage-run','reservation-run']) await denied(requireResource('cost',id));

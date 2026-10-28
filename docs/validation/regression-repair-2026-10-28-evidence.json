@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-28",
+  "baseline": "38435f63e0db53169f5c5b4192fae142aa176dd3",
+  "scope": "Deterministic engineering regression only",
+  "uniqueFiles": 14,
+  "uniquePassed": 120.0,
+  "skipped": 0,
+  "failed": 0,
+  "paidModelCalls": 0,
+  "database": "Fresh per-file PGlite with one product connection; not independent PostgreSQL lock evidence",
+  "duplicateNote": "resource-authorization 17 cases rerun with stronger viewer/operator assertions; counted once",
+  "runs": [
+    {
+      "command": "node --test --test-concurrency=1 services/agent-runtime/status-lifecycle.test.mjs",
+      "log": "lifecycle-green-restricted.log",
+      "logSha256": "f913cb5befb6ef2a84d9b3c6a335e16dd68859a71333f3df281c5ef62ba266a4",
+      "exitCode": 0,
+      "observedPassed": 5.0,
+      "uniquePassed": 5,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "command": "node --test --test-concurrency=1 services/agent-runtime/employee-hosts.test.mjs services/agent-runtime/host-admission.test.mjs services/agent-runtime/verification-writer.test.mjs",
+      "log": "lifecycle-neighbors-native.log",
+      "logSha256": "b94eb50d091ac5bf904b3c4f6aac9c18cdae6b5e5232648dd619de6447ceb4f8",
+      "exitCode": 0,
+      "observedPassed": 21.0,
+      "uniquePassed": 21,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/api.test.ts",
+      "log": "api-full-final.log",
+      "logSha256": "cbf706193e11cb51f7cc9f8555663a3077290b94dc5489e300e301fb2c97c7b6",
+      "exitCode": 0,
+      "observedPassed": 14.0,
+      "uniquePassed": 14,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/backup-size.test.ts",
+      "log": "backup-size-green.log",
+      "logSha256": "ec98216f9200ed15f41cc1724844f2ba60d2a9983c1952ff5461f238abb498ff",
+      "exitCode": 0,
+      "observedPassed": 2.0,
+      "uniquePassed": 2,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/resource-authorization.test.ts tests/company-capabilities.test.ts tests/resource-knowledge-lineage.test.ts tests/source-bounds.test.ts",
+      "log": "company-scope-green.log",
+      "logSha256": "a0607d9c9a4cd35ab2f4ce4d9053f68cc7e9d236543b72fb932655bc557a6f25",
+      "exitCode": 0,
+      "observedPassed": 43.0,
+      "uniquePassed": 43,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/resource-authorization.test.ts tests/completion-protocol-api.test.ts tests/identity-initialization-barrier.test.ts",
+      "log": "completion-protocol-green.log",
+      "logSha256": "8af5a940ac79a28f20792b018c75fe7e2f259e1ab0e1097986d2cf37e6384212",
+      "exitCode": 0,
+      "observedPassed": 27.0,
+      "uniquePassed": 10,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/department-workbench.test.ts tests/resource-project-routes.test.ts",
+      "log": "workbench-green.log",
+      "logSha256": "49b8debad9aea77d35f94c2495fa546750a2fd93e9f82adf7f0811e885e2e716",
+      "exitCode": 0,
+      "observedPassed": 25.0,
+      "uniquePassed": 25,
+      "skipped": 0,
+      "failed": 0
+    }
+  ],
+  "build": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "log": "build-final.log",
+    "logSha256": "fc35b36be77d7013af7f5dfe2cce2f481a50c0f34ef729fe172918e1f2e6dfd8",
+    "knownWarning": "Existing Vite chunk above 500 kB"
+  },
+  "review": "Read-only independent review: no Critical or Important findings for these changes",
+  "notVerified": [
+    "Full 191 TypeScript / 86 portable runtime suite",
+    "Independent PostgreSQL backend locking",
+    "JJ deployment",
+    "Real model acceptance"
+  ]
+}

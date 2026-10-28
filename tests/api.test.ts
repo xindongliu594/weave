@@ -179,8 +179,22 @@ test('organization planning returns a complete editable DAG, rejects invalid pla
  const created=await call('/organizations','POST',edited);assert.equal(created.status,201,JSON.stringify(created.data));
  const project=(await call('/projects')).data.find((p:any)=>p.id===created.data.projectId);assert.deepEqual(project.plan,edited.plan);assert.equal(project.source,'model');assert.ok(project.planningCost>0);
  const versions=(await call('/projects/'+project.id+'/versions')).data;assert.equal(versions[0].version,1);assert.equal(versions[1].version,0);assert.deepEqual(versions[1].plan,preview.data.plan);
- const invalidGrant=structuredClone(project.plan);invalidGrant.agents[0].knowledgeSpaceIds=['missing-space'];assert.equal((await call('/projects/'+project.id+'/plan','PUT',{version:1,plan:invalidGrant,policy:{...project.policy,allowedKnowledgeSpaceIds:['missing-space']}})).status,200);
- const beforeApprovalCalls=requests;const denied=await call('/projects/'+project.id+'/approve','POST',{version:2});assert.equal(denied.status,422);assert.equal(denied.data.code,'KNOWLEDGE_GRANT_INVALID');assert.equal(requests,beforeApprovalCalls);
+ const invalidGrant=structuredClone(project.plan);invalidGrant.agents[0].knowledgeSpaceIds=['missing-space'];
+ const beforeGrantCalls=requests;
+ const invalidSave=await call('/projects/'+project.id+'/plan','PUT',{version:1,plan:invalidGrant,policy:{...project.policy,allowedKnowledgeSpaceIds:['missing-space']}});
+ assert.equal(invalidSave.status,422,JSON.stringify(invalidSave.data));assert.equal(invalidSave.data.code,'KNOWLEDGE_GRANT_INVALID');
+ const unchanged=(await call('/projects')).data.find((p:any)=>p.id===project.id);
+ assert.equal(unchanged.version,1);assert.deepEqual(unchanged.plan,project.plan);assert.equal(requests,beforeGrantCalls);
+ assert.deepEqual((await call('/projects/'+project.id+'/versions')).data.map((v:any)=>v.version),[1,0]);
+ // A real grant can disappear after saving; approval must still recheck it.
+ const spaceId='planning-grant-space',departmentId=(await pool.query('SELECT department_id FROM projects WHERE id=$1',[project.id])).rows[0].department_id;
+ await pool.query("INSERT INTO knowledge_spaces(id,name,scope,department_id) VALUES($1,'Planning grant fixture','department',$2)",[spaceId,departmentId]);
+ const granted=structuredClone(project.plan);granted.agents[0].knowledgeSpaceIds=[spaceId];
+ const saved=await call('/projects/'+project.id+'/plan','PUT',{version:1,plan:granted,policy:{...project.policy,allowedKnowledgeSpaceIds:[spaceId]}});
+ assert.equal(saved.status,200,JSON.stringify(saved.data));
+ await pool.query('UPDATE knowledge_spaces SET deleted_at=now() WHERE id=$1',[spaceId]);
+ const beforeApprovalCalls=requests;const denied=await call('/projects/'+project.id+'/approve','POST',{version:2});assert.equal(denied.status,422,JSON.stringify(denied.data));assert.equal(denied.data.code,'KNOWLEDGE_GRANT_INVALID');assert.equal(requests,beforeApprovalCalls);
+ assert.equal((await pool.query('SELECT count(*)::int AS n FROM project_runs WHERE project_id=$1',[project.id])).rows[0].n,0);
  plannedResponse={department:template.department,rationale:'bad cycle',tasks:template.plan.tasks.map((t:any,i:number)=>({...t,dependencies:i===0?['deliver']:t.dependencies}))};
  assert.equal((await call('/organizations/preview','POST',{...input,generate:true,maxPlanningCost:.1})).status,422);
  assert.equal((await call('/departments')).data.length,before+1);
@@ -245,7 +259,10 @@ test('cross-origin mutations, remote host headers, and malformed data fail close
 
 test('small trace pages preserve every complete event and do not change the full export', async () => {
   const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
-  const archive=createRunArchive(join(directory,'runs'),{title:'分页测试',mode:'fixture',agents:[],tasks:[],policy:{maxBudget:0}});
+  const departmentId='pagination-department',projectId='pagination-project';
+  const policy={maxBudget:0,maxAgents:1,maxConcurrentAgents:1,allowedDepartmentIds:[departmentId]},plan={rationale:'Synthetic pagination only',agents:[{id:'pagination-reader',name:'分页读取员',role:'manager',title:'只读夹具',instructions:'No model execution',modelId:'pagination-no-model',tools:[],sourceDepartmentId:departmentId,sourceAgentId:'pagination-reader'}],tasks:[]};
+  const snapshot={title:'分页测试',mode:'fixture',projectId,planVersion:1,departmentId,agents:plan.agents,tasks:[],policy};
+  const archive=createRunArchive(join(directory,'runs'),snapshot);
   for(let index=0;index<65;index++)archive.append('model/wire-request',{message:'完整原文-'+index+'中'.repeat(1000)});
   const first=await call(`/runs/${archive.id}?limit=30`);
   assert.equal(first.status,200);assert.equal(first.data.events.length,30);assert.equal(first.data.nextCursor,30);assert.equal(first.data.hasMore,true);
@@ -255,7 +272,13 @@ test('small trace pages preserve every complete event and do not change the full
   const all=[...first.data.events,...second.data.events,...last.data.events];
   assert.deepEqual(all.map(event=>event.seq),Array.from({length:66},(_,index)=>index+1));
   assert.equal(all[65].data.message,'完整原文-64'+'中'.repeat(1000));
-  const exported=await call(`/runs/${archive.id}/export`);assert.deepEqual(exported.data.events,all);
+  const unbound=await call(`/runs/${archive.id}/export`);assert.equal(unbound.status,404);assert.equal(unbound.data.code,'RESOURCE_NOT_FOUND');
+  // Export requires an actual persisted run; a loose archive is not authority.
+  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',[departmentId,{name:'分页夹具部门',agents:plan.agents}]);
+  await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,'分页夹具部门','Synthetic pagination fixture',$3,$4,'manual')",[projectId,departmentId,policy,plan]);
+  await pool.query('INSERT INTO plan_versions(project_id,version,plan,policy) VALUES($1,1,$2,$3)',[projectId,plan,policy]);
+  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids,authority_kind) VALUES($1,$2,1,'completed',$3,$4,'local-owner')",[archive.id,projectId,snapshot,[departmentId]]);
+  const exported=await call(`/runs/${archive.id}/export`);assert.equal(exported.status,200,JSON.stringify(exported.data));assert.deepEqual(exported.data.events,all);
   assert.equal((await call(`/runs/${archive.id}`)).data.events.length,66,'existing API consumers keep the default page size');
   for(const limit of ['0','301','1.5','bad'])assert.equal((await call(`/runs/${archive.id}?limit=${limit}`)).status,422);
   const {commitStepCheckpoint}=await import('../services/agent-runtime/step-checkpoints.mjs');

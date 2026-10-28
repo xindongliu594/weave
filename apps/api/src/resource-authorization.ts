@@ -98,7 +98,7 @@ const sourceCtes=`${ctes}, source_nodes AS (
   UNION ALL SELECT 'file',f.id,NULL,encode(sha256(convert_to(f.files::text,'UTF8')),'hex'),scope.departments,f.source_bounds,f.source_run_id,jsonb_typeof(f.files)='array'
   FROM work_file_snapshots f LEFT JOIN resource_runs scope ON scope.id=f.source_run_id
   UNION ALL SELECT 'knowledge-revision',r.document_id,r.version::text,r.sha256,
-    ARRAY(SELECT DISTINCT department FROM (SELECT s.department_id AS department UNION ALL SELECT jsonb_array_elements_text(${jsonArray("r.source_bounds->'requiredDepartmentIds'")})) departments ORDER BY department),
+    ARRAY(SELECT DISTINCT department FROM (SELECT s.department_id AS department UNION ALL SELECT jsonb_array_elements_text(${jsonArray("r.source_bounds->'requiredDepartmentIds'")})) departments WHERE department IS NOT NULL ORDER BY department),
     r.source_bounds,NULL::text,
     s.scope='department' AND s.deleted_at IS NULL AND d.deleted_at IS NULL AND s.department_id IS NOT NULL
       AND r.sha256=encode(sha256(convert_to(r.content,'UTF8')),'hex')

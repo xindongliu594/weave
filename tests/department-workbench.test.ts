@@ -4,24 +4,26 @@ import { once } from 'node:events';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import express from 'express';
-import { PGlite } from '@electric-sql/pglite';
 import { departmentWorkbenchRouter } from '../apps/api/src/department-workbench.ts';
 import { groupWorkbenchItems, workbenchItemLabel, type DepartmentWorkbenchData } from '../apps/web/src/department-workbench-view.ts';
 
-// An in-memory PostgreSQL-compatible database and a test-owned HTTP listener.
-// No application database, trace archive, model, scheduler or device is opened.
-const db = new PGlite();
+// Use the runner's fresh database and the real schema; the router requires the
+// identity and ownership tables too. No scheduler, trace archive or model runs.
+assert.equal(process.env.SIMULATED_INTEGRATION, 'pglite', 'Use scripts/test-integration.mjs for an isolated database');
+assert.equal(new URL(process.env.DATABASE_URL!).hostname, '127.0.0.1');
+const {pool: db, migrate} = await import('../apps/api/src/db.ts');
 let server: Server, baseUrl: string;
+const ownerHeaders = { 'x-fixture-owner': 'local-owner' };
 before(async () => {
-  await db.exec(`
-    CREATE TABLE departments(id text PRIMARY KEY,deleted_at timestamptz);
-    CREATE TABLE projects(id text PRIMARY KEY,department_id text,requirement text,version int,status text,created_at timestamptz);
-    CREATE TABLE project_runs(id text PRIMARY KEY,project_id text,project_version int,status text,error text,
-      created_at timestamptz,finished_at timestamptz,cancel_requested boolean DEFAULT false,snapshot jsonb);
-    CREATE TABLE tool_approvals(id text PRIMARY KEY,run_id text,status text);
-    CREATE TABLE usage(id text PRIMARY KEY,department_id text,cost numeric);
-    INSERT INTO departments VALUES ('research',NULL),('foreign',NULL),('archived',now()),('empty',NULL);
-    INSERT INTO projects VALUES
+  await migrate();
+  await db.query(`
+    INSERT INTO departments(id,data,deleted_at) VALUES ('research','{}',NULL),('foreign','{}',NULL),('archived','{}',now()),('empty','{}',NULL);
+    INSERT INTO models(id,data) VALUES ('workbench-no-model','{}');
+    INSERT INTO projects(id,department_id,requirement,version,status,created_at,department_version,department_name,policy,plan,source)
+    SELECT id,department_id,requirement,version,status,created_at::timestamptz,1,'Fixture',
+      jsonb_build_object('allowedDepartmentIds',jsonb_build_array(department_id)),
+      jsonb_build_object('agents',jsonb_build_array(jsonb_build_object('id','reader','sourceDepartmentId',department_id,'sourceAgentId','reader'))),'test'
+    FROM (VALUES
       ('draft','research','Same title',2,'DRAFT','2026-10-09T08:01Z'),
       ('active','research','Same title',1,'RUNNING','2026-10-09T08:02Z'),
       ('approval','research','Waiting for a command',1,'RUNNING','2026-10-09T08:03Z'),
@@ -29,8 +31,11 @@ before(async () => {
       ('interrupted','research','Stopped work',1,'INTERRUPTED','2026-10-09T08:05Z'),
       ('completed-label','research','A status without a completed run',1,'COMPLETED','2026-10-09T08:06Z'),
       ('finished','research','Actual completed run',1,'COMPLETED','2026-10-09T08:07Z'),
-      ('foreign-project','foreign','Same title',1,'RUNNING','2026-10-09T08:08Z');
-    INSERT INTO project_runs(id,project_id,project_version,status,error,created_at,finished_at,snapshot) VALUES
+      ('foreign-project','foreign','Same title',1,'RUNNING','2026-10-09T08:08Z')) fixture(id,department_id,requirement,version,status,created_at);
+    INSERT INTO project_runs(id,project_id,project_version,status,error,created_at,finished_at,snapshot,attempt)
+    SELECT id,project_id,project_version,status,error,created_at::timestamptz,finished_at::timestamptz,snapshot::jsonb,
+      row_number() OVER(PARTITION BY project_id ORDER BY created_at,id)::int
+    FROM (VALUES
       ('old-draft-run','draft',1,'failed','Old version error','2026-10-08T08:01Z',NULL,'{"private":"never return snapshot"}'),
       ('active-run','active',1,'running',NULL,'2026-10-09T09:02Z',NULL,'{}'),
       ('approval-run','approval',1,'running',NULL,'2026-10-09T09:03Z',NULL,'{}'),
@@ -38,20 +43,26 @@ before(async () => {
       ('failed-latest','failed',1,'failed','Transport outcome unknown; retained','2026-10-09T09:04Z','2026-10-09T10:04Z','{}'),
       ('interrupted-run','interrupted',1,'interrupted','Service restarted','2026-10-09T09:05Z',NULL,'{}'),
       ('finished-run','finished',1,'completed',NULL,'2026-10-09T09:07Z','2026-10-09T10:07Z','{}'),
-      ('foreign-run','foreign-project',1,'running',NULL,'2026-10-09T09:08Z',NULL,'{}');
-    INSERT INTO tool_approvals VALUES
+      ('foreign-run','foreign-project',1,'running',NULL,'2026-10-09T09:08Z',NULL,'{}')) fixture(id,project_id,project_version,status,error,created_at,finished_at,snapshot);
+    INSERT INTO tool_approvals(id,run_id,status,agent_id,tool,arguments)
+    SELECT id,run_id,status,'reader','synthetic-workbench-tool','{}'::jsonb FROM (VALUES
       ('one','approval-run','pending'),('two','approval-run','pending'),('past','approval-run','approved'),
-      ('stale','failed-latest','pending'),('old-version','old-draft-run','pending'),('foreign','foreign-run','pending');
-    INSERT INTO usage VALUES ('u1','research',0.21),('u2','research',0.04),('u3','foreign',19.0);
+      ('stale','failed-latest','pending'),('old-version','old-draft-run','pending'),('foreign','foreign-run','pending')) fixture(id,run_id,status);
+    INSERT INTO usage(id,department_id,cost,model_id,input_tokens,output_tokens,purpose)
+    SELECT id,department_id,cost,'workbench-no-model',0,0,'Synthetic workbench fixture' FROM (VALUES
+      ('u1','research',0.21),('u2','research',0.04),('u3','foreign',19.0)) fixture(id,department_id,cost);
   `);
-  const app = express(); app.use('/api', departmentWorkbenchRouter(db));
+  const app = express();
+  // Test-only identity dependency. The actual router still calls httpPrincipal.
+  app.use((_req,res,next) => { if (_req.get('x-fixture-owner') === 'local-owner') res.locals.principal = { kind: 'local-owner' }; next(); });
+  app.use('/api', departmentWorkbenchRouter(db));
   app.use((error: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => res.status(error.status ?? 400).json({ message: error.message }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening');
   baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api/department-workbench`;
 });
-after(async () => { if (server) await new Promise<void>(done => server.close(() => done())); await db.close(); });
+after(async () => { if (server) await new Promise<void>(done => server.close(() => done())); await db.end(); });
 async function read(query = 'departmentId=research') {
-  const response = await fetch(baseUrl + '?' + query); assert.equal(response.status, 200);
+  const response = await fetch(baseUrl + '?' + query, {headers: ownerHeaders}); assert.equal(response.status, 200);
   return await response.json() as DepartmentWorkbenchData;
 }
 
@@ -91,9 +102,10 @@ test('bounded pages retain department-wide counts and deterministic ordering', a
 
 test('empty departments load, archived or absent departments and invalid bounds are rejected', async () => {
   const empty = await read('departmentId=empty'); assert.equal(empty.summary.total, 0); assert.deepEqual(empty.items, []);
-  for (const departmentId of ['archived', 'missing']) assert.equal((await fetch(baseUrl + '?departmentId=' + departmentId)).status, 404);
+  assert.equal((await fetch(baseUrl + '?departmentId=research')).status, 401, 'the actual router still rejects a missing principal');
+  for (const departmentId of ['archived', 'missing']) assert.equal((await fetch(baseUrl + '?departmentId=' + departmentId, {headers: ownerHeaders})).status, 404);
   for (const query of ['departmentId=research&limit=201', 'departmentId=research&offset=-1', 'departmentId=research&limit=2.5', 'departmentId=research&extra=true', 'departmentId=research&departmentId=foreign', ''])
-    assert.equal((await fetch(baseUrl + '?' + query)).status, 400, query);
+    assert.equal((await fetch(baseUrl + '?' + query, {headers: ownerHeaders})).status, 400, query);
 });
 
 test('reads preserve pending approvals, run outcomes and the billing ledger', async () => {

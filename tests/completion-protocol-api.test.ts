@@ -73,7 +73,8 @@ before(async () => {
   await db.migrate();
   app = (await import('../apps/api/src/app.ts')).createApp();
   // Disable background work so the file tests only API completion/probe paths.
-  await app.locals.shutdown();
+  await app.locals.shutdownBackground();
+  await app.locals.ready;
   api = app.listen(0, '127.0.0.1'); await once(api, 'listening'); apiOrigin = 'http://127.0.0.1:' + (api.address() as AddressInfo).port;
   fixture = http.createServer(async (request, response) => {
     try {
