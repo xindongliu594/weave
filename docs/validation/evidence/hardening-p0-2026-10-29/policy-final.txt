@@ -1,0 +1,20 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ pre-identity legacy business backups restore policy and unknown historical policy versions (10332.4285ms)
+✔ approval freezes an execution phase while preserving earlier planning dialogue as quoted background (1053.1582ms)
+✔ manual scope expansion requires explicit policy; generated plans and planner selection cannot expand it (2438.2375ms)
+✔ planner receives the project net budget and generated validation deducts the newly billed planning call (454.4155ms)
+✔ project list validation includes open cost holds without modifying the ledger or starting execution (786.9347ms)
+✔ approval freezes per-call output limits separately from the cumulative task estimates (1194.6298ms)
+✔ archived departments and revoked private knowledge grants block approval or retry without changing old snapshots (1943.4827ms)
+﹣ request admission fences stale lease owners and rechecks current run authorization transactionally (0.3891ms) # requires independent PostgreSQL backends and row locks
+﹣ queue skips locked projects and simultaneous retries create at most one successor (0.2546ms) # requires independent PostgreSQL backends and row locks
+✔ modern execution policy history rejects business-only backup without changing snapshots, ledger, audit or archives (307.0469ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 19528.1574

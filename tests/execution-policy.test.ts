@@ -3,17 +3,17 @@ import {before,after,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
 import http from 'node:http';
-import {mkdtemp,rm} from 'node:fs/promises';
+import {mkdtemp,rm,readdir,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve,sep} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {toolEvidence} from './model-fixture.ts';
 import {bindPolicy} from '../packages/contracts/index.ts';
-import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
+import {createRunArchive,readRun} from '../services/agent-runtime/trace-store.mjs';
 const base=process.env.DATABASE_URL??'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department';
 const admin=new pg.Pool({connectionString:base}),schema='execution_policy_'+Date.now();
-let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,requests=0,candidate:any,lastInput:any;
+let pool:pg.Pool,app:any,server:any,gateway:any,url:string,dir:string,requests=0,candidate:any,lastInput:any,portableBackup:any;
 async function call(path:string,method='GET',body?:any){const response=await fetch(url+path,{method,headers:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});return {status:response.status,data:await response.json() as any};}
 const agent={id:'manager',name:'经理',role:'manager',title:'经理',instructions:'协调任务',modelId:'model',tools:[] as string[],knowledgeSpaceIds:[] as string[]};
 const policy={maxBudget:1,maxAgents:2,maxConcurrentAgents:1,deadlineSeconds:300};
@@ -37,6 +37,63 @@ before(async()=>{
  for(const id of ['model','outside'])await pool.query("INSERT INTO models(id,data,status,capabilities) VALUES($1,$2,'available',$3)",[id,{name:id,gatewayId:'gateway',model:id,inputRate:1,outputRate:1},toolEvidence]);
 });
 after(async()=>{await app?.locals.shutdown();for(const s of [server,gateway])if(s)await new Promise<void>(r=>s.close(()=>r()));await pool?.end();await admin.query('DROP SCHEMA '+schema+' CASCADE');await admin.end();if(dir){assert.ok(resolve(dir).startsWith(resolve(tmpdir())+sep+'execution-policy-'));await rm(dir,{recursive:true,force:true});}});
+
+test('pre-identity legacy business backups restore policy and unknown historical policy versions',async()=>{
+ // A genuine pre-identity installation has no audit records. Seed its business
+ // rows before any modern mutating HTTP call; never clear real audit history.
+ assert.equal((await pool.query('SELECT count(*)::int AS n FROM human_audit_events')).rows[0].n,0);
+ const id=randomUUID(),departmentId=randomUUID();
+ const plan={rationale:'旧业务备份权限验证',agents:[agent],tasks:[{id:'legacy-task',assigneeId:'manager',subject:'核对权限',objective:'整理权限清单',dependencies:[],acceptanceCriteria:['交付权限清单'],estimatedInputTokens:1000,estimatedOutputTokens:1000}]};
+ await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',[departmentId,{name:'旧业务部门',agents:[agent]}]);
+ await pool.query("INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,'旧业务部门','旧业务权限回归',$3,$4,'manual')",[id,departmentId,policy,plan]);
+ await pool.query('INSERT INTO plan_versions(project_id,version,plan) VALUES($1,1,$2)',[id,plan]);
+ const p={id,plan};
+ await pool.query('UPDATE projects SET policy=$1,version=2 WHERE id=$2',[policy,p.id]);
+ await pool.query('UPDATE plan_versions SET policy=NULL WHERE project_id=$1',[p.id]);
+ await pool.query('INSERT INTO plan_versions(project_id,version,plan) VALUES($1,2,$2)',[p.id,p.plan]);
+ const {migrateProduct}=await import('../apps/api/src/product-schema.ts');await migrateProduct(pool);
+ // Recorded pre-identity terminal history, with its real archive and cost receipt.
+ // No approval actor or live execution authorization is manufactured here.
+ const runId=randomUUID(),usageId=randomUUID();
+ const historicalSnapshot={projectId:id,planVersion:2,departmentId,departmentIds:[departmentId],agents:plan.agents,tasks:plan.tasks,policy:bindPolicy(policy,plan.agents,departmentId)};
+ const archive=createRunArchive(join(dir,'runs'),historicalSnapshot,{id:runId});
+ archive.append('run/finished',{status:'cancelled'});
+ const originalRun=readRun(join(dir,'runs'),runId)!;
+ assert.equal(originalRun.integrity,'ok');
+ await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,department_ids) VALUES($1,$2,2,'cancelled',$3,$4)",[runId,id,originalRun.snapshot,[departmentId]]);
+ await pool.query("INSERT INTO usage(id,model_id,project_id,run_id,department_id,input_tokens,output_tokens,cost,purpose) VALUES($1,'model',$2,$3,$4,100,23,.0123,'historical-execution-fixture')",[usageId,id,runId,departmentId]);
+ const originalUsage=(await pool.query('SELECT * FROM usage WHERE id=$1',[usageId])).rows[0];
+ const archiveSnapshot=await readFile(join(archive.dir,'snapshot.json'));
+ const archiveEvents=await readFile(join(archive.dir,'events.jsonl'));
+
+ const versions=(await call('/projects/'+p.id+'/versions')).data;assert.equal(versions[0].policy,null);assert.equal(versions[1].policy,null,'unknown historical policies are not invented');assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy,bindPolicy(policy,p.plan.agents,departmentId));
+ const backup=await call('/backup/export','POST',{password:'execution-policy-backup'});assert.equal(backup.status,200,JSON.stringify(backup.data));portableBackup=backup.data;
+ await pool.query("UPDATE projects SET policy=policy||'{\"allowedTools\":[\"terminal\"]}'::jsonb WHERE id=$1",[p.id]);
+ assert.equal((await call('/backup/restore','POST',{password:'execution-policy-backup',backup:backup.data,confirmation:'RESTORE'})).status,200);
+ assert.deepEqual((await call('/projects/'+p.id+'/versions')).data,versions);
+ assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy.allowedTools,[]);
+ const {encryptBackup,decryptBackup}=await import('../apps/api/src/backup.ts');const legacy=await decryptBackup(backup.data,'execution-policy-backup');
+ assert.equal(legacy.tables.project_runs.length,1,'legacy migration requires a populated historical run');
+ assert.equal(legacy.tables.usage.length,1,'legacy migration requires a populated cost receipt');
+ for(const item of legacy.tables.projects)for(const key of ['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds'])delete item.policy[key];
+ for(const version of legacy.tables.plan_versions)delete version.policy;
+  for(const run of legacy.tables.project_runs)delete run.department_ids;
+  for(const usage of legacy.tables.usage)delete usage.department_id;
+ const oldBackup=await encryptBackup(legacy,'execution-policy-backup');assert.equal((await call('/backup/restore','POST',{password:'execution-policy-backup',backup:oldBackup,confirmation:'RESTORE'})).status,200);
+ assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy.allowedTools,[]);
+ assert.ok((await call('/projects/'+p.id+'/versions')).data.every((version:any)=>version.policy===null));
+ const restoredRun=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[runId])).rows[0];
+ assert.deepEqual(restoredRun.department_ids,historicalSnapshot.departmentIds,'missing run department_ids migrate from the fixed snapshot');
+ assert.deepEqual(restoredRun.snapshot,originalRun.snapshot);assert.equal(restoredRun.project_id,id);assert.equal(restoredRun.project_version,2);
+ const restoredUsage=(await pool.query('SELECT * FROM usage WHERE id=$1',[usageId])).rows[0];
+ assert.equal(restoredUsage.department_id,departmentId,'missing usage department_id migrates from its project');
+ assert.deepEqual(restoredUsage,originalUsage,'receipt amount, model, tokens, purpose and project/run attribution remain unchanged');
+ assert.equal(Number(restoredUsage.cost),.0123);assert.equal(restoredUsage.project_id,id);assert.equal(restoredUsage.run_id,runId);
+ assert.equal(readRun(join(dir,'runs'),runId)!.integrity,'ok');
+ assert.deepEqual(await readFile(join(archive.dir,'snapshot.json')),archiveSnapshot);
+ assert.deepEqual(await readFile(join(archive.dir,'events.jsonl')),archiveEvents);
+
+});
 
 test('approval freezes an execution phase while preserving earlier planning dialogue as quoted background',async()=>{
  const history='先讨论一个 Todo API，只生成草案，暂不保存，等待确认。\n\n增加独立测试，并按实际终端结果验收。';
@@ -158,8 +215,10 @@ test('approval freezes per-call output limits separately from the cumulative tas
 });
 
 test('archived departments and revoked private knowledge grants block approval or retry without changing old snapshots',async()=>{
+ const before=requests;
  const space=(await call('/knowledge/spaces','POST',{name:'可撤回知识',scope:'company'})).data;
  const p=await project([{...agent,tools:['knowledge_search'],knowledgeSpaceIds:[space.id]}]);
+ const unapproved=await project([{...agent,tools:['knowledge_search'],knowledgeSpaceIds:[space.id]}]);
  const run=await call('/projects/'+p.id+'/approve','POST',{version:1});assert.equal(run.status,202,JSON.stringify(run.data));await call('/runs/'+run.data.id+'/cancel','POST',{});
  const original=(await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[run.data.id])).rows[0].snapshot;
  const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
@@ -169,13 +228,28 @@ test('archived departments and revoked private knowledge grants block approval o
  await call('/knowledge/spaces/'+space.id,'DELETE',{version:1});
  assert.equal((await call('/runs/'+run.data.id+'/retry','POST',{resume:true})).data.code,'KNOWLEDGE_GRANT_INVALID');
  assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[run.data.id])).rows[0].snapshot,original);
- const fresh=await project();await call('/departments/'+fresh.departmentId,'DELETE',{version:1});
- assert.equal((await call('/projects/'+fresh.id+'/approve','POST',{version:1})).data.code,'DEPARTMENT_ARCHIVED');
+ const fresh=await project();
+ const saved=(await pool.query('SELECT plan,policy,version FROM projects WHERE id=$1',[fresh.id])).rows[0];
+ const versions=(await call('/projects/'+fresh.id+'/versions')).data;
+ assert.equal((await call('/departments/'+fresh.departmentId,'DELETE',{version:1})).status,200);
+ const denied=await call('/projects/'+fresh.id+'/approve','POST',{version:1});
+ assert.equal(denied.status,404);assert.equal(denied.data.code,'RESOURCE_NOT_FOUND','archived resources are concealed at the current authorization boundary');
+ assert.equal((await pool.query('SELECT id FROM project_runs WHERE project_id=$1',[fresh.id])).rowCount,0);
+ assert.deepEqual((await pool.query('SELECT plan,policy,version FROM projects WHERE id=$1',[fresh.id])).rows[0],saved);
+ assert.deepEqual((await call('/projects/'+fresh.id+'/versions')).data,versions);
+ assert.equal(requests,before,'archived department approval adds no provider call');
  const privateDept=await project();
  const privateSpace=(await call('/knowledge/spaces','POST',{name:'员工私有',scope:'employee',departmentId:privateDept.departmentId,agentIds:['manager']})).data;
  const forged={...p.plan,agents:[{...p.plan.agents[0],knowledgeSpaceIds:[privateSpace.id]}]};
- assert.equal((await call('/projects/'+p.id+'/plan','PUT',{version:1,plan:forged,policy:{...p.policy,allowedKnowledgeSpaceIds:[privateSpace.id]}})).status,200);
- assert.equal((await call('/projects/'+p.id+'/approve','POST',{version:2})).data.code,'KNOWLEDGE_GRANT_INVALID','project allowlist never grants access to another department');
+ const priorVersions=(await call('/projects/'+p.id+'/versions')).data;
+ const forgedResponse=await call('/projects/'+p.id+'/plan','PUT',{version:1,plan:forged,policy:{...p.policy,allowedKnowledgeSpaceIds:[privateSpace.id]}});
+ assert.equal(forgedResponse.status,422);assert.equal(forgedResponse.data.code,'KNOWLEDGE_GRANT_INVALID','project allowlist never grants access to another department, including at save time');
+ assert.deepEqual((await call('/projects/'+p.id+'/versions')).data,priorVersions,'a rejected foreign grant cannot create a policy version');
+ assert.deepEqual((await pool.query('SELECT snapshot FROM project_runs WHERE id=$1',[run.data.id])).rows[0].snapshot,original);
+ assert.equal((await call('/projects/'+unapproved.id+'/approve','POST',{version:1})).data.code,'KNOWLEDGE_GRANT_INVALID','approval rejects a revoked grant before creating a run');
+ assert.equal((await pool.query('SELECT id FROM project_runs WHERE project_id=$1',[unapproved.id])).rowCount,0);
+ assert.equal((await pool.query('SELECT id FROM project_runs WHERE project_id=$1',[p.id])).rowCount,1,'rejected approval and retry create no successor');
+ assert.equal(requests,before,'permission validation never calls a model');
 });
 
 test('request admission fences stale lease owners and rechecks current run authorization transactionally',{skip:process.env.SIMULATED_INTEGRATION==='pglite'?'requires independent PostgreSQL backends and row locks':false},async()=>{
@@ -215,24 +289,28 @@ test('queue skips locked projects and simultaneous retries create at most one su
  await call('/runs/'+children[0].id+'/cancel','POST',{});
 });
 
-test('legacy projects inherit only their existing scope; backup restores policy and historical policy versions',async()=>{
- const p=await project();
- await pool.query('UPDATE projects SET policy=$1,version=2 WHERE id=$2',[policy,p.id]);
- await pool.query('UPDATE plan_versions SET policy=NULL WHERE project_id=$1',[p.id]);
- await pool.query('INSERT INTO plan_versions(project_id,version,plan) VALUES($1,2,$2)',[p.id,p.plan]);
- const {migrateProduct}=await import('../apps/api/src/product-schema.ts');await migrateProduct(pool);
- const versions=(await call('/projects/'+p.id+'/versions')).data;assert.equal(versions[0].policy,null);assert.equal(versions[1].policy,null,'unknown historical policies are not invented');assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy,bindPolicy(policy,p.plan.agents));
- const backup=await call('/backup/export','POST',{password:'execution-policy-backup'});assert.equal(backup.status,200,JSON.stringify(backup.data));
- await pool.query("UPDATE projects SET policy=policy||'{\"allowedTools\":[\"terminal\"]}'::jsonb WHERE id=$1",[p.id]);
- assert.equal((await call('/backup/restore','POST',{password:'execution-policy-backup',backup:backup.data,confirmation:'RESTORE'})).status,200);
- assert.deepEqual((await call('/projects/'+p.id+'/versions')).data,versions);
- assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy.allowedTools,[]);
- const {encryptBackup,decryptBackup}=await import('../apps/api/src/backup.ts');const legacy=await decryptBackup(backup.data,'execution-policy-backup');
- for(const item of legacy.tables.projects)for(const key of ['allowedModelIds','allowedTools','allowedKnowledgeSpaceIds'])delete item.policy[key];
- for(const version of legacy.tables.plan_versions)delete version.policy;
-  for(const run of legacy.tables.project_runs)delete run.department_ids;
-  for(const usage of legacy.tables.usage)delete usage.department_id;
- const oldBackup=await encryptBackup(legacy,'execution-policy-backup');assert.equal((await call('/backup/restore','POST',{password:'execution-policy-backup',backup:oldBackup,confirmation:'RESTORE'})).status,200);
- assert.deepEqual((await call('/projects')).data.find((item:any)=>item.id===p.id).policy.allowedTools,[]);
- assert.ok((await call('/projects/'+p.id+'/versions')).data.every((version:any)=>version.policy===null));
+test('modern execution policy history rejects business-only backup without changing snapshots, ledger, audit or archives',async()=>{
+ const before=requests;
+ const files=async()=>{
+  const entries:Record<string,string>={};
+  async function walk(root:string){for(const entry of await readdir(root,{withFileTypes:true})){const path=join(root,entry.name);if(entry.isDirectory())await walk(path);else entries[path]=Buffer.from(await readFile(path)).toString('base64');}}
+  await walk(join(dir,'runs'));return entries;
+ };
+ const state=async()=>({
+  projects:(await pool.query('SELECT * FROM projects ORDER BY id')).rows,
+  versions:(await pool.query('SELECT * FROM plan_versions ORDER BY project_id,version')).rows,
+  runs:(await pool.query('SELECT * FROM project_runs ORDER BY id')).rows,
+  usage:(await pool.query('SELECT * FROM usage ORDER BY id')).rows,
+  reservations:(await pool.query('SELECT * FROM model_reservations ORDER BY id')).rows,
+  audit:(await pool.query('SELECT * FROM human_audit_events ORDER BY id')).rows,
+  outbox:(await pool.query('SELECT * FROM audit_outbox ORDER BY id')).rows,
+  files:await files()
+ });
+ const original=await state();assert.ok(original.audit.length>0,'modern HTTP writes retain their audit history');
+ const exported=await call('/backup/export','POST',{password:'execution-policy-backup'});
+ assert.equal(exported.status,409);assert.equal(exported.data.code,'BACKUP_SOURCE_IDENTITY_UNSUPPORTED');
+ const restored=await call('/backup/restore','POST',{password:'execution-policy-backup',backup:portableBackup,confirmation:'RESTORE'});
+ assert.equal(restored.status,409);assert.equal(restored.data.code,'BACKUP_DESTINATION_PROTECTED');
+ assert.deepEqual(await state(),original);
+ assert.equal(requests,before,'rejected backups cannot call a model');
 });

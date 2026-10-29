@@ -1,0 +1,22 @@
+✔ single manager is a valid one-agent department (15.9104ms)
+✔ legacy placeholder tasks cannot pass execution validation through configuration-only edits (22.0168ms)
+✔ an explicit one-person text plan remains executable without file tools (1.8038ms)
+✔ recovery policy cannot authorize unbounded retries or immediate false stall decisions (8.3959ms)
+✔ team protocol capability is required even without workspace tools and for fallback models (2.9623ms)
+✔ cyclic dependencies and missing owners are rejected (1.7345ms)
+✔ unknown model, excessive concurrency and cost cannot pass validation (1.5481ms)
+✔ manager count, duplicate agent IDs and empty acceptance are rejected (3.7739ms)
+✔ task estimates and task turn limits must fit the approved policy (3.2609ms)
+✔ run inputs require valid recipients, bounded text, unique IDs and a retrieval grant (14.8795ms)
+✔ identity store uses its direct SQL adapter through the standard integration entry (1.9213ms)
+✔ other files retain the socket preload and cannot inherit the direct identity flag (0.4149ms)
+✔ identity path comparison follows platform casing without matching other files (0.4656ms)
+✔ runner selection preserves caller filters and never adds test skips (1.6316ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1142.8568

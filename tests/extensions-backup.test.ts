@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import express from 'express';
 import { once } from 'node:events';
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type http from 'node:http';
@@ -66,7 +66,14 @@ before(async () => {
   await pool.query("INSERT INTO model_reservations(id,model_id,project_id,purpose,amount,input_rate,output_rate,status) VALUES('unknown-cost','model','project','backup-fixture',0.13,1,2,'uncertain')");
   await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot) VALUES('run','project',1,'completed',$1)", [{ approval: { kind: 'project' }, title: 'Fixture completed', agents: [agent], policy }]);
   await pool.query("INSERT INTO knowledge_spaces(id,name,scope,agent_ids) VALUES('space','经验','company','[]')");
-  const knowledge = await import('../apps/api/src/knowledge.ts'); documentId = (await knowledge.saveKnowledgeDocument({ spaceId: 'space', title: '经验来源', content: '测试前应确认版本。' })).id;
+  // This positive fixture represents a pre-identity business-only installation.
+  // Modern knowledge writes create audit history that v1 intentionally cannot export.
+  documentId = randomUUID(); const content = '测试前应确认版本。';
+  await pool.query("INSERT INTO knowledge_documents(id,space_id,title) VALUES($1,'space','经验来源')", [documentId]);
+  await pool.query('INSERT INTO knowledge_revisions(document_id,version,content,sha256) VALUES($1,1,$2,$3)', [documentId, content, createHash('sha256').update(content).digest('hex')]);
+  const { chunkDocument } = await import('../services/agent-runtime/knowledge.mjs');
+  for (const chunk of chunkDocument(documentId, 1, content)) await pool.query('INSERT INTO knowledge_chunks(id,document_id,version,line_start,line_end,content,tokens) VALUES($1,$2,1,$3,$4,$5,$6)', [chunk.id, documentId, chunk.lineStart, chunk.lineEnd, chunk.content, JSON.stringify(chunk.tokens)]);
+  await (await import('../apps/api/src/obsidian.ts')).writeVaultDocument(documentId);
   const revision = (await pool.query('SELECT sha256 FROM knowledge_revisions WHERE document_id=$1 AND version=1', [documentId])).rows[0];
   await pool.query("INSERT INTO automation_schedules(id,name,source_project_id,snapshot,kind,interval_seconds,next_due) VALUES('schedule','每日检查','project',$1,'interval',86400,now()+interval '1 day')", [{ department_id: 'department', department_version: 1, department_name: 'Fixture', requirement: '备份扩展功能测试需求', policy, plan }]);
   await pool.query("INSERT INTO automation_occurrences(id,schedule_id,due_at,project_id) VALUES('occurrence','schedule',now(),'project')");
@@ -85,7 +92,7 @@ before(async () => {
   const {createArchiveWriterManager}=await import('../services/agent-runtime/archive-writer-scope.mjs');
   const {createBackupRestoreState,migrateBackupRestoreState}=await import('../apps/api/src/backup-restore-state.ts');await migrateBackupRestoreState(pool);
   const writers=createArchiveWriterManager({traceRoot:join(directory,'runs')}),state=createBackupRestoreState({pool,writers,traceRoot:join(directory,'runs'),dataRoot:directory});await state.reconcilePending();
-  const app = express(); app.use(express.json({ limit: '45mb' }));app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();}); app.use(backupModule.backupRouter(join(directory, 'runs'),writers,state)); app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message }));
+  const app = express(); app.use(express.json({ limit: '45mb' }));app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();}); app.use(backupModule.backupRouter(join(directory, 'runs'),writers,state)); app.use((error: any, _req: any, res: any, _next: any) => res.status(error.status ?? 500).json({ message: error.message, code: error.code }));
   server = app.listen(0, '127.0.0.1'); await once(server, 'listening'); url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 });
 after(async () => { if (server) await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await pool?.end(); await admin.query(`DROP SCHEMA ${schema} CASCADE`); await admin.end(); if (directory) await rm(directory, { recursive: true, force: true }); });
@@ -193,4 +200,29 @@ test('legacy backups without extension tables restore with empty defaults rather
   const result = await call('restore', { password, backup: await backupModule.encryptBackup(legacy, password), confirmation: 'RESTORE' }); assert.equal(result.status, 200, JSON.stringify(result.data));
   for (const table of extensionTables) assert.equal((await pool.query('SELECT * FROM ' + table)).rowCount, 0, `${table} is reset to the old backup's empty state`);
   assert.equal((await pool.query("SELECT id FROM projects WHERE id='project'")).rowCount, 1);
+});
+
+test('modern audit history rejects business-only export and restore without changing the ledger, files or audit', async () => {
+  const { saveKnowledgeDocument } = await import('../apps/api/src/knowledge.ts');
+  const document = await saveKnowledgeDocument({ spaceId: 'space', title: '新审计资料', content: '现代写入必须保留审计，不可降级为旧业务备份。' });
+  const vaultPath = (await pool.query('SELECT vault_path FROM knowledge_documents WHERE id=$1', [document.id])).rows[0].vault_path;
+  const before = async () => ({
+    audits: (await pool.query('SELECT * FROM human_audit_events ORDER BY id')).rows,
+    outbox: (await pool.query('SELECT * FROM audit_outbox ORDER BY id')).rows,
+    usage: (await pool.query('SELECT * FROM usage ORDER BY id')).rows,
+    holds: (await pool.query('SELECT * FROM model_reservations ORDER BY id')).rows,
+    documents: (await pool.query('SELECT * FROM knowledge_documents ORDER BY id')).rows,
+    revisions: (await pool.query('SELECT * FROM knowledge_revisions ORDER BY document_id,version')).rows,
+    artifact: await readFile(join(directory, 'runs', archivedRunId, 'artifacts', 'result.txt')),
+    checkpoint: await readFile(join(directory, 'runs', archivedRunId, 'checkpoint-objects', stepCheckpoint.files[0].sha256)),
+    vault: await readFile(join(directory, 'vault', vaultPath)),
+  });
+  const original = await before(); assert.ok(original.audits.length > 0);
+  const exported = await call('export', { password });
+  assert.equal(exported.status, 409); assert.equal(exported.data.code, 'BACKUP_SOURCE_IDENTITY_UNSUPPORTED');
+  assert.deepEqual(await before(), original, 'rejected export cannot mutate persisted state or files');
+  const restored = await call('restore', { password, backup, confirmation: 'RESTORE' });
+  assert.equal(restored.status, 409); assert.equal(restored.data.code, 'BACKUP_DESTINATION_PROTECTED');
+  assert.deepEqual(await before(), original, 'rejected restore cannot mutate persisted state or files');
+  assert.deepEqual((await readdir(directory)).filter(name => name.startsWith('restore-')), []);
 });

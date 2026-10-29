@@ -1,0 +1,67 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+Identity store: direct PGlite SQL adapter; independent backend locks remain excluded.
+▶ unused bootstrap closes permanently when prior administration or disabled identity is recognized
+  ✔ prior administrators close bootstrap without a fictitious grant, even after they are disabled (218.0239ms)
+  ✔ an existing disabled bootstrap identity cannot be reactivated by verified login (106.9664ms)
+  ✔ closure audit failure rolls back closure and identity creation together (124.2512ms)
+✔ unused bootstrap closes permanently when prior administration or disabled identity is recognized (2704.6573ms)
+▶ identity persistence, bootstrap, lifecycle and audit stay fail closed
+  ✔ additive repeatable migration preserves old data and enforces constraints (109.9883ms)
+  ✔ OIDC activation persists and forbids local downgrade (14.2921ms)
+  ✔ exact issuer/subject only, same email never links, bootstrap consumes once (40.6914ms)
+  ✔ current user role, status and epoch control session with strict time boundaries (17.2248ms)
+  ✔ audit is constrained, append only and stores no arbitrary payload (10.8888ms)
+  ✔ audit failure rolls back a new identity and bootstrap grant (77.0475ms)
+✔ identity persistence, bootstrap, lifecycle and audit stay fail closed (2414.3794ms)
+✔ legacy audit compatibility uses one store without fictitious business authority (2247.1385ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8236.3351
+✔ removed employees restore complete role configuration with a new version, without changing existing projects (5984.2214ms)
+✔ manager restoration explicitly changes the incumbent role and keeps exactly one manager (121.363ms)
+✔ capacity, archive, stale version and wrong source cannot overwrite current employees (204.0137ms)
+✔ audited employee history blocks business-only export and restore without replacing current history or files (250.1988ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7082.9401
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (4798.8399ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (201.2271ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (1025.3069ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (970.413ms)
+✔ active paid manager replies block export and restore before any database replacement (482.4691ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (1983.3692ms)
+✔ modern audit history rejects business-only export and restore without changing the ledger, files or audit (593.6326ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10831.5966
+✔ legacy encrypted restore remains available for a destination without enterprise history (2976.2493ms)
+✔ business-only imports reject human authority before staging or SQL replacement (3015.1721ms)
+✔ authority-only source cannot create an archive that its importer would reject (88.2236ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (279.1129ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (225.9754ms)
+✔ online business export refuses enterprise identity and audit omission without changing source (64.8247ms)
+✔ a protected source is rejected before Obsidian indexing changes knowledge or note bytes (102.9492ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7455.4507

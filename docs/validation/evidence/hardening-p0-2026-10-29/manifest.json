@@ -1,0 +1,74 @@
+{
+  "format": "weave-hardening-p0-evidence-v1",
+  "date": "2026-10-29",
+  "baseCommit": "91050f1",
+  "passed": 52,
+  "failed": 0,
+  "skipped": 2,
+  "database": "temporary PGlite; native PostgreSQL competition unverified",
+  "modelCalls": 0,
+  "browserChecks": 0,
+  "productionDeployments": 0,
+  "artifacts": [
+    {
+      "file": "mixed-integration.txt",
+      "sha256": "08bf15d20783793e9b7b4c5c253b26b69a8b1076b9b75619a3225e8537738db2",
+      "bytes": 4148
+    },
+    {
+      "file": "policy-final.txt",
+      "sha256": "f45829dce21a725b46280d77397e8fa4c901aad45f8feddb97842f54f43fd947",
+      "bytes": 1656
+    },
+    {
+      "file": "units-final.txt",
+      "sha256": "b697a83a801e10e0ceaec322ee3d4eb9d5d01a1d3b17420c9303fa0f2b89ccd5",
+      "bytes": 1385
+    },
+    {
+      "file": "build-final.txt",
+      "sha256": "948701df1edbcb8a53cc5b205549207f32862d6256e44d57b6df4d33c561702b",
+      "bytes": 784
+    }
+  ],
+  "sourceFiles": [
+    {
+      "file": "scripts/test-integration.mjs",
+      "sha256": "32a0d8f312435d805c6f8707f0c029425f5acaca07b0b53a600c7246d9ce4a46"
+    },
+    {
+      "file": "tests/test-integration-runner.test.mjs",
+      "sha256": "f7949d587c82645737b4e681c7a985bee397aa664ffa248aa02689fc0dada05a"
+    },
+    {
+      "file": "tests/employee-history.test.ts",
+      "sha256": "77f3a61ec09da6263ef4c3e663d60a157c2e215014300ec937abb379265f4a42"
+    },
+    {
+      "file": "tests/execution-policy.test.ts",
+      "sha256": "62cc8156ae540dc6149deb32efdba3fd60cb90cf685b3a05545e114bccd666ef"
+    },
+    {
+      "file": "tests/extensions-backup.test.ts",
+      "sha256": "e0fc2d6cfa5c90198ee1f1900766a8f8a4d0ca757bf82bae9b3e41f04a901630"
+    },
+    {
+      "file": "tests/identity-store.test.ts",
+      "sha256": "ce80f3ca4c2384e1bd4d7eb8bcd7239e07e4a80a24306e5284cfdd19854e4838"
+    },
+    {
+      "file": "tests/backup-enterprise-protection.test.ts",
+      "sha256": "d80b649d54e3be71426a9c921c50da6c5b01c83c44a5cadd63c87aff08310967"
+    },
+    {
+      "file": "tests/policy.test.ts",
+      "sha256": "cbf4e321c6ae35001e7f8b48efc15c2b24a33d1d86b78219cc6647048cba43ec"
+    }
+  ],
+  "limitations": [
+    "Core targeted checks only, not full suite.",
+    "Two native backend-only tests did not execute.",
+    "Existing web chunk-size warning retained.",
+    "Complete enterprise backup remains not implemented."
+  ]
+}
