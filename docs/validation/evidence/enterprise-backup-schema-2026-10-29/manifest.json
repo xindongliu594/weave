@@ -1,0 +1,74 @@
+{
+  "format": "weave-enterprise-backup-schema-evidence-v1",
+  "date": "2026-10-29",
+  "baseCommit": "b5249aa",
+  "passed": 17,
+  "failed": 0,
+  "skipped": 0,
+  "modelCalls": 0,
+  "productionDeployments": 0,
+  "engine": "PGlite 0.5.8; native PostgreSQL compatibility unverified",
+  "artifacts": [
+    {
+      "file": "build.txt",
+      "sha256": "0e53cd0d8fbbe568dd6bfb4b24aa33a1a09925d60270329157b5095e2a59f48f",
+      "bytes": 765,
+      "originalSha256": "87d7186ffcfa6381d72331cd67464aeb53e49e63099a5e8896141010c4ac90b0",
+      "originalBytes": 783
+    },
+    {
+      "file": "v1-regressions.txt",
+      "sha256": "f4b8a187bea571c26192ac9b6295f63f703a2fc1a68e5ee2a14ea3fc91297950",
+      "bytes": 858,
+      "originalSha256": "96382e77bf3d04058e60148d0d0d9f3e798cfb85ccaaadd13906c09861c41aae",
+      "originalBytes": 874
+    },
+    {
+      "file": "catalog.txt",
+      "sha256": "153e221e60a46261dadfca62f3ee3078771d76bea6f03af428196f2474670a06",
+      "bytes": 469,
+      "originalSha256": "fc5c37155bc687bac444ae667629015b5bfb1c13cdc2e4bb30a16e85a810708c",
+      "originalBytes": 480
+    },
+    {
+      "file": "schema.txt",
+      "sha256": "05a91e49d438455f1d00c4bb3f3bf5359c634b7067dbb240de5b3a91970cc3d2",
+      "bytes": 981,
+      "originalSha256": "1af9a461571b6bdc21b96680d159495b7b266707722a1c1adb719f6a33aaf0c9",
+      "originalBytes": 997
+    }
+  ],
+  "sourceFiles": [
+    {
+      "file": "apps/api/src/enterprise-backup-schema.ts",
+      "sha256": "7fe7bf9c170734ae7c9c963ee0cb76ef1404321916fc72e5ed9b0a97184a8143",
+      "verifiedInputSha256": "7fe7bf9c170734ae7c9c963ee0cb76ef1404321916fc72e5ed9b0a97184a8143"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-catalog.ts",
+      "sha256": "4126bcc966b15d336f28dd75d4999dbdf8de79db3f5d9829e906fbc66f7fd799",
+      "verifiedInputSha256": "4126bcc966b15d336f28dd75d4999dbdf8de79db3f5d9829e906fbc66f7fd799"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-tables.ts",
+      "sha256": "00bca3470cdc2749a6887cb990cdb6dcc9e6e9c9a921c1e1cd89d72e2d668c24",
+      "verifiedInputSha256": "00bca3470cdc2749a6887cb990cdb6dcc9e6e9c9a921c1e1cd89d72e2d668c24"
+    },
+    {
+      "file": "tests/enterprise-backup-schema.test.ts",
+      "sha256": "8c7ee3b2eaa5bbb83b4c8e7c02fa9c3d32bc547cdb214b67d776356b348cef72",
+      "verifiedInputSha256": "8c7ee3b2eaa5bbb83b4c8e7c02fa9c3d32bc547cdb214b67d776356b348cef72"
+    },
+    {
+      "file": "tests/enterprise-backup-catalog.test.ts",
+      "sha256": "0cc3678dad0fc4f2c4667628d87db4c85ac256b13e55aeb5c7e9fc8ffcd4a331",
+      "verifiedInputSha256": "0cc3678dad0fc4f2c4667628d87db4c85ac256b13e55aeb5c7e9fc8ffcd4a331"
+    }
+  ],
+  "limitations": [
+    "Pure contract/crypto and test-database metadata only.",
+    "No full export, preserving import, crash, browser or JJ acceptance yet.",
+    "No physical soft/hard-link proof in pure schema tests."
+  ],
+  "textNormalization": "UTF-8 LF for repository text evidence/source only; backup data bytes are never normalized"
+}

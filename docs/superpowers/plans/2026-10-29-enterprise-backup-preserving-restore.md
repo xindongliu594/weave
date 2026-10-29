@@ -57,7 +57,7 @@
 
 解密 payload 精确字段：`version:2, schemaId:'weiwu-enterprise-2026-10-29-v1', createdAt, source:{applicationVersion,databaseId,engine}, tables, files, master, nativePluginBundles, vaultFiles, manifest`。`schemaId` 的兼容合同绑定受控列清单及 FK/触发器 fingerprint；发现未知迁移/列必须拒绝而不是猜测默认值。后续迁移另加显式 schemaId adapter。engine 是 `pglite|postgresql`，只作来源信息，不代表物理可移植。
 
-`manifest` 为各表行数/规范排序后的 SHA-256 和每个文件的 root kind、相对路径、字节数、SHA-256；`files` 只含 trace 根相对路径，vault/bundle 分别沿用其 validator。JSON 日期明确 ISO 字符串；bigint、numeric、vector 用无损文本 codec，不能把金额先转 JS number。每表仅接受固定列；SQL 用该映射的显式列参数化 INSERT。缺表（即使应为空）、重复 PK/唯一键、未知表/列、未知根、哈希不符均拒绝。
+`manifest` 为各表行数/规范排序后的 SHA-256 和每个文件的 root kind、相对路径、字节数、SHA-256；`files` 只含 trace 根相对路径，vault/bundle 分别沿用其 validator。JSON 日期明确 ISO 字符串；bigint、numeric、vector 用无损文本 codec，不能把金额先转 JS number。JSONB 同样保存数据库文本，避免内部大数被 JS 改写并区分 SQL NULL 与 JSON null。每表仅接受固定列；SQL 用该映射的显式列参数化 INSERT。缺表（即使应为空）、重复 PK/唯一键、未知表/列、未知根、哈希不符均拒绝。
 
 上限保留现有 50 MiB **解压后完整 JSON**（包括 base64 文件）和 70 MiB HTTP body；外层文件统一上限 70 MiB，解码前检查，gunzip `maxOutputLength` 50 MiB。最多 100,000 文件、每表最多 100,000 行且总行数最多 500,000，bundle 最多 100，单 path 最多 1,024 UTF-8 bytes。现有物理 receipt 上限（128 MiB manifest、40 MiB vault、512 MiB 树）仍独立成立。错误明确 `BACKUP_SIZE_LIMIT`，UI/API 同值；禁止 UI 45 MiB 与 API 不一致。总 plaintext 同限仍是最终边界。
 
@@ -69,7 +69,7 @@
 4. 审计/效果：`human_audit_events, audit_outbox, audit_run_projection, tool_effect_contracts, tool_approvals, local_devices, local_operations, task_attempt_workspaces`。
 5. 自动化：`automation_schedules, automation_occurrences, automation_notifications, automation_observations, automation_knowledge_candidates, automation_improvements, automation_evaluations, automation_reviews`。
 
-**排除且不得输入：** `human_sessions, human_session_lifecycles, oidc_login_transactions, request_keys, backup_restore_anchor, backup_restore_receipts`，以及本计划新增的目标 `enterprise_restore_admission`。原会话安全生命周期不跨环境延续；不导出 SID/token/session JSON。保留会话相关审计事件已有的 actor snapshot，不伪造丢失会话。local_devices 只导出非凭据历史列及 disabled 形式；新目标随机不可用 token hash 填满足 NOT NULL，原 token 不进包。`backend/grant_id/label` 可保留为历史证据但无主机访问权。
+**排除且不得输入：** `human_sessions, human_session_lifecycles, oidc_login_transactions, request_keys, backup_restore_anchor, backup_restore_receipts`，以及本计划新增的目标 `enterprise_restore_admission`。原认证存储、安全生命周期、登录 nonce/verifier 不跨环境延续。会话相关审计中的历史标识和 actor snapshot 原样保留，但不得拿它们签发或接受新会话。local_devices 不导出 token_hash，local_operations 不导出临时 claim_token；设备新目标随机不可用 token hash 填满足 NOT NULL，原 token 不进包。`backend/grant_id/label` 可保留为历史证据但无主机访问权；停用及恢复信任由目标隔离门禁实现，不拿旧 enabled 状态恢复执行。
 
 **插入顺序：** 基础无依赖表 → human_users → identity_bootstrap/memberships/contracts → projects → plan_versions/project_runs/其余 run 子表 → audit 父链 → approvals → local_devices → operations 父链 → outbox/projection → 自动化各父/子表。准确有向边从受控迁移合同与 `pg_constraint` 比对：`tool_approvals.decision_audit_id→audit`、audit.requested_by_audit_id→audit、operations.parent_operation_id→operations；自引用做 Kahn 排序（最多行数已有限），缺父/环直接拒绝；不通过关闭 FK 解决。JSON 内的 runId/operationId/checkpoint/CAS 也校验闭包，不能只看 SQL FK。
 
@@ -79,14 +79,14 @@
 
 ### Task 1: 固化格式、列清单及受限 crypto
 
-**Files:** 新 `enterprise-backup-schema.ts`、`tests/enterprise-backup-schema.test.ts`；改 `backup.ts` 共用 helper。执行前从上述所有 migrate 函数提取完整列名/codec 字面量进 schema 文件；本计划不复制数百行数据库定义。
+**Files:** 新 `enterprise-backup-schema.ts`、固定字面量 `enterprise-backup-tables.ts`、只读比对 `enterprise-backup-catalog.ts` 及对应 schema/catalog 测试。v2 使用相同 Node crypto/zlib 原语但不引入 v1 的数据库依赖；v1 无改动。执行前从正式 migrate 提取完整列名/codec 字面量；不复制数据库定义或运行请求给定 SQL。
 
 **Interfaces:** 导出 `EnterpriseBackupV2`、`EncryptedEnterpriseBackupV2`、`EnterpriseTableName`；`parseEnterpriseBackup(value:unknown):EnterpriseBackupV2`；`encryptEnterpriseBackup(value:EnterpriseBackupV2,password:string):Promise<EncryptedEnterpriseBackupV2>`；`decryptEnterpriseBackup(value:unknown,password:string):Promise<EnterpriseBackupV2>`；`enterpriseTableSpecs` 固定列/PK/FK/codec 描述。schema 名/表名绝不来自请求。
 
-- [ ] 写测试 `strict_v2_roundtrip_and_lossless_money`：日期/大 epoch/numeric/vector 往返一致；加密包不含 SID/token/可检索明文；错误密码/头篡改 422。
-- [ ] 写 `reject_unsupported_before_stage`：未来 schemaId、缺表/多列、重复主键、自引用环、非 canonical base64、50 MiB+1 解压 JSON、70 MiB+1 envelope、行/文件上限及大小写/Windows 路径碰撞均失败；边界等号通过。路径拒绝 `..`、反斜线、绝对路径、驱动器、ADS、NUL、设备名、软/硬链接。
-- [ ] 运行 `node --import tsx --test tests/enterprise-backup-schema.test.ts`，确认新断言先红；实现以上接口和固定表 codec。
-- [ ] 同命令绿；再跑 `node --import tsx --test tests/backup-size.test.ts tests/backup-checkpoints.test.ts`，v1 回归零失败。提交该任务指定文件，message `feat: define bounded enterprise backup v2 contract`。
+- [x] 写测试 `strict_v2_roundtrip_and_lossless_money`：日期/大 epoch/numeric/vector 往返一致；加密包不含 SID/token/可检索明文；错误密码/头篡改 422。
+- [x] 写 `reject_unsupported_before_stage`：未来 schemaId、缺表/多列、重复主键、自引用环、非 canonical base64、50 MiB+1 解压 JSON、70 MiB+1 envelope、行/文件上限及大小写/Windows 路径碰撞均失败；50 MiB 边界等号通过。路径拒绝 `..`、反斜线、绝对路径、驱动器、ADS、NUL、设备名。真实软/硬链接归属验证属于 Task2/3 IO，不由纯 JSON 测试冒充。
+- [x] 运行 `node --import tsx --test tests/enterprise-backup-schema.test.ts`，确认新断言先红；实现以上接口和固定表 codec。
+- [x] 同命令绿；再跑 `node --import tsx --test tests/backup-size.test.ts tests/backup-checkpoints.test.ts`，v1 回归零失败。另有正式迁移双 schema 合同比对及未知表/列拒绝证明。提交该任务指定文件，message `feat: define bounded enterprise backup v2 contract`。
 
 ### Task 2: 完整一致导出和 carrier 闭包
 

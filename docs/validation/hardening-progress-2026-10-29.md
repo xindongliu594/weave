@@ -17,7 +17,9 @@
 ## 下一批
 
 - 已保存：`docs/superpowers/plans/2026-10-29-enterprise-backup-preserving-restore.md`。
-- 下一步：v2 严格格式/表合同与一致导出；之后全新隔离目标保留导入、信任隔离、崩溃与网页验收。
+- 企业备份 Task1 已实现：44 表固定合同、纯 v2 加密及严格验证；17 个用例通过、类型/构建退出 0。尚未接用户入口。
+- 详情：`docs/validation/enterprise-backup-preserving-restore-2026-10-29.md`。
+- 下一步：Task2 一致导出；之后全新隔离目标保留导入、信任隔离、崩溃与网页验收。
 - 总体目标、预算、未知费用与效果保护保持；不会在 P0 通过后提前关闭。
 
 ## 执行约定

@@ -33,6 +33,8 @@
 
 公开核心输出和摘要见 [evidence/hardening-p0-2026-10-29](evidence/hardening-p0-2026-10-29/)。原始红/绿、中间失败、环境拒绝及受控构建中断日志在本机 `.private/hardening-p0-20261029/`；包含临时路径的原始日志不自动公开。
 
+后续企业备份阶段复核发现 Git 会归一化文本行尾，原 manifest 的 Windows 原始摘要不能直接核对 Git blob。现为仓库日志/源码统一记录 UTF-8 LF 摘要，同时保留 `originalSha256/originalBytes` 和 `verifiedInputSha256` 原验证值；历史提交与原私有日志不变。备份正文及交付文件继续按原始字节核对，此文本规则不用于业务数据。
+
 独立实施/审查报告保存在本批隔离 ledger：`.superpowers/sdd/2026-10-29-hardening-p0-regressions/`。报告记录具体命令和日志来源；不是新的生产数据。
 
 本批没有使用 Computer Use、访问生产数据库、调用真实模型、提高额度或部署 JJ。没有宣称全量 191 份 TypeScript / 86 份 runtime 文件全部通过。

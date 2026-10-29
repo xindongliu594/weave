@@ -12,57 +12,73 @@
   "artifacts": [
     {
       "file": "mixed-integration.txt",
-      "sha256": "08bf15d20783793e9b7b4c5c253b26b69a8b1076b9b75619a3225e8537738db2",
-      "bytes": 4148
+      "sha256": "eafec635dc5ced1fee6e1c69d39537c2b5d7a072d0409f4bedf6c85810b03681",
+      "bytes": 4081,
+      "originalSha256": "08bf15d20783793e9b7b4c5c253b26b69a8b1076b9b75619a3225e8537738db2",
+      "originalBytes": 4148
     },
     {
       "file": "policy-final.txt",
-      "sha256": "f45829dce21a725b46280d77397e8fa4c901aad45f8feddb97842f54f43fd947",
-      "bytes": 1656
+      "sha256": "9f796bba077fbfd687a0511db1b0983bcd33f2ac5f20c1d8812615be00bc7f09",
+      "bytes": 1636,
+      "originalSha256": "f45829dce21a725b46280d77397e8fa4c901aad45f8feddb97842f54f43fd947",
+      "originalBytes": 1656
     },
     {
       "file": "units-final.txt",
-      "sha256": "b697a83a801e10e0ceaec322ee3d4eb9d5d01a1d3b17420c9303fa0f2b89ccd5",
-      "bytes": 1385
+      "sha256": "c7c2a7747915deefc50c58b336cd745f6d8830260396b4b3e079e5885665fcbe",
+      "bytes": 1363,
+      "originalSha256": "b697a83a801e10e0ceaec322ee3d4eb9d5d01a1d3b17420c9303fa0f2b89ccd5",
+      "originalBytes": 1385
     },
     {
       "file": "build-final.txt",
-      "sha256": "948701df1edbcb8a53cc5b205549207f32862d6256e44d57b6df4d33c561702b",
-      "bytes": 784
+      "sha256": "9e3f9aa332373ce6567e8d0c88c83db62d50173318394c8dae959de354a82ad6",
+      "bytes": 766,
+      "originalSha256": "948701df1edbcb8a53cc5b205549207f32862d6256e44d57b6df4d33c561702b",
+      "originalBytes": 784
     }
   ],
   "sourceFiles": [
     {
       "file": "scripts/test-integration.mjs",
-      "sha256": "32a0d8f312435d805c6f8707f0c029425f5acaca07b0b53a600c7246d9ce4a46"
+      "sha256": "41a450c53ed1ae6a308acc8d3b334ea3af8665023661ca417b8307e5aa4a95f1",
+      "verifiedInputSha256": "32a0d8f312435d805c6f8707f0c029425f5acaca07b0b53a600c7246d9ce4a46"
     },
     {
       "file": "tests/test-integration-runner.test.mjs",
-      "sha256": "f7949d587c82645737b4e681c7a985bee397aa664ffa248aa02689fc0dada05a"
+      "sha256": "f7949d587c82645737b4e681c7a985bee397aa664ffa248aa02689fc0dada05a",
+      "verifiedInputSha256": "f7949d587c82645737b4e681c7a985bee397aa664ffa248aa02689fc0dada05a"
     },
     {
       "file": "tests/employee-history.test.ts",
-      "sha256": "77f3a61ec09da6263ef4c3e663d60a157c2e215014300ec937abb379265f4a42"
+      "sha256": "b904534ed7fbb447d973bb2d86f605f2958e4c36b223cca14e71d4217df213aa",
+      "verifiedInputSha256": "77f3a61ec09da6263ef4c3e663d60a157c2e215014300ec937abb379265f4a42"
     },
     {
       "file": "tests/execution-policy.test.ts",
-      "sha256": "62cc8156ae540dc6149deb32efdba3fd60cb90cf685b3a05545e114bccd666ef"
+      "sha256": "76dbf436cc43006983e651e9b55c32ec13274e00cc163dcfff08feee90b1fde0",
+      "verifiedInputSha256": "62cc8156ae540dc6149deb32efdba3fd60cb90cf685b3a05545e114bccd666ef"
     },
     {
       "file": "tests/extensions-backup.test.ts",
-      "sha256": "e0fc2d6cfa5c90198ee1f1900766a8f8a4d0ca757bf82bae9b3e41f04a901630"
+      "sha256": "e9c7a9e4f26b4466b958b007c1142eca85f94e839611c6f5da086119dff27bdb",
+      "verifiedInputSha256": "e0fc2d6cfa5c90198ee1f1900766a8f8a4d0ca757bf82bae9b3e41f04a901630"
     },
     {
       "file": "tests/identity-store.test.ts",
-      "sha256": "ce80f3ca4c2384e1bd4d7eb8bcd7239e07e4a80a24306e5284cfdd19854e4838"
+      "sha256": "ce80f3ca4c2384e1bd4d7eb8bcd7239e07e4a80a24306e5284cfdd19854e4838",
+      "verifiedInputSha256": "ce80f3ca4c2384e1bd4d7eb8bcd7239e07e4a80a24306e5284cfdd19854e4838"
     },
     {
       "file": "tests/backup-enterprise-protection.test.ts",
-      "sha256": "d80b649d54e3be71426a9c921c50da6c5b01c83c44a5cadd63c87aff08310967"
+      "sha256": "d80b649d54e3be71426a9c921c50da6c5b01c83c44a5cadd63c87aff08310967",
+      "verifiedInputSha256": "d80b649d54e3be71426a9c921c50da6c5b01c83c44a5cadd63c87aff08310967"
     },
     {
       "file": "tests/policy.test.ts",
-      "sha256": "cbf4e321c6ae35001e7f8b48efc15c2b24a33d1d86b78219cc6647048cba43ec"
+      "sha256": "acd33f5228a5807c6271884a79aab22ef8d5cf8a3f2dd60207fb73042d370890",
+      "verifiedInputSha256": "cbf4e321c6ae35001e7f8b48efc15c2b24a33d1d86b78219cc6647048cba43ec"
     }
   ],
   "limitations": [
@@ -70,5 +86,6 @@
     "Two native backend-only tests did not execute.",
     "Existing web chunk-size warning retained.",
     "Complete enterprise backup remains not implemented."
-  ]
+  ],
+  "textNormalization": "UTF-8 LF for repository text evidence/source only; backup data bytes are never normalized"
 }
