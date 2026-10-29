@@ -1,0 +1,76 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise export preserves source history, secrets boundary and referenced bytes
+  ✔ full encrypted snapshot has all fixed tables, immutable audit and exact textual codecs (729.3196ms)
+  ✔ active execution and model calls block export, with known failures leaving source usable (1349.0017ms)
+  ✔ revoked principals cannot export (453.9134ms)
+  ✔ active manager and capability probes block a consistent snapshot (831.2298ms)
+  ✔ missing checkpoint CAS and hardlinked files reject without latching source (899.0084ms)
+  ✔ changed vault bytes are not silently reindexed during export (931.0417ms)
+  ✔ sealed credentials cannot be exported without their original master key (735.1884ms)
+  ✔ root writer fence blocks snapshot overlap and releases after writer completes (2569.3796ms)
+✔ enterprise export preserves source history, secrets boundary and referenced bytes (9576.0011ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12880.3879
+▶ enterprise task carrier resolves original API commits without granting execution
+  ✔ rejects operation-missing (40.9135ms)
+  ✔ rejects task-missing (65.815ms)
+  ✔ rejects merge-digest (79.4587ms)
+  ✔ rejects result-digest (71.1406ms)
+  ✔ rejects principal (89.1664ms)
+  ✔ rejects import-missing (72.9631ms)
+  ✔ rejects canonical-operation (34.641ms)
+✔ enterprise task carrier resolves original API commits without granting execution (6340.084ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9993.2228
+✔ fixed portable catalog covers formal migrations, normalizes owned schema names and rejects drift (6544.4035ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7586.5224
+✔ legacy encrypted restore remains available for a destination without enterprise history (5305.584ms)
+✔ business-only imports reject human authority before staging or SQL replacement (3029.7911ms)
+✔ authority-only source cannot create an archive that its importer would reject (156.8362ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (415.3548ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (316.7228ms)
+✔ online business export refuses enterprise identity and audit omission without changing source (72.7074ms)
+✔ a protected source is rejected before Obsidian indexing changes knowledge or note bytes (189.6095ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10935.0263
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (7355.331ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (203.28ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (1091.2803ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (904.3634ms)
+✔ active paid manager replies block export and restore before any database replacement (420.8284ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (2863.3381ms)
+✔ modern audit history rejects business-only export and restore without changing the ledger, files or audit (870.5245ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14727.8817

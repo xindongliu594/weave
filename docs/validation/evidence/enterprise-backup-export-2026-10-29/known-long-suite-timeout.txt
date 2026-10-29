@@ -1,0 +1,124 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise export preserves source history, secrets boundary and referenced bytes
+  ✔ full encrypted snapshot has all fixed tables, immutable audit and exact textual codecs (642.4966ms)
+  ✔ active execution and model calls block export, with known failures leaving source usable (1018.0916ms)
+  ✔ revoked principals cannot export (424.6744ms)
+  ✔ missing checkpoint CAS and hardlinked files reject without latching source (933.3166ms)
+  ✔ changed vault bytes are not silently reindexed during export (762.6996ms)
+  ✔ sealed credentials cannot be exported without their original master key (690.9504ms)
+  ✔ root writer fence blocks snapshot overlap and releases after writer completes (2417.1426ms)
+✔ enterprise export preserves source history, secrets boundary and referenced bytes (8013.7394ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10612.4226
+▶ enterprise task carrier resolves original API commits without granting execution
+  ✔ rejects operation-missing (24.8739ms)
+  ✔ rejects task-missing (36.7247ms)
+  ✔ rejects merge-digest (42.0932ms)
+  ✔ rejects result-digest (49.5225ms)
+  ✔ rejects principal (42.6235ms)
+  ✔ rejects import-missing (35.7676ms)
+  ✔ rejects canonical-operation (32.0288ms)
+✔ enterprise task carrier resolves original API commits without granting execution (4343.3356ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6782.8034
+✔ fixed portable catalog covers formal migrations, normalizes owned schema names and rejects drift (3259.7689ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3752.7778
+✔ legacy encrypted restore remains available for a destination without enterprise history (2654.7379ms)
+✔ business-only imports reject human authority before staging or SQL replacement (2374.3969ms)
+✔ authority-only source cannot create an archive that its importer would reject (51.189ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (187.8696ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (169.2719ms)
+✔ online business export refuses enterprise identity and audit omission without changing source (41.6716ms)
+✔ a protected source is rejected before Obsidian indexing changes knowledge or note bytes (79.1997ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6226.2634
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (4025.2511ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (150.2227ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (771.2ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (849.503ms)
+✔ active paid manager replies block export and restore before any database replacement (324.9784ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (1388.492ms)
+✔ modern audit history rejects business-only export and restore without changing the ledger, files or audit (504.7118ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8704.1938
+✖ task preparation fails closed before SQL when trusted stop maintenance is missing (319.3109ms)
+✔ original commit verifies raw result and historical objects independently of a current lease owner (93.869ms)
+✔ original commit rejects a separately valid workspace binding for another task key (55.2722ms)
+✔ original commit rejects damaged raw-result (56.0217ms)
+✔ original commit rejects damaged merge-digest (56.2041ms)
+✔ original commit rejects damaged committed-output (53.4513ms)
+✔ original commit rejects damaged claim-token (51.6742ms)
+✔ original commit refuses a self-consistent raw result from a different claim (53.5721ms)
+✔ API prepares target only after original accepted checkpoint stop commits (4349.9519ms)
+✔ beforeDispatch refuses fresh provider changes without a device effect (2888.0075ms)
+✔ beforeDispatch refuses fresh method changes without a device effect (2743.3024ms)
+✔ beforeDispatch refuses fresh permission changes without a device effect (2689.387ms)
+✔ beforeDispatch refuses fresh lease changes without a device effect (3086.55ms)
+✔ beforeDispatch refuses fresh target changes without a device effect (2822.291ms)
+✖ lost prepared COMMIT acknowledgement never grants a replacement dispatch (2865.4783ms)
+✖ lost dispatching COMMIT acknowledgement never grants a replacement dispatch (3080.2227ms)
+✔ cold bind observes original stopped identity after a lost response without another stop (3590.9315ms)
+✔ real Stopped fact survives cancel after the effect while target admission fails (3587.0653ms)
+✔ real Stopped fact survives lease after the effect while target admission fails (3799.4157ms)
+✔ post-COMMIT authority progress uses relevant assignment semantics (4853.8669ms)
+✔ post-COMMIT authority assignment uses relevant assignment semantics (3553.9005ms)
+✔ original commit rejects a separately valid queued backend binding (69.2104ms)
+✔ current full B canonical requires its own original claim before stopping historical A (6005.5717ms)
+✔ cold observation records original stopped fact after response loss and cancellation (3648.456ms)
+✔ historical stop rejects synthetic damaged accepted-only provenance (3336.6429ms)
+✔ historical stop rejects synthetic damaged checkpoint-v1 provenance (3255.276ms)
+✔ historical stop rejects synthetic damaged accepted-output provenance (5163.803ms)
+✔ historical stop rejects synthetic damaged original-merge provenance (3590.6571ms)
+✔ fresh stop refuses boundary payload taskId contradicting its exact task links (2606.9421ms)
+✔ cold observation refuses boundary payload attemptId contradicting its original links (2827.7691ms)
+✔ dispatching COMMIT boundary payload mutation prevents a new device effect (2769.1457ms)
+✔ sync proof surface rejects cp-body changes after its original verification (2778.0894ms)
+✔ sync proof surface rejects accepted-only changes after its original verification (2849.5843ms)
+✔ sync proof surface rejects completed-witness changes after its original verification (2725.8598ms)
+✔ sync proof surface rejects cp-work-object changes after its original verification (2948.4814ms)
+✔ sync proof surface rejects historical-a-object changes after its original verification (3715.3595ms)
+✔ sync proof surface rejects current-b-object changes after its original verification (5145.9285ms)
+✔ sync proof surface rejects producer-origin changes after its original verification (5610.2879ms)
+✔ queued task context cannot be replaced in place with another authorized task (3932.8653ms)
+✔ terminal source-only stops the last accepted scope without an active target (10032.3024ms)
+✔ terminal all-approved proof refuses incomplete-node before any fresh effect (2170.1559ms)
+✔ terminal all-approved proof refuses missing-row before any fresh effect (7161.4183ms)
+✔ terminal all-approved proof refuses null-provenance before any fresh effect (7557.3679ms)
+✔ terminal all-approved proof refuses missing-cp before any fresh effect (8858.6399ms)
+✔ terminal all-approved proof refuses retired-row before any fresh effect (7113.3859ms)
+✖ terminal prepare refuses capability mutation during initialization before any device prepare (154.0973ms)
+✔ terminal fresh-stop bound handles 2 real accepted scopes (12426.419ms)
+✔ terminal fresh-stop bound handles 3 real accepted scopes (10002.2152ms)
+Integration file tests/task-accepted-stop-delivery.test.ts exceeded 180 seconds

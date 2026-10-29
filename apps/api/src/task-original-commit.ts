@@ -12,10 +12,18 @@ const digest=(v:any)=>createHash('sha256').update(JSON.stringify(ordered(v))).di
 
 /** Pure positive provenance only; callers separately prove current assignment and authority. */
 export function assertOriginalTaskCommit(traceRoot:string,run:any,task:any,row:any,backend:any){
+ if(!row?.claim_token||row.result?.claimToken!==row.claim_token)taskOperationDenied('原操作来源与准确任务绑定不符');
+ return validateArchivedTaskCommit(traceRoot,run,task,row,backend);
+}
+
+/** History/backup integrity only. The live claim secret is deliberately absent
+ * from portable rows; this cannot replace assertOriginalTaskCommit, current
+ * authority or restore admission when executing/recovering an operation. */
+export function validateArchivedTaskCommit(traceRoot:string,run:any,task:any,row:any,backend:any){
  const key={runId:run.id,taskId:task.task_id,attemptId:task.attempt_id,generation:task.generation};
  const scope:TaskExecutionScope=row?.payload?.taskScope,result=row?.result?.result,record=row?.merge_record,receipt=record?.receipt;
  const context={agentId:task.principal,sessionId:task.session_id,taskId:task.task_id,attemptId:task.attempt_id,generation:task.generation};
- if(!row||row.run_id!==run.id||row.status!=='completed'||!row.started||!row.claim_token||row.result?.claimToken!==row.claim_token||!row.lease_owner||!row.result?.ok||row.merge_state!=='committed'||
+ if(!row||row.run_id!==run.id||row.status!=='completed'||!row.started||typeof row.result?.claimToken!=='string'||!row.result.claimToken||!row.lease_owner||!row.result?.ok||row.merge_state!=='committed'||
   !isDeepStrictEqual(scope?.key,key)||!isDeepStrictEqual(scope.inputOrigins,task.input_origins)||scope.capabilityHash!==task.capability_hash||
   scope.workspace.binding.permissionHash!==task.permission_hash||scope.workspace.binding.contractHash!==task.contract_hash||
   scope.workspace.binding.runId!==key.runId||scope.workspace.binding.taskId!==key.taskId||scope.workspace.binding.attemptId!==key.attemptId||scope.workspace.binding.generation!==key.generation||

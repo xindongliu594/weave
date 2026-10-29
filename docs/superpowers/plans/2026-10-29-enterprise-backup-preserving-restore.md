@@ -96,7 +96,7 @@
 
 - [ ] 建完整 fixture：human/admin+member+撤权用户、membership、human approval/audit 请求链、runtime/local operation 父链、task_attempt_workspaces、uncertain reservation/usage、knowledge version、checkpoint CAS/恢复 initialization 与 native bundle；断言所有受控表行数/hash、sourceId 和原 DB/files/key 前后 digest 相同。
 - [ ] 写 `snapshot_denies_concurrent_writers` 及 `missing_carrier_is_rejected`：活动 run/经理/测试/pending 模型 409；未知费用/效果允许归档且原状态不变；缺 CAS、sourceHistoryDigest 对应来源、task refs/SQL original operation 对应证据失败。
-- [ ] 运行 `node scripts/test-integration.mjs tests/enterprise-backup-export.test.ts` 先红。实现根独占→vault lock→现有 SQL advisory locks 918274/918275→事务/受控表 SHARE 锁→当前管理员重验→读取的顺序；快照第一次读取前获得全部需要的表锁。沿用成本维护锁顺序，锁忙/超时 409，未知提交/解锁置现有安全屏障。不要在 export 偷写 knowledge 索引；若必须 syncObsidian 则在快照前按原锁完成，并明确其写入。
+- [x] 运行 `node scripts/test-integration.mjs tests/enterprise-backup-export.test.ts` 先红。实现根独占→vault lock→现有 SQL advisory locks 918274/918275→事务/受控表 SHARE 锁→当前管理员重验→读取的顺序；快照第一次读取前获得全部需要的表锁。沿用成本维护锁顺序，锁忙/超时 409，未知提交/解锁置现有安全屏障。不要在 export 偷写 knowledge 索引；若必须 syncObsidian 则在快照前按原锁完成，并明确其写入。
 - [ ] carrier 保留现有 trace 树/步骤 codec；task v2 继续用 `task-recovery-state.ts`、`step-checkpoints.mjs`、`task-original-commit.ts` 的固定对象/回执校验。格式尚无可信生产 writer 的 task carrier 可存证但标记 `executionEligible:false`，不得用备份自行签发可信来源。不能因此省略这些数据。
 - [ ] 同命令绿，补 Task 1 回归；提交 `feat: export complete enterprise backup snapshots`。独立 PG 并发在 Task 5 证明，当前 PGlite 证据只证明功能。
 

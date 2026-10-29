@@ -1,0 +1,26 @@
+✔ restore rejects missing or corrupt child journals even without own checkpoint objects (171.5251ms)
+✔ database checkpoint references cannot disappear with missing archived files (79.0668ms)
+✔ empty checkpoints survive the file-only backup format (72.5316ms)
+✔ checkpoint receipts must still match the original journal observation (97.1455ms)
+✔ structurally sound unknown operations remain backup data, not permission to resume (84.4573ms)
+✔ unrelated old forensic logs stay portable without being certified for resume (102.6468ms)
+✔ 31MiB archives below the total plaintext limit survive real encrypted export/restore/export (14342.5484ms)
+✔ plaintext above 50MiB is rejected before replacing target data or files (1390.0851ms)
+✔ backup read-set detects outside edits, additions and linked ancestors (38.4146ms)
+✔ optional credential absence belongs to the read-set and cannot mask a broken link (8.1782ms)
+✔ strict v2 encryption preserves decimal text, large epochs, timestamps, vectors and file manifests (356.0758ms)
+✔ unknown schema, missing/extra tables, credential columns and altered manifests are rejected (15.8797ms)
+✔ duplicate identities and broken or cyclic foreign-key chains cannot enter a preserving import (3.9814ms)
+✔ portable paths reject traversal, Windows aliases, alternate data streams and case collisions (26.702ms)
+✔ native bundles reuse the fixed manifest validator and bind all compressed/code/metadata bytes (206.3874ms)
+✔ SQL null and JSON null remain distinct and fixed metadata cannot be mutated (2.0549ms)
+✔ size checks precede crypto and decompression is bounded even for an authenticated compressed bomb (2125.212ms)
+✔ row/file limits and invalid scalar codecs are rejected without evaluating untrusted objects (1350.6014ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16968.0684

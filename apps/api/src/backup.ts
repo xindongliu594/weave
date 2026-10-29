@@ -9,7 +9,7 @@ import { readFileSync, writeFileSync, readdirSync, lstatSync, existsSync, mkdirS
 import { join, resolve, dirname, relative } from 'node:path';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
-import { vaultFileSnapshot, restoreVaultFiles, syncObsidian, withVaultLock } from './obsidian.ts';
+import { vaultFileSnapshot, restoreVaultFiles, syncObsidian } from './obsidian.ts';
 import { managerChatTables } from './manager-chat.ts';
 import { browserMcpTables } from './work-tools-browser.ts';
 import { workFileTables } from './work-files.ts';
@@ -22,6 +22,7 @@ import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive
 import {createBackupRestoreState,type BackupRestoreState,type BackupRestoreOperation} from './backup-restore-state.ts';
 import {administrative,currentRoutePrincipal,httpPrincipal} from './project-route-access.ts';
 import type {Principal} from './identity-types.ts';
+import {underBackupRoot,type BackupSafety} from './backup-root-scope.ts';
 const scrypt=promisify(scryptCallback);
 const tables=['gateways','departments','department_versions','models','projects','plan_versions','activity','usage','project_runs','templates','knowledge_spaces','knowledge_documents','knowledge_revisions','knowledge_chunks','product_settings','tool_approvals','organization_previews','organization_conversations','model_reservations','knowledge_embeddings','model_capability_tests',...managerChatTables,...browserMcpTables,...workFileTables,...automationTables,...storageTables,...nativeCapabilityTables];
 const password=z.string().min(12).max(200);
@@ -34,7 +35,7 @@ function validFile(path:string){return /^[a-f0-9-]{36}\/.+/.test(path)&&!path.in
 // Reject an already unsupported source before syncObsidian can index or write notes.
 // Release this short transaction before sync (which borrows its own connection).
 // The actual export repeats the protected-table check under its snapshot locks.
-type Safety={unknown:boolean};
+type Safety=BackupSafety;
 async function currentAdministrator(client:pg.PoolClient,principal:Principal){await currentRoutePrincipal(client,principal,true);if(!administrative(principal))throw new AppError(403,'备份需要当前管理员权限','BACKUP_ADMIN_REQUIRED');}
 async function preflightBackupSource(principal:Principal,safety:Safety){
  const client=await pool.connect();let committing=false,discard=false,first:unknown;
@@ -45,8 +46,7 @@ async function preflightBackupSource(principal:Principal,safety:Safety){
 export function backupRouter(traceRoot:string,writers:ArchiveWriterManager,state:BackupRestoreState=createBackupRestoreState({pool,writers,traceRoot,dataRoot:resolve(process.env.DATA_DIR??'.data')})){
  const router=Router(),dataRoot=resolve(process.env.DATA_DIR??'.data');
  async function underRoot<T>(work:(safety:Safety)=>Promise<T>){
-  const outcome=await writers.withRootExclusive(()=>withVaultLock(async()=>{const safety:Safety={unknown:false};try{try{state.requireClear();}catch(error){safety.unknown=true;throw error;}return {ok:true as const,value:await work(safety)};}catch(error){if(safety.unknown)throw error;return {ok:false as const,error};}}),{timeoutMs:2000});
-  if(!outcome.ok)throw outcome.error;return outcome.value;
+  return underBackupRoot(writers,state,work);
  }
  router.post('/backup/export',async(req,res)=>{
   const pass=password.parse(req.body.password),principal=httpPrincipal(res);

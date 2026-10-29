@@ -53,7 +53,7 @@ test('task preparation fails closed before SQL when trusted stop maintenance is 
  const directory=mkdtempSync(join(tmpdir(),'accepted-stop-provider-'));
  try{
   const executor=new LocalRunExecutor({id:'unused',dir:directory},{executionProfile:'task-attempt-openshell-v1'},{traceRoot:directory,owner:'unused'} as any);
-  await assert.rejects(()=>executor.prepareTask({agentId:'employee',sessionId:'session',taskId:'task',attemptId:'attempt',generation:1},new AbortController().signal),{code:'TASK_STOP_UNAVAILABLE'});
+  await assert.rejects(async()=>executor.prepareTask({agentId:'employee',sessionId:'session',taskId:'task',attemptId:'attempt',generation:1},new AbortController().signal),{code:'TASK_STOP_UNAVAILABLE'});
  }finally{rmSync(directory,{recursive:true,force:true});}
 });
 
@@ -124,7 +124,9 @@ for(const state of ['prepared','dispatching'])test('lost '+state+' COMMIT acknow
    return result;
   });db.release();
   await assert.rejects(()=>f.executor.prepareTask(context,new AbortController().signal),/LOST_COMMIT_ACK/);assert.equal(lost,true);assert.equal(f.control.effects,0);assert.equal((await marker(f.runId)).state,state);
-  await assert.rejects(()=>f.bind('b'),/No original device intent/);assert.equal(f.control.effects,0);assert.equal(f.control.calls,state==='prepared'?0:1);assert.equal(f.control.reconciles,1);
+  // An uncertain COMMIT poisons this original writer. A warm retry must stay
+  // behind that fence, rather than pretending it is an independent restart.
+  await assert.rejects(()=>f.bind('b'),/LOST_COMMIT_ACK/);assert.equal(f.control.effects,0);assert.equal(f.control.calls,state==='prepared'?0:1);assert.equal(f.control.reconciles,0);
  }finally{await f.close();}
 });
 
@@ -323,8 +325,8 @@ test('terminal prepare refuses capability mutation during initialization before 
  const f=await acceptedStopApiFixture(integrationRoot);try{
   const db=await pool.connect(),query=db.query.bind(db);let changed=false;
   t.mock.method(db,'query',async(...args:any[])=>{const result=await (query as any)(...args);if(queryText(args)==='COMMIT'&&!changed){changed=true;f.maintenance().executor.acceptedStopCapabilities=()=>({version:1,deadline:'wrong'} as any);}return result;});db.release();
-  await assert.rejects(()=>f.executor.prepare(new AbortController().signal),{code:'TASK_STOP_UNAVAILABLE'});assert.equal(changed,true);assert.equal(f.jobs.length,0);assert.equal(f.control.effects,0);
-  await assert.rejects(()=>f.executor.prepare(new AbortController().signal),{code:'TASK_STOP_UNAVAILABLE'});
+  await assert.rejects(async()=>f.executor.prepare(new AbortController().signal),{code:'TASK_STOP_UNAVAILABLE'});assert.equal(changed,true);assert.equal(f.jobs.length,0);assert.equal(f.control.effects,0);
+  await assert.rejects(async()=>f.executor.prepare(new AbortController().signal),{code:'TASK_STOP_UNAVAILABLE'});
  }finally{t.mock.restoreAll();await f.close();}
 });
 
