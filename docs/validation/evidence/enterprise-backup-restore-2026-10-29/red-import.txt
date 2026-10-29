@@ -1,0 +1,48 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (375.8233ms)
+  ✔ rejects business history before changing it (531.0612ms)
+  ✔ rejects department and its trigger history before changing it (449.9141ms)
+  ✔ rejects existing user before changing it (440.3805ms)
+  ✔ rejects changed defaults without version bump before changing it (530.8701ms)
+  ✔ rejects activated identity before changing it (462.4021ms)
+  ✔ rejects old idempotency cache before changing it (855.2213ms)
+  ✔ rejects previous restore generation before changing it (687.7831ms)
+  ✖ fresh isolated preserving import keeps source, historical task bytes and target identity (5.7845ms)
+✖ enterprise restore preflight admits only untouched fresh database defaults (4713.6801ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 8
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7359.4051
+
+✖ failing tests:
+
+test at tests\enterprise-backup-restore.test.ts:1:3815
+✖ fresh isolated preserving import keeps source, historical task bytes and target identity (5.7845ms)
+  AssertionError [ERR_ASSERTION]: preserving importer must exist
+  + actual - expected
+  
+  + 'undefined'
+  - 'function'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-restore.test.ts:39:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at TestContext.test (node:internal/test_runner/test:377:20)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-restore.test.ts:38:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

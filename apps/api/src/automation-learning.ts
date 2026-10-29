@@ -13,6 +13,7 @@ import {visibleSourceQuery,visibleCandidateQuery,requireCandidate,requireKnowled
 import {withVaultLock,writeVaultDocument} from './obsidian.ts';
 import type {KnowledgeWriteContext} from './knowledge.ts';
 import {combineSourceBounds,readRunBounds,readKnowledgeRevisionBounds,readCandidateBounds,rootSourceBounds,type SourceBounds} from './source-bounds.ts';
+import {restoreExecutionBlocked,restoreResourcePending,assertRestoreExecutionAdmitted} from './enterprise-restore-admission.ts';
 
 export const automationTables = ['automation_schedules', 'automation_occurrences', 'automation_notifications', 'automation_observations', 'automation_knowledge_candidates', 'automation_improvements', 'automation_evaluations', 'automation_reviews'];
 export async function migrateAutomationLearning(db: pg.Pool) {
@@ -74,6 +75,7 @@ export class AutomationLearningService {
     await transaction(this.db, async client => {
       // Share the backup/coordinator fence; writes and notification dedupe commit together.
       if (!(await client.query('SELECT pg_try_advisory_xact_lock(918274) AS locked')).rows[0].locked) return;
+      if (await restoreExecutionBlocked(client)) return;
       if(this.reuseCheckedAt===undefined||now.getTime()-this.reuseCheckedAt>=60000){
         let departments=(await client.query("SELECT DISTINCT p.department_id FROM projects p JOIN departments d ON d.id=p.department_id JOIN project_runs r ON r.project_id=p.id WHERE d.deleted_at IS NULL AND r.status='completed' AND p.department_id>$1 ORDER BY p.department_id LIMIT 20",[this.reuseDepartmentCursor])).rows;
         if(!departments.length&&this.reuseDepartmentCursor)departments=(await client.query("SELECT DISTINCT p.department_id FROM projects p JOIN departments d ON d.id=p.department_id JOIN project_runs r ON r.project_id=p.id WHERE d.deleted_at IS NULL AND r.status='completed' ORDER BY p.department_id LIMIT 20")).rows;
@@ -81,8 +83,11 @@ export class AutomationLearningService {
         reuseCursor=departments.length===20?departments.at(-1).department_id:'';
         reuseChecked=true;
       }
-      const schedules = (await client.query("SELECT * FROM automation_schedules WHERE status='active' AND next_due<=$1 ORDER BY next_due LIMIT 20 FOR UPDATE SKIP LOCKED", [now])).rows;
+      const schedules = (await client.query(`SELECT * FROM automation_schedules s WHERE s.status='active' AND s.next_due<=$1
+        AND NOT EXISTS(SELECT 1 FROM enterprise_restore_admission m CROSS JOIN LATERAL jsonb_array_elements_text(m.pending_resources->'schedule') pending(value)
+          WHERE pending.value::jsonb=jsonb_build_array(s.id,s.version)) ORDER BY s.next_due LIMIT 20 FOR UPDATE OF s SKIP LOCKED`, [now])).rows;
       for (const schedule of schedules) {
+        if(await restoreResourcePending(client,'schedule',JSON.stringify([schedule.id,schedule.version])))continue;
         // Clone the complete approved-to-be plan, including file selections and tool scopes.
         // A schedule does not infer new grants or approve this newly created project.
         const projectId = randomUUID(), occurrenceId = randomUUID(), source = schedule.snapshot;
@@ -156,7 +161,7 @@ export type PublishKnowledge = (input: { spaceId: string; title: string; content
 export function automationLearningRouter(options: { db?: pg.Pool; service?: AutomationLearningService; publishKnowledge?: PublishKnowledge } = {}) {
   const db = options.db ?? pool, router = Router();
   router.get('/automation/status', (_req, res) => res.json({ lastCheckedAt: options.service?.lastCheckedAt ?? null, error: options.service?.lastError ?? null, dispatchMode: 'approval-draft', observation: 'hourly-and-terminal', actualMultiDayValidation: false }));
-  router.get('/automation/schedules', async (_req, res) => res.json((await db.query('SELECT id,name,source_project_id AS "sourceProjectId",kind,interval_seconds AS "intervalSeconds",status,next_due AS "nextDue",version,created_at AS "createdAt" FROM automation_schedules ORDER BY created_at DESC LIMIT 200')).rows));
+  router.get('/automation/schedules', async (_req, res) => {const blocked=await restoreExecutionBlocked(db);res.json(await Promise.all((await db.query('SELECT id,name,source_project_id AS "sourceProjectId",kind,interval_seconds AS "intervalSeconds",status,next_due AS "nextDue",version,created_at AS "createdAt" FROM automation_schedules ORDER BY created_at DESC LIMIT 200')).rows.map(async row=>{const pending=await restoreResourcePending(db,'schedule',JSON.stringify([row.id,row.version]));return {...row,status:row.status==='active'&&(blocked||pending)?'paused':row.status,historicalStatus:row.status,restoreAuthorizationRequired:pending};})));});
   router.get('/automation/occurrences', async (_req, res) => res.json((await db.query('SELECT id,schedule_id AS "scheduleId",project_id AS "projectId",due_at AS "dueAt",created_at AS "createdAt" FROM automation_occurrences ORDER BY created_at DESC LIMIT 200')).rows));
   router.post('/automation/schedules', async (req, res) => {
     const input = z.object({ name: z.string().trim().min(1).max(100), projectId: z.string().min(1), firstDue: z.iso.datetime({ offset: true }), kind: z.enum(['once', 'interval']), intervalSeconds: z.number().int().min(60).max(31536000).optional() }).refine(v => v.kind !== 'interval' || v.intervalSeconds !== undefined, '间隔计划需要间隔秒数').parse(req.body);
@@ -168,7 +173,9 @@ export function automationLearningRouter(options: { db?: pg.Pool; service?: Auto
   });
   router.post('/automation/schedules/:id/state', async (req, res) => {
     const input = z.object({ action: z.enum(['pause', 'resume', 'cancel']), version: z.number().int().positive() }).parse(req.body);
-    const result = await db.query("UPDATE automation_schedules SET status=$1,version=version+1 WHERE id=$2 AND version=$3 AND status=ANY($4::text[]) RETURNING id", [{ pause: 'paused', resume: 'active', cancel: 'cancelled' }[input.action], req.params.id, input.version, input.action === 'pause' ? ['active'] : input.action === 'resume' ? ['paused'] : ['active', 'paused']]);
+    if(input.action==='resume')await assertRestoreExecutionAdmitted(db);
+    const pending=await restoreResourcePending(db,'schedule',JSON.stringify([req.params.id,input.version]));
+    const result = await db.query("UPDATE automation_schedules SET status=$1,version=version+1 WHERE id=$2 AND version=$3 AND status=ANY($4::text[]) RETURNING id", [{ pause: 'paused', resume: 'active', cancel: 'cancelled' }[input.action], req.params.id, input.version, input.action === 'pause' ? ['active'] : input.action === 'resume'&&!pending ? ['paused'] : ['active', 'paused']]);
     if (!result.rowCount) throw new AppError(409, '计划状态已变化，请刷新；已完成或取消的计划不能恢复');
     res.json({ ok: true });
   });

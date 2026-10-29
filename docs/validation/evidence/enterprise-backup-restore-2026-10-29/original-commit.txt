@@ -1,0 +1,22 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ task preparation fails closed before SQL when trusted stop maintenance is missing (473.4244ms)
+✔ original commit verifies raw result and historical objects independently of a current lease owner (94.7375ms)
+✔ original commit rejects a separately valid workspace binding for another task key (61.9734ms)
+✔ original commit rejects damaged raw-result (58.3362ms)
+✔ original commit rejects damaged merge-digest (69.2559ms)
+✔ original commit rejects damaged committed-output (77.2289ms)
+✔ original commit rejects damaged claim-token (67.1067ms)
+✔ original commit refuses a self-consistent raw result from a different claim (64.852ms)
+✔ lost prepared COMMIT acknowledgement never grants a replacement dispatch (3824.8519ms)
+✔ lost dispatching COMMIT acknowledgement never grants a replacement dispatch (3910.5211ms)
+✔ original commit rejects a separately valid queued backend binding (70.8874ms)
+✔ terminal prepare refuses capability mutation during initialization before any device prepare (214.8547ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11384.7359

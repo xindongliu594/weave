@@ -9,11 +9,13 @@ import {ToolEffectContractService,migrateToolEffectContracts,toolEffectContracts
 import {effectDigest} from '../services/agent-runtime/tool-effects.mjs';
 import type {EffectContract} from '../packages/contracts/tool-effects.ts';
 import type {HumanPrincipal} from '../apps/api/src/identity-types.ts';
+import {migrateRestoreControlFixture} from './helpers/restore-control-schema.ts';
 assert.equal(process.env.SIMULATED_INTEGRATION,'pglite','Use isolated runner');
 const contract:EffectContract={schema:1,capabilityId:'fixture:knowledge',namespace:'fixture',toolName:'knowledge_read',source:{kind:'builtin',reference:'fixture',version:'1',digest:'a'.repeat(64)},definitionSha256:'b'.repeat(64),effect:'read',isolationProfile:'fixture',permissions:['tool:knowledge_read'],retry:'bounded-read',cost:{kind:'free'},reconciliation:{kind:'receipt'},compensation:{kind:'none',requiresApproval:true},evidenceRefs:['fixture:protocol-only']};
 let db:pg.Pool,server:Server,url:string,sourceLoads=0;
 before(async()=>{
  db=new pg.Pool({connectionString:process.env.DATABASE_URL});await db.query('CREATE TABLE departments(id text PRIMARY KEY)');await migrateIdentity(db);await migrateToolEffectContracts(db);
+ await migrateRestoreControlFixture(db);
  await db.query("INSERT INTO human_users(id,issuer,subject,status,org_role) VALUES('admin','https://issuer.test','admin','active','admin'),('member','https://issuer.test','member','active','member')");
  const service=new ToolEffectContractService({db,resolveBinding:async(_db,key)=>key.toolName===contract.toolName&&key.namespace===contract.namespace?contract:null});
  const app=express();app.use(express.json());app.use((req,res,next)=>{

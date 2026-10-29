@@ -1,0 +1,87 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise backup cannot carry a queued manager request into an activated target
+  ✖ export rejects waiting without changing source or fees (478.1055ms)
+  ✔ export rejects replying without changing source or fees (296.6596ms)
+  ✔ completed and explicitly cancelled manager history remains exportable (1327.0168ms)
+  ✖ import rejects a valid waiting package before staging or publishing authority (502.3039ms)
+  ✖ import rejects a valid replying package before staging or publishing authority (281.5089ms)
+  ✖ valid cancelled history imports after rejected attempts without recreating a waiting request (221.9898ms)
+✖ enterprise backup cannot carry a queued manager request into an activated target (3993.4853ms)
+ℹ {"sourceUnchanged":true,"modelCalls":0}
+ℹ tests 7
+ℹ suites 0
+ℹ pass 2
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6686.735
+
+✖ failing tests:
+
+test at tests\enterprise-backup-manager-queue.test.ts:1:3015
+✖ export rejects waiting without changing source or fees (478.1055ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:27:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:25:45)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\enterprise-backup-manager-queue.test.ts:1:4538
+✖ import rejects a valid waiting package before staging or publishing authority (502.3039ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:43:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:40:45)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\enterprise-backup-manager-queue.test.ts:1:4538
+✖ import rejects a valid replying package before staging or publishing authority (281.5089ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:45:88)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:40:45)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\enterprise-backup-manager-queue.test.ts:1:5528
+✖ valid cancelled history imports after rejected attempts without recreating a waiting request (221.9898ms)
+  Error: 目标已有数据、身份、历史或自定义设置；请使用全新隔离实例恢复，原数据未替换。
+      at notFresh (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:26:33)
+      at preflightEnterpriseRestore (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:37:41)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:118:4)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'BACKUP_DESTINATION_NOT_FRESH',
+    upstreamStatus: undefined
+  }

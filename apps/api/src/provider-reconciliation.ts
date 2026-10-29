@@ -1,3 +1,4 @@
+import {restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { pool } from './db.ts';
@@ -156,6 +157,7 @@ export async function queryProviderForCall(id:string,automatic=false):Promise<Pr
 
 export async function expireProviderQueries(){
  await costMaintenanceTransaction(async db=>{
+  if(await restoreExecutionBlocked(db))return;
   await db.query(`UPDATE model_reservations SET context=jsonb_set(context-'billingQueryClaim','{providerReconciliation}',(context->'providerReconciliation')||jsonb_build_object('status','unresolved','message','上次账单查询中断；预留仍保留，可在网页重新查询。','checkedAt',now())),history=history||jsonb_build_array(jsonb_build_object('at',now(),'source','billing-query','status','unresolved','note','中断的账单查询已停止，未释放费用')) WHERE status='uncertain' AND context->'providerReconciliation'->>'status'='querying' AND (context->'providerReconciliation'->>'checkedAt')::timestamptz<now()-interval '30 seconds'`);
  });
 }
@@ -166,6 +168,7 @@ export class ProviderReconciliationService{
  private tick(){
   if(this.busy||this.stopped)return;this.busy=true;
   this.work=(async()=>{
+   if(await restoreExecutionBlocked(pool))return;
    await expireProviderQueries();
    const rows=(await pool.query(`SELECT id FROM model_reservations WHERE status='uncertain' AND context->'billingRoute'->>'autoReconcile'='true'
     AND COALESCE((context->'providerReconciliation'->>'attempts')::int,0)<3

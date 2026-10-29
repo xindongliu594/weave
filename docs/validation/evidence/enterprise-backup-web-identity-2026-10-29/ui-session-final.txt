@@ -1,0 +1,25 @@
+✔ backup upload rejects oversized files before reading, bad JSON and unsupported formats (4.2797ms)
+✔ v2 requires a successful preview and precise confirmation; busy and missing password always deny (0.3352ms)
+✔ restore failure and status text distinguish invalid password, nonfresh, quarantine and uncertainty (0.3967ms)
+✔ settings backup panel renders clear default v2, separate old format and a disabled restore action (71.4997ms)
+✔ business transport waits for session readiness and sends same-origin credentials (36.4166ms)
+✔ session failure denies all business requests instead of selecting local owner (1.4672ms)
+✔ session GET deduplicates, stops polling while hidden or unsubscribed and focus rechecks revocation (3.0002ms)
+✔ unsafe quote, PATCH, PUT, DELETE use current CSRF independently of billing/idempotency semantics (3.5034ms)
+✔ 401 invalidates immediately even with an unreadable body, 403 preserves session, neither replays writes (1.8272ms)
+✔ late old principal GET and artifact body cannot reach the next identity (3.0611ms)
+✔ logout unmounts immediately, clears registered state, and never resubmits on lost response (1.2314ms)
+✔ login POST receives JSON handoff, sends CSRF and navigates only after server URL validation (0.8249ms)
+✔ cached drafts and late component writes remain scoped to the captured principal (1.2798ms)
+✔ a broken reset subscriber cannot keep the old principal authorized (0.6223ms)
+✔ focus and explicit reads during an unresolved logout cannot remount the old session (0.9904ms)
+✔ a lost logout response holds the workspace closed until explicit verification (1.3226ms)
+✔ page restore blocks the old business subtree until identity revalidation completes (1.7791ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 687.9138

@@ -22,3 +22,9 @@ test('optional credential absence belongs to the read-set and cannot mask a brok
  unlinkSync(path);symlinkSync(join(root,'missing-directory'),path,process.platform==='win32'?'junction':'dir');
  assert.throws(()=>createBackupFileReader().optional(path),{code:'BACKUP_FILE_UNSAFE'});
 });
+
+test('a literal __proto__ filename is retained as bytes rather than silently dropped',t=>{
+ const root=mkdtempSync(join(tmpdir(),'backup-own-key-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
+ writeFileSync(join(root,'__proto__'),'literal file');const files=createBackupFileReader().tree(root);
+ assert.equal(Object.hasOwn(files,'__proto__'),true);assert.equal(files.__proto__,Buffer.from('literal file').toString('base64'));
+});

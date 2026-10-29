@@ -1,20 +1,21 @@
 import type pg from 'pg';
 import {AppError} from './provider.ts';
 
-const protectedTables=['human_users','department_memberships','human_sessions','human_session_lifecycles','oidc_login_transactions','identity_bootstrap','human_audit_events','audit_outbox','audit_run_projection','tool_effect_contracts'];
+const protectedTables=['human_users','department_memberships','human_sessions','human_session_lifecycles','oidc_login_transactions','identity_bootstrap','human_audit_events','audit_outbox','audit_run_projection','tool_effect_contracts','enterprise_restore_admission'];
 const approvalDecisionFields=['decided_by_user_id','decided_epoch','decision_actor_kind','decision_request_id','decision_reason','decision_audit_id'];
 
 /** Caller holds the transaction. Take these locks before the export's first data read. */
 async function assertIdentityHistoryEmpty(db:Pick<pg.PoolClient,'query'>,purpose:'export'|'restore'){
  try{
   // NOWAIT avoids deadlocks with identity issuance; acquired locks prevent a check/clear race.
-  await db.query('LOCK TABLE '+protectedTables.join(',')+' IN SHARE ROW EXCLUSIVE MODE NOWAIT');
+  await db.query('LOCK TABLE '+[...protectedTables,'backup_restore_anchor'].join(',')+' IN SHARE ROW EXCLUSIVE MODE NOWAIT');
  }catch(error:any){
   if(error.code==='55P03')throw new AppError(409,'身份或审计正在变更，请保留当前数据并稍后检查。',purpose==='export'?'BACKUP_SOURCE_BUSY':'BACKUP_DESTINATION_BUSY');
   throw error;
  }
  const queries=protectedTables.filter(table=>table!=='identity_bootstrap').map(table=>'EXISTS(SELECT 1 FROM '+table+')');
  queries.push('EXISTS(SELECT 1 FROM identity_bootstrap WHERE version<>1 OR expected_fingerprint IS NOT NULL OR activated_at IS NOT NULL OR consumed_by IS NOT NULL OR consumed_at IS NOT NULL OR closed_at IS NOT NULL OR closed_reason IS NOT NULL)');
+ queries.push('EXISTS(SELECT 1 FROM backup_restore_anchor WHERE enterprise_restore_operation_id IS NOT NULL)');
  const {rows}=await db.query('SELECT '+queries.join(' OR ')+' AS protected');
  if(rows[0]?.protected!==false){
   if(purpose==='export')throw new AppError(409,'当前在线备份仅支持本机业务数据，不能完整保存企业身份、授权与审计记录，因此未生成备份。企业完整备份与隔离恢复仍需专门验证。','BACKUP_SOURCE_IDENTITY_UNSUPPORTED');

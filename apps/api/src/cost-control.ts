@@ -8,6 +8,7 @@ import {withFreshLocalAdmission} from './local-admission.ts';
 import {assertStorageHeadroom} from '../../../services/agent-runtime/storage-governance.mjs';
 import {assertGoalContract} from '../../../packages/contracts/goal-contract.mjs';
 import {verifiedResourceEdge} from './recovery-resource-plan.ts';
+import {assertRestoreExecutionAdmitted,restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 type Database=Pick<pg.PoolClient,'query'>;
 const today="date_trunc('day',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'";
 const open="status IN ('pending','uncertain')";
@@ -26,7 +27,7 @@ export async function costMaintenanceTransaction<T>(work:(db:Database)=>Promise<
 }
 
 export async function expireReservations() {
- await costMaintenanceTransaction(expireReservationsInTransaction);
+ await costMaintenanceTransaction(async db=>{if(await restoreExecutionBlocked(db))return;await expireReservationsInTransaction(db);});
 }
 
 // Only the owning admission/maintenance transaction calls this after its shared gate.
@@ -100,6 +101,7 @@ export function projectCostCarryover(readiness:ProjectCostReadiness,retained:boo
 
 type CallInput={id?:string;model:Pick<Model,'id'|'inputRate'|'outputRate'>;amount:number;purpose:string;projectId?:string;projectVersion?:number;runId?:string;resourcePlanningRunId?:string;leaseOwner?:string;billingDepartmentId?:string;authorize?:(db:Database,row:any)=>Promise<void>;maxCost?:number;context?:Record<string,any>;retainUncertainCosts?:boolean;signal?:AbortSignal;accountingMode?:'conversation'};
 export async function reserveCall(input:CallInput) {
+ await assertRestoreExecutionAdmitted(pool);
  const id=input.id??randomUUID();
  return withFreshLocalAdmission(()=>reserveCallAttempt({...input,id}),input.signal);
 }
@@ -113,6 +115,7 @@ async function reserveCallAttempt(input:CallInput) {
   input.signal?.throwIfAborted();
   await client.query('BEGIN');
   await shareCostMaintenance(client);
+  await assertRestoreExecutionAdmitted(client);
   const project=input.projectId?(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[input.projectId])).rows[0]:null;
   if(input.projectId&&!project)throw new AppError(404,'项目不存在');
   if(input.projectVersion!==undefined&&project.version!==input.projectVersion)throw new AppError(409,'方案版本已变化');

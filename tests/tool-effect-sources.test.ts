@@ -13,6 +13,7 @@ import {nativeManifestId} from '../services/agent-runtime/native-capabilities.mj
 import {effectDigest} from '../services/agent-runtime/tool-effects.mjs';
 import type {HumanPrincipal} from '../apps/api/src/identity-types.ts';
 import type {EffectContract} from '../packages/contracts/tool-effects.ts';
+import {migrateRestoreControlFixture} from './helpers/restore-control-schema.ts';
 
 assert.equal(process.env.SIMULATED_INTEGRATION,'pglite','Use the isolated integration runner; never a production connection');
 const hash=(body:Buffer|string)=>createHash('sha256').update(body).digest('hex');
@@ -37,6 +38,7 @@ function install(version:string){
 before(async()=>{
   db=new pg.Pool({connectionString:process.env.DATABASE_URL});root=mkdtempSync(join(tmpdir(),'effect-source-'));
   await db.query('CREATE TABLE departments(id text PRIMARY KEY)');await migrateIdentity(db);await migrateNativeCapabilities(db);await migrateToolEffectContracts(db);
+  await migrateRestoreControlFixture(db);
   await db.query("INSERT INTO human_users(id,issuer,subject,status,org_role) VALUES('source-admin','https://issuer.example','admin','active','admin')");
 });
 after(async()=>{await db?.end();if(root){assert.equal(dirname(resolve(root)),resolve(tmpdir()));assert.ok(root.includes('effect-source-'));rmSync(root,{recursive:true,force:true});}});

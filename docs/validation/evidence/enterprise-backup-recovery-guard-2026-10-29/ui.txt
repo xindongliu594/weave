@@ -1,0 +1,12 @@
+✔ backup upload rejects oversized files before reading, bad JSON and unsupported formats (4.4923ms)
+✔ v2 requires a successful preview and precise confirmation; busy and missing password always deny (0.361ms)
+✔ restore failure and status text distinguish invalid password, nonfresh, quarantine and uncertainty (0.4276ms)
+✔ settings backup panel renders clear default v2, separate old format and a disabled restore action (146.6891ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1340.0836

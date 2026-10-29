@@ -2,6 +2,7 @@ import type pg from 'pg';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { embedTexts,embeddingVersion,embeddingStatus } from '../../../services/embedding/local.mjs';
+import {assertRestoreExecutionAdmitted,restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 type Database=Pick<pg.PoolClient,'query'>;
 async function embed(texts:string[],kind:'query'|'passage'='passage'){
  try{return await embedTexts(texts,kind);}catch{throw new AppError(503,'本地语义模型无法运行或文件校验失败，请检查安装；未切换到其他模型或外部 API。','EMBEDDING_NOT_READY');}
@@ -10,6 +11,7 @@ export const authorizedChunks=`WITH refs AS (SELECT * FROM jsonb_to_recordset($1
  authorized AS MATERIALIZED (SELECT c.id,c.document_id AS "documentId",c.version,c.line_start AS "lineStart",c.line_end AS "lineEnd",c.content,c.tokens,x.title,x."spaceId",x.sha256,x.source
  FROM refs x JOIN knowledge_chunks c ON c.document_id=x."documentId" AND c.version=x.version)`;
 export async function indexChunks(chunks:any[],db:Database=pool){
+ await assertRestoreExecutionAdmitted(db);
  for(let offset=0;offset<chunks.length;offset+=16){
   const batch=chunks.slice(offset,offset+16);
   const found=(await db.query(`SELECT chunk_id,title FROM knowledge_embeddings WHERE model_version=$1 AND chunk_id=ANY($2::text[])`,[embeddingVersion,batch.map(c=>c.id)])).rows;
@@ -19,6 +21,7 @@ export async function indexChunks(chunks:any[],db:Database=pool){
  }
 }
 export async function vectorCandidates(refs:any[],inputs:any[],query:string,limit:number,db:Database=pool){
+ if(await restoreExecutionBlocked(db))return [];
  if(!embeddingStatus().installed)throw new AppError(503,'本地语义模型尚未安装，请在知识库页查看准备方式','EMBEDDING_NOT_READY');
  const encoded=JSON.stringify(refs);
  // Index only authorized immutable revisions. No global nearest-neighbor query followed by filtering.
@@ -50,6 +53,7 @@ export function startKnowledgeIndex(){
  if(indexing)return indexing;
  indexing=(async()=>{
   indexError=undefined;
+  if(await restoreExecutionBlocked(pool))return;
   while(true){const missing=(await pool.query(`SELECT c.id,c.content,d.title FROM knowledge_documents d JOIN knowledge_spaces s ON s.id=d.space_id JOIN knowledge_chunks c ON c.document_id=d.id AND c.version=d.version
    LEFT JOIN knowledge_embeddings e ON e.chunk_id=c.id AND e.model_version=$1 AND e.title=d.title WHERE d.deleted_at IS NULL AND s.deleted_at IS NULL AND e.chunk_id IS NULL ORDER BY c.id LIMIT 16`,[embeddingVersion])).rows;
    if(!missing.length)break;await indexChunks(missing);

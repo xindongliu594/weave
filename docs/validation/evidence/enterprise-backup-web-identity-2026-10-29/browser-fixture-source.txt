@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import {once} from 'node:events';
+import {randomUUID,createHash} from 'node:crypto';
+import {PGlite} from '@electric-sql/pglite';
+import {vector} from '@electric-sql/pglite-pgvector';
+import {PGLiteSocketServer} from '@electric-sql/pglite-socket';
+import {createServer as createViteServer} from 'vite';
+const temporary=fs.realpathSync(os.tmpdir()),root=fs.mkdtempSync(path.join(temporary,'weave-browser-')),owner={root,pid:process.pid};fs.writeFileSync(path.join(root,'.owner.json'),JSON.stringify(owner));
+const db=await PGlite.create({extensions:{vector}}),socket=new PGLiteSocketServer({db,host:'127.0.0.1',port:0,maxConnections:8});let dbPort;socket.addEventListener('listening',e=>{dbPort=e.detail.port;});await socket.start();process.env.DATABASE_URL=`postgresql://postgres:postgres@127.0.0.1:${dbPort}/postgres`;
+function env(folder){Object.assign(process.env,{DATA_DIR:folder,TRACE_ROOT:path.join(folder,'runs'),OBSIDIAN_VAULT:path.join(folder,'vault'),LOCAL_WORKSPACE_ROOT:folder,WEIWU_AUTH_MODE:'legacy-local'});fs.mkdirSync(path.join(folder,'runs'),{recursive:true});}
+const sourceRoot=path.join(root,'source');env(sourceRoot);fs.mkdirSync(path.join(sourceRoot,'runs','history'));fs.writeFileSync(path.join(sourceRoot,'runs','history','delivery.txt'),'Synthetic browser acceptance delivery.');fs.writeFileSync(path.join(sourceRoot,'credential.key'),Buffer.alloc(32,6));
+const product=await import('../../apps/api/src/db.ts');product.pool.options.max=1;await product.migrate();
+await product.pool.query("INSERT INTO human_users(id,issuer,subject,status,org_role) VALUES('browser-admin','https://fixture.invalid','admin','active','admin')");await product.pool.query("INSERT INTO knowledge_spaces(id,name,scope) VALUES('browser-space','网页验收资料','company')");const {saveKnowledgeDocument}=await import('../../apps/api/src/knowledge.ts');await saveKnowledgeDocument({spaceId:'browser-space',title:'备份浏览器验收',content:'这是虚构资料。恢复后需要保留文件、知识版本和未知费用。'});
+await product.pool.query("INSERT INTO models(id,data,status) VALUES('browser-model','{}','untested')");await product.pool.query("INSERT INTO model_reservations(id,model_id,purpose,amount,input_rate,output_rate,status,expires_at) VALUES('browser-unknown','browser-model','虚构待核对费用',0.02,1,1,'uncertain',now()-interval '1 hour')");
+const {readEnterpriseTables}=await import('../../apps/api/src/enterprise-backup-export.ts'),sourceDigest=createHash('sha256').update(JSON.stringify(await readEnterpriseTables(product.pool))).digest('hex');
+const {createApp}=await import('../../apps/api/src/app.ts');let app,http,apiPort;
+async function start(){app=createApp();await app.locals.ready;await app.locals.shutdownBackground();http=app.listen(apiPort??0,'127.0.0.1');await once(http,'listening');apiPort=http.address().port;}
+await start();const origin=`http://127.0.0.1:${apiPort}`;
+const web=await createViteServer({server:{host:'127.0.0.1',port:0,strictPort:false,proxy:{'/api':origin,'/auth':origin,'/healthz':origin}}});await web.listen();const url=`http://127.0.0.1:${web.httpServer.address().port}/#settings`;
+let switching=false,target=false;console.log(JSON.stringify({phase:'source-ready',url,root,modelCalls:0}));
+process.stdin.setEncoding('utf8');process.stdin.on('data',chunk=>{void command(chunk.trim()).catch(error=>{console.error(error);process.exitCode=1;});});
+async function command(command){
+ if(switching)return;switching=true;
+ try{
+  if(command==='target'&&!target){http.closeAllConnections();await new Promise(resolve=>http.close(resolve));await app.locals.shutdown();await product.pool.query('CREATE SCHEMA browser_target');await product.pool.query('SET search_path TO browser_target,public');await product.migrate();env(path.join(root,'target'));await start();target=true;console.log(JSON.stringify({phase:'target-ready',url,modelCalls:0}));}
+  if(command==='quit'){http.closeAllConnections();await new Promise(resolve=>http.close(resolve));await app.locals.shutdown();await web.close();await product.pool.query('SET search_path TO public');assert.equal(createHash('sha256').update(JSON.stringify(await readEnterpriseTables(product.pool))).digest('hex'),sourceDigest);await product.pool.end();await socket.stop();await db.close();assert.equal(fs.realpathSync(root),root);assert.match(path.relative(temporary,root),/^weave-browser-[A-Za-z0-9]+$/);assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root,'.owner.json'),'utf8')),owner);fs.rmSync(root,{recursive:true});console.log(JSON.stringify({phase:'closed',sourceUnchanged:true,modelCalls:0}));process.exit(0);}
+ }finally{switching=false;}
+}

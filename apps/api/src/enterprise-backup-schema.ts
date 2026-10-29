@@ -5,10 +5,8 @@ import {nativeManifestId} from '../../../services/agent-runtime/native-capabilit
 import {enterpriseTableSpecs,type EnterpriseTableName,type EnterpriseTableSpec,type EnterpriseColumnType} from './enterprise-backup-tables.ts';
 export {enterpriseTableSpecs,type EnterpriseTableName};
 
-export const ENTERPRISE_BACKUP_SCHEMA_ID='weiwu-enterprise-2026-10-29-v1';
-export const ENTERPRISE_BACKUP_FORMAT='agent-department-enterprise-backup-v2';
-export const ENTERPRISE_BACKUP_LIMIT_BYTES=50*1024*1024;
-export const ENTERPRISE_ENVELOPE_LIMIT_BYTES=70*1024*1024;
+import {ENTERPRISE_BACKUP_SCHEMA_ID,ENTERPRISE_BACKUP_FORMAT,ENTERPRISE_BACKUP_LIMIT_BYTES,ENTERPRISE_ENVELOPE_LIMIT_BYTES} from '../../../packages/contracts/backup.ts';
+export {ENTERPRISE_BACKUP_SCHEMA_ID,ENTERPRISE_BACKUP_FORMAT,ENTERPRISE_BACKUP_LIMIT_BYTES,ENTERPRISE_ENVELOPE_LIMIT_BYTES};
 const MAX_ROWS=100000,MAX_TOTAL_ROWS=500000,MAX_FILES=100000;
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex');
 const kdfOptions={N:16384,r:8,p:1,maxmem:64*1024*1024};

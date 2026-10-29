@@ -1,0 +1,132 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ startup inspector is read-only and treats a broken active pointer as pending (1327.9011ms)
+✔ damaged active pointer (truncated-json) requires reconciliation and preserves both generations (297.2749ms)
+✔ damaged active pointer (oversized) requires reconciliation and preserves both generations (286.0867ms)
+✔ damaged active pointer (directory) requires reconciliation and preserves both generations (265.2261ms)
+✔ same-transaction receipt proves commit and a valid new generation clears pending without replay (483.1593ms)
+✔ absent receipt plus unchanged DB generation restores verified old trace key and vault and retains new trace (439.9168ms)
+✔ committed DB cannot certify changed physical bytes and leaves original evidence pending (308.5343ms)
+✔ missing active pointer cannot hide an unfinished durable operation (227.76ms)
+✔ new staged archive files are fsynced before publishing the active durable operation (291.2895ms)
+✔ process restart after prepared reconciles actual SQL and recorded physical generations without replay (5488.9721ms)
+✔ process restart after old-moved reconciles actual SQL and recorded physical generations without replay (5590.6438ms)
+✔ process restart after installed reconciles actual SQL and recorded physical generations without replay (5642.3071ms)
+BACKUP_STATE_OWNED_ROOTS={"pid":43324,"roots":["C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-3okRfw","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-bZvUQG","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-haw2uO","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-k7fAvu","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-3KYYt5","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-SoH1NE","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-tQEVwO","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-PdghGj","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-1M4CXq","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-pFaigF","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-CJ8IT6","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-zXIDkR","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-1Slgp5","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-KwndWN"]}
+✔ process restart after committed reconciles actual SQL and recorded physical generations without replay (5568.9492ms)
+✔ vault physical rollback failure does not replace the first frozen restore error (29.1758ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28059.8722
+▶ enterprise web API exports, previews, restores and requires verified human activation
+  ✔ all enterprise routes are classified and ordinary members cannot export (440.8614ms)
+  ✔ actual admin export contains the fixed v2 format and excludes response cache (485.4563ms)
+  ✔ preview is read-only, password failure is explicit and metadata contains no key (239.7097ms)
+  ✔ inspect and restore accept more than the ordinary 2 MiB parser limit (272.0122ms)
+  ✔ wrong origin and imprecise confirmation cannot restore (10.0187ms)
+  ✔ fresh application scaffolds do not prevent import and no execution authority is restored (625.3765ms)
+  ✔ status is safe and model calls stay blocked; local-owner cannot activate (96.9232ms)
+  ✔ changed restored delivery blocks activation without overwriting it (84.0695ms)
+  ✔ fresh live target admin activates once; later normal file changes do not break idempotence (195.6609ms)
+✔ enterprise web API exports, previews, restores and requires verified human activation (14344.8225ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15089.3809
+▶ restored environment quarantine blocks common execution paths without changing history
+  ✔ normal instance remains admitted (4.9095ms)
+  ✔ environment admission denies quarantine (4.0143ms)
+  ✔ all planning/manager/model callers share the guarded reservation entry (6.881ms)
+  ✔ cost reads do not expire or rewrite imported reservations (6.7459ms)
+  ✔ run admission cannot escape through the legacy local-owner branch (7.8445ms)
+  ✔ old v1 export and restore both protect the target marker (20.239ms)
+  ✔ manager background maintenance preserves imported messages (8.4268ms)
+  ✔ automation cannot create drafts or rewrite schedules before activation (11.6656ms)
+  ✔ coordinator does not inspect or start executors while quarantined (725.1591ms)
+  ✔ automatic billing reconciliation retains unknown query evidence (40.9325ms)
+  ✔ vault and embedding background paths cannot alter restored references (11.9475ms)
+  ▶ activation requires a fresh live target session of the current source-issuer admin
+    ✔ a marker without its committed receipt cannot activate (4.5179ms)
+    ✔ local-owner, device and system cannot activate (11.8193ms)
+    ✔ a different package digest is rejected (3.8596ms)
+    ✔ missing session, changed issuer and disabled or revoked administrator are rejected (33.7405ms)
+    ✔ old login and revoked session family cannot activate (23.2164ms)
+    ✔ fresh activation adds one new audit and does not rewrite identity history (35.2665ms)
+    ✔ an active label cannot bypass missing audit or mismatched generation (6.1118ms)
+    ✔ losing the admission marker must not make a restored instance look like a normal instance (2.6691ms)
+    ✔ global activation never grants copied resources or a different native version (44.6785ms)
+    ✔ pending restored schedules cannot starve a newly authorized schedule (52.6286ms)
+    ✔ schedule API displays effective pause and explicit resume creates a new authorized version (134.6268ms)
+    ✔ only a genuinely virgin source can activate through first target OIDC bootstrap (173.9483ms)
+  ✔ activation requires a fresh live target session of the current source-issuer admin (541.8208ms)
+✔ restored environment quarantine blocks common execution paths without changing history (1710.9492ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4304.9545
+▶ restored resources use existing native, MCP, device and contract entry points
+  ✔ native enable, device heartbeat and API model tests are denied before any effect (82.4087ms)
+  ✔ native versions remain isolated and explicit enable uses the existing bundle validator (55.654ms)
+  ✔ copied devices remain effectively disabled and cannot be revived by their old key (50.2081ms)
+  ✔ copied MCP cannot discover or call until a new connection version is saved (40.2253ms)
+  ✔ copied immutable contract needs a new target review audit without rewriting the old row (28.1459ms)
+✔ restored resources use existing native, MCP, device and contract entry points (3244.8433ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4046.2954
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (379.0954ms)
+  ✔ rejects business history before changing it (501.8722ms)
+  ✔ rejects department and its trigger history before changing it (456.8663ms)
+  ✔ rejects existing user before changing it (447.4983ms)
+  ✔ rejects changed defaults without version bump before changing it (436.5913ms)
+  ✔ rejects activated identity before changing it (543.9995ms)
+  ✔ rejects old idempotency cache before changing it (527.6209ms)
+  ✔ rejects previous restore generation before changing it (584.4591ms)
+  ✔ rejects enterprise restore anchor without marker before changing it (515.2242ms)
+  ✔ rejects previous admission marker before changing it (460.6196ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (1868.8909ms)
+  ✔ fresh isolated preserving import keeps source, historical task bytes and target identity (7681.572ms)
+✔ enterprise restore preflight admits only untouched fresh database defaults (14782.9294ms)
+ℹ Target SQL/files/key/receipt/quarantine matched; checking re-export without live claim authority.
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17540.2711
+✔ legacy encrypted restore remains available for a destination without enterprise history (3665.4787ms)
+✔ business-only imports reject human authority before staging or SQL replacement (2694.9739ms)
+✔ authority-only source cannot create an archive that its importer would reject (49.9501ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (200.9109ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (172.5651ms)
+✔ online business export refuses enterprise identity and audit omission without changing source (45.9024ms)
+✔ a protected source is rejected before Obsidian indexing changes knowledge or note bytes (44.1386ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7745.437

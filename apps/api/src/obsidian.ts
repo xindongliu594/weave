@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { chunkDocument } from '../../../services/agent-runtime/knowledge.mjs';
+import {assertRestoreExecutionAdmitted} from './enterprise-restore-admission.ts';
 const vaultContext = new AsyncLocalStorage<boolean>();
 let vaultTail: Promise<unknown> = Promise.resolve();
 export function withVaultLock<T>(work: () => Promise<T>): Promise<T> {
@@ -31,7 +32,8 @@ export function renderNote(doc:any,existingRaw=''){
  return '---\n'+[...kept,...Object.entries(managed).map(([key,value])=>key+': '+JSON.stringify(value))].join('\n')+'\n---\n'+doc.content;
 }
 function safe(path:string){if(!path||path.startsWith('/')||path.includes('\\')||path.split('/').some(p=>!p||p==='.'||p==='..'))throw new AppError(422,'Vault 路径不合法');let current=obsidianRoot();for(const part of path.split('/')){current=join(current,part);if(existsSync(current)&&lstatSync(current).isSymbolicLink())throw new AppError(422,'Vault 中不索引符号链接');}return current;}
-export function ensureVault(){const root=obsidianRoot();mkdirSync(root,{recursive:true,mode:0o700});if(!existsSync(join(root,'.obsidian')))mkdirSync(join(root,'.obsidian'),{mode:0o700});const welcome=join(root,'知识库说明.md');if(!existsSync(welcome))writeFileSync(welcome,'# 为伍知识库\n\n这是普通 Obsidian Vault，资料以 Markdown 文件保存。\n\n- 请在工作台创建公司、部门或员工知识空间；对应目录会自动建立。\n- 在这些目录中编辑或新建 Markdown，点击同步索引即可供授权员工检索。\n- `ad_document_id` 标识文档，移动文件时请保留；不要复制该 ID 到其他文档。\n- Wiki 链接和标签会保留，引用依据每次索引的文档版本及行号。\n- 删除或移出已授权文件夹的笔记会从当前检索中移除；历史引用仍保留。\n- 员工访问权限由工作台管理，修改 Markdown 属性不会扩大授权。\n',{mode:0o600});return root;}
+export const INITIAL_VAULT_FILES:Readonly<Record<string,string>>=Object.freeze({'知识库说明.md':'# 为伍知识库\n\n这是普通 Obsidian Vault，资料以 Markdown 文件保存。\n\n- 请在工作台创建公司、部门或员工知识空间；对应目录会自动建立。\n- 在这些目录中编辑或新建 Markdown，点击同步索引即可供授权员工检索。\n- `ad_document_id` 标识文档，移动文件时请保留；不要复制该 ID 到其他文档。\n- Wiki 链接和标签会保留，引用依据每次索引的文档版本及行号。\n- 删除或移出已授权文件夹的笔记会从当前检索中移除；历史引用仍保留。\n- 员工访问权限由工作台管理，修改 Markdown 属性不会扩大授权。\n'});
+export function ensureVault(){const root=obsidianRoot();mkdirSync(root,{recursive:true,mode:0o700});if(!existsSync(join(root,'.obsidian')))mkdirSync(join(root,'.obsidian'),{mode:0o700});const welcome=join(root,'知识库说明.md');if(!existsSync(welcome))writeFileSync(welcome,INITIAL_VAULT_FILES['知识库说明.md'],{mode:0o600});return root;}
 export async function ensureSpaceFolder(id:string){
  const space=(await pool.query('SELECT * FROM knowledge_spaces WHERE id=$1',[id])).rows[0];if(!space)throw new AppError(404,'知识空间不存在');
  const folder=space.vault_folder??`${space.scope}/${space.name.replace(/[<>:"/\\|?*\x00-\x1f]/g,'-').slice(0,60)}-${space.id.slice(0,8)}`;
@@ -55,7 +57,7 @@ export function restoreVaultFiles(files:Record<string,string>,previousPaths:stri
  try{for(const path of paths){const file=safe(path),old=before.get(path);if(old){const retained=join(trash,path);mkdirSync(dirname(retained),{recursive:true,mode:0o700});writeFileSync(retained,old,{mode:0o600});}if(files[path]!==undefined){if(typeof files[path]!=='string')throw new AppError(422,'Vault 备份格式不正确');mkdirSync(dirname(file),{recursive:true,mode:0o700});writeFileSync(file,Buffer.from(files[path],'base64'),{mode:0o600});}else if(existsSync(file))unlinkSync(file);}return rollback;}catch(e){try{rollback();}catch{/* The caller must verify physical outcome; preserve the original failure. */}throw e;}
 }
 let lastSync:any=null;
-export function syncObsidian(){return withVaultLock(sync);}
+export function syncObsidian(){return withVaultLock(async()=>{await assertRestoreExecutionAdmitted(pool);return sync();});}
 async function sync(){
  ensureVault();const spaces=(await pool.query('SELECT * FROM knowledge_spaces WHERE deleted_at IS NULL')).rows;let indexed=0;const errors:string[]=[];
  for(const space of spaces){

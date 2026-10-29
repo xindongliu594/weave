@@ -11,6 +11,7 @@ import {randomUUID} from 'node:crypto';
 import {auditActor} from './audit-events.ts';
 import {recordDeniedAudit} from './human-audit.ts';
 import {assertCurrentRunAuthority,recordRunAuthorityDenial} from './run-current-authority.ts';
+import {assertRestoreExecutionAdmitted} from './enterprise-restore-admission.ts';
 
 export function authorizeRoute(policy:RoutePolicy|null,principal:Principal|null,path=policy?.path):boolean {
   if(!policy||!principal)return false;
@@ -37,6 +38,10 @@ export function apiAccess(identity:ReturnType<typeof createIdentityHttp>,config:
         res.status(principal?403:401).json({error:'Access denied'});return;
       }
       res.locals.principal=principal;
+      // Quarantine permits authorized reads, explicit accounting and identity
+      // maintenance. New mutation/effect routes default to denied.
+      if(!['GET','HEAD'].includes(req.method)&&!policy.path.startsWith('/api/identity/')
+        &&!['/api/knowledge/search','/api/costs/:id/query-provider','/api/costs/:id/reconcile','/api/backup/enterprise/activate','/api/backup/enterprise/export','/api/backup/enterprise/inspect'].includes(policy.path))await assertRestoreExecutionAdmitted(pool);
       if(policy.access==='member'&&principal){
         await currentRoutePrincipal(pool,principal);
         const parts=path.split('/'),id=parts[3];
@@ -79,7 +84,7 @@ export function apiAccess(identity:ReturnType<typeof createIdentityHttp>,config:
           correlation:{correlationId:requestId,requestId,approvalId:path.split('/')[3]},resource:{type:'tool_operation',id:path.split('/')[3],departmentIds:[]},
           outcome:denied?'denied':'failure',reasonCode:denied?'forbidden':'storage-unavailable',changes:{decision:req.body.decision,policyVersion:'human-approval-v1'}});}catch{/* Audit failure cannot turn a rejected request into a cache hit. */}
       }
-      if(error instanceof AppError&&[401,403,404,422].includes(error.status)){res.status(error.status).json({code:error.code,message:error.message});return;}
+      if(error instanceof AppError&&[401,403,404,409,422].includes(error.status)){res.status(error.status).json({code:error.code,message:error.message});return;}
       if((error as {status?:number}).status===403){res.status(403).json({error:'Access denied'});return;}
       res.status(503).json({error:'Identity service unavailable'});
     }

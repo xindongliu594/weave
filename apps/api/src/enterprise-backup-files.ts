@@ -32,7 +32,7 @@ export function createBackupFileReader(){
     }return read(path);
   }
   function tree(root:string){
-    const files:Record<string,string>={};let entries=0;
+    const files:Record<string,string>=Object.create(null);let entries=0;
     function walk(dir:string,depth:number){
       if(depth>64||++entries>100000)throw invalid('BACKUP_SIZE_LIMIT');
       const stat=assertArchivePlain(dir,'directory'),names=readdirSync(dir).sort();directories.set(dir,{stat,names});

@@ -1,0 +1,22 @@
+{
+  "reviewer": "/root/enterprise_backup_final_review",
+  "mode": "independent read-only; no tests, mutations, network or production access",
+  "findings": [
+    {
+      "severity": "Important",
+      "issue": "Imported waiting manager_messages could execute after global activation",
+      "resolution": "Locked export and pre-stage import both refuse waiting/replying; source history unchanged; terminal messages preserved",
+      "reReview": "Closed in code; runtime results supplied separately by parent"
+    },
+    {
+      "severity": "Minor",
+      "issue": "Stale importer unmounted comment",
+      "resolution": "Corrected"
+    }
+  ],
+  "unverified": [
+    "native PostgreSQL contention",
+    "cross-engine compatibility",
+    "company IdP"
+  ]
+}

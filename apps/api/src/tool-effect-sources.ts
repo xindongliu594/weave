@@ -1,3 +1,4 @@
+import {assertRestoredResourceAdmitted} from './enterprise-restore-admission.ts';
 import {isAbsolute} from 'node:path';
 import {z} from 'zod';
 import type {EffectContract} from '../../../packages/contracts/tool-effects.ts';
@@ -68,6 +69,7 @@ export async function createToolEffectSources(value:Options):Promise<ToolEffectS
       // no network discovery is started while the caller owns this lock.
       const state=(await client.query('SELECT namespace,enabled FROM native_capabilities WHERE namespace=$1 FOR SHARE',[native[1]])).rows[0];
       if(!state?.enabled)return null;
+      await assertRestoredResourceAdmitted(client,'native',native[2]);
       const bundle=readNativeBundle(native[2],options.nativeRoot);
       if(bundle.manifest.namespace!==native[1])throw sourceError('TOOL_EFFECT_SOURCE_CHANGED');
       let entries=nativeEntries.get(bundle.id);

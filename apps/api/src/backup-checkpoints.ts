@@ -67,6 +67,12 @@ export function validateEnterpriseBackupReferences(payload:EnterpriseBackupV2,ro
   const imports=new Map(payload.tables.work_file_snapshots.map(row=>[row.id,JSON.parse(row.files as string)]));
   const key=(row:any)=>JSON.stringify([row.run_id,row.task_id,row.attempt_id,row.generation]);
   const tasks=new Map(attempts.map(row=>[key(row),row]));
+  const activeNotes=new Set<string>();
+  for(const doc of payload.tables.knowledge_documents){
+   if(doc.deleted_at!==null||doc.vault_path===null)continue;const path=doc.vault_path as string;
+   if(activeNotes.has(path)||!Object.hasOwn(payload.vaultFiles,path)||createHash('sha256').update(Buffer.from(payload.vaultFiles[path],'base64')).digest('hex')!==doc.vault_hash)throw Error('VAULT_REFERENCE_INVALID');activeNotes.add(path);
+  }
+  if(Object.keys(payload.vaultFiles).some(path=>!activeNotes.has(path)))throw Error('VAULT_REFERENCE_UNREGISTERED');
   validateBackupCheckpoints(root,Object.keys(payload.files),runs);
   for(const row of payload.tables.work_file_snapshots){
    const files=JSON.parse(row.files as string);let total=0;const paths=new Set();

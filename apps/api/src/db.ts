@@ -11,6 +11,7 @@ import {migrateToolEffectContracts} from './tool-effect-contracts.ts';
 import {migrateToolOperations} from './tool-operations.ts';
 import {migrateHumanApprovals} from './human-audit.ts';
 import {migrateBackupRestoreState} from './backup-restore-state.ts';
+import {migrateEnterpriseRestoreAdmission} from './enterprise-restore-admission.ts';
 export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL ?? 'postgres://agent_department:local-development-only@127.0.0.1:55432/agent_department' });
 export async function migrate() {
   await pool.query(`
@@ -59,6 +60,7 @@ export async function migrate() {
   await migrateToolOperations(pool);
   await migrateHumanApprovals(pool);
   await migrateBackupRestoreState(pool);
+  await migrateEnterpriseRestoreAdmission(pool);
   await pool.query(`
     ALTER TABLE request_keys ADD COLUMN IF NOT EXISTS principal_key text;
     UPDATE request_keys SET principal_key='legacy-local' WHERE principal_key IS NULL;

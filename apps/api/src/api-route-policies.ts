@@ -34,6 +34,11 @@ export const routePolicies:readonly RoutePolicy[] = [
   {method:'GET',path:'/api/automation/status',access:'admin',source:'automation-learning.ts'},
   {method:'POST',path:'/api/backup/export',access:'admin',source:'backup.ts'},
   {method:'POST',path:'/api/backup/restore',access:'admin',source:'backup.ts'},
+  {method:'POST',path:'/api/backup/enterprise/export',access:'admin',source:'enterprise-backup-router.ts'},
+  {method:'POST',path:'/api/backup/enterprise/inspect',access:'admin',source:'enterprise-backup-router.ts'},
+  {method:'POST',path:'/api/backup/enterprise/restore',access:'admin',source:'enterprise-backup-router.ts'},
+  {method:'GET',path:'/api/backup/enterprise/status',access:'admin',source:'enterprise-backup-router.ts'},
+  {method:'POST',path:'/api/backup/enterprise/activate',access:'admin',source:'enterprise-backup-router.ts'},
   {method:'GET',path:'/api/capabilities/plugins',access:'member',source:'native-capabilities.ts'},
   {method:'POST',path:'/api/capabilities/plugins/install',access:'admin',source:'native-capabilities.ts'},
   {method:'GET',path:'/api/capabilities/plugins/install/:id',access:'admin',source:'native-capabilities.ts'},
@@ -237,7 +242,7 @@ export function actualRouteRegistrations():string[] {
 const mountedRouters=['identityManagementRouter','managerChatRouter','browserMcpRouter','nativeCapabilityRouter','toolEffectContractsRouter','workFilesRouter',
   'automationLearningRouter','observabilityRouter','localDeviceRouter','obsidianRouter','knowledgeRouter','productRouter',
   'employeeHistoryRouter','departmentWorkbenchRouter','openRigRouter','runLineageEvidenceRouter','taskStopMaintenanceRouter',
-  'costRouter','runManagementRouter','backupRouter','storageRouter'];
+  'costRouter','runManagementRouter','backupRouter','enterpriseBackupRouter','storageRouter'];
 const expectedNestedMounts:Record<string,string[]>={
   'product.ts':['organizationChatRouter'],
   'run-management.ts':['recoveryResourceRouter'],
@@ -271,7 +276,7 @@ function useRegistrations(source:string):string[] {
 }
 
 const expectedAppUses=[
-  'app /api/backup/restore express.json','app /api/local-devices express.json','app /api/work-files express.json',
+  'app /api/backup/restore express.json','app /api/backup/enterprise/inspect express.json','app /api/backup/enterprise/restore express.json','app /api/local-devices express.json','app /api/work-files express.json',
   'app (root) express.json',
   ...Array(3).fill('app (root) anonymous'),
   'app (root) identity.router',

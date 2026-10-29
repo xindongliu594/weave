@@ -7,6 +7,8 @@ import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { nativeManifestId } from '../services/agent-runtime/native-capabilities.mjs';
+import {migrateIdentity} from '../apps/api/src/identity-schema.ts';
+import {migrateRestoreControlFixture} from './helpers/restore-control-schema.ts';
 import { migrateNativeCapabilities, setNativeCapability, snapshotNativeCapabilities, assertNativeCapabilities,exportNativeBundles,restoreNativeBundles,readNativeBundle,listNativeCapabilities,nativeCapabilityRoot } from '../apps/api/src/native-capabilities.ts';
 test('local launcher stores installed plugins in the workspace, independently of its credential directory',()=>{
  const previous=process.env.LOCAL_WORKSPACE_ROOT;
@@ -22,6 +24,9 @@ test('registry admits installed bytes, preserves old version across upgrade, den
   const id=nativeManifestId(manifest), dir=join(root,id);mkdirSync(dir);writeFileSync(join(dir,'bundle.gz'),compressed);writeFileSync(join(dir,'package.json'),metadata);writeFileSync(join(dir,'manifest.json'),JSON.stringify(manifest));return {id,manifest};
  };
  try {
+  await db.query('CREATE TABLE departments(id text PRIMARY KEY)');
+  const schemaDb={query:(sql:string,values?:any[])=>values?db.query(sql,values):db.exec(sql).then(results=>results.at(-1))};
+  await migrateIdentity(schemaDb as any);await migrateRestoreControlFixture(schemaDb as any);
   await migrateNativeCapabilities(db as any);
   const one=install('1.0.0'),two=install('2.0.0');
   const agents=[{id:'reader',tools:['plugin__office__read']}];

@@ -16,6 +16,7 @@ import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { captureToolDefinition } from '../services/agent-runtime/tool-definition-effects.mjs';
+import {migrateRestoreControlFixture} from './helpers/restore-control-schema.ts';
 
 const nativeUrl = process.env.TOOL_EFFECT_POSTGRES_URL;
 if (nativeUrl) identityPostgresUrl(nativeUrl);
@@ -37,6 +38,7 @@ const review = () => service.review(key, effectDigest(source), actor);
 before(async () => {
   db = nativeUrl ? await identityPostgresPool(nativeUrl) : new pg.Pool({ connectionString: process.env.DATABASE_URL });
   if (!nativeUrl) { await db.query('CREATE TABLE departments(id text PRIMARY KEY)'); await migrateIdentity(db); }
+  await migrateRestoreControlFixture(db);
   const app = express(); app.use(express.json());
   app.use((req, res, next) => { res.locals.principal = req.get('x-test-actor') === 'admin' ? actor : { ...actor, userId: 'member', subject: 'member', orgRole: 'member' }; next(); });
   const faultDb = { async connect() { const client = await db.connect(); return {

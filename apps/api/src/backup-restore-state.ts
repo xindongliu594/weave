@@ -9,6 +9,7 @@ import {AppError} from './provider.ts';
 import {obsidianRoot,withVaultLock} from './obsidian.ts';
 import {nativeCapabilityRoot,readNativeBundle} from './native-capabilities.ts';
 import {resetVaultCache} from './vault.ts';
+import {readRestoreAdmission} from './enterprise-restore-admission.ts';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const HASH=/^[a-f0-9]{64}$/;
@@ -53,6 +54,7 @@ export function inspectBackupRestoreStartup(options:{traceRoot:string;dataRoot:s
 export async function migrateBackupRestoreState(db:Database){
  await db.query(`CREATE TABLE IF NOT EXISTS backup_restore_anchor(singleton integer PRIMARY KEY CHECK(singleton=1),database_id uuid NOT NULL UNIQUE,generation bigint NOT NULL DEFAULT 0 CHECK(generation>=0));
  CREATE TABLE IF NOT EXISTS backup_restore_receipts(operation_id uuid PRIMARY KEY,database_id uuid NOT NULL,previous_generation bigint NOT NULL CHECK(previous_generation>=0),next_generation bigint NOT NULL CHECK(next_generation=previous_generation+1),manifest_sha256 text NOT NULL CHECK(manifest_sha256 ~ '^[a-f0-9]{64}$'),UNIQUE(database_id,next_generation));`);
+ await db.query('ALTER TABLE backup_restore_anchor ADD COLUMN IF NOT EXISTS enterprise_restore_operation_id uuid');
  await db.query('INSERT INTO backup_restore_anchor(singleton,database_id) VALUES(1,$1) ON CONFLICT(singleton) DO NOTHING',[randomUUID()]);
 }
 export function createBackupRestoreState(options:{pool:Pick<pg.Pool,'connect'>;writers:ArchiveWriterManager;traceRoot:string;dataRoot:string}){
@@ -63,9 +65,8 @@ export function createBackupRestoreState(options:{pool:Pick<pg.Pool,'connect'>;w
  function paths(id:string){if(!UUID.test(id))throw invalid();return {id,stage:path.join(path.dirname(traceRoot),'restore-'+id),beforeTrace:path.join(path.dirname(traceRoot),'before-restore-'+id),retainedAfter:path.join(path.dirname(traceRoot),'after-restore-'+id),directory:path.join(control,id)};}
  function materialize(manifest:Manifest,digest:string):BackupRestoreOperation{const p=paths(manifest.operationId),operation={id:p.id,stage:p.stage,beforeTrace:p.beforeTrace,retainedAfter:p.retainedAfter,manifestSha256:digest,manifest};owned.add(operation);return operation;}
  function assertOwned(operation:BackupRestoreOperation){assertRoot();if(!owned.has(operation))throw invalid();}
- function load():BackupRestoreOperation|null{
-  assertRoot();if(!stat(control))return null;plain(control,'directory');if(!stat(active)){try{if(unfinished(control))throw unresolved();}catch{throw unresolved();}return null;}
-  try{const pointer=readJson(active,2048);if(!UUID.test(pointer.operationId)||!HASH.test(pointer.manifestSha256))throw invalid();const p=paths(pointer.operationId);plain(p.directory,'directory');const manifestPath=path.join(p.directory,'manifest.json');if(plain(manifestPath,'file').size>MANIFEST_LIMIT)throw invalid();const bytes=fs.readFileSync(manifestPath);if(sha(bytes)!==pointer.manifestSha256)throw invalid();const m=JSON.parse(bytes.toString()) as Manifest;
+ function readOperation(pointer:{operationId:string;manifestSha256:string}):BackupRestoreOperation{
+  assertRoot();try{if(!UUID.test(pointer.operationId)||!HASH.test(pointer.manifestSha256))throw invalid();const p=paths(pointer.operationId);plain(p.directory,'directory');const manifestPath=path.join(p.directory,'manifest.json');if(plain(manifestPath,'file').size>MANIFEST_LIMIT)throw invalid();const bytes=fs.readFileSync(manifestPath);if(sha(bytes)!==pointer.manifestSha256)throw invalid();const m=JSON.parse(bytes.toString()) as Manifest;
    if(m.format!==1||m.operationId!==pointer.operationId||!UUID.test(m.databaseId)||!/^\d+$/.test(m.generation)||!HASH.test(m.inputDigest)||m.traceRoot!==traceRoot||m.dataRoot!==dataRoot||m.vaultRoot!==vaultRoot||m.bundleRoot!==bundleRoot||!Array.isArray(m.bundles)||m.bundles.length>100)throw invalid();
    for(const item of m.bundles)if(!HASH.test(item.id)||typeof item.existed!=='boolean')throw invalid();
    for(const value of [m.beforeKey,m.afterKey,...Object.values(m.beforeVault),...Object.values(m.afterVault)])if(value!==null&&(!value||!HASH.test(value.sha256)||!isDeepStrictEqual(fromBase64(value.data,VAULT_LIMIT),value)))throw invalid();
@@ -73,13 +74,17 @@ export function createBackupRestoreState(options:{pool:Pick<pg.Pool,'connect'>;w
    return materialize(m,pointer.manifestSha256);
   }catch{throw unresolved();}
  }
+ function load():BackupRestoreOperation|null{
+  assertRoot();if(!stat(control))return null;plain(control,'directory');if(!stat(active)){try{if(unfinished(control))throw unresolved();}catch{throw unresolved();}return null;}
+  try{return readOperation(readJson(active,2048));}catch{throw unresolved();}
+ }
  function requireClear(){if(load())throw unresolved();}
  function createStage():Stage{assertRoot();requireClear();const p=paths(randomUUID());for(const name of [p.stage,p.beforeTrace,p.retainedAfter]){parents(name);if(stat(name))throw invalid();}fs.mkdirSync(p.stage,{mode:0o700});syncArchiveDirectory(path.dirname(p.stage));return {id:p.id,path:p.stage};}
  function removeUnpublishedStage(stage:Stage){assertRoot();if(stage.path!==paths(stage.id).stage||load())throw unresolved();if(stat(stage.path)){tree(stage.path);fs.rmSync(stage.path,{recursive:true});syncArchiveDirectory(path.dirname(stage.path));}}
  async function prepareRestore(db:Database,input:{stage:Stage;master?:string;vaultFiles:Record<string,string>;previousPaths:string[];nativePluginBundles:Record<string,unknown>;inputDigest:string}){
   assertRoot();requireClear();if(input.stage.path!==paths(input.stage.id).stage||!HASH.test(input.inputDigest))throw invalid();
   const anchor=(await db.query('SELECT database_id,generation::text FROM backup_restore_anchor WHERE singleton=1 FOR UPDATE')).rows[0];if(!anchor||!UUID.test(anchor.database_id))throw unresolved();
-  const beforeVault:Record<string,SavedFile>={},afterVault:Record<string,SavedFile>={};let bytes=0;const names=[...new Set([...input.previousPaths,...Object.keys(input.vaultFiles)])].sort();if(names.length>ENTRY_LIMIT)throw limit();
+  const beforeVault:Record<string,SavedFile>=Object.create(null),afterVault:Record<string,SavedFile>=Object.create(null);let bytes=0;const names=[...new Set([...input.previousPaths,...Object.keys(input.vaultFiles)])].sort();if(names.length>ENTRY_LIMIT)throw limit();
   for(const name of names){beforeVault[name]=saved(child(vaultRoot,name));afterVault[name]=fromBase64(input.vaultFiles[name],VAULT_LIMIT);bytes+=(beforeVault[name]?.data.length??0)+(afterVault[name]?.data.length??0);if(bytes>VAULT_LIMIT*8/3)throw limit();}
   const afterKey=fromBase64(input.master,32);if(afterKey&&Buffer.from(afterKey.data,'base64').length!==32)throw invalid();
   const bundles=Object.keys(input.nativePluginBundles).sort().map(id=>{if(!HASH.test(id))throw invalid();const existed=stat(path.join(bundleRoot,id))!==null;if(existed)readNativeBundle(id,bundleRoot);return {id,existed};});if(bundles.length>100)throw limit();
@@ -109,18 +114,32 @@ export function createBackupRestoreState(options:{pool:Pick<pg.Pool,'connect'>;w
  }
  function rollbackAfterSql(operation:BackupRestoreOperation){assertOwned(operation);rollbackPhysical(operation);finish(operation,'rolled-back');}
  function confirmCommitted(operation:BackupRestoreOperation){finish(operation,'committed');}
+ async function verifyCommittedRestoreIn(db:Database,input:{operationId:string;inputDigest:string}){
+  assertRoot();requireClear();const admission=await readRestoreAdmission(db);
+  if(!admission||!('operation_id' in admission)||!admission.receiptVerified||admission.operation_id!==input.operationId||admission.input_digest!==input.inputDigest)throw unresolved();
+  const operation=readOperation({operationId:input.operationId,manifestSha256:admission.manifest_sha256}),completion=readJson(path.join(paths(input.operationId).directory,'completion.json'),2048);
+  if(completion.operationId!==operation.id||completion.manifestSha256!==operation.manifestSha256||completion.status!=='committed'||operation.manifest.inputDigest!==input.inputDigest)throw unresolved();
+  verifyFiles(operation,'after');
+ }
  async function reconcilePending(){
   return writers.withRootExclusive(()=>withVaultLock(async()=>{
    const operation=load();if(!operation)return {status:'clear' as const};let client:pg.PoolClient|undefined,committing=false,discard=false;
-   try{client=await pool.connect();await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918274)');await client.query('SELECT pg_advisory_xact_lock(918275)');const anchor=(await client.query('SELECT database_id,generation::text FROM backup_restore_anchor WHERE singleton=1 FOR UPDATE')).rows[0],receipt=(await client.query('SELECT database_id,previous_generation::text,next_generation::text,manifest_sha256 FROM backup_restore_receipts WHERE operation_id=$1',[operation.id])).rows[0],m=operation.manifest;
+   try{client=await pool.connect();await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(918274)');await client.query('SELECT pg_advisory_xact_lock(918275)');const anchor=(await client.query('SELECT database_id,generation::text,enterprise_restore_operation_id FROM backup_restore_anchor WHERE singleton=1 FOR UPDATE')).rows[0],receipt=(await client.query('SELECT database_id,previous_generation::text,next_generation::text,manifest_sha256 FROM backup_restore_receipts WHERE operation_id=$1',[operation.id])).rows[0],m=operation.manifest;
     if(!anchor||anchor.database_id!==m.databaseId)throw unresolved();let status:'committed'|'rolled-back';
-    if(receipt){if(receipt.database_id!==m.databaseId||receipt.previous_generation!==m.generation||receipt.next_generation!==(BigInt(m.generation)+1n).toString()||anchor.generation!==receipt.next_generation||receipt.manifest_sha256!==operation.manifestSha256)throw unresolved();verifyFiles(operation,'after');status='committed';}
+    if(receipt){
+     if(receipt.database_id!==m.databaseId||receipt.previous_generation!==m.generation||receipt.next_generation!==(BigInt(m.generation)+1n).toString()||anchor.generation!==receipt.next_generation||receipt.manifest_sha256!==operation.manifestSha256)throw unresolved();
+     if(anchor.enterprise_restore_operation_id!==null){
+      const admission=await readRestoreAdmission(client);
+      if(!admission||!('operation_id' in admission)||admission.operation_id!==operation.id||admission.input_digest!==m.inputDigest||!admission.receiptVerified||(admission.status!=='quarantined'&&!admission.verified))throw unresolved();
+     }
+     verifyFiles(operation,'after');status='committed';
+    }
     else{if(anchor.generation!==m.generation)throw unresolved();rollbackPhysical(operation);status='rolled-back';}
     committing=true;await client.query('COMMIT');committing=false;finish(operation,status);return {status};
    }catch(error){discard=committing;try{if(client&&!committing)await client.query('ROLLBACK');}catch{discard=true;}throw error instanceof AppError?error:unresolved();}
    finally{client?.release(discard);}
   }),{timeoutMs:2000});
  }
- return Object.freeze({reconcilePending,requireClear,createStage,removeUnpublishedStage,prepareRestore,installArchive,recordCommitReceipt,confirmCommitted,rollbackAfterSql});
+ return Object.freeze({reconcilePending,requireClear,createStage,removeUnpublishedStage,prepareRestore,installArchive,recordCommitReceipt,confirmCommitted,rollbackAfterSql,verifyCommittedRestoreIn});
 }
 export type BackupRestoreState=ReturnType<typeof createBackupRestoreState>;

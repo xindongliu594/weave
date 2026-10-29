@@ -1,3 +1,4 @@
+import {assertRestoreExecutionAdmitted,assertRestoredResourceAdmitted,restoreResourcePending,restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 import {Router} from 'express';
 import {z} from 'zod';
 import {randomUUID,createHash,timingSafeEqual} from 'node:crypto';
@@ -47,6 +48,7 @@ const publicDevice=(row:any)=>({id:row.id,name:row.name,platform:row.platform,gr
 export async function localTarget(policy:any,agents:any[],db:Pick<pg.PoolClient,'query'>=pool,online=true){
  const target=policy.executionTarget;
  if(target?.kind!=='local')return {kind:'server',platform:'linux'};
+ await assertRestoredResourceAdmitted(db,'device',target.deviceId);
  const row=(await db.query("SELECT *,last_seen>clock_timestamp()-interval '15 seconds' AS online FROM local_devices WHERE id=$1",[target.deviceId])).rows[0];
  if(!row?.enabled||row.grant_id!==target.grantId)throw new AppError(422,'本机设备或目录授权已变化，请重新选择设备并批准方案','LOCAL_GRANT_CHANGED');
  const backend=executionBackend(row.backend);assertExecutionBackendBinding(backend,target.backend);
@@ -418,11 +420,11 @@ export class LocalRunExecutor {
 export function localDeviceRouter(traceRoot:string,writers:ArchiveWriterManager){
  requireWriters(traceRoot,writers);
  const router=Router(),registration=z.object({id:z.uuid(),token:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().trim().min(1).max(100),platform:z.enum(['win32','darwin','linux']),grant:z.object({id:z.uuid(),label:z.string().min(1).max(200),allowCommands:z.boolean()}),backend:executionBackendSchema.default({kind:'native'})});
- router.get('/local-devices',async(_req,res)=>res.json((await pool.query("SELECT *,last_seen>clock_timestamp()-interval '15 seconds' AS online FROM local_devices ORDER BY name")).rows.map(publicDevice)));
+ router.get('/local-devices',async(_req,res)=>{const blocked=await restoreExecutionBlocked(pool);res.json(await Promise.all((await pool.query("SELECT *,last_seen>clock_timestamp()-interval '15 seconds' AS online FROM local_devices ORDER BY name")).rows.map(async row=>{const pending=await restoreResourcePending(pool,'device',row.id);return {...publicDevice(row),enabled:row.enabled&&!blocked&&!pending,restoreAuthorizationRequired:pending};})));});
  router.post('/local-devices/register',async(req,res)=>{
   const input=registration.parse(req.body);
   if(input.backend.kind==='openshell'&&input.platform!=='linux')throw new AppError(422,'当前 OpenShell 执行环境需要 Linux','LOCAL_BACKEND_INVALID');
-  await deviceTransaction(async db=>{const existing=(await db.query('SELECT * FROM local_devices WHERE id=$1 FOR UPDATE',[input.id])).rows[0];
+  await deviceTransaction(async db=>{await assertRestoredResourceAdmitted(db,'device',input.id);const existing=(await db.query('SELECT * FROM local_devices WHERE id=$1 FOR UPDATE',[input.id])).rows[0];
    if(existing){await proof(input.id,req.get('X-Local-Device-Key'),db);if(!existing.enabled||existing.grant_id!==input.grant.id||existing.label!==input.grant.label||existing.allow_commands!==input.grant.allowCommands||existing.platform!==input.platform||!isDeepStrictEqual(executionBackend(existing.backend),input.backend))throw new AppError(403,'设备授权已撤回或改变，请在启动器中重新启用','LOCAL_GRANT_CHANGED');await db.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[input.id]);}
    else await db.query('INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands,backend) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[input.id,digest(input.token).toString('hex'),input.name,input.platform,input.grant.id,input.grant.label,input.grant.allowCommands,input.backend]);
   });res.json({ok:true,id:input.id});
@@ -432,6 +434,7 @@ export function localDeviceRouter(traceRoot:string,writers:ArchiveWriterManager)
   if(!device.enabled)throw new AppError(403,'本机设备已被停用','LOCAL_DEVICE_DENIED');
   const input=z.object({active:z.object({id:z.uuid(),claimToken:z.uuid()}).nullable().default(null)}).parse(req.body);
   await deviceTransaction(async db=>{
+   await assertRestoredResourceAdmitted(db,'device',id);
    await db.query('SELECT id FROM local_devices WHERE id=$1 FOR UPDATE',[id]);const current=await proof(id,req.get('X-Local-Device-Key'),db);
    if(!current.enabled)throw new AppError(403,'本机设备已被停用','LOCAL_DEVICE_DENIED');
    await db.query('UPDATE local_devices SET last_seen=clock_timestamp() WHERE id=$1',[id]);
@@ -458,6 +461,7 @@ export function localDeviceRouter(traceRoot:string,writers:ArchiveWriterManager)
   });res.json({job});
  });
  router.post('/local-devices/:id/operations/:operation/start',async(req,res)=>{
+  await assertRestoreExecutionAdmitted(pool);
   const id=z.uuid().parse(req.params.id);await proof(id,req.get('X-Local-Device-Key'));const token=z.uuid().parse(req.body.claimToken);
   await authenticatedOperation(writers,z.uuid().parse(req.params.operation),id,req.get('X-Local-Device-Key'),async(db,row,run,device)=>{
    if(row.device_id!==id||row.claim_token!==token||row.status!=='claimed'||!await executable(db,row,run,device,false,traceRoot))throw new AppError(409,'操作已启动、停止或授权失效','LOCAL_START_DENIED');

@@ -1,0 +1,49 @@
+{
+  "surface": "Codex in-app browser",
+  "fixture": "PGlite + socket, real createApp and Vite; synthetic data only",
+  "flow": [
+    "Settings: download enterprise v2",
+    "switch to fresh isolated target",
+    "upload actual downloaded file",
+    "preview: 44 tables / 2 files / 1 unknown cost / 0 unknown tool effects",
+    "confirm RESTORE ENTERPRISE and import",
+    "quarantined, physical verification true, local-owner activation disabled",
+    "repeat fresh-target import after responsive layout repair"
+  ],
+  "operations": [
+    "c875fc2d-9443-4376-9286-ff1a2ca0ea0b",
+    "4d1a3e89-5ffe-4414-99f4-835a6b1989b5"
+  ],
+  "layoutAfter": {
+    "viewport": 401,
+    "clientWidth": 251,
+    "scrollWidth": 251,
+    "paragraphWidths": [
+      219.33334350585935,
+      219.33334350585935,
+      219.33334350585935
+    ]
+  },
+  "shutdowns": [
+    {
+      "session": 45477,
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "ownedRootRemoved": true
+    },
+    {
+      "session": 68304,
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "ownedRootRemoved": true
+    }
+  ],
+  "downloadCleanup": {
+    "bytes": 5115,
+    "sha256": "451b4c73f17f4d87704f893618869006bb6dea7987f2c503302d39b72db40064",
+    "syntheticVerified": true,
+    "deleted": true
+  },
+  "modelCalls": 0,
+  "note": "Browser proves download/preview/import/quarantine. Fresh OIDC activation is a separate real protocol integration fixture, not a browser/company IdP claim."
+}

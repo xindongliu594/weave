@@ -38,6 +38,8 @@ import { configuredOrigins, isAllowedRequestOrigin,isAllowedCallbackNavigation }
 import {loadIdentityConfig} from './identity-config.ts';
 import {createIdentityHttp} from './identity-http.ts';
 import {apiAccess} from './api-access.ts';
+import {enterpriseBackupRouter} from './enterprise-backup-router.ts';
+import {ENTERPRISE_ENVELOPE_LIMIT_BYTES} from '../../../packages/contracts/backup.ts';
 import {assertRouteInventory,routePolicy,isClassifiedEntry} from './api-route-policies.ts';
 import { knowledgeRouter } from './knowledge.ts';
 import { productRouter } from './product.ts';
@@ -171,6 +173,8 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
     res.setHeader('Cache-Control', 'no-store'); next();
   });
   app.use('/api/backup/restore', express.json({ limit: '70mb' }));
+  app.use('/api/backup/enterprise/inspect',express.json({limit:ENTERPRISE_ENVELOPE_LIMIT_BYTES}));
+  app.use('/api/backup/enterprise/restore',express.json({limit:ENTERPRISE_ENVELOPE_LIMIT_BYTES}));
   app.use('/api/local-devices',express.json({limit:'32mb'}));
   app.use('/api/work-files', express.json({ limit: '12mb' }));
   app.use(express.json({ limit: '2mb' }));
@@ -188,7 +192,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   });
   if(options.demo)app.use((req,res,next)=>{
     if((req.method==='POST'&&/^\/api\/gateways\/?$/i.test(req.path)||req.method==='PUT'&&/^\/api\/gateways\/[^/]+\/?$/i.test(req.path))&&req.body?.baseUrl!==options.demo!.gatewayUrl)return res.status(422).json({message:'演示环境仅连接本地固定响应服务；配置真实模型请使用正式启动方式。'});
-    if(req.method==='POST'&&/^\/api\/backup\/restore\/?$/i.test(req.path))return res.status(422).json({message:'演示环境不能导入正式工作空间备份。'});
+    if(req.method==='POST'&&/^\/api\/backup\/(?:enterprise\/)?restore\/?$/i.test(req.path))return res.status(422).json({message:'演示环境不能导入正式工作空间备份。'});
     next();
   });
   app.use('/api',apiAccess(identity,identityConfig));
@@ -213,6 +217,7 @@ export function createApp(options:{sandboxMaintenance?:()=>SandboxMaintenance|un
   app.use('/api', costRouter());
   app.use('/api', runManagementRouter(traceRoot,writers));
   app.use('/api', backupRouter(traceRoot,writers,restoreState));
+  app.use('/api', enterpriseBackupRouter(traceRoot,writers,restoreState));
   app.use('/api',storageRouter(traceRoot,{dataRoot:process.env.LOCAL_WORKSPACE_ROOT,workspaceRoot:options.localWorkspace?.workspacesPath,nativeDeviceId:options.localWorkspace?.executionTarget.kind==='local'?options.localWorkspace.executionTarget.deviceId:undefined,deploymentBase:process.env.WEIWU_STORAGE_BASE,maintenanceReportDir:process.env.WEIWU_MAINTENANCE_REPORT_DIR,sandbox:options.sandboxMaintenance},pool,writers));
   app.get('/api/health', async (_req, res) => {
     await pool.query('SELECT 1'); res.json({ database: 'connected', runtime: await runtime.inspect(), version: '0.2.0',executionMode:executionMode(),...(options.demo?{demo:options.demo}: {}),...(options.localWorkspace?{workspace:options.localWorkspace}:{}) });

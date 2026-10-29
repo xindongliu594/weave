@@ -29,6 +29,25 @@ test('startup inspector is read-only and treats a broken active pointer as pendi
  const f=fixture();assert.deepEqual(stateModule.inspectBackupRestoreStartup({traceRoot:f.traceRoot,dataRoot:f.root}),{pending:false});assert.equal(existsSync(join(f.root,'.backup-restore-state')),false);
  mkdirSync(join(f.root,'.backup-restore-state'));writeFileSync(join(f.root,'.backup-restore-state','active.json'),'{');assert.deepEqual(stateModule.inspectBackupRestoreStartup({traceRoot:f.traceRoot,dataRoot:f.root}),{pending:true});
 });
+for(const damage of ['truncated-json','oversized','directory'] as const)test(`damaged active pointer (${damage}) requires reconciliation and preserves both generations`,async()=>{
+ const f=fixture();await stateModule.migrateBackupRestoreState(pool);let operation:any;
+ await f.writers.withRootExclusive(async()=>{const client=await pool.connect();try{await client.query('BEGIN');operation=await prepared(f,client);await client.query('ROLLBACK');}finally{client.release();}});
+ const control=join(f.root,'.backup-restore-state'),active=join(control,'active.json'),manifestPath=join(control,operation.id,'manifest.json'),manifest=readFileSync(manifestPath);
+ if(damage==='directory'){unlinkSync(active);mkdirSync(active);}else writeFileSync(active,damage==='truncated-json'?'{':' '.repeat(2049));
+ const pointer=damage==='directory'?null:readFileSync(active);
+ assert.deepEqual(stateModule.inspectBackupRestoreStartup({traceRoot:f.traceRoot,dataRoot:f.root}),{pending:true});
+ await f.writers.withRootExclusive(()=>assert.throws(()=>f.service.createStage(),{status:409,code:'BACKUP_RESTORE_RECONCILIATION_REQUIRED'}));
+ await assert.rejects(f.service.reconcilePending(),{status:409,code:'BACKUP_RESTORE_RECONCILIATION_REQUIRED'});
+ await assert.rejects(f.writers.withRootExclusive(()=>assert.fail('unresolved recovery must retain the write barrier'),{timeoutMs:0}),{code:'E_ARCHIVE_FENCE_TIMEOUT'});
+ assert.deepEqual(readFileSync(manifestPath),manifest);
+ if(pointer===null)assert.equal(fs.lstatSync(active).isDirectory(),true);else assert.deepEqual(readFileSync(active),pointer);
+ assert.equal(readFileSync(join(f.traceRoot,runId,'proof.txt'),'utf8'),'before');
+ assert.equal(readFileSync(join(operation.stage,runId,'proof.txt'),'utf8'),'after');
+ assert.deepEqual(readFileSync(join(f.root,'credential.key')),Buffer.alloc(32,2));
+ assert.equal(readFileSync(join(f.root,'vault','note.md'),'utf8'),'before-note');
+ assert.equal(existsSync(join(control,operation.id,'completion.json')),false);
+ assert.equal((await pool.query('SELECT count(*)::int AS count FROM backup_restore_receipts WHERE operation_id=$1',[operation.id])).rows[0].count,0);
+});
 test('same-transaction receipt proves commit and a valid new generation clears pending without replay',async()=>{
  const f=fixture();await stateModule.migrateBackupRestoreState(pool);
  await f.writers.withRootExclusive(async()=>{const client=await pool.connect();try{await client.query('BEGIN');const op=await prepared(f,client);writeFileSync(join(f.root,'vault','note.md'),'after-note');f.service.installArchive(op);await f.service.recordCommitReceipt(client,op);await client.query('COMMIT');}finally{client.release();}});

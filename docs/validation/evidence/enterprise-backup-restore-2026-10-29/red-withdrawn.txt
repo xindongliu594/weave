@@ -1,0 +1,37 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (425.5441ms)
+  ✔ rejects business history before changing it (614.8092ms)
+  ✔ rejects department and its trigger history before changing it (603.2516ms)
+  ✔ rejects existing user before changing it (573.078ms)
+  ✔ rejects changed defaults without version bump before changing it (567.4485ms)
+  ✔ rejects activated identity before changing it (565.0863ms)
+  ✔ rejects old idempotency cache before changing it (561.541ms)
+  ✔ rejects previous restore generation before changing it (559.4648ms)
+  ✔ rejects previous admission marker before changing it (533.3706ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (1870.1975ms)
+  ✖ fresh isolated preserving import keeps source, historical task bytes and target identity (4161.3539ms)
+✖ enterprise restore preflight admits only untouched fresh database defaults (11539.3932ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 10
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14088.8328
+
+✖ failing tests:
+
+test at tests\enterprise-backup-restore.test.ts:1:5339
+✖ fresh isolated preserving import keeps source, historical task bytes and target identity (4161.3539ms)
+  Error: 备份文件不完整、被修改或包含不支持的链接。
+      at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-files.ts:8:58)
+      at Object.read (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-files.ts:25:78)
+      at snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:63:98)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_FILE_UNSAFE'
+  }

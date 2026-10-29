@@ -1,0 +1,225 @@
+{
+  "date": "2026-10-29",
+  "base": "11aacf9",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "database": "PGlite 0.5.8; same backend, two owned schemas with distinct anchors and directories",
+  "textNormalization": "UTF-8 LF for repository text evidence/source only; backup data bytes are never normalized",
+  "verification": {
+    "integration": 55,
+    "pure": 19,
+    "originalCommit": 12,
+    "distinctTotal": 86,
+    "failed": 0,
+    "skipped": 0,
+    "restoreRelationEnrichment": "The same 12 restore cases were enriched and rerun in relations.txt; not added to the total. Production source unchanged from the broad run; final build verifies enriched fixture types.",
+    "buildExitCode": 0
+  },
+  "preserved": [
+    "source A portable rows/trace/key unchanged",
+    "target B database identity retained",
+    "human membership/disabled/epoch",
+    "human approval and immutable audit parent chain",
+    "runtime parent/unknown effect records",
+    "precise unknown fees",
+    "task canonical/CAS/operation/accepted-stop data",
+    "active and withdrawn knowledge revisions",
+    "native bundle exact bytes",
+    "literal __proto__ trace/vault and physical receipt keys"
+  ],
+  "notPortable": [
+    "human sessions/login transactions/device token hash/live claim token",
+    "source restore control receipts or database anchor"
+  ],
+  "unverified": [
+    "execution quarantine and new login activation (Task4)",
+    "independent process/native PG crash/lock proof (Task5)",
+    "web/API flow and JJ deployment (Task6)",
+    "whole task-accepted-stop-delivery file previously timed out180s; only relevant12cases rerun",
+    "unwired task recovery initialization sourceHistoryDigest carrier"
+  ],
+  "modelCalls": 0,
+  "openshellPhysicalProof": false,
+  "browserChecks": 0,
+  "jjOperations": 0,
+  "evidence": [
+    {
+      "file": "integration.txt",
+      "exitCode": 0,
+      "sha256": "b911eabce3564a450f6343a68f3dcdd4fa2f8ba8e6e7347e0b3c003e6ce0eb00",
+      "bytes": 7156,
+      "originalSha256": "9048bd5563664e3edd66d6b1f0d1d37264e5be227191953a6c5bca213603e0a8",
+      "originalBytes": 7274
+    },
+    {
+      "file": "pure.txt",
+      "exitCode": 0,
+      "sha256": "61b2c2fbe028be41a8101979fc72231fabd96e5de9f1f38b70103946ab3968ba",
+      "bytes": 2002,
+      "originalSha256": "7cfe5e8e1ab90eacf2aa0d957a6cc1d7655b5a26c1c03f66f77c3e24749271f7",
+      "originalBytes": 2029
+    },
+    {
+      "file": "original-commit.txt",
+      "exitCode": 0,
+      "sha256": "b237366b561fcea2e57aa1831a91de87d7d231f8046b7bd268e5495791899cf9",
+      "bytes": 1381,
+      "originalSha256": "a2b5956107787b34c423c573b8bfff14dc586d7bfc5d9a52365353dac5bcd6fd",
+      "originalBytes": 1403
+    },
+    {
+      "file": "relations.txt",
+      "exitCode": 0,
+      "sha256": "c57556636bde49a7d5697fa9ce9d55f9da8ee9e12eb9f9ee84d486894e9d5322",
+      "bytes": 1478,
+      "originalSha256": "5329e81e461efb44ffbf125db761eb688081e6f13187e5775a8c56d86b6f2ca8",
+      "originalBytes": 1502
+    },
+    {
+      "file": "build.txt",
+      "exitCode": 0,
+      "sha256": "63379bf2bdc9205ceaba5e3612661fec6172ad1e3c9a811ac8cf88e84ab3ef2b",
+      "bytes": 765,
+      "originalSha256": "d21c62a1a3102128eac96d7a5995a48a16f05707e5e57387982fdb1cff271b7d",
+      "originalBytes": 783
+    },
+    {
+      "file": "red-preflight.txt",
+      "exitCode": 1,
+      "sha256": "dccf245c9ff7dcd82fdd466022268e425e686470d541fa56413d01ac4703d7c8",
+      "bytes": 1295,
+      "originalSha256": "bf58fe4bbf7aab7a46576a5349a331804801802394e456eed31e4d37be0fbfff",
+      "originalBytes": 1329
+    },
+    {
+      "file": "red-import.txt",
+      "exitCode": 1,
+      "sha256": "271d6a11b97fd52108501d26e066e72d0365d8ff8daed7cf4d858815df12f7b1",
+      "bytes": 2400,
+      "originalSha256": "764bf85fadc842f24470038ca736a8a97f284121067c54130c391a5a41df1138",
+      "originalBytes": 2448
+    },
+    {
+      "file": "red-scaffold.txt",
+      "exitCode": 1,
+      "sha256": "3caa86d5ad7edaeb4e01430502533bdaf9a02c1a8a8014025c5e4cc6d74e3aa6",
+      "bytes": 3329,
+      "originalSha256": "109cf6ba9dcd764641cec12e2f381abc0be2f4ebb7fa857b5db3e9734d4354b1",
+      "originalBytes": 3380
+    },
+    {
+      "file": "red-own-key.txt",
+      "exitCode": 1,
+      "sha256": "17d3ea26a096d9066df2c82433d4011e80fff28814681f156814c20da18b4e17",
+      "bytes": 1326,
+      "originalSha256": "36bb2db11a1d68afec817116f783f519620c018984841b20a1a5578b0f2e8687",
+      "originalBytes": 1360
+    },
+    {
+      "file": "red-withdrawn.txt",
+      "exitCode": 1,
+      "sha256": "2fd11b6ea1b8a0ebadf181e4182cefe314d5ae0448444c9e9c0262b0c7de45b4",
+      "bytes": 2245,
+      "originalSha256": "69fe9318d62ef3faa63887b9471c717e4e7c71065a1f666cf0b9c60ed2b94311",
+      "originalBytes": 2282
+    }
+  ],
+  "sources": [
+    {
+      "file": "apps/api/src/enterprise-backup-restore.ts",
+      "sha256": "19587f9baa7be007a26c7a4a166d37236c83dcac65d502ba134279f69c41b385",
+      "bytes": 13248,
+      "verifiedInputSha256": "19587f9baa7be007a26c7a4a166d37236c83dcac65d502ba134279f69c41b385"
+    },
+    {
+      "file": "apps/api/src/enterprise-restore-admission.ts",
+      "sha256": "138df05cbb4e6c32360298cdcc641696aa6040ce93b5707003e805ee5fc2ae4c",
+      "bytes": 1194,
+      "verifiedInputSha256": "138df05cbb4e6c32360298cdcc641696aa6040ce93b5707003e805ee5fc2ae4c"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-export.ts",
+      "sha256": "7b06e9d5a716edaa67b49f18f89750898ad58c0490ff3a30b5d3853fc0ca19e5",
+      "bytes": 8256,
+      "verifiedInputSha256": "7b06e9d5a716edaa67b49f18f89750898ad58c0490ff3a30b5d3853fc0ca19e5"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-files.ts",
+      "sha256": "f1a03e17788d1d1e5b277d7d21c43b8c5d84ca6c116dc6c3774454d2e7af765f",
+      "bytes": 3559,
+      "verifiedInputSha256": "f1a03e17788d1d1e5b277d7d21c43b8c5d84ca6c116dc6c3774454d2e7af765f"
+    },
+    {
+      "file": "apps/api/src/backup-checkpoints.ts",
+      "sha256": "0c43b1e676950108c2b8f6f4738661d11af2e6767d2599601d8ad899951452f0",
+      "bytes": 9396,
+      "verifiedInputSha256": "56dab3996eca38cd2bf511a1c682f23e694fb1fccd66704ee8339cef20db5ea7"
+    },
+    {
+      "file": "apps/api/src/backup-restore-state.ts",
+      "sha256": "dafb9841a04ebe8973fa214c7b1ab6bebbe6c1e04c8f4f62385122a5f9860a7f",
+      "bytes": 20456,
+      "verifiedInputSha256": "dafb9841a04ebe8973fa214c7b1ab6bebbe6c1e04c8f4f62385122a5f9860a7f"
+    },
+    {
+      "file": "apps/api/src/backup-root-scope.ts",
+      "sha256": "7f5506f56f4927ca41e6ebc37527d357c45e759d7b6053d98f4eb939560be24d",
+      "bytes": 975,
+      "verifiedInputSha256": "7f5506f56f4927ca41e6ebc37527d357c45e759d7b6053d98f4eb939560be24d"
+    },
+    {
+      "file": "apps/api/src/db.ts",
+      "sha256": "93cf1d3e21e69d260a1f5d07234e6c5f542d7f4f7a8902d3ac7a87cbe1471cb1",
+      "bytes": 4601,
+      "verifiedInputSha256": "4d7405932308ee6af306670e57088c8d86a5d65f43f7bae49f8b91d1176d6420"
+    },
+    {
+      "file": "apps/api/src/obsidian.ts",
+      "sha256": "7db348c729177cf75d35b940dee90e4ef33171ea1c773a98e6739d4688f1ea85",
+      "bytes": 12112,
+      "verifiedInputSha256": "c8246205dcf023a9de798fcb28266c56adceefdb6236e4aeb9443421b5a90bf4"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-schema.ts",
+      "sha256": "7fe7bf9c170734ae7c9c963ee0cb76ef1404321916fc72e5ed9b0a97184a8143",
+      "bytes": 15233,
+      "verifiedInputSha256": "7fe7bf9c170734ae7c9c963ee0cb76ef1404321916fc72e5ed9b0a97184a8143"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-tables.ts",
+      "sha256": "00bca3470cdc2749a6887cb990cdb6dcc9e6e9c9a921c1e1cd89d72e2d668c24",
+      "bytes": 24628,
+      "verifiedInputSha256": "00bca3470cdc2749a6887cb990cdb6dcc9e6e9c9a921c1e1cd89d72e2d668c24"
+    },
+    {
+      "file": "apps/api/src/enterprise-backup-catalog.ts",
+      "sha256": "4126bcc966b15d336f28dd75d4999dbdf8de79db3f5d9829e906fbc66f7fd799",
+      "bytes": 3536,
+      "verifiedInputSha256": "4126bcc966b15d336f28dd75d4999dbdf8de79db3f5d9829e906fbc66f7fd799"
+    },
+    {
+      "file": "apps/api/src/task-original-commit.ts",
+      "sha256": "5297d883b6135c4febf5405505826ad112a4605e9403aecacdb4dea95e1861fc",
+      "bytes": 4871,
+      "verifiedInputSha256": "5297d883b6135c4febf5405505826ad112a4605e9403aecacdb4dea95e1861fc"
+    },
+    {
+      "file": "tests/enterprise-backup-restore.test.ts",
+      "sha256": "57ab456ecfe9f02324603a297fd88ed22e844723f9b619c0ec5e47aec07de9ad",
+      "bytes": 20837,
+      "verifiedInputSha256": "57ab456ecfe9f02324603a297fd88ed22e844723f9b619c0ec5e47aec07de9ad"
+    },
+    {
+      "file": "tests/enterprise-backup-files.test.ts",
+      "sha256": "636dd8882b6666b5b1ca373b98423a53730597e2e96b9d4a79e7fb8e75b3cfa8",
+      "bytes": 2628,
+      "verifiedInputSha256": "636dd8882b6666b5b1ca373b98423a53730597e2e96b9d4a79e7fb8e75b3cfa8"
+    },
+    {
+      "file": "tests/helpers/task-accepted-stop-api-fixture.ts",
+      "sha256": "b50646e55f94268a4f86fcdd076cf142d42eacd3f26f922523e27817ff3866d0",
+      "bytes": 11124,
+      "verifiedInputSha256": "b50646e55f94268a4f86fcdd076cf142d42eacd3f26f922523e27817ff3866d0"
+    }
+  ]
+}

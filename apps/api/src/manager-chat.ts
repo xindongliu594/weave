@@ -8,6 +8,7 @@ import { completeBudgeted } from './cost-control.ts';
 import { assertPlanningModel } from './execution-policy.ts';
 import type { Model } from '../../../packages/contracts/index.ts';
 import {httpPrincipal,lockProjectAuthority,routeAudit,authorizeProjectMessage} from './project-route-access.ts';
+import {restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 
 export const managerChatTables = ['manager_messages'];
 export async function migrateManagerChat(db: pg.Pool) {
@@ -34,14 +35,18 @@ export class ManagerChatService {
     return this.work ??= this.process().finally(() => { this.work = undefined; });
   }
   private async process() {
-    // A crashed paid request is never replayed automatically.
-    await this.db.query("UPDATE manager_messages SET status='failed',error='回复中断，请先在用量页核对费用，再发送新消息。',finished_at=now() WHERE status='replying' AND COALESCE(started_at,created_at)<now()-interval '10 minutes'");
-    const candidate = (await this.db.query(`SELECT m.id FROM manager_messages m WHERE m.status='waiting'
-      AND NOT EXISTS(SELECT 1 FROM project_runs r WHERE r.project_id=m.project_id AND r.status IN ('queued','running'))
-      ORDER BY m.created_at LIMIT 1`)).rows[0];
-    if (!candidate) return;
     const client = await this.db.connect(); let claimed;
-    try { await client.query('BEGIN'); await client.query('SELECT pg_advisory_xact_lock(918274)'); claimed = (await client.query("UPDATE manager_messages SET status='replying',started_at=now() WHERE id=$1 AND status='waiting' RETURNING *", [candidate.id])).rows[0]; await client.query('COMMIT'); }
+    try {
+      await client.query('BEGIN'); await client.query('SELECT pg_advisory_xact_lock(918274)');
+      if (!(await restoreExecutionBlocked(client))) {
+        // A crashed paid request is never replayed automatically.
+        await client.query("UPDATE manager_messages SET status='failed',error='回复中断，请先在用量页核对费用，再发送新消息。',finished_at=now() WHERE status='replying' AND COALESCE(started_at,created_at)<now()-interval '10 minutes'");
+        const candidate=(await client.query(`SELECT m.id FROM manager_messages m WHERE m.status='waiting'
+          AND NOT EXISTS(SELECT 1 FROM project_runs r WHERE r.project_id=m.project_id AND r.status IN ('queued','running')) ORDER BY m.created_at LIMIT 1`)).rows[0];
+        if(candidate)claimed=(await client.query("UPDATE manager_messages SET status='replying',started_at=now() WHERE id=$1 AND status='waiting' RETURNING *",[candidate.id])).rows[0];
+      }
+      await client.query('COMMIT');
+    }
     catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
     if (!claimed) return;
     try {

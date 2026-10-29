@@ -1,0 +1,118 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (479.4645ms)
+  ✔ rejects business history before changing it (633.0601ms)
+  ✔ rejects department and its trigger history before changing it (602.4444ms)
+  ✔ rejects existing user before changing it (593.9581ms)
+  ✔ rejects changed defaults without version bump before changing it (576.903ms)
+  ✔ rejects activated identity before changing it (576.021ms)
+  ✔ rejects old idempotency cache before changing it (576.2091ms)
+  ✔ rejects previous restore generation before changing it (575.0422ms)
+  ✔ rejects previous admission marker before changing it (544.5512ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (1861.8236ms)
+  ✔ fresh isolated preserving import keeps source, historical task bytes and target identity (8226.6123ms)
+✔ enterprise restore preflight admits only untouched fresh database defaults (15766.5425ms)
+ℹ Target SQL/files/key/receipt/quarantine matched; checking re-export without live claim authority.
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18294.1108
+✔ legacy encrypted restore remains available for a destination without enterprise history (2845.1574ms)
+✔ business-only imports reject human authority before staging or SQL replacement (2687.0318ms)
+✔ authority-only source cannot create an archive that its importer would reject (58.0896ms)
+✔ activated bootstrap alone protects an otherwise empty target before SQL clear and file swap (217.0929ms)
+✔ restore preserves destination users, membership, audits, outbox, projection, files and key (199.0484ms)
+✔ online business export refuses enterprise identity and audit omission without changing source (56.1489ms)
+✔ a protected source is rejected before Obsidian indexing changes knowledge or note bytes (58.0161ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6798.9855
+✔ startup inspector is read-only and treats a broken active pointer as pending (1271.6322ms)
+✔ same-transaction receipt proves commit and a valid new generation clears pending without replay (384.1014ms)
+✔ absent receipt plus unchanged DB generation restores verified old trace key and vault and retains new trace (477.5188ms)
+✔ committed DB cannot certify changed physical bytes and leaves original evidence pending (376.4035ms)
+✔ missing active pointer cannot hide an unfinished durable operation (230.5023ms)
+✔ new staged archive files are fsynced before publishing the active durable operation (324.2749ms)
+✔ process restart after prepared reconciles actual SQL and recorded physical generations without replay (4939.8394ms)
+✔ process restart after old-moved reconciles actual SQL and recorded physical generations without replay (4938.4346ms)
+✔ process restart after installed reconciles actual SQL and recorded physical generations without replay (5041.2295ms)
+BACKUP_STATE_OWNED_ROOTS={"pid":43604,"roots":["C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-LPx36Y","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-paWtn7","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-C9kXOy","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-QRMWGq","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-cJsm7u","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-HCYpWL","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-SCIRer","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-2w8HfA","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-IK01QC","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-7JfIwf","C:\\Users\\JJ\\AppData\\Local\\Temp\\weiwu-backup-state-XUQGrx"]}
+✔ process restart after committed reconciles actual SQL and recorded physical generations without replay (5012.4171ms)
+✔ vault physical rollback failure does not replace the first frozen restore error (29.0945ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24527.9609
+▶ enterprise export preserves source history, secrets boundary and referenced bytes
+  ✔ full encrypted snapshot has all fixed tables, immutable audit and exact textual codecs (747.8729ms)
+  ✔ active execution and model calls block export, with known failures leaving source usable (1277.339ms)
+  ✔ revoked principals cannot export (550.5453ms)
+  ✔ active manager and capability probes block a consistent snapshot (1051.1894ms)
+  ✔ missing checkpoint CAS and hardlinked files reject without latching source (1181.0544ms)
+  ✔ changed vault bytes are not silently reindexed during export (913.0953ms)
+  ✔ sealed credentials cannot be exported without their original master key (817.7045ms)
+  ✔ root writer fence blocks snapshot overlap and releases after writer completes (2518.7064ms)
+✔ enterprise export preserves source history, secrets boundary and referenced bytes (10162.6823ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12527.8697
+▶ enterprise task carrier resolves original API commits without granting execution
+  ✔ rejects operation-missing (27.7886ms)
+  ✔ rejects task-missing (38.8697ms)
+  ✔ rejects merge-digest (40.0736ms)
+  ✔ rejects result-digest (39.5142ms)
+  ✔ rejects principal (41.3353ms)
+  ✔ rejects import-missing (39.3147ms)
+  ✔ rejects canonical-operation (27.1347ms)
+✔ enterprise task carrier resolves original API commits without granting execution (4459.2163ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6863.226
+✔ fixed portable catalog covers formal migrations, normalizes owned schema names and rejects drift (3500.5221ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3992.9856
+✔ extension tables survive encrypted backup while scheduled dispatch and pending chat require fresh user action (4389.957ms)
+✔ encrypted backup preserves checkpoint objects separately from later delivery versions (178.8779ms)
+✔ missing or corrupt checkpoint objects reject backup restoration before replacing current data (989.0693ms)
+✔ backup restores both generations and original test receipts while retaining current usage and unknown fees (881.524ms)
+✔ active paid manager replies block export and restore before any database replacement (408.9257ms)
+✔ legacy backups without extension tables restore with empty defaults rather than stale extension records (1621.4231ms)
+✔ modern audit history rejects business-only export and restore without changing the ledger, files or audit (517.1966ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9676.8271

@@ -1,0 +1,170 @@
+{
+  "date": "2026-10-29",
+  "base": "11aacf9c1d42dc7af05cde73712db7c8bfd5901e",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "database": "PGlite 0.5.8, fresh isolated database per test file; not native PostgreSQL",
+  "commands": [
+    {
+      "command": "node scripts/test-integration.mjs tests/enterprise-backup-manager-queue.test.ts",
+      "phase": "red",
+      "exitCode": 1,
+      "note": "Two actual missing rejections, two cascading failures, parent also fails."
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/enterprise-backup-manager-queue.test.ts tests/enterprise-backup-export.test.ts tests/enterprise-backup-restore.test.ts tests/enterprise-backup-api.test.ts tests/enterprise-backup-identity.test.ts tests/identity-initialization-barrier.test.ts",
+      "phase": "intermediate",
+      "exitCode": 1,
+      "note": "43 unaffected cases pass; new group has one lock-scaffold assertion failure plus parent. Original log retained."
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/enterprise-backup-manager-queue.test.ts",
+      "phase": "final-after-fixture-fix",
+      "exitCode": 0,
+      "passed": 7
+    },
+    {
+      "command": "node --import tsx --test tests/enterprise-backup-ui.test.ts tests/identity-session.test.ts",
+      "exitCode": 0,
+      "passed": 17
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "note": "TypeScript + Vite; existing >500kB bundle warning"
+    }
+  ],
+  "finalPerFileResults": {
+    "managerQueue": 7,
+    "export": 9,
+    "restore": 13,
+    "httpApi": 10,
+    "oidcRestore": 7,
+    "identityBarrier": 4,
+    "ui": 4,
+    "identitySession": 13,
+    "totalPassed": 67,
+    "unresolvedFailures": 0,
+    "skipped": 0,
+    "note": "Counts final results by file; not a successful combined command or whole-repository suite. Prior batches overlap and must not be added."
+  },
+  "oidc": {
+    "operationId": "a7278acf-ca10-4e1b-8fe0-bd10b7f1204b",
+    "inputDigest": "3e05574814ce1a4e4a7641f5631f0148c77a0195e7dbf027bb9ea5f43e14ef8a",
+    "sourceDigest": "f59d7bb5d127d9146dc025108ca10e4d39e895963f3332d98c568d6dda1ec1d3",
+    "sourceUnchanged": true,
+    "oidcProvider": "local oidc-provider fixture over trusted TLS",
+    "productionProvider": false,
+    "modelCalls": 0
+  },
+  "browserEvidence": "browser-receipt.json",
+  "review": "review.json",
+  "unverified": [
+    "Native PostgreSQL:13 previously skipped tests, no owned fixture URL configured",
+    "Company IdP and deployment HTTPS end-to-end",
+    "Existing full accepted-stop-delivery suite timeout",
+    "Current JJ deployment"
+  ],
+  "modelCalls": 0,
+  "gitMutations": 0,
+  "deploymentOperations": 0,
+  "textNormalization": "UTF-8 LF for source/log text only; original backup and image bytes unmodified",
+  "sources": [
+    {
+      "path": "apps/api/src/enterprise-backup-export.ts",
+      "sha256Utf8LF": "ac9cd0cd4be1d3052f613ca36616cd5ad020bdcbd3d6c8f557b5a8d27894437b"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-restore.ts",
+      "sha256Utf8LF": "d6aaf1eaed80744ff17d8c9399b3deb1386093d9ff20c9d0798cad1ea17aa492"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-router.ts",
+      "sha256Utf8LF": "9a396be8009a2d617fe65366281a927bed2f60835c153eff923db8456fb480a3"
+    },
+    {
+      "path": "apps/api/src/enterprise-restore-admission.ts",
+      "sha256Utf8LF": "f7e604eafdef4710688b9d947fbd92498bc372f3f7d75ead4ad913be2617bb35"
+    },
+    {
+      "path": "apps/api/src/backup-restore-state.ts",
+      "sha256Utf8LF": "efb12a41b72508b4c56acd26c848141de499f8d8d71cd5425ea8a9b26e53d7f9"
+    },
+    {
+      "path": "apps/api/src/identity-http.ts",
+      "sha256Utf8LF": "7630bd073670c8174f1ef7f2ec5c091b637e0ec9ba14920485790c32af20cf9b"
+    },
+    {
+      "path": "apps/api/src/identity-store.ts",
+      "sha256Utf8LF": "3ce6d307d6458c2b26c7638df0f841045e4a57d342ab07de1f76733fcd2d7228"
+    },
+    {
+      "path": "apps/api/src/manager-chat.ts",
+      "sha256Utf8LF": "3d34d4d41d6971f47f6fbef855f4fb025a87ce21a2509cac22b3a1adebeee43d"
+    },
+    {
+      "path": "apps/web/src/EnterpriseBackupCenter.tsx",
+      "sha256Utf8LF": "7631fa20e4af49e990133ef8fea771c7e198b4f87f00236437adc5267bbe5219"
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256Utf8LF": "565a7dc34ff8577b9157d3996b5463d74899344af01ad2d18bc4c30e26f8aa48"
+    },
+    {
+      "path": "tests/enterprise-backup-identity.test.ts",
+      "sha256Utf8LF": "fbd32c205c132123fa4fa67584232d7cc34306a2fb5313fda948e0b925782941"
+    },
+    {
+      "path": "tests/enterprise-backup-manager-queue.test.ts",
+      "sha256Utf8LF": "5cb243e9197bd0618a96ab1fcc7770674d3e89ca8a87760998cc97cc759839aa"
+    },
+    {
+      "path": "tests/fixtures/identity/idp.ts",
+      "sha256Utf8LF": "1786c21191972e213ddc5660fee41624aa676dbdec8465a53408bf4b068d2106"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "manager-queue-red.txt",
+      "sha256Utf8LF": "d8ddaba032d88ccec343342ffc58d483f3b85356991f05317213c1abd77770ea"
+    },
+    {
+      "path": "integration-intermediate.txt",
+      "sha256Utf8LF": "a388adfbe4b994af265be72b8e6e0ab1ca3d461d71a44879d0cd57b65e83c62c"
+    },
+    {
+      "path": "manager-queue-final.txt",
+      "sha256Utf8LF": "70e44b2e825a652995e7f93cfb00516f8dc82ebdc1c88c8603937ba214543d8b"
+    },
+    {
+      "path": "ui-session-final.txt",
+      "sha256Utf8LF": "86ba4af2f60ebe9e2fc4c46c673f2845b38945fcb65195f8ce09956a61fa5e89"
+    },
+    {
+      "path": "build-final.txt",
+      "sha256Utf8LF": "2250c317f20ae58560683e0f84530a6908316c0ea8f26de7f781b533ee4b81d2"
+    },
+    {
+      "path": "browser-fixture-source.txt",
+      "sha256Utf8LF": "bfeef2cb11ab83f3a379cefdf3fa80590e1d9dacf19b2790a8b9776ca62804fc"
+    },
+    {
+      "path": "browser-receipt.json",
+      "sha256Utf8LF": "dd5bee0e8eaed9f3f2a690f94d7e645e1b85953c0fcc67b520e45ea3ea9e3946"
+    },
+    {
+      "path": "review.json",
+      "sha256Utf8LF": "d855abc2bee01e12b39b922df9386dbeb0ff1a2d9a53bdc50ddcb96d55c4080b"
+    }
+  ],
+  "images": [
+    {
+      "path": "quarantine-before.png",
+      "sha256": "1129be3ae6766178631f75bea6cc54aedd6acdb57dc747f15127cb87b9000e43"
+    },
+    {
+      "path": "quarantine-fixed.png",
+      "sha256": "ed311de41cf69e7b678e4a893dcdec289d755fe32ff0e7e2b8ef46dfce04829e"
+    }
+  ]
+}

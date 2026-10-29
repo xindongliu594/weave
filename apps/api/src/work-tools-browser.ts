@@ -1,3 +1,4 @@
+import {assertRestoreExecutionAdmitted,assertRestoredResourceAdmitted,restoreResourcePending,restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 import { Router } from 'express';
 import type pg from 'pg';
 import { randomUUID } from 'node:crypto';
@@ -227,6 +228,7 @@ export function authorizeBrowserMcp(snapshot: any, agentId: string, name: string
 async function connectionById(id: string, version?: number): Promise<Connection> {
   const row = (await pool.query('SELECT * FROM mcp_connections WHERE id=$1', [id])).rows[0] as Connection | undefined;
   if (!row) throw new AppError(404, 'MCP 连接不存在');
+  await assertRestoredResourceAdmitted(pool,'mcp',JSON.stringify([row.id,row.version]));
   if (version !== undefined && row.version !== version) throw new AppError(409, 'MCP 连接已变化，请刷新后重试');
   if (!row.data.enabled) throw new AppError(403, 'MCP 连接已停用');
   return row;
@@ -237,6 +239,7 @@ async function usingMcp<T>(row: Connection, work: (client: HttpMcpClient) => Pro
 }
 const mcpCallSchema = z.object({ connectionId: z.string().uuid(), tool: z.string().min(1).max(150), arguments: z.record(z.string(), z.unknown()).default({}) });
 export async function executeBrowserMcpTool(input: { runId: string; agentId: string; name: string; args: unknown; signal?: AbortSignal }) {
+  await assertRestoreExecutionAdmitted(pool);
   input.signal?.throwIfAborted();
   const run = (await pool.query("SELECT snapshot FROM project_runs WHERE id=$1 AND status='running' AND NOT cancel_requested AND lease_until>now()", [input.runId])).rows[0];
   if (!run) throw new AppError(409, '项目不在可执行状态');
@@ -286,13 +289,15 @@ export function browserMcpRouter() {
     }));
   });
   router.delete('/work-tools/browser/:id', async (req, res) => { await closeSession(String(req.params.id)); res.json({ ok: true }); });
-  router.get('/work-tools/mcp', async (_req, res) => res.json((await pool.query('SELECT * FROM mcp_connections ORDER BY id')).rows.map(publicConnection)));
+  router.get('/work-tools/mcp', async (_req, res) => {const blocked=await restoreExecutionBlocked(pool);res.json(await Promise.all((await pool.query('SELECT * FROM mcp_connections ORDER BY id')).rows.map(async row=>{const pending=await restoreResourcePending(pool,'mcp',JSON.stringify([row.id,row.version]));return {...publicConnection(row),enabled:row.data.enabled&&!blocked&&!pending,restoreAuthorizationRequired:pending};})));});
   router.post('/work-tools/mcp', async (req, res) => {
+    await assertRestoreExecutionAdmitted(pool);
     const { token, clearToken: _clear, ...data } = mcpConnectionSchema.parse(req.body); data.url = mcpUrl(data.url);
     const id = randomUUID(); await pool.query('INSERT INTO mcp_connections(id,data,credential) VALUES($1,$2,$3)', [id, data, token ? seal(token) : null]);
     res.status(201).json({ id, ...data, version: 1, hasCredential: Boolean(token), tools: [] });
   });
   router.put('/work-tools/mcp/:id', async (req, res) => {
+    await assertRestoreExecutionAdmitted(pool);
     const input = mcpConnectionSchema.extend({ version: z.number().int().positive() }).parse(req.body);
     const { token, clearToken, version, ...data } = input; data.url = mcpUrl(data.url);
     const result = await pool.query('UPDATE mcp_connections SET data=$1,credential=CASE WHEN $2 THEN $3 ELSE credential END,version=version+1,tools=\'[]\' WHERE id=$4 AND version=$5 RETURNING *', [data, Boolean(token || clearToken), token ? seal(token) : null, req.params.id, version]);

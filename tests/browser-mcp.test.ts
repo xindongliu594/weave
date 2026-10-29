@@ -9,6 +9,8 @@ import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import pg from 'pg';
 import express from 'express';
+import {migrateIdentity} from '../apps/api/src/identity-schema.ts';
+import {migrateRestoreControlFixture} from './helpers/restore-control-schema.ts';
 
 const schema = `test_browser_mcp_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 const databaseUrl = process.env.DATABASE_URL!;
@@ -27,6 +29,7 @@ before(async () => {
   directory = await mkdtemp(join(tmpdir(), 'ad-browser-mcp-')); process.env.DATA_DIR = directory;
   mod = await import('../apps/api/src/work-tools-browser.ts'); pool = (await import('../apps/api/src/db.ts')).pool;
   await mod.migrateBrowserMcp(pool);
+  await pool.query('CREATE TABLE departments(id text PRIMARY KEY)');await migrateIdentity(pool);await migrateRestoreControlFixture(pool);
   await pool.query("CREATE TABLE project_runs(id text PRIMARY KEY,snapshot jsonb,status text,cancel_requested boolean DEFAULT false,lease_until timestamptz DEFAULT now()+interval '1 hour')");
   service = http.createServer(async (req, res) => {
     if (req.url === '/redirect-outside') { res.writeHead(302, { location: serviceUrl.replace('127.0.0.1', 'localhost') + '/outside' }).end(); return; }

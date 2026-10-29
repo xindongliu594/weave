@@ -1,3 +1,4 @@
+import {restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 import {lockedRun,claimExpiredRun,deferUnstartedRun,finishRun,terminalStatus} from './run-state.ts';
 import {assertRunAuthorization,assertExecutionProfile,executionMode} from './execution-policy.ts';
 import {assertCurrentRunAuthority,recordRunAuthorityDenial,type RunEffect} from './run-current-authority.ts';
@@ -46,6 +47,7 @@ export class RunCoordinator {
     this.timer=setInterval(()=>{void this.heartbeat().catch(e=>{if(!this.stopped)console.error('Run heartbeat:',e instanceof Error?e.name:'error');});void this.tick();},1000);this.timer.unref();void this.tick();
   }
   async heartbeat(){
+    if(await restoreExecutionBlocked(pool))return {ids:[],held:[]};
     if(this.stopped)return {ids:[],held:[]};if(this.heartbeatWork)return this.heartbeatWork;
     const entries=[...this.active].filter(([,entry])=>!entry.drainFailure&&(!entry.phase||entry.phase==='executing'));
     const ids=entries.map(([id])=>id);if(!ids.length)return {ids,held:[]};
@@ -133,10 +135,12 @@ export class RunCoordinator {
   }
 
   async recover(){
+    if(await restoreExecutionBlocked(pool))return;
     await expireReservations();
     const stale=(await pool.query("SELECT id FROM project_runs WHERE status='running' AND (lease_until IS NULL OR lease_until<clock_timestamp())")).rows;
     for(const candidate of stale){
       await this.writers.withWriter([candidate.id],async()=>{
+      if(await restoreExecutionBlocked(pool))return;
       let legacy=false;
       const row=await claimExpiredRun(this.writers,candidate.id,current=>{
         legacy=current.snapshot.executionTarget?.kind!=='local';
@@ -161,6 +165,7 @@ export class RunCoordinator {
   async tick(){
     if(this.ticking||this.stopped)return;this.ticking=true;
     try{
+      if(await restoreExecutionBlocked(pool))return;
       // Heartbeats precede recovery. A dead worker eventually loses its lease.
       await this.heartbeat();
       const cancel=(await pool.query("SELECT id FROM project_runs WHERE lease_owner=$1 AND cancel_requested=true AND status='running'",[this.owner])).rows;

@@ -1,0 +1,24 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (467.4773ms)
+  ✔ rejects business history before changing it (621.9814ms)
+  ✔ rejects department and its trigger history before changing it (596.7528ms)
+  ✔ rejects existing user before changing it (586.1225ms)
+  ✔ rejects changed defaults without version bump before changing it (586.6788ms)
+  ✔ rejects activated identity before changing it (567.2193ms)
+  ✔ rejects old idempotency cache before changing it (577.4744ms)
+  ✔ rejects previous restore generation before changing it (563.7306ms)
+  ✔ rejects previous admission marker before changing it (575.1709ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (1886.4027ms)
+  ✔ fresh isolated preserving import keeps source, historical task bytes and target identity (8958.7055ms)
+✔ enterprise restore preflight admits only untouched fresh database defaults (16503.527ms)
+ℹ Target SQL/files/key/receipt/quarantine matched; checking re-export without live claim authority.
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19024.775

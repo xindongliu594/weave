@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-29",
+  "base": "11aacf9",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "database": "PGlite 0.5.8; isolated fresh database per test file",
+  "scope": "Damaged active restore pointer error contract and no replay / file preservation",
+  "commands": [
+    "node scripts/test-integration.mjs --test-name-pattern=\"damaged active pointer\" tests/backup-restore-state.test.ts",
+    "node scripts/test-integration.mjs tests/backup-restore-state.test.ts tests/enterprise-backup-api.test.ts tests/enterprise-backup-admission.test.ts tests/enterprise-backup-resource-entry.test.ts tests/enterprise-backup-restore.test.ts tests/backup-enterprise-protection.test.ts",
+    "node --import tsx --test tests/enterprise-backup-ui.test.ts",
+    "npm run build"
+  ],
+  "results": {
+    "redExpectedFailures": 3,
+    "integrationPassed": 75,
+    "uiPassed": 4,
+    "totalPassed": 79,
+    "failed": 0,
+    "skipped": 0,
+    "buildExitCode": 0
+  },
+  "newCases": [
+    "truncated JSON",
+    "oversized active pointer",
+    "directory replacing active pointer"
+  ],
+  "proof": [
+    "409 BACKUP_RESTORE_RECONCILIATION_REQUIRED",
+    "new stage refused",
+    "unresolved recovery retains archive write barrier",
+    "before and staged after files/key/vault unchanged",
+    "active pointer and manifest unchanged",
+    "no completion or SQL receipt created"
+  ],
+  "environmentNotes": [
+    "First restricted run could not connect to its own loopback PGlite endpoint; excluded from product RED.",
+    "First green attempt had a fixture mistake: it tried to reacquire a deliberately retained fence after unresolved reconciliation. Assertion order corrected, then full relevant suites passed.",
+    "Restricted build compiler stopped after 171 seconds without output; normal local build succeeded. Existing Vite >500kB chunk warning remains."
+  ],
+  "unverified": [
+    "native PostgreSQL independent backend locks / cross-engine restore compatibility; no owned fixture configured",
+    "browser main-flow acceptance",
+    "real OIDC provider",
+    "full repository suite",
+    "new production deployment"
+  ],
+  "modelCalls": 0,
+  "gitMutations": 0,
+  "deploymentOperations": 0,
+  "textNormalization": "UTF-8 LF for source/evidence text only; business bytes remain unchanged",
+  "sources": [
+    {
+      "path": "apps/api/src/backup-restore-state.ts",
+      "sha256Utf8LF": "efb12a41b72508b4c56acd26c848141de499f8d8d71cd5425ea8a9b26e53d7f9"
+    },
+    {
+      "path": "tests/backup-restore-state.test.ts",
+      "sha256Utf8LF": "9abd6364ac6a13ed205a01308e90c35a43e4df7dd6daf4213773447cab266205"
+    },
+    {
+      "path": "apps/api/src/enterprise-restore-admission.ts",
+      "sha256Utf8LF": "f7e604eafdef4710688b9d947fbd92498bc372f3f7d75ead4ad913be2617bb35"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-router.ts",
+      "sha256Utf8LF": "9a396be8009a2d617fe65366281a927bed2f60835c153eff923db8456fb480a3"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-restore.ts",
+      "sha256Utf8LF": "48f145e9c93d65129c00368054bad2d2f0f71dd04bab178184baa4e06f675680"
+    },
+    {
+      "path": "apps/web/src/enterprise-backup-state.ts",
+      "sha256Utf8LF": "3df2a4615eac7908f7f716aac00bb6beb9fbef9d3683691159a1a76a9050bf2f"
+    },
+    {
+      "path": "tests/enterprise-backup-api.test.ts",
+      "sha256Utf8LF": "d0de2781de21a2e81565186abb2eef1666bef776c48130e0d2abf6981ac9fdbd"
+    },
+    {
+      "path": "tests/enterprise-backup-admission.test.ts",
+      "sha256Utf8LF": "b763f41c9731b2330778f67bba9841a0027212f81ac4e678f9250eb5556f2182"
+    },
+    {
+      "path": "tests/enterprise-backup-resource-entry.test.ts",
+      "sha256Utf8LF": "8d11e66e3ef140f1453583156db6c97875cd2379766e7e1f85046f27335f4329"
+    },
+    {
+      "path": "tests/enterprise-backup-restore.test.ts",
+      "sha256Utf8LF": "a97b053dcb6a691f2b51b3c7664538038627d76f1c686a561c326c64b612de6f"
+    },
+    {
+      "path": "tests/backup-enterprise-protection.test.ts",
+      "sha256Utf8LF": "d80b649d54e3be71426a9c921c50da6c5b01c83c44a5cadd63c87aff08310967"
+    },
+    {
+      "path": "tests/enterprise-backup-ui.test.ts",
+      "sha256Utf8LF": "de47119c21bb4f3f2b185fd7039b92101f4668670e2b57d9871a3895a836522c"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "build.txt",
+      "sha256": "c7464d823a88060b2972cbb4a607415891b37f34e67a383b716a15bbe193d190"
+    },
+    {
+      "path": "integration.txt",
+      "sha256": "cdecb3d01fb704f37c51546f97e2a73b5990d623ab6f4049a9906d910f5859ae"
+    },
+    {
+      "path": "red.txt",
+      "sha256": "400ffc2b445f3540c66dca87b32ef996c27fc9342333e3459d11818d4411c3ec"
+    },
+    {
+      "path": "ui.txt",
+      "sha256": "f3cc7829b860bdff680d867c2e54df48c1bb93f815222384ece7a244ecf2885f"
+    }
+  ]
+}

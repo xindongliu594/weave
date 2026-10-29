@@ -8,6 +8,7 @@ import {AppError} from './provider.ts';
 import {appendAudit,type AuditInput,type AuthorityEvidence} from './audit-events.ts';
 import {lockDepartmentAuthority,lockActiveDepartments,currentRoutePrincipal,requireRunRoute} from './project-route-access.ts';
 import {resolveRunDepartments,requireDepartments} from './resource-authorization.ts';
+import {assertRestoreExecutionAdmitted} from './enterprise-restore-admission.ts';
 
 export type RunEffect='resume'|'model'|'knowledge'|'tool'|'retry';
 export type CurrentRunAuthority={principal:Principal;authority?:AuthorityEvidence;requestedByAuditId?:string};
@@ -20,6 +21,7 @@ function deniedError(audit:AuditInput){
 const canonical=(ids:unknown):string[]|null=>Array.isArray(ids)&&ids.length>0&&ids.length<=100&&ids.every(id=>identityText(id,128))&&new Set(ids).size===ids.length?[...ids].sort():null;
 /** Admission callers already own project→run. A read-only diagnostic must pass lock:false. */
 export async function assertCurrentRunAuthority(db:IdentityQueryExecutor,runId:string,effect:RunEffect,{lock=true}:{lock?:boolean}={}):Promise<CurrentRunAuthority>{
+ await assertRestoreExecutionAdmitted(db);
  const identity=(await db.query('SELECT project_id FROM project_runs WHERE id=$1',[runId])).rows[0];
  if(identity&&lock)await db.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
  const row=(await db.query(`SELECT * FROM project_runs WHERE id=$1${lock?' FOR UPDATE':''}`,[runId])).rows[0];

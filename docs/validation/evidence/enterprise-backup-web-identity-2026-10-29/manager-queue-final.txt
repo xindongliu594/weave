@@ -1,0 +1,19 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise backup cannot carry a queued manager request into an activated target
+  ✔ export rejects waiting without changing source or fees (682.0368ms)
+  ✔ export rejects replying without changing source or fees (688.068ms)
+  ✔ completed and explicitly cancelled manager history remains exportable (2042.8166ms)
+  ✔ import rejects a valid waiting package before staging or publishing authority (296.484ms)
+  ✔ import rejects a valid replying package before staging or publishing authority (270.9157ms)
+  ✔ valid cancelled history imports after rejected attempts without recreating a waiting request (435.7249ms)
+✔ enterprise backup cannot carry a queued manager request into an activated target (5695.7035ms)
+ℹ {"sourceUnchanged":true,"modelCalls":0}
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9717.5999

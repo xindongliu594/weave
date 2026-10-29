@@ -15,12 +15,10 @@ import {createBackupFileReader} from './enterprise-backup-files.ts';
 import {validateEnterpriseBackupReferences} from './backup-checkpoints.ts';
 import {enterpriseTableSpecs,createEnterpriseBackup,encryptEnterpriseBackup,ENTERPRISE_BACKUP_SCHEMA_ID,type EnterpriseTableName,type EnterpriseBackupV2} from './enterprise-backup-schema.ts';
 import packageMetadata from '../../../package.json';
-import {assertOriginalTaskCommit} from './task-original-commit.ts';
-import {executionBackend} from './execution-backend.ts';
 
 const tables=Object.keys(enterpriseTableSpecs) as EnterpriseTableName[];
 const quote=(name:string)=>'"'+name.replaceAll('"','""')+'"';
-const busy=()=>new AppError(409,'请等待执行、模型调用、经理回复或其他数据写入结束后再备份。','BACKUP_SOURCE_BUSY');
+const busy=()=>new AppError(409,'请等待执行、模型调用、经理回复或其他数据写入结束后再备份；尚未开始的经理消息可在对话页取消等待。','BACKUP_SOURCE_BUSY');
 const invalid=(code:string)=>new AppError(422,'企业备份文件或关联证据不完整，请先核对来源。',code);
 const hash=(bytes:Buffer)=>createHash('sha256').update(bytes).digest('hex');
 
@@ -55,14 +53,14 @@ async function snapshot(input:{principal:Principal;traceRoot:string;password:str
     await client.query('LOCK TABLE '+[...tables,'backup_restore_anchor'].map(quote).join(',')+' IN SHARE MODE NOWAIT');
     await currentRoutePrincipal(client,input.principal,true);if(!administrative(input.principal))throw new AppError(403,'备份需要当前管理员权限','BACKUP_ADMIN_REQUIRED');
     await assertEnterpriseCatalog(client);
-    for(const sql of ["SELECT 1 FROM project_runs WHERE status IN ('queued','running') LIMIT 1","SELECT 1 FROM model_reservations WHERE status='pending' LIMIT 1","SELECT 1 FROM manager_messages WHERE status='replying' LIMIT 1","SELECT 1 FROM model_capability_tests WHERE status='running' LIMIT 1"]){if((await client.query(sql)).rowCount)throw busy();}
+    for(const sql of ["SELECT 1 FROM project_runs WHERE status IN ('queued','running') LIMIT 1","SELECT 1 FROM model_reservations WHERE status='pending' LIMIT 1","SELECT 1 FROM manager_messages WHERE status IN ('waiting','replying') LIMIT 1","SELECT 1 FROM model_capability_tests WHERE status='running' LIMIT 1"]){if((await client.query(sql)).rowCount)throw busy();}
     const rows=await readEnterpriseTables(client),decoded=decodedEnterpriseTables(rows),reader=createBackupFileReader();
     const files=reader.tree(input.traceRoot),masterPath=join(resolve(process.env.DATA_DIR??'.data'),'credential.key');
     const master=reader.optional(masterPath)?.toString('base64')??null;
     if(master===null&&[...rows.gateways,...rows.models,...rows.mcp_connections].some(row=>row.credential!==null))throw invalid('BACKUP_CREDENTIAL_KEY_MISSING');
     if(master&&Buffer.from(master,'base64').length!==32)throw invalid('BACKUP_FILE_UNSAFE');
-    const vaultFiles:Record<string,string>={};
-    for(const doc of decoded.knowledge_documents){if(!doc.vault_path)continue;const bytes=reader.read(child(obsidianRoot(),doc.vault_path));
+    const vaultFiles:Record<string,string>=Object.create(null);
+    for(const doc of decoded.knowledge_documents){if(doc.deleted_at!==null||!doc.vault_path)continue;const bytes=reader.read(child(obsidianRoot(),doc.vault_path));
       if(!doc.vault_hash||hash(bytes)!==doc.vault_hash)throw invalid('BACKUP_VAULT_UNSYNCED');vaultFiles[doc.vault_path]=bytes.toString('base64');}
     const nativePluginBundles=exportNativeBundles(decoded);
     for(const [id,bundle] of Object.entries(nativePluginBundles)){
@@ -73,13 +71,9 @@ async function snapshot(input:{principal:Principal;traceRoot:string;password:str
     const anchor=(await client.query('SELECT database_id FROM backup_restore_anchor WHERE singleton=1')).rows[0],version=String((await client.query('SELECT version() AS value')).rows[0]?.value??'');
     const payload=createEnterpriseBackup({version:2,schemaId:ENTERPRISE_BACKUP_SCHEMA_ID,createdAt:new Date().toISOString(),source:{applicationVersion:packageMetadata.version,databaseId:anchor?.database_id,engine:/emcc|emscripten|wasm|pglite/i.test(version)?'pglite':'postgresql'},tables:rows,files,master,nativePluginBundles,vaultFiles});
     validateEnterpriseBackupReferences(payload,input.traceRoot);
-    // The source can additionally prove the live database claim, without ever
-    // placing it in the portable row. Restore only receives archival integrity.
-    for(const task of decoded.task_attempt_workspaces)for(const commit of task.committed_outputs??[]){
-      const operation=decoded.local_operations.find(row=>row.id===commit.receipt?.operationId),run=decoded.project_runs.find(row=>row.id===task.run_id),device=decoded.local_devices.find(row=>row.id===operation?.device_id);
-      const claim=(await client.query('SELECT claim_token FROM local_operations WHERE id=$1',[operation?.id])).rows[0];
-      try{assertOriginalTaskCommit(input.traceRoot,run,task,{...operation,claim_token:claim?.claim_token},executionBackend(device?.backend));}catch{throw invalid('BACKUP_REFERENCE_INVALID');}
-    }
+    // Backing up restored history must not require reviving its discarded live
+    // claim secret. Archive integrity is checked above; execution always uses
+    // the separate original-claim and current-authority gates.
     reader.verify();
     result=await encryptEnterpriseBackup(payload,input.password);reader.verify();
     committing=true;await client.query('COMMIT');committing=false;transaction=false;

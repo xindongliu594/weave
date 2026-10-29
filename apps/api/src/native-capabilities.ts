@@ -12,6 +12,7 @@ import { nativeManifestId, nativeToolBinding, assertNativeTaskAccess } from '../
 import { createNativeInstallManager } from './native-plugin-install.ts';
 import {httpPrincipal,administrative} from './project-route-access.ts';
 import {visibleResourceQuery} from './resource-authorization.ts';
+import {assertRestoreExecutionAdmitted,assertRestoredResourceAdmitted,acknowledgeRestoredResourceIn,restoreResourcePending,restoreExecutionBlocked} from './enterprise-restore-admission.ts';
 export { assertNativeTaskAccess };
 
 type Database = Pick<pg.PoolClient,'query'>;
@@ -42,10 +43,12 @@ export async function setNativeCapability(id: string, enabled: boolean, db: Data
   const rows=(await db.query('UPDATE native_capabilities SET enabled=false,updated_at=now() WHERE manifest_id=$1 RETURNING namespace',[id])).rows;
   return {id,namespace:rows[0]?.namespace,enabled:false};
  }
+ await assertRestoreExecutionAdmitted(db);
  const {manifest} = readNativeBundle(id,root);
  // Changing current installation only affects new snapshots. Previous content
  // remains available; disabling its namespace revokes both old and new runs.
  await db.query('INSERT INTO native_capabilities(namespace,manifest_id,enabled) VALUES($1,$2,$3) ON CONFLICT(namespace) DO UPDATE SET manifest_id=$2,enabled=$3,updated_at=now()', [manifest.namespace,id,enabled]);
+ await acknowledgeRestoredResourceIn(db,'native',id);
  return {id,namespace:manifest.namespace,enabled};
 }
 export async function snapshotNativeCapabilities(agents: any[], db: Database = pool, root = nativeCapabilityRoot()) {
@@ -53,7 +56,7 @@ export async function snapshotNativeCapabilities(agents: any[], db: Database = p
  if (!names.length) return [];
  const namespaces=[...new Set(names.map(name=>String(name).split('__')[1]))];
  const rows = (await db.query('SELECT * FROM native_capabilities WHERE enabled=true AND namespace=ANY($1::text[])',[namespaces])).rows;
- const bindings = rows.map(row => {const {id,manifest}=readNativeBundle(row.manifest_id,root);return {id,manifest};});
+ const bindings=[];for(const row of rows){await assertRestoredResourceAdmitted(db,'native',row.manifest_id);const {id,manifest}=readNativeBundle(row.manifest_id,root);bindings.push({id,manifest});}
  const snapshot = {nativeCapabilities:bindings};
  const used = new Set(names.map(name => nativeToolBinding(snapshot,name).id));
  return bindings.filter(binding => used.has(binding.id));
@@ -64,6 +67,7 @@ export async function assertNativeCapabilities(snapshot: any, db: Database = poo
  const rows = (await db.query('SELECT namespace,enabled FROM native_capabilities')).rows;
  for (const name of names) {
   const binding = nativeToolBinding(snapshot,name);
+  await assertRestoredResourceAdmitted(db,'native',binding.id);
   if (!rows.some(row => row.namespace === binding.manifest.namespace && row.enabled)) throw new AppError(409,'NATIVE_PLUGIN_DISABLED: 此插件已停用，请调整方案后重新批准','NATIVE_PLUGIN_DISABLED');
   readNativeBundle(binding.id,root);
  }
@@ -92,7 +96,8 @@ export async function listNativeCapabilities(db:Database=pool,root=nativeCapabil
   const states=(await db.query('SELECT * FROM native_capabilities')).rows;
   const ids=[...new Set([...states.map(row=>row.manifest_id),...(existsSync(root)?readdirSync(root).filter(id=>/^[a-f0-9]{64}$/.test(id)):[])])];
   if(ids.length>100)throw new AppError(422,'插件安装版本超过目录限制，请先归档未引用版本');
-  return ids.map(id=>{const state=states.find(row=>row.manifest_id===id);try{const {manifest}=readNativeBundle(id,root);return {id,manifest,available:true,enabled:!!state?.enabled};}catch{return {id,namespace:state?.namespace,available:false,enabled:!!state?.enabled,error:'安装文件缺失、版本不符或校验失败；可停用后重新安装固定版本'};}});
+  const blocked=await restoreExecutionBlocked(db);
+  return Promise.all(ids.map(async id=>{const state=states.find(row=>row.manifest_id===id),pending=await restoreResourcePending(db,'native',id),enabled=!!state?.enabled&&!blocked&&!pending;try{const {manifest}=readNativeBundle(id,root);return {id,manifest,available:true,enabled,restoreAuthorizationRequired:pending};}catch{return {id,namespace:state?.namespace,available:false,enabled,restoreAuthorizationRequired:pending,error:'安装文件缺失、版本不符或校验失败；可停用后重新安装固定版本'};}}));
 }
 export function nativeCapabilityRouter(options:{demo?:unknown;root?:string}={}) {
  const router=Router();
@@ -105,7 +110,7 @@ export function nativeCapabilityRouter(options:{demo?:unknown;root?:string}={}) 
   const namespaces=[...new Set([...names].map(name=>name.split('__')[1]))];
   const rows=(await pool.query('SELECT namespace,manifest_id FROM native_capabilities WHERE enabled=true AND namespace=ANY($1::text[]) ORDER BY namespace LIMIT 100',[namespaces])).rows;
   const result=[];
-  for(const row of rows){try{const {id,manifest}=readNativeBundle(row.manifest_id,options.root);if(manifest.namespace!==row.namespace)continue;
+  for(const row of rows){try{await assertRestoredResourceAdmitted(pool,'native',row.manifest_id);const {id,manifest}=readNativeBundle(row.manifest_id,options.root);if(manifest.namespace!==row.namespace)continue;
     const tools=manifest.tools.filter((tool:any)=>names.has(tool.name)).map(({name,originalName,description}:any)=>({name,originalName,description}));
     if(tools.length)result.push({id,available:true,enabled:true,manifest:{namespace:manifest.namespace,package:manifest.package,version:manifest.version,dshVersion:manifest.dshVersion,source:{kind:manifest.source.kind},tools}});
   }catch{/* An unverified installed version grants no member metadata. */}}

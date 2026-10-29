@@ -1,0 +1,142 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise backup cannot carry a queued manager request into an activated target
+  ✔ export rejects waiting without changing source or fees (488.1918ms)
+  ✔ export rejects replying without changing source or fees (325.5984ms)
+  ✔ completed and explicitly cancelled manager history remains exportable (1360.4853ms)
+  ✖ import rejects a valid waiting package before staging or publishing authority (294.9412ms)
+  ✔ import rejects a valid replying package before staging or publishing authority (273.1286ms)
+  ✔ valid cancelled history imports after rejected attempts without recreating a waiting request (470.7785ms)
+✖ enterprise backup cannot carry a queued manager request into an activated target (4131.2987ms)
+ℹ {"sourceUnchanged":true,"modelCalls":0}
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6570.2428
+
+✖ failing tests:
+
+test at tests\enterprise-backup-manager-queue.test.ts:1:4538
+✖ import rejects a valid waiting package before staging or publishing authority (294.9412ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+      '.archive-write-locks',
+      '.archive-write-locks\\b385ccd5baec67db1aa799bd1a4bec449766a5ae910d85ebbac86fa4f628b32c',
+  +   '.archive-write-locks\\b385ccd5baec67db1aa799bd1a4bec449766a5ae910d85ebbac86fa4f628b32c\\root.gate',
+      'runs'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:44:80)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-manager-queue.test.ts:40:45)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ '.archive-write-locks', '.archive-write-locks\\b385ccd5baec67db1aa799bd1a4bec449766a5ae910d85ebbac86fa4f628b32c', '.archive-write-locks\\b385ccd5baec67db1aa799bd1a4bec449766a5ae910d85ebbac86fa4f628b32c\\root.gate', 'runs' ],
+    expected: [ '.archive-write-locks', '.archive-write-locks\\b385ccd5baec67db1aa799bd1a4bec449766a5ae910d85ebbac86fa4f628b32c', 'runs' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+▶ enterprise export preserves source history, secrets boundary and referenced bytes
+  ✔ full encrypted snapshot has all fixed tables, immutable audit and exact textual codecs (598.0728ms)
+  ✔ active execution and model calls block export, with known failures leaving source usable (996.431ms)
+  ✔ revoked principals cannot export (413.9141ms)
+  ✔ active manager and capability probes block a consistent snapshot (802.3175ms)
+  ✔ missing checkpoint CAS and hardlinked files reject without latching source (885.0814ms)
+  ✔ changed vault bytes are not silently reindexed during export (986.3566ms)
+  ✔ sealed credentials cannot be exported without their original master key (822.323ms)
+  ✔ root writer fence blocks snapshot overlap and releases after writer completes (2439.5091ms)
+✔ enterprise export preserves source history, secrets boundary and referenced bytes (8919.5934ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11449.7279
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (295.8975ms)
+  ✔ rejects business history before changing it (448.8668ms)
+  ✔ rejects department and its trigger history before changing it (443.2841ms)
+  ✔ rejects existing user before changing it (438.6246ms)
+  ✔ rejects changed defaults without version bump before changing it (430.5845ms)
+  ✔ rejects activated identity before changing it (432.2598ms)
+  ✔ rejects old idempotency cache before changing it (419.3304ms)
+  ✔ rejects previous restore generation before changing it (420.2557ms)
+  ✔ rejects enterprise restore anchor without marker before changing it (418.0484ms)
+  ✔ rejects previous admission marker before changing it (432.8483ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (2116.5083ms)
+  ✔ fresh isolated preserving import keeps source, historical task bytes and target identity (7652.0518ms)
+✔ enterprise restore preflight admits only untouched fresh database defaults (14328.2819ms)
+ℹ Target SQL/files/key/receipt/quarantine matched; checking re-export without live claim authority.
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16951.8751
+▶ enterprise web API exports, previews, restores and requires verified human activation
+  ✔ all enterprise routes are classified and ordinary members cannot export (51.9746ms)
+  ✔ actual admin export contains the fixed v2 format and excludes response cache (389.7743ms)
+  ✔ preview is read-only, password failure is explicit and metadata contains no key (216.4039ms)
+  ✔ inspect and restore accept more than the ordinary 2 MiB parser limit (236.2435ms)
+  ✔ wrong origin and imprecise confirmation cannot restore (9.9891ms)
+  ✔ fresh application scaffolds do not prevent import and no execution authority is restored (553.4273ms)
+  ✔ status is safe and model calls stay blocked; local-owner cannot activate (91.1182ms)
+  ✔ changed restored delivery blocks activation without overwriting it (79.4292ms)
+  ✔ fresh live target admin activates once; later normal file changes do not break idempotence (200.1087ms)
+✔ enterprise web API exports, previews, restores and requires verified human activation (8329.35ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8889.0912
+oidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+oidc-provider NOTICE: default ttl.Interaction function called, you SHOULD change it in order to define the expiration for Interaction artifacts.
+oidc-provider NOTICE: default ttl.Grant function called, you SHOULD change it in order to define the expiration for Grant artifacts.
+oidc-provider NOTICE: default ttl.Session function called, you SHOULD change it in order to define the expiration for Session artifacts.
+oidc-provider NOTICE: default ttl.AccessToken function called, you SHOULD change it in order to define the expiration for AccessToken artifacts.
+oidc-provider NOTICE: default ttl.IdToken function called, you SHOULD change it in order to define the expiration for IdToken artifacts.
+▶ enterprise restore requires fresh OIDC login after restart without importing old session authority
+  ✔ source administrator signs in through OIDC and exports through the protected HTTP route (612.2446ms)
+  ✔ fresh local target imports history but contains no source sessions or login transactions (602.939ms)
+  ✔ real application restart refuses legacy-local downgrade without changing restored history (479.1477ms)
+  ✔ changed bootstrap configuration cannot take over restored administration (29.704ms)
+  ✔ old signed cookie cannot read restored administration or activate execution (22.7017ms)
+  ✔ new verified login and CSRF are required to activate once, preserving unknown cost (250.2021ms)
+✔ enterprise restore requires fresh OIDC login after restart without importing old session authority (5446.3596ms)
+ℹ {"operationId":"a7278acf-ca10-4e1b-8fe0-bd10b7f1204b","inputDigest":"3e05574814ce1a4e4a7641f5631f0148c77a0195e7dbf027bb9ea5f43e14ef8a","sourceDigest":"f59d7bb5d127d9146dc025108ca10e4d39e895963f3332d98c568d6dda1ec1d3","sourceUnchanged":true,"oidcProvider":"local oidc-provider fixture over trusted TLS","productionProvider":false,"modelCalls":0}
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8775.2121
+✔ identity initialization and request admission wait for the restore barrier (921.1476ms)
+✔ failed restore barrier preserves its error and never activates identity or prunes sessions (4.6321ms)
+✔ closing before restore readiness prevents a late identity activation (0.7593ms)
+✔ close drains identity initialization that has already entered SQL (3.1934ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2803.0049

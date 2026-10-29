@@ -1,3 +1,4 @@
+import {assertRestoreExecutionAdmitted,assertRestoredResourceAdmitted,restoreResourcePending,acknowledgeRestoredResourceIn} from './enterprise-restore-admission.ts';
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import type pg from 'pg';
@@ -124,12 +125,13 @@ export class ToolEffectContractService {
   async review(key: ToolEffectKey, expectedDigest: string, principal: HumanPrincipal) {
     key = keySchema.parse(key); hash.parse(expectedDigest);
     return this.transaction(async client => {
+      await assertRestoreExecutionAdmitted(client);
       const actor = await this.admin(client, principal), contract = await this.candidateFor(client, key), digest = effectDigest(contract);
       if (digest !== expectedDigest) throw fail('TOOL_EFFECT_SOURCE_CHANGED');
       supported(contract);
       const old = (await client.query<Row>('SELECT * FROM tool_effect_contracts WHERE digest=$1 FOR UPDATE', [digest])).rows[0];
       if (old?.retired_at) throw fail('TOOL_EFFECT_RETIRED');
-      if (old) return publicRow(old);
+      if (old) {if(await restoreResourcePending(client,'contract',digest)){await this.audit(client,actor,principal,old);await acknowledgeRestoredResourceIn(client,'contract',digest);}return publicRow(old);}
       const inserted = (await client.query<Row>(`INSERT INTO tool_effect_contracts(digest,namespace,tool_name,contract,reviewed_by)
         VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING RETURNING *`, [digest, contract.namespace, contract.toolName, contract, principal.userId])).rows[0];
       if (!inserted) throw fail('TOOL_EFFECT_ACTIVE_CONFLICT');
@@ -156,6 +158,7 @@ export class ToolEffectContractService {
   }
   async assertContractIn(client: Pick<pg.PoolClient, 'query'>, input: EffectContract) {
     const contract = checkedContract(input), digest = effectDigest(contract);
+    await assertRestoredResourceAdmitted(client,'contract',digest);
     const current = await this.candidateFor(client, { namespace: contract.namespace, toolName: contract.toolName });
     const row = (await client.query<Row>('SELECT * FROM tool_effect_contracts WHERE digest=$1 FOR SHARE', [digest])).rows[0];
     if (!row || effectDigest(checkedContract(row.contract)) !== digest) throw fail('TOOL_EFFECT_UNREVIEWED');

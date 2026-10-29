@@ -1,0 +1,51 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (470.4192ms)
+  ✔ rejects business history before changing it (784.8173ms)
+  ✔ rejects department and its trigger history before changing it (704.2578ms)
+  ✔ rejects existing user before changing it (725.7884ms)
+  ✔ rejects changed defaults without version bump before changing it (928.1039ms)
+  ✔ rejects activated identity before changing it (658.5381ms)
+  ✔ rejects old idempotency cache before changing it (896.3406ms)
+  ✔ rejects previous restore generation before changing it (636.3377ms)
+  ✔ rejects previous admission marker before changing it (563.1366ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (1570.7184ms)
+  ✖ fresh isolated preserving import keeps source, historical task bytes and target identity (6602.6225ms)
+✖ enterprise restore preflight admits only untouched fresh database defaults (15056.208ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 10
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17717.3032
+
+✖ failing tests:
+
+test at tests\enterprise-backup-restore.test.ts:1:5273
+✖ fresh isolated preserving import keeps source, historical task bytes and target identity (6602.6225ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: 目标已有数据、身份、历史或自定义设置；请使用全新隔离实例恢复，原数据未替换。
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-restore.test.ts:86:50)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-restore.test.ts:50:2)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: 目标已有数据、身份、历史或自定义设置；请使用全新隔离实例恢复，原数据未替换。
+        at notFresh (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:26:33)
+        at emptyDirectory (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:52:130)
+        at freshFiles (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:58:109)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-restore.ts:107:53)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112),
+    operator: 'rejects',
+    diff: 'simple'
+  }

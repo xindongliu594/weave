@@ -10,6 +10,8 @@
 
 **Spec:** `docs/research/reuse-and-ai-delivery-estimate-2026-10-29.md`（用户已批准）；范围约束见根 `AGENTS.md`。本计划补足该研究的 F1 实施合同，不表示功能已实现或通过。
 
+**执行状态更新（2026-10-29）：** Task1–3 原有成果保留；Task4 隔离/重新授权与 Task6 API/设置页已在工作树实现并有定向验证，Task5 已有 PGlite 独立进程证据。原生 PG、浏览器/真实 IdP 和最终集成审查仍未完成。本轮损坏恢复指针修复及相关回归 79 例通过，构建通过，详见验收报告。用户已取消全量迁移并要求继续本机开发；“暂不提交”覆盖下列 Git 提交步骤，不因测试通过自行暂存/提交/推送。
+
 ## Global Constraints
 
 - 为伍仍运行在 JJ；本阶段只在当前隔离工作树开发/测试，不访问、安装或部署 JJ，不调用付费模型。
@@ -106,11 +108,11 @@
 
 **Interfaces:** `preflightEnterpriseRestore(db:Pick<pg.PoolClient,'query'>,payload:EnterpriseBackupV2):Promise<void>`；`restoreEnterpriseBackup(input:{principal:Principal;payload:EnterpriseBackupV2;traceRoot:string;writers:ArchiveWriterManager;state:BackupRestoreState}):Promise<{operationId:string;status:'quarantined';inputDigest:string}>`。本任务定义并实现下述 `migrateEnterpriseRestoreAdmission` / `installRestoreAdmissionIn`，必须和行导入/receipt 同事务；Task 4 消费该 marker。
 
-- [ ] 写 `fresh_restore_preserves_ids_history_and_original`：A 导出 B 导入，两个不同拥有标记临时根/DB，所有不含活动凭据的 portable 行按 codec/hash 相同、audit/FK 完整，A 未变，B 的 anchor.database_id 仍是 B。
-- [ ] 写 `reject_nonempty_target_without_mutation`：对每类 protected/业务/history 表单行非空、已激活 bootstrap、修改过默认 settings、额外用户、额外文件、现存 credential.key（非 fixture 预置）分别 409 `BACKUP_DESTINATION_NOT_FRESH`；错误包无 stage，目标非空预检也在 stage 前。预检后竞态写入在 SQL 锁内重验，不能覆盖。
-- [ ] `node scripts/test-integration.mjs tests/enterprise-backup-restore.test.ts` 先红。实现全表 NOWAIT 锁和 preflight；仅允许明确 migrate 创建的默认行。载入 staging 后调用 Task 2 validator，再在 SQL 锁内重验 freshness/当前本机管理员。严格 INSERT，保留 audit/operation/contract 触发器；数据库触发器额外生成行须显式校验，不静默吞错。
-- [ ] 调用现有 `state.prepareRestore`（trace/vault/key/bundle）、导入行与 quarantine marker、`installArchive`、`recordCommitReceipt`、COMMIT、`confirmCommitted`；失败完全沿用现有 rolled-back/unknown 分支和保留前后树。绝不复制源 `.backup-restore-state`/lock/control。返回 `operationId/inputDigest` 可核对，响应不含秘密。
-- [ ] 同命令绿；`node scripts/test-integration.mjs tests/backup-enterprise-protection.test.ts tests/backup-restore-state.test.ts` 必须仍绿，v1 仍拒绝企业历史。提交 `feat: restore enterprise snapshots into fresh destinations`。
+- [x] 写 `fresh_restore_preserves_ids_history_and_original`：A 导出 B 导入，两个不同拥有标记临时根/DB，所有不含活动凭据的 portable 行按 codec/hash 相同、audit/FK 完整，A 未变，B 的 anchor.database_id 仍是 B。
+- [x] 写 `reject_nonempty_target_without_mutation`：protected/业务/history 代表行、已激活 bootstrap、修改过默认 settings、额外用户/文件/key、旧恢复代数/标记分别拒绝，原记录/字节不变；格式错误在 stage 前拒绝，闭包检查只能使用未发布临时 stage，失败后清理。原生并发竞态另在 Task5 证明。
+- [x] `node scripts/test-integration.mjs tests/enterprise-backup-restore.test.ts` 先红。实现全表 NOWAIT 锁内的真实 freshness/管理员重验，不信客户端先前预览；仅允许正式迁移预置行和原版空 vault scaffold。严格 INSERT，保留 audit/operation/contract 触发器；预先插入没有 FK 的部门历史，最终全表 hash 核对额外触发行。
+- [x] 调用现有 `state.prepareRestore`（trace/vault/key/bundle）、导入行与 quarantine marker、`installArchive`、`recordCommitReceipt`、COMMIT、`confirmCommitted`；沿用 rolled-back/unknown 分支与保留前后树。原控制目录不从源复制；返回本机 operationId/inputDigest。标记不是全入口隔离，Task4 前不挂产品路由。
+- [x] 定向回归86通过、类型检查及构建退出0；恢复组加细人工审批/审计和 runtime 操作自引用后12例再次通过。v1 企业历史保护和原物理回执仍绿。提交 `feat: restore enterprise snapshots into fresh destinations`。
 
 ### Task 4: 恢复隔离、费用及来源重新准入
 
@@ -149,6 +151,8 @@
 - [ ] 写 validation 报告：每项“已验证/未验证/受阻”；附受控 schema/FK fingerprint、A/B 前后 digest、两种引擎行往返差异、原生 crash 结果、浏览器与模型次数。提交 `feat: expose enterprise backup recovery in settings`。
 
 ## 完成条件、风险和不能由代码猜测的问题
+
+2026-10-29 执行状态补记：Task4 隔离/重新准入与 Task6 API/网页已接入；实际网页下载、预览、隔离导入和本地受信 TLS/OIDC 重新登录已验证。窄窗口排版及独立审查发现的经理排队请求恢复风险已修复。导出与导入同时拒绝 `waiting/replying`，沿用既有静止检查；终态消息保留，来源等待消息不自动取消。最终本轮67项定向测试通过，详见 validation 与 SDD ledger。原生 PG13项、真实公司 IdP 和部署仍未完成；Git 步骤按用户“暂不提交”暂停，不因代码审查完成而自动提交。原计划中的红/绿和提交复合步骤不整体勾选，避免将部分完成误记成全部验收。
 
 完成必须同时有完整表/文件覆盖、fresh-only preserving import、旧身份/设备失效、未知费用/效果不被清除、receipt 崩溃证明和网页可操作证据。只完成停机目录复制、只导出 JSON、v1 放宽保护、只有 PGlite 顺序成功均不能标 F1 完成。原生 PG/真实 IdP 未验证时明确限制发布资格，不冒充已验证。
 

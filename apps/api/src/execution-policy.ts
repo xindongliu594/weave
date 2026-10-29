@@ -7,6 +7,7 @@ import {validateProjectTeam} from './collaboration.ts';
 import {localTarget} from './local-execution.ts';
 import {assertNativeCapabilities} from './native-capabilities.ts';
 import {assertCurrentRunAuthority,type RunEffect} from './run-current-authority.ts';
+import {assertRestoreExecutionAdmitted} from './enterprise-restore-admission.ts';
 type CurrentOptions={requireLocalOnline?:boolean;authorityLock?:boolean;effect?:RunEffect};
 export type ExecutionMode='legacy'|'enterprise';
 export function executionMode(env:NodeJS.ProcessEnv=process.env):ExecutionMode{
@@ -32,6 +33,7 @@ export function assertPlanningModel(id:string,policy:Policy){
  if(!policy.allowedModelIds?.includes(id))throw new AppError(422,'规划模型不在项目允许范围内，请先编辑项目策略','POLICY_MODEL_DENIED');
 }
 export async function assertRunAuthorization(row:any,db:Pick<pg.PoolClient,'query'>=pool,options:CurrentOptions={}){
+ await assertRestoreExecutionAdmitted(db);
  assertExecutionProfile(row.snapshot);
  return assertCurrentRunPermissions(row,db,options);
 }
