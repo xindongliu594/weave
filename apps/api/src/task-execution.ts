@@ -21,7 +21,7 @@ export function taskCapabilityHashes(snapshot:any,employee:any){
  return {permissionHash:hash({employeeId:employee.employeeId,tools:[...employee.tools].sort(),policy:snapshot.policy,knowledge:snapshot.knowledge??null,imports:(snapshot.importedFiles??[]).map((f:any)=>({path:f.path,snapshotId:f.snapshotId,sha256:f.sha256,agentIds:f.agentIds})),resourceRevision:snapshot.resourceRevision??0}),
   capabilityHash:hash({tools:[...employee.tools].sort(),nativeCapabilities:snapshot.nativeCapabilities??null})};
 }
-function taskWritePaths(contract:any):string[]{
+export function taskWritePaths(contract:any):string[]{
  const scoped=(path:string,list:string[])=>list.some(p=>path===p||path.startsWith(p.replace(/\/$/,'')+'/'));
  return contract.outputs.filter((output:any)=>scoped(output.path,contract.inScope)&&!scoped(output.path,contract.outOfScope)).map((output:any)=>output.path);
 }
@@ -91,20 +91,13 @@ export function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:a
   return {path:input.path,sha256:imported.sha256,origin:base,source:{kind:'import',snapshotId:imported.snapshotId,sha256:imported.sha256,agentIds:[...imported.agentIds]}};
  });
 }
-export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:TrustedTaskAssignment,canonical:TaskCanonical,previous:TaskExecutionScope|null):Promise<TaskExecutionScope>{
- identity(assignment,true);const {employee,contract}=activeTaskAssignment(run,assignment);await assertLease(db,run);
- await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation});
- if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)throw new AppError(422,'任务沙箱恢复尚未接通可信 canonical 与检查点来源，请保留原恢复记录','TASK_RECOVERY_UNAVAILABLE');
- const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active' FOR UPDATE",[run.id,assignment.taskId,assignment.attemptId,assignment.generation])).rows[0];
- const hashes=taskCapabilityHashes(run.snapshot,employee);
- if(!row||row.principal!==assignment.agentId||row.session_id!==assignment.sessionId||row.runtime_task_id!==assignment.runtimeTaskId||row.contract_hash!==assignment.contractHash||row.permission_hash!==hashes.permissionHash||row.capability_hash!==hashes.capabilityHash||!isDeepStrictEqual(row.contract,contract))denied('任务未绑定或授权已变化');
- if(previous&&!isDeepStrictEqual(row.scope,previous))denied('操作 scope 已过期');
+/** Pure reconstruction only; this does not prove SQL provenance, current authority or live admission. */
+export function rebuildTaskScope({run,assignment,contract,hashes,canonical,inputs,committedOutputs}:{run:any;assignment:TrustedTaskAssignment;contract:any;hashes:ReturnType<typeof taskCapabilityHashes>;canonical:TaskCanonical;inputs:TaskInputOrigin[];committedOutputs:TaskCommittedOutput[]}):TaskExecutionScope{
  const writePaths=taskWritePaths(contract);
- const inputs:TaskInputOrigin[]=row.scope?row.input_origins:pinnedInputs(run,assignment,contract,canonical.revision);
  const origins=new Map(inputs.map(i=>[i.path,i.origin])),expected=new Map(inputs.map(i=>[i.path,i.sha256]));
  const key={runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation};
  const operations=new Set<string>();
- for(const commit of row.committed_outputs as TaskCommittedOutput[]){
+ for(const commit of committedOutputs){
   const r=commit.receipt,s=commit.scope;
   const binding=s?.workspace?.binding;
   if(!s||s.profile!=='task-attempt-openshell-v1'||!isDeepStrictEqual(s.key,key)||s.capabilityHash!==hashes.capabilityHash||!isDeepStrictEqual(s.inputOrigins,inputs)||
@@ -123,7 +116,18 @@ export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:Trust
  const backend=run.snapshot.executionTarget?.backend;if(run.snapshot.executionTarget?.kind!=='local'||backend?.kind!=='openshell')denied('任务要求本机 OpenShell');
  const workspace=createTaskWorkspace({binding:{projectId:run.project_id,planVersion:run.project_version,runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,assigneeId:assignment.agentId,generation:assignment.generation,contractHash:assignment.contractHash,permissionHash:hashes.permissionHash,backend:{kind:'openshell',version:backend.version,image:backend.image,policyHash:backend.policySha256}},readPaths:[...expected.keys()],writePaths,canonicalFiles:canonical.files,origins:[...origins.values()]});
  if(workspace.baseCanonicalRevision!==canonical.revision)denied('可信工作版本与完整 manifest 不符');
- const scope:TaskExecutionScope={profile:'task-attempt-openshell-v1',key,workspace,workRevision:canonical.revision,capabilityHash:hashes.capabilityHash,inputOrigins:inputs};
+ return {profile:'task-attempt-openshell-v1',key,workspace,workRevision:canonical.revision,capabilityHash:hashes.capabilityHash,inputOrigins:inputs};
+}
+export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:TrustedTaskAssignment,canonical:TaskCanonical,previous:TaskExecutionScope|null):Promise<TaskExecutionScope>{
+ identity(assignment,true);const {employee,contract}=activeTaskAssignment(run,assignment);await assertLease(db,run);
+ await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation});
+ if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)throw new AppError(422,'任务沙箱恢复尚未接通可信 canonical 与检查点来源，请保留原恢复记录','TASK_RECOVERY_UNAVAILABLE');
+ const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active' FOR UPDATE",[run.id,assignment.taskId,assignment.attemptId,assignment.generation])).rows[0];
+ const hashes=taskCapabilityHashes(run.snapshot,employee);
+ if(!row||row.principal!==assignment.agentId||row.session_id!==assignment.sessionId||row.runtime_task_id!==assignment.runtimeTaskId||row.contract_hash!==assignment.contractHash||row.permission_hash!==hashes.permissionHash||row.capability_hash!==hashes.capabilityHash||!isDeepStrictEqual(row.contract,contract))denied('任务未绑定或授权已变化');
+ if(previous&&!isDeepStrictEqual(row.scope,previous))denied('操作 scope 已过期');
+ const inputs:TaskInputOrigin[]=row.scope?row.input_origins:pinnedInputs(run,assignment,contract,canonical.revision);
+ const scope=rebuildTaskScope({run,assignment,contract,hashes,canonical,inputs,committedOutputs:row.committed_outputs});
  await db.query('UPDATE task_attempt_workspaces SET scope=$1,input_origins=$2::jsonb,work_revision=$3 WHERE run_id=$4 AND task_id=$5 AND attempt_id=$6 AND generation=$7',[scope,JSON.stringify(inputs),canonical.revision,run.id,assignment.taskId,assignment.attemptId,assignment.generation]);
  return scope;
 }

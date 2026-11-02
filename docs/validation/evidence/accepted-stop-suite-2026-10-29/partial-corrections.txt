@@ -1,0 +1,193 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ terminal dispatch rechecks cap-method after provider queue wait (13824.362ms)
+✔ terminal dispatch rechecks cap-response after provider queue wait (11221.8ms)
+✔ terminal dispatch rechecks related-node after provider queue wait (11526.269ms)
+✔ terminal dispatch rechecks unrelated-progress after provider queue wait (11729.9263ms)
+✔ terminal confirmed fact survives SQL cancellation and lease transfer (11128.6334ms)
+✔ terminal aborted bookkeeping retains original marker and exact observer only reads original ID (13493.9354ms)
+✔ terminal dispatching COMMIT loss preserves original ID with no fresh device effect (15030.8065ms)
+✔ terminal rechecks another approved slot accepted proof after dispatching COMMIT (16622.972ms)
+✔ terminal exact observer rejects extra identity fields and class-run mismatch (13661.137ms)
+✔ terminal review stopped duplicate observes original ID without fresh stop (13519.2468ms)
+✔ terminal review stopped duplicate refuses replaced grant root (18678.9021ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 153130.9351
+✔ terminal pool acquisition abort releases late client before BEGIN or fn (11440.9207ms)
+✔ terminal shared deadline abort waits for the original pool acquisition before physical drain (255.106ms)
+✖ terminal prepareTask preflight rejects missing shared-deadline capability before SQL (46.1545ms)
+✖ terminal prepareTask preflight rejects extra shared-deadline capability before SQL (62.8555ms)
+✖ terminal prepareTask preflight rejects wrong shared-deadline capability before SQL (53.6897ms)
+✖ terminal prepareTask preflight rejects async shared-deadline capability before SQL (48.0792ms)
+✖ terminal prepare preflight rejects missing shared-deadline capability before SQL (56.3504ms)
+✖ terminal prepare preflight rejects extra shared-deadline capability before SQL (70.4136ms)
+✖ terminal prepare preflight rejects wrong shared-deadline capability before SQL (57.0925ms)
+✖ terminal prepare preflight rejects async shared-deadline capability before SQL (50.8244ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 2
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17263.3614
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepareTask preflight rejects missing shared-deadline capability before SQL (46.1545ms)
+  Error: 任务停止维护尚未连接可信本机执行器
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:61:210)
+      at LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:332:217)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:103)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepareTask preflight rejects extra shared-deadline capability before SQL (62.8555ms)
+  Error: 任务停止维护不支持共享截止时间
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:63:82)
+      at LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:332:217)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:103)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepareTask preflight rejects wrong shared-deadline capability before SQL (53.6897ms)
+  Error: 任务停止维护不支持共享截止时间
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:63:82)
+      at LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:332:217)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:103)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepareTask preflight rejects async shared-deadline capability before SQL (48.0792ms)
+  Error: 任务停止维护不支持共享截止时间
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:63:82)
+      at LocalRunExecutor.prepareTask (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:332:217)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:103)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepare preflight rejects missing shared-deadline capability before SQL (56.3504ms)
+  Error: 任务停止维护尚未连接可信本机执行器
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:61:210)
+      at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:371:108)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:56)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepare preflight rejects extra shared-deadline capability before SQL (70.4136ms)
+  Error: 任务停止维护不支持共享截止时间
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:63:82)
+      at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:371:108)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:56)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepare preflight rejects wrong shared-deadline capability before SQL (57.0925ms)
+  Error: 任务停止维护不支持共享截止时间
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:63:82)
+      at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:371:108)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:56)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }
+
+test at tests\task-accepted-stop-lifecycle.test.ts:1:4239
+✖ terminal prepare preflight rejects async shared-deadline capability before SQL (50.8244ms)
+  Error: 任务停止维护不支持共享截止时间
+      at denied (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:31:82)
+      at requireTaskStopProvider (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:63:82)
+      at LocalRunExecutor.prepare (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\local-execution.ts:371:108)
+      at assert.rejects.code (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:56)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-lifecycle.test.ts:48:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    outputDiagnostic: undefined,
+    status: 409,
+    code: 'TASK_STOP_UNAVAILABLE',
+    upstreamStatus: undefined
+  }

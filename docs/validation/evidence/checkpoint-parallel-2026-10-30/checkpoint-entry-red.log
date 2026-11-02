@@ -1,0 +1,28 @@
+✖ registered checkpoint refuses an unowned write before creating objects and then saves with its writer (959.9125ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1200.5072
+
+✖ failing tests:
+
+test at services\agent-runtime\checkpoint-writer-entry.test.mjs:10:1
+✖ registered checkpoint refuses an unowned write before creating objects and then saves with its writer (959.9125ms)
+  AssertionError [ERR_ASSERTION]: unowned checkpoint cannot create an object directory
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/checkpoint-writer-entry.test.mjs:20:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -5,6 +5,8 @@ import { once } from 'node:events';
 import { mkdtemp, mkdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import {randomUUID} from 'node:crypto';
+import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
 import pg from 'pg';
 import type { AddressInfo } from 'node:net';
 
@@ -258,12 +260,16 @@ test('cross-origin mutations, remote host headers, and malformed data fail close
 });
 
 test('small trace pages preserve every complete event and do not change the full export', async () => {
-  const {createRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
+  const {createRunArchive,openRunArchive}=await import('../services/agent-runtime/trace-store.mjs');
   const departmentId='pagination-department',projectId='pagination-project';
   const policy={maxBudget:0,maxAgents:1,maxConcurrentAgents:1,allowedDepartmentIds:[departmentId]},plan={rationale:'Synthetic pagination only',agents:[{id:'pagination-reader',name:'分页读取员',role:'manager',title:'只读夹具',instructions:'No model execution',modelId:'pagination-no-model',tools:[],sourceDepartmentId:departmentId,sourceAgentId:'pagination-reader'}],tasks:[]};
   const snapshot={title:'分页测试',mode:'fixture',projectId,planVersion:1,departmentId,agents:plan.agents,tasks:[],policy};
-  const archive=createRunArchive(join(directory,'runs'),snapshot);
-  for(let index=0;index<65;index++)archive.append('model/wire-request',{message:'完整原文-'+index+'中'.repeat(1000)});
+  const root=join(directory,'runs'),id=randomUUID(),writers=createArchiveWriterManager({traceRoot:root});
+  const archive=await writers.withWriter([id],async()=>{
+    const archive=createRunArchive(root,snapshot,{id});
+    for(let index=0;index<65;index++)archive.append('model/wire-request',{message:'完整原文-'+index+'中'.repeat(1000)});
+    return archive;
+  });
   const first=await call(`/runs/${archive.id}?limit=30`);
   assert.equal(first.status,200);assert.equal(first.data.events.length,30);assert.equal(first.data.nextCursor,30);assert.equal(first.data.hasMore,true);
   const second=await call(`/runs/${archive.id}?after=30&limit=30`);
@@ -283,7 +289,7 @@ test('small trace pages preserve every complete event and do not change the full
   for(const limit of ['0','301','1.5','bad'])assert.equal((await call(`/runs/${archive.id}?limit=${limit}`)).status,422);
   const {commitStepCheckpoint}=await import('../services/agent-runtime/step-checkpoints.mjs');
   const workspace=join(archive.dir,'artifacts');await mkdir(workspace);
-  const checkpoint=commitStepCheckpoint({archive,workspace,boundary:{taskId:'qa',attemptId:'fixture-attempt',sessionId:'fixture-session',trigger:'tool-result',eventCursor:66,contractHash:'a'.repeat(64)}});
+  const checkpoint=await writers.withWriter([id],()=>commitStepCheckpoint({archive:openRunArchive(root,id),workspace,boundary:{taskId:'qa',attemptId:'fixture-attempt',sessionId:'fixture-session',trigger:'tool-result',eventCursor:66,contractHash:'a'.repeat(64)}}));
   const tiny=await call(`/runs/${archive.id}?limit=1`);
   assert.equal(tiny.status,200);assert.equal(tiny.data.events.length,1);assert.equal(tiny.data.hasMore,true);
   assert.equal(tiny.data.events.some((event:any)=>event.type==='step/checkpoint'),false);

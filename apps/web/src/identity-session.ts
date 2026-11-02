@@ -17,6 +17,7 @@ function decode(value:any):Session {
 }
 const statusOf=(s:Session):IdentitySnapshot['status']=>s.mode==='legacy-local'?'local-owner':s.user?.status==='pending'?'pending':s.user?.status==='disabled'?'disabled':s.authenticated?(s.user?.orgRole==='admin'?'authenticated':'member'):'signed-out';
 export const identityAuthorized=(s:IdentitySnapshot)=>s.status==='local-owner'||s.status==='authenticated';
+export const identityMemberReadable=(s:IdentitySnapshot)=>s.status==='member'&&s.session?.authenticated===true&&s.session.user?.status==='active'&&s.session.user.orgRole==='member';
 const scopeOf=(s:IdentitySnapshot)=>s.status==='local-owner'?'legacy-local':s.session?.user?`human:${s.session.user.id}:${s.session.user.orgRole}:${s.session.user.status}:${s.session.authenticated}`:s.status;
 
 export function createIdentitySession(options:Options={}) {
@@ -52,6 +53,7 @@ export function createIdentitySession(options:Options={}) {
  function restore(){if(snapshot.session?.user||identityAuthorized(snapshot))suspend();wake();}
  function subscribe(listener:()=>void){listeners.add(listener);if(listeners.size===1){options.activity?.addEventListener('focus',wake);options.activity?.addEventListener('pagehide',suspend);options.activity?.addEventListener('pageshow',restore);options.visibility?.addEventListener('visibilitychange',wake);if(!logoutUnconfirmed)void refresh();}return()=>{listeners.delete(listener);if(!listeners.size){stop();options.activity?.removeEventListener('focus',wake);options.activity?.removeEventListener('pagehide',suspend);options.activity?.removeEventListener('pageshow',restore);options.visibility?.removeEventListener('visibilitychange',wake);}};}
  async function requireAuthorized(){if(snapshot.status==='loading')await refresh();if(!identityAuthorized(snapshot))throw Error('请先确认登录状态和工作空间权限。');return {generation:snapshot.generation,csrf:snapshot.session!.csrf,signal:reads.signal};}
+ async function requireMemberRead(){if(snapshot.status==='loading')await refresh();if(!identityMemberReadable(snapshot))throw Error('请先确认成员身份和资源读取权限。');return {generation:snapshot.generation,signal:reads.signal};}
  async function authAction(kind:'login'|'logout',returnTo=base()){
   if(snapshot.busy)return;
   if(!snapshot.session)await refresh();
@@ -68,7 +70,7 @@ export function createIdentitySession(options:Options={}) {
   }catch(error){if(generation===snapshot.generation)publish({...snapshot,error:error instanceof Error?error.message:'登录服务暂不可用。'});}
   finally{loggingOut=false;publish({...snapshot,busy:false});}
  }
- return {getSnapshot:()=>snapshot,subscribe,refresh:()=>{if(!loggingOut)logoutUnconfirmed=false;return refresh();},invalidate,requireAuthorized,login:(returnTo?:string)=>authAction('login',returnTo),logout:()=>authAction('logout'),onReset(fn:()=>void){resets.add(fn);return()=>{resets.delete(fn);};}};
+ return {getSnapshot:()=>snapshot,subscribe,refresh:()=>{if(!loggingOut)logoutUnconfirmed=false;return refresh();},invalidate,requireAuthorized,requireMemberRead,login:(returnTo?:string)=>authAction('login',returnTo),logout:()=>authAction('logout'),onReset(fn:()=>void){resets.add(fn);return()=>{resets.delete(fn);};}};
 }
 export const identitySession=createIdentitySession({activity:typeof window==='undefined'?undefined:window,visibility:typeof document==='undefined'?undefined:document,visible:()=>typeof document==='undefined'||!document.hidden});
 

@@ -83,7 +83,7 @@ test('ambiguous, malformed, oversized and schema-invalid output retains known fe
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM organization_previews WHERE project_id=$1',[id])).rows[0].n,0);await noExecution();
   const again=await call('/projects/'+id+'/generate',generateInput,key);assert.equal(again.status,422);assert.deepEqual(again.data,response.data);assert.equal(requests,calls+1,'cached paid failure cannot trigger a repair call');
  }
- const diagnostics=readdirSync(join(traceRoot,'planning-output-diagnostics')).map(name=>JSON.parse(readFileSync(join(traceRoot,'planning-output-diagnostics',name),'utf8')));
+ const diagnostics=readdirSync(traceRoot+'.planning-output-diagnostics').map(name=>JSON.parse(readFileSync(join(traceRoot+'.planning-output-diagnostics',name),'utf8')));
  assert.ok(diagnostics.some(item=>item.reason==='TRUNCATED_JSON'));assert.ok(!JSON.stringify(diagnostics).includes('sk-'));assert.ok(diagnostics.every(item=>!('content' in item)&&!('raw' in item)));
 });
 
@@ -95,7 +95,7 @@ test('schema field diagnostics reach the existing web error message and one safe
  const receipt=await paidOnce(),saved=(await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receipt.id])).rows[0];assert.equal(saved.status,'settled');assert.deepEqual(saved.context.planningOutputDiagnostic,response.data.diagnostic);const history=saved.history.filter((entry:any)=>entry.source==='planning-output');assert.equal(history.length,1);assert.deepEqual(history[0].diagnostic,response.data.diagnostic);assert.ok(!JSON.stringify(history).includes('sk-private'));
  const usage=(await pool.query('SELECT * FROM usage WHERE id=$1',[receipt.id])).rows[0],usageSHA=createHash('sha256').update(JSON.stringify(usage)).digest('hex');const again=await call('/projects/'+id+'/generate',generateInput,key);assert.deepEqual(again,response);assert.equal(requests,1);assert.equal(createHash('sha256').update(JSON.stringify((await pool.query('SELECT * FROM usage WHERE id=$1',[receipt.id])).rows[0])).digest('hex'),usageSHA);
  const after=(await pool.query('SELECT * FROM model_reservations WHERE id=$1',[receipt.id])).rows[0];assert.deepEqual(after,saved);assert.deepEqual(await source(id),before);assert.equal((await pool.query('SELECT count(*)::int AS n FROM organization_previews WHERE project_id=$1',[id])).rows[0].n,0);await noExecution();
- const diagnostics=readdirSync(join(traceRoot,'planning-output-diagnostics')).map(name=>JSON.parse(readFileSync(join(traceRoot,'planning-output-diagnostics',name),'utf8')));assert.ok(diagnostics.some(item=>item.originalOutputSHA===response.data.diagnostic.originalOutputSHA&&item.schemaIssues?.length));assert.ok(!JSON.stringify(diagnostics).includes('sk-private'));
+ const diagnostics=readdirSync(traceRoot+'.planning-output-diagnostics').map(name=>JSON.parse(readFileSync(join(traceRoot+'.planning-output-diagnostics',name),'utf8')));assert.ok(diagnostics.some(item=>item.originalOutputSHA===response.data.diagnostic.originalOutputSHA&&item.schemaIssues?.length));assert.ok(!JSON.stringify(diagnostics).includes('sk-private'));
 });
 
 test('schema failure caps multiple field issues and preserves null failures without a preview or repair request', {skip:!isolated},async()=>{

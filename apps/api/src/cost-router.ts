@@ -6,6 +6,7 @@ import { queryProviderForCall } from './provider-reconciliation.ts';
 import {httpPrincipal,administrative,currentRoutePrincipal} from './project-route-access.ts';
 import {visibleResourceQuery,visibleSourceQuery} from './resource-authorization.ts';
 import type {Principal} from './identity-types.ts';
+import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
 
 async function memberCosts(principal:Principal){
  const departments=visibleResourceQuery(principal,'department','viewer'),costs=visibleResourceQuery(principal,'cost','viewer',{parameterOffset:departments.values.length}),runs=visibleSourceQuery(principal,'run','viewer',{parameterOffset:departments.values.length+costs.values.length});
@@ -45,7 +46,7 @@ function providerResponseDetails(row:Record<string,unknown>){
  return {...call,...details};
 }
 
-export function costRouter(){
+export function costRouter(writers?:ArchiveWriterManager){
  const router=Router();
  router.get('/costs',async(_req,res)=>{
   const principal=httpPrincipal(res);await currentRoutePrincipal(pool,principal);
@@ -61,7 +62,7 @@ export function costRouter(){
   res.json({timezone:'UTC',...totals,conversationSpent,recordedSpent:totals.spent+conversationSpent,calls,recent,departments});
  });
  router.post('/costs/:id/query-provider',async(req,res)=>{
-  res.json(await queryProviderForCall(z.uuid().parse(req.params.id)));
+  res.json(await queryProviderForCall(z.uuid().parse(req.params.id),false,writers));
  });
  router.post('/costs/:id/reconcile',async(req,res)=>{
   const input=z.object({inputTokens:z.number().int().min(0).max(2147483647),outputTokens:z.number().int().min(0).max(2147483647),note:z.string().trim().min(5).max(1000),confirmation:z.literal('RECONCILE')}).parse(req.body);

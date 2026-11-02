@@ -1,0 +1,44 @@
+✔ source authority exists only in its actual manager callback and native guard alone grants none (568.1568ms)
+✔ source scope assertion rejects fake managers and copied real assertion closures (276.7227ms)
+✔ source expires after sync and async callbacks including escaped async resources (655.3548ms)
+✔ source refuses nesting, writer ownership and cross-root authority in either direction (718.2477ms)
+✔ source cannot bind a journal, mutate registered files or reuse an earlier writer handle (719.1117ms)
+✔ sync and async read validation rejection releases the source guard and preserves original errors (1569.1849ms)
+✔ source validates inputs and native options without leaking guards or invoking rejected callbacks (380.815ms)
+✔ source forwards contended timeout and abort and never enters the callback (527.4195ms)
+✖ real processes enforce writer to source to writer exclusion until each original callback settles (511.756ms)
+✔ a failed original writer physically blocks manager source until its process exits (713.283ms)
+✔ source fails closed on native identity-assert until its process exits (975.9936ms)
+✔ source fails closed on native identity-final until its process exits (829.4301ms)
+✔ source fails closed on native release-failure until its process exits (806.8139ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9434.6536
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-source-scope.test.mjs:179:1
+✖ real processes enforce writer to source to writer exclusion until each original callback settles (511.756ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   sourceBlocked: true
+  -   sourceAcquired: true
+    }
+  
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-source-scope.test.mjs:183:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { sourceBlocked: true },
+    expected: { sourceAcquired: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

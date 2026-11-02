@@ -1,0 +1,185 @@
+{
+  "source": "tests/task-accepted-stop-delivery.test.ts",
+  "originalSha256": "a8f9e844398f333570b319fcb3c9cc5bb653d9b566c10dbd5e63177d983e4548",
+  "registrationBlocks": 35,
+  "expectedTests": 79,
+  "bodyEquality": true,
+  "groups": [
+    {
+      "path": "tests/task-accepted-stop-delivery.test.ts",
+      "expectedTests": 21,
+      "registrationBlocks": [
+        {
+          "originalLine": 52,
+          "sha256": "dc4ed45b657f049e5825feed4409fc4207b774af2390660039036fe547ccfa8c"
+        },
+        {
+          "originalLine": 60,
+          "sha256": "6e6b8fa586aacc167695c0f51756d54bd255c914aaa06ab2ccf1c628db9048b3"
+        },
+        {
+          "originalLine": 64,
+          "sha256": "54a9caa03090ece162589fbb633a3eb3815a018e8f054da6bb7d2caab18bfea6"
+        },
+        {
+          "originalLine": 75,
+          "sha256": "55f04fa9443508de570adaf8264a8d9da5360b195e70066d8f9c2b45ed078dbe"
+        },
+        {
+          "originalLine": 85,
+          "sha256": "237ca0340d7494eb55306c57ae56ab5339c22a736fa124d6532849a581e96189"
+        },
+        {
+          "originalLine": 95,
+          "sha256": "86c3cd374bcccb9f3c7b1908978760fd665462de77d6771a725de71ab53a8e12"
+        },
+        {
+          "originalLine": 103,
+          "sha256": "65a884c574072a3cf76e76d4df26c536aced5da0174235b1689b2040193285d0"
+        },
+        {
+          "originalLine": 117,
+          "sha256": "0a42e0748ab31887681660e063561e410f5f9406d0b98f8c706b8da8e4da4e4e"
+        },
+        {
+          "originalLine": 133,
+          "sha256": "fec476eef12338b7c751723e3ea34be639225dc2b2050afe6528658e7eaded6f"
+        },
+        {
+          "originalLine": 142,
+          "sha256": "87920a29db4a313f04b85dc9eea413036d4f77d749e097ebac8edca83812e7b2"
+        },
+        {
+          "originalLine": 150,
+          "sha256": "7cb4132091b741e762cb9d8f5eccbeca37454099999658e9b6eddaad4fc174d5"
+        }
+      ]
+    },
+    {
+      "path": "tests/task-accepted-stop-provenance.test.ts",
+      "expectedTests": 18,
+      "registrationBlocks": [
+        {
+          "originalLine": 167,
+          "sha256": "b7b8a76450da930e70f33b983270a74eb572f16230ccf9eb7087affe0372507e"
+        },
+        {
+          "originalLine": 177,
+          "sha256": "6f4834eda93be42603d1caa499083175132d0833aa96e7b12bc86228d612c784"
+        },
+        {
+          "originalLine": 185,
+          "sha256": "ee5ce4fc10b2711a261d02ee8d97ad791f97c93ee5e01386e4c412cbb1490ffb"
+        },
+        {
+          "originalLine": 195,
+          "sha256": "389c4a2d6d8d7e570e54468c924049159a96bd47711dc38ef26804b35eec0a08"
+        },
+        {
+          "originalLine": 212,
+          "sha256": "664b0aa91e03a109f25ac8580033dfe985c7532c5708807efdb9deb32ae16106"
+        },
+        {
+          "originalLine": 221,
+          "sha256": "c8356b93c2c69389192aaff0698294f8d4ee9b8f44a4d9687bfed13e83cb2cbc"
+        },
+        {
+          "originalLine": 233,
+          "sha256": "5b10f8fce44f46139b1387754667495be21cd2fe4ebc979a4dbf49dab38e437a"
+        },
+        {
+          "originalLine": 249,
+          "sha256": "cdff5ef25561a1d8b22cdbb8d3cc46b34a1374102b07e793046b344cbe9b3766"
+        },
+        {
+          "originalLine": 284,
+          "sha256": "4dcef20bcd8e0c2a6bad6be72583970c76c5b9f4283487a01a118fb07d27a4df"
+        }
+      ]
+    },
+    {
+      "path": "tests/task-accepted-stop-terminal.test.ts",
+      "expectedTests": 9,
+      "registrationBlocks": [
+        {
+          "originalLine": 306,
+          "sha256": "8793457f94ee93cf576b609481d59046fd80205d2d1b6b5a24a66cf0c16a4ec8"
+        },
+        {
+          "originalLine": 313,
+          "sha256": "3a8cf88fa2ad948fb3e9806a531b66b931371e8ff777e6dfb3bf9099ec4d4438"
+        },
+        {
+          "originalLine": 324,
+          "sha256": "611d8923732d0072e6ae0a84ec1dae13029e0be79e758911120099f25e4daea3"
+        },
+        {
+          "originalLine": 333,
+          "sha256": "5648977ffad47c386c7bfa8849d4cbd1f23ab3d18a4b2c5cb2b2a17e2455e433"
+        }
+      ]
+    },
+    {
+      "path": "tests/task-accepted-stop-authority.test.ts",
+      "expectedTests": 11,
+      "registrationBlocks": [
+        {
+          "originalLine": 341,
+          "sha256": "e4e248568b50412fcf0f256eaa95f9cba1ef1ff3bfa78ce17672e5c3d1746c8f"
+        },
+        {
+          "originalLine": 356,
+          "sha256": "f9ccb7b1326dc50fd0dd1d644b387a3d49dba88f900c034508e6790a3135030a"
+        },
+        {
+          "originalLine": 363,
+          "sha256": "076fcc75bebacec1c8fd93c9c7cd6a92778272d7a382a3e9dc890c639fa7fd02"
+        },
+        {
+          "originalLine": 382,
+          "sha256": "308a287a9075c791e22ef3f295b85c7c34c8f721242e449ba6ff7d95f62ebba9"
+        },
+        {
+          "originalLine": 396,
+          "sha256": "6f1161267f359687c42bf05bf94dbed9601e0eb9f5fc69a5cee63c779ebabd4b"
+        },
+        {
+          "originalLine": 424,
+          "sha256": "069c6580f6f3ddbe02282ea3d43d9f1b76c2b6aeb3f275dc07525bae5c0f239b"
+        },
+        {
+          "originalLine": 470,
+          "sha256": "62887d0c1db9600531c9f19cc129b25fc203a6dd886a769a07688f9ff2508641"
+        }
+      ]
+    },
+    {
+      "path": "tests/task-accepted-stop-lifecycle.test.ts",
+      "expectedTests": 10,
+      "registrationBlocks": [
+        {
+          "originalLine": 371,
+          "sha256": "bc7a5b5a9a23bb96b8614166ad2f6fd0ca6beee62dcfd5be923bcd768662a559"
+        },
+        {
+          "originalLine": 408,
+          "sha256": "ec48e983e81e1c84d749c191304e2bd69d580010f314dfde4bbbcc2ff2599963"
+        },
+        {
+          "originalLine": 433,
+          "sha256": "a3873c9edc88103e9446351d1b80c9b27d1b5b0356738d4861bdc1a490ec12bb"
+        }
+      ]
+    },
+    {
+      "path": "tests/task-accepted-stop-sql-deadline.test.ts",
+      "expectedTests": 10,
+      "registrationBlocks": [
+        {
+          "originalLine": 443,
+          "sha256": "acaba0fe774b74db38cbfdf314244156a9441e5dd440ae3aeb2a6a4821a5e12c"
+        }
+      ]
+    }
+  ]
+}

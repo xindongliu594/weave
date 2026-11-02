@@ -1,0 +1,66 @@
+✔ immutable objects persist new and repeated bytes, including an empty object (182.8161ms)
+✖ corrupt and hardlinked objects fail closed without replacing their contents (72.2757ms)
+✔ a failure after durable blob writes can be reconciled by verifying the same objects (102.3142ms)
+✔ registered checkpoint refuses an unowned write before creating objects and then saves with its writer (813.9175ms)
+✔ committed checkpoints retain exact file versions and deduplicate unchanged content (241.2813ms)
+✔ partial writes are not checkpoints and corrupt objects fail closed (122.4644ms)
+✔ oversized and excessive workspaces are rejected rather than silently truncated (323.559ms)
+✔ failed archive commit never publishes a restorable checkpoint (86.3998ms)
+✖ hardlinked workspace files cannot enter a checkpoint (21.5223ms)
+✖ hardlinked stored objects are refused on restore and reuse (75.7827ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 7
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1097.0835
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-objects.test.mjs:25:1
+✖ corrupt and hardlinked objects fail closed without replacing their contents (72.2757ms)
+  Error: EPERM: operation not permitted, link 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\recovery-source-20261030\guard\temp\archive-object-test-fV5aE5\checkpoint-objects\0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5' -> 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\recovery-source-20261030\guard\temp\archive-object-test-fV5aE5\alias'
+      at linkSync (node:fs:1907:11)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-objects.test.mjs:33:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'link',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.private\\recovery-source-20261030\\guard\\temp\\archive-object-test-fV5aE5\\checkpoint-objects\\0682c5f2076f099c34cfdd15a9e063849ed437a49677e6fcc5b4198c76575be5',
+    dest: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.private\\recovery-source-20261030\\guard\\temp\\archive-object-test-fV5aE5\\alias'
+  }
+
+test at services\agent-runtime\step-checkpoints.test.mjs:50:1
+✖ hardlinked workspace files cannot enter a checkpoint (21.5223ms)
+  Error: EPERM: operation not permitted, link 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\recovery-source-20261030\guard\temp\step-proof-EIttQ3\outside.txt' -> 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\recovery-source-20261030\guard\temp\step-proof-EIttQ3\cc1e9476-9596-499a-87fe-cac62a356b1f\artifacts\linked.txt'
+      at linkSync (node:fs:1907:11)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.test.mjs:54:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'link',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.private\\recovery-source-20261030\\guard\\temp\\step-proof-EIttQ3\\outside.txt',
+    dest: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.private\\recovery-source-20261030\\guard\\temp\\step-proof-EIttQ3\\cc1e9476-9596-499a-87fe-cac62a356b1f\\artifacts\\linked.txt'
+  }
+
+test at services\agent-runtime\step-checkpoints.test.mjs:59:1
+✖ hardlinked stored objects are refused on restore and reuse (75.7827ms)
+  Error: EPERM: operation not permitted, link 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\recovery-source-20261030\guard\temp\step-proof-aAfMjA\9a4bdf1c-1eb6-4f7e-8bb5-017d1153cada\checkpoint-objects\a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e' -> 'C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\recovery-source-20261030\guard\temp\step-proof-aAfMjA\object-alias.txt'
+      at linkSync (node:fs:1907:11)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.test.mjs:62:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'link',
+    path: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.private\\recovery-source-20261030\\guard\\temp\\step-proof-aAfMjA\\9a4bdf1c-1eb6-4f7e-8bb5-017d1153cada\\checkpoint-objects\\a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e',
+    dest: 'C:\\Users\\JJ\\.codex\\worktrees\\f57c\\agent_department\\.private\\recovery-source-20261030\\guard\\temp\\step-proof-aAfMjA\\object-alias.txt'
+  }

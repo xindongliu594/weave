@@ -1,0 +1,20 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ terminal pool acquisition abort releases late client before BEGIN or fn (11794.3159ms)
+✔ terminal shared deadline abort waits for the original pool acquisition before physical drain (265.3186ms)
+✔ terminal prepareTask preflight rejects missing shared-deadline capability before SQL (54.9487ms)
+✔ terminal prepareTask preflight rejects extra shared-deadline capability before SQL (64.6377ms)
+✔ terminal prepareTask preflight rejects wrong shared-deadline capability before SQL (48.8573ms)
+✔ terminal prepareTask preflight rejects async shared-deadline capability before SQL (47.6951ms)
+✔ terminal prepare preflight rejects missing shared-deadline capability before SQL (60.8152ms)
+✔ terminal prepare preflight rejects extra shared-deadline capability before SQL (57.3166ms)
+✔ terminal prepare preflight rejects wrong shared-deadline capability before SQL (69.5078ms)
+✔ terminal prepare preflight rejects async shared-deadline capability before SQL (70.9591ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15247.645

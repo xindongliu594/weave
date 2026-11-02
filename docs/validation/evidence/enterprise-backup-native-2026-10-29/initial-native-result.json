@@ -1,0 +1,26 @@
+{
+  "id": "6c20e3d7-22f5-4d94-84f5-1dacb0ca2f09",
+  "postgresVersion": "postgres (PostgreSQL) 17.10",
+  "vectorVersion": "0.8.7",
+  "backendPids": [
+    636,
+    37600
+  ],
+  "commands": [
+    {
+      "command": "node --import tsx --test --test-concurrency=1 tests/backup-restore-native.test.ts",
+      "exitCode": 0,
+      "database": "weiwu_backup_test_f02fc30404324166bbead1fb6e40860e",
+      "log": ".private\\enterprise-native-20261029\\cluster-6c20e3d7-22f5-4d94-84f5-1dacb0ca2f09\\backup-restore-native.test.ts.log"
+    },
+    {
+      "command": "node --import tsx --test --test-concurrency=1 tests/enterprise-backup-native.test.ts",
+      "exitCode": 1,
+      "database": "weiwu_backup_test_6dc60ec417b84b839b0d021ed4a03773",
+      "log": ".private\\enterprise-native-20261029\\cluster-6c20e3d7-22f5-4d94-84f5-1dacb0ca2f09\\enterprise-backup-native.test.ts.log"
+    }
+  ],
+  "stopped": true,
+  "dataRemoved": false,
+  "error": "Native test failed; see owned evidence\n\n1 !== 0\n"
+}

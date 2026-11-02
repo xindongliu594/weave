@@ -1,0 +1,57 @@
+✖ wide arrays are refused before allocating an own-key list for millions of elements (4726.5635ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8248.0975
+
+✖ failing tests:
+
+test at tests\task-recovery-history.test.ts:3:821
+✖ wide arrays are refused before allocating an own-key list for millions of elements (4726.5635ms)
+  AssertionError [ERR_ASSERTION]: >+718540
+  28: 00007FF7FC54F03B v8::base::UnsignedDivisionByConstant<unsigned __int64>+717355
+  29: 00007FF7FB3643CB OPENSSL_version_minor+3979
+  30: 00007FF7FB364ED5 OPENSSL_version_minor+6805
+  31: 00007FF7FB365013 OPENSSL_version_minor+7123
+  32: 00007FF7FAFAEE6F v8::MemorySpan<unsigned __int64>::operator[]+117343
+  33: 00007FF7FAFAE92B v8::MemorySpan<unsigned __int64>::operator[]+115995
+  34: 00007FF7FB48445E EVP_MD_CTX_set_update_fn+597086
+  35: 00007FF7FC5FB27A v8::base::UnsignedDivisionByConstant<unsigned __int64>+1422442
+  36: 00007FF7FC67F335 v8::base::UnsignedDivisionByConstant<unsigned __int64>+1963301
+  37: 00007FF7FC582C07 v8::base::UnsignedDivisionByConstant<unsigned __int64>+929271
+  38: 00007FF7FC54F3BB v8::base::UnsignedDivisionByConstant<unsigned __int64>+718251
+  39: 00007FF7FB364396 OPENSSL_version_minor+3926
+  40: 00007FF7FB364ED5 OPENSSL_version_minor+6805
+  41: 00007FF7FB3650C2 OPENSSL_version_minor+7298
+  42: 00007FF7FB3342EB v8::Unlocker::~Unlocker+19019
+  43: 00007FF7FB334BA1 v8::Unlocker::~Unlocker+21249
+  44: 00007FF7FA97A613 node::CallbackScope::~CallbackScope+835
+  45: 00007FF7FA97A34D node::CallbackScope::~CallbackScope+125
+  46: 00007FF7FA8BD5D5 node_api_create_buffer_from_arraybuffer+10293
+  47: 00007FF7FA974F23 node::LoadEnvironment+339
+  48: 00007FF7FA7F2C89 node::MultiIsolatePlatform::DisposeIsolate+250393
+  49: 00007FF7FA8C1ADC node::Start+1052
+  50: 00007FF7FB8DE942 AES_cbc_encrypt+2546
+  51: 00007FF7FC7539B4 v8::base::UnsignedDivisionByConstant<unsigned __int64>+2833316
+  52: 00007FFB7C0CDDA7 BaseThreadInitThunk+23
+  53: 00007FFB7D51EE4C RtlUserThreadStart+44
+  
+  
+  134 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-history.test.ts:131:37)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 134,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

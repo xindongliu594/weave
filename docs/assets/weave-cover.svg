@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440" role="img" aria-labelledby="title description">
+  <title id="title">Weave · 为伍 — 一个想法，一支团队</title>
+  <desc id="description">深绿色封面。交织的线连接需求、规划、员工执行和独立验收，表达将目标编织成可追溯的交付。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102f29"/><stop offset="1" stop-color="#081b1b"/></linearGradient>
+    <linearGradient id="thread" x2="1" y2="1"><stop stop-color="#b5e7bd"/><stop offset="1" stop-color="#42bfa6"/></linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#a8d8c5" stroke-opacity=".05"/></pattern>
+    <radialGradient id="glow"><stop stop-color="#70d6ad" stop-opacity=".13"/><stop offset="1" stop-color="#70d6ad" stop-opacity="0"/></radialGradient>
+    <style>text{font-family:Segoe UI,Microsoft YaHei,PingFang SC,Arial,sans-serif}.label{font-size:13px;letter-spacing:2px;fill:#b7d7c7}.card{fill:#173832;stroke:#41675b}.small{font-size:13px;fill:#b7d0c5}</style>
+  </defs>
+  <rect width="1280" height="440" rx="22" fill="url(#bg)"/>
+  <rect width="1280" height="440" rx="22" fill="url(#grid)"/>
+  <ellipse cx="950" cy="210" rx="330" ry="250" fill="url(#glow)"/>
+  <g transform="translate(66 54)">
+    <rect width="31" height="31" rx="9" fill="#c2edc6"/>
+    <path d="M7 10l6 12 6-12m-6 0 6 12 6-12" fill="none" stroke="#173f32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="45" y="22" class="label">AGENT TEAMS · BUILT TO DELIVER</text>
+    <text y="137" fill="#f4f7ee" font-size="92" font-weight="700" letter-spacing="-4">Weave<tspan dx="22" fill="#badfc4" font-size="42" letter-spacing="1">为伍</tspan></text>
+    <text y="192" fill="#e0eadd" font-size="29" letter-spacing="3">一个想法，一支团队。</text>
+    <text y="233" fill="#9abeb0" font-size="16">从需求、分工到独立验收，让工作有组织，让交付有依据。</text>
+    <g transform="translate(0 283)" class="small">
+      <rect width="104" height="31" rx="15.5" fill="#23463b"/><text x="52" y="21" text-anchor="middle">多 Agent 编排</text>
+      <rect x="116" width="92" height="31" rx="15.5" fill="#23463b"/><text x="162" y="21" text-anchor="middle">知识与工具</text>
+      <rect x="220" width="92" height="31" rx="15.5" fill="#23463b"/><text x="266" y="21" text-anchor="middle">可验证交付</text>
+    </g>
+  </g>
+  <g fill="none" stroke-linecap="round">
+    <path d="M777 104C955 104 847 335 1099 335" stroke="#31564b" stroke-width="17"/>
+    <path d="M750 217C955 217 858 104 1134 104" stroke="url(#thread)" stroke-width="6"/>
+    <path d="M777 104C955 104 847 335 1099 335" stroke="#a9d4b5" stroke-width="5"/>
+    <path d="M769 335C942 335 917 217 1105 217" stroke="#63bca0" stroke-width="5"/>
+    <path d="M910 217C966 217 983 179 1003 151" stroke="#132e28" stroke-width="15"/>
+    <path d="M910 217C966 217 983 179 1003 151" stroke="url(#thread)" stroke-width="6"/>
+  </g>
+  <g class="card"><rect x="721" y="77" width="116" height="54" rx="13"/><rect x="694" y="190" width="116" height="54" rx="13"/><rect x="721" y="308" width="116" height="54" rx="13"/><rect x="1069" y="77" width="145" height="54" rx="13"/><rect x="1069" y="190" width="145" height="54" rx="13"/><rect x="1069" y="308" width="145" height="54" rx="13"/></g>
+  <g fill="#e2eddf" font-size="14" text-anchor="middle"><text x="779" y="110">需求 / Goal</text><text x="752" y="223">知识 / Context</text><text x="779" y="341">工具 / Tools</text><text x="1141" y="110">规划 / Plan</text><text x="1141" y="223">执行 / Execute</text><text x="1141" y="341">验收 / Verify</text></g>
+  <g fill="#b9e9c4" stroke="#14382e" stroke-width="5"><circle cx="930" cy="170" r="8"/><circle cx="952" cy="271" r="8"/></g>
+</svg>

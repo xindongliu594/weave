@@ -1,0 +1,59 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executor construction does not create an artifacts directory before writer admission (577.7526ms)
+✔ legacy prepare creates its empty workspace only after native writer admission (226.0593ms)
+✔ task transaction waits for native source before SQL and takes the shared SQL gate (305.4669ms)
+✔ stop transaction waits for native source before SQL and takes the shared SQL gate (301.2726ms)
+✔ task transaction known preserves the original outcome and native guard (160.0359ms)
+✔ task transaction commit preserves the original outcome and native guard (168.6732ms)
+✔ task transaction rollback preserves the original outcome and native guard (171.1857ms)
+✔ stop transaction known preserves the original outcome and native guard (131.987ms)
+✔ stop transaction commit preserves the original outcome and native guard (162.8248ms)
+✔ stop transaction rollback preserves the original outcome and native guard (188.4546ms)
+✔ legacy execution holds its original writer through device wait and mirror and close waits for it (346.6234ms)
+✔ close awaits a failing original device producer and preserves its first error over cleanup failure (301.5934ms)
+✔ accepted-stop abort retains the original pool acquisition until it settles without starting SQL (299.7362ms)
+✔ checkpoint physical completion is distinct from SQL rollback (181.3016ms)
+✔ checkpoint physical failure stays latched (197.4074ms)
+✔ checkpoint publisher remains in the same writer after acknowledged COMMIT (99.8714ms)
+✔ accepted-stop abort cannot replace a held original SQL reply or issue a late continuation (299.6745ms)
+✔ a second rejected dispatch callback cannot undo an already granted stop effect (155.5753ms)
+✔ local wait keeps its first error when cancellation COMMIT is unknown and retains the original scope (200.5206ms)
+EXECUTOR_WRITER_EXIT_CLEANUP={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-zh0Nwi","pid":48272}
+✔ an unknown executor operation cannot acquire fresh finalization authority (107.716ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9119.439
+✔ checkpoint refs preserve A work and original merge while canonical advances to independent B (6727.6108ms)
+✔ before-tool checkpoint uses imported task bytes rather than full canonical revision (2293.9812ms)
+✔ after-tool checkpoint refuses a missing, other-task, stale or nonexistent operation identity (6419.5024ms)
+✔ SQL unknown blocks checkpoint despite finished events and human acknowledgment (2326.9061ms)
+✔ checkpoint refuses missing referenced objects without cache repair (2715.7879ms)
+✔ checkpoint refuses corrupt referenced objects without cache repair (3138.7243ms)
+✔ checkpoint refuses changed lease (2709.7748ms)
+✔ checkpoint refuses changed authority (2290.5872ms)
+✔ checkpoint refuses changed assignment (2349.7636ms)
+✔ checkpoint refuses changed capability (2218.9157ms)
+✔ checkpoint refuses changed recovery (1980.9383ms)
+✔ checkpoint independently authenticates the task merge record after a newer canonical commit (4156.64ms)
+✔ checkpoint revalidates lease after asynchronous preparation (2248.8949ms)
+✔ checkpoint revalidates authority after asynchronous preparation (2144.0001ms)
+✔ checkpoint revalidates assignment after asynchronous preparation (2214.7132ms)
+✔ checkpoint revalidates object after asynchronous preparation (2262.6636ms)
+✔ checkpoint publication fences assignment at the real COMMIT response (2078.2495ms)
+✔ checkpoint publication fences object at the real COMMIT response (2319.6407ms)
+✔ checkpoint publication fences abort at the real COMMIT response (2148.8795ms)
+✔ checkpoint publication fences progress at the real COMMIT response (2256.338ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59864.7341

@@ -1,0 +1,37 @@
+✔ business subtree mounts only for local owner and active administrator (47.8577ms)
+✔ local-owner personnel page requests enterprise login without showing mutation controls (41.4424ms)
+✔ active enterprise administrator sees human permission scope and the remaining member boundary (3.909ms)
+✔ member and disabled sessions never render human administration controls (2.0368ms)
+✔ health reset aborts reads and excludes a noncooperative old response (2.2114ms)
+✔ usage reset aborts reads and excludes a noncooperative old response (0.7441ms)
+✔ project reset aborts reads and excludes a noncooperative old response (0.7612ms)
+✔ business transport waits for session readiness and sends same-origin credentials (38.932ms)
+✔ session failure denies all business requests instead of selecting local owner (1.688ms)
+✔ session GET deduplicates, stops polling while hidden or unsubscribed and focus rechecks revocation (3.5656ms)
+✔ unsafe quote, PATCH, PUT, DELETE use current CSRF independently of billing/idempotency semantics (4.5529ms)
+✔ 401 invalidates immediately even with an unreadable body, 403 preserves session, neither replays writes (1.8158ms)
+✔ late old principal GET and artifact body cannot reach the next identity (3.1525ms)
+✔ logout unmounts immediately, clears registered state, and never resubmits on lost response (1.2364ms)
+✔ login POST receives JSON handoff, sends CSRF and navigates only after server URL validation (0.875ms)
+✔ cached drafts and late component writes remain scoped to the captured principal (1.3846ms)
+✔ a broken reset subscriber cannot keep the old principal authorized (0.6086ms)
+✔ focus and explicit reads during an unresolved logout cannot remount the old session (1.0791ms)
+✔ a lost logout response holds the workspace closed until explicit verification (1.3471ms)
+✔ page restore blocks the old business subtree until identity revalidation completes (0.9449ms)
+✔ active member mounts independent read workspace, auditor and pending remain closed (43.3654ms)
+✔ resource view renders read summaries and bounded pagination without action or download links (1.5809ms)
+✔ member transport reads only allowlisted resources and leaves common admin transport closed (60.3388ms)
+✔ refresh clears old rows, latest request wins, reset aborts and rejects late principal data (9.2275ms)
+✔ 401 invalidates; 403 and malformed payload clear all displayed rows without retry (7.4292ms)
+✔ offset navigation requests backend pages and never invents frontend department grants (3.8807ms)
+✔ a late member response body cannot cross into the next principal (5.0376ms)
+✔ session publication during a pending automatic resource read never aborts or restarts it (5.0009ms)
+✔ session publications never retry resource denials or network errors; explicit refresh can retry (5.657ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 840.7699

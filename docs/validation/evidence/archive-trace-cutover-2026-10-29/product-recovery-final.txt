@@ -1,0 +1,17 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+PRODUCT_FLOW_FIXTURE={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\product-flow-7aSQI2","pid":30188}
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (35305.8945ms)
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (76428.192ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (40934.6561ms)
+✔ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (27349.9689ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (42914.8662ms)
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (48934.575ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 272845.6384

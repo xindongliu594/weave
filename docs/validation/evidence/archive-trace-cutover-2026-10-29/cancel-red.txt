@@ -1,0 +1,49 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ acknowledged device cancellation preserves unknown receipt without poisoning local writer: false (562.0414ms)
+EXECUTOR_WRITER_EXIT_CLEANUP={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-p8SrXn","pid":21132}
+✖ acknowledged device cancellation preserves unknown receipt without poisoning local writer: true (180.2371ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3268.8577
+
+✖ failing tests:
+
+test at tests\local-executor-writer.test.ts:1:18171
+✖ acknowledged device cancellation preserves unknown receipt without poisoning local writer: false (562.0414ms)
+  AssertionError [ERR_ASSERTION]: settled local SQL is drained; unresolved device outcome stays in the durable receipt
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:169:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\local-executor-writer.test.ts:1:18171
+✖ acknowledged device cancellation preserves unknown receipt without poisoning local writer: true (180.2371ms)
+  AssertionError [ERR_ASSERTION]: settled local SQL is drained; unresolved device outcome stays in the durable receipt
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:169:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

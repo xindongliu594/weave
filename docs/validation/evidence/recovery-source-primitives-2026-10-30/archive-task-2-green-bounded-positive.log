@@ -1,0 +1,13 @@
+✔ pins every event after the old checkpoint and returns detached snapshot/events/cursor (823.3769ms)
+✔ object key order is stable while array order remains evidence (1053.3978ms)
+✔ canonical digest sorts numeric-looking object keys lexically rather than JS enumeration order (581.7271ms)
+✔ compressed journals preserve the same full prefix; both-file interrupted archives prefer plain (1530.5027ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7589.8298
+EXIT_CODE=0

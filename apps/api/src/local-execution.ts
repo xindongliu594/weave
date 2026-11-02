@@ -220,8 +220,8 @@ export class LocalOperationService {
     archiveMutation();openRunArchive(this.traceRoot,runId).append('local/operation-queued',{operationId:id,name,deviceId:target.deviceId,...context});return id;
    },signal,rolledBack);
  }
- async wait(id:string,signal?:AbortSignal){
-   let persistenceFailed=false;
+ async wait(id:string,signal?:AbortSignal,onCancellationSettled?:()=>void){
+   let persistenceFailed=false,cancelled=false;
   try{
    while(true){
     signal?.throwIfAborted();
@@ -235,14 +235,17 @@ export class LocalOperationService {
      },()=>{rolledBack=true;}).catch(error=>{persistenceFailed=!rolledBack;throw error;});
     if(state.status==='completed')return state.result.result;
     if(state.status==='failed')throw Object.assign(Error(state.result.error.message),{code:state.result.error.code,notExecuted:state.result.error.notExecuted});
-    if(state.status==='cancelled')throw Object.assign(Error('本机操作已停止；已开始的修改需要核对'),{code:'LOCAL_OPERATION_CANCELLED',notExecuted:!state.started});
+    if(state.status==='cancelled'){cancelled=true;throw Object.assign(Error('本机操作已停止；已开始的修改需要核对'),{code:'LOCAL_OPERATION_CANCELLED',notExecuted:!state.started});}
     await sleep(100);
    }
    }catch(error){
     if(persistenceFailed)throw error;
     try{
-     const cancelled=await operationTransaction(this.writers,id,async(db)=>db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1 AND status IN ('queued','claimed','started') RETURNING started",[id]));
-     if(cancelled.rows[0]?.started===false)executionFact(error,true);
+     const receipt=await operationTransaction(this.writers,id,async(db)=>db.query("UPDATE local_operations SET status='cancelled',finished_at=now() WHERE id=$1 AND status IN ('queued','claimed','started') RETURNING started",[id]));
+     if(receipt.rows[0]?.started===false)executionFact(error,true);
+     // Only the original acknowledged SQL cleanup grants this private outcome.
+     // A started device operation stays unresolved; it is never marked unexecuted.
+     if(cancelled||(signal?.aborted&&signal.reason===error))onCancellationSettled?.();
     }catch{/* The original transaction keeps an unknown cleanup latched; preserve the first failure. */}
     throw error;
    }
@@ -268,8 +271,9 @@ export class LocalRunExecutor {
  }
  private physical<T>(fn:()=>T){return this.service.writers.withWriter([this.archive.id],fn);}
  private async waitOperation(id:string,signal:AbortSignal){
+  let cancellationSettled=false;
   const result=await this.service.writers.withWriter([this.archive.id],async()=>{
-   try{return {ok:true as const,value:await this.service.wait(id,signal)};}catch(error){if((error as any)?.notExecuted===true)return {ok:false as const,error};throw error;}
+   try{return {ok:true as const,value:await this.service.wait(id,signal,()=>{cancellationSettled=true;})};}catch(error){if(cancellationSettled||(error as any)?.notExecuted===true)return {ok:false as const,error};throw error;}
   });if(!result.ok)throw result.error;return result.value;
  }
  revision(){return revision(exportFiles(this.root));}
@@ -283,23 +287,26 @@ export class LocalRunExecutor {
  private async taskTransaction<T,R=T>(signal:AbortSignal,fn:(db:pg.PoolClient,run:any,persist:<V>(fn:()=>V)=>V)=>Promise<T>,publish?:(value:T)=>R):Promise<R>{
   if(this.snapshot.executionProfile!=='task-attempt-openshell-v1')throw new AppError(409,'旧执行器没有可信任务上下文','TASK_SCOPE_DENIED');
   const outcome=await this.service.writers.withWriter([this.archive.id],async()=>{
-  let db:pg.PoolClient|undefined,committing=false,committed=false,uncertain=false,discard=false;
-  const persist=<V>(fn:()=>V):V=>{uncertain=true;const value=fn();uncertain=false;return value;};
+  let db:pg.PoolClient|undefined,transactionStarted=false,committing=false,committed=false,uncertain=false,discard=false;
+  const persist=<V>(fn:()=>V):V=>{signal.throwIfAborted();uncertain=true;const value=fn();uncertain=false;return value;};
   try{
-   db=await pool.connect();signal.throwIfAborted();await db.query('BEGIN');await shareCostMaintenance(db);
+   db=await pool.connect();signal.throwIfAborted();transactionStarted=true;await db.query('BEGIN');signal.throwIfAborted();await shareCostMaintenance(db);signal.throwIfAborted();
    const identity=(await db.query('SELECT project_id FROM project_runs WHERE id=$1',[this.archive.id])).rows[0];
+   signal.throwIfAborted();
    if(!identity)throw new AppError(404,'运行不存在');
    const project=(await db.query('SELECT id,version FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
+   signal.throwIfAborted();
    const run=(await db.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[this.archive.id])).rows[0];
+   signal.throwIfAborted();
    if(!project||!run||run.project_id!==identity.project_id||project.version!==run.project_version)throw new AppError(409,'项目方案已变化，请重新批准','RUN_REAPPROVAL_REQUIRED');
    if(run.lease_owner!==this.service.owner)throw new AppError(409,'运行租约已转移','TASK_SCOPE_DENIED');
    const archive=readRun(this.service.traceRoot,this.archive.id);
    if(!archive||archive.integrity!=='ok')throw new AppError(409,'可信运行记录不可用','TASK_SCOPE_DENIED');
    run.events=archive.events;
-   const value=await fn(db,run,persist);signal.throwIfAborted();committing=true;await db.query('COMMIT');committed=true;committing=false;
+   const value=await fn(db,run,persist);signal.throwIfAborted();committing=true;await db.query('COMMIT');committed=true;committing=false;signal.throwIfAborted();
    return {ok:true as const,value:publish?publish(value):value as unknown as R};
   }catch(error){
-   if(db&&!committed)try{await db.query('ROLLBACK');}catch{discard=true;}
+   if(db&&transactionStarted&&!committed)try{await db.query('ROLLBACK');}catch{discard=true;}
    if(committing||uncertain||discard){discard=true;throw error;}return {ok:false as const,error};
   }finally{db?.release(discard);}
   },{signal});if(!outcome.ok)throw outcome.error;return outcome.value;

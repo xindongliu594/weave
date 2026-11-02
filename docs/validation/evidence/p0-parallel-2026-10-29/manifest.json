@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-29",
+  "baseCommit": "417b46e5510ab72203d722292e46e1e9b9322b77",
+  "scope": "three P0 slices; excludes concurrent checkpoint and other agents changes",
+  "hashFormat": "sha256 of UTF-8 LF text",
+  "modelCalls": 0,
+  "deploymentOperations": 0,
+  "results": {
+    "memberFrontend": 29,
+    "memberScopedHttp": 4,
+    "observationExporter": 12,
+    "observationPipeline": 6,
+    "observationRuntimePreviouslyVerified": 17,
+    "coreUnitGroups": 4,
+    "legacyEvaluationTests": 14,
+    "coreCases": {
+      "passed": 23,
+      "failed": 0,
+      "pending": 9,
+      "integrity": true,
+      "complete": false
+    },
+    "buildExit": 0
+  },
+  "limitations": [
+    "Full resource-project-routes HTTP run was terminated at a later lock test; scoped cases do not substitute for full suite.",
+    "No real OIDC, browser, real model, production collector or JJ deployment in this batch.",
+    "Telemetry export is opt-in loopback only; SDK acknowledgement is not complete collector storage proof.",
+    "Exporter health is readable from the in-process snapshot only; management HTTP/UI health display is not yet connected.",
+    "Checkpoint and unrelated concurrent modifications are outside this batch.",
+    "Observation RED was reported from tool output; independent RED file was not found at packaging."
+  ],
+  "artifacts": [
+    {
+      "path": "member-green.txt",
+      "sha256": "dcc50735bc044c583829df4fbdd68c60060950dc14b99b874fe4c58c631da7ec",
+      "bytes": 2962
+    },
+    {
+      "path": "member-http-scope.txt",
+      "sha256": "3b96f7fcd780cd19d1483b78bc2d192686c3ce5c705f3d096674cdf02ec44766",
+      "bytes": 718
+    },
+    {
+      "path": "member-http-pagination.txt",
+      "sha256": "9d461863c16562038bf1dbda79d9a3f2284a9a364f00a76e19d910b9a9e0346d",
+      "bytes": 474
+    },
+    {
+      "path": "observation-green.txt",
+      "sha256": "b518dd15e06dafe7b9daa149e08a94bfb770e4765a5f685a3fb188b416d042b6",
+      "bytes": 4948
+    },
+    {
+      "path": "observation-pipeline.txt",
+      "sha256": "b157f46808faeb59ee18397e146365ebe1b1b5d0364852c62567521228311181",
+      "bytes": 717
+    },
+    {
+      "path": "core-unit-green.txt",
+      "sha256": "4d628d89ad1ca9647b6f717d33855192673f4403c61bdfaa0e92b48a804a284b",
+      "bytes": 2837
+    },
+    {
+      "path": "evaluation-v1.txt",
+      "sha256": "42b4686989a1742ff011c9e2d90153d84734426a0c5b0a35d1279b34d3d49f10",
+      "bytes": 14943
+    },
+    {
+      "path": "evaluation-v2.txt",
+      "sha256": "5843539c4f3d615193db6973a68afd5f699a883b8b03ae447225316617acdeff",
+      "bytes": 8591
+    },
+    {
+      "path": "core-gate.json",
+      "sha256": "af9acc4e332d41b0164a6d2dc265ab4af4175d695673c411679cb969acd0072c",
+      "bytes": 296
+    },
+    {
+      "path": "core-manifest.json",
+      "sha256": "22d0c01f57c016f4f40030cd16f7a09e3985dc4cb17a854cb3ecf11a0b0e776a",
+      "bytes": 25513
+    },
+    {
+      "path": "build.txt",
+      "sha256": "5b149d06b0bb727b78284b1f143cda2f674c0c6f58858dbcca8c2bddaee8ae27",
+      "bytes": 765
+    },
+    {
+      "path": "core-promptfoo.json",
+      "sha256": "cc78febfbed3bc46b62b6dae95d3556f04e3bc80eada794984d7f77d7c6c7863",
+      "bytes": 144013
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/web/src/IdentityGate.tsx",
+      "sha256": "352082e0777ef6d2713a6dcd30a3dfa938aebb37384e35df911a98a717ac0847"
+    },
+    {
+      "path": "apps/web/src/identity-session.ts",
+      "sha256": "5cf8d1b39ed344456c4891d34c9c0838e2e423a0639fc45211dfdf0a4f1332d4"
+    },
+    {
+      "path": "apps/web/src/IdentityManagement.tsx",
+      "sha256": "947e851dfa157a12de818cfad167e6e6e89f3785005119a9674de470709a6344"
+    },
+    {
+      "path": "apps/web/src/MemberWorkspace.tsx",
+      "sha256": "9802f48941045c10c04a765bba92f8b119cc3f64451df4ece0daf2bcaac29143"
+    },
+    {
+      "path": "apps/web/src/MemberWorkspace-data.ts",
+      "sha256": "bf740a4674e8162c5f5f814c9ae4266362a4f93e25f07d483a10dc037bbd9f7f"
+    },
+    {
+      "path": "tests/identity-gate.test.ts",
+      "sha256": "49bb00923da9343ac02504e061fd34e3f0023d4aded23595cd58635ef6a5ac74"
+    },
+    {
+      "path": "tests/identity-management-ui.test.ts",
+      "sha256": "2e995a6c7b45ca6428c63fda205ef0879177b2ff4f5cf09b38bf25d582c5ae0d"
+    },
+    {
+      "path": "tests/member-workspace.test.ts",
+      "sha256": "983b9aacc3269f57e202cf1028d4f9fc442e18a7d3dc094166d9768ba1a02930"
+    },
+    {
+      "path": "tests/member-workspace-ui.test.ts",
+      "sha256": "06cc8edf2880409518b24af76e99ce2f0eb683ddb0128be0968b0500bc963b16"
+    },
+    {
+      "path": "apps/api/src/observability.ts",
+      "sha256": "7e0af574bdfbbf66cda84c43d0e71952e1e277e1c413d4abe5ab97f5f4f5ef84"
+    },
+    {
+      "path": "apps/api/src/observation-exporter.ts",
+      "sha256": "871304afab9a0bc1c92b1665367f8267b33de7306583b6bfe33a58ca1549c0aa"
+    },
+    {
+      "path": "apps/api/src/observation-exporter-worker.mjs",
+      "sha256": "4712ebc065cb30ddc2e4c3471b4fc75478551f2ed68c23731ed8d7984be6a3fd"
+    },
+    {
+      "path": "tests/observation-export.test.ts",
+      "sha256": "eb88ac9cb1949e87a5047c5a69ec0bf01432cb113b58b98745849b9b0c1b00eb"
+    },
+    {
+      "path": "services/agent-runtime/package.json",
+      "sha256": "327b281332a6e75e31e44ab52ce9699e2ab9856f65125654e58591bddeaec449"
+    },
+    {
+      "path": "services/agent-runtime/package-lock.json",
+      "sha256": "70c9c96215b33a74c3949b613f40720bee145a7b10838732667bd9fd67ce94a6"
+    },
+    {
+      "path": "tools/evaluations/core-v2-checks.mjs",
+      "sha256": "69d17975e76b29080bdc3a3006d1ba7691f777796452f130d8c51b23da8fc15e"
+    },
+    {
+      "path": "tools/evaluations/core-v2-provider.mjs",
+      "sha256": "e838a54b9006060eac660dfd2dee9c4f19715758f0794124407be5cfbf9bc31f"
+    },
+    {
+      "path": "tools/evaluations/core-v2-assertion.mjs",
+      "sha256": "46ae495366ac18c7dd5dd38a46685026bff6d85dce8d32a79e0f99df3bef5ffd"
+    },
+    {
+      "path": "tools/evaluations/core-v2-run.mjs",
+      "sha256": "ed6c28d174b65b17f9c5ebb4101a5776f8336588197a2afc3ed5da9dc704faf9"
+    },
+    {
+      "path": "tools/evaluations/core-v2-gate.mjs",
+      "sha256": "9c99102bad5cbeb698edcdc47e17a1f33bce366039f6ad2357e989cf010960f9"
+    },
+    {
+      "path": "tools/evaluations/datasets/core-v2.json",
+      "sha256": "2020813d849c11028c65614a4acf84163902375da995ed4c10e6f95b62a34a33"
+    },
+    {
+      "path": "tests/evaluation-core.test.mjs",
+      "sha256": "80015a70b24c98289f66fbef8a5403be620a77efc0abc0009f2f4427ad8d4867"
+    }
+  ]
+}

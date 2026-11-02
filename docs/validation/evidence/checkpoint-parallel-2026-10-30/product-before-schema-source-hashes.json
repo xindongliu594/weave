@@ -1,0 +1,11 @@
+{
+  "scripts/test-integration.mjs": "64d1925563a5d424827cc2fa6ff8f48ab0a079ab9b473a8c44b782a36a6c91c0",
+  "tests/test-integration-runner.test.mjs": "6122b15248fcacd70832b4b6f8bacedfb8eefc0e38be17376326686ad95c2d99",
+  "tests/helpers/product-flow-support.ts": "cb021698a4975eca3236824dae5a482a47d366ce3b543f2004e0a0c80ee6db8c",
+  "tests/product-flow.test.ts": "59f3a74cf57047e2ca4030f34750df629488a408d3a048c28ac418ca1fc61081",
+  "tests/product-flow-core.test.ts": "5e10a0caf25e5a07de95559216cf877ed76cab3c9fb3088cfcbafcfeca4cb02b",
+  "tests/product-flow-rework.test.ts": "e5ff68b7fe11285b6b0e9d28f4f76600486bd0725e16ab6c2903ae563e5d8fdf",
+  "tests/product-flow-escalation.test.ts": "c8a90d2c87b3602d01cc274fb2b5ff3d74e4d3c5467ca77badcf066b62cbcde9",
+  "tests/product-flow-recovery.test.ts": "9cb868ffc791390008b9188bf53a93b96a786778e3a9bdeff79060c98440c9f2",
+  "tests/product-flow-recovery-rework.test.ts": "31cabea157c6b67b9a373112267489b5d7a04c9c0ae8fe0bad7e8f0450f53690"
+}

@@ -1,0 +1,85 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ checkpoint transaction cancellation drains a late pool connection without any SQL (618.6342ms)
+✖ checkpoint transaction cancellation stops SQL continuation and awaits acknowledged rollback (217.1663ms)
+✖ checkpoint transaction cancellation stops SQL continuation and retains uncertain rollback (248.1601ms)
+EXECUTOR_WRITER_EXIT_CLEANUP={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-RK25GI","pid":48516}
+✖ checkpoint transaction cancellation after COMMIT never invokes its publisher (102.4448ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3843.2748
+
+✖ failing tests:
+
+test at tests\local-executor-writer.test.ts:1:10009
+✖ checkpoint transaction cancellation drains a late pool connection without any SQL (618.6342ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:98:59)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\local-executor-writer.test.ts:1:11222
+✖ checkpoint transaction cancellation stops SQL continuation and awaits acknowledged rollback (217.1663ms)
+  AssertionError [ERR_ASSERTION]: cancelled SQL preparation must not execute the checkpoint callback
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:108:59)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\local-executor-writer.test.ts:1:11222
+✖ checkpoint transaction cancellation stops SQL continuation and retains uncertain rollback (248.1601ms)
+  AssertionError [ERR_ASSERTION]: cancelled SQL preparation must not execute the checkpoint callback
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:108:59)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\local-executor-writer.test.ts:1:12529
+✖ checkpoint transaction cancellation after COMMIT never invokes its publisher (102.4448ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:116:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }

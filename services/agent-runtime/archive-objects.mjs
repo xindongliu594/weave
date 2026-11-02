@@ -1,7 +1,8 @@
 import {constants,lstatSync,fstatSync,openSync,readFileSync,writeSync,fsyncSync,closeSync,existsSync,mkdirSync} from 'node:fs';
-import {join,resolve,parse,relative,sep} from 'node:path';
+import {join,resolve,parse,relative,sep,dirname,basename} from 'node:path';
 import {createHash} from 'node:crypto';
 import {assertArchiveCapacity,archiveStorageUsage,RUN_ARCHIVE_LIMIT_BYTES} from './archive-storage.mjs';
+import {withArchiveMutationSync} from './archive-writer-scope.mjs';
 const sha=/^[a-f0-9]{64}$/,hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const invalid=()=>Object.assign(Error('ARCHIVE_OBJECT_INVALID'),{code:'ARCHIVE_OBJECT_INVALID'});
 const unsafe=()=>Object.assign(Error('ARCHIVE_PATH_UNSAFE'),{code:'ARCHIVE_PATH_UNSAFE'});
@@ -36,6 +37,7 @@ export function readArchiveObject(dir,entry){
 /** Immutable, bounded SHA objects. A failed exclusive write is retained and
  * fails verification on retry; no head can publish a partial or corrupt blob. */
 export function storeArchiveObjects(archiveDir,files,{afterFsync}={}){
+ return withArchiveMutationSync(dirname(archiveDir),basename(archiveDir),'writer',()=>{
  assertArchivePlain(archiveDir,'directory');assertArchiveCapacity(archiveDir);
  const dir=join(archiveDir,'checkpoint-objects');
  if(!existsSync(dir)){mkdirSync(dir,{mode:0o700});syncArchiveDirectory(archiveDir);}assertArchivePlain(dir,'directory');
@@ -63,4 +65,5 @@ export function storeArchiveObjects(archiveDir,files,{afterFsync}={}){
  }
  syncArchiveDirectory(archiveDir);
  return dir;
+ });
 }

@@ -1,0 +1,28 @@
+✔ review: an already exited worker closes promptly and preserves its true error (29.8629ms)
+ℹ {"alreadyExitedCloseMs":0,"health":{"state":"closed","configured":true,"exportAccepted":1,"exportedSuccess":0,"exportedFailure":0,"exportedUnknown":1,"transportAcknowledged":0,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":1,"timedOut":0,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":null,"lastFailureAt":"2026-10-29T15:42:52.751Z","lastErrorCode":"OBSERVATION_EXPORT_WORKER_EXITED"}}
+✔ review: collector receives fixed bodies, allowlisted scalar correlation attributes and service metadata (1467.2964ms)
+✔ disabled and invalid configurations construct no transport and expose only fixed codes (5.2238ms)
+✔ strict allowlist exports fresh terminal outcomes; transport acknowledgement is final-delivery unknown (1384.8426ms)
+✔ 256 reservations include in-flight records and flood remains synchronous and bounded (3414.9805ms)
+ℹ {"offered":10000,"accepted":256,"queueFull":9744,"pendingBytes":43264,"offerMs":183,"closeMs":2907,"rssBefore":120668160,"rssAfter":139485184,"closeHealth":{"state":"closed","configured":true,"exportAccepted":256,"exportedSuccess":0,"exportedFailure":32,"exportedUnknown":224,"transportAcknowledged":0,"sanitizeRejected":0,"queueFull":9744,"unavailable":0,"disabled":0,"closedUnconfirmed":224,"timedOut":1,"dropped":9744,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":null,"lastFailureAt":"2026-10-29T15:42:59.037Z","lastErrorCode":"OBSERVATION_EXPORT_CLOSE_TIMEOUT"}}
+✔ callback stalled by a trickling response keeps reservations until bounded close, then releases singleton (6888.4915ms)
+ℹ {"closeMs":2915,"health":{"state":"closed","configured":true,"exportAccepted":32,"exportedSuccess":0,"exportedFailure":0,"exportedUnknown":32,"transportAcknowledged":0,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":32,"timedOut":1,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":null,"lastFailureAt":"2026-10-29T15:43:04.416Z","lastErrorCode":"OBSERVATION_EXPORT_CLOSE_TIMEOUT"}}
+✔ collector 429 has truthful bounded health without raw error text (2583.4768ms)
+ℹ {"collector":"429","requests":2,"health":{"state":"degraded","configured":true,"exportAccepted":1,"exportedSuccess":0,"exportedFailure":1,"exportedUnknown":0,"transportAcknowledged":0,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":0,"timedOut":0,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":null,"lastFailureAt":"2026-10-29T15:43:08.482Z","lastErrorCode":"OBSERVATION_EXPORT_FAILED"}}
+✔ collector 503 has truthful bounded health without raw error text (2403.1497ms)
+ℹ {"collector":"503","requests":2,"health":{"state":"degraded","configured":true,"exportAccepted":1,"exportedSuccess":0,"exportedFailure":1,"exportedUnknown":0,"transportAcknowledged":0,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":0,"timedOut":0,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":null,"lastFailureAt":"2026-10-29T15:43:10.887Z","lastErrorCode":"OBSERVATION_EXPORT_FAILED"}}
+✔ collector reset has truthful bounded health without raw error text (2279.7461ms)
+ℹ {"collector":"reset","requests":2,"health":{"state":"degraded","configured":true,"exportAccepted":1,"exportedSuccess":0,"exportedFailure":1,"exportedUnknown":0,"transportAcknowledged":0,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":0,"timedOut":0,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":null,"lastFailureAt":"2026-10-29T15:43:13.180Z","lastErrorCode":"OBSERVATION_EXPORT_FAILED"}}
+✔ collector partial has truthful bounded health without raw error text (1471.6255ms)
+ℹ {"collector":"partial","requests":1,"health":{"state":"enabled","configured":true,"exportAccepted":1,"exportedSuccess":0,"exportedFailure":0,"exportedUnknown":1,"transportAcknowledged":1,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":0,"timedOut":0,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":"2026-10-29T15:43:14.644Z","lastFailureAt":null,"lastErrorCode":null}}
+✔ collector malformed has truthful bounded health without raw error text (1476.2898ms)
+ℹ {"collector":"malformed","requests":1,"health":{"state":"enabled","configured":true,"exportAccepted":1,"exportedSuccess":0,"exportedFailure":0,"exportedUnknown":1,"transportAcknowledged":1,"sanitizeRejected":0,"queueFull":0,"unavailable":0,"disabled":0,"closedUnconfirmed":0,"timedOut":0,"dropped":0,"pendingRecords":0,"pendingBytes":0,"lastSuccessAt":"2026-10-29T15:43:16.121Z","lastFailureAt":null,"lastErrorCode":null}}
+✔ createObservability forwards only fresh offers and keeps existing counters (1492.8509ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25570.255

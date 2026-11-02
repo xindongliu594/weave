@@ -60,6 +60,9 @@ export function validateEnterpriseBackupReferences(payload:EnterpriseBackupV2,ro
  try{
   const decode=(row:any,columns:string[])=>({...row,...Object.fromEntries(columns.map(key=>[key,row[key]===null?null:JSON.parse(row[key])]))});
   const runs=payload.tables.project_runs.map(row=>decode(row,['snapshot','canonical_workspace']));
+  // Recovery carriers need their own frozen source/import contract; never drop or certify their marker.
+  if(runs.some(run=>run.task_evidence!==null||run.snapshot?.executionProfile==='task-attempt-openshell-v1'&&
+    (run.snapshot.recovery||run.snapshot.resumedFrom&&run.snapshot.approval?.kind!=='retry')))throw Error('TASK_RECOVERY_CARRIER_UNSUPPORTED');
   const attempts=payload.tables.task_attempt_workspaces.map(row=>decode(row,['input_origins','committed_outputs','scope','sandbox_identity','contract','accepted_stop']));
   const operations=payload.tables.local_operations.map(row=>decode(row,['payload','result','merge_record']));
   const operationMap=new Map(operations.map(row=>[row.id,row]));

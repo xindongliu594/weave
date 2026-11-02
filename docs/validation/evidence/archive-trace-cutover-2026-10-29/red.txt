@@ -1,0 +1,122 @@
+✖ registered roots reject create/open/append without a live writer before changing bytes (4.1085ms)
+✖ old handles cannot borrow a new owner, wrong run or an expired nested invocation (2.4163ms)
+✖ registration invalidates preexisting raw handles and relative spelling cannot bypass it (2.3751ms)
+✖ SHA object writes require the matching writer before creating the object directory (2.575ms)
+✖ journal compression requires maintenance ownership and preserves readable original events (2.467ms)
+✖ a real journal lock prevents production append and leaves bytes unchanged on timeout (2.5348ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 205.2101
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:38:1
+✖ registered roots reject create/open/append without a live writer before changing bytes (4.1085ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+      at Object.realpathSync (node:fs:2776:29)
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:19:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:39:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:50:1
+✖ old handles cannot borrow a new owner, wrong run or an expired nested invocation (2.4163ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+      at Object.realpathSync (node:fs:2776:29)
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:19:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:51:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:63:1
+✖ registration invalidates preexisting raw handles and relative spelling cannot bypass it (2.3751ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+      at Object.realpathSync (node:fs:2776:29)
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:19:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:64:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:75:1
+✖ SHA object writes require the matching writer before creating the object directory (2.575ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+      at Object.realpathSync (node:fs:2776:29)
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:19:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:76:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:85:1
+✖ journal compression requires maintenance ownership and preserves readable original events (2.467ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+      at Object.realpathSync (node:fs:2776:29)
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:19:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:86:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:96:1
+✖ a real journal lock prevents production append and leaves bytes unchanged on timeout (2.5348ms)
+  Error: ENOENT: no such file or directory, lstat 'C:\Users\JJ\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+      at Object.realpathSync (node:fs:2776:29)
+      at fixture (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:19:17)
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:97:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'lstat',
+    path: 'C:\\Users\\JJ\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}\\#!sandbox.{1d9b6b05-e3d3-47ed-9891-77b00fc2c96f}'
+  }

@@ -44,6 +44,7 @@ export async function migrateProduct(pool: pg.Pool) {
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS authority_department_ids text[];
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS source_bounds jsonb;
     ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS canonical_workspace jsonb;
+    ALTER TABLE project_runs ADD COLUMN IF NOT EXISTS task_evidence jsonb;
     UPDATE project_runs SET department_ids=ARRAY[snapshot->>'departmentId'] WHERE department_ids='{}' AND snapshot ? 'departmentId';
     CREATE INDEX IF NOT EXISTS project_runs_departments ON project_runs USING gin(department_ids);
     ALTER TABLE usage ADD COLUMN IF NOT EXISTS run_id text;

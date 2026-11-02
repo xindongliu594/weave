@@ -1,0 +1,101 @@
+✖ native enterprise preserving import process restart after prepared (4042.5914ms)
+✖ native enterprise preserving import process restart after old-moved (1068.731ms)
+✖ native enterprise preserving import process restart after installed (1392.3062ms)
+✖ native enterprise preserving import process restart after committed (1322.211ms)
+✖ native committed enterprise restart retains barrier after damaged marker (1343.7112ms)
+✖ native committed enterprise restart retains barrier after damaged generation (1188.343ms)
+✖ native committed enterprise restart retains barrier after damaged file (1267.3674ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12088.1851
+
+✖ failing tests:
+
+test at tests\enterprise-backup-native.test.ts:1:715
+✖ native enterprise preserving import process restart after prepared (4042.5914ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }
+
+test at tests\enterprise-backup-native.test.ts:1:715
+✖ native enterprise preserving import process restart after old-moved (1068.731ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }
+
+test at tests\enterprise-backup-native.test.ts:1:715
+✖ native enterprise preserving import process restart after installed (1392.3062ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }
+
+test at tests\enterprise-backup-native.test.ts:1:715
+✖ native enterprise preserving import process restart after committed (1322.211ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }
+
+test at tests\enterprise-backup-native.test.ts:1:892
+✖ native committed enterprise restart retains barrier after damaged marker (1343.7112ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }
+
+test at tests\enterprise-backup-native.test.ts:1:892
+✖ native committed enterprise restart retains barrier after damaged generation (1188.343ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }
+
+test at tests\enterprise-backup-native.test.ts:1:892
+✖ native committed enterprise restart retains barrier after damaged file (1267.3674ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async snapshot (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-export.ts:55:5)
+      at async <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\backup-root-scope.ts:11:112) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }

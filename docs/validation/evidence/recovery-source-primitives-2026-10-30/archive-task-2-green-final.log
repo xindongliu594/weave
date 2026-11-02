@@ -1,0 +1,25 @@
+✔ pins every event after the old checkpoint and returns detached snapshot/events/cursor (412.1699ms)
+✔ rejects missing, duplicate, misplaced or malformed run/created even when readRun reports ok (1735.8375ms)
+✔ rejects raw snapshot mutation and SQL snapshot mismatches without repairing either file (455.5952ms)
+✔ SQL/archive identity, version and injected fields follow actual createRunArchive rules (2365.7522ms)
+✔ SQL projection requires exact keys, strict UUIDs, positive safe planVersion and strict JSON (1602.3921ms)
+✔ strict JSON rejects getters without invoking them, sparse arrays, proxies and hidden fields (327.0263ms)
+✔ rejects gaps, torn tail, malformed events and nonfinite values read from JSONL (1518.0209ms)
+✔ changing an early accepted record changes the full prefix pin while the same tail pin stays fixed (270.7546ms)
+✔ object key order is stable while array order remains evidence (418.0946ms)
+✔ canonical digest sorts numeric-looking object keys lexically rather than JS enumeration order (229.6586ms)
+✔ compressed journals preserve the same full prefix; both-file interrupted archives prefer plain (590.3005ms)
+✔ rejects hardlinked snapshot/journal and symlink or junction directory/file aliases (641.9478ms)
+✔ enforces bounds by refusing the whole archive rather than returning a truncated prefix (479.4431ms)
+✔ requires the real live source scope for the same run and rejects expired callbacks (302.4286ms)
+✔ rejects structural fake managers before touching their traceRoot (155.1038ms)
+✔ borrowed real source methods cannot authorize a cloned manager or a substituted root (194.4459ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15366.7615
+EXIT_CODE=0

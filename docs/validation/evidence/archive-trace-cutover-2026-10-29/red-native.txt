@@ -1,0 +1,119 @@
+✖ registered roots reject create/open/append without a live writer before changing bytes (106.5327ms)
+✖ old handles cannot borrow a new owner, wrong run or an expired nested invocation (144.5042ms)
+✖ registration invalidates preexisting raw handles and relative spelling cannot bypass it (35.3814ms)
+✖ SHA object writes require the matching writer before creating the object directory (86.9211ms)
+✖ journal compression requires maintenance ownership and preserves readable original events (145.0368ms)
+✖ a real journal lock prevents production append and leaves bytes unchanged on timeout (283.4887ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 965.1519
+
+✖ failing tests:
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:38:1
+✖ registered roots reject create/open/append without a live writer before changing bytes (106.5327ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:40:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_WRITER_SCOPE' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:50:1
+✖ old handles cannot borrow a new owner, wrong run or an expired nested invocation (144.5042ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:54:12
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:104:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:72:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:42
+      at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+      at invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:26)
+      at Object.run (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:72:18)
+      at withMode (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:104:28)
+      at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:53:3)
+      at async Test.run (node:internal/test_runner/test:1208:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_WRITER_SCOPE' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:63:1
+✖ registration invalidates preexisting raw handles and relative spelling cannot bypass it (35.3814ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:66:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_WRITER_SCOPE' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:75:1
+✖ SHA object writes require the matching writer before creating the object directory (86.9211ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:79:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_WRITER_SCOPE' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:85:1
+✖ journal compression requires maintenance ownership and preserves readable original events (145.0368ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:89:50
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:104:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:72:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:42
+      at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+      at invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:26)
+      at Object.run (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:72:18)
+      at withMode (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:104:28)
+      at async TestContext.<anonymous> (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:89:3)
+      at async Test.run (node:internal/test_runner/test:1208:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_WRITER_SCOPE' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at services\agent-runtime\archive-trace-scope.test.mjs:96:1
+✖ a real journal lock prevents production append and leaves bytes unchanged on timeout (283.4887ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-trace-scope.test.mjs:101:12
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'E_ARCHIVE_FENCE_TIMEOUT' },
+    operator: 'throws',
+    diff: 'simple'
+  }

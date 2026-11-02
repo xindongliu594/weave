@@ -1,0 +1,102 @@
+{
+  "status": "passed-per-file",
+  "totalTests": 19,
+  "failed": 0,
+  "skipped": 0,
+  "scope": "Six latest per-file results across two commands; no single final six-file or full-default-suite rerun.",
+  "rows": [
+    {
+      "group": "native",
+      "file": "tests/product-flow.test.ts",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 84179.9248,
+      "childExitCode": null,
+      "parentCommandExitCode": 124,
+      "sourceLog": "integration-escalated.log",
+      "isolatedLog": "result-native.log",
+      "note": "node:test recorded all assertions passed; individual child exit code was not logged. Parent command exited 124 from a later group."
+    },
+    {
+      "group": "core",
+      "file": "tests/product-flow-core.test.ts",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 113695.8791,
+      "childExitCode": null,
+      "parentCommandExitCode": 124,
+      "sourceLog": "integration-escalated.log",
+      "isolatedLog": "result-core.log",
+      "note": "node:test recorded all assertions passed; individual child exit code was not logged. Parent command exited 124 from a later group."
+    },
+    {
+      "group": "rework",
+      "file": "tests/product-flow-rework.test.ts",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 104283.3595,
+      "childExitCode": 0,
+      "parentCommandExitCode": 0,
+      "sourceLog": "integration-final.log",
+      "isolatedLog": "result-rework.log",
+      "note": "All assertions passed; parent command exit 0 confirms successful completion of its child processes."
+    },
+    {
+      "group": "escalation",
+      "file": "tests/product-flow-escalation.test.ts",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 86847.4557,
+      "childExitCode": 0,
+      "parentCommandExitCode": 0,
+      "sourceLog": "integration-final.log",
+      "isolatedLog": "result-escalation.log",
+      "note": "All assertions passed; parent command exit 0 confirms successful completion of its child processes."
+    },
+    {
+      "group": "recovery",
+      "file": "tests/product-flow-recovery.test.ts",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 107483.3866,
+      "childExitCode": 0,
+      "parentCommandExitCode": 0,
+      "sourceLog": "integration-final.log",
+      "isolatedLog": "result-recovery.log",
+      "note": "All assertions passed; parent command exit 0 confirms successful completion of its child processes."
+    },
+    {
+      "group": "recovery-rework",
+      "file": "tests/product-flow-recovery-rework.test.ts",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 58958.0505,
+      "childExitCode": 0,
+      "parentCommandExitCode": 0,
+      "sourceLog": "integration-final.log",
+      "isolatedLog": "result-recovery-rework.log",
+      "note": "All assertions passed; parent command exit 0 confirms successful completion of its child processes."
+    }
+  ],
+  "schemaOwnershipFix": {
+    "afterHeavyValidation": true,
+    "heavySourceHashes": "source-hashes.pre-schema-fix.json",
+    "finalSourceHashes": "source-hashes.json",
+    "lightweightTests": 8,
+    "exitCode": 0,
+    "log": "lightweight-final.log",
+    "scenarioBodiesUnchanged": true
+  }
+}

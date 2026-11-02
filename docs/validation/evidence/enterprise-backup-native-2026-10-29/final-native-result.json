@@ -1,0 +1,25 @@
+{
+  "id": "49f0fbfc-37ef-4055-a1f6-09b769c55cbf",
+  "postgresVersion": "postgres (PostgreSQL) 17.10",
+  "vectorVersion": "0.8.7",
+  "backendPids": [
+    44540,
+    16632
+  ],
+  "commands": [
+    {
+      "command": "node --import tsx --test --test-concurrency=1 tests/enterprise-backup-catalog.test.ts",
+      "exitCode": 0,
+      "database": "weiwu_backup_test_715f1b25e8a542bfad46a917fd863659",
+      "log": ".private\\enterprise-native-20261029\\cluster-49f0fbfc-37ef-4055-a1f6-09b769c55cbf\\enterprise-backup-catalog.test.ts.log"
+    },
+    {
+      "command": "node --import tsx --test --test-concurrency=1 tests/enterprise-backup-native.test.ts",
+      "exitCode": 0,
+      "database": "weiwu_backup_test_16a4564c3b6c4befb78917096c4c141b",
+      "log": ".private\\enterprise-native-20261029\\cluster-49f0fbfc-37ef-4055-a1f6-09b769c55cbf\\enterprise-backup-native.test.ts.log"
+    }
+  ],
+  "stopped": true,
+  "dataRemoved": true
+}

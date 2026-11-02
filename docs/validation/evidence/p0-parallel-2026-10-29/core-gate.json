@@ -1,0 +1,13 @@
+{
+  "integrity": true,
+  "complete": false,
+  "counts": {
+    "passed": 23,
+    "failed": 0,
+    "pending": 9
+  },
+  "reasons": [
+    "pending-evidence-required"
+  ],
+  "meaning": "Product-function checks on synthetic input only; pending is not passed; no fresh model quality or savings claim."
+}

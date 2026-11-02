@@ -36,3 +36,18 @@ manifest 绑定评测身份与日期、Git commit/相关源码 dirty、源码内
 - [npm 包与版本](https://www.npmjs.com/package/promptfoo/v/0.124.1)，实施时执行 `npm view promptfoo version engines license dist.integrity dist.unpackedSize --json` 核实；顶层 npm 完整性为 `sha512-Y6fq/WGTL7lPvDsirNSmmmcPLhURwRao03iv8fCoLbFq6H1eqg5VVTmXiap5Jl+fiRaQQZXYMHb2N1gQm1tGyQ==`。
 - [官方 GitHub 源码](https://github.com/promptfoo/promptfoo)、[JS provider](https://www.promptfoo.dev/docs/providers/custom-api/)、[确定性 JS 断言](https://www.promptfoo.dev/docs/configuration/expected-outputs/javascript/)。固定版本运行证据优先于最新网站说明。
 - 项目调研见 `docs/research/enterprise-quality-operations-2026-10-20.md`；DSH 原有发现/执行链路继续沿用，本工具不创建另一套生产插件或执行系统。
+
+## Core v2 独立入口（2026-10-29）
+
+旧 synthetic-v1 的五例、命令和报告契约保持不变。Core v2 声明32例七维开发回归集，其中23例实际调用产品函数检查合成输入，9例需要真实运行证据，固定记录为 pending。它不是32个真实业务任务的通过证明，不代表语义模型质量、完整权限服务、崩溃恢复或Token收益。
+
+在仓库根目录、已有根 tsx 和本目录固定 Promptfoo 0.124.1 依赖的环境运行：
+
+```powershell
+node --import tsx --test tests/evaluation-core.test.mjs
+node --import tsx tools/evaluations/core-v2-run.mjs --output tools/evaluations/output/core-v2-UNIQUE
+```
+
+每次使用新的输出目录。运行器固定本地provider/JS断言、清除凭据环境并复用网络阻断；execute拒绝。输出包含原生JSON/JUnit/HTML、manifest、gate与日志，仅保存在忽略目录。Promptfoo 对 pending 返回失败断言（退出100）；外层因为完整验收未完成返回1。不能将这个命令称为通过。`gate.counts` 区分 passed/failed/pending，`integrity` 只对完整且符合版本与证据规则的工程报告为true；`complete` 因9项pending保持false。源码在并行开发期间变化时integrity也失败，最终需要在稳定源码重跑。
+
+manifest绑定dataset、适配/断言/门禁/运行器、全量允许范围源码、lock和Promptfoo版本。`rawDigest`绑定解析后JSON，`rawFileDigest`仅额外记录文件字节；它们是本地一致性检查，不是签名或可信执行证明。数据输入/公开oracle属于开发回归材料，不能称为盲测。未接API/数据库/浏览器/付费模型；9个pending含具体输入、oracle与最低证据字段，不能用手写“通过”补齐。

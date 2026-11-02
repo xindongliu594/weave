@@ -1,0 +1,30 @@
+warning: in the working copy of 'apps/api/src/enterprise-backup-catalog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/local-execution.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/observability.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/identity-session.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/test-integration.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-objects.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.d.mts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/journal-archive.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/enterprise-backup-catalog.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-executor-writer.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product-flow.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/storage-governance.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/task-accepted-stop-delivery.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-integration-runner.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/evaluations/README.md', LF will be replaced by CRLF the next time Git touches it
+✔ core runner only builds controlled offline config and rejects execution and paths (9.8879ms)
+✔ core declares 32 unique cases, seven dimensions, concrete pending contracts (7.123ms)
+✔ product functions run; pending never passes; case oracle cannot be replaced by caller (364.6659ms)
+✔ core complete gate refuses pending and tampering; integrity verifies all raw results (32364.4226ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33749.6864

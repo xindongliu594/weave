@@ -1,0 +1,58 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ actual SQL source capture rolls A back and retains accepted B: tool-result (9417.2192ms)
+✔ actual SQL source capture rolls A back and retains accepted B: before-tool (8071.9131ms)
+✔ actual SQL source capture rolls A back and retains accepted B: cycle-complete (9100.5573ms)
+✔ SQL source capture refuses late-result (7670.5197ms)
+✔ SQL source capture refuses wrong-claim (8026.443ms)
+✔ SQL source capture refuses source-lease (7349.0036ms)
+✔ SQL source capture refuses child-contract (7495.561ms)
+✔ SQL source capture refuses revoke-device (7645.7438ms)
+✔ SQL source capture refuses unknown-stop (7249.2829ms)
+✔ SQL source capture refuses wrong-checkpoint-sha (7581.5342ms)
+✔ SQL source capture refuses child-source (7351.018ms)
+✔ SQL source capture refuses child-completed (7514.8554ms)
+✔ SQL source capture refuses child-handoff (7805.6703ms)
+✔ live source capture is a concrete private entry, not caller supplied verified facts (41.9459ms)
+✔ fake source callback authority cannot reach SQL or return a source certificate (46.7677ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 105478.6125
+✔ private initializer takes locators and obtains the actual guarded source itself (445.9095ms)
+✔ migration adds nullable evidence without minting certificates or resetting old runs (8037.6185ms)
+✔ NULL-only publication copies full candidate once, preserves source and repairs only child cache (9425.3938ms)
+✔ initializer refuses partial or unrelated existing state: head-only (7616.2759ms)
+✔ initializer refuses partial or unrelated existing state: marker-only (7938.1428ms)
+✔ pre-publication failure leaves both SQL fields NULL: blob-fsync (7696.0209ms)
+✔ pre-publication failure leaves both SQL fields NULL: before-sql-commit (7838.4587ms)
+✔ post-publication failure repairs reporting without reinitializing: after-sql-commit (8687.469ms)
+✔ post-publication failure repairs reporting without reinitializing: archive-append (9780.5198ms)
+✔ post-publication failure repairs reporting without reinitializing: cache-mirror (10575.4952ms)
+✔ lost COMMIT response is observed through a new connection and never repeats initialization UPDATE (9887.7216ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 90896.2102
+✔ runtime recovery authenticates SQL state instead of accepting caller proof (446.5114ms)
+✔ initialized NULL root exposes only selected output seed and keeps opaque files private (10222.0407ms)
+✔ runtime rejects changed caller-marker (10093.7671ms)
+✔ runtime rejects changed sql-snapshot (10120.2212ms)
+✔ runtime rejects changed sql-root (11530.5839ms)
+✔ locator-only private initialization cannot authorize running a team (11063.9ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56416.8453

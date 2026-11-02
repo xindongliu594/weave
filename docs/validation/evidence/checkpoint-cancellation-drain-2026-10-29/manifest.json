@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-29",
+  "base": "417b46e5510ab72203d722292e46e1e9b9322b77",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "reuse": {
+    "name": "@deepseek-ai/dsh-session-checkpoint-policy",
+    "version": "0.1.5-rc.1",
+    "installedPolicySha256": "80a4475de0594399bfdd3203e000cfe0bf1967af163f8747c45b9b80e9549f2a",
+    "nativeRuntime": "Reused owned PostgreSQL17.10 + pgvector0.8.7; no new download or product dependency"
+  },
+  "commands": [
+    {
+      "command": "node scripts/test-integration.mjs tests/local-executor-writer.test.ts tests/task-checkpoint-state.test.ts",
+      "phase": "baseline",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs --test-name-pattern=\"checkpoint transaction cancellation\" tests/local-executor-writer.test.ts",
+      "phase": "red-four-cases",
+      "exitCode": 1
+    },
+    {
+      "command": "node scripts/test-integration.mjs --test-name-pattern=\"checkpoint transaction cancellation prevents a late physical\" tests/local-executor-writer.test.ts",
+      "phase": "red-physical-write",
+      "exitCode": 1
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/local-executor-writer.test.ts tests/task-checkpoint-state.test.ts",
+      "phase": "green",
+      "exitCode": 0
+    },
+    {
+      "command": "node --test --test-concurrency=1 services/agent-runtime/employee-checkpoint-policy.test.mjs services/agent-runtime/task-checkpoint-v2.test.mjs services/agent-runtime/archive-writer-scope.test.mjs services/agent-runtime/writer-drain.test.mjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node .private/enterprise-native-20261029/run-owned-postgres.mjs tests/task-checkpoint-native.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0
+    }
+  ],
+  "results": {
+    "green": [
+      {
+        "tests": 25,
+        "passed": 25,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 7450.8757
+      },
+      {
+        "tests": 20,
+        "passed": 20,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 59081.3955
+      }
+    ],
+    "runtime": [
+      {
+        "tests": 44,
+        "passed": 44,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 13928.8928
+      }
+    ],
+    "native": [
+      {
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 5745.0841
+      }
+    ],
+    "relatedPassed": 89,
+    "nativePassed": 2,
+    "unresolvedFailures": 0,
+    "skipped": 0,
+    "note": "Per-layer counts, not whole-repository results or new real-model cases. Baseline40 overlaps final89 and is not added."
+  },
+  "nativeRun": {
+    "id": "c390f1dc-d133-41c1-bbf3-31f6a196110f",
+    "postgresVersion": "postgres (PostgreSQL) 17.10",
+    "vectorVersion": "0.8.7",
+    "backendPids": [
+      40188,
+      45072
+    ],
+    "commands": [
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/task-checkpoint-native.test.ts",
+        "exitCode": 0,
+        "database": "weiwu_backup_test_6ea9d9942b3e410e8f3fba9d4db37e58",
+        "log": ".private\\enterprise-native-20261029\\cluster-c390f1dc-d133-41c1-bbf3-31f6a196110f\\task-checkpoint-native.test.ts.log"
+      }
+    ],
+    "stopped": true,
+    "dataRemoved": true,
+    "evidence": ".private\\enterprise-native-20261029\\cluster-c390f1dc-d133-41c1-bbf3-31f6a196110f"
+  },
+  "review": {
+    "reviewer": "/root/checkpoint_cancellation_review",
+    "critical": 0,
+    "important": 0,
+    "minorDeferred": [
+      "Dedicated held ROLLBACK-response case",
+      "BEGIN executed but response failed case"
+    ],
+    "scope": "Read-only diff and test design; runtime results verified by main agent. Full recovery source/IdP/physical OpenShell excluded."
+  },
+  "unverified": [
+    "Full writer-coverage certification and positive trusted recovery source",
+    "NULL-only child initialization and full task recovery",
+    "Physical OpenShell/JJ/real-model acceptance for this change",
+    "Whole-repository suite"
+  ],
+  "modelCalls": 0,
+  "budgetIncrease": 0,
+  "deploymentOperations": 0,
+  "artifacts": [
+    {
+      "path": "initial-checkpoint-writers.txt",
+      "sha256Utf8LF": "a74eca9574b596605df231fdce1ed5676f0fa3b1c027a84c14681e9cf00f950e",
+      "bytes": 4123
+    },
+    {
+      "path": "cancellation-red.txt",
+      "sha256Utf8LF": "79e452655e1f392503b01baa9d506f88a4645219951dbc0d1f80e19b14e55708",
+      "bytes": 3900
+    },
+    {
+      "path": "physical-cancellation-red.txt",
+      "sha256Utf8LF": "792442f4a7cf0ec8711b7eec0948755ab67fbeb23a86d82181d37005cc47d0d6",
+      "bytes": 1335
+    },
+    {
+      "path": "checkpoint-writers-green.txt",
+      "sha256Utf8LF": "a0fc77c672e06f7254f5b30ec0d18d0f1f92166bc474cecb15ecc0562ebeb339",
+      "bytes": 4623
+    },
+    {
+      "path": "runtime-regressions.txt",
+      "sha256Utf8LF": "7065f95e9acbb57f88605b3c5d3269cf8b85ef6612d030d77cedf1deed5ad93c",
+      "bytes": 4414
+    },
+    {
+      "path": "build-final.txt",
+      "sha256Utf8LF": "0d64a2ec42dcc2ccd7fafce81c9f711052739aa07cb5bb411c2c0ce8e3421472",
+      "bytes": 765
+    },
+    {
+      "path": "fixture-cleanup.json",
+      "sha256Utf8LF": "b87ead1cdf87f66ab28191be04a42309fbb66b43f96fe1c0490916d7fa90c7ba",
+      "bytes": 734
+    },
+    {
+      "path": "native-writer-green.txt",
+      "sha256Utf8LF": "9dae1b05d0d12cf4206500c1fe1a61d10734aea877b37c5880b25725922eeb12",
+      "bytes": 727
+    },
+    {
+      "path": "native-result.json",
+      "sha256Utf8LF": "2014cd0ceb064a9e315754116053a075e469c3b1cbcf432c8b9f20dd5cf9d26c",
+      "bytes": 590
+    },
+    {
+      "path": "owned-native-harness.mjs.txt",
+      "sha256Utf8LF": "c58fc83383f462c4590f9e606d7e40f24404bce2596adc1312edde92b9ccba67",
+      "bytes": 6253
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256Utf8LF": "27976c6e633047c537c0ec725c0267b45fed4a5e31810877f3991530a9c3783c"
+    },
+    {
+      "path": "apps/api/src/task-checkpoint-state.ts",
+      "sha256Utf8LF": "ee94678852be062b642f5432d088095fb3c7f69a1e73ebe7fa7fa5142a0595f8"
+    },
+    {
+      "path": "services/agent-runtime/task-tool-context.mjs",
+      "sha256Utf8LF": "0277040f1e3ce3c00d37a8d618396355400947494405f886345176cdaab9c2d7"
+    },
+    {
+      "path": "services/agent-runtime/host.mjs",
+      "sha256Utf8LF": "00c88fed97b9ba31495da3d5e9c4ffc9dc9632d776a7bb50f215f262cb1bde89"
+    },
+    {
+      "path": "services/agent-runtime/employee-hosts.mjs",
+      "sha256Utf8LF": "a1caea48e7d9b967c96c93b1b82a7a1754481e66a5392b2aaa87ff9053c02202"
+    },
+    {
+      "path": "services/agent-runtime/product-runtime.mjs",
+      "sha256Utf8LF": "8e4784b66828db9840fa6019d18e36397ad472fadc7f208852a0663fa1cdb432"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256Utf8LF": "9fc01c6e92919cdf8acf54a4f1475db89c9d8364c03b8f85ff57ea27d9bc4239"
+    },
+    {
+      "path": "tests/local-executor-writer.test.ts",
+      "sha256Utf8LF": "714368140a64194400b1134e4b4b79dd4b1850c92b5b0b6aaac85a9638ad78be"
+    },
+    {
+      "path": "tests/task-checkpoint-state.test.ts",
+      "sha256Utf8LF": "4ffb85001969691a7c11306611c39bb054a506ac76136be5b02e5352fad00d0c"
+    },
+    {
+      "path": "tests/task-checkpoint-native.test.ts",
+      "sha256Utf8LF": "6f2871707b1fd1b50e108a0b0c0c682042c64de6eca0a2999674fcf1dd2be67b"
+    },
+    {
+      "path": "services/agent-runtime/employee-checkpoint-policy.test.mjs",
+      "sha256Utf8LF": "85a64cb2bd3ce0d62a533fe5a39704b47c0969ab9d7699cae9f9ce384326ca40"
+    }
+  ]
+}

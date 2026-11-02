@@ -1,0 +1,10 @@
+✔ planning diagnostic stays outside an archive root swap and preserves old diagnostics (86.6282ms)
+✔ planning diagnostic directory cannot be a junction into the archive root (46.3788ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2868.9397

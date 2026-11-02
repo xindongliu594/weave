@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "date": "2026-11-02",
+  "base": "417b46e5510ab72203d722292e46e1e9b9322b77",
+  "validatedIndexTree": "1d1f9ff7f47366ee644a68bea2a12bfc45762001",
+  "checks": {
+    "build": 0,
+    "rules": 34,
+    "uiAndRunner": 14,
+    "recoveryGroups": [
+      15,
+      11,
+      6
+    ],
+    "recoveryTotal": 32
+  },
+  "modelCalls": 0,
+  "scope": "Isolated staged development snapshot. PGlite and synthetic models; not full repository CI, native PostgreSQL, JJ or real-model recovery acceptance.",
+  "artifacts": [
+    {
+      "name": "snapshot-build.txt",
+      "sha256": "afa87008ee23a86a5b5ba3e68a00093b391ca4d9946aad1244a5ee8742356d50"
+    },
+    {
+      "name": "snapshot-build.exit.txt",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "name": "snapshot-build-final.txt",
+      "sha256": "146d671ae326ce6f56c5bea7df276c3abf478b9272f7b090f558903952ca7f32"
+    },
+    {
+      "name": "snapshot-build-final.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "snapshot-rules.txt",
+      "sha256": "63e44a6ff6c2f11f88c4ccebf908f62b9e94a62e94131538bcafefdc7186d2c4"
+    },
+    {
+      "name": "snapshot-rules.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "snapshot-ui-rules.txt",
+      "sha256": "6bf79e46b71468bb61d1a490d63afd75fcc4dfd384d58237b8b012fc0d392f4c"
+    },
+    {
+      "name": "snapshot-ui-rules.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "snapshot-recovery.txt",
+      "sha256": "4747c2b53c0b249b904098c786016d0d06c213308175a471ca94ef1f6cbd7dd9"
+    },
+    {
+      "name": "snapshot-recovery.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "snapshot-review.json",
+      "sha256": "75d9648e69f75736a82441589e442af54001ff981f5e376a78ff4b1881a2f41a"
+    }
+  ]
+}

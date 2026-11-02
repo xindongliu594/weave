@@ -17,11 +17,17 @@ export function enterpriseCatalogFingerprint(value:unknown,schema:string):string
 export async function inspectEnterpriseTable(db:Query,name:EnterpriseTableName){
   if(!Object.hasOwn(enterpriseTableSpecs,name))unsupported();
   const columns=(await db.query(`SELECT a.attname AS name,format_type(a.atttypid,a.atttypmod) AS type,a.attnotnull AS required FROM pg_attribute a WHERE a.attrelid=format('%I.%I',current_schema(),$1::text)::regclass AND a.attnum>0 AND NOT a.attisdropped ORDER BY a.attnum`,[name])).rows;
+  // Before PG18, table NOT NULL lives only in pg_attribute; preserve the fixed PG18 representation.
   const constraints=(await db.query(`SELECT c.contype AS kind,pg_get_constraintdef(c.oid) AS definition,
     ARRAY(SELECT a.attname::text FROM unnest(c.conkey) WITH ORDINALITY AS k(attnum,n) JOIN pg_attribute a ON a.attrelid=c.conrelid AND a.attnum=k.attnum ORDER BY k.n) AS columns,
     CASE WHEN c.contype='f' THEN c.confrelid::regclass::text END AS target,
     CASE WHEN c.contype='f' THEN ARRAY(SELECT a.attname::text FROM unnest(c.confkey) WITH ORDINALITY AS k(attnum,n) JOIN pg_attribute a ON a.attrelid=c.confrelid AND a.attnum=k.attnum ORDER BY k.n) END AS "targetColumns"
-    FROM pg_constraint c WHERE c.conrelid=format('%I.%I',current_schema(),$1::text)::regclass ORDER BY c.contype,pg_get_constraintdef(c.oid)`,[name])).rows;
+    FROM pg_constraint c WHERE c.conrelid=format('%I.%I',current_schema(),$1::text)::regclass
+    UNION ALL
+    SELECT 'n', 'NOT NULL '||quote_ident(a.attname), ARRAY[a.attname::text], NULL::text, NULL::text[]
+    FROM pg_attribute a WHERE a.attrelid=format('%I.%I',current_schema(),$1::text)::regclass
+      AND a.attnum>0 AND NOT a.attisdropped AND a.attnotnull AND current_setting('server_version_num')::int<180000
+    ORDER BY kind,definition`,[name])).rows;
   const triggers=(await db.query(`SELECT pg_get_triggerdef(t.oid) AS definition,pg_get_functiondef(t.tgfoid) AS function FROM pg_trigger t WHERE t.tgrelid=format('%I.%I',current_schema(),$1::text)::regclass AND NOT t.tgisinternal ORDER BY t.tgname`,[name])).rows;
   return {name,columns,constraints,triggers};
 }

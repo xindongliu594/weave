@@ -1,0 +1,12 @@
+✔ native checkpoint cancellation drains the original row-lock wait after blocker COMMIT (2927.8692ms)
+ℹ {"runId":"b6a31037-682c-4f20-8677-57b2e3d2188c","blockerPid":6316,"writerPid":39496,"decision":"COMMIT","actualLockWait":true,"checkpointCallbackCalls":0,"sourceReleasedAfterOriginalSettled":true}
+✔ native checkpoint cancellation drains the original row-lock wait after blocker ROLLBACK (253.4123ms)
+ℹ {"runId":"3bfbd8fa-bc92-494e-8b60-74e43600b58b","blockerPid":6316,"writerPid":39496,"decision":"ROLLBACK","actualLockWait":true,"checkpointCallbackCalls":0,"sourceReleasedAfterOriginalSettled":true}
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5745.0841

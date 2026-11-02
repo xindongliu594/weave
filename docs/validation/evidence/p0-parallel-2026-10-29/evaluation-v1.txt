@@ -1,0 +1,127 @@
+warning: in the working copy of 'apps/api/src/enterprise-backup-catalog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/local-execution.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/observability.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/project-planning.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/provider-reconciliation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/identity-session.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/test-integration.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-objects.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.d.mts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/journal-archive.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/enterprise-backup-catalog.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-executor-writer.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/planning-output-api.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product-flow.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/storage-governance.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/task-accepted-stop-delivery.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-integration-runner.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/evaluations/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/enterprise-backup-catalog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/local-execution.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/observability.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/project-planning.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/provider-reconciliation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/identity-session.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/test-integration.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-objects.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.d.mts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/journal-archive.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/enterprise-backup-catalog.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-executor-writer.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/planning-output-api.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product-flow.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/storage-governance.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/task-accepted-stop-delivery.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-integration-runner.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/evaluations/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/enterprise-backup-catalog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/local-execution.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/observability.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/project-planning.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/provider-reconciliation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/identity-session.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/test-integration.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-objects.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.d.mts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/journal-archive.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/enterprise-backup-catalog.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-executor-writer.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/planning-output-api.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product-flow.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/storage-governance.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/task-accepted-stop-delivery.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-integration-runner.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/evaluations/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/enterprise-backup-catalog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/local-execution.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/observability.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/project-planning.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/provider-reconciliation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/identity-session.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/test-integration.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-objects.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.d.mts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/journal-archive.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/enterprise-backup-catalog.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-executor-writer.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/planning-output-api.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product-flow.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/storage-governance.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/task-accepted-stop-delivery.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-integration-runner.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/evaluations/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/enterprise-backup-catalog.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/local-execution.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/observability.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/project-planning.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/api/src/provider-reconciliation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/identity-session.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/test-integration.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-objects.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.d.mts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/archive-writer-scope.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/journal-archive.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/agent-runtime/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/enterprise-backup-catalog.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/local-executor-writer.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/planning-output-api.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/product-flow.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/storage-governance.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/task-accepted-stop-delivery.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test-integration-runner.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tools/evaluations/README.md', LF will be replaced by CRLF the next time Git touches it
+✔ controlled file references avoid Windows drive-colon assertion parsing (16.2816ms)
+✔ isolated evaluator explicitly rejects project CI Node 22.19 (0.8524ms)
+✔ installed real Promptfoo CLI produces private reports and an offline gate (47076.0229ms)
+✔ execute fails before any request, even with bypass environment and transport (1.2363ms)
+✔ replay validates exact synthetic case version and digest (108.4076ms)
+✔ unsafe paths and non-replay modes are rejected (0.8577ms)
+✔ runner allows only generated provider and deterministic reviewed assertion (58.9931ms)
+✔ runner refuses execute before spawning Promptfoo (0.3307ms)
+✔ fixture gate passes only offline engineering invariants; live is unavailable (209.4445ms)
+✔ gate rejects mutations, empty/omitted/duplicate cases, false live, bad scores and missing evidence (901.6457ms)
+✔ normalization preserves errors and cannot turn missing data into pass (0.8949ms)
+✔ consistent manifest/raw rewrites cannot hide failure, unknown cost or altered evidence (646.5951ms)
+✔ native Promptfoo contradictory failure signals remain failures after consistent rehashing (554.6995ms)
+✔ source binding includes uncommitted implementation but excludes private and acceptance history before reading (112.6311ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47465.7052

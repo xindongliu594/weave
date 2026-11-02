@@ -1,0 +1,399 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✖ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (6.9924ms)
+✖ D1 lost poll response recovers an unstarted claim and executes it exactly once (6.9029ms)
+✖ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (0.1281ms)
+✖ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (0.0937ms)
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (8.8681ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1052.7349
+
+✖ failing tests:
+
+test at tests\helpers\product-flow-support.ts:1:20483
+✖ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (6.9924ms)
+  Error: connect EACCES 127.0.0.1:58866
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 58866
+  }
+
+test at tests\helpers\product-flow-support.ts:1:24464
+✖ D1 lost poll response recovers an unstarted claim and executes it exactly once (6.9029ms)
+  Error: connect EACCES 127.0.0.1:58866
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 58866
+  }
+
+test at tests\helpers\product-flow-support.ts:1:25660
+✖ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (0.1281ms)
+  Error: connect EACCES 127.0.0.1:58866
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 58866
+  }
+
+test at tests\helpers\product-flow-support.ts:1:26805
+✖ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (0.0937ms)
+  Error: connect EACCES 127.0.0.1:58866
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 58866
+  }
+
+test at tests\helpers\product-flow-support.ts:1:12111
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (8.8681ms)
+  Error: connect EACCES 127.0.0.1:58866
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:178:22)
+      at async TestHook.run (node:internal/test_runner/test:1208:7)
+      at async Test.runHook (node:internal/test_runner/test:1117:9)
+      at async after (node:internal/test_runner/test:1159:9)
+      at async Test.run (node:internal/test_runner/test:1227:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 58866
+  }
+✖ approved API flow waits for command approval, hands off verified files and settles usage (7.3648ms)
+✖ employee summaries are billed to the active task and preserve approved contracts through handoff (6.8386ms)
+✖ missing output and forged verification cannot dispatch the dependent reviewer (0.1766ms)
+✖ a modified accepted input is rejected before the reviewer makes a model request (0.0771ms)
+✖ cancellation while approval is pending cancels the receipt and never runs the command (0.1217ms)
+✖ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (0.1689ms)
+✖ C3 retries a transient read within the same tool call, without extra model charges (0.1123ms)
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (9.947ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 0
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 962.0548
+
+✖ failing tests:
+
+test at tests\helpers\product-flow-support.ts:1:28118
+✖ approved API flow waits for command approval, hands off verified files and settles usage (7.3648ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:31245
+✖ employee summaries are billed to the active task and preserve approved contracts through handoff (6.8386ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:39786
+✖ missing output and forged verification cannot dispatch the dependent reviewer (0.1766ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:40564
+✖ a modified accepted input is rejected before the reviewer makes a model request (0.0771ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:41142
+✖ cancellation while approval is pending cancels the receipt and never runs the command (0.1217ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:41776
+✖ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (0.1689ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:42706
+✖ C3 retries a transient read within the same tool call, without extra model charges (0.1123ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+
+test at tests\helpers\product-flow-support.ts:1:12111
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (9.947ms)
+  Error: connect EACCES 127.0.0.1:63224
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:178:22)
+      at async TestHook.run (node:internal/test_runner/test:1208:7)
+      at async Test.runHook (node:internal/test_runner/test:1117:9)
+      at async after (node:internal/test_runner/test:1159:9)
+      at async Test.run (node:internal/test_runner/test:1227:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 63224
+  }
+✖ approved API rework repairs, independently re-reviews and bills the original task buckets (7.1046ms)
+✖ API rework stops at its call allowance and full retry cannot reset the task counter (7.0564ms)
+✖ API rework escalates exhausted rounds, forbidden files and explicit rejection (0.1398ms)
+✖ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (0.1642ms)
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (8.6976ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1015.1308
+
+✖ failing tests:
+
+test at tests\helpers\product-flow-support.ts:1:34520
+✖ approved API rework repairs, independently re-reviews and bills the original task buckets (7.1046ms)
+  Error: connect EACCES 127.0.0.1:53407
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 53407
+  }
+
+test at tests\helpers\product-flow-support.ts:1:36824
+✖ API rework stops at its call allowance and full retry cannot reset the task counter (7.0564ms)
+  Error: connect EACCES 127.0.0.1:53407
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 53407
+  }
+
+test at tests\helpers\product-flow-support.ts:1:39030
+✖ API rework escalates exhausted rounds, forbidden files and explicit rejection (0.1398ms)
+  Error: connect EACCES 127.0.0.1:53407
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 53407
+  }
+
+test at tests\helpers\product-flow-support.ts:1:44011
+✖ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (0.1642ms)
+  Error: connect EACCES 127.0.0.1:53407
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 53407
+  }
+
+test at tests\helpers\product-flow-support.ts:1:12111
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (8.6976ms)
+  Error: connect EACCES 127.0.0.1:53407
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:178:22)
+      at async TestHook.run (node:internal/test_runner/test:1208:7)
+      at async Test.runHook (node:internal/test_runner/test:1117:9)
+      at async after (node:internal/test_runner/test:1159:9)
+      at async Test.run (node:internal/test_runner/test:1227:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 53407
+  }
+✖ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (6.7827ms)
+✖ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (7.0722ms)
+✖ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (0.1195ms)
+✖ C3 restores an independently passed rework pair and runs only its remaining consumer (0.0741ms)
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (8.5777ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 970.9222
+
+✖ failing tests:
+
+test at tests\helpers\product-flow-support.ts:1:45185
+✖ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (6.7827ms)
+  Error: connect EACCES 127.0.0.1:49229
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 49229
+  }
+
+test at tests\helpers\product-flow-support.ts:4:707
+✖ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (7.0722ms)
+  Error: connect EACCES 127.0.0.1:49229
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 49229
+  }
+
+test at tests\helpers\product-flow-support.ts:4:11638
+✖ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (0.1195ms)
+  Error: connect EACCES 127.0.0.1:49229
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 49229
+  }
+
+test at tests\helpers\product-flow-support.ts:4:14455
+✖ C3 restores an independently passed rework pair and runs only its remaining consumer (0.0741ms)
+  Error: connect EACCES 127.0.0.1:49229
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:36:3)
+      at async TestHook.run (node:internal/test_runner/test:1208:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 49229
+  }
+
+test at tests\helpers\product-flow-support.ts:1:12111
+✖ C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts (8.5777ms)
+  Error: connect EACCES 127.0.0.1:49229
+      at C:\Users\JJ\.codex\worktrees\f57c\agent_department\node_modules\pg-pool\index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\product-flow-support.ts:178:22)
+      at async TestHook.run (node:internal/test_runner/test:1208:7)
+      at async Test.runHook (node:internal/test_runner/test:1117:9)
+      at async after (node:internal/test_runner/test:1159:9)
+      at async Test.run (node:internal/test_runner/test:1227:7) {
+    errno: -4092,
+    code: 'EACCES',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 49229
+  }

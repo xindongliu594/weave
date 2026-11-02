@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {randomUUID,randomBytes} from 'node:crypto';
+import {mkdirSync,writeFileSync,readFileSync,rmSync,existsSync,realpathSync,openSync,closeSync} from 'node:fs';
+import {resolve,join,relative,isAbsolute} from 'node:path';
+import {createServer} from 'node:net';
+import {spawn,spawnSync} from 'node:child_process';
+import pg from 'pg';
+
+// Reuses the owned initdb/pg_ctl lifecycle from the prior native validation probe.
+const workspace=realpathSync(process.cwd()),ownerRoot=realpathSync('.private/enterprise-native-20261029');
+const bin=join(ownerRoot,'runtime/bin'),id=randomUUID(),root=join(ownerRoot,'cluster-'+id),data=join(root,'data'),pwfile=join(root,'password.tmp'),marker=join(root,'owned.json');
+const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('PG')&&!key.startsWith('BACKUP_RESTORE_')&&!['DATABASE_URL','DATA_DIR','TRACE_ROOT','OBSIDIAN_VAULT','LOCAL_WORKSPACE_ROOT','SIMULATED_INTEGRATION','IDENTITY_TEST_DIRECT_PGLITE','NODE_OPTIONS'].includes(key)));
+function inside(target,parent){const part=relative(parent,resolve(target));assert.ok(part&&!part.startsWith('..')&&!isAbsolute(part));}
+inside(ownerRoot,workspace);inside(root,ownerRoot);inside(data,root);inside(realpathSync(bin),ownerRoot);assert.equal(process.platform,'win32');mkdirSync(root,{mode:0o700});
+const ownership={version:1,id,root,data};writeFileSync(marker,JSON.stringify(ownership),{flag:'wx',mode:0o600});
+const password=randomBytes(24).toString('base64url');writeFileSync(pwfile,password,{flag:'wx',mode:0o600});
+const result={id,postgresVersion:null,vectorVersion:null,backendPids:[],commands:[],stopped:false,dataRemoved:false};
+function run(name,args,log){const fd=log?openSync(log,'wx',0o600):null;try{const p=spawnSync(join(bin,name+'.exe'),args,{encoding:'utf8',windowsHide:true,env,timeout:30000,...(fd===null?{}:{stdio:['ignore',fd,fd]})});if(p.error)throw p.error;return p;}finally{if(fd!==null)closeSync(fd);}}
+let pool;
+try{
+ const version=run('postgres',['--version']);assert.equal(version.status,0);assert.match(version.stdout,/PostgreSQL\) 17\.10/);result.postgresVersion=version.stdout.trim();
+ const init=run('initdb',['-D',data,'-U','weiwu_test','--pwfile='+pwfile,'--auth=scram-sha-256','--encoding=UTF8','--locale=C']);writeFileSync(join(root,'initdb.log'),init.stdout+init.stderr);assert.equal(init.status,0,'initdb failed; see owned evidence');
+ const server=createServer();await new Promise((r,j)=>server.once('error',j).listen(0,'127.0.0.1',r));const port=server.address().port;await new Promise(r=>server.close(r));
+ const start=run('pg_ctl',['-D',data,'-l',join(root,'postgres.log'),'-o',`-h 127.0.0.1 -p ${port} -c max_connections=16 -c shared_buffers=16MB`,'-w','-t','20','start'],join(root,'start.log'));assert.equal(start.status,0,'pg_ctl start failed; see owned evidence');
+ pool=new pg.Pool({connectionString:`postgresql://weiwu_test:${password}@127.0.0.1:${port}/postgres`,max:4,connectionTimeoutMillis:3000,statement_timeout:10000});
+ await pool.query('CREATE EXTENSION vector');result.vectorVersion=(await pool.query("SELECT extversion FROM pg_extension WHERE extname='vector'")).rows[0].extversion;assert.equal(result.vectorVersion,'0.8.7');
+ assert.equal((await pool.query("SELECT '[1,2,3]'::vector <-> '[1,2,4]'::vector AS d")).rows[0].d,1);
+ const a=await pool.connect(),b=await pool.connect();try{result.backendPids=[(await a.query('SELECT pg_backend_pid() AS pid')).rows[0].pid,(await b.query('SELECT pg_backend_pid() AS pid')).rows[0].pid];assert.notEqual(...result.backendPids);}finally{a.release();b.release();}
+ const testFiles=process.argv.slice(2);assert.ok(testFiles.length>0);
+ for(const file of testFiles){assert.ok(/^tests\/(?:enterprise-backup-native|enterprise-backup-catalog|backup-restore-native)\.test\.ts$/.test(file)||file==='.private/enterprise-native-20261029/catalog-probe.ts');const database='weiwu_backup_test_'+randomUUID().replaceAll('-','');await pool.query('CREATE DATABASE '+database);
+  const log=join(root,file.split('/').at(-1)+'.log'),output=openSync(log,'wx',0o600);let child,code;try{
+   child=spawn(process.execPath,['--import','tsx','--test','--test-concurrency=1',file],{cwd:workspace,env:{...env,BACKUP_RESTORE_POSTGRES_URL:`postgresql://weiwu_test:${password}@127.0.0.1:${port}/${database}`},windowsHide:true,stdio:['ignore',output,output]});
+   const timer=setTimeout(()=>child.kill('SIGTERM'),150000);try{code=await new Promise((r,j)=>{child.once('error',j);child.once('exit',r);});}finally{clearTimeout(timer);}
+  }finally{closeSync(output);}
+  result.commands.push({command:'node --import tsx --test --test-concurrency=1 '+file,exitCode:code,database,log:relative(workspace,log)});
+  assert.equal(code,0,'Native test failed; see owned evidence');await pool.query('DROP DATABASE '+database);
+ }
+}catch(error){result.error=String(error.message).replaceAll(password,'[redacted]');process.exitCode=1;}
+finally{
+ if(existsSync(pwfile))rmSync(pwfile);
+ if(pool){let deadline;try{await Promise.race([pool.end(),new Promise((_,reject)=>{deadline=setTimeout(()=>reject(Error('Owned pool drain timed out')),3000);})]);}catch{result.error??='Owned pool drain failed';process.exitCode=1;}finally{clearTimeout(deadline);}}
+ if(existsSync(data)){assert.deepEqual(JSON.parse(readFileSync(marker,'utf8')),ownership);assert.equal(realpathSync(root),root);assert.equal(realpathSync(data),data);inside(data,ownerRoot);
+  let status=run('pg_ctl',['-D',data,'status']);if(status.status===0){const stop=run('pg_ctl',['-D',data,'-m','fast','-w','-t','20','stop']);writeFileSync(join(root,'stop.log'),stop.stdout+stop.stderr);status=run('pg_ctl',['-D',data,'status']);}
+  result.stopped=status.status===3;if(!result.stopped){result.error??='Owned PostgreSQL shutdown could not be verified';process.exitCode=1;}if(result.stopped&&!result.error){rmSync(data,{recursive:true});result.dataRemoved=true;}
+ }
+ writeFileSync(join(root,'result.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({...result,evidence:relative(workspace,root)}));
+}

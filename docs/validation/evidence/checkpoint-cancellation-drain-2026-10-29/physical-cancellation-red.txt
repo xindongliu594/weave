@@ -1,0 +1,32 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+EXECUTOR_WRITER_EXIT_CLEANUP={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-ti7WW3","pid":21904}
+✖ checkpoint transaction cancellation prevents a late physical checkpoint write (549.4439ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3393.7881
+
+✖ failing tests:
+
+test at tests\local-executor-writer.test.ts:1:12529
+✖ checkpoint transaction cancellation prevents a late physical checkpoint write (549.4439ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\local-executor-writer.test.ts:116:146)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

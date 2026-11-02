@@ -1,0 +1,57 @@
+✖ planning diagnostic stays outside an archive root swap and preserves old diagnostics (85.7373ms)
+✖ planning diagnostic directory cannot be a junction into the archive root (49.4781ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2743.4495
+
+✖ failing tests:
+
+test at tests\planning-diagnostic-root.test.ts:1:991
+✖ planning diagnostic stays outside an archive root swap and preserves old diagnostics (85.7373ms)
+  AssertionError [ERR_ASSERTION]: diagnostics must not recreate the swapped archive root
+  
+  true !== false
+  
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-diagnostic-root.test.ts:24:10)
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:129:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:97:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:85:42
+      at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+      at invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:85:26)
+      at Object.run (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:97:18)
+      at withMode (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:129:28)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-diagnostic-root.test.ts:21:2)
+      at async Test.run (node:internal/test_runner/test:1208:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\planning-diagnostic-root.test.ts:1:1966
+✖ planning diagnostic directory cannot be a junction into the archive root (49.4781ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-diagnostic-root.test.ts:36:10)
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:129:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:97:36
+      at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:85:42
+      at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+      at invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:85:26)
+      at Object.run (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:97:18)
+      at withMode (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:129:28)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\planning-diagnostic-root.test.ts:35:2)
+      at async Test.run (node:internal/test_runner/test:1208:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /diagnostic directory/i,
+    operator: 'throws',
+    diff: 'simple'
+  }

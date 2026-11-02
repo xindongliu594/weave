@@ -1,0 +1,96 @@
+✖ writer covers the original save COMMIT after claim completion (139.0658ms)
+PROVIDER_WRITER_EXIT_CLEANUP=C:\Users\JJ\.codex\worktrees\f57c\agent_department\.private\provider-writer-20261029\native-2aPqiI
+✖ native admission precedes claim SQL and rechecks the receipt state after waiting (188.8773ms)
+✔ a pending receipt is rejected after confirmed rollback without retaining its writer (129.3075ms)
+✖ an unknown original save COMMIT escapes the catch and retains the run (132.9572ms)
+✖ rollback uncertainty retains the original error and run guard (1.2369ms)
+✔ unbound receipts use the shared SQL fee gate while root source is held (69.8683ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 2
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4766.8966
+
+✖ failing tests:
+
+test at tests\provider-reconciliation-writer.test.ts:1:2577
+✖ writer covers the original save COMMIT after claim completion (139.0658ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:47:56)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\provider-reconciliation-writer.test.ts:1:3067
+✖ native admission precedes claim SQL and rechecks the receipt state after waiting (188.8773ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'unresolved'
+  - 'already-settled'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:55:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'unresolved',
+    expected: 'already-settled',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\provider-reconciliation-writer.test.ts:1:3886
+✖ an unknown original save COMMIT escapes the catch and retains the run (132.9572ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:70:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\provider-reconciliation-writer.test.ts:1:4381
+✖ rollback uncertainty retains the original error and run guard (1.2369ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+  
+  Caught error:
+  
+  Error: rollback unavailable
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:76:2)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: rollback unavailable
+        at Object.f.hook (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:75:91)
+        at Object.query (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:26:37)
+        at receiptTransaction (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\cost-control.ts:214:29)
+        at async queryProviderForCall (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\provider-reconciliation.ts:85:14)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\provider-reconciliation-writer.test.ts:76:2)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:831:7),
+    operator: 'rejects',
+    diff: 'simple'
+  }

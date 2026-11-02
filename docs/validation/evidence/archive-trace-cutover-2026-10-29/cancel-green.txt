@@ -1,0 +1,38 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ executor construction does not create an artifacts directory before writer admission (374.0519ms)
+✔ legacy prepare creates its empty workspace only after native writer admission (204.1645ms)
+✔ task transaction waits for native source before SQL and takes the shared SQL gate (182.1837ms)
+✔ stop transaction waits for native source before SQL and takes the shared SQL gate (185.2529ms)
+✔ task transaction known preserves the original outcome and native guard (91.0303ms)
+✔ task transaction commit preserves the original outcome and native guard (149.2551ms)
+✔ task transaction rollback preserves the original outcome and native guard (139.1568ms)
+✔ stop transaction known preserves the original outcome and native guard (90.4625ms)
+✔ stop transaction commit preserves the original outcome and native guard (144.0653ms)
+✔ stop transaction rollback preserves the original outcome and native guard (137.6533ms)
+✔ legacy execution holds its original writer through device wait and mirror and close waits for it (255.6538ms)
+✔ close awaits a failing original device producer and preserves its first error over cleanup failure (222.9205ms)
+✔ accepted-stop abort retains the original pool acquisition until it settles without starting SQL (260.5699ms)
+✔ checkpoint physical completion is distinct from SQL rollback (83.5302ms)
+✔ checkpoint physical failure stays latched (140.1567ms)
+✔ checkpoint transaction cancellation drains a late pool connection without any SQL (225.259ms)
+✔ checkpoint transaction cancellation stops SQL continuation and awaits acknowledged rollback (269.169ms)
+✔ checkpoint transaction cancellation stops SQL continuation and retains uncertain rollback (331.0961ms)
+✔ checkpoint transaction cancellation prevents a late physical checkpoint write (195.8062ms)
+✔ checkpoint transaction cancellation after COMMIT never invokes its publisher (75.9974ms)
+✔ checkpoint publisher remains in the same writer after acknowledged COMMIT (81.5688ms)
+✔ accepted-stop abort cannot replace a held original SQL reply or issue a late continuation (297.4049ms)
+✔ a second rejected dispatch callback cannot undo an already granted stop effect (173.3863ms)
+✔ local wait keeps its first error when cancellation COMMIT is unknown and retains the original scope (200.2786ms)
+✔ an unknown executor operation cannot acquire fresh finalization authority (115.8779ms)
+✔ acknowledged device cancellation preserves unknown receipt without poisoning local writer: false (122.775ms)
+EXECUTOR_WRITER_EXIT_CLEANUP={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-jzo72f","pid":40744}
+✔ acknowledged device cancellation preserves unknown receipt without poisoning local writer: true (100.0981ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7315.5009

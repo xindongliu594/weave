@@ -1,0 +1,12 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (16158.5741ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (5699.5123ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22607.1143

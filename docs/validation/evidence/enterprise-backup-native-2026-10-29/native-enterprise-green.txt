@@ -1,0 +1,22 @@
+✔ native enterprise preserving import process restart after prepared (13976.2955ms)
+ℹ {"engine":"postgresql","phase":"prepared","fault":null,"operationId":"f9fa2460-5385-49bc-a2e0-91d87c82ffd6","inputDigest":"70d0915b675c291710326b910a054bd32d768d226f51776e673bf9ac02e60f1e","sourceUnchanged":true,"targetExecutionBlocked":false}
+✔ native enterprise preserving import process restart after old-moved (9768.3016ms)
+ℹ {"engine":"postgresql","phase":"old-moved","fault":null,"operationId":"2433ddcf-d305-4fc4-92bb-9d8e60b96001","inputDigest":"9752b69e7d2c8b0c586ee7000aa271bca28b183909583dc8b56fba69a4bf7a11","sourceUnchanged":true,"targetExecutionBlocked":false}
+✔ native enterprise preserving import process restart after installed (11242.4568ms)
+ℹ {"engine":"postgresql","phase":"installed","fault":null,"operationId":"1de50e95-3457-4e12-b174-4a2161b9f3eb","inputDigest":"77feff22bd43ddbbee196f82d080cba555983e118a03a9306b341d01d2badc8a","sourceUnchanged":true,"targetExecutionBlocked":false}
+✔ native enterprise preserving import process restart after committed (9637.1515ms)
+ℹ {"engine":"postgresql","phase":"committed","fault":null,"operationId":"4a8216de-4161-412b-9747-c7475373a49e","inputDigest":"dbb54da002c00ba49c1349d866c87a8a4ce106e5e1b807b5a175350a1cfbadd2","sourceUnchanged":true,"targetExecutionBlocked":true}
+✔ native committed enterprise restart retains barrier after damaged marker (9254.0447ms)
+ℹ {"engine":"postgresql","phase":"committed","fault":"marker","operationId":"03608540-1d23-4774-ae96-40367dba6fda","inputDigest":"2b376f8be764d94884e59ab2c82f3985dad73ccad8417c83ff0af4c04756edaf","sourceUnchanged":true,"targetExecutionBlocked":true}
+✔ native committed enterprise restart retains barrier after damaged generation (9962.0677ms)
+ℹ {"engine":"postgresql","phase":"committed","fault":"generation","operationId":"5f309291-2f42-4a72-8fe3-a99c64488f7a","inputDigest":"b5664ddb8a588387ec5023f137aea1e8140b3f2d9703ee60685f2f9e9c2a3d46","sourceUnchanged":true,"targetExecutionBlocked":true}
+✔ native committed enterprise restart retains barrier after damaged file (16795.7438ms)
+ℹ {"engine":"postgresql","phase":"committed","fault":"file","operationId":"bcce850f-7fc0-48bd-8a30-428eb6e8c15a","inputDigest":"a7dd74e750c22b86a7a7b91f21d44277e17935c9dff25363e4fabb7ac56d547f","sourceUnchanged":true,"targetExecutionBlocked":true}
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 81239.6766

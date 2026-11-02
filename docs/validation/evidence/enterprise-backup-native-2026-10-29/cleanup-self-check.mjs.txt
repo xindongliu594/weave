@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+const file='.private/enterprise-native-20261029/run-owned-postgres.mjs',source=ts.createSourceFile(file,fs.readFileSync(file,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+const statement=source.statements.find(node=>ts.isTryStatement(node)&&node.finallyBlock),block=statement.finallyBlock.statements.find(node=>ts.isIfStatement(node)&&node.expression.getText(source)==='existsSync(data)');assert.ok(block);
+for(const [name,statuses,priorError,expectedCode,removed]of [['already-stopped',[3],null,0,true],['stop-failed',[0,1,0],null,1,false],['unknown-final-status',[0,0,4],null,1,false],['unknown-initial-status',[4],null,1,false],['retain-failed-evidence',[3],'tests failed',1,false]]){
+ const root='owned-root',data='owned-root/data',ownership={root,data},result={error:priorError,stopped:false,dataRemoved:false},process={exitCode:priorError?1:0},calls=[];
+ const context={assert,JSON,result,process,root,data,ownership,marker:'owned-root/owned.json',ownerRoot:'owned-root-parent',join:(...args)=>args.join('/'),existsSync:()=>true,readFileSync:()=>JSON.stringify(ownership),realpathSync:value=>value,inside:()=>{},writeFileSync:()=>{},run:()=>{const status=statuses.shift();assert.notEqual(status,undefined);return {status,stdout:'',stderr:''};},rmSync:(...args)=>calls.push(args)};
+ vm.runInNewContext(block.getText(source),context);assert.equal(process.exitCode,expectedCode,name+' must report cleanup outcome');assert.equal(calls.length,removed?1:0,name+' must retain data when shutdown is unverified');assert.equal(result.stopped,name==='already-stopped'||name==='retain-failed-evidence');if(expectedCode&&!priorError)assert.ok(result.error,name+' requires an explicit error');console.log('PASS '+name);
+}

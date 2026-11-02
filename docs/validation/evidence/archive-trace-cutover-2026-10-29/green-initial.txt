@@ -1,0 +1,16 @@
+✔ registered roots reject create/open/append without a live writer before changing bytes (177.1295ms)
+✔ old handles cannot borrow a new owner, wrong run or an expired nested invocation (300.5954ms)
+✔ registration invalidates preexisting raw handles and relative spelling cannot bypass it (114.3592ms)
+✔ SHA object writes require the matching writer before creating the object directory (187.8347ms)
+✔ journal compression requires maintenance ownership and preserves readable original events (247.5581ms)
+✔ a real journal lock prevents production append and leaves bytes unchanged on timeout (3528.0262ms)
+✔ two real production writers preserve contiguous sequence and deduplicate overlapping source keys (2848.363ms)
+✔ source guard waits for retained production append then prevents a new process writer (2308.7106ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9868.5748

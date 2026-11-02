@@ -1,0 +1,227 @@
+{
+  "postgresVersion": "17.10",
+  "pgvectorVersion": "0.8.7",
+  "source": "https://github.com/andreiramani/pgvector_pgsql_windows/releases/tag/0.8.7",
+  "distribution": "unofficial Windows build, isolated test runtime only",
+  "zipSha256": "acd9d678200e856623f0b7416f6f5d132ef8606a2273ff37f0fdf8a7f2c5d7d2",
+  "dllSha256": "bb2dc3ebe638e5c15fc278cf145f8c7c325414cb731b42acb460413507cb05cb",
+  "postgres": [
+    {
+      "name": "postgres.exe",
+      "version": "postgres (PostgreSQL) 17.10",
+      "exit": 0,
+      "sha256": "db14ddb0efc10b72b57dc29dbce5a719e2755dcd0ae54297d0ea4bbfc75f79a0"
+    },
+    {
+      "name": "initdb.exe",
+      "version": "initdb (PostgreSQL) 17.10",
+      "exit": 0,
+      "sha256": "f775e03d6dc6c67f115d7e688c6933573fff7ac7285f6b1f5809354223cfb9e1"
+    },
+    {
+      "name": "pg_ctl.exe",
+      "version": "pg_ctl (PostgreSQL) 17.10",
+      "exit": 0,
+      "sha256": "9e1c3375f47116eef8d04c1f67cc79f03c7c3cca99172511c4464cb9c6b8116f"
+    }
+  ],
+  "readme": "https://github.com/andreiramani/pgvector_pgsql_windows\r\n------------------------------------------------------\r\n\r\n- ONLY for PostgreSQL v17 - Windows x64\r\n- Stop PostgreSQL using services.msc\r\n- Extract the zip file to your Postgres installed folder\r\n- Start PostgreSQL service\r\n- Run query: \r\nCREATE EXTENSION vector\r\n- Run this query to check if the extension is enable (t):\r\nSELECT extname,extrelocatable,extversion FROM pg_extension where extname='vector'\r\n\r\n\r\n=============================\r\nUPGRADE FROM PREVIOUS VERSION\r\n=============================\r\n- Stop PostgreSQL using services.msc\r\n- Extract the zip file to your Postgres installed folder, on overwrite dialog option, choose \"Yes to all\"\r\n- Start PostgreSQL service\r\n- Run query: \r\nALTER EXTENSION vector UPDATE\r\n- Check the version in the current database with:\r\nSELECT extversion FROM pg_extension WHERE extname = 'vector'\r\n\r\n",
+  "files": [
+    {
+      "path": "include/server/extension/vector/halfvec.h",
+      "bytes": 2205
+    },
+    {
+      "path": "include/server/extension/vector/sparsevec.h",
+      "bytes": 1423
+    },
+    {
+      "path": "include/server/extension/vector/vector.h",
+      "bytes": 999
+    },
+    {
+      "path": "lib/vector.dll",
+      "bytes": 281088
+    },
+    {
+      "path": "share/extension/vector--0.1.0--0.1.1.sql",
+      "bytes": 2047
+    },
+    {
+      "path": "share/extension/vector--0.1.1--0.1.3.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.1.3--0.1.4.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.1.4--0.1.5.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.1.5--0.1.6.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.1.6--0.1.7.sql",
+      "bytes": 403
+    },
+    {
+      "path": "share/extension/vector--0.1.7--0.1.8.sql",
+      "bytes": 396
+    },
+    {
+      "path": "share/extension/vector--0.1.8--0.2.0.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.0--0.2.1.sql",
+      "bytes": 744
+    },
+    {
+      "path": "share/extension/vector--0.2.1--0.2.2.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.2--0.2.3.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.3--0.2.4.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.4--0.2.5.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.5--0.2.6.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.6--0.2.7.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.2.7--0.3.0.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.3.0--0.3.1.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.3.1--0.3.2.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.3.2--0.4.0.sql",
+      "bytes": 864
+    },
+    {
+      "path": "share/extension/vector--0.4.0--0.4.1.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.4.1--0.4.2.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.4.2--0.4.3.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.4.3--0.4.4.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.4.4--0.5.0.sql",
+      "bytes": 1426
+    },
+    {
+      "path": "share/extension/vector--0.5.0--0.5.1.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.5.1--0.6.0.sql",
+      "bytes": 243
+    },
+    {
+      "path": "share/extension/vector--0.6.0--0.6.1.sql",
+      "bytes": 459
+    },
+    {
+      "path": "share/extension/vector--0.6.1--0.6.2.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.6.2--0.7.0.sql",
+      "bytes": 20375
+    },
+    {
+      "path": "share/extension/vector--0.7.0--0.7.1.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.7.1--0.7.2.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.7.2--0.7.3.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.7.3--0.7.4.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.7.4--0.8.0.sql",
+      "bytes": 1227
+    },
+    {
+      "path": "share/extension/vector--0.8.0--0.8.1.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.8.1--0.8.2.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector.control",
+      "bytes": 145
+    },
+    {
+      "path": "readme.txt",
+      "bytes": 892
+    },
+    {
+      "path": "share/extension/vector--0.8.2--0.8.3.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector.sql",
+      "bytes": 42850
+    },
+    {
+      "path": "share/extension/vector--0.8.3--0.8.4.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.8.4--0.8.5.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.8.5--0.8.6.sql",
+      "bytes": 153
+    },
+    {
+      "path": "share/extension/vector--0.8.6--0.8.7.sql",
+      "bytes": 11833
+    },
+    {
+      "path": "share/extension/vector--0.8.7.sql",
+      "bytes": 42850
+    }
+  ]
+}

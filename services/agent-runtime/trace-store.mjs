@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import {readJournal,assertJournalWritable} from './journal-archive.mjs';
 import {summarizeObservation,observationCorrelation} from './observation-summary.mjs';
+import {bindArchiveJournal} from './archive-writer-scope.mjs';
 
 const observationRoots=new Map(),increment=value=>Math.min(Number.MAX_SAFE_INTEGER,value+1);
 const observationRoot=root=>{const value=resolve(root);return process.platform==='win32'?value.toLowerCase():value;};
@@ -53,26 +54,35 @@ function durableWrite(file, text, flags) {
 export function createRunArchive(root, snapshot, options = {}) {
   const id = options.id ?? randomUUID();
   const dir = location(root, id);
+  const journal=bindArchiveJournal(root,id);
+  journal(()=>{
   mkdirSync(dir, { recursive: true, mode: 0o700 });
   const record = redact({ id, createdAt: new Date().toISOString(), formatVersion: 1, ...snapshot });
   record.id = id;
   const json = JSON.stringify(record);
   durableWrite(join(dir, 'snapshot.json'), json, 'wx');
   durableWrite(join(dir, 'events.jsonl'), '', 'wx');
-  const archive = openRunArchive(root, id);
-  archive.append('run/created', { snapshotSha256: createHash('sha256').update(json).digest('hex') });
-  return archive;
+  appendInJournal(root,id,dir,'run/created', { snapshotSha256: createHash('sha256').update(json).digest('hex') });
+  });
+  return archiveHandle(root,id,dir,journal);
 }
 export function openRunArchive(root, id) {
   const dir = location(root, id);
-  verifiedAppendCursor(root, id);
+  const journal=bindArchiveJournal(root,id);
+  journal(()=>verifiedAppendCursor(root, id));
+  return archiveHandle(root,id,dir,journal);
+}
+function archiveHandle(root,id,dir,journal){
   return {
     id, dir,
     append(type, data = {}, links = {}) {
-      // Approval and runtime handles append to the same journal. A handle's
-      // cursor is shared by absolute archive path and only reused while both
-      // files retain their verified content metadata. Validation, fsync and
-      // cursor advancement remain synchronous across all handles.
+      return journal(()=>appendInJournal(root,id,dir,type,data,links));
+    },
+  };
+}
+// The registered journal lock covers validation, deduplication, sequence and
+// fsync as one synchronous operation, including the initial run/created event.
+function appendInJournal(root,id,dir,type,data={},links={}){
       const current = verifiedAppendCursor(root, id);
       if (links.sourceKey && (current.fullRun
         ? current.fullRun.events.some(event => event.sourceKey === links.sourceKey)
@@ -85,8 +95,6 @@ export function openRunArchive(root, id) {
       advanceAppendCursor(key, current, event, Buffer.byteLength(text));
       observeCommitted(root,id,text,current);
       return event;
-    },
-  };
 }
 export function readRun(root, id) {
   const dir = location(root, id);

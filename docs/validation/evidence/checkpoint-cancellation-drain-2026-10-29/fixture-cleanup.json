@@ -1,0 +1,30 @@
+[
+  {
+    "log": "initial-checkpoint-writers.txt",
+    "pid": 48272,
+    "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-zh0Nwi",
+    "bytes": 8644,
+    "removed": true
+  },
+  {
+    "log": "cancellation-red.txt",
+    "pid": 48516,
+    "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-RK25GI",
+    "bytes": 1580,
+    "removed": true
+  },
+  {
+    "log": "physical-cancellation-red.txt",
+    "pid": 21904,
+    "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-ti7WW3",
+    "bytes": 416,
+    "removed": true
+  },
+  {
+    "log": "checkpoint-writers-green.txt",
+    "pid": 39556,
+    "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-l2sl2L",
+    "bytes": 10619,
+    "removed": true
+  }
+]

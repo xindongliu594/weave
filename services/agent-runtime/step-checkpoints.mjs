@@ -29,29 +29,52 @@ function validateManifest(files,origins=false){
   }
   if(!isDeepStrictEqual(canonicalManifest(files),manifest(files)))throw Error('CHECKPOINT_MANIFEST_INVALID');
 }
-function validateOrigin(origin,path){
+function seedOrigin(origin,path,seed){
+ const pin=seed?.sourceCheckpoint,key=pin?.key;
+ return !!key&&exact(origin,['path','runId','taskId','attemptId','acceptedRevision','checkpointId'])&&origin.path===path&&origin.runId===key.runId&&origin.taskId===key.taskId&&origin.attemptId===key.attemptId&&origin.acceptedRevision===seed.workRevision&&origin.checkpointId===pin.id;
+}
+function validateOrigin(origin,path,seed){
+ if(seedOrigin(origin,path,seed))return;
  if(!exact(origin,['path','runId','taskId','attemptId','acceptedRevision'])||origin.path!==path||![origin.runId,origin.taskId,origin.attemptId].every(v=>typeof v==='string'&&v.length>0)||!sha.test(origin.acceptedRevision??''))throw Error('CHECKPOINT_ORIGIN_INVALID');
 }
-/** Verify metadata and every immutable referenced object without scanning a compatibility cache. */
-export function validateTaskCheckpointRefs(refs,{runId,taskId,attemptId,archiveDir,checkedObjects=new Set()}={}){
+function validateRecoverySeed(seed,key){
+ const pin=seed?.sourceCheckpoint;
+ if(!exact(seed,['version','initializationDigest','sourceCheckpoint','workRevision'])||seed.version!==1||![seed.initializationDigest,seed.workRevision].every(v=>typeof v==='string'&&sha.test(v))||
+  !exact(pin,['key','id','sha256','seq'])||!identity(pin.key)||!uuid.test(pin.key.runId)||pin.key.runId===key.runId||pin.key.taskId!==key.taskId||!uuid.test(pin.id??'')||!sha.test(pin.sha256??'')||!Number.isSafeInteger(pin.seq)||pin.seq<1)throw Error('CHECKPOINT_REFS_INVALID');
+}
+/** Verify metadata and immutable objects, not SQL recovery authority or the source chain. */
+export function validateTaskCheckpointRefs(refs,{runId,taskId,attemptId,generation,archiveDir,checkedObjects=new Set()}={}){
  const invalid=()=>{throw Error('CHECKPOINT_REFS_INVALID');};
  if(!isDeepStrictEqual(refs,redact(refs)))throw Error('CHECKPOINT_METADATA_UNSAFE');
- if(!exact(refs,['profile','key','inputManifest','inputOrigins','workManifest','canonical','lastMerge','scopeHash','capabilityHash'])||refs.profile!=='task-attempt-openshell-v1'||!identity(refs.key)||!uuid.test(refs.key.runId)||runId&&refs.key.runId!==runId||taskId&&refs.key.taskId!==taskId||attemptId&&refs.key.attemptId!==attemptId||!sha.test(refs.scopeHash??'')||!sha.test(refs.capabilityHash??''))invalid();
+ const hasSeed=!!refs&&Object.hasOwn(refs,'recoverySeed');
+ if(!exact(refs,['profile','key','inputManifest','inputOrigins','workManifest','canonical','lastMerge','scopeHash','capabilityHash',...(hasSeed?['recoverySeed']:[])])||refs.profile!=='task-attempt-openshell-v1'||!identity(refs.key)||!uuid.test(refs.key.runId)||runId&&refs.key.runId!==runId||taskId&&refs.key.taskId!==taskId||attemptId&&refs.key.attemptId!==attemptId||generation!==undefined&&refs.key.generation!==generation||!sha.test(refs.scopeHash??'')||!sha.test(refs.capabilityHash??''))invalid();
+ if(hasSeed)validateRecoverySeed(refs.recoverySeed,refs.key);
  validateManifest(refs.workManifest);validateManifest(refs.inputManifest,true);
- for(const row of refs.inputManifest)validateOrigin(row.origin,row.path);
+ for(const row of refs.inputManifest)validateOrigin(row.origin,row.path,refs.recoverySeed);
  if(!Array.isArray(refs.inputOrigins)||refs.inputOrigins.length>128)invalid();
- const seen=new Set();
+ const seen=new Set(),producers=new Map();let initializationDigest=refs.recoverySeed?.initializationDigest;
  for(const row of refs.inputOrigins){
-  if(!exact(row,['path','sha256','origin','source'])||seen.has(row.path)||!sha.test(row.sha256??''))invalid();seen.add(row.path);validArtifactPath(row.path);validateOrigin(row.origin,row.path);if(row.origin.runId!==refs.key.runId)invalid();
+  if(!exact(row,['path','sha256','origin','source'])||seen.has(row.path)||!sha.test(row.sha256??''))invalid();seen.add(row.path);validArtifactPath(row.path);validateOrigin(row.origin,row.path);
   const source=row.source,input=refs.inputManifest.find(f=>f.path===row.path);
   if(!input||input.sha256!==row.sha256||!isDeepStrictEqual(input.origin,row.origin))invalid();
   if(source?.kind==='import'){
-   if(!exact(source,['kind','snapshotId','sha256','agentIds'])||typeof source.snapshotId!=='string'||!source.snapshotId||source.sha256!==row.sha256||!Array.isArray(source.agentIds)||!source.agentIds.length||source.agentIds.some(id=>typeof id!=='string'||!id)||new Set(source.agentIds).size!==source.agentIds.length)invalid();
+   if(row.origin.runId!==refs.key.runId||!exact(source,['kind','snapshotId','sha256','agentIds'])||typeof source.snapshotId!=='string'||!source.snapshotId||source.sha256!==row.sha256||!Array.isArray(source.agentIds)||!source.agentIds.length||source.agentIds.some(id=>typeof id!=='string'||!id)||new Set(source.agentIds).size!==source.agentIds.length)invalid();
   }else if(source?.kind==='accepted'){
-   if(!exact(source,['kind','runId','taskId','attemptId','revision'])||source.runId!==row.origin.runId||source.taskId!==row.origin.taskId||source.attemptId!==row.origin.attemptId||source.revision!==row.origin.acceptedRevision)invalid();
+   if(row.origin.runId!==refs.key.runId||!exact(source,['kind','runId','taskId','attemptId','revision'])||source.runId!==row.origin.runId||source.taskId!==row.origin.taskId||source.attemptId!==row.origin.attemptId||source.revision!==row.origin.acceptedRevision)invalid();
+  }else if(source?.kind==='recovery-accepted'){
+   if(!exact(source,['kind','initializationDigest','key','revision','acceptedDigest'])||!identity(source.key)||!uuid.test(source.key.runId)||source.key.runId===refs.key.runId||
+    source.key.runId!==row.origin.runId||source.key.taskId!==row.origin.taskId||source.key.attemptId!==row.origin.attemptId||source.revision!==row.origin.acceptedRevision||
+    ![source.initializationDigest,source.revision,source.acceptedDigest].every(v=>typeof v==='string'&&sha.test(v))||initializationDigest!==undefined&&source.initializationDigest!==initializationDigest)invalid();
+   initializationDigest=source.initializationDigest;
+   const producer=JSON.stringify([source.key.runId,source.key.taskId,source.key.attemptId]),previous=producers.get(producer);
+   if(previous&&!isDeepStrictEqual(previous,source))invalid();producers.set(producer,source);
   }else invalid();
  }
- for(const row of refs.inputManifest)if(!seen.has(row.path)&&(row.origin.runId!==refs.key.runId||row.origin.taskId!==refs.key.taskId||row.origin.attemptId!==refs.key.attemptId||refs.lastMerge===null))invalid();
+ for(const row of refs.inputManifest)if(!seen.has(row.path)){
+  if(seedOrigin(row.origin,row.path,refs.recoverySeed)){
+   const work=refs.workManifest.find(file=>file.path===row.path);if(!work||work.sha256!==row.sha256||work.size!==row.size)invalid();
+  }else if(row.origin.runId!==refs.key.runId||row.origin.taskId!==refs.key.taskId||row.origin.attemptId!==refs.key.attemptId||refs.lastMerge===null)invalid();
+ }
  const c=refs.canonical;
  if(!exact(c,['revision','manifest','mergeId'])||!(c.mergeId===null||typeof c.mergeId==='string'&&c.mergeId.length>0))invalid();
  validateManifest(c.manifest);if(checkpointDigest(c.manifest)!==c.revision)invalid();
@@ -81,14 +104,19 @@ function commitTaskCheckpoint({archive,boundary,receipts,taskRefs}){
  return {...record,seq:event.seq,at:event.at};
 }
 
+function taskCheckpointBinding(legacy,taskRefs){
+ const {profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}=taskRefs,binding={legacy,profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash};
+ if(Object.hasOwn(taskRefs,'recoverySeed')||inputOrigins?.some(row=>row.source?.kind==='recovery-accepted'))return {domain:'task-checkpoint-recovery-v1',...binding,...(Object.hasOwn(taskRefs,'recoverySeed')?{recoverySeed:taskRefs.recoverySeed}:{})};
+ return binding;
+}
 export function checkpointContract(snapshot,task,taskRefs) {
-  if(taskRefs){const {profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}=taskRefs;return checkpointDigest({legacy:checkpointContract(snapshot,task),profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash});}
+  if(taskRefs)return checkpointDigest(taskCheckpointBinding(checkpointContract(snapshot,task),taskRefs));
   const {maxBudget,maxModelCalls,maxOutputTokens,estimatedInputTokens,estimatedOutputTokens,...contract}=task;
   const employee=snapshot.agents?.find(agent=>agent.id===task.assignee);
   return checkpointDigest({contract,principal:employee&&{id:employee.id,tools:[...employee.tools].sort()},knowledge:snapshot.knowledge??null,executionTarget:snapshot.executionTarget??null});
 }
 export function checkpointEnvironment(snapshot,proof,taskRefs) {
-  if(taskRefs){const legacy=checkpointEnvironment(snapshot,proof),{profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}=taskRefs;return legacy?checkpointDigest({legacy,profile,key,inputManifest,inputOrigins,scopeHash,capabilityHash}):null;}
+  if(taskRefs){const legacy=checkpointEnvironment(snapshot,proof);return legacy?checkpointDigest(taskCheckpointBinding(legacy,taskRefs)):null;}
   const expected=snapshot.executionTarget?.backend;
   if(expected?.kind!=='openshell'||!proof||Object.entries(expected).some(([key,value])=>proof[key]!==value)||
       !/@sha256:[a-f0-9]{64}$/.test(proof.image??'')||!proof.node||!proof.effectivePolicyHash||proof.uid!==1000||proof.gid!==1000)return null;
@@ -141,7 +169,7 @@ export function commitStepCheckpoint({archive,workspace,boundary,receipts=[],tas
   assertPlain(archive.dir,'directory');assertArchiveCapacity(archive.dir);
   if(taskRefs!==undefined)return commitTaskCheckpoint({archive,boundary,receipts,taskRefs});
   const files=checkpointFiles(workspace),objects=join(archive.dir,'checkpoint-objects');
-  if(!existsSync(objects))mkdirSync(objects,{mode:0o700});assertPlain(objects,'directory');
+  if(existsSync(objects))assertPlain(objects,'directory');
   const fresh=files.filter(file=>!existsSync(join(objects,file.sha256)));
   const metadata=redact({id:randomUUID(),version:1,runId:archive.id,boundary,files:manifest(files),receipts});
   const bytes=Buffer.byteLength(JSON.stringify(metadata));

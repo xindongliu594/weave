@@ -62,7 +62,7 @@ function Personnel({ departments, actorId }: { departments: Department[]; actorI
   return <>
     <div className="page-head"><div><div className="eyebrow">PEOPLE & ACCESS</div><h1>人员与部门权限</h1><p>开通真人账号，分配组织角色与部门权限。</p></div>
       <button disabled={busy || loading} onClick={refresh}>刷新人员资料</button></div>
-    <div className="notice-box"><p>这里管理真人账号，与部门中的 AI 员工分别授权。当前成员业务入口尚未开放；保存部门权限不代表成员已经能够读取、执行或审批业务资源。</p></div>
+    <div className="notice-box"><p>这里管理真人账号，与部门中的 AI 员工分别授权。成员只读入口已开放部门、项目和运行概要；资源读取由后端逐次校验，执行、审批与管理入口仍在接入。</p></div>
     {error && <div className="banner error lower" role="alert">{error} 未自动重试，请先刷新核对。</div>}
     {notice && <div className="banner lower" role="status">{notice}</div>}
     <div className="product-columns lower">
@@ -136,7 +136,7 @@ function DepartmentGrant({ user, departments, disabled, revision, mutate }: { us
     {error && <p className="banner error" role="alert">{error} 请使用页面顶部的刷新按钮。</p>}
     {departmentId && exists && <>
       <p className="subcopy" role="status">{!ready ? '正在核对当前部门授权…' : grant ? '已授予本部门权限。' : '尚未授予本部门权限。'}</p>
-      <form onSubmit={event => { event.preventDefault(); if (!locked) void mutate(path, 'PUT', { version: grant?.version ?? 0, role, canApprove }, '部门权限已保存；成员业务入口仍在接入。', user.id); }}>
+      <form onSubmit={event => { event.preventDefault(); if (!locked) void mutate(path, 'PUT', { version: grant?.version ?? 0, role, canApprove }, '部门权限已保存；成员可刷新只读工作台核对可见资源。', user.id); }}>
         <label className="field">部门角色<select value={role} disabled={locked} onChange={event => { const next = event.target.value as Membership['role']; setRole(next); if (next === 'viewer') setCanApprove(false); }}>
           <option value="viewer">查看者</option><option value="operator">操作员</option><option value="manager">部门经理</option>
         </select></label>

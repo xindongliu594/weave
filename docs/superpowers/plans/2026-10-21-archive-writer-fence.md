@@ -200,7 +200,20 @@ SQL 尾部采用已有门禁，不增加另一套分布式锁：普通运行状�
 
 验证两进程下对象复制、归档、备份目录交换与 writer 的冲突；旧 handle 不复活、新 guard 绑定新物理根。保留原 enterprise destination/未知操作门禁。
 
+### 2026-10-29 补齐同步档案写入入口
+
+复核当前代码后，运行、控制、目标 admission、维护和备份外层已有持锁入口，不重复实现旧 ledger 中仍显示待派发的部分。沿用此前选定并固定的 `fs-native-extensions@1.5.1`、`archive-write-fence` 和 `archive-writer-scope`，补齐尚缺的底层强制检查。
+
+1. 在应用启动时登记唯一档案根。登记后不可解除，原始句柄不能借新作用域继续写；独立、未登记的离线夹具保留旧接口。
+2. create/open/append 共用已有同步 journal 锁，临界区覆盖快照初始化、验证、去重、序号、fsync 和游标更新。句柄绑定原始存活作用域。
+3. SHA 对象写入检查同一运行 writer；日志压缩要求 maintenance。物理写入异常保留原失败占用，不自动解除或重放。
+4. 两个真实进程核对连续序号、sourceKey 去重、写入排空和 source 排他；再跑产品/API/维护/备份相关回归与构建。
+
+本批只补上述入口，不能据此宣称所有磁盘/SQL writer 已覆盖。Task 4 的完整来源审查、恢复来源证明、子运行初始化及实际 JJ 验收仍是后续门禁；企业 profile 保持关闭。
+
 ## Task 4：覆盖审查及交付给恢复来源核对
+
+2026-10-30：限定覆盖审查形成26行矩阵，已修两个确定缺口（运行账单query全生命周期writer、root内规划诊断写入）；同步检查点的首个mkdir交还受保护对象入口。6项物理失败跨进程回归、14项账单writer/HTTP、17项账单、12项费用、8项规划API、10项对象/Checkpoint及2项目录隔离通过，产品19场景分组有通过证据，8项runner/所有权通过，类型构建0。独立限定/整合审查无待处理Critical/Important。相关原失败、产品聚合124及schema修正后的轻量边界保留，见 [收口报告](../../validation/checkpoint-parallel-2026-10-30.md)。不将本次矩阵当作source认证；后续仍须按来源计划的完整SQL/日志/对象/当前权限条件实现真实捕获与子初始化，企业profile保持关闭。
 
 逐入口核对所有源表 UPDATE/INSERT、档案 create/append、对象/mirror/rename，保留双进程和原生 PostgreSQL 证据。所有 writer 接完且独立审查通过后，才把真实独占 guard 交给恢复来源 Task 2；随后仍须核对完整 SQL/档案/权限/已验收节点，才能初始化子运行。
 

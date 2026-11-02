@@ -1,0 +1,6360 @@
+{
+  "schema": "public",
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "tables": [
+    {
+      "name": "gateways",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "credential",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "4cde368cf7f5a80b03fe6a96791841871a7cf352240e0e56ae39639d3f16a911",
+      "expectedFingerprint": "4cde368cf7f5a80b03fe6a96791841871a7cf352240e0e56ae39639d3f16a911"
+    },
+    {
+      "name": "departments",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL updated_at",
+          "columns": [
+            "updated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER department_version_history AFTER INSERT OR UPDATE ON public.departments FOR EACH ROW EXECUTE FUNCTION record_department_version()",
+          "function": "CREATE OR REPLACE FUNCTION public.record_department_version()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n      INSERT INTO department_versions(department_id,version,data) VALUES(NEW.id,NEW.version,NEW.data) ON CONFLICT DO NOTHING; RETURN NEW;\n    END $function$\n"
+        }
+      ],
+      "actualFingerprint": "0bcb5f14f0553da5efa05388891c4c5bd5e0003ffb765e25e9e9957a44251ada",
+      "expectedFingerprint": "0bcb5f14f0553da5efa05388891c4c5bd5e0003ffb765e25e9e9957a44251ada"
+    },
+    {
+      "name": "department_versions",
+      "columns": [
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL department_id",
+          "columns": [
+            "department_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (department_id, version)",
+          "columns": [
+            "department_id",
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "e37a5d4be4f7819566bc989fdd3d5528deeb7819961cc3a0aa4b74a394f07668",
+      "expectedFingerprint": "e37a5d4be4f7819566bc989fdd3d5528deeb7819961cc3a0aa4b74a394f07668"
+    },
+    {
+      "name": "models",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "credential",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "checked_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "capabilities",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL capabilities",
+          "columns": [
+            "capabilities"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "82e70cc39d0f2f8eb999eb9af89ee83560552f93105de4ec6b26ebfffe2dc699",
+      "expectedFingerprint": "82e70cc39d0f2f8eb999eb9af89ee83560552f93105de4ec6b26ebfffe2dc699"
+    },
+    {
+      "name": "templates",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL kind",
+          "columns": [
+            "kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL name",
+          "columns": [
+            "name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "c195f1fe3fcb0c099fe7ba3b0a94e29d5bb2c7efcecf976fe16d50a4a2b36ce9",
+      "expectedFingerprint": "c195f1fe3fcb0c099fe7ba3b0a94e29d5bb2c7efcecf976fe16d50a4a2b36ce9"
+    },
+    {
+      "name": "knowledge_spaces",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "agent_ids",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "vault_folder",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL agent_ids",
+          "columns": [
+            "agent_ids"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL name",
+          "columns": [
+            "name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL scope",
+          "columns": [
+            "scope"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "494b99d58b69ecf0c84e9ddfc93cb0d7e6845041ce700def10186a1cf4a772a0",
+      "expectedFingerprint": "494b99d58b69ecf0c84e9ddfc93cb0d7e6845041ce700def10186a1cf4a772a0"
+    },
+    {
+      "name": "knowledge_documents",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "space_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "vault_path",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "vault_hash",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (space_id) REFERENCES knowledge_spaces(id)",
+          "columns": [
+            "space_id"
+          ],
+          "target": "knowledge_spaces",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL space_id",
+          "columns": [
+            "space_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL title",
+          "columns": [
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "a9c71a9e132ad8f1194d9842cfd8dcffda97b92c1f14bdf9edff60fed8090043",
+      "expectedFingerprint": "a9c71a9e132ad8f1194d9842cfd8dcffda97b92c1f14bdf9edff60fed8090043"
+    },
+    {
+      "name": "knowledge_revisions",
+      "columns": [
+        {
+          "name": "document_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "sha256",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "source",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "source_bounds",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (document_id) REFERENCES knowledge_documents(id)",
+          "columns": [
+            "document_id"
+          ],
+          "target": "knowledge_documents",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL content",
+          "columns": [
+            "content"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL document_id",
+          "columns": [
+            "document_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL sha256",
+          "columns": [
+            "sha256"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL source",
+          "columns": [
+            "source"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (document_id, version)",
+          "columns": [
+            "document_id",
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "e9d8999fe8535d5e857b87b66af265ff47300095202377044789f3627585f344",
+      "expectedFingerprint": "e9d8999fe8535d5e857b87b66af265ff47300095202377044789f3627585f344"
+    },
+    {
+      "name": "knowledge_chunks",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "line_start",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "line_end",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "tokens",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL content",
+          "columns": [
+            "content"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL document_id",
+          "columns": [
+            "document_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL line_end",
+          "columns": [
+            "line_end"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL line_start",
+          "columns": [
+            "line_start"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL tokens",
+          "columns": [
+            "tokens"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "eab9e0aa0066c7daa690a39a52b2d36ec8fe01e25465f4a9534773dd68ce48fe",
+      "expectedFingerprint": "eab9e0aa0066c7daa690a39a52b2d36ec8fe01e25465f4a9534773dd68ce48fe"
+    },
+    {
+      "name": "knowledge_embeddings",
+      "columns": [
+        {
+          "name": "chunk_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "model_version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "embedding",
+          "type": "vector(384)",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL chunk_id",
+          "columns": [
+            "chunk_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL embedding",
+          "columns": [
+            "embedding"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL model_version",
+          "columns": [
+            "model_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL title",
+          "columns": [
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (chunk_id, model_version, title)",
+          "columns": [
+            "chunk_id",
+            "model_version",
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "9cd85e1c6b1eba6d123fd4050a0848fe9d00ebc73b06baed5e47e455979d638d",
+      "expectedFingerprint": "9cd85e1c6b1eba6d123fd4050a0848fe9d00ebc73b06baed5e47e455979d638d"
+    },
+    {
+      "name": "product_settings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((id = 1))",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "f0cea9cb2d4fe8df406688faed471d42eeceee06a41c04840417e0c1418047aa",
+      "expectedFingerprint": "f0cea9cb2d4fe8df406688faed471d42eeceee06a41c04840417e0c1418047aa"
+    },
+    {
+      "name": "human_users",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "issuer",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "org_role",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "session_epoch",
+          "type": "bigint",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK (((session_epoch >= 0) AND (session_epoch <= '9007199254740991'::bigint)))",
+          "columns": [
+            "session_epoch"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((length(issuer) > 0))",
+          "columns": [
+            "issuer"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((length(subject) > 0))",
+          "columns": [
+            "subject"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((org_role = ANY (ARRAY['member'::text, 'admin'::text, 'auditor'::text])))",
+          "columns": [
+            "org_role"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'active'::text, 'disabled'::text])))",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((version > 0))",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL issuer",
+          "columns": [
+            "issuer"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL org_role",
+          "columns": [
+            "org_role"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL session_epoch",
+          "columns": [
+            "session_epoch"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL subject",
+          "columns": [
+            "subject"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL updated_at",
+          "columns": [
+            "updated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (issuer, subject)",
+          "columns": [
+            "issuer",
+            "subject"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "3f1158c7b43def710c8b63af2bac3ab97e0be0802c23bed4401e1c25fc6a6ce3",
+      "expectedFingerprint": "3f1158c7b43def710c8b63af2bac3ab97e0be0802c23bed4401e1c25fc6a6ce3"
+    },
+    {
+      "name": "department_memberships",
+      "columns": [
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "can_approve",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "granted_by",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((role = ANY (ARRAY['viewer'::text, 'operator'::text, 'manager'::text])))",
+          "columns": [
+            "role"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((version > 0))",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (department_id) REFERENCES departments(id)",
+          "columns": [
+            "department_id"
+          ],
+          "target": "departments",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (granted_by) REFERENCES human_users(id)",
+          "columns": [
+            "granted_by"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES human_users(id)",
+          "columns": [
+            "user_id"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL can_approve",
+          "columns": [
+            "can_approve"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL department_id",
+          "columns": [
+            "department_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL role",
+          "columns": [
+            "role"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL updated_at",
+          "columns": [
+            "updated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL user_id",
+          "columns": [
+            "user_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (department_id, user_id)",
+          "columns": [
+            "department_id",
+            "user_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "a1e8bac2036efff044ce7c9a90e9513b5c45f8755483a46b4370c5d10153c81d",
+      "expectedFingerprint": "a1e8bac2036efff044ce7c9a90e9513b5c45f8755483a46b4370c5d10153c81d"
+    },
+    {
+      "name": "identity_bootstrap",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "expected_fingerprint",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "activated_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "consumed_by",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "consumed_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "closed_reason",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((((closed_at IS NULL) = (closed_reason IS NULL)) AND ((closed_reason IS NULL) OR (closed_reason = ANY (ARRAY['existing-administration'::text, 'disabled-bootstrap-identity'::text]))) AND ((closed_at IS NULL) OR ((activated_at IS NOT NULL) AND (consumed_at IS NULL)))))",
+          "columns": [
+            "closed_at",
+            "closed_reason",
+            "activated_at",
+            "consumed_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK (((activated_at IS NULL) = (expected_fingerprint IS NULL)))",
+          "columns": [
+            "activated_at",
+            "expected_fingerprint"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK (((consumed_at IS NULL) = (consumed_by IS NULL)))",
+          "columns": [
+            "consumed_at",
+            "consumed_by"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK (((consumed_at IS NULL) OR (activated_at IS NOT NULL)))",
+          "columns": [
+            "consumed_at",
+            "activated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((id = 1))",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((version > 0))",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (consumed_by) REFERENCES human_users(id)",
+          "columns": [
+            "consumed_by"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "67c9d8deda95995ec817919ff5cc51c7e6ebd4829e16bf86ffea43893faaf788",
+      "expectedFingerprint": "67c9d8deda95995ec817919ff5cc51c7e6ebd4829e16bf86ffea43893faaf788"
+    },
+    {
+      "name": "projects",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "department_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "department_name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "requirement",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "policy",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "plan",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (department_id) REFERENCES departments(id)",
+          "columns": [
+            "department_id"
+          ],
+          "target": "departments",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL department_id",
+          "columns": [
+            "department_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL department_name",
+          "columns": [
+            "department_name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL department_version",
+          "columns": [
+            "department_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL plan",
+          "columns": [
+            "plan"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL policy",
+          "columns": [
+            "policy"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL requirement",
+          "columns": [
+            "requirement"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL source",
+          "columns": [
+            "source"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "aab81f0391ee84aef1c70e21ac910e6a3c1b4cf5e7c4f61837a9fe43eceeeb08",
+      "expectedFingerprint": "aab81f0391ee84aef1c70e21ac910e6a3c1b4cf5e7c4f61837a9fe43eceeeb08"
+    },
+    {
+      "name": "plan_versions",
+      "columns": [
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "plan",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "policy",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id)",
+          "columns": [
+            "project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL plan",
+          "columns": [
+            "plan"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL project_id",
+          "columns": [
+            "project_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (project_id, version)",
+          "columns": [
+            "project_id",
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "0472fdac8ed664ea840e85ffc792aeeaa128641d35d9ea41f102badf293c4266",
+      "expectedFingerprint": "0472fdac8ed664ea840e85ffc792aeeaa128641d35d9ea41f102badf293c4266"
+    },
+    {
+      "name": "activity",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL kind",
+          "columns": [
+            "kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL title",
+          "columns": [
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "18473942de83a1dedc316f3a6244f45e270aa425e88e4418d70bb4e094dd24f6",
+      "expectedFingerprint": "18473942de83a1dedc316f3a6244f45e270aa425e88e4418d70bb4e094dd24f6"
+    },
+    {
+      "name": "usage",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "input_tokens",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "output_tokens",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "cost",
+          "type": "numeric",
+          "required": true
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "planning_preview_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "agent_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "employee_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "task_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "attempt_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "request_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "duration_ms",
+          "type": "integer",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (model_id) REFERENCES models(id)",
+          "columns": [
+            "model_id"
+          ],
+          "target": "models",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id)",
+          "columns": [
+            "project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL cost",
+          "columns": [
+            "cost"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL input_tokens",
+          "columns": [
+            "input_tokens"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL model_id",
+          "columns": [
+            "model_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL output_tokens",
+          "columns": [
+            "output_tokens"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL purpose",
+          "columns": [
+            "purpose"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "cd158c710828da468ea2bc903714718e76e05ef3c60d11570f50ebb1acbe35d1",
+      "expectedFingerprint": "cd158c710828da468ea2bc903714718e76e05ef3c60d11570f50ebb1acbe35d1"
+    },
+    {
+      "name": "project_runs",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "project_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "lease_owner",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "attempt",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "parent_run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "cancel_requested",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "department_ids",
+          "type": "text[]",
+          "required": true
+        },
+        {
+          "name": "requested_by_user_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "authorized_by_user_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "authorized_epoch",
+          "type": "bigint",
+          "required": false
+        },
+        {
+          "name": "authority_kind",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "authority_department_ids",
+          "type": "text[]",
+          "required": false
+        },
+        {
+          "name": "source_bounds",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "canonical_workspace",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK (((authorized_epoch >= 0) AND (authorized_epoch <= '9007199254740991'::bigint)))",
+          "columns": [
+            "authorized_epoch"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((authority_kind = ANY (ARRAY['human'::text, 'local-owner'::text, 'automatic-policy'::text])))",
+          "columns": [
+            "authority_kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (authorized_by_user_id) REFERENCES human_users(id)",
+          "columns": [
+            "authorized_by_user_id"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id)",
+          "columns": [
+            "project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (requested_by_user_id) REFERENCES human_users(id)",
+          "columns": [
+            "requested_by_user_id"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL attempt",
+          "columns": [
+            "attempt"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL cancel_requested",
+          "columns": [
+            "cancel_requested"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL department_ids",
+          "columns": [
+            "department_ids"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL project_id",
+          "columns": [
+            "project_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL project_version",
+          "columns": [
+            "project_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL snapshot",
+          "columns": [
+            "snapshot"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "fc9d6a6be59b5ab1f3fd89259b87473f14565e91766ef52ce7fa7699b8babea4",
+      "expectedFingerprint": "fc9d6a6be59b5ab1f3fd89259b87473f14565e91766ef52ce7fa7699b8babea4"
+    },
+    {
+      "name": "model_reservations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "numeric",
+          "required": true
+        },
+        {
+          "name": "input_rate",
+          "type": "numeric",
+          "required": true
+        },
+        {
+          "name": "output_rate",
+          "type": "numeric",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "context",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "history",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((amount >= (0)::numeric))",
+          "columns": [
+            "amount"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'uncertain'::text, 'settled'::text, 'released'::text])))",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (model_id) REFERENCES models(id)",
+          "columns": [
+            "model_id"
+          ],
+          "target": "models",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id)",
+          "columns": [
+            "project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL amount",
+          "columns": [
+            "amount"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL context",
+          "columns": [
+            "context"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL expires_at",
+          "columns": [
+            "expires_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL history",
+          "columns": [
+            "history"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL input_rate",
+          "columns": [
+            "input_rate"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL model_id",
+          "columns": [
+            "model_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL output_rate",
+          "columns": [
+            "output_rate"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL purpose",
+          "columns": [
+            "purpose"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "f0c5c376040dada1953c87a5ab158f2e90c69ba0ea56d0b1a886eb66c3814b0b",
+      "expectedFingerprint": "f0c5c376040dada1953c87a5ab158f2e90c69ba0ea56d0b1a886eb66c3814b0b"
+    },
+    {
+      "name": "model_capability_tests",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "model_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "probe_version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "request_ids",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (model_id) REFERENCES models(id)",
+          "columns": [
+            "model_id"
+          ],
+          "target": "models",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL model_id",
+          "columns": [
+            "model_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL model_version",
+          "columns": [
+            "model_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL probe_version",
+          "columns": [
+            "probe_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL request_ids",
+          "columns": [
+            "request_ids"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "d0107ba34b58ac1bed5132591bd228c318caf359e80967ede7ee6da56e4c0ff5",
+      "expectedFingerprint": "d0107ba34b58ac1bed5132591bd228c318caf359e80967ede7ee6da56e4c0ff5"
+    },
+    {
+      "name": "organization_previews",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "819e71d72942c7ca31673bf85716b401e2c142d916f7e39d5a95512f227d8f17",
+      "expectedFingerprint": "819e71d72942c7ca31673bf85716b401e2c142d916f7e39d5a95512f227d8f17"
+    },
+    {
+      "name": "organization_conversations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "preview_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "failed_draft",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL turn_id",
+          "columns": [
+            "turn_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL updated_at",
+          "columns": [
+            "updated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "63c3fb2f9f5f9a7373102b522352c4841271fa5b60b4fc396b91b75cc129c96e",
+      "expectedFingerprint": "63c3fb2f9f5f9a7373102b522352c4841271fa5b60b4fc396b91b75cc129c96e"
+    },
+    {
+      "name": "manager_messages",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "project_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "reply",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "error",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "max_cost",
+          "type": "numeric",
+          "required": true
+        },
+        {
+          "name": "model_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "model_version",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "name": "gateway_version",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "name": "usage_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "authorized_by_user_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "authorized_epoch",
+          "type": "bigint",
+          "required": false
+        },
+        {
+          "name": "authority_kind",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "authority_department_ids",
+          "type": "text[]",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK (((authorized_epoch >= 0) AND (authorized_epoch <= '9007199254740991'::bigint)))",
+          "columns": [
+            "authorized_epoch"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((authority_kind = ANY (ARRAY['human'::text, 'local-owner'::text])))",
+          "columns": [
+            "authority_kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (authorized_by_user_id) REFERENCES human_users(id)",
+          "columns": [
+            "authorized_by_user_id"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id)",
+          "columns": [
+            "project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL content",
+          "columns": [
+            "content"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL max_cost",
+          "columns": [
+            "max_cost"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL model_id",
+          "columns": [
+            "model_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL project_id",
+          "columns": [
+            "project_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL project_version",
+          "columns": [
+            "project_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "f7e6b549aff2d2de39a0eda62f98cedf4912e9e17fdce0cac0d857ad4b26f226",
+      "expectedFingerprint": "f7e6b549aff2d2de39a0eda62f98cedf4912e9e17fdce0cac0d857ad4b26f226"
+    },
+    {
+      "name": "work_file_snapshots",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "files",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "bytes",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "source_run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "source_bounds",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL bytes",
+          "columns": [
+            "bytes"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL files",
+          "columns": [
+            "files"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL name",
+          "columns": [
+            "name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "eba2ed61b1a5a2d9e6ec4690c6c38ff203960cfbeb9c47ac6eba781bc8ce0c8e",
+      "expectedFingerprint": "eba2ed61b1a5a2d9e6ec4690c6c38ff203960cfbeb9c47ac6eba781bc8ce0c8e"
+    },
+    {
+      "name": "mcp_connections",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "credential",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "tools",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL data",
+          "columns": [
+            "data"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL tools",
+          "columns": [
+            "tools"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "0b7b25409609bcf54ff41d907ca8abbe807a8afb18892b263e4b22eb3995d12b",
+      "expectedFingerprint": "0b7b25409609bcf54ff41d907ca8abbe807a8afb18892b263e4b22eb3995d12b"
+    },
+    {
+      "name": "storage_cleanups",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "preview",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "result",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL preview",
+          "columns": [
+            "preview"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL updated_at",
+          "columns": [
+            "updated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "01e8af5c26a2deee630f028b9485dd707d6f06f6956418c3aea65fdb25fc6e96",
+      "expectedFingerprint": "01e8af5c26a2deee630f028b9485dd707d6f06f6956418c3aea65fdb25fc6e96"
+    },
+    {
+      "name": "native_capabilities",
+      "columns": [
+        {
+          "name": "namespace",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "manifest_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL enabled",
+          "columns": [
+            "enabled"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL manifest_id",
+          "columns": [
+            "manifest_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL namespace",
+          "columns": [
+            "namespace"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL updated_at",
+          "columns": [
+            "updated_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (namespace)",
+          "columns": [
+            "namespace"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "0787309fc01b204bed6db4ce05389bd28bb81babef0270fe816f0e956abf8280",
+      "expectedFingerprint": "0787309fc01b204bed6db4ce05389bd28bb81babef0270fe816f0e956abf8280"
+    },
+    {
+      "name": "human_audit_events",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "actor_kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "actor_user_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "actor_snapshot",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "resource_type",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "resource_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "department_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "request_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "changes",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "schema_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "source_event_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "correlation_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "task_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "attempt_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "operation_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "parent_operation_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "approval_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "merge_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "requested_by_audit_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "executed_employee",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "authority_evidence",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "resource_versions",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "canonical_payload",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK (((actor_kind = 'human'::text) = (actor_user_id IS NOT NULL)))",
+          "columns": [
+            "actor_kind",
+            "actor_user_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((actor_kind = ANY (ARRAY['human'::text, 'local-owner'::text, 'device'::text, 'system'::text, 'unidentified'::text])))",
+          "columns": [
+            "actor_kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((outcome = ANY (ARRAY['success'::text, 'denied'::text, 'failure'::text, 'unknown'::text])))",
+          "columns": [
+            "outcome"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((schema_version = ANY (ARRAY[1, 2])))",
+          "columns": [
+            "schema_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (actor_user_id) REFERENCES human_users(id)",
+          "columns": [
+            "actor_user_id"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (department_id) REFERENCES departments(id)",
+          "columns": [
+            "department_id"
+          ],
+          "target": "departments",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (requested_by_audit_id) REFERENCES human_audit_events(id)",
+          "columns": [
+            "requested_by_audit_id"
+          ],
+          "target": "human_audit_events",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL action",
+          "columns": [
+            "action"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL actor_kind",
+          "columns": [
+            "actor_kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL actor_snapshot",
+          "columns": [
+            "actor_snapshot"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL changes",
+          "columns": [
+            "changes"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL occurred_at",
+          "columns": [
+            "occurred_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL outcome",
+          "columns": [
+            "outcome"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL resource_id",
+          "columns": [
+            "resource_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL resource_type",
+          "columns": [
+            "resource_type"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL schema_version",
+          "columns": [
+            "schema_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (source_event_id)",
+          "columns": [
+            "source_event_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER human_audit_append_only BEFORE DELETE OR UPDATE ON public.human_audit_events FOR EACH ROW EXECUTE FUNCTION reject_human_audit_mutation()",
+          "function": "CREATE OR REPLACE FUNCTION public.reject_human_audit_mutation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\n      BEGIN RAISE EXCEPTION 'human audit events are append only'; END\n    $function$\n"
+        }
+      ],
+      "actualFingerprint": "66390c486608b95e7b575afe2265e8e311b47ebec7ff401e708bd001eedf251e",
+      "expectedFingerprint": "66390c486608b95e7b575afe2265e8e311b47ebec7ff401e708bd001eedf251e"
+    },
+    {
+      "name": "audit_outbox",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "audit_event_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "published_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "next_attempt_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "last_error_code",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((attempts >= 0))",
+          "columns": [
+            "attempts"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((last_error_code = ANY (ARRAY['AUDIT_SOURCE_INVALID'::text, 'AUDIT_RELATION_CONFLICT'::text, 'AUDIT_PROJECTION_FAILED'::text, 'AUDIT_STORAGE_UNAVAILABLE'::text])))",
+          "columns": [
+            "last_error_code"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (audit_event_id) REFERENCES human_audit_events(id)",
+          "columns": [
+            "audit_event_id"
+          ],
+          "target": "human_audit_events",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL attempts",
+          "columns": [
+            "attempts"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL audit_event_id",
+          "columns": [
+            "audit_event_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL event_type",
+          "columns": [
+            "event_type"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL next_attempt_at",
+          "columns": [
+            "next_attempt_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL payload",
+          "columns": [
+            "payload"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (audit_event_id)",
+          "columns": [
+            "audit_event_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "f92ca8ed31e6ea69d956e772fc98dd5ef9d471f372fd48c9d730f93a3897b3fe",
+      "expectedFingerprint": "f92ca8ed31e6ea69d956e772fc98dd5ef9d471f372fd48c9d730f93a3897b3fe"
+    },
+    {
+      "name": "audit_run_projection",
+      "columns": [
+        {
+          "name": "audit_event_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "correlation_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "summary",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((jsonb_typeof(summary) = 'object'::text))",
+          "columns": [
+            "summary"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (audit_event_id) REFERENCES human_audit_events(id)",
+          "columns": [
+            "audit_event_id"
+          ],
+          "target": "human_audit_events",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL audit_event_id",
+          "columns": [
+            "audit_event_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL correlation_id",
+          "columns": [
+            "correlation_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL occurred_at",
+          "columns": [
+            "occurred_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL summary",
+          "columns": [
+            "summary"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (audit_event_id)",
+          "columns": [
+            "audit_event_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "8b1bb186150e45ff3ac622a400cf02ca2718648645735c9b06f58e287514a2bf",
+      "expectedFingerprint": "8b1bb186150e45ff3ac622a400cf02ca2718648645735c9b06f58e287514a2bf"
+    },
+    {
+      "name": "tool_effect_contracts",
+      "columns": [
+        {
+          "name": "digest",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "namespace",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "tool_name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contract",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "reviewed_by",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "retired_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((((retired_at IS NULL) AND (version = 1)) OR ((retired_at IS NOT NULL) AND (version = 2))))",
+          "columns": [
+            "retired_at",
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((digest ~ '^[a-f0-9]{64}$'::text))",
+          "columns": [
+            "digest"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (reviewed_by) REFERENCES human_users(id)",
+          "columns": [
+            "reviewed_by"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL contract",
+          "columns": [
+            "contract"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL digest",
+          "columns": [
+            "digest"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL namespace",
+          "columns": [
+            "namespace"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL reviewed_at",
+          "columns": [
+            "reviewed_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL reviewed_by",
+          "columns": [
+            "reviewed_by"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL tool_name",
+          "columns": [
+            "tool_name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (digest)",
+          "columns": [
+            "digest"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER tool_effect_contract_immutable BEFORE DELETE OR UPDATE ON public.tool_effect_contracts FOR EACH ROW EXECUTE FUNCTION protect_tool_effect_contract()",
+          "function": "CREATE OR REPLACE FUNCTION public.protect_tool_effect_contract()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n    IF TG_OP='DELETE' THEN RAISE EXCEPTION 'tool effect contract immutable'; END IF;\n    IF ROW(NEW.digest,NEW.namespace,NEW.tool_name,NEW.contract,NEW.reviewed_by,NEW.reviewed_at)\n        IS DISTINCT FROM ROW(OLD.digest,OLD.namespace,OLD.tool_name,OLD.contract,OLD.reviewed_by,OLD.reviewed_at)\n      OR OLD.retired_at IS NOT NULL OR NEW.retired_at IS NULL OR NEW.version<>OLD.version+1 THEN\n      RAISE EXCEPTION 'tool effect contract immutable';\n    END IF;\n    RETURN NEW;\n  END $function$\n"
+        }
+      ],
+      "actualFingerprint": "3563b41fadb40026254c8966c7201cb856f50f6848f0173110e86b9513aa1789",
+      "expectedFingerprint": "3563b41fadb40026254c8966c7201cb856f50f6848f0173110e86b9513aa1789"
+    },
+    {
+      "name": "tool_approvals",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "agent_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "tool",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "arguments",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "decided_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "decided_by_user_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "decided_epoch",
+          "type": "bigint",
+          "required": false
+        },
+        {
+          "name": "decision_actor_kind",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "decision_request_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "decision_reason",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "decision_audit_id",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((((decision_actor_kind IS NULL) AND (decided_by_user_id IS NULL) AND (decided_epoch IS NULL) AND (decision_request_id IS NULL) AND (decision_reason IS NULL) AND (decision_audit_id IS NULL)) OR ((decision_actor_kind IS NOT NULL) AND (status = ANY (ARRAY['approved'::text, 'denied'::text])) AND (decided_at IS NOT NULL) AND (decision_request_id IS NOT NULL) AND ((length(decision_request_id) >= 1) AND (length(decision_request_id) <= 128)) AND (decision_reason IS NOT NULL) AND (decision_audit_id IS NOT NULL) AND (((decision_actor_kind = 'human'::text) AND (decided_by_user_id IS NOT NULL) AND (decided_epoch IS NOT NULL)) OR ((decision_actor_kind = 'local-owner'::text) AND (decided_by_user_id IS NULL) AND (decided_epoch IS NULL))))))",
+          "columns": [
+            "decision_actor_kind",
+            "decided_by_user_id",
+            "decided_epoch",
+            "decision_request_id",
+            "decision_reason",
+            "decision_audit_id",
+            "status",
+            "decided_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK (((decided_epoch >= 0) AND (decided_epoch <= '9007199254740991'::bigint)))",
+          "columns": [
+            "decided_epoch"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((decision_actor_kind = ANY (ARRAY['human'::text, 'local-owner'::text])))",
+          "columns": [
+            "decision_actor_kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((decision_reason = ANY (ARRAY['approved-by-current-authority'::text, 'denied-by-current-authority'::text])))",
+          "columns": [
+            "decision_reason"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (decided_by_user_id) REFERENCES human_users(id)",
+          "columns": [
+            "decided_by_user_id"
+          ],
+          "target": "human_users",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (decision_audit_id) REFERENCES human_audit_events(id)",
+          "columns": [
+            "decision_audit_id"
+          ],
+          "target": "human_audit_events",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES project_runs(id)",
+          "columns": [
+            "run_id"
+          ],
+          "target": "project_runs",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL agent_id",
+          "columns": [
+            "agent_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL arguments",
+          "columns": [
+            "arguments"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL run_id",
+          "columns": [
+            "run_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL tool",
+          "columns": [
+            "tool"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "050bb75760cd948a9b89404e76fd5073460d4c5a971416c38518bcb2209d0655",
+      "expectedFingerprint": "050bb75760cd948a9b89404e76fd5073460d4c5a971416c38518bcb2209d0655"
+    },
+    {
+      "name": "local_devices",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "token_hash",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "platform",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "grant_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "label",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "allow_commands",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "last_seen",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "backend",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL allow_commands",
+          "columns": [
+            "allow_commands"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL backend",
+          "columns": [
+            "backend"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL enabled",
+          "columns": [
+            "enabled"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL grant_id",
+          "columns": [
+            "grant_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL label",
+          "columns": [
+            "label"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL last_seen",
+          "columns": [
+            "last_seen"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL name",
+          "columns": [
+            "name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL platform",
+          "columns": [
+            "platform"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL token_hash",
+          "columns": [
+            "token_hash"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "f0b3c67ab34571b6427ed561d3d7795925162faa24fd4d05f3179648a9bbc926",
+      "expectedFingerprint": "f0b3c67ab34571b6427ed561d3d7795925162faa24fd4d05f3179648a9bbc926"
+    },
+    {
+      "name": "local_operations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "device_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "grant_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "lease_owner",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "approval_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "claim_token",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "started",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "result",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "late_result",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "deadline",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "merge_state",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "merge_record",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "merge_rejection",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "executor_kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "effect_intent",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "effect_state",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "effect_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "parent_operation_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "evidence_records",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((((executor_kind = 'local'::text) AND (device_id IS NOT NULL) AND (grant_id IS NOT NULL)) OR ((executor_kind = 'runtime'::text) AND (device_id IS NULL) AND (grant_id IS NULL) AND (approval_id IS NULL) AND (claim_token IS NULL) AND (status = ANY (ARRAY['prepared'::text, 'dispatched'::text, 'completed'::text, 'failed'::text, 'unknown'::text])) AND (effect_intent IS NOT NULL) AND (effect_state IS NOT NULL) AND (effect_state = ANY (ARRAY['prepared'::text, 'dispatched'::text, 'confirmed'::text, 'failed-known'::text, 'unknown'::text])) AND (effect_version >= 1) AND (status =\nCASE effect_state\n    WHEN 'confirmed'::text THEN 'completed'::text\n    WHEN 'failed-known'::text THEN 'failed'::text\n    ELSE effect_state\nEND) AND ((effect_state <> 'failed-known'::text) OR ((started = false) AND (jsonb_array_length(evidence_records) = 1))) AND (jsonb_typeof(evidence_records) = 'array'::text) AND (jsonb_array_length(evidence_records) <= 32) AND (octet_length((evidence_records)::text) <= 32768))))",
+          "columns": [
+            "executor_kind",
+            "device_id",
+            "grant_id",
+            "approval_id",
+            "claim_token",
+            "status",
+            "effect_intent",
+            "effect_state",
+            "effect_version",
+            "started",
+            "evidence_records"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((merge_state = ANY (ARRAY['pending'::text, 'committed'::text, 'rejected'::text, 'unknown'::text])))",
+          "columns": [
+            "merge_state"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (approval_id) REFERENCES tool_approvals(id)",
+          "columns": [
+            "approval_id"
+          ],
+          "target": "tool_approvals",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (device_id) REFERENCES local_devices(id)",
+          "columns": [
+            "device_id"
+          ],
+          "target": "local_devices",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (parent_operation_id) REFERENCES local_operations(id)",
+          "columns": [
+            "parent_operation_id"
+          ],
+          "target": "local_operations",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES project_runs(id)",
+          "columns": [
+            "run_id"
+          ],
+          "target": "project_runs",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL deadline",
+          "columns": [
+            "deadline"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL effect_version",
+          "columns": [
+            "effect_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL evidence_records",
+          "columns": [
+            "evidence_records"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL executor_kind",
+          "columns": [
+            "executor_kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL lease_owner",
+          "columns": [
+            "lease_owner"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL payload",
+          "columns": [
+            "payload"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL run_id",
+          "columns": [
+            "run_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL started",
+          "columns": [
+            "started"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (approval_id)",
+          "columns": [
+            "approval_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [
+        {
+          "definition": "CREATE TRIGGER runtime_operation_immutable BEFORE DELETE OR UPDATE ON public.local_operations FOR EACH ROW EXECUTE FUNCTION protect_runtime_operation()",
+          "function": "CREATE OR REPLACE FUNCTION public.protect_runtime_operation()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$ BEGIN\n IF TG_OP='DELETE' THEN IF OLD.executor_kind='runtime' THEN RAISE EXCEPTION 'runtime operation immutable'; END IF; RETURN OLD; END IF;\n IF NEW.executor_kind IS DISTINCT FROM OLD.executor_kind THEN RAISE EXCEPTION 'runtime operation immutable'; END IF;\n IF OLD.executor_kind='runtime' THEN\n  IF ROW(NEW.id,NEW.run_id,NEW.lease_owner,NEW.payload,NEW.effect_intent,NEW.parent_operation_id) IS DISTINCT FROM ROW(OLD.id,OLD.run_id,OLD.lease_owner,OLD.payload,OLD.effect_intent,OLD.parent_operation_id)\n   OR NEW.effect_version<>OLD.effect_version+1 OR jsonb_array_length(NEW.evidence_records)<jsonb_array_length(OLD.evidence_records)\n   OR EXISTS(SELECT 1 FROM jsonb_array_elements(OLD.evidence_records) WITH ORDINALITY AS prior_evidence(value,n) WHERE NEW.evidence_records->(prior_evidence.n::int-1) IS DISTINCT FROM prior_evidence.value)\n   OR NEW.effect_state IS NULL OR OLD.effect_state IN ('confirmed','failed-known')\n   OR (OLD.effect_state='prepared' AND NOT (\n      NEW.effect_state='dispatched' AND NEW.started=true AND NEW.evidence_records=OLD.evidence_records\n      OR NEW.effect_state='failed-known' AND OLD.started=false AND NEW.started=false\n       AND jsonb_array_length(NEW.evidence_records)=jsonb_array_length(OLD.evidence_records)+1))\n   OR (OLD.effect_state IN ('dispatched','unknown') AND (NEW.effect_state NOT IN ('unknown','confirmed') OR jsonb_array_length(NEW.evidence_records)<>jsonb_array_length(OLD.evidence_records)+1)) THEN RAISE EXCEPTION 'runtime operation immutable'; END IF;\n END IF; RETURN NEW; END $function$\n"
+        }
+      ],
+      "actualFingerprint": "9e554f85fe431a8f0789b16092e78d5cc1df1d66a206cb0996e92a2a93c96816",
+      "expectedFingerprint": "9e554f85fe431a8f0789b16092e78d5cc1df1d66a206cb0996e92a2a93c96816"
+    },
+    {
+      "name": "task_attempt_workspaces",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "task_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "attempt_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "generation",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "principal",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "session_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "runtime_task_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contract_hash",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "permission_hash",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "capability_hash",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contract",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "input_origins",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "committed_outputs",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "sandbox_identity",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "scope",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "work_revision",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "phase",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "accepted_stop",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((generation > 0))",
+          "columns": [
+            "generation"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((phase = ANY (ARRAY['active'::text, 'retired'::text, 'unknown'::text])))",
+          "columns": [
+            "phase"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES project_runs(id)",
+          "columns": [
+            "run_id"
+          ],
+          "target": "project_runs",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL attempt_id",
+          "columns": [
+            "attempt_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL capability_hash",
+          "columns": [
+            "capability_hash"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL committed_outputs",
+          "columns": [
+            "committed_outputs"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL contract",
+          "columns": [
+            "contract"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL contract_hash",
+          "columns": [
+            "contract_hash"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL generation",
+          "columns": [
+            "generation"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL input_origins",
+          "columns": [
+            "input_origins"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL permission_hash",
+          "columns": [
+            "permission_hash"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL phase",
+          "columns": [
+            "phase"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL principal",
+          "columns": [
+            "principal"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL run_id",
+          "columns": [
+            "run_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL runtime_task_id",
+          "columns": [
+            "runtime_task_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL session_id",
+          "columns": [
+            "session_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL task_id",
+          "columns": [
+            "task_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (run_id, task_id, attempt_id, generation)",
+          "columns": [
+            "run_id",
+            "task_id",
+            "attempt_id",
+            "generation"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "922710d700d204a7f3a7f74c115d4152ddc1faef7f3290c4fc3853fa2811db21",
+      "expectedFingerprint": "922710d700d204a7f3a7f74c115d4152ddc1faef7f3290c4fc3853fa2811db21"
+    },
+    {
+      "name": "automation_schedules",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "source_project_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "interval_seconds",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "next_due",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "c",
+          "definition": "CHECK ((kind = ANY (ARRAY['once'::text, 'interval'::text])))",
+          "columns": [
+            "kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "c",
+          "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'paused'::text, 'cancelled'::text, 'completed'::text])))",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (source_project_id) REFERENCES projects(id)",
+          "columns": [
+            "source_project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL kind",
+          "columns": [
+            "kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL name",
+          "columns": [
+            "name"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL next_due",
+          "columns": [
+            "next_due"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL snapshot",
+          "columns": [
+            "snapshot"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL source_project_id",
+          "columns": [
+            "source_project_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "d3f9f213e134f2d4c881acda46ca5af11db3cb6281359e81e2d6e103f6c9d38b",
+      "expectedFingerprint": "d3f9f213e134f2d4c881acda46ca5af11db3cb6281359e81e2d6e103f6c9d38b"
+    },
+    {
+      "name": "automation_occurrences",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "schedule_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "due_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id)",
+          "columns": [
+            "project_id"
+          ],
+          "target": "projects",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (schedule_id) REFERENCES automation_schedules(id)",
+          "columns": [
+            "schedule_id"
+          ],
+          "target": "automation_schedules",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL due_at",
+          "columns": [
+            "due_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL project_id",
+          "columns": [
+            "project_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL schedule_id",
+          "columns": [
+            "schedule_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (schedule_id, due_at)",
+          "columns": [
+            "schedule_id",
+            "due_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "1610256beecdecc5688398d7f39d3c9840454c37a84a7b8d0ea7e8bd84cce4d7",
+      "expectedFingerprint": "1610256beecdecc5688398d7f39d3c9840454c37a84a7b8d0ea7e8bd84cce4d7"
+    },
+    {
+      "name": "automation_notifications",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "event_key",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "details",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "read_at",
+          "type": "timestamp with time zone",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL details",
+          "columns": [
+            "details"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL event_key",
+          "columns": [
+            "event_key"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL kind",
+          "columns": [
+            "kind"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL title",
+          "columns": [
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (event_key)",
+          "columns": [
+            "event_key"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "976e24e49d678c1b6cc9d2b69b86632c8230f2fdd1643a8039478cc46755a819",
+      "expectedFingerprint": "976e24e49d678c1b6cc9d2b69b86632c8230f2fdd1643a8039478cc46755a819"
+    },
+    {
+      "name": "automation_observations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "bucket",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "details",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES project_runs(id)",
+          "columns": [
+            "run_id"
+          ],
+          "target": "project_runs",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL bucket",
+          "columns": [
+            "bucket"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL details",
+          "columns": [
+            "details"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL observed_at",
+          "columns": [
+            "observed_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL run_id",
+          "columns": [
+            "run_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (run_id, bucket)",
+          "columns": [
+            "run_id",
+            "bucket"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "ee33215e6d2970ff853692a8f90112b6f3a74cc6df80dfffce274678134ea7a2",
+      "expectedFingerprint": "ee33215e6d2970ff853692a8f90112b6f3a74cc6df80dfffce274678134ea7a2"
+    },
+    {
+      "name": "automation_knowledge_candidates",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "document_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "source_version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "source_hash",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "space_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "published_document_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "publishing_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "reuse_evidence",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "source_bounds",
+          "type": "jsonb",
+          "required": false
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (document_id) REFERENCES knowledge_documents(id)",
+          "columns": [
+            "document_id"
+          ],
+          "target": "knowledge_documents",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (run_id) REFERENCES project_runs(id)",
+          "columns": [
+            "run_id"
+          ],
+          "target": "project_runs",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (space_id) REFERENCES knowledge_spaces(id)",
+          "columns": [
+            "space_id"
+          ],
+          "target": "knowledge_spaces",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL content",
+          "columns": [
+            "content"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL document_id",
+          "columns": [
+            "document_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL run_id",
+          "columns": [
+            "run_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL source_hash",
+          "columns": [
+            "source_hash"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL source_version",
+          "columns": [
+            "source_version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL space_id",
+          "columns": [
+            "space_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL title",
+          "columns": [
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "u",
+          "definition": "UNIQUE (document_id, source_hash)",
+          "columns": [
+            "document_id",
+            "source_hash"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "870487a7024308d9bf70df27e373fefd42a5b73994f3cf538fad17ed9a7cf38b",
+      "expectedFingerprint": "870487a7024308d9bf70df27e373fefd42a5b73994f3cf538fad17ed9a7cf38b"
+    },
+    {
+      "name": "automation_improvements",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "source_run_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "baseline",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "proposal",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "cases",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (source_run_id) REFERENCES project_runs(id)",
+          "columns": [
+            "source_run_id"
+          ],
+          "target": "project_runs",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL baseline",
+          "columns": [
+            "baseline"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL cases",
+          "columns": [
+            "cases"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL proposal",
+          "columns": [
+            "proposal"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL status",
+          "columns": [
+            "status"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL title",
+          "columns": [
+            "title"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL version",
+          "columns": [
+            "version"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "bcf10e442a9509f5b777f3fb7177dbcaed24cb2f9342cd5586db213674787eb3",
+      "expectedFingerprint": "bcf10e442a9509f5b777f3fb7177dbcaed24cb2f9342cd5586db213674787eb3"
+    },
+    {
+      "name": "automation_evaluations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "improvement_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "results",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (improvement_id) REFERENCES automation_improvements(id)",
+          "columns": [
+            "improvement_id"
+          ],
+          "target": "automation_improvements",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL improvement_id",
+          "columns": [
+            "improvement_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL results",
+          "columns": [
+            "results"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "89a9091f042a1697e218b68d5813cd9abbd709bb9b94c51c1bf04418df301807",
+      "expectedFingerprint": "89a9091f042a1697e218b68d5813cd9abbd709bb9b94c51c1bf04418df301807"
+    },
+    {
+      "name": "automation_reviews",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "improvement_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "evaluation_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "constraints": [
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (evaluation_id) REFERENCES automation_evaluations(id)",
+          "columns": [
+            "evaluation_id"
+          ],
+          "target": "automation_evaluations",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "f",
+          "definition": "FOREIGN KEY (improvement_id) REFERENCES automation_improvements(id)",
+          "columns": [
+            "improvement_id"
+          ],
+          "target": "automation_improvements",
+          "targetColumns": [
+            "id"
+          ]
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL action",
+          "columns": [
+            "action"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL created_at",
+          "columns": [
+            "created_at"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL id",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL improvement_id",
+          "columns": [
+            "improvement_id"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "n",
+          "definition": "NOT NULL note",
+          "columns": [
+            "note"
+          ],
+          "target": null,
+          "targetColumns": null
+        },
+        {
+          "kind": "p",
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ],
+          "target": null,
+          "targetColumns": null
+        }
+      ],
+      "triggers": [],
+      "actualFingerprint": "beaaada151f625adde6fa3c182cdc41fa19004a54d1f77d023c140ec225f10da",
+      "expectedFingerprint": "beaaada151f625adde6fa3c182cdc41fa19004a54d1f77d023c140ec225f10da"
+    }
+  ]
+}

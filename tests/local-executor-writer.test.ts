@@ -89,6 +89,43 @@ for(const interrupted of [false,true])test('checkpoint physical '+(interrupted?'
  }),error=>error===original);
  assert.equal(readFileSync(file,'utf8'),'durable bytes','SQL rollback does not undo a completed physical write');assert.equal(await available(f.runId),!interrupted);
 });
+test('checkpoint transaction cancellation drains a late pool connection without any SQL',{skip:!isolated},async t=>{
+ const f=await fixture(),entered=gate(),finish=gate(),connect=pool.connect.bind(pool),abort=new AbortController(),reason=Error('checkpoint cancelled before connection');let queries=0,released=0,called=0,settled=false;let work:Promise<any>|undefined;
+ t.mock.method(pool,'connect',async()=>{entered.release();await finish.promise;const db=await connect(),query=db.query.bind(db),release=db.release.bind(db);db.query=((...args:any[])=>{queries++;return query(...args as [any]);}) as any;db.release=((value?:any)=>{db.query=query as any;db.release=release;released++;release(value);}) as any;return db;});
+ try{
+  work=(f.executor as any).taskTransaction(abort.signal,async()=>{called++;}).catch((error:any)=>error);work!.then(()=>{settled=true;});await entered.promise;abort.abort(reason);await pause();
+  assert.equal(settled,false);assert.equal(await available(f.runId),false,'the original connection producer still owns the writer');
+  finish.release();assert.equal(await work,reason);assert.equal(queries,0);assert.equal(released,1);assert.equal(called,0);assert.equal(await available(f.runId),true);
+ }finally{finish.release();await work;t.mock.restoreAll();}
+});
+
+for(const rollbackFails of [false,true])test('checkpoint transaction cancellation stops SQL continuation and '+(rollbackFails?'retains uncertain rollback':'awaits acknowledged rollback'),{skip:!isolated},async t=>{
+ const f=await fixture(),entered=gate(),finish=gate(),abort=new AbortController(),reason=Error('checkpoint cancelled during SQL'),queries:string[]=[],released:any[]=[];let called=0,settled=false,work:Promise<any>|undefined;
+ await intercept(t,async(text,next)=>{queries.push(text);if(text==='ROLLBACK'&&rollbackFails)throw Error('rollback response unknown');const result=await next();if(text==='SELECT project_id FROM project_runs WHERE id=$1'){entered.release();await finish.promise;}return result;},released);
+ try{
+  work=(f.executor as any).taskTransaction(abort.signal,async()=>{called++;}).catch((error:any)=>error);work!.then(()=>{settled=true;});await entered.promise;abort.abort(reason);await pause();
+  assert.equal(settled,false);assert.equal(await available(f.runId),false);const before=queries.length;
+  finish.release();assert.equal(await work,reason);assert.equal(called,0,'cancelled SQL preparation must not execute the checkpoint callback');assert.deepEqual(queries.slice(before),['ROLLBACK']);assert.equal(released.length,1);assert.equal(Boolean(released[0]),rollbackFails);assert.equal(await available(f.runId),!rollbackFails);
+ }finally{finish.release();await work;t.mock.restoreAll();}
+});
+
+test('checkpoint transaction cancellation prevents a late physical checkpoint write',{skip:!isolated},async()=>{
+ const f=await fixture(),entered=gate(),finish=gate(),abort=new AbortController(),reason=Error('checkpoint cancelled before file write'),file=join(f.archive.dir,'cancelled-checkpoint-object');let work:Promise<any>|undefined;
+ try{
+  work=(f.executor as any).taskTransaction(abort.signal,async(_db:any,_run:any,persist:any)=>{entered.release();await finish.promise;persist(()=>writeFileSync(file,'must not be persisted'));}).catch((error:any)=>error);
+  await entered.promise;abort.abort(reason);assert.equal(await available(f.runId),false);finish.release();assert.equal(await work,reason);assert.equal(existsSync(file),false);assert.equal(await available(f.runId),true);
+ }finally{finish.release();await work;}
+});
+
+test('checkpoint transaction cancellation after COMMIT never invokes its publisher',{skip:!isolated},async t=>{
+ const f=await fixture(),abort=new AbortController(),reason=Error('checkpoint cancelled after commit');let published=0,committed=0;
+ await intercept(t,async(text,next)=>{const value=await next();if(text==='COMMIT'){committed++;abort.abort(reason);}return value;});
+ try{
+  await assert.rejects((f.executor as any).taskTransaction(abort.signal,async()=>23,()=>{published++;return 23;}),error=>error===reason);
+  assert.equal(committed,1);assert.equal(published,0);assert.equal(await available(f.runId),true,'acknowledged SQL commit is preserved without publishing a cancelled checkpoint');
+ }finally{t.mock.restoreAll();}
+});
+
 test('checkpoint publisher remains in the same writer after acknowledged COMMIT',{skip:!isolated},async t=>{
  const f=await fixture();let committed=false;
  await intercept(t,async(text,next)=>{const result=await next();if(text==='COMMIT')committed=true;return result;});
@@ -119,4 +156,15 @@ test('an unknown executor operation cannot acquire fresh finalization authority'
  const executor=new LocalRunExecutor(f.archive,{},f.service,{sandboxMaintenance:()=>({deviceId:'device',grantId:'grant',fingerprint:'a'.repeat(64),executor:{acceptedStopCapabilities:()=>({version:1,deadline:'shared-abort-v1'}),stopAcceptedTask:async()=>{stops++;},reconcileAcceptedTaskStop:async()=>{stops++;}} as any})});executor.preparing=Promise.resolve();
  f.service.enqueue=async()=>randomUUID();f.service.wait=async()=>{throw original;};await assert.rejects(executor.execute('artifact_write',{},signal(),{}),error=>error===original);
  await intercept(t,async(_text,next)=>{queries++;return next();});try{assert.equal((await executor.finalizeAccepted(signal())).state,'pending');assert.equal(queries,0);assert.equal(stops,0);await assert.rejects(executor.close(),error=>error===original);}finally{t.mock.restoreAll();}
+});
+
+for(const abortFirst of [false,true])test('acknowledged device cancellation preserves unknown receipt without poisoning local writer: '+abortFirst,{skip:!isolated},async()=>{
+ const f=await fixture(),device=randomUUID(),grant=randomUUID(),operation=randomUUID(),controller=new AbortController(),reason=Error('requested stop');
+ await pool.query("INSERT INTO local_devices(id,token_hash,name,platform,grant_id,label,allow_commands) VALUES($1,$2,'fixture','linux',$3,'fixture',true)",[device,'b'.repeat(64),grant]);
+ await pool.query("INSERT INTO local_operations(id,device_id,run_id,grant_id,lease_owner,payload,status,started) VALUES($1,$2,$3,$4,$5,'{}',$6,true)",[operation,device,f.runId,grant,f.service.owner,abortFirst?'started':'cancelled']);
+ if(abortFirst)controller.abort(reason);
+ await assert.rejects((f.executor as any).waitOperation(operation,controller.signal),(error:any)=>abortFirst?error===reason:error.code==='LOCAL_OPERATION_CANCELLED');
+ const row=(await pool.query('SELECT status,started,result,late_result FROM local_operations WHERE id=$1',[operation])).rows[0];
+ assert.deepEqual(row,{status:'cancelled',started:true,result:null,late_result:null});
+ assert.equal(await available(f.runId),true,'settled local SQL is drained; unresolved device outcome stays in the durable receipt');
 });

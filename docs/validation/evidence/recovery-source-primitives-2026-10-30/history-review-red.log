@@ -1,0 +1,70 @@
+✖ oversized wide JSON is refused before it can exhaust a bounded child heap (4769.1042ms)
+✖ unpaired surrogate identities cannot collide under UTF-8 byte sorting (7.1704ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8716.3709
+
+✖ failing tests:
+
+test at tests\task-recovery-history.test.ts:1:7243
+✖ oversized wide JSON is refused before it can exhaust a bounded child heap (4769.1042ms)
+  AssertionError [ERR_ASSERTION]: 
+  <--- Last few GCs --->
+  
+  [36172:00000145A8A2D000]     4322 ms: Mark-Compact 252.9 (385.7) -> 252.9 (382.5) MB, pooled: 5 MB, 46.90 / 0.00 ms  (average mu = 0.927, current mu = 0.439) allocation failure; scavenge might not succeed
+  [36172:00000145A8A2D000]     4353 ms: Mark-Compact 255.9 (385.5) -> 254.9 (385.5) MB, pooled: 5 MB, 25.42 / 0.00 ms  (average mu = 0.876, current mu = 0.181) allocation failure; scavenge might not succeed
+  
+  FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+  ----- Native stack trace -----
+  
+   1: 00007FF7FA86403F node::OnFatalError+1343
+   2: 00007FF7FB4AFAA7 v8::Function::NewInstance+423
+   3: 00007FF7FB2B04D7 v8::base::AddressSpaceReservation::AddressSpaceReservation+322071
+   4: 00007FF7FB2AE176 v8::base::AddressSpaceReservation::AddressSpaceReservation+313014
+   5: 00007FF7FB2C87EA X509_STORE_set_cleanup+5098
+   6: 00007FF7FB2D4648 uv_timer_set_repeat+19096
+   7: 00007FF7FB2EF52B uv_timer_set_repeat+129403
+   8: 00007FF7FB14B33F v8::Promise::MarkAsSilent+219855
+   9: 00007FF7FB1511ED v8::Promise::MarkAsSilent+244093
+  10: 00007FF7FB466251 EVP_MD_CTX_set_update_fn+473681
+  11: 00007FF7FC5FB27A v8::base::UnsignedDivisionByConstant<unsigned __int64>+1422442
+  12: 00000145C2FA5DEF 
+  
+  
+  134 !== 0
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-history.test.ts:115:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 134,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\task-recovery-history.test.ts:3:446
+✖ unpaired surrogate identities cannot collide under UTF-8 byte sorting (7.1704ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-history.test.ts:120:103)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_RECOVERY_HISTORY_INVALID' },
+    operator: 'throws',
+    diff: 'simple'
+  }

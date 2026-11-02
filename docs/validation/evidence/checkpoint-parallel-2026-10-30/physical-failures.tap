@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: registered create write failure swallowed by business keeps source blocked across processes until owner exits
+ok 1 - registered create write failure swallowed by business keeps source blocked across processes until owner exits
+  ---
+  duration_ms: 907.0341
+  type: 'test'
+  ...
+# {"operation":"create","fault":"write","base":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-KRTrUl","holderPid":7028,"blockedPid":32016,"releasedPid":30572,"ownerNonce":"642e1ea9-10eb-498e-bcf8-e3ceae165230","holderExit":[null,"SIGTERM"],"originalError":{"message":"synthetic physical create write failure","code":"EIO","syscall":"write","path":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-KRTrUl\\\\runs\\\\10000000-0000-4000-8000-000000000071\\\\snapshot.json"},"initialBytes":0,"bytesWritten":7,"targetBytes":7,"targetSha256":"b3db5716e15361d4f51d88ef52115db9c5d53ef6e3364c9ea021e0f4ea331458","journalBytes":null,"journalSha256":null,"eventCount":0,"integrity":"journal absent","blocked":"E_ARCHIVE_FENCE_TIMEOUT","blockedElapsedMs":208.0228,"released":true}
+# Subtest: registered create fsync failure swallowed by business keeps source blocked across processes until owner exits
+ok 2 - registered create fsync failure swallowed by business keeps source blocked across processes until owner exits
+  ---
+  duration_ms: 875.9813
+  type: 'test'
+  ...
+# {"operation":"create","fault":"fsync","base":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-gssAIh","holderPid":13536,"blockedPid":29536,"releasedPid":49032,"ownerNonce":"5ad82183-c1c6-4cae-befe-cf7bb31ce7b7","holderExit":[null,"SIGTERM"],"originalError":{"message":"synthetic physical create fsync failure","code":"EIO","syscall":"fsync","path":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-gssAIh\\\\runs\\\\10000000-0000-4000-8000-000000000071\\\\snapshot.json"},"initialBytes":0,"bytesWritten":102,"targetBytes":102,"targetSha256":"03caeed62380385dc8edd07d826381765392450f134aa5c9805b82d08e333470","journalBytes":null,"journalSha256":null,"eventCount":0,"integrity":"journal absent","blocked":"E_ARCHIVE_FENCE_TIMEOUT","blockedElapsedMs":209.03040000000004,"released":true}
+# Subtest: registered append write failure swallowed by business keeps source blocked across processes until owner exits
+ok 3 - registered append write failure swallowed by business keeps source blocked across processes until owner exits
+  ---
+  duration_ms: 955.3179
+  type: 'test'
+  ...
+# {"operation":"append","fault":"write","base":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-Y78uel","holderPid":40212,"blockedPid":42864,"releasedPid":47880,"ownerNonce":"e4d749bb-2f4f-45b5-a3aa-4e6de3219c11","holderExit":[null,"SIGTERM"],"originalError":{"message":"synthetic physical append write failure","code":"EIO","syscall":"write","path":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-Y78uel\\\\runs\\\\10000000-0000-4000-8000-000000000071\\\\events.jsonl"},"initialBytes":156,"bytesWritten":7,"targetBytes":163,"targetSha256":"04e06d99a12f383b9595ac9d1b3032fc6185a82abec2a15f7c1b700f5c632c5b","journalBytes":163,"journalSha256":"04e06d99a12f383b9595ac9d1b3032fc6185a82abec2a15f7c1b700f5c632c5b","eventCount":1,"integrity":"incomplete","blocked":"E_ARCHIVE_FENCE_TIMEOUT","blockedElapsedMs":214.6531,"released":true}
+# Subtest: registered append fsync failure swallowed by business keeps source blocked across processes until owner exits
+ok 4 - registered append fsync failure swallowed by business keeps source blocked across processes until owner exits
+  ---
+  duration_ms: 996.2743
+  type: 'test'
+  ...
+# {"operation":"append","fault":"fsync","base":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-9EUd9N","holderPid":47824,"blockedPid":47704,"releasedPid":41224,"ownerNonce":"b0047657-6d80-49bc-b790-717cbe44f4f1","holderExit":[null,"SIGTERM"],"originalError":{"message":"synthetic physical append fsync failure","code":"EIO","syscall":"fsync","path":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-9EUd9N\\\\runs\\\\10000000-0000-4000-8000-000000000071\\\\events.jsonl"},"initialBytes":156,"bytesWritten":93,"targetBytes":249,"targetSha256":"a245935fc75ec32f8aa955fbe5657f4aa1ea21334b29f0815acd4710f7ca98b2","journalBytes":249,"journalSha256":"a245935fc75ec32f8aa955fbe5657f4aa1ea21334b29f0815acd4710f7ca98b2","eventCount":2,"integrity":"ok","blocked":"E_ARCHIVE_FENCE_TIMEOUT","blockedElapsedMs":212.4862,"released":true}
+# Subtest: registered object write failure swallowed by business keeps source blocked across processes until owner exits
+ok 5 - registered object write failure swallowed by business keeps source blocked across processes until owner exits
+  ---
+  duration_ms: 911.2299
+  type: 'test'
+  ...
+# {"operation":"object","fault":"write","base":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-NbAAUp","holderPid":31616,"blockedPid":41172,"releasedPid":19156,"ownerNonce":"acf0861a-fe0b-4009-9444-f42716be8c61","holderExit":[null,"SIGTERM"],"originalError":{"message":"synthetic physical object write failure","code":"EIO","syscall":"write","path":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-NbAAUp\\\\runs\\\\10000000-0000-4000-8000-000000000071\\\\checkpoint-objects\\\\4f04d79858505a6c58e529e0ecb6b3b77594395e82dd3331693af403d14273bf"},"initialBytes":0,"bytesWritten":7,"targetBytes":7,"targetSha256":"02975714ab68a87c910f115e5e9d0dbbf266a87b8e47d132df5e9eb4e9f6158a","journalBytes":156,"journalSha256":"124fc8bd9e943c5b7fc1c860c2b323914c3e443ddaa62abad11dc9951b83781f","eventCount":1,"integrity":"ok","blocked":"E_ARCHIVE_FENCE_TIMEOUT","blockedElapsedMs":203.8902,"released":true}
+# Subtest: registered object fsync failure swallowed by business keeps source blocked across processes until owner exits
+ok 6 - registered object fsync failure swallowed by business keeps source blocked across processes until owner exits
+  ---
+  duration_ms: 955.8039
+  type: 'test'
+  ...
+# {"operation":"object","fault":"fsync","base":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-WItC9t","holderPid":37112,"blockedPid":49024,"releasedPid":40480,"ownerNonce":"d056b77b-1086-4aef-9070-dbee7f4333a9","holderExit":[null,"SIGTERM"],"originalError":{"message":"synthetic physical object fsync failure","code":"EIO","syscall":"fsync","path":"C:\\\\Users\\\\JJ\\\\.codex\\\\worktrees\\\\f57c\\\\agent_department\\\\.private\\\\checkpoint-physical-20261029\\\\physical-WItC9t\\\\runs\\\\10000000-0000-4000-8000-000000000071\\\\checkpoint-objects\\\\4f04d79858505a6c58e529e0ecb6b3b77594395e82dd3331693af403d14273bf"},"initialBytes":0,"bytesWritten":33,"targetBytes":33,"targetSha256":"4f04d79858505a6c58e529e0ecb6b3b77594395e82dd3331693af403d14273bf","journalBytes":156,"journalSha256":"6f8d012110130ed891b62da01a44b3f5eb80d37e2569cdfd8d7f1380d27e83dc","eventCount":1,"integrity":"ok","blocked":"E_ARCHIVE_FENCE_TIMEOUT","blockedElapsedMs":209.32619999999997,"released":true}
+# Subtest: registered roots reject create/open/append without a live writer before changing bytes
+ok 7 - registered roots reject create/open/append without a live writer before changing bytes
+  ---
+  duration_ms: 219.1335
+  type: 'test'
+  ...
+# Subtest: old handles cannot borrow a new owner, wrong run or an expired nested invocation
+ok 8 - old handles cannot borrow a new owner, wrong run or an expired nested invocation
+  ---
+  duration_ms: 331.3496
+  type: 'test'
+  ...
+# Subtest: registration invalidates preexisting raw handles and relative spelling cannot bypass it
+ok 9 - registration invalidates preexisting raw handles and relative spelling cannot bypass it
+  ---
+  duration_ms: 134.0029
+  type: 'test'
+  ...
+# Subtest: SHA object writes require the matching writer before creating the object directory
+ok 10 - SHA object writes require the matching writer before creating the object directory
+  ---
+  duration_ms: 225.0188
+  type: 'test'
+  ...
+# Subtest: a live handle also refuses a different simultaneous owner of the same run
+ok 11 - a live handle also refuses a different simultaneous owner of the same run
+  ---
+  duration_ms: 221.3422
+  type: 'test'
+  ...
+# Subtest: a junction spelling of a registered root cannot use the standalone trace API
+ok 12 - a junction spelling of a registered root cannot use the standalone trace API
+  ---
+  duration_ms: 25.5429
+  type: 'test'
+  ...
+# Subtest: journal compression requires maintenance ownership and preserves readable original events
+ok 13 - journal compression requires maintenance ownership and preserves readable original events
+  ---
+  duration_ms: 258.1084
+  type: 'test'
+  ...
+# Subtest: a real journal lock prevents production append and leaves bytes unchanged on timeout
+ok 14 - a real journal lock prevents production append and leaves bytes unchanged on timeout
+  ---
+  duration_ms: 3562.1178
+  type: 'test'
+  ...
+# Subtest: two real production writers preserve contiguous sequence and deduplicate overlapping source keys
+ok 15 - two real production writers preserve contiguous sequence and deduplicate overlapping source keys
+  ---
+  duration_ms: 3029.4551
+  type: 'test'
+  ...
+# Subtest: source guard waits for retained production append then prevents a new process writer
+ok 16 - source guard waits for retained production append then prevents a new process writer
+  ---
+  duration_ms: 2390.0234
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10577.981

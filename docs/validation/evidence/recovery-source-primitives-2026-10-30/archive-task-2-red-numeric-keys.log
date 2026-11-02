@@ -1,0 +1,31 @@
+✖ canonical digest sorts numeric-looking object keys lexically rather than JS enumeration order (830.1868ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4304.8989
+
+✖ failing tests:
+
+test at tests\task-recovery-archive.test.ts:1:10050
+✖ canonical digest sorts numeric-looking object keys lexically rather than JS enumeration order (830.1868ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'ead2d9730b26ce5a79c531e6e750813b8ae5e4164b89fd4655e2ef53a78a9ecd'
+  - '0ca2865ab6261af8c040416333640510ceb1b1debe71045319f51873be472780'
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-archive.test.ts:162:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'ead2d9730b26ce5a79c531e6e750813b8ae5e4164b89fd4655e2ef53a78a9ecd',
+    expected: '0ca2865ab6261af8c040416333640510ceb1b1debe71045319f51873be472780',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+EXIT_CODE=1

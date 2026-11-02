@@ -1,0 +1,22 @@
+✔ business subtree mounts only for local owner and active administrator (56.6416ms)
+✔ local-owner personnel page requests enterprise login without showing mutation controls (42.7265ms)
+✔ active enterprise administrator sees human permission scope and the remaining member boundary (3.8548ms)
+✔ member and disabled sessions never render human administration controls (2.0403ms)
+✔ active member mounts independent read workspace, auditor and pending remain closed (44.0293ms)
+✔ resource view renders read summaries and bounded pagination without action or download links (1.6393ms)
+✔ product-flow schemas remain unique within a fixed clock tick (8.5619ms)
+✔ schema cleanup drops only a successfully created schema and relinquishes ownership (1.8392ms)
+✔ identity store uses its direct SQL adapter through the standard integration entry (1.3992ms)
+✔ other files retain the socket preload and cannot inherit the direct identity flag (0.288ms)
+✔ identity path comparison follows platform casing without matching other files (0.3847ms)
+✔ runner selection preserves caller filters and never adds test skips (1.1923ms)
+✔ default and legacy product-flow entries select every isolated group exactly once (1.6732ms)
+✔ timeout exit 124 survives later failures or successes (0.2619ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1377.3021

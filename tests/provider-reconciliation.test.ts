@@ -42,7 +42,7 @@ before(async()=>{
  gatewayBaseUrl=origin+'/v1';
  await pool.query("INSERT INTO gateways(id,data) VALUES('fixture-gateway',$1)",[{name:'Ledger fixture',baseUrl:gatewayBaseUrl,pricingSource:'new-api',_billingUnit:{quotaPerUSD:500000,basis:'new-api-status',verifiedAt:new Date().toISOString()}}]);
  await pool.query("INSERT INTO models(id,data) VALUES('fixture-model',$1)",[{name:'Ledger fixture',model:'fixture-model',gatewayId:'fixture-gateway',inputRate:100,outputRate:100}]);
- const app=express();app.use('/api',(await import('../apps/api/src/cost-router.ts')).costRouter());costServer=app.listen(0,'127.0.0.1');await once(costServer,'listening');costUrl='http://127.0.0.1:'+(costServer.address() as {port:number}).port+'/api/costs';
+ const app=express();app.use((_req,res,next)=>{res.locals.principal={kind:'local-owner'};next();});app.use('/api',(await import('../apps/api/src/cost-router.ts')).costRouter());costServer=app.listen(0,'127.0.0.1');await once(costServer,'listening');costUrl='http://127.0.0.1:'+(costServer.address() as {port:number}).port+'/api/costs';
 });
 beforeEach(async()=>{
  await pool.query('TRUNCATE model_reservations,usage CASCADE');await pool.query("UPDATE gateways SET version=1,data=jsonb_set(data,'{baseUrl}',to_jsonb($1::text)) WHERE id='fixture-gateway'",[gatewayBaseUrl]);

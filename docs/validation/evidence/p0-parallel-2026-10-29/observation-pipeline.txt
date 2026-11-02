@@ -1,0 +1,14 @@
+✔ root trace and acknowledged audit projection feed the same safe local sink (2552.2628ms)
+✔ lost projection COMMIT acknowledgement emits nothing and never replays the published projection (2452.89ms)
+✔ throwing audit observer cannot turn a committed projection into failure (2412.2422ms)
+✔ 100000 fresh IDs retain only fixed counters and close disposes both subscriptions (4463.8513ms)
+✔ audit subscription changes during dispatch cannot extend the current notification traversal (2361.5616ms)
+✔ audit pool limits and pipeline initialization failure release all subscriptions (2415.819ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17744.6259

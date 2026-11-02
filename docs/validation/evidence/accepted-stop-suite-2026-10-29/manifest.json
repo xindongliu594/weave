@@ -1,0 +1,213 @@
+{
+  "date": "2026-10-29",
+  "base": "417b46e5510ab72203d722292e46e1e9b9322b77",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "database": "Isolated PGlite + pgvector per file; not independent PostgreSQL backends",
+  "scope": "HTTP, SQL, file CAS, handoff and trusted-stop lifecycle; device effects are fixtures; zero model calls",
+  "commands": [
+    {
+      "command": "node scripts/test-integration.mjs tests/task-accepted-stop-delivery.test.ts",
+      "phase": "before-split",
+      "exitCode": 124,
+      "log": "original-timeout.txt"
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/task-accepted-stop-delivery.test.ts tests/task-accepted-stop-provenance.test.ts tests/task-accepted-stop-terminal.test.ts tests/task-accepted-stop-authority.test.ts tests/task-accepted-stop-lifecycle.test.ts tests/task-accepted-stop-sql-deadline.test.ts",
+      "phase": "initial-split",
+      "exitCode": 124,
+      "log": "split-first.txt",
+      "note": "Two stale authority assertions failed and the old lifecycle fixture self-deadlocked. Unaffected final file results retained."
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/task-accepted-stop-authority.test.ts tests/task-accepted-stop-lifecycle.test.ts",
+      "phase": "after-initial-three-corrections",
+      "exitCode": 1,
+      "log": "partial-corrections.txt",
+      "note": "Authority 11 pass; lifecycle 2 pass, 8 preflight failures caused by synchronous throws bypassing the old rejects callback."
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/task-accepted-stop-lifecycle.test.ts",
+      "phase": "after-preflight-assertion-fix",
+      "exitCode": 0,
+      "log": "lifecycle-final.txt"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.txt",
+      "note": "TypeScript and Vite; existing bundle-size warning retained"
+    }
+  ],
+  "finalPerFileResults": [
+    {
+      "path": "tests/task-accepted-stop-delivery.test.ts",
+      "tests": 21,
+      "passed": 21,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 61868.4788,
+      "log": "split-first.txt"
+    },
+    {
+      "path": "tests/task-accepted-stop-provenance.test.ts",
+      "tests": 18,
+      "passed": 18,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 92424.7905,
+      "log": "split-first.txt"
+    },
+    {
+      "path": "tests/task-accepted-stop-terminal.test.ts",
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 97306.8245,
+      "log": "split-first.txt"
+    },
+    {
+      "path": "tests/task-accepted-stop-authority.test.ts",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 153130.9351,
+      "log": "partial-corrections.txt"
+    },
+    {
+      "path": "tests/task-accepted-stop-lifecycle.test.ts",
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 15247.645,
+      "log": "lifecycle-final.txt"
+    },
+    {
+      "path": "tests/task-accepted-stop-sql-deadline.test.ts",
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 116113.7996,
+      "log": "split-first.txt"
+    }
+  ],
+  "totalPassed": 79,
+  "unresolvedFailures": 0,
+  "skipped": 0,
+  "aggregation": "Latest successful result per file; not a successful initial combined command or whole-repository pass. Earlier targeted results overlap.",
+  "review": {
+    "reviewer": "/root/accepted_stop_split_review",
+    "mode": "independent-read-only",
+    "findings": "No Critical/Important or minor findings. Independently verified exact split and preserved fixture/runner bounds, then all four corrections against actual provider, drain and synchronous preflight contracts. Reviewer did not execute tests."
+  },
+  "unverified": [
+    "Native PostgreSQL thirteen enterprise-backup cases",
+    "Company identity provider and target deployment acceptance",
+    "Whole-repository regression",
+    "Enterprise task profile remains disabled"
+  ],
+  "modelCalls": 0,
+  "deploymentOperations": 0,
+  "textNormalization": "UTF-8 LF for logs and hash comparisons only; no business data changed",
+  "coverage": "coverage-final.json",
+  "artifacts": [
+    {
+      "path": "original-timeout.txt",
+      "sha256Utf8LF": "c0adb1fdefe96b6c4a59f5675060456cf20555f4fdbea1eeb87294280bbc3ca4",
+      "bytes": 4239
+    },
+    {
+      "path": "split-first.txt",
+      "sha256Utf8LF": "2a51a6679dd56db0bc5fce2e6633f41f09a0e6f6fc56ce41db25c2a9f1f28017",
+      "bytes": 11690
+    },
+    {
+      "path": "partial-corrections.txt",
+      "sha256Utf8LF": "aec346b96b7b6d0a40b573a9e15517e597fec3948ed0a9ac8a2dbae836b0c889",
+      "bytes": 12530
+    },
+    {
+      "path": "lifecycle-final.txt",
+      "sha256Utf8LF": "44af948dc97e1f275b687295e8f62e5132990004b6b2c6ff3552aa3699c5f90b",
+      "bytes": 1337
+    },
+    {
+      "path": "build.txt",
+      "sha256Utf8LF": "30cc88e94a83df299a766620d4ecc4161af834839971de28e1b2849ec1b18e33",
+      "bytes": 765
+    },
+    {
+      "path": "coverage-at-split.json",
+      "sha256Utf8LF": "2a440a837fe0aeb4c5939e314369ea25bdabb49808222d4d44302b06f3d6bf7d",
+      "bytes": 5923
+    },
+    {
+      "path": "coverage-final.json",
+      "sha256Utf8LF": "54eb15b3981054614eb3b58d2892705d216f0287f6cb5fc143cad4c67aab4602"
+    }
+  ],
+  "sources": [
+    {
+      "path": "tests/task-accepted-stop-delivery.test.ts",
+      "sha256Utf8LF": "b57d2f4e0bb8ed2a5572c0efd745bde8f0a307c26fd5c23e6c30dcf1f00846b5"
+    },
+    {
+      "path": "tests/task-accepted-stop-provenance.test.ts",
+      "sha256Utf8LF": "ea22148698e6a95134b9a916fce1871ae999b6caacfe4a490a7d365847a3d931"
+    },
+    {
+      "path": "tests/task-accepted-stop-terminal.test.ts",
+      "sha256Utf8LF": "6916a2b364f324ce9f107f658c480936c469e78b87aa0454c2920c7c74166871"
+    },
+    {
+      "path": "tests/task-accepted-stop-authority.test.ts",
+      "sha256Utf8LF": "bc54695d61f9a6ef159ecf3d3b75991c85a9e17630fc8bdd02bd736fbe84e8ae"
+    },
+    {
+      "path": "tests/task-accepted-stop-lifecycle.test.ts",
+      "sha256Utf8LF": "9091ff727fbd66d7a655c703c28576b6e4f9801479e19a59a49f64c4f575d934"
+    },
+    {
+      "path": "tests/task-accepted-stop-sql-deadline.test.ts",
+      "sha256Utf8LF": "6b6365a25cea5cf998d6b012777e63f637f1a21b0ae7e9d579e45b091d84b90f"
+    },
+    {
+      "path": "tests/helpers/task-accepted-stop-delivery-support.ts",
+      "sha256Utf8LF": "2e7f0f461aad1f431eafb9e491a8bc3138cf6023fa7298b03bd54c15ff1ff9e0"
+    },
+    {
+      "path": "tests/helpers/task-accepted-stop-api-fixture.ts",
+      "sha256Utf8LF": "b50646e55f94268a4f86fcdd076cf142d42eacd3f26f922523e27817ff3866d0"
+    },
+    {
+      "path": "scripts/test-integration.mjs",
+      "sha256Utf8LF": "41a450c53ed1ae6a308acc8d3b334ea3af8665023661ca417b8307e5aa4a95f1"
+    },
+    {
+      "path": "apps/api/src/task-accepted-stop.ts",
+      "sha256Utf8LF": "2f9fcea016326882e5b850fcab852c641deaf4b644180f6f7bd214e8e17d8f52"
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256Utf8LF": "8ff41e5112b0cf130e7b7acabf3802b9767b679f693633138ae40fa41d844fbd"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256Utf8LF": "9fc01c6e92919cdf8acf54a4f1475db89c9d8364c03b8f85ff57ea27d9bc4239"
+    },
+    {
+      "path": "services/agent-runtime/archive-write-fence.mjs",
+      "sha256Utf8LF": "680b78f6100c1a942b2cff931adb1a55298070bb2011a6eca26a523869c18816"
+    }
+  ]
+}

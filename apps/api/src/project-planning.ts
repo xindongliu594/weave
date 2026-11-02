@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-import {mkdirSync,writeFileSync} from 'node:fs';
+import {lstatSync,mkdirSync,writeFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import type pg from 'pg';
 import { z } from 'zod';
@@ -21,7 +21,11 @@ import {participantDepartmentIds} from './collaboration.ts';
 type Database = Pick<pg.PoolClient, 'query'>;
 /** Safe diagnostics only; no provider text, request body or credential is saved. */
 export function recordPlanningOutputDiagnostic(traceRoot:string,diagnostic:PlanningOutputDiagnostic){
- const directory=resolve(traceRoot,'planning-output-diagnostics');mkdirSync(directory,{recursive:true,mode:0o700});
+ // Non-run diagnostics must not recreate a root being exchanged by backup restore.
+ const directory=resolve(traceRoot)+'.planning-output-diagnostics';
+ const existing=lstatSync(directory,{throwIfNoEntry:false});
+ if(existing&&(!existing.isDirectory()||existing.isSymbolicLink()))throw Error('Invalid planning diagnostic directory');
+ mkdirSync(directory,{recursive:true,mode:0o700});
  const id=randomUUID();writeFileSync(resolve(directory,id+'.json'),JSON.stringify({id,at:new Date().toISOString(),...diagnostic})+'\n',{encoding:'utf8',mode:0o600,flag:'wx'});return id;
 }
 export const projectPlanningInputSchema = z.object({

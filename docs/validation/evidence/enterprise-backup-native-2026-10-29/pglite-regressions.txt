@@ -1,0 +1,52 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ fixed portable catalog covers formal migrations, normalizes owned schema names and rejects drift (6364.8586ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6972.6229
+▶ enterprise export preserves source history, secrets boundary and referenced bytes
+  ✔ full encrypted snapshot has all fixed tables, immutable audit and exact textual codecs (1035.5479ms)
+  ✔ active execution and model calls block export, with known failures leaving source usable (1856.7363ms)
+  ✔ revoked principals cannot export (1048.7531ms)
+  ✔ active manager and capability probes block a consistent snapshot (1519.2159ms)
+  ✔ missing checkpoint CAS and hardlinked files reject without latching source (1429.7471ms)
+  ✔ changed vault bytes are not silently reindexed during export (1444.4804ms)
+  ✔ sealed credentials cannot be exported without their original master key (1318.1177ms)
+  ✔ root writer fence blocks snapshot overlap and releases after writer completes (2731.326ms)
+✔ enterprise export preserves source history, secrets boundary and referenced bytes (13826.2391ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16747.8874
+▶ enterprise restore preflight admits only untouched fresh database defaults
+  ✔ fresh defaults survive preflight without a write (594.4148ms)
+  ✔ rejects business history before changing it (790.3329ms)
+  ✔ rejects department and its trigger history before changing it (707.1602ms)
+  ✔ rejects existing user before changing it (737.1863ms)
+  ✔ rejects changed defaults without version bump before changing it (685.179ms)
+  ✔ rejects activated identity before changing it (601.0382ms)
+  ✔ rejects old idempotency cache before changing it (591.4749ms)
+  ✔ rejects previous restore generation before changing it (627.1413ms)
+  ✔ rejects enterprise restore anchor without marker before changing it (658.8867ms)
+  ✔ rejects previous admission marker before changing it (635.8194ms)
+  ✔ extra target files or device actor fail before stage creation without erasing files (2538.0385ms)
+  ✔ fresh isolated preserving import keeps source, historical task bytes and target identity (12060.6582ms)
+✔ enterprise restore preflight admits only untouched fresh database defaults (21921.9145ms)
+ℹ Target SQL/files/key/receipt/quarantine matched; checking re-export without live claim authority.
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24951.6374

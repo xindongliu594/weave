@@ -1,0 +1,4 @@
+
+> weave@0.2.0 build
+> tsc --noEmit && vite build
+

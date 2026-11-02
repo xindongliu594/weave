@@ -1,0 +1,17 @@
+
+> weave@0.2.0 build
+> tsc --noEmit && vite build
+
+apps/api/src/task-recovery-runtime.ts(26,15): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(27,5): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(35,16): error TS18047: 'archived' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(37,89): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(42,52): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(47,39): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(47,88): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(48,27): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(48,81): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(51,62): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(51,117): error TS18047: 'initialization' is possibly 'null'.
+apps/api/src/task-recovery-runtime.ts(52,52): error TS18047: 'initialization' is possibly 'null'.
+tests/helpers/task-recovery-source-fixture.ts(37,148): error TS2304: Cannot find name 'join'.

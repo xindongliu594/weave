@@ -1,0 +1,14 @@
+✔ native PostgreSQL process restart after prepared proves the same operation outcome (7729.0666ms)
+✔ native PostgreSQL process restart after old-moved proves the same operation outcome (5343.5412ms)
+✔ native PostgreSQL process restart after installed proves the same operation outcome (5343.8344ms)
+✔ native PostgreSQL process restart after committed proves the same operation outcome (5314.6039ms)
+✔ independent backend reconciliation waits for original SQL ROLLBACK before deciding from receipt absence (3170.9948ms)
+✔ independent backend reconciliation waits for original SQL COMMIT before deciding from receipt absence (3061.712ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30593.6258

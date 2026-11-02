@@ -31,6 +31,9 @@
     "@deepseek-ai/dsh-tools": "0.1.5-rc.1",
     "@deepseek-ai/dsh-util-values": "0.1.5-rc.1",
     "@nanmicoder/dsh-agent-teams": "0.1.20",
+    "@opentelemetry/exporter-logs-otlp-http": "0.220.0",
+    "@opentelemetry/resources": "2.9.0",
+    "@opentelemetry/sdk-logs": "0.220.0",
     "fs-native-extensions": "1.5.1"
   },
   "overrides": {

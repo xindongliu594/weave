@@ -1,0 +1,32 @@
+{
+  "registrationBlocks": 35,
+  "expandedTests": 79,
+  "unchangedFinalBlocks": 31,
+  "correctedBlocks": [
+    {
+      "path": "tests/task-accepted-stop-authority.test.ts",
+      "originalLine": 382,
+      "originalSha256": "308a287a9075c791e22ef3f295b85c7c34c8f721242e449ba6ff7d95f62ebba9",
+      "currentSha256": "5889e5e3529de9767712d46c0c1af000c68000a7c8f61fada295c6031266f1da"
+    },
+    {
+      "path": "tests/task-accepted-stop-authority.test.ts",
+      "originalLine": 470,
+      "originalSha256": "62887d0c1db9600531c9f19cc129b25fc203a6dd886a769a07688f9ff2508641",
+      "currentSha256": "bf5dbbac7acba03f257b8fc8dfb1f16e81fbcbe07044ab6fd4b7f217d99361c6"
+    },
+    {
+      "path": "tests/task-accepted-stop-lifecycle.test.ts",
+      "originalLine": 371,
+      "originalSha256": "bc7a5b5a9a23bb96b8614166ad2f6fd0ca6beee62dcfd5be923bcd768662a559",
+      "currentSha256": "313a08e0512575dd47ddbf1ebcf4f02bdddfc3febb39f6b61bc07fba5c13132a"
+    },
+    {
+      "path": "tests/task-accepted-stop-lifecycle.test.ts",
+      "originalLine": 433,
+      "originalSha256": "a3873c9edc88103e9446351d1b80c9b27d1b5b0356738d4861bdc1a490ec12bb",
+      "currentSha256": "aadf6983ac62b6c8806f29e117a2453da84274bb813dc44223abae4ba98438ea"
+    }
+  ],
+  "note": "All 35 blocks were identical at split time; four later corrections address two stale error assertions, one self-deadlocking cancellation fixture and a synchronous-rejection preflight loop. No omitted or added registration blocks."
+}

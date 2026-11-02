@@ -1,0 +1,297 @@
+{
+  "version": 1,
+  "date": "2026-10-30",
+  "baseline": "417b46e5510ab72203d722292e46e1e9b9322b77 + preserved working-tree changes",
+  "status": "scoped-validation-only",
+  "artifacts": [
+    {
+      "file": "physical-failures.tap",
+      "source": ".private/checkpoint-physical-20261029/native-tests.tap",
+      "bytes": 10180,
+      "sha256Utf8LF": "78a3a9a8119549c3e7a5faa3b905a67030a0f4bdecf3186fb02e3a47243890ae"
+    },
+    {
+      "file": "product-initial.log",
+      "source": ".private/product-flow-split-20261029/integration.log",
+      "bytes": 19993,
+      "sha256Utf8LF": "b608f11cbf4f7f0b1bc981e186f7313bd6d5e3f9e004b5bf3c44d21341f65fd9"
+    },
+    {
+      "file": "product-first-native.log",
+      "source": ".private/product-flow-split-20261029/integration-escalated.log",
+      "bytes": 3053,
+      "sha256Utf8LF": "5a0b819159c491b99fe44f428363b9df1a4409b2e8fd94c88ab6920fba650aea"
+    },
+    {
+      "file": "product-final-four.log",
+      "source": ".private/product-flow-split-20261029/integration-final.log",
+      "bytes": 2015,
+      "sha256Utf8LF": "12d63217d3d927af15fab78c2dbd481be7065917d24b722664d8cff4a047b4fa"
+    },
+    {
+      "file": "product-results.json",
+      "source": ".private/product-flow-split-20261029/final-results.json",
+      "bytes": 3379,
+      "sha256Utf8LF": "5702dbefe1fef76c6bbf8d525052cd6ca87d567fd43a8ba967b0e5a7957f0047"
+    },
+    {
+      "file": "product-test-body-proof.json",
+      "source": ".private/product-flow-split-20261029/test-body-proof.json",
+      "bytes": 7622,
+      "sha256Utf8LF": "8aeb4ac95101ff21ffd681ed67103bb33fc7f3adb220b3d5a34db40709f00718"
+    },
+    {
+      "file": "product-scenario-map.json",
+      "source": ".private/product-flow-split-20261029/scenario-map.json",
+      "bytes": 3556,
+      "sha256Utf8LF": "53bd1b033fc0bee5877a8f41b2ff0977e0664a2a3b7176ee8c3eea341589d0e1"
+    },
+    {
+      "file": "product-lightweight.log",
+      "source": ".private/product-flow-split-20261029/lightweight-final.log",
+      "bytes": 820,
+      "sha256Utf8LF": "1746f8e9709b6d8db8d7ad616c2246e35d8c643d882b1a84ec9880cf5efc8b35"
+    },
+    {
+      "file": "product-before-schema-source-hashes.json",
+      "source": ".private/product-flow-split-20261029/source-hashes.pre-schema-fix.json",
+      "bytes": 976,
+      "sha256Utf8LF": "1b47dc4e9a706625803f0f4a53a94a2a1ec38ef72a23bc2f6a19b70550b462f1"
+    },
+    {
+      "file": "provider-red.log",
+      "source": ".private/provider-writer-20261029/red.log",
+      "bytes": 4518,
+      "sha256Utf8LF": "c1624c3ff3a6f34fcac89ce5da020fb901dbee17a8ab9a94ff2570e98b75b272"
+    },
+    {
+      "file": "provider-writer-http.log",
+      "source": ".private/provider-writer-20261029/green-http.log",
+      "bytes": 1507,
+      "sha256Utf8LF": "ccd7ad234156ddf4be96de451cb911f70d6c65ee15bc89d087c8f7c77882e02a"
+    },
+    {
+      "file": "provider-initial-integration.log",
+      "source": ".private/provider-writer-20261029/integration.log",
+      "bytes": 6800,
+      "sha256Utf8LF": "3b9d7df8eab5e4f6373dd896b0a8ec463e7c40de0b1d190ec58fabcd5414725d"
+    },
+    {
+      "file": "provider-final.log",
+      "source": ".private/provider-writer-20261029/provider-final.log",
+      "bytes": 2327,
+      "sha256Utf8LF": "0a87c8d11fcc01d9953a3a50e7bfbab6ae6497940ac40f901d1ce1bb4d39ea43"
+    },
+    {
+      "file": "diagnostic-red.log",
+      "source": ".private/planning-diagnostic-root-20261029/red.log",
+      "bytes": 3471,
+      "sha256Utf8LF": "e2375f6715fe3b84416c0b74397625b7f1a107d9636dbe9784563aa0a2c0e1e3"
+    },
+    {
+      "file": "diagnostic-green.log",
+      "source": ".private/planning-diagnostic-root-20261029/green.log",
+      "bytes": 304,
+      "sha256Utf8LF": "d0a674a16483f413b62416eb3f72a11410fe3a7d4b9fa6dcf5a5f93b1ae47b5e"
+    },
+    {
+      "file": "cost-and-planning-final.log",
+      "source": ".private/planning-diagnostic-root-20261029/integration.log",
+      "bytes": 2788,
+      "sha256Utf8LF": "1a231409ffbc9831cedb71b73197028aec12f2662fb72c5b24cd2733b27d9d51"
+    },
+    {
+      "file": "checkpoint-entry-red.log",
+      "source": ".private/checkpoint-directory-20261030/red.log",
+      "bytes": 1004,
+      "sha256Utf8LF": "b8794cc263f4480ebea73697b5e90031e43d891e5b74b153ac622c456676a823"
+    },
+    {
+      "file": "checkpoint-entry-green.log",
+      "source": ".private/checkpoint-directory-20261030/green.log",
+      "bytes": 1016,
+      "sha256Utf8LF": "c41a28000dfa2cfe44344b3b5ecfe41bb11960862fa369c5d1aa354a5cf3d92c"
+    },
+    {
+      "file": "build.log",
+      "source": ".private/checkpoint-parallel-20261029/build-final.log",
+      "bytes": 975,
+      "sha256Utf8LF": "c7c8d2c71695e6592a9f8bc59e58e4d79e01fc1d849d4587fea60246986b6f6c"
+    }
+  ],
+  "sources": [
+    {
+      "file": "apps/api/src/app.ts",
+      "sha256Utf8LF": "bb326b10208f85f288d43a7138e3d8b3238cf5ee81e94df057d6b986e9c54687"
+    },
+    {
+      "file": "apps/api/src/cost-control.ts",
+      "sha256Utf8LF": "a73121497c3cb6ec5621ee734623f1a761ba773d10841034528bead667ecb6be"
+    },
+    {
+      "file": "apps/api/src/cost-router.ts",
+      "sha256Utf8LF": "0fb0cbb2b8be0c76c2c5e9691ba8989833d1cbe6f78f3bb32b4767b1193644d0"
+    },
+    {
+      "file": "apps/api/src/provider-reconciliation.ts",
+      "sha256Utf8LF": "1595d937822433bd5ced3ca36d58910c76be43f0b9204774242a2f2d2823b931"
+    },
+    {
+      "file": "apps/api/src/project-planning.ts",
+      "sha256Utf8LF": "83bb1ae9bc02056c3dba2cc761e9b63896e7369f55eafd27c908edcdb07199a6"
+    },
+    {
+      "file": "services/agent-runtime/step-checkpoints.mjs",
+      "sha256Utf8LF": "bc04bbe1880f86e4e3b8f856821b08c5a2b418d909135436e0396c6755a3887e"
+    },
+    {
+      "file": "services/agent-runtime/archive-physical-failure.test.mjs",
+      "sha256Utf8LF": "6b7a0f1453b78a88fd4bb0d827298c8d591a1e5f105cac618bb086d679c7b628"
+    },
+    {
+      "file": "services/agent-runtime/test-helpers/archive-physical-failure-child.mjs",
+      "sha256Utf8LF": "d87e2b7759c295d2445f0cf5f13dbe7673e163559626ee5fd78c77d549f6b034"
+    },
+    {
+      "file": "services/agent-runtime/checkpoint-writer-entry.test.mjs",
+      "sha256Utf8LF": "e297e9447070e303dad501b9fe3797f72c5c5fd33febe0631c9cf8f81920b1a7"
+    },
+    {
+      "file": "tests/planning-diagnostic-root.test.ts",
+      "sha256Utf8LF": "fe514c9eabeb4cab0f11250d91291b149c76af997ac6b8f03aa9229f7dc692e8"
+    },
+    {
+      "file": "tests/planning-output-api.test.ts",
+      "sha256Utf8LF": "416d21508c2bbb1c7f8fbeff5877f65be0de58d831600ace8b3e0b9c28ebdb3b"
+    },
+    {
+      "file": "tests/cost.test.ts",
+      "sha256Utf8LF": "7d75b35620951b250cab1b0294c94b0296362aa9bcaf11b725b8dbf8c466a90e"
+    },
+    {
+      "file": "tests/provider-reconciliation.test.ts",
+      "sha256Utf8LF": "d4a9f723a03bdaab2c496f34ba5109427ac9b8de2462bc851204ae428a98f9bc"
+    },
+    {
+      "file": "tests/provider-reconciliation-writer.test.ts",
+      "sha256Utf8LF": "f6245fd3923c51d3b1acaac99b907e34ed8a62f45bfe83ba4e99c1ede2f51ec2"
+    },
+    {
+      "file": "tests/fixtures/provider-writer-probe.mjs",
+      "sha256Utf8LF": "d52feb827ee05c7f0c8ae5aa506457322e85a775364bcaf3f6c7f2eb95f21f4a"
+    },
+    {
+      "file": "scripts/test-integration.mjs",
+      "sha256Utf8LF": "6824d783f834b75c25f566c9639ff4b165d5850db8a3f1f1a96ec17a9f364b4d"
+    },
+    {
+      "file": "tests/test-integration-runner.test.mjs",
+      "sha256Utf8LF": "6122b15248fcacd70832b4b6f8bacedfb8eefc0e38be17376326686ad95c2d99"
+    },
+    {
+      "file": "tests/helpers/product-flow-support.ts",
+      "sha256Utf8LF": "f865df33e666ab4c6ec5d068e1bbb8aabeaccc5da09fc56d47e087b8b56e3bda"
+    },
+    {
+      "file": "tests/product-flow.test.ts",
+      "sha256Utf8LF": "59f3a74cf57047e2ca4030f34750df629488a408d3a048c28ac418ca1fc61081"
+    },
+    {
+      "file": "tests/product-flow-core.test.ts",
+      "sha256Utf8LF": "5e10a0caf25e5a07de95559216cf877ed76cab3c9fb3088cfcbafcfeca4cb02b"
+    },
+    {
+      "file": "tests/product-flow-rework.test.ts",
+      "sha256Utf8LF": "e5ff68b7fe11285b6b0e9d28f4f76600486bd0725e16ab6c2903ae563e5d8fdf"
+    },
+    {
+      "file": "tests/product-flow-escalation.test.ts",
+      "sha256Utf8LF": "c8a90d2c87b3602d01cc274fb2b5ff3d74e4d3c5467ca77badcf066b62cbcde9"
+    },
+    {
+      "file": "tests/product-flow-recovery.test.ts",
+      "sha256Utf8LF": "9cb868ffc791390008b9188bf53a93b96a786778e3a9bdeff79060c98440c9f2"
+    },
+    {
+      "file": "tests/product-flow-recovery-rework.test.ts",
+      "sha256Utf8LF": "31cabea157c6b67b9a373112267489b5d7a04c9c0ae8fe0bad7e8f0450f53690"
+    },
+    {
+      "file": "tests/product-flow-fixture.test.ts",
+      "sha256Utf8LF": "c8a1503de7561a7eb65e8d45258d05b83a9b07a48acfcb39b9e54db57f883c93"
+    }
+  ],
+  "results": [
+    {
+      "layer": "native-file-locks",
+      "tests": 16,
+      "pass": 16,
+      "exitCode": 0,
+      "note": "6 new physical-failure + 10 previous trace cases; simulated EIO, not hardware power loss"
+    },
+    {
+      "layer": "product-integration",
+      "tests": 19,
+      "pass": 19,
+      "exitCode": null,
+      "note": "All scenario assertions passed across two commands. First parent124; native/core child exits not recorded separately. Final four-group command0. No single final six-file rerun; final UUID/schema ownership change has separate8/8 checks."
+    },
+    {
+      "layer": "runner-fixture",
+      "tests": 8,
+      "pass": 8,
+      "exitCode": 0
+    },
+    {
+      "layer": "billing-writer-native-and-http",
+      "tests": 14,
+      "pass": 14,
+      "exitCode": 0,
+      "note": "Controlled SQL and billing response, actual native lock and loopback HTTP; not native PostgreSQL"
+    },
+    {
+      "layer": "billing-business-pglite",
+      "tests": 17,
+      "pass": 17,
+      "exitCode": 0
+    },
+    {
+      "layer": "cost-business-pglite",
+      "tests": 12,
+      "pass": 12,
+      "exitCode": 0
+    },
+    {
+      "layer": "planning-api-pglite",
+      "tests": 8,
+      "pass": 8,
+      "exitCode": 0
+    },
+    {
+      "layer": "diagnostic-root-native",
+      "tests": 2,
+      "pass": 2,
+      "exitCode": 0
+    },
+    {
+      "layer": "checkpoint-objects",
+      "tests": 10,
+      "pass": 10,
+      "exitCode": 0
+    },
+    {
+      "layer": "typecheck-build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "note": "Existing bundle warning >500kB retained"
+    }
+  ],
+  "limits": [
+    "No source approval certification or child initialization",
+    "Enterprise execution profile remains closed",
+    "No real model, native PostgreSQL for this billing change, physical OpenShell/JJ, or browser validation",
+    "No commit, push or deployment",
+    "Other conversation member/observability/evaluation work excluded from claims",
+    "Later read-only billing GET probes retain original claim/attempt/pause rules; no claim of permanent query ban"
+  ]
+}

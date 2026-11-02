@@ -18,7 +18,7 @@ const file=(path:string,text:string)=>({path,content:Buffer.from(text).toString(
 const signal=()=>new AbortController().signal;
 
 /** Real HTTP/SQL commits and Handoff seals; only physical operations/stop effects are fixtures. */
-export async function acceptedStopApiFixture(root:string,{producerInput=false}={}){
+export async function acceptedStopApiFixture(root:string,{producerInput=false,resourceRevision}: {producerInput?:boolean;resourceRevision?:number}={}){
  const writers=createArchiveWriterManager({traceRoot:root});
  const runId=randomUUID(),projectId=randomUUID(),deviceId=randomUUID(),grantId=randomUUID(),owner=randomUUID(),token='a'.repeat(64);
  const employee={id:'employee',employeeId:'employee',modelId:'unused',tools:['filesystem','artifact_write'],name:'Fixture',role:'manager'};
@@ -27,6 +27,7 @@ export async function acceptedStopApiFixture(root:string,{producerInput=false}={
  const tasks=['a','b','c'].map(id=>({id,kind:'work',assignee:'employee',inputs:[{path:'in.txt',sha256:sha('input')}],outputs:[{path:id+'.txt'}],inScope:[id+'.txt'],outOfScope:[],dependencies:[]}));
  if(producerInput){tasks.unshift({id:'p',kind:'work',assignee:'employee',inputs:[{path:'in.txt',sha256:sha('input')}],outputs:[{path:'p.txt'}],inScope:['p.txt'],outOfScope:[],dependencies:[]});const a=tasks.find(task=>task.id==='a')!;a.inputs=[{path:'p.txt',producerTaskId:'p'} as any];a.dependencies=['p'] as any;}
  let snapshot:any={projectId,planVersion:1,departmentId:'department',executionProfile:'task-attempt-openshell-v1',policy,agents:[employee],tasks,executionTarget:{...target,platform:'linux',allowCommands:true},importedFiles:[{path:'in.txt',content:'input',snapshotId:'snapshot',sha256:sha('input'),agentIds:['employee']}]};
+ if(resourceRevision!==undefined)snapshot.resourceRevision=resourceRevision;
  await pool.query('INSERT INTO departments(id,data) VALUES($1,$2)',['department',{name:'fixture',agents:[employee]}]);
  await pool.query('INSERT INTO projects(id,department_id,department_version,department_name,requirement,policy,plan,source) VALUES($1,$2,1,$3,$3,$4,$5,$3)',[projectId,'department','fixture',policy,{agents:[employee],tasks}]);
  await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,lease_owner,lease_until) VALUES($1,$2,1,'running',$3,$4,now()+interval '1 hour')",[runId,projectId,snapshot,owner]);
@@ -76,5 +77,5 @@ export async function acceptedStopApiFixture(root:string,{producerInput=false}={
   const accepted=gate.prepare(id,'attempt-'+id,{});state.tasks.find((task:any)=>task.id==='native-'+id).status='completed';archive.append('team/checkpoint',state);gate.commit(accepted);archive.append('team/checkpoint',state);
   return context;
  }
- return {runId,deviceId,grantId,owner,backend,archive,bindingRoot,state,snapshot,service,executor,control,maintenance,jobs,bind,write,acceptTask,acceptA:()=>acceptTask('a','A'),drive,swapProvider:()=>{currentExecutor={...stopExecutor};},swapMethod:()=>{stopExecutor.reconcileAcceptedTaskStop=async()=>{throw Error('replacement maintenance method');};},close:async()=>{server.closeAllConnections();await new Promise<void>(done=>server.close(()=>done()));}};
+ return {runId,projectId,writers,deviceId,grantId,owner,backend,archive,bindingRoot,state,snapshot,service,executor,control,maintenance,jobs,bind,write,acceptTask,acceptA:()=>acceptTask('a','A'),drive,swapProvider:()=>{currentExecutor={...stopExecutor};},swapMethod:()=>{stopExecutor.reconcileAcceptedTaskStop=async()=>{throw Error('replacement maintenance method');};},close:async()=>{server.closeAllConnections();await new Promise<void>(done=>server.close(()=>done()));}};
 }

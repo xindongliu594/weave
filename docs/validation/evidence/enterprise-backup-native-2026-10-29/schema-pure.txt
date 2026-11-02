@@ -1,0 +1,16 @@
+✔ strict v2 encryption preserves decimal text, large epochs, timestamps, vectors and file manifests (461.6057ms)
+✔ unknown schema, missing/extra tables, credential columns and altered manifests are rejected (26.3515ms)
+✔ duplicate identities and broken or cyclic foreign-key chains cannot enter a preserving import (5.6464ms)
+✔ portable paths reject traversal, Windows aliases, alternate data streams and case collisions (42.4508ms)
+✔ native bundles reuse the fixed manifest validator and bind all compressed/code/metadata bytes (338.0385ms)
+✔ SQL null and JSON null remain distinct and fixed metadata cannot be mutated (1.8549ms)
+✔ size checks precede crypto and decompression is bounded even for an authenticated compressed bomb (2767.4492ms)
+✔ row/file limits and invalid scalar codecs are rejected without evaluating untrusted objects (2238.7512ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6827.8425

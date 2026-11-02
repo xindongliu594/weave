@@ -1,0 +1,342 @@
+{
+  "date": "2026-10-29",
+  "base": "417b46e5510ab72203d722292e46e1e9b9322b77",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "reuse": {
+    "name": "fs-native-extensions",
+    "version": "1.5.1",
+    "dependencyChange": false
+  },
+  "commands": [
+    {
+      "command": "node --test --test-concurrency=1 --test-name-pattern=\"registered roots|old handles|registration invalidates|SHA object|journal compression|real journal lock\" services/agent-runtime/archive-trace-scope.test.mjs",
+      "attempts": [
+        {
+          "log": "red.txt",
+          "exitCode": 1,
+          "meaning": "Invalid sandbox temporary-path fixture; not valid RED"
+        },
+        {
+          "log": "red-owned.txt",
+          "exitCode": 1,
+          "meaning": "Same virtual-path issue; not valid RED"
+        },
+        {
+          "log": "red-native.txt",
+          "exitCode": 1,
+          "meaning": "Six expected behavioral failures on ordinary Windows"
+        }
+      ]
+    },
+    {
+      "command": "node --test --test-concurrency=1 services/agent-runtime/archive-trace-scope.test.mjs",
+      "log": "green-initial.txt",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs --test-name-pattern=\"acknowledged device cancellation\" tests/local-executor-writer.test.ts",
+      "log": "cancel-red.txt",
+      "exitCode": 1
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/local-executor-writer.test.ts",
+      "log": "cancel-green.txt",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs --test-name-pattern=\"D1 cancels|cancellation while approval\" tests/product-flow.test.ts",
+      "log": "product-cancel.txt",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/product-flow.test.ts tests/api.test.ts tests/extensions-backup.test.ts tests/storage-governance.test.ts",
+      "log": "integration-initial.txt",
+      "exitCode": 1,
+      "productFileTimeoutSeconds": 300
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/product-flow.test.ts tests/api.test.ts tests/storage-governance.test.ts",
+      "log": "integration-final.txt",
+      "exitCode": 1,
+      "productFileTimeoutSeconds": 300
+    },
+    {
+      "command": "node scripts/test-integration.mjs --test-name-pattern=\"approved API rework repairs|API rework escalates|checkpoint resume|resource-approved recovery|checkpoint recovery|C3 restores\" tests/product-flow.test.ts",
+      "log": "product-recovery-final.txt",
+      "exitCode": 0
+    },
+    {
+      "command": "node --test --test-concurrency=1 services/agent-runtime/{archive-trace-scope,archive-writer-scope,archive-maintenance-scope,archive-root-scope,archive-objects,journal-archive,trace,trace-append-cursor,trace-list-cache,trace-observation,step-checkpoints}.test.mjs",
+      "note": "Eleven paths were passed explicitly; braces are report shorthand.",
+      "log": "runtime-final.txt",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/api.test.ts",
+      "log": "api-final.txt",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "log": "build.txt",
+      "exitCode": -1,
+      "meaning": "Owned sandbox tsc process stopped after prolonged system-call activity; not a pass"
+    },
+    {
+      "command": "npm run build",
+      "log": "build-native.txt",
+      "exitCode": 0,
+      "meaning": "Ordinary Windows environment, TypeScript and Vite passed; existing >500kB advisory remains"
+    }
+  ],
+  "results": {
+    "runtime": [
+      {
+        "tests": 77,
+        "passed": 77,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 34205.189
+      }
+    ],
+    "executor": [
+      {
+        "tests": 27,
+        "passed": 27,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 7315.5009
+      }
+    ],
+    "api": [
+      {
+        "tests": 14,
+        "passed": 14,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 26239.4517
+      }
+    ],
+    "storage": {
+      "tests": 21,
+      "passed": 21,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 12145.2827
+    },
+    "backup": {
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "durationMs": 8572.0786
+    },
+    "recovery": [
+      {
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 272845.6384
+      }
+    ],
+    "product": {
+      "uniqueScenariosPassed": 19,
+      "names": [
+        "API rework escalates exhausted rounds, forbidden files and explicit rejection",
+        "API rework stops at its call allowance and full retry cannot reset the task counter",
+        "C3 monitors actual employee waits and stops repeated actions/errors before more paid calls",
+        "C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry",
+        "C3 restores an independently passed rework pair and runs only its remaining consumer",
+        "C3 retries a transient read within the same tool call, without extra model charges",
+        "D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting",
+        "D1 cancels an in-flight native command and reconnects by reporting its receipt without replay",
+        "D1 lost poll response recovers an unstarted claim and executes it exactly once",
+        "D1 revoked device grants reject dispatch after approval and do not become unknown mutations",
+        "a modified accepted input is rejected before the reviewer makes a model request",
+        "approved API flow waits for command approval, hands off verified files and settles usage",
+        "approved API rework repairs, independently re-reviews and bills the original task buckets",
+        "cancellation while approval is pending cancels the receipt and never runs the command",
+        "checkpoint recovery preserves the DAG, unfinished files and history across two interruptions",
+        "checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard",
+        "employee summaries are billed to the active task and preserve approved contracts through handoff",
+        "missing output and forged verification cannot dispatch the dependent reviewer",
+        "resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay"
+      ],
+      "wholeFileExitZero": false,
+      "note": "14 passes in a timed-out full file +6 passing selected scenarios, one overlap; the failed aggregate commands are retained."
+    },
+    "distinctRelatedPassed": 165,
+    "note": "No baseline/double-counted retries added; not whole repository or real-model acceptance."
+  },
+  "review": {
+    "critical": 0,
+    "important": 0,
+    "minorDeferred": [
+      "Dedicated caught physical write/fsync failure on registered trace/object paths with independent source probe"
+    ],
+    "reviewer": "/root/archive_trace_cutover_review",
+    "declined": [
+      "Whole repository writer coverage",
+      "Positive source certification and child initializer",
+      "Enterprise profile",
+      "Native PostgreSQL concurrency this batch",
+      "Real model / JJ deployment"
+    ],
+    "inheritedOnly": [
+      "Native primitive physical root replacement"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "red.txt",
+      "bytes": 8770,
+      "sha256Utf8LF": "474beb9d251f43d66853b195dacc3e054adda90bf395e33f2756614628f4e869"
+    },
+    {
+      "path": "red-owned.txt",
+      "bytes": 8772,
+      "sha256Utf8LF": "58a17a1bb6bb20a1122fca2c53ffe7750108de73cfe3f8babe78c6f32d2aef28"
+    },
+    {
+      "path": "red-native.txt",
+      "bytes": 7077,
+      "sha256Utf8LF": "49d58add081227d8c75aea60be685dfa1d82cb77e8a526bd921aa2b932740697"
+    },
+    {
+      "path": "green-initial.txt",
+      "bytes": 948,
+      "sha256Utf8LF": "1d512459cfaa0ff132e6c04dcbd072f7c442c3525c2aaf4b3478298ad9b25e00"
+    },
+    {
+      "path": "cancel-red.txt",
+      "bytes": 2178,
+      "sha256Utf8LF": "5909b9d74dfe98524fda41a21ae4454053956e8f148ecdf360d52538756406f7"
+    },
+    {
+      "path": "cancel-green.txt",
+      "bytes": 3104,
+      "sha256Utf8LF": "a1791e621c268281527fef20e3e211923b63e2042e9f166a6d39f2102a4d3db6"
+    },
+    {
+      "path": "product-cancel.txt",
+      "bytes": 572,
+      "sha256Utf8LF": "25f30a79b37d4aeefcf64a2362e9d6d7a736e59a5fee5f2f60d82c02133310ec"
+    },
+    {
+      "path": "integration-initial.txt",
+      "bytes": 7729,
+      "sha256Utf8LF": "34bf2e2a4bb5bbdeb6bd70befae59f2e1bef02fa9481ae9939724016b2e90ce8"
+    },
+    {
+      "path": "integration-final.txt",
+      "bytes": 7321,
+      "sha256Utf8LF": "a9cc4dc94778539193c4f97bbb7946799029b4582c89211073823b934941139d"
+    },
+    {
+      "path": "product-recovery-final.txt",
+      "bytes": 1149,
+      "sha256Utf8LF": "827c88bef33ba3101160fb10207cdcc55c090f4bccec961746143e80a2f5a20c"
+    },
+    {
+      "path": "runtime-final.txt",
+      "bytes": 7778,
+      "sha256Utf8LF": "fb65d44d29fac54c54ddd1509962a571904d48a08681ba1f38526a2be33beb4d"
+    },
+    {
+      "path": "api-final.txt",
+      "bytes": 1842,
+      "sha256Utf8LF": "ced929eab2e5263da58291f6e630a1b44248653dbb327dcc690923e708744e76"
+    },
+    {
+      "path": "build.txt",
+      "bytes": 51,
+      "sha256Utf8LF": "ad73c4e5855a0dc42ca9f279321e37aeebe181606ea73efad0cc8048cdf55b97"
+    },
+    {
+      "path": "build-native.txt",
+      "bytes": 765,
+      "sha256Utf8LF": "0fe7acb1f5b6faf1879f92f5f77ea9462e5cafdfe9db13b013f4faec10616fff"
+    },
+    {
+      "path": "fixture-cleanup.json",
+      "bytes": 1052,
+      "sha256Utf8LF": "f3eb1f2d0319836a3ce1fb65f461ffebb4a0e81218afad3f4394900d45be3977"
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/api/src/app.ts",
+      "sha256Utf8LF": "58994227bf54dbce5f18b4d39304968c2d3864808e448fc77cc2b476f41c0c2d"
+    },
+    {
+      "path": "apps/api/src/local-execution.ts",
+      "sha256Utf8LF": "4d63152adad7572e890206e9b393696fa0e27fb61083d8413901bc3ba6109e40"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256Utf8LF": "3f7521095a7f4cb3a23201bca22c4023c24f06bd3056a958abd8d4f8fd21edce"
+    },
+    {
+      "path": "services/agent-runtime/archive-writer-scope.d.mts",
+      "sha256Utf8LF": "2d519ca7e2df45e84fa9b63782c444b1d0d7bcbdbd90c1518c3c005d946fd7ee"
+    },
+    {
+      "path": "services/agent-runtime/archive-write-fence.mjs",
+      "sha256Utf8LF": "680b78f6100c1a942b2cff931adb1a55298070bb2011a6eca26a523869c18816"
+    },
+    {
+      "path": "services/agent-runtime/trace-store.mjs",
+      "sha256Utf8LF": "d0677924be1b75695bef5433bb24192c667720cc568ef6229bc5ea2119bb39b9"
+    },
+    {
+      "path": "services/agent-runtime/archive-objects.mjs",
+      "sha256Utf8LF": "cc6eb45c7efb45bde5f45bfbffcc782d22f5bf1414cb74cb111723683b60c248"
+    },
+    {
+      "path": "services/agent-runtime/journal-archive.mjs",
+      "sha256Utf8LF": "e269b0f7efb0b0f97b64e7be9e451491df0a57149e645b047446587f72e80c97"
+    },
+    {
+      "path": "services/agent-runtime/archive-trace-scope.test.mjs",
+      "sha256Utf8LF": "5951d5531de1ce5d509e8b6a44cfd3fd99d92cbf9df30ad8e6fbb5343660d761"
+    },
+    {
+      "path": "services/agent-runtime/test-helpers/archive-trace-child.mjs",
+      "sha256Utf8LF": "5c1af31f8a74efb03b194ee0ae713c680fa8623cc1862265bfd7805f602efc7c"
+    },
+    {
+      "path": "tests/local-executor-writer.test.ts",
+      "sha256Utf8LF": "3c5ee8e6c67d0f77882bc5b78d7e67c2ed00338f58fa4fab3345ea1d0f028004"
+    },
+    {
+      "path": "tests/api.test.ts",
+      "sha256Utf8LF": "28534f0bf84ebc66069f3b543a71892b4dda847881a8a22d2db52b047fbc7599"
+    },
+    {
+      "path": "tests/storage-governance.test.ts",
+      "sha256Utf8LF": "c0a1af3d5e2022a3723491ccec605a4130a95c16e6f82bee6ec091d48d7078c8"
+    },
+    {
+      "path": "tests/product-flow.test.ts",
+      "sha256Utf8LF": "3f600284aefcea28028da967972e75a7754d6fc2fd89d4e2de479c1f4ce4635d"
+    }
+  ],
+  "earlierProductFixtureSha256Utf8LF": "b295a9f983597e02827416b8efa49b06b52c5f640ee91c8d642433e589e07963",
+  "modelCalls": 0,
+  "budgetIncrease": 0,
+  "deploymentOperations": 0,
+  "unverified": [
+    "Complete raw SQL/FS writer coverage",
+    "Trusted live recovery source and NULL-only child initialization",
+    "Physical JJ/OpenShell and real-model acceptance",
+    "Whole repository suite"
+  ]
+}

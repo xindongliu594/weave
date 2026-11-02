@@ -1,0 +1,88 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting (26468.4296ms)
+✔ D1 lost poll response recovers an unstarted claim and executes it exactly once (21418.1996ms)
+✔ D1 revoked device grants reject dispatch after approval and do not become unknown mutations (7838.6796ms)
+✔ D1 cancels an in-flight native command and reconnects by reporting its receipt without replay (14066.8719ms)
+✔ approved API flow waits for command approval, hands off verified files and settles usage (20368.1148ms)
+✔ employee summaries are billed to the active task and preserve approved contracts through handoff (24991.1231ms)
+✖ approved API rework repairs, independently re-reviews and bills the original task buckets (25458.0739ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (20471.726ms)
+✖ API rework escalates exhausted rounds, forbidden files and explicit rejection (25693.4231ms)
+✔ missing output and forged verification cannot dispatch the dependent reviewer (11234.0631ms)
+✔ a modified accepted input is rejected before the reviewer makes a model request (8280.6218ms)
+✔ cancellation while approval is pending cancels the receipt and never runs the command (5616.7715ms)
+✔ C3 monitors actual employee waits and stops repeated actions/errors before more paid calls (18374.642ms)
+✔ C3 retries a transient read within the same tool call, without extra model charges (15301.2156ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (19292.4352ms)
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (23622.6042ms)
+Integration file tests/product-flow.test.ts exceeded 300 seconds
+✔ gateway discovery, formal execution, versioned plans and deletion preserve history (11187.6765ms)
+✔ organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost (688.8396ms)
+✔ model planning preserves user input scope and refuses to remove an input recipient (577.6431ms)
+✔ dynamic loopback preview can save a gateway through the local proxy (24.061ms)
+✔ cross-origin mutations, remote host headers, and malformed data fail closed (31.0177ms)
+✖ small trace pages preserve every complete event and do not change the full export (1551.0703ms)
+✔ trace verification API persists a run and serves history after recreating the app (5100.2271ms)
+✔ one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings (115.4542ms)
+✔ catalog refuses quotes fetched across a concurrent gateway edit (19.3571ms)
+✔ text replies accept null tool calls but reject malformed non-null calls and retain usage (139.9082ms)
+✔ gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes (70.8735ms)
+✔ gateway service checks reject results from a changed connection and diagnose a closed port (29.7607ms)
+✔ official pricing is the default, matches exact models, and does not fetch relay public prices (11.7056ms)
+✔ planning timeouts preserve the saved plan and keep unresolved billing without automatic retries (853.8081ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 13
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21067.4666
+
+✖ failing tests:
+
+test at tests\api.test.ts:1:23201
+✖ small trace pages preserve every complete event and do not change the full export (1551.0703ms)
+  Error: Archive writer scope
+      at fail (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:11:46)
+      at assertContext (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:56:153)
+      at Object.mutate (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:164:21)
+      at withArchiveMutationSync (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:40:47)
+      at storeArchiveObjects (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-objects.mjs:40:9)
+      at commitStepCheckpoint (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/step-checkpoints.mjs:149:7)
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\api.test.ts:292:20)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    code: 'E_ARCHIVE_WRITER_SCOPE'
+  }
+✔ inventory keeps legacy quota fields and reports archive/workspace categories without model calls (2466.925ms)
+✔ retention advice is read-only, uses finished age, and cannot bypass preview confirmation (130.7863ms)
+✔ retention protects unknown or damaged original archives even when database says completed (190.7424ms)
+✔ explicit confirmation deletes only completed identical copies and repeated confirmation never repeats deletion (391.1409ms)
+✔ failed/running and unregistered workspaces are retained; queued work blocks confirmation (250.6863ms)
+✔ post-preview file change refuses the whole batch (236.2755ms)
+✔ expired persisted previews reject confirmation (217.6848ms)
+✔ restart preserves preview/history and interrupted deletion is reconciled without replay (444.0798ms)
+✔ wrong confirmation and arbitrary path input cannot authorize deletion (340.6373ms)
+✔ unchanged previews reuse one durable record rather than duplicating file lists (294.4455ms)
+✔ bounded cleanup metadata refuses new previews without deleting stored history (296.1223ms)
+✔ a cancelled operation that started without a receipt blocks cleanup until explicitly reconciled (539.7036ms)
+✔ simultaneous preview requests reuse one record under the shared metadata lock (459.3123ms)
+✔ every model reservation including free-accounted conversation stops on low disk before provider dispatch (167.6966ms)
+✔ sandbox storage shows registered identity and explicit inspection never deletes (321.4651ms)
+✔ sandbox retirement requires its own confirmation and preserves official delivery (564.0283ms)
+✔ changed canonical delivery blocks sandbox retirement before external delete (311.0581ms)
+✔ sandbox uncertain deletion records partial and keeps its original process guard without another delete (2300.38ms)
+✔ journal preview seals real completed events and preserves exact trace reads (336.0946ms)
+✔ persisted unresolved sandbox receipt can be queried repeatedly without dispatching retirement (315.8985ms)
+STORAGE_GOVERNANCE_EXIT_CLEANUP={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\storage-api-TgK2uS","pid":48728}
+✔ journal archive refuses post-preview append and never removes original evidence (316.442ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12145.2827

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "6c20e3d7-22f5-4d94-84f5-1dacb0ca2f09",
+    "pgCtlStatus": 3,
+    "dataRemoved": true,
+    "originalFailureLogsRetained": true
+  },
+  {
+    "id": "83b85c9e-b772-43eb-8607-cedb2d762928",
+    "pgCtlStatus": 3,
+    "dataRemoved": true,
+    "originalFailureLogsRetained": true
+  },
+  {
+    "id": "2e98dbfe-e878-4c22-8c58-56114d7d31ef",
+    "pgCtlStatus": 3,
+    "dataRemoved": true,
+    "originalFailureLogsRetained": true
+  }
+]

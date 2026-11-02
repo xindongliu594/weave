@@ -1,6 +1,7 @@
 import {existsSync,lstatSync,readFileSync,openSync,writeFileSync,fsyncSync,closeSync,unlinkSync} from 'node:fs';
 import {join,resolve,parse,relative,sep} from 'node:path';import {createHash} from 'node:crypto';import {gzipSync,gunzipSync} from 'node:zlib';
 import {readRun} from './trace-store.mjs';import {unresolvedOperations} from './recovery.mjs';
+import {withArchiveMutationSync} from './archive-writer-scope.mjs';
 const sha=value=>createHash('sha256').update(value).digest('hex'),same=stat=>[stat.dev,stat.ino,stat.size,stat.mtimeMs,stat.ctimeMs,stat.nlink].join(':'),hex=/^[a-f0-9]{64}$/,uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const changed=()=>Object.assign(Error('日志、快照或归档状态已变化，原数据保留，请重新核对。'),{code:'JOURNAL_ARCHIVE_CHANGED'});
 function archivePayload(raw,candidate){
@@ -29,6 +30,7 @@ export function journalArchiveCandidate(root,runId){
 function durable(file,value){const fd=openSync(file,'wx',0o600);try{writeFileSync(fd,value);fsyncSync(fd);}finally{closeSync(fd);}}
 function syncDirectory(dir){if(process.platform==='win32')return;const fd=openSync(dir,'r');try{fsyncSync(fd);}finally{closeSync(fd);}}
 export function archiveJournal(root,candidate){
+ return withArchiveMutationSync(root,candidate.runId,'maintenance',()=>{
  const current=journalArchiveCandidate(root,candidate.runId);if(Object.entries(current).some(([key,value])=>candidate[key]!==value))throw changed();
  const dir=join(resolve(root),candidate.runId),file=join(dir,'events.jsonl'),raw=readFileSync(file),{compressed,metadata,metadataBytes,savedBytes}=archivePayload(raw,candidate);
  if(compressed.length>64*1024*1024||sha(gunzipSync(compressed,{maxOutputLength:128*1024*1024}))!==candidate.sha256)throw changed();
@@ -39,4 +41,5 @@ export function archiveJournal(root,candidate){
  ordinary(join(dir,'events.jsonl.gz'),64*1024*1024);ordinary(join(dir,'journal-archive.json'),16384);
  if(readFileSync(join(dir,'journal-archive.json'),'utf8')!==metadata||sha(gunzipSync(readFileSync(join(dir,'events.jsonl.gz')),{maxOutputLength:128*1024*1024}))!==candidate.sha256)throw changed();
  unlinkSync(file);syncDirectory(dir);return {runId:candidate.runId,originalBytes:raw.length,compressedBytes:compressed.length,metadataBytes,savedBytes,sha256:candidate.sha256};
+ });
 }

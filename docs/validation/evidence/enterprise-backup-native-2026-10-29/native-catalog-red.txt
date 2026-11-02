@@ -1,0 +1,24 @@
+✖ fixed portable catalog covers formal migrations, normalizes owned schema names and rejects drift (3351.9723ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3814.3788
+
+✖ failing tests:
+
+test at tests\enterprise-backup-catalog.test.ts:1:551
+✖ fixed portable catalog covers formal migrations, normalizes owned schema names and rejects drift (3351.9723ms)
+  Error: 当前数据库结构与固定企业备份格式不匹配，未导出或替换数据。
+      at unsupported (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:7:50)
+      at assertEnterpriseCatalog (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\enterprise-backup-catalog.ts:36:100)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\enterprise-backup-catalog.test.ts:15:21)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    status: 422,
+    code: 'BACKUP_SCHEMA_UNSUPPORTED'
+  }

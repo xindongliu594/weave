@@ -1,0 +1,97 @@
+[
+  {
+    "title": "D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting",
+    "group": "native",
+    "file": "tests/product-flow.test.ts"
+  },
+  {
+    "title": "D1 lost poll response recovers an unstarted claim and executes it exactly once",
+    "group": "native",
+    "file": "tests/product-flow.test.ts"
+  },
+  {
+    "title": "D1 revoked device grants reject dispatch after approval and do not become unknown mutations",
+    "group": "native",
+    "file": "tests/product-flow.test.ts"
+  },
+  {
+    "title": "D1 cancels an in-flight native command and reconnects by reporting its receipt without replay",
+    "group": "native",
+    "file": "tests/product-flow.test.ts"
+  },
+  {
+    "title": "approved API flow waits for command approval, hands off verified files and settles usage",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "employee summaries are billed to the active task and preserve approved contracts through handoff",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "approved API rework repairs, independently re-reviews and bills the original task buckets",
+    "group": "rework",
+    "file": "tests/product-flow-rework.test.ts"
+  },
+  {
+    "title": "API rework stops at its call allowance and full retry cannot reset the task counter",
+    "group": "rework",
+    "file": "tests/product-flow-rework.test.ts"
+  },
+  {
+    "title": "API rework escalates exhausted rounds, forbidden files and explicit rejection",
+    "group": "escalation",
+    "file": "tests/product-flow-escalation.test.ts"
+  },
+  {
+    "title": "missing output and forged verification cannot dispatch the dependent reviewer",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "a modified accepted input is rejected before the reviewer makes a model request",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "cancellation while approval is pending cancels the receipt and never runs the command",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "C3 monitors actual employee waits and stops repeated actions/errors before more paid calls",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "C3 retries a transient read within the same tool call, without extra model charges",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts"
+  },
+  {
+    "title": "C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry",
+    "group": "rework",
+    "file": "tests/product-flow-rework.test.ts"
+  },
+  {
+    "title": "checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard",
+    "group": "recovery",
+    "file": "tests/product-flow-recovery.test.ts"
+  },
+  {
+    "title": "resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay",
+    "group": "recovery",
+    "file": "tests/product-flow-recovery.test.ts"
+  },
+  {
+    "title": "checkpoint recovery preserves the DAG, unfinished files and history across two interruptions",
+    "group": "recovery",
+    "file": "tests/product-flow-recovery.test.ts"
+  },
+  {
+    "title": "C3 restores an independently passed rework pair and runs only its remaining consumer",
+    "group": "recovery-rework",
+    "file": "tests/product-flow-recovery-rework.test.ts"
+  }
+]

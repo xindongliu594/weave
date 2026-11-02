@@ -203,15 +203,23 @@ async function reserveCallAttempt(input:CallInput) {
  }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
 }
 
-export async function receiptTransaction(id:string,work:(db:Database,row:any)=>Promise<any>) {
+// Reconciliation's SQL-only callbacks use a fresh proof for each original transaction.
+export type ReceiptTransactionProof={rolledBack:boolean;expectedRunId:string|null};
+export async function receiptTransaction(id:string,work:(db:Database,row:any)=>Promise<any>,proof?:ReceiptTransactionProof) {
  // Identity fields never change while a call is pending. Adoption into an organization happens after settlement.
- const client=await pool.connect();
+ if(proof)proof.rolledBack=false;
+ const client=await pool.connect();let committing=false,discard=false;
  try{await client.query('BEGIN');await shareCostMaintenance(client);
   const identity=(await client.query('SELECT project_id FROM model_reservations WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'费用预留不存在');
   if(identity.project_id)await client.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);await lockCostPolicy(client);
   const row=(await client.query('SELECT * FROM model_reservations WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!row)throw new AppError(404,'费用预留不存在');
-  const result=await work(client,row);await client.query('COMMIT');return result;
- }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
+  if(proof&&row.run_id!==proof.expectedRunId)throw new AppError(409,'费用预留所属运行已变化，请刷新后核对','RECONCILIATION_IDENTITY_CHANGED');
+  const result=await work(client,row);committing=true;await client.query('COMMIT');return result;
+ }catch(error){
+  try{await client.query('ROLLBACK');if(proof&&!committing)proof.rolledBack=true;}catch{discard=true;}
+  if(committing)discard=true;
+  throw error;
+ }finally{client.release(discard);}
 }
 
 export async function markCallUncertain(id:string,note:string,dispatched=true) {
@@ -232,7 +240,7 @@ export async function recordProviderResponse(id:string,metadata:{providerRequest
  });
 }
 
-export async function settleCall(id:string,inputTokens:number,outputTokens:number,metadata:any={},manualNote?:string) {
+export async function settleCall(id:string,inputTokens:number,outputTokens:number,metadata:any={},manualNote?:string,proof?:ReceiptTransactionProof) {
  return receiptTransaction(id,async(db,row)=>{
   if(manualNote!==undefined&&row.status!=='uncertain')throw new AppError(409,'仅能核对待确认的费用，请刷新');
   const providerBill=metadata.providerBill;
@@ -257,7 +265,7 @@ export async function settleCall(id:string,inputTokens:number,outputTokens:numbe
   const reconciliation=billed?{status:'settled',message:'已按中转站消费记录核对并结算；调用次数继续保留。',checkedAt:entry.at,requestId:providerBill.requestId,providerQuota:providerBill.quota,cost,inputTokens,outputTokens,attempts:row.context.providerReconciliation?.attempts??1}:row.context.providerReconciliation?{status:'settled',message:manualNote!==undefined?'费用已人工核对，保留核对依据。':'已收到模型用量回执，费用记录已更新。',checkedAt:entry.at,cost,inputTokens,outputTokens,attempts:row.context.providerReconciliation.attempts}:undefined;
   await db.query("UPDATE model_reservations SET status='settled',context=context||$2::jsonb,history=history||$3::jsonb WHERE id=$1",[id,JSON.stringify(reconciliation?{providerReconciliation:reconciliation}:{}),JSON.stringify([entry])]);
   return {cost,reserved:Number(row.amount)};
- });
+ },proof);
 }
 
 export function budgetedRequestEstimate(model:Pick<Model,'inputRate'|'outputRate'> & Partial<Pick<Model,'protocol'|'model'|'thinkingMode'>>,messages:ChatMessage[],maxTokens:number,request:CompletionOptions={}) {

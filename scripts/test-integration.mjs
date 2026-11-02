@@ -7,6 +7,28 @@ import { resolve } from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
+export const productFlowTestPaths = ['tests/product-flow.test.ts', 'tests/product-flow-core.test.ts', 'tests/product-flow-rework.test.ts', 'tests/product-flow-escalation.test.ts', 'tests/product-flow-recovery.test.ts', 'tests/product-flow-recovery-rework.test.ts'];
+const defaultTests = ['tests/api.test.ts', 'tests/plan-readiness.test.ts', 'tests/capabilities.test.ts', ...productFlowTestPaths, 'tests/work-files.test.ts', 'tests/work-file-project.test.ts', 'tests/browser-mcp.test.ts', 'tests/automation-learning.test.ts', 'tests/manager-chat.test.ts', 'tests/organization-chat.test.ts', 'tests/organization-update.test.ts', 'tests/extensions-backup.test.ts'];
+const pathKey = path => {
+  const absolute = resolve(root, path.replaceAll('\\', '/'));
+  return process.platform === 'win32' ? absolute.toLowerCase() : absolute;
+};
+
+export function integrationTestPaths(paths = []) {
+  const selected = paths.length ? paths.flatMap(path => pathKey(path) === pathKey(productFlowTestPaths[0]) ? productFlowTestPaths : [path]) : defaultTests;
+  const seen = new Set();
+  return selected.filter(path => {
+    const key = pathKey(path);
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+}
+
+export function integrationExitCode(previous, code, timedOut = false) {
+  if (timedOut || previous === 124) return 124;
+  return previous || (code === 0 ? 0 : code ?? 1);
+}
+
 export function integrationTestConfig(testPath, options = []) {
   const actualPath = resolve(root, testPath.replaceAll('\\', '/'));
   const identityPath = resolve(root, 'tests/identity-store.test.ts');
@@ -24,7 +46,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const args = process.argv.slice(2);
   const options=args.filter(value=>value.startsWith('--test-name-pattern=')||value.startsWith('--test-skip-pattern='));
   const paths=args.filter(value=>!options.includes(value));
-  const tests = paths.length ? paths : ['tests/api.test.ts', 'tests/plan-readiness.test.ts', 'tests/capabilities.test.ts', 'tests/product-flow.test.ts', 'tests/work-files.test.ts', 'tests/work-file-project.test.ts', 'tests/browser-mcp.test.ts', 'tests/automation-learning.test.ts', 'tests/manager-chat.test.ts', 'tests/organization-chat.test.ts', 'tests/organization-update.test.ts', 'tests/extensions-backup.test.ts'];
+  const tests = integrationTestPaths(paths);
   console.log('Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.');
   console.log('Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.');
   // PGlite's socket layer has a single backend; connection startup search_path
@@ -45,16 +67,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         cwd: root, stdio: 'inherit', env: { ...process.env, ...config.env, DATABASE_URL: config.directIdentity ? '' : `postgresql://postgres:postgres@127.0.0.1:${port}/postgres` },
       });
       let timedOut = false;
-      // Product flow includes real native commands, service recreation and two
-      // checkpoint resumes. Keep its per-test deadlines and allow the longer file.
-      const fileTimeout = testPath.replaceAll('\\','/').endsWith('product-flow.test.ts') ? 300000 : 180000;
+      const fileTimeout = 180000;
       const timer = setTimeout(() => { timedOut = true; console.error(`Integration file ${testPath} exceeded ${fileTimeout / 1000} seconds`); child.kill('SIGTERM'); }, fileTimeout);
       let killTimer;
       const stop = () => { interrupted = true; child.kill('SIGTERM'); killTimer ??= setTimeout(() => child.kill('SIGKILL'), 5000); };
       process.once('SIGINT', stop); process.once('SIGTERM', stop);
       try {
         const code = await new Promise((resolve, reject) => { child.once('error', reject); child.once('exit', resolve); });
-        if (timedOut || code !== 0) process.exitCode = timedOut ? 124 : code ?? 1;
+        process.exitCode = integrationExitCode(process.exitCode, code, timedOut);
       } finally {
         clearTimeout(timer); clearTimeout(killTimer); process.off('SIGINT', stop); process.off('SIGTERM', stop);
       }

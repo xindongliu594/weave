@@ -4,7 +4,8 @@ import type pg from 'pg';
 import { pool } from './db.ts';
 import { AppError } from './provider.ts';
 import { billingFailureReason, queryNewApiBilling, type BillingFailureReason, type NewApiLogRecord } from './new-api-billing.ts';
-import { costMaintenanceTransaction, receiptTransaction, settleCall } from './cost-control.ts';
+import { costMaintenanceTransaction, receiptTransaction, settleCall, type ReceiptTransactionProof } from './cost-control.ts';
+import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
 
 export type ProviderQueryResult={status:'settled'|'unresolved'|'failed'|'already-settled';message:string;checkedAt:string;requestId?:string;cost?:number;inputTokens?:number;outputTokens?:number;providerQuota?:number;code?:string;upstreamStatus?:number;failureReason?:BillingFailureReason;automaticPaused?:true};
 const integer=(value:unknown):value is number=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0;
@@ -80,9 +81,27 @@ export function matchNewApiReceipt(identity:BillingIdentity,records:NewApiLogRec
  return {record,message:'已唯一匹配这次请求的消费记录。'};
 }
 
-export async function queryProviderForCall(id:string,automatic=false):Promise<ProviderQueryResult>{
+export async function queryProviderForCall(id:string,automatic=false,writers?:ArchiveWriterManager):Promise<ProviderQueryResult>{
+ // Discover without SQL locks; recheck the pinned identity under each receipt lock.
+ const identity=(await pool.query('SELECT run_id FROM model_reservations WHERE id=$1',[id])).rows[0];
+ if(!identity)throw new AppError(404,'费用预留不存在');
+ const runId=identity.run_id as string|null;
+ if(runId&&!writers)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
+ let transaction:ReceiptTransactionProof|undefined;
+ const proof=()=>transaction={rolledBack:false,expectedRunId:runId};
+ const transact=async(work:Parameters<typeof receiptTransaction>[1])=>{
+  const value=await receiptTransaction(id,work,proof());transaction=undefined;return value;
+ };
+ const perform=async()=>{try{return {ok:true as const,value:await query()};}catch(error){
+  // Only the current original SQL rollback proves a normal rejection drained.
+  if(transaction?.rolledBack)return {ok:false as const,error};throw error;
+ }};
+ const outcome=runId?await writers!.withWriter([runId],perform):await perform();
+ if(!outcome.ok)throw outcome.error;return outcome.value;
+
+ async function query():Promise<ProviderQueryResult>{
  const checkedAt=new Date().toISOString(),token=randomUUID();
- const claim=await receiptTransaction(id,async(db,row)=>{
+ const claim=await transact(async(db,row)=>{
   if(['settled','released'].includes(row.status))return {result:{status:'already-settled',message:'这次费用已结算或请求未发送，无需再次核对。',checkedAt} as ProviderQueryResult};
   if(row.status!=='uncertain')throw new AppError(409,'请求仍在进行中，请等待返回或停止后再核对','CALL_STILL_PENDING');
   const previous=row.context.providerReconciliation;
@@ -121,7 +140,7 @@ export async function queryProviderForCall(id:string,automatic=false):Promise<Pr
  });
  if(claim.result)return claim.result;
  const save=async(result:ProviderQueryResult)=>{
-  return receiptTransaction(id,async(db,row)=>{
+  return transact(async(db,row)=>{
    const settled=['settled','released'].includes(row.status);
    const alreadySettled=()=>({status:'already-settled',checkedAt:result.checkedAt,message:'查询期间费用已被核对，保留最新记录。'} as ProviderQueryResult);
    if(row.context.billingQueryClaim?.token!==token)return settled?alreadySettled():result;
@@ -148,10 +167,13 @@ export async function queryProviderForCall(id:string,automatic=false):Promise<Pr
   const record=matched.record;
   const pinnedUnit=claim.route.billingUnit;
   if(!billing.billingUnit||!pinnedUnit||pinnedUnit.quotaPerUSD!==billing.billingUnit.quotaPerUSD)return save({status:'unresolved',checkedAt:billing.checkedAt,requestId:record.requestId,providerQuota:record.quota,message:'已找到消费记录，但调用时的额度换算未固定或站点换算已变化，暂不自动修改费用。'});
-  const receipt=await settleCall(id,record.promptTokens!,record.completionTokens!,{reconciliationToken:token,providerBill:{source:'new-api',requestId:record.requestId,upstreamRequestId:record.upstreamRequestId,gatewayId:claim.route.gatewayId,gatewayVersion:claim.route.gatewayVersion,quota:record.quota,quotaPerUSD:pinnedUnit.quotaPerUSD,basis:pinnedUnit.basis,unitVerifiedAt:pinnedUnit.verifiedAt,checkedAt:billing.checkedAt}});
+  const receipt=await settleCall(id,record.promptTokens!,record.completionTokens!,{reconciliationToken:token,providerBill:{source:'new-api',requestId:record.requestId,upstreamRequestId:record.upstreamRequestId,gatewayId:claim.route.gatewayId,gatewayVersion:claim.route.gatewayVersion,quota:record.quota,quotaPerUSD:pinnedUnit.quotaPerUSD,basis:pinnedUnit.basis,unitVerifiedAt:pinnedUnit.verifiedAt,checkedAt:billing.checkedAt}},undefined,proof());
+  transaction=undefined;
   return save({status:receipt.alreadySettled?'already-settled':'settled',message:receipt.alreadySettled?'查询期间费用已被核对，保留最新记录。':'已按唯一匹配的中转站消费记录结算。已用预算与调用次数继续保留。',checkedAt:billing.checkedAt,requestId:record.requestId,providerQuota:record.quota,cost:receipt.cost,inputTokens:record.promptTokens,outputTokens:record.completionTokens});
  }catch(error){
+  if(transaction&&(!transaction.rolledBack||!(error instanceof AppError&&error.code==='RECONCILIATION_CLAIM_LOST')))throw error;
   return save({status:error instanceof AppError&&error.code==='RECONCILIATION_CLAIM_LOST'?'unresolved':'failed',checkedAt:new Date().toISOString(),message:error instanceof AppError?error.message:'中转站账单查询失败，预留仍保留，请稍后查询或手动核对。'});
+ }
  }
 }
 
@@ -163,6 +185,7 @@ export async function expireProviderQueries(){
 }
 
 export class ProviderReconciliationService{
+ constructor(private writers?:ArchiveWriterManager){}
  private timer?:NodeJS.Timeout;private work:Promise<void>=Promise.resolve();private busy=false;private stopped=false;
  start(){this.timer=setInterval(()=>this.tick(),10000);this.timer.unref();this.tick();}
  private tick(){
@@ -174,7 +197,7 @@ export class ProviderReconciliationService{
     AND COALESCE((context->'providerReconciliation'->>'attempts')::int,0)<3
     AND COALESCE(context->'providerReconciliation'->>'automaticPaused','false')<>'true'
     AND (context->'providerReconciliation'->>'nextAttemptAt' IS NULL OR (context->'providerReconciliation'->>'nextAttemptAt')::timestamptz<now()) ORDER BY created_at LIMIT 5`)).rows;
-   for(const row of rows){if(this.stopped)break;await queryProviderForCall(row.id,true);}
+   for(const row of rows){if(this.stopped)break;await queryProviderForCall(row.id,true,this.writers);}
   })().catch(()=>{}).finally(()=>{this.busy=false;});
  }
  async close(){this.stopped=true;clearInterval(this.timer);await this.work;}

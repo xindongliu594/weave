@@ -1,0 +1,27 @@
+✔ history includes all rows, is deterministic by byte order and does not mutate source (9.3899ms)
+✔ snapshot, owner, claim and operation result material enter the projection only as digests (1.4105ms)
+✔ NULL, empty JSON and every failed, late, stopped and runtime effect fact remain distinct (15.9419ms)
+✔ SQL bigint epoch is normalized losslessly and microseconds cannot be replaced with Date/millisecond values (5.5053ms)
+✔ missing, additional and cross-run fields or duplicate rows fail closed without filling defaults (4.36ms)
+✔ non-JSON input is rejected before getters/toJSON can execute (2.0619ms)
+✔ history projection is detached and cannot silently discard unknown future columns or huge depth (2.3931ms)
+✔ valid records round trip without mutation and domain digests preserve array order (32.5867ms)
+✔ SQL NULL is distinct from explicit empty V1 evidence and cannot create source authority (2.6047ms)
+✔ source identity, generation, sequence, head and committed receipt are strictly bound (30.2996ms)
+✔ all nested keys, versions and identity text stay exact without dropping or repairing fields (82.8269ms)
+✔ manifest paths reject Windows aliases, links syntax, conflicts and noncanonical order (29.7502ms)
+✔ scope and delta cannot mutate outside writes, delete files, fake changes or mismatch either manifest (23.5628ms)
+✔ both digest domains are checked after structure and cross-field validation (14.928ms)
+✔ non JSON, hidden values, custom objects, sparse arrays and overlarge records fail without mutation (7.1491ms)
+✔ archive redaction cannot silently rewrite identity or nested authority (3.334ms)
+✔ identity text rejects Unicode control characters (1.6353ms)
+✔ proxy objects cannot masquerade as plain JSON identity data (0.556ms)
+✔ exact file limits and unchanged child head remain valid without a fabricated delta (12.0317ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4885.2277

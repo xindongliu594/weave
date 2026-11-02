@@ -1,0 +1,24 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ gateway discovery, formal execution, versioned plans and deletion preserve history (13439.2551ms)
+✔ organization planning returns a complete editable DAG, rejects invalid plans and attributes planning cost (734.7341ms)
+✔ model planning preserves user input scope and refuses to remove an input recipient (593.7809ms)
+✔ dynamic loopback preview can save a gateway through the local proxy (29.053ms)
+✔ cross-origin mutations, remote host headers, and malformed data fail closed (41.1768ms)
+✔ small trace pages preserve every complete event and do not change the full export (1739.7707ms)
+✔ trace verification API persists a run and serves history after recreating the app (7221.8433ms)
+✔ one-click catalog reads prices without inference, retains missing rates, and preserves existing model settings (190.7812ms)
+✔ catalog refuses quotes fetched across a concurrent gateway edit (31.095ms)
+✔ text replies accept null tool calls but reject malformed non-null calls and retain usage (207.3983ms)
+✔ gateway service checks report access, empty catalogs and safe actionable failures without inference or configuration changes (176.9803ms)
+✔ gateway service checks reject results from a changed connection and diagnose a closed port (37.1609ms)
+✔ official pricing is the default, matches exact models, and does not fetch relay public prices (13.6678ms)
+✔ planning timeouts preserve the saved plan and keep unresolved billing without automatic retries (937.9931ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26239.4517

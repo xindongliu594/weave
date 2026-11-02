@@ -1,0 +1,35 @@
+✔ history includes all rows, is deterministic by byte order and does not mutate source (14.5736ms)
+✔ snapshot, owner, claim and operation result material enter the projection only as digests (1.6464ms)
+✔ NULL, empty JSON and every failed, late, stopped and runtime effect fact remain distinct (29.8451ms)
+✔ SQL bigint epoch is normalized losslessly and microseconds cannot be replaced with Date/millisecond values (11.4752ms)
+✖ missing, additional and cross-run fields or duplicate rows fail closed without filling defaults (12.5994ms)
+✔ non-JSON input is rejected before getters/toJSON can execute (3.6227ms)
+✔ history projection is detached and cannot silently discard unknown future columns or huge depth (2.916ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 6
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4921.6942
+
+✖ failing tests:
+
+test at tests\task-recovery-history.test.ts:1:5682
+✖ missing, additional and cross-run fields or duplicate rows fail closed without filling defaults (12.5994ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-history.test.ts:84:48)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: { code: 'TASK_RECOVERY_HISTORY_INVALID' },
+    operator: 'throws',
+    diff: 'simple'
+  }

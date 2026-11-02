@@ -27,7 +27,7 @@ test('active enterprise administrator sees human permission scope and the remain
     globalThis.fetch = async () => Response.json({ mode: 'oidc', authenticated: true, user: { id: 'admin', displayName: '管理员', email: null, status: 'active', orgRole: 'admin' }, csrf: 'fixture', loginAvailable: true });
     await identitySession.refresh();
     const html = renderToStaticMarkup(createElement(IdentityManagement, { departments: [] }));
-    assert.match(html, /真人账号/); assert.match(html, /AI 员工/); assert.match(html, /成员业务入口尚未开放/);
+    assert.match(html, /真人账号/); assert.match(html, /AI 员工/); assert.match(html, /成员只读入口已开放/);
     assert.match(html, /账号状态筛选/); assert.match(html, /刷新人员资料/);
   } finally { globalThis.fetch = original; }
 });

@@ -9,18 +9,17 @@ import {tmpdir} from 'node:os';
 import fs from 'node:fs';
 import {syncBuiltinESMExports} from 'node:module';
 import {createRequire} from 'node:module';
-import {createRunArchive} from '../services/agent-runtime/trace-store.mjs';
-import {createArchiveWriterManager} from '../services/agent-runtime/archive-writer-scope.mjs';
+import {createRunArchive,openRunArchive} from '../services/agent-runtime/trace-store.mjs';
+import {createArchiveWriterManager,registerArchiveWriterRoot} from '../services/agent-runtime/archive-writer-scope.mjs';
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite';
 let pool:any,server:any,url:string,root:string,traceRoot:string,workspaceRoot:string,runId:string,routerModule:any;
-const fixtures:any={};
 let attempt=0;
 let sandboxAdapter:any;
 let writers:ReturnType<typeof createArchiveWriterManager>,latched=false;
 const {exportFiles,revision}=createRequire(import.meta.url)('../apps/desktop/local-executor.cjs');
 before(async()=>{if(!isolated)return;
  root=await mkdtemp(join(tmpdir(),'storage-api-'));traceRoot=join(root,'runs');workspaceRoot=join(root,'workspaces');await mkdir(workspaceRoot);
- await writeFile(join(root,'.fixture-owner'),String(process.pid));writers=createArchiveWriterManager({traceRoot,workspaceRoots:[workspaceRoot]});
+ await writeFile(join(root,'.fixture-owner'),String(process.pid));writers=createArchiveWriterManager({traceRoot,workspaceRoots:[workspaceRoot]});registerArchiveWriterRoot(writers);
  process.env.DATA_DIR=root;process.env.TRACE_ROOT=traceRoot;process.env.OBSIDIAN_VAULT=join(root,'vault');
  const db=await import('../apps/api/src/db.ts');pool=db.pool;await db.migrate();
  await pool.query("INSERT INTO departments(id,data) VALUES('storage-department',$1)",[{name:'storage fixture',agents:[]}]);
@@ -31,11 +30,12 @@ before(async()=>{if(!isolated)return;
  app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.status??(error.name==='ZodError'?422:error.code==='STORAGE_CANDIDATE_CHANGED'?409:500)).json({message:error.message,code:error.code}));
  server=app.listen(0,'127.0.0.1');await once(server,'listening');url=`http://127.0.0.1:${server.address().port}/api`;
 });
-beforeEach(async()=>{if(!isolated)return;sandboxAdapter=undefined;const archive=createRunArchive(traceRoot,{projectId:'storage-project',executionTarget:{kind:'local',deviceId:'native'}});runId=archive.id;
+beforeEach(async()=>{if(!isolated)return;sandboxAdapter=undefined;runId=randomUUID();await writers.withWriter([runId],async()=>{const archive=createRunArchive(traceRoot,{projectId:'storage-project',executionTarget:{kind:'local',deviceId:'native'}},{id:runId});
  archive.append('run/finished',{status:'completed'});await mkdir(join(archive.dir,'artifacts'));await mkdir(join(workspaceRoot,runId));
  for(const base of [join(archive.dir,'artifacts'),join(workspaceRoot,runId)])await writeFile(join(base,'delivery.txt'),'official delivery');
- await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt) VALUES($1,'storage-project',1,'completed',$2,$3)",[runId,{executionTarget:{kind:'local',deviceId:'native'}},++attempt]);fixtures[runId]=archive;
+ await pool.query("INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt) VALUES($1,'storage-project',1,'completed',$2,$3)",[runId,{executionTarget:{kind:'local',deviceId:'native'}},++attempt]);});
 });
+const appendFixture=(type:string,data:unknown)=>writers.withWriter([runId],()=>openRunArchive(traceRoot,runId).append(type,data));
 after(async()=>{if(!isolated)return;server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));await pool.end();assert.equal(fs.realpathSync(root),root);assert.equal(fs.readFileSync(join(root,'.fixture-owner'),'utf8'),String(process.pid));if(latched)console.log('STORAGE_GOVERNANCE_EXIT_CLEANUP='+JSON.stringify({root,pid:process.pid}));else await rm(root,{recursive:true,force:true});});
 async function call(path:string,body?:any){const response=await fetch(url+path,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const text=await response.text();let data:any;try{data=JSON.parse(text);}catch{data={message:text};}return {status:response.status,data};}
 async function preview(){const r=await call('/storage/preview',{});assert.equal(r.status,201);return r.data;}
@@ -53,7 +53,7 @@ test('retention advice is read-only, uses finished age, and cannot bypass previe
 });
 test('retention protects unknown or damaged original archives even when database says completed',{skip:!isolated},async()=>{
  await pool.query("UPDATE project_runs SET finished_at=now()-interval '8 days' WHERE id=$1",[runId]);
- fixtures[runId].append('runtime/outcome-unknown',{callId:'unverified-operation',name:'terminal'});
+ await appendFixture('runtime/outcome-unknown',{callId:'unverified-operation',name:'terminal'});
  assert.ok(!(await call('/storage/retention')).data.recommendations.some((a:any)=>a.runId===runId),'Unknown archive must not receive maintenance advice');
  await writeFile(join(traceRoot,runId,'events.jsonl'),'broken journal');
  assert.ok(!(await call('/storage/retention')).data.recommendations.some((a:any)=>a.runId===runId),'Damaged archive must not receive maintenance advice');
@@ -122,7 +122,7 @@ test('every model reservation including free-accounted conversation stops on low
 
 async function enableSandbox(){
  const target={kind:'local',deviceId:'native',grantId:'fixture-grant',backend:{kind:'openshell',fingerprint:'f'.repeat(64)}},sandboxId=randomUUID();
- await rm(join(traceRoot,runId),{recursive:true});const record=createRunArchive(traceRoot,{projectId:'storage-project',executionTarget:target},{id:runId});record.append('run/finished',{status:'completed'});await mkdir(join(record.dir,'artifacts'));await writeFile(join(record.dir,'artifacts','delivery.txt'),'official delivery');
+ await writers.withMaintenance([runId],async()=>{await rm(join(traceRoot,runId),{recursive:true});const record=createRunArchive(traceRoot,{projectId:'storage-project',executionTarget:target},{id:runId});record.append('run/finished',{status:'completed'});await mkdir(join(record.dir,'artifacts'));await writeFile(join(record.dir,'artifacts','delivery.txt'),'official delivery');});
  await pool.query('UPDATE project_runs SET snapshot=$2 WHERE id=$1',[runId,{executionTarget:target}]);await pool.query('UPDATE local_devices SET backend=$1 WHERE id=\'native\'',[target.backend]);
  const expected=revision(exportFiles(join(traceRoot,runId,'artifacts')));let phase='ready',retired=0,inspected=0;
  sandboxAdapter={deviceId:'native',grantId:'fixture-grant',fingerprint:target.backend.fingerprint,executor:{storageScopes:()=>[{runId,sandboxId,phase,workspaceRevision:expected,storage:{workspace:{bytes:17},temp:{bytes:0},hardQuota:false,checkedAt:new Date().toISOString()}}],inspectStorage:async()=>{inspected++;return {runId,sandboxId,workspaceRevision:expected,storage:{workspace:{bytes:17},temp:{bytes:0},hardQuota:false}};},retireStorage:async()=>{retired++;if(sandboxAdapter.disconnect){phase='unknown';throw Object.assign(Error('uncertain deletion'),{code:'LOCAL_OUTCOME_UNKNOWN'});}phase='retired';return {runId,sandboxId,state:'retired',replayed:false};},reconcileStorage:async()=>{phase='retired';return {runId,sandboxId,state:'retired',replayed:false};}}};
@@ -151,7 +151,7 @@ test('sandbox uncertain deletion records partial and keeps its original process 
  const checked=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(checked.status,409);assert.equal(checked.data.code,'STORAGE_WRITER_BUSY');assert.equal(f.counts().retired,1);
 });
 test('journal preview seals real completed events and preserves exact trace reads',{skip:!isolated},async()=>{
- fixtures[runId].append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});
+ await appendFixture('evidence/test-output',{output:'test evidence\n'.repeat(2000)});
  const {readRun}=await import('../services/agent-runtime/trace-store.mjs'),before=readRun(traceRoot,runId),p=await call('/storage/preview',{kind:'journal',runId});assert.equal(p.status,201);
  const done=await call('/storage/cleanups/'+p.data.id+'/confirm',{confirmation:'ARCHIVE_JOURNAL'});assert.equal(done.status,200);assert.equal(done.data.status,'completed');assert.deepEqual(readRun(traceRoot,runId),before);
  await assert.rejects(readFile(join(traceRoot,runId,'events.jsonl')),{code:'ENOENT'});assert.equal((await readFile(join(traceRoot,runId,'events.jsonl.gz'))).length>0,true);
@@ -167,7 +167,7 @@ test('persisted unresolved sandbox receipt can be queried repeatedly without dis
  const last=await call('/storage/cleanups/'+p.data.id+'/reconcile',{});assert.equal(last.data.result.state,'retired');assert.equal(checks,2);assert.equal(f.counts().retired,0);
 });
 test('journal archive refuses post-preview append and never removes original evidence',{skip:!isolated},async()=>{
- fixtures[runId].append('evidence/test-output',{output:'test evidence\n'.repeat(2000)});
- const p=await call('/storage/preview',{kind:'journal',runId});assert.equal(p.status,201);fixtures[runId].append('late/evidence',{});
+ await appendFixture('evidence/test-output',{output:'test evidence\n'.repeat(2000)});
+ const p=await call('/storage/preview',{kind:'journal',runId});assert.equal(p.status,201);await appendFixture('late/evidence',{});
  assert.equal((await call('/storage/cleanups/'+p.data.id+'/confirm',{confirmation:'ARCHIVE_JOURNAL'})).status,409);assert.ok((await readFile(join(traceRoot,runId,'events.jsonl'))).length>0);
 });

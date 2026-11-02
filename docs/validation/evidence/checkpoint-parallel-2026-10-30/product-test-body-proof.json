@@ -1,0 +1,154 @@
+[
+  {
+    "title": "D1 API and actual DSH execute native device files and an approved command, preserving verified handoff and accounting",
+    "group": "native",
+    "file": "tests/product-flow.test.ts",
+    "originalSha256": "5b9e8e58c3c84b363d8525aa55014ebef0f73a12b8c61f26c2684de758bc24f4",
+    "movedSha256": "6c713df4ddaae6aba037aba85faaa40c0db04807cfca38091ec1a6576efc6649",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "D1 lost poll response recovers an unstarted claim and executes it exactly once",
+    "group": "native",
+    "file": "tests/product-flow.test.ts",
+    "originalSha256": "65451ce80d1fd71c25c316556a950211eea7fda0e0ede9b836a6c862964906db",
+    "movedSha256": "65451ce80d1fd71c25c316556a950211eea7fda0e0ede9b836a6c862964906db",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "D1 revoked device grants reject dispatch after approval and do not become unknown mutations",
+    "group": "native",
+    "file": "tests/product-flow.test.ts",
+    "originalSha256": "7c4fe44f229b42de4df657fa65e30ea50f9d783f572e2aec9e963832e1c85487",
+    "movedSha256": "7c4fe44f229b42de4df657fa65e30ea50f9d783f572e2aec9e963832e1c85487",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "D1 cancels an in-flight native command and reconnects by reporting its receipt without replay",
+    "group": "native",
+    "file": "tests/product-flow.test.ts",
+    "originalSha256": "f87a1b3c12414aa294c10b9b3c347129d7ed8cfc0fe4b825cc4c7467fd353d7a",
+    "movedSha256": "f87a1b3c12414aa294c10b9b3c347129d7ed8cfc0fe4b825cc4c7467fd353d7a",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "approved API flow waits for command approval, hands off verified files and settles usage",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "ea8831a0c7c2c5fd37a3de72f8c44485caefddf8c8345091dfbcb599be3a419b",
+    "movedSha256": "ea8831a0c7c2c5fd37a3de72f8c44485caefddf8c8345091dfbcb599be3a419b",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "employee summaries are billed to the active task and preserve approved contracts through handoff",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "b2df3110785750219a7d98c46671dfea7be356430d85a17ab7127db447722133",
+    "movedSha256": "b2df3110785750219a7d98c46671dfea7be356430d85a17ab7127db447722133",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "approved API rework repairs, independently re-reviews and bills the original task buckets",
+    "group": "rework",
+    "file": "tests/product-flow-rework.test.ts",
+    "originalSha256": "95db47956e876f09330bf462d7a7acc57e63e3d011ec7ad1f434abb3cb1a7d82",
+    "movedSha256": "95db47956e876f09330bf462d7a7acc57e63e3d011ec7ad1f434abb3cb1a7d82",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "API rework stops at its call allowance and full retry cannot reset the task counter",
+    "group": "rework",
+    "file": "tests/product-flow-rework.test.ts",
+    "originalSha256": "2b7550a4decb5c50c19299ce2184fd7c76c3a696ddfeda7648a001cf4d6174a1",
+    "movedSha256": "64c41014de548bb3a264af41ada1e913fcbae24911547b0a373adf95b0179b52",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "API rework escalates exhausted rounds, forbidden files and explicit rejection",
+    "group": "escalation",
+    "file": "tests/product-flow-escalation.test.ts",
+    "originalSha256": "6c24f3257b73232cef35db2c5eeed7a729575b21ed1a865d145f5889555dead0",
+    "movedSha256": "6c24f3257b73232cef35db2c5eeed7a729575b21ed1a865d145f5889555dead0",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "missing output and forged verification cannot dispatch the dependent reviewer",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "03cdea1de8c960c8e518c026d8ee6462f393f6d7968a27cb8943ffebc2497f21",
+    "movedSha256": "03cdea1de8c960c8e518c026d8ee6462f393f6d7968a27cb8943ffebc2497f21",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "a modified accepted input is rejected before the reviewer makes a model request",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "800dd1c0e5190dea8f8448854e9b87beecc8fde0db791c88aa882db3f535ffda",
+    "movedSha256": "800dd1c0e5190dea8f8448854e9b87beecc8fde0db791c88aa882db3f535ffda",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "cancellation while approval is pending cancels the receipt and never runs the command",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "078f63114e0b3173dd054043ca37316e3562b6db1c5d749ed0cf630e269ee9d4",
+    "movedSha256": "078f63114e0b3173dd054043ca37316e3562b6db1c5d749ed0cf630e269ee9d4",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "C3 monitors actual employee waits and stops repeated actions/errors before more paid calls",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "c3a799240a8865b8393d8d3059ff1f76101b4b04c3e73094a20a22ab826487e1",
+    "movedSha256": "c3a799240a8865b8393d8d3059ff1f76101b4b04c3e73094a20a22ab826487e1",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "C3 retries a transient read within the same tool call, without extra model charges",
+    "group": "core",
+    "file": "tests/product-flow-core.test.ts",
+    "originalSha256": "84feb9f25d2e64762fe6aaf37b9f278e80171fe6e18ee2f1e1fda99573d5ed84",
+    "movedSha256": "84feb9f25d2e64762fe6aaf37b9f278e80171fe6e18ee2f1e1fda99573d5ed84",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry",
+    "group": "rework",
+    "file": "tests/product-flow-rework.test.ts",
+    "originalSha256": "f62f450efc537aec869b6c64943566301f3687d23e779be379d80268a38d82c0",
+    "movedSha256": "f62f450efc537aec869b6c64943566301f3687d23e779be379d80268a38d82c0",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard",
+    "group": "recovery",
+    "file": "tests/product-flow-recovery.test.ts",
+    "originalSha256": "dac8e2bade159bd02df8c2d937440254f6d093aedfdbfbfc5e9b9a6569700c0b",
+    "movedSha256": "dac8e2bade159bd02df8c2d937440254f6d093aedfdbfbfc5e9b9a6569700c0b",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay",
+    "group": "recovery",
+    "file": "tests/product-flow-recovery.test.ts",
+    "originalSha256": "ae9b2096e1c01749ac9064e96758984a1db8948f8652db6550724faef44f3a86",
+    "movedSha256": "643b3b7ca4d8299ebe02406e5721be49176931a2d20f4b2d97210c095fc229e5",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "checkpoint recovery preserves the DAG, unfinished files and history across two interruptions",
+    "group": "recovery",
+    "file": "tests/product-flow-recovery.test.ts",
+    "originalSha256": "27157e5400b12ad086402ce22d4409ea61b9bb679024e3075a594aeb074dc8aa",
+    "movedSha256": "4c7a757ad35928b3b63c183fd0fc891063a9bdc91888266a8074d2579de36a6d",
+    "onlyModulePathsAdjusted": true
+  },
+  {
+    "title": "C3 restores an independently passed rework pair and runs only its remaining consumer",
+    "group": "recovery-rework",
+    "file": "tests/product-flow-recovery-rework.test.ts",
+    "originalSha256": "98f723fb7cdbe104eef509fe7521c045d708b4da8215deddb04dac3c759c1824",
+    "movedSha256": "98f723fb7cdbe104eef509fe7521c045d708b4da8215deddb04dac3c759c1824",
+    "onlyModulePathsAdjusted": true
+  }
+]

@@ -1,0 +1,46 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+PRODUCT_FLOW_FIXTURE={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\product-flow-zGYBFz","pid":33264}
+✔ approved API rework repairs, independently re-reviews and bills the original task buckets (49805.4133ms)
+✔ API rework stops at its call allowance and full retry cannot reset the task counter (28570.4491ms)
+✔ C3 never replays an uncertain write; explicit reconciliation is recorded before a bounded retry (25011.8908ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 104283.3595
+PRODUCT_FLOW_FIXTURE={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\product-flow-qN1zB8","pid":636}
+✔ API rework escalates exhausted rounds, forbidden files and explicit rejection (85988.595ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86847.4557
+PRODUCT_FLOW_FIXTURE={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\product-flow-ojYIyu","pid":12244}
+✔ checkpoint resume returns the active child without duplicate rows or model dispatch and keeps the new-parent activity guard (33414.8545ms)
+✔ resource-approved recovery carries frozen knowledge and real QA seals to the manager without developer replay (30375.0287ms)
+✔ checkpoint recovery preserves the DAG, unfinished files and history across two interruptions (42890.6605ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 107483.3866
+PRODUCT_FLOW_FIXTURE={"root":"C:\\Users\\JJ\\AppData\\Local\\Temp\\product-flow-wZIUKq","pid":40148}
+✔ C3 restores an independently passed rework pair and runs only its remaining consumer (58135.3599ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 58958.0505

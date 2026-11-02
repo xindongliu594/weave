@@ -1,0 +1,41 @@
+✖ rejects structural fake managers before touching their traceRoot (626.917ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4330.9341
+
+✖ failing tests:
+
+test at tests\task-recovery-archive.test.ts:1:12760
+✖ rejects structural fake managers before touching their traceRoot (626.917ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   code: 'TASK_RECOVERY_ARCHIVE_INVALID'
+  -   code: 'E_ARCHIVE_WRITER_SCOPE'
+    }
+  
+      at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-archive.test.ts:206:10)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: 任务恢复来源档案无效
+        at invalid (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-archive.ts:13:32)
+        at Object.readTaskRecoveryArchive (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-recovery-archive.ts:148:17)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-archive.test.ts:206:23)
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-recovery-archive.test.ts:206:10)
+        at async Test.run (node:internal/test_runner/test:1208:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3),
+    expected: { code: 'E_ARCHIVE_WRITER_SCOPE' },
+    operator: 'throws',
+    diff: 'simple'
+  }
+EXIT_CODE=1

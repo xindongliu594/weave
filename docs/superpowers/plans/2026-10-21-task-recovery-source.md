@@ -99,6 +99,8 @@ type TaskEvidenceV1 = {
 
 2026-10-21 预检确认现有 SQL 终态、单进程 Map 和日志归档均不能提供 writer 静止保证。因此 Task 2/3 的成功入口暂不实施，先补跨进程写入隔离。现成 `fs-native-extensions@1.5.1` 已通过 Windows/JJ 隔离验证，产品接线仍未完成；详见 [复用调研](../../research/task-recovery-writer-fence-2026-10-21.md)。这不改变恢复门禁、费用或权限。
 
+2026-10-30 接续：writer接线和覆盖修复后，原Manager的真实只读source入口、完整档案前缀校验、当前全部SQL字段的纯历史投影已经实现并分别验收，见[本批报告](../../validation/recovery-source-primitives-2026-10-30.md)。这关闭了“没有可用Manager source入口”的前置缺口；不是Task2完整完成。SQL collector及原scope/claim/result/merge、历史CP/输入、保留B验收和当前权限仍待同一锁窗口内组合。Task3 NULL-only初始化与公开恢复入口继续关闭，不再重复开发已完成的codec、writer或上述事实层。
+
 ## Task 3：NULL-only 初始化与丢应答补证
 
 增加 additive nullable `project_runs.task_evidence`，不回填旧行或复制 live operation。复制并核验 child SHA 对象后重查全部 source/权限 pins，再以同一 SQL UPDATE/COMMIT 原子发布 initialHead + 初始化 marker；head 与 marker 必须同时为 NULL，原 task_evidence 精确匹配。

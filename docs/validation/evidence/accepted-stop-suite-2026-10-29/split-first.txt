@@ -1,0 +1,178 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ task preparation fails closed before SQL when trusted stop maintenance is missing (612.3038ms)
+✔ original commit verifies raw result and historical objects independently of a current lease owner (230.4435ms)
+✔ original commit rejects a separately valid workspace binding for another task key (155.045ms)
+✔ original commit rejects damaged raw-result (156.9059ms)
+✔ original commit rejects damaged merge-digest (67.0267ms)
+✔ original commit rejects damaged committed-output (60.301ms)
+✔ original commit rejects damaged claim-token (59.4596ms)
+✔ original commit refuses a self-consistent raw result from a different claim (59.0049ms)
+✔ API prepares target only after original accepted checkpoint stop commits (5872.9364ms)
+✔ beforeDispatch refuses fresh provider changes without a device effect (5047.1034ms)
+✔ beforeDispatch refuses fresh method changes without a device effect (3600.9496ms)
+✔ beforeDispatch refuses fresh permission changes without a device effect (4605.4456ms)
+✔ beforeDispatch refuses fresh lease changes without a device effect (4189.8058ms)
+✔ beforeDispatch refuses fresh target changes without a device effect (4135.6991ms)
+✔ lost prepared COMMIT acknowledgement never grants a replacement dispatch (3383.484ms)
+✔ lost dispatching COMMIT acknowledgement never grants a replacement dispatch (3623.6306ms)
+✔ cold bind observes original stopped identity after a lost response without another stop (4113.341ms)
+✔ real Stopped fact survives cancel after the effect while target admission fails (3927.284ms)
+✔ real Stopped fact survives lease after the effect while target admission fails (3596.4048ms)
+✔ post-COMMIT authority progress uses relevant assignment semantics (6041.48ms)
+✔ post-COMMIT authority assignment uses relevant assignment semantics (3601.9798ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 61868.4788
+✔ original commit rejects a separately valid queued backend binding (604.6877ms)
+✔ current full B canonical requires its own original claim before stopping historical A (7462.3145ms)
+✔ cold observation records original stopped fact after response loss and cancellation (6712.8642ms)
+✔ historical stop rejects synthetic damaged accepted-only provenance (3480.6576ms)
+✔ historical stop rejects synthetic damaged checkpoint-v1 provenance (3519.6089ms)
+✔ historical stop rejects synthetic damaged accepted-output provenance (4809.8717ms)
+✔ historical stop rejects synthetic damaged original-merge provenance (5367.5596ms)
+✔ fresh stop refuses boundary payload taskId contradicting its exact task links (4914.5793ms)
+✔ cold observation refuses boundary payload attemptId contradicting its original links (4275.5323ms)
+✔ dispatching COMMIT boundary payload mutation prevents a new device effect (4127.1234ms)
+✔ sync proof surface rejects cp-body changes after its original verification (3831.9165ms)
+✔ sync proof surface rejects accepted-only changes after its original verification (3981.2973ms)
+✔ sync proof surface rejects completed-witness changes after its original verification (5104.2565ms)
+✔ sync proof surface rejects cp-work-object changes after its original verification (4299.6538ms)
+✔ sync proof surface rejects historical-a-object changes after its original verification (5218.8933ms)
+✔ sync proof surface rejects current-b-object changes after its original verification (6516.5646ms)
+✔ sync proof surface rejects producer-origin changes after its original verification (10113.7644ms)
+✔ queued task context cannot be replaced in place with another authorized task (4813.8894ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 92424.7905
+✔ terminal source-only stops the last accepted scope without an active target (16647.4312ms)
+✔ terminal all-approved proof refuses incomplete-node before any fresh effect (3122.1808ms)
+✔ terminal all-approved proof refuses missing-row before any fresh effect (12242.6586ms)
+✔ terminal all-approved proof refuses null-provenance before any fresh effect (10149.1635ms)
+✔ terminal all-approved proof refuses missing-cp before any fresh effect (13331.4503ms)
+✔ terminal all-approved proof refuses retired-row before any fresh effect (9855.4638ms)
+✔ terminal prepare refuses capability mutation during initialization before any device prepare (205.7787ms)
+✔ terminal fresh-stop bound handles 2 real accepted scopes (15999.7823ms)
+✔ terminal fresh-stop bound handles 3 real accepted scopes (12990.028ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 97306.8245
+✔ terminal dispatch rechecks cap-method after provider queue wait (12722.8232ms)
+✔ terminal dispatch rechecks cap-response after provider queue wait (12227.7286ms)
+✔ terminal dispatch rechecks related-node after provider queue wait (11445.8239ms)
+✔ terminal dispatch rechecks unrelated-progress after provider queue wait (13568.2435ms)
+✔ terminal confirmed fact survives SQL cancellation and lease transfer (11807.0456ms)
+✔ terminal aborted bookkeeping retains original marker and exact observer only reads original ID (13323.3224ms)
+✖ terminal dispatching COMMIT loss preserves original ID with no fresh device effect (12882.4884ms)
+✔ terminal rechecks another approved slot accepted proof after dispatching COMMIT (12143.6258ms)
+✔ terminal exact observer rejects extra identity fields and class-run mismatch (12290.5843ms)
+✔ terminal review stopped duplicate observes original ID without fresh stop (13935.2703ms)
+✖ terminal review stopped duplicate refuses replaced grant root (13142.7343ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 9
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 142486.9301
+
+✖ failing tests:
+
+test at tests\task-accepted-stop-authority.test.ts:1:2798
+✖ terminal dispatching COMMIT loss preserves original ID with no fresh device effect (12882.4884ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    Comparison {
+  +   code: 'LOCAL_OUTCOME_UNKNOWN'
+  -   code: 'TASK_ACCEPTED_STOP_UNRESOLVED'
+    }
+  
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-authority.test.ts:49:29)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: No original device intent
+        at Object.reconcileAcceptedTaskStop (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\task-accepted-stop-api-fixture.ts:44:370)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:437:44)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:84:45)
+        at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:99:16
+        at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:42
+        at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+        at invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:26)
+        at Object.invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:57:53)
+        at withMode (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:97:22)
+        at Object.withWriter (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:122:42),
+    expected: { code: 'TASK_ACCEPTED_STOP_UNRESOLVED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\task-accepted-stop-authority.test.ts:1:5950
+✖ terminal review stopped duplicate refuses replaced grant root (13142.7343ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + Comparison {}
+  - Comparison {
+  -   code: 'TASK_ACCEPTED_STOP_UNRESOLVED'
+  - }
+  
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\task-accepted-stop-authority.test.ts:79:15)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: LOCAL_BINDING_CHANGED
+        at Object.reconcileAcceptedTaskStop (C:\Users\JJ\.codex\worktrees\f57c\agent_department\tests\helpers\task-accepted-stop-api-fixture.ts:44:265)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:437:44)
+        at <anonymous> (C:\Users\JJ\.codex\worktrees\f57c\agent_department\apps\api\src\task-accepted-stop.ts:84:45)
+        at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:99:16
+        at file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:42
+        at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+        at invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:60:26)
+        at Object.invoke (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:57:53)
+        at withMode (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:97:22)
+        at Object.withWriter (file:///C:/Users/JJ/.codex/worktrees/f57c/agent_department/services/agent-runtime/archive-writer-scope.mjs:122:42),
+    expected: { code: 'TASK_ACCEPTED_STOP_UNRESOLVED' },
+    operator: 'rejects',
+    diff: 'simple'
+  }
+Integration file tests/task-accepted-stop-lifecycle.test.ts exceeded 180 seconds
+✔ terminal review SQL begin reply hold obeys shared abort and discards client (10759.681ms)
+✔ terminal review SQL set reply hold obeys shared abort and discards client (9561.408ms)
+✔ terminal review SQL query reply hold obeys shared abort and discards client (9448.5349ms)
+✔ terminal review SQL commit reply hold obeys shared abort and discards client (11441.2502ms)
+✔ terminal review SQL rollback reply hold obeys shared abort and discards client (9388.5105ms)
+✔ terminal review SQL begin reply hold obeys shared deadline and discards client (9717.1546ms)
+✔ terminal review SQL set reply hold obeys shared deadline and discards client (10549.4564ms)
+✔ terminal review SQL query reply hold obeys shared deadline and discards client (10329.4829ms)
+✔ terminal review SQL commit reply hold obeys shared deadline and discards client (11922.8828ms)
+✔ terminal review SQL rollback reply hold obeys shared deadline and discards client (10603.2708ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 116113.7996

@@ -1,4 +1,5 @@
 # Keep archived executor output byte-exact for receipt SHA256 checks on Windows.
+docs/validation/evidence/** -text -whitespace
 docs/validation/evidence/delivery-2026-10-10/** -text
 docs/validation/evidence/userflow-2026-10-10/** -text -whitespace
 docs/validation/evidence/endurance-retention-2026-10-11/samples.jsonl -text

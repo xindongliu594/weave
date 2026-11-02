@@ -1,0 +1,338 @@
+{
+  "version": 1,
+  "date": "2026-10-30",
+  "scope": "private read-only recovery source facts, not full live certification or product restoration",
+  "artifactEncoding": "UTF-8 LF, SHA256 of published artifact bytes",
+  "sourceHashEncoding": "SHA256 of actual working-tree file bytes",
+  "modelCalls": 0,
+  "deployment": false,
+  "artifacts": [
+    {
+      "name": "guard-export-red.exit.txt",
+      "origin": ".private\\recovery-source-20261030\\guard\\export-red.exit.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "guard-export-red.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\export-red.log",
+      "sha256": "b4890cd150c8cb6ae3ccd868eab2a50db05e8300b12ba368c1a330caf1384c99"
+    },
+    {
+      "name": "guard-task-1-green-atomic.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-atomic.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "guard-task-1-green-atomic.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-atomic.log",
+      "sha256": "2a12394df1fd8ac42925f7aa81696388f7c4a66351c86ad84a2dd1ec7b2b6eef"
+    },
+    {
+      "name": "guard-task-1-green-files.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-files.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "guard-task-1-green-files.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-files.log",
+      "sha256": "9c768b4043b0185f7d7788e7cc56cd4bb7c0725092b599889941675d68aa3e57"
+    },
+    {
+      "name": "guard-task-1-green-final.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-final.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "guard-task-1-green-final.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-final.log",
+      "sha256": "246c2fb76ed3553dcc332965063e4f52718e3a5e9809deaf223311bae459c9c8"
+    },
+    {
+      "name": "guard-task-1-green-verified.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-verified.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "guard-task-1-green-verified.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-verified.log",
+      "sha256": "46084bc54ea9ec0668af7317d876c9822539b646c437dde4904c5e3d19d1e49e"
+    },
+    {
+      "name": "guard-task-1-green-workspace.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-workspace.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "guard-task-1-green-workspace.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green-workspace.log",
+      "sha256": "bf9c6028eb13f22e18af16a1290b91373e27aeeb8b145a9d447b3e9f98592357"
+    },
+    {
+      "name": "guard-task-1-green.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "guard-task-1-green.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-green.log",
+      "sha256": "6901200c10153301e4dbdcd985c0aa854793498fab5f0d158dc7a68f0ab32e15"
+    },
+    {
+      "name": "guard-task-1-red.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-red.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "guard-task-1-red.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-red.log",
+      "sha256": "ecaf1f78e7c3ea6a42ca7127ab4d7ae2571225099dba107a03689f7bf594e5c0"
+    },
+    {
+      "name": "guard-task-1-regression.exit",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-regression.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "guard-task-1-regression.log",
+      "origin": ".private\\recovery-source-20261030\\guard\\task-1-regression.log",
+      "sha256": "69c761b0db2a8048119997956faefb95cf33e351a779eabb9fc20c333abce8b7"
+    },
+    {
+      "name": "history-array-red.log",
+      "origin": ".private\\recovery-source-20261030\\history\\array-red.log",
+      "sha256": "75f7fa92f72124c9d1ea7a8537de743555939c5dd9a0169bb639fd392c0b9bb5"
+    },
+    {
+      "name": "history-final-verified.exit.txt",
+      "origin": ".private\\recovery-source-20261030\\history\\final-verified.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "history-final-verified.log",
+      "origin": ".private\\recovery-source-20261030\\history\\final-verified.log",
+      "sha256": "39e41a94a668bfbde3ac08bd3af81f3e9dcf29463ed1abd358fd74e6426e0849"
+    },
+    {
+      "name": "history-final.exit.txt",
+      "origin": ".private\\recovery-source-20261030\\history\\final.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "history-final.log",
+      "origin": ".private\\recovery-source-20261030\\history\\final.log",
+      "sha256": "5bb4b2cf9cc6680df1070ab00b3a516e9d349a9f7a76d1b67e0b92f637098ed3"
+    },
+    {
+      "name": "history-green.exit.txt",
+      "origin": ".private\\recovery-source-20261030\\history\\green.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "history-green.log",
+      "origin": ".private\\recovery-source-20261030\\history\\green.log",
+      "sha256": "d4357366e83943e0aee30b4782439428bd35e16d6f216864f307a287a1d9a0b7"
+    },
+    {
+      "name": "history-id-red.log",
+      "origin": ".private\\recovery-source-20261030\\history\\id-red.log",
+      "sha256": "360121b4a8732141656eb482f7b3e9081f5255cf5cb40c460886e23de71bb42f"
+    },
+    {
+      "name": "history-red.log",
+      "origin": ".private\\recovery-source-20261030\\history\\red.log",
+      "sha256": "3752c39b33b0f0808ecff23a8a976bbbd93197c578a5120dc0079118e5237a69"
+    },
+    {
+      "name": "history-review-green.exit.txt",
+      "origin": ".private\\recovery-source-20261030\\history\\review-green.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "history-review-green.log",
+      "origin": ".private\\recovery-source-20261030\\history\\review-green.log",
+      "sha256": "978369cc0fc8a508afcd5341fdf02290349ba0c8889f9420e9ca6a6d843b92f6"
+    },
+    {
+      "name": "history-review-red.log",
+      "origin": ".private\\recovery-source-20261030\\history\\review-red.log",
+      "sha256": "cce43f3a879980f3a59d4e5df759a679c8e49cf3c272ff6fad2417e6cbe1663e"
+    },
+    {
+      "name": "archive-task-2-green-attempt.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green-attempt.log",
+      "sha256": "983faa20474b20ba949d7d2620eceba9c2ab3e8a9256a835dee8b270374641bb"
+    },
+    {
+      "name": "archive-task-2-green-bounded-final.exit.txt",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green-bounded-final.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "archive-task-2-green-bounded-final.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green-bounded-final.log",
+      "sha256": "e2310d3f0c9520457397ab6c3304b32f6d9206889ec836a1622eb5eba690b9dd"
+    },
+    {
+      "name": "archive-task-2-green-bounded-positive.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green-bounded-positive.log",
+      "sha256": "0917edd7641e8c2e6afa02ed1f16e70b8b495ac5ad6b331c66e9c4d74cb84999"
+    },
+    {
+      "name": "archive-task-2-green-final.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green-final.log",
+      "sha256": "9ac6395aadec9c8f0b5642657c74075ddb00cf1c0702909d2af26bd4aa7eb595"
+    },
+    {
+      "name": "archive-task-2-green-resource.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green-resource.log",
+      "sha256": "d3a4b50d2cfd632d4890f9498fcf0da3cb88cf3ac12cd9350c22e2b96a403279"
+    },
+    {
+      "name": "archive-task-2-green.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-green.log",
+      "sha256": "5f4f73d53f5f90dd40d4bb188d8ebf6fd9ce9c76dfb528bdba8d96df0699439a"
+    },
+    {
+      "name": "archive-task-2-red-fake-manager.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-red-fake-manager.log",
+      "sha256": "5ea390c84762024ba1550a176c2603273f49fb2602be7e9fc5ed2f62f7a61b19"
+    },
+    {
+      "name": "archive-task-2-red-numeric-keys.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-red-numeric-keys.log",
+      "sha256": "902751f0be0cf6cf8297af0f57f72eec683ef0dea032c78ea771e7c84391f87c"
+    },
+    {
+      "name": "archive-task-2-red-resource.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-red-resource.log",
+      "sha256": "c7fc1e205dc37be23c03213ceb7b9c88922e771c8e09444f23b5b028822f810e"
+    },
+    {
+      "name": "archive-task-2-red.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-red.log",
+      "sha256": "653db37d929728a60536c79b8e129312867b76e7ecd04c4505abe342f1033d78"
+    },
+    {
+      "name": "archive-task-2-types-attempt.log",
+      "origin": ".superpowers\\sdd\\2026-10-30-recovery-source-primitives\\task-2-types-attempt.log",
+      "sha256": "2631934877440ad8bc3d90e7ea3e8a57f4243e938120020153160608afc93425"
+    },
+    {
+      "name": "checkpoint-regression.log",
+      "origin": ".private/recovery-source-20261030/checkpoint-regression.log",
+      "sha256": "e32e1218e368d721e90bb4e8aab07f77f9c598dd5df51fd13b2ce5d494d92006"
+    },
+    {
+      "name": "checkpoint-regression.exit.txt",
+      "origin": ".private/recovery-source-20261030/checkpoint-regression.exit.txt",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "name": "checkpoint-regression-native.log",
+      "origin": ".private/recovery-source-20261030/checkpoint-regression-native.log",
+      "sha256": "d29f4c4d10521e197e426c29a2ada943c1dda9164cf950fd8bf6af69458b1932"
+    },
+    {
+      "name": "checkpoint-regression-native.exit.txt",
+      "origin": ".private/recovery-source-20261030/checkpoint-regression-native.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "typecheck-direct.log",
+      "origin": ".private/recovery-source-20261030/typecheck-direct.log",
+      "sha256": "6d8b3ceee2937037c0b91d3b71bf53000a2e59d9c672d5232508e229fa344eac"
+    },
+    {
+      "name": "typecheck-direct.exit.txt",
+      "origin": ".private/recovery-source-20261030/typecheck-direct.exit.txt",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "name": "typecheck-after-source.log",
+      "origin": ".private/recovery-source-20261030/typecheck-after-source.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typecheck-after-source.exit.txt",
+      "origin": ".private/recovery-source-20261030/typecheck-after-source.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "build-final.log",
+      "origin": ".private/recovery-source-20261030/build-final.log",
+      "sha256": "778d792e45202b48685d58e7aceb97e933e6b72626e6871a0a518e873df06f4a"
+    },
+    {
+      "name": "build-final.exit.txt",
+      "origin": ".private/recovery-source-20261030/build-final.exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "test-temp-preload.mjs",
+      "origin": ".private/recovery-source-20261030/guard/test-temp-preload.mjs",
+      "sha256": "8356658f5dc323487f1e9ec4f3c84e71576686d58c8712ef8ade66813704d74b"
+    }
+  ],
+  "sources": [
+    {
+      "file": "services/agent-runtime/archive-writer-scope.mjs",
+      "sha256": "e1be1276e23c0902a21958148e3219663341c4190624ce426c8d447f0e6c67f8"
+    },
+    {
+      "file": "services/agent-runtime/archive-writer-scope.d.mts",
+      "sha256": "b8ff408fe90aa6346a2984d92b9e8e1c87e61841c5802c5495e215fcfc9e36aa"
+    },
+    {
+      "file": "services/agent-runtime/archive-source-scope.test.mjs",
+      "sha256": "16b64049119d218066cc1b7641d8caed439257c6eeaf976a029bd369ccfb1dc3"
+    },
+    {
+      "file": "services/agent-runtime/test-helpers/archive-source-scope-child.mjs",
+      "sha256": "99f215100e7b7ddd51a0356522f1889e8909abed839827a4786c688c494ccfff"
+    },
+    {
+      "file": "apps/api/src/task-recovery-archive.ts",
+      "sha256": "1b223d609b6b81a17a661000df7cbb000250e4e8d71b92d90a7028c1ab143518"
+    },
+    {
+      "file": "tests/task-recovery-archive.test.ts",
+      "sha256": "566650eb77ad7db3ece7625c0a15f0c5bd1c3d55eedc3f6d39e4de75017eeb97"
+    },
+    {
+      "file": "apps/api/src/task-recovery-history.ts",
+      "sha256": "6dd55174822001649945bda05581cf6f39a0ddd6ae9adce5a762f614e93d8180"
+    },
+    {
+      "file": "tests/task-recovery-history.test.ts",
+      "sha256": "56780a330dd8707ea2d1b01b61a3478ba2dccb99a45d089ef8753a73fc35c9ba"
+    },
+    {
+      "file": "apps/api/src/task-recovery-state.ts",
+      "sha256": "e5d978537531dbfa33bd66ba8f79e7222545d2b6ab712f6fc47cd78687458a77"
+    },
+    {
+      "file": "tests/task-recovery-state.test.ts",
+      "sha256": "493b86e864ca73b80c1a929ec6cb8a6236a04e4c66329cd252308d0833dffd43"
+    },
+    {
+      "file": "services/agent-runtime/archive-write-fence.mjs",
+      "sha256": "680b78f6100c1a942b2cff931adb1a55298070bb2011a6eca26a523869c18816"
+    },
+    {
+      "file": "services/agent-runtime/trace-store.mjs",
+      "sha256": "f323b1479059e48e1856098340eaa480e89bebe84238ba2df1c50a5a6b0fdb86"
+    },
+    {
+      "file": "services/agent-runtime/journal-archive.mjs",
+      "sha256": "e269b0f7efb0b0f97b64e7be9e451491df0a57149e645b047446587f72e80c97"
+    },
+    {
+      "file": "services/agent-runtime/archive-objects.mjs",
+      "sha256": "cc6eb45c7efb45bde5f45bfbffcc782d22f5bf1414cb74cb111723683b60c248"
+    },
+    {
+      "file": "services/agent-runtime/step-checkpoints.mjs",
+      "sha256": "45ebe6f4d5845b1abe96d0015c360498ef7411bb9f781b400f09c9bc7da3582b"
+    }
+  ]
+}

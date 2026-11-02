@@ -1,0 +1,38 @@
+{
+  "receipts": [
+    {
+      "log": "cancel-red.txt",
+      "pid": 21132,
+      "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-p8SrXn",
+      "bytes": 790,
+      "removed": true
+    },
+    {
+      "log": "cancel-green.txt",
+      "pid": 40744,
+      "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\executor-writer-jzo72f",
+      "bytes": 11409,
+      "removed": true
+    },
+    {
+      "log": "integration-initial.txt",
+      "pid": 11380,
+      "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\storage-api-rl1E6s",
+      "bytes": 40881,
+      "removed": true
+    },
+    {
+      "log": "integration-final.txt",
+      "pid": 48728,
+      "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\storage-api-TgK2uS",
+      "bytes": 40882,
+      "removed": true
+    },
+    {
+      "root": "C:\\Users\\JJ\\AppData\\Local\\Temp\\product-flow-7aSQI2",
+      "pid": 30188,
+      "removedByOwnAfterHook": true
+    }
+  ],
+  "unknownOldTimeoutFixtures": "Two earlier product-file timeouts predate the ownership marker; no prefix/age-based deletion attempted."
+}

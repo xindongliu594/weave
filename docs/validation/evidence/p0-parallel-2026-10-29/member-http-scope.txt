@@ -1,0 +1,13 @@
+Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
+Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
+✔ unknown run lineage and input-bearing historical plans cannot leak through project lists or versions (6467.7497ms)
+✔ member run list and cancellation use durable source bounds and current operator authority (1153.8872ms)
+✔ fixed historical plan and run departments constrain versions, pagination and workbench before current scope can shrink (1514.6956ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9693.1835

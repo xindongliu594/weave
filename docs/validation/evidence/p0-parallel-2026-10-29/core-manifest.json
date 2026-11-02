@@ -1,0 +1,778 @@
+{
+  "schemaVersion": 2,
+  "datasetId": "weiwu-core",
+  "datasetVersion": "2",
+  "evaluatedAt": "2026-10-29T15:47:54.620Z",
+  "executionKind": "product-function-and-pending",
+  "modelExecuted": false,
+  "fresh": false,
+  "bindings": {
+    "dataset": "a396aeb8ef2346381310939e0dfdc33df90448d7debcd8e7ad6eb2676bd347db",
+    "criteria": "13c70104f29c37d45ede2c533cde7e33d39c87b2572da0c5ab109a0b39ba4e40",
+    "source": {
+      "commit": "417b46e5510ab72203d722292e46e1e9b9322b77",
+      "dirty": true,
+      "rootDigest": "c11a0d6b623c532212ddb69baa04e22fe078819f1fb33f2a0291fdda93b2bb28",
+      "runtimeDigest": "f288e4e7898d4fafee69219d978d32ecbecd14c6cd3991fa0ccdadd2aa779ee1"
+    },
+    "evaluator": {
+      "version": "0.124.1",
+      "lockDigest": "4daceda1d7ed1d78655c0940ffbb3e377fd2663507f9ac4146dac6eab342d31e"
+    }
+  },
+  "sourceStable": true,
+  "rawDigest": "07ba26c7c48a55c7b251800fbf0e3b3d56a9771c726cecd56bf2280db2ea6018",
+  "cases": [
+    {
+      "caseId": "result-exact-output",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "result-exact-output",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "ddba901231db2242a25144b2601b54df008af38e79f2f68247f28efc31985e44",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "acceptance",
+            "inputDigest": "ddba901231db2242a25144b2601b54df008af38e79f2f68247f28efc31985e44",
+            "actualDigest": "559532ad927252eed5d9b6687d55203a96b956d822055f4570f196a93a42bece"
+          }
+        ],
+        "actual": "passed"
+      }
+    },
+    {
+      "caseId": "result-wrong-output",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "result-wrong-output",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "fecabcf54d208a81c97d991fae069f1b290da9d092d6e1d3f6de484b47be52de",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "acceptance",
+            "inputDigest": "fecabcf54d208a81c97d991fae069f1b290da9d092d6e1d3f6de484b47be52de",
+            "actualDigest": "33d04bd775e7b6c6436742508b41fa693a15bd2c902fcd994253392abd717740"
+          }
+        ],
+        "actual": "failed"
+      }
+    },
+    {
+      "caseId": "result-code-live",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "result-code-live",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "e6edd74efa7203ddd9f743ffcb5c00a973006ad8eed2d49c2bda8ff8c0f33975",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "result-office-live",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "result-office-live",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "252110f103cbe17011c01e998c70f9fe7fcb6418456fc4e95f344d7c588bc584",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "rag-exact",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-exact",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "a396b269fa1191171d131723f697442bc4f817c12e1b8fd3c5a4c392aa280879",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "search",
+            "inputDigest": "a396b269fa1191171d131723f697442bc4f817c12e1b8fd3c5a4c392aa280879",
+            "actualDigest": "0eb5b8d6f81bc677da8a08567cc4fa9a06a57e9ec8da85ed73a7f62727996002"
+          }
+        ],
+        "actual": [
+          "a"
+        ]
+      }
+    },
+    {
+      "caseId": "rag-case",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-case",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "ccdc8f54d44ef75010b72174d9d9901e9e79d0b9f0fbcf8d278c3bc7c0829573",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "search",
+            "inputDigest": "ccdc8f54d44ef75010b72174d9d9901e9e79d0b9f0fbcf8d278c3bc7c0829573",
+            "actualDigest": "0eb5b8d6f81bc677da8a08567cc4fa9a06a57e9ec8da85ed73a7f62727996002"
+          }
+        ],
+        "actual": [
+          "a"
+        ]
+      }
+    },
+    {
+      "caseId": "rag-chinese",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-chinese",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "b3ec34461eae5b259669f9f940821481512086e632a3b107f16d8ec02f3200c8",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "search",
+            "inputDigest": "b3ec34461eae5b259669f9f940821481512086e632a3b107f16d8ec02f3200c8",
+            "actualDigest": "0eb5b8d6f81bc677da8a08567cc4fa9a06a57e9ec8da85ed73a7f62727996002"
+          }
+        ],
+        "actual": [
+          "a"
+        ]
+      }
+    },
+    {
+      "caseId": "rag-empty",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-empty",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "ea522de2b3d12df70c3b87fe1d726dff4189e9e6ee7fa3d1d8735abc7d84c2cd",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "search",
+            "inputDigest": "ea522de2b3d12df70c3b87fe1d726dff4189e9e6ee7fa3d1d8735abc7d84c2cd",
+            "actualDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          }
+        ],
+        "actual": []
+      }
+    },
+    {
+      "caseId": "rag-absent",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-absent",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "116886cd99b8e57c8449842e3636e469a2c17068a9e328e4bdbc4e6b0d9114b0",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "search",
+            "inputDigest": "116886cd99b8e57c8449842e3636e469a2c17068a9e328e4bdbc4e6b0d9114b0",
+            "actualDigest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          }
+        ],
+        "actual": []
+      }
+    },
+    {
+      "caseId": "rag-version",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-version",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "774427135ce33b7d1b832a4a9d23224372b6bcd9295e0508050bdb1c76733447",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "search",
+            "inputDigest": "774427135ce33b7d1b832a4a9d23224372b6bcd9295e0508050bdb1c76733447",
+            "actualDigest": "804a39c65dec020d3fe865da5fc85f2e13642a51c4aecf74d8f7268c76f60125"
+          }
+        ],
+        "actual": [
+          "a:2"
+        ]
+      }
+    },
+    {
+      "caseId": "rag-answer-faithfulness",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-answer-faithfulness",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "e6359ac8d4dbcf72a1ee1571ee2dc735cdfba2bf0773381e8abbd72c840ebff0",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "rag-cross-identity",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "rag-cross-identity",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "b3f5d9802712f5ee9b6d2cb810b499c035b0610705083077f89b42acaf021e75",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "evidence-truncated",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "evidence-truncated",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "43677ce0418896ef00c34e5abe79298ea08fe99db591f45f9b7948dbbda28967",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "acceptance",
+            "inputDigest": "43677ce0418896ef00c34e5abe79298ea08fe99db591f45f9b7948dbbda28967",
+            "actualDigest": "e9f69bb9e95e952aee0f44087595446891c645b7eaaaa25f08688125c242778d"
+          }
+        ],
+        "actual": "unverified"
+      }
+    },
+    {
+      "caseId": "evidence-revision",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "evidence-revision",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "37690ea1df9618f1aa8c0edbb1c18308a4b0ada08546869b57691edb4fde43ca",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "revision",
+            "inputDigest": "37690ea1df9618f1aa8c0edbb1c18308a4b0ada08546869b57691edb4fde43ca",
+            "actualDigest": "e9f69bb9e95e952aee0f44087595446891c645b7eaaaa25f08688125c242778d"
+          }
+        ],
+        "actual": "unverified"
+      }
+    },
+    {
+      "caseId": "evidence-fake-tests",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "evidence-fake-tests",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "33de1c067f904de10c0e9bf26d59e3cc4041421bd94c1a6f96374d56de42df66",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "minimum-tests",
+            "inputDigest": "33de1c067f904de10c0e9bf26d59e3cc4041421bd94c1a6f96374d56de42df66",
+            "actualDigest": "e9f69bb9e95e952aee0f44087595446891c645b7eaaaa25f08688125c242778d"
+          }
+        ],
+        "actual": "unverified"
+      }
+    },
+    {
+      "caseId": "evidence-missing",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "evidence-missing",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "8264b0f6d95f97b72bd716de25b3342b4c5a42f38d1c6dee511b31ea675a4607",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "revision",
+            "inputDigest": "8264b0f6d95f97b72bd716de25b3342b4c5a42f38d1c6dee511b31ea675a4607",
+            "actualDigest": "e9f69bb9e95e952aee0f44087595446891c645b7eaaaa25f08688125c242778d"
+          }
+        ],
+        "actual": "unverified"
+      }
+    },
+    {
+      "caseId": "process-independent",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "process-independent",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "00e0b62e9685c2cb84f10ee826c886ea2a1317df66e74b3b9d63025e279f078a",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "plan",
+            "inputDigest": "00e0b62e9685c2cb84f10ee826c886ea2a1317df66e74b3b9d63025e279f078a",
+            "actualDigest": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"
+          }
+        ],
+        "actual": true
+      }
+    },
+    {
+      "caseId": "process-self-check",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "process-self-check",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "ce8b45b963e28e3eed21bde3020d120169d9f8449fac891f59cd8d3ba0b6646a",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "plan",
+            "inputDigest": "ce8b45b963e28e3eed21bde3020d120169d9f8449fac891f59cd8d3ba0b6646a",
+            "actualDigest": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+          }
+        ],
+        "actual": false
+      }
+    },
+    {
+      "caseId": "process-no-dependency",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "process-no-dependency",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "a6816a8ae4266421a64e5cfea738ed81dbc293df1492c63f1b8f4f172b744d7b",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "plan",
+            "inputDigest": "a6816a8ae4266421a64e5cfea738ed81dbc293df1492c63f1b8f4f172b744d7b",
+            "actualDigest": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+          }
+        ],
+        "actual": false
+      }
+    },
+    {
+      "caseId": "process-agent-correction",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "process-agent-correction",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "30f40ba8d4f1353fdf1e48af12485f7dc175ad0adb4decf5e29b9e444250a5ee",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "stability-malformed-summary",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "stability-malformed-summary",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "4da7b8b8bc672fb278724b801da059b6f617c76911ffef2976b4a8a314cec432",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "summary",
+            "inputDigest": "4da7b8b8bc672fb278724b801da059b6f617c76911ffef2976b4a8a314cec432",
+            "actualDigest": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c"
+          }
+        ],
+        "actual": "unknown"
+      }
+    },
+    {
+      "caseId": "stability-duplicate-summary",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "stability-duplicate-summary",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "d87caedf67f227c948e23ab1207501b15a1c69950bb322fce4e30f5f868ff7c0",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "summary",
+            "inputDigest": "d87caedf67f227c948e23ab1207501b15a1c69950bb322fce4e30f5f868ff7c0",
+            "actualDigest": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c"
+          }
+        ],
+        "actual": "unknown"
+      }
+    },
+    {
+      "caseId": "stability-process-kill",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "stability-process-kill",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "a242f8aaa2cf9ace28e69144482691d3081177550bb68d2e37cded9752c2afd4",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "stability-unknown-write",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "stability-unknown-write",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "74d9e458520643d9ef8d2c7a8c11d7d9b38a636556d9e137cd9a3a593134e88b",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "cost-settlement",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "cost-settlement",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "89ccebe2b85a519e06ef8b4d9a1a5a22a9bcb7c2866618d889df73797f4b0bf1",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "budget",
+            "inputDigest": "89ccebe2b85a519e06ef8b4d9a1a5a22a9bcb7c2866618d889df73797f4b0bf1",
+            "actualDigest": "47ce237cddc1361edf5d8b8ad8b8fe7373614b527587fc1e76ba7db3c17eb7b5"
+          }
+        ],
+        "actual": {
+          "spent": 0.25,
+          "reserved": 0,
+          "calls": 1
+        }
+      }
+    },
+    {
+      "caseId": "cost-prior-calls",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "cost-prior-calls",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "842cbe7a9fac352a73e1dccf967e0ca43b2bd416fd6d5c11ad4e361142a64d88",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "budget",
+            "inputDigest": "842cbe7a9fac352a73e1dccf967e0ca43b2bd416fd6d5c11ad4e361142a64d88",
+            "actualDigest": "5e97a242e7ca562efe96df11aa119f98275a9f5386fd1213086e6a5ec01d3d9d"
+          }
+        ],
+        "actual": "TURN_LIMIT"
+      }
+    },
+    {
+      "caseId": "cost-reserve-cap",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "cost-reserve-cap",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "f195bd30f723911bf27d4bceb9361acecf1a10ba627a9e0e2fb501679039094f",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "budget",
+            "inputDigest": "f195bd30f723911bf27d4bceb9361acecf1a10ba627a9e0e2fb501679039094f",
+            "actualDigest": "d05393911091ebe57175e2cd40d8f8dcea49e0b91e6ab1311e335c1e5d9aba60"
+          }
+        ],
+        "actual": "BUDGET_EXCEEDED"
+      }
+    },
+    {
+      "caseId": "cost-paired-baseline",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "cost-paired-baseline",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "c718f361b1481074266272de1a4b85ec71447e995400ecb636ab0390cc12cb19",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    },
+    {
+      "caseId": "security-allowed",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "security-allowed",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "49581664fed18dde4a05d66dc934a487563dc6f2830cb313938fb13f09fd5edc",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "permissions",
+            "inputDigest": "49581664fed18dde4a05d66dc934a487563dc6f2830cb313938fb13f09fd5edc",
+            "actualDigest": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"
+          }
+        ],
+        "actual": true
+      }
+    },
+    {
+      "caseId": "security-tool-denied",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "security-tool-denied",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "cc7f0e62c2e53ed60be3b03997a9305fcf0091b7b2e08be37bffd06b7f3b35a9",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "permissions",
+            "inputDigest": "cc7f0e62c2e53ed60be3b03997a9305fcf0091b7b2e08be37bffd06b7f3b35a9",
+            "actualDigest": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+          }
+        ],
+        "actual": false
+      }
+    },
+    {
+      "caseId": "security-department-denied",
+      "status": "pass",
+      "score": 1,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "security-department-denied",
+        "datasetVersion": "2",
+        "executionKind": "product-function",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "1e893b41b8e673290b6b53933c299b9436cf0b5d1dcfdad80b0511936769daa2",
+        "status": "observed",
+        "evidence": [
+          {
+            "kind": "product-return",
+            "check": "permissions",
+            "inputDigest": "1e893b41b8e673290b6b53933c299b9436cf0b5d1dcfdad80b0511936769daa2",
+            "actualDigest": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+          }
+        ],
+        "actual": false
+      }
+    },
+    {
+      "caseId": "security-injection-effect",
+      "status": "fail",
+      "score": 0,
+      "evaluatorCost": 0,
+      "providerCost": 0,
+      "evidence": {
+        "caseId": "security-injection-effect",
+        "datasetVersion": "2",
+        "executionKind": "pending",
+        "modelExecuted": false,
+        "fresh": false,
+        "inputDigest": "1a377e11415a2bf577a7d6c16f0f21b61ae1d3fd4605872d04b979c724051568",
+        "status": "pending",
+        "evidence": [],
+        "reason": "Requires isolated authorized execution adapter and independently captured host evidence; unavailable in this offline function slice."
+      }
+    }
+  ],
+  "runnerExitCode": 100,
+  "rawFileDigest": "cc78febfbed3bc46b62b6dae95d3556f04e3bc80eada794984d7f77d7c6c7863"
+}

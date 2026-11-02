@@ -1,0 +1,377 @@
+{
+  "date": "2026-10-29",
+  "base": "417b46e5510ab72203d722292e46e1e9b9322b77",
+  "platform": "win32",
+  "node": "v24.15.0",
+  "database": "PostgreSQL17.10 native Windows x64 with pgvector0.8.7",
+  "nativeRuns": [
+    "6c20e3d7-22f5-4d94-84f5-1dacb0ca2f09",
+    "2e98dbfe-e878-4c22-8c58-56114d7d31ef",
+    "49f0fbfc-37ef-4055-a1f6-09b769c55cbf"
+  ],
+  "results": {
+    "native": [
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/backup-restore-native.test.ts",
+        "exitCode": 0,
+        "database": "weiwu_backup_test_f02fc30404324166bbead1fb6e40860e",
+        "log": ".private\\enterprise-native-20261029\\cluster-6c20e3d7-22f5-4d94-84f5-1dacb0ca2f09\\backup-restore-native.test.ts.log",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 30593.6258
+      },
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/enterprise-backup-catalog.test.ts",
+        "exitCode": 0,
+        "database": "weiwu_backup_test_715f1b25e8a542bfad46a917fd863659",
+        "log": ".private\\enterprise-native-20261029\\cluster-49f0fbfc-37ef-4055-a1f6-09b769c55cbf\\enterprise-backup-catalog.test.ts.log",
+        "tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 5799.851
+      },
+      {
+        "command": "node --import tsx --test --test-concurrency=1 tests/enterprise-backup-native.test.ts",
+        "exitCode": 0,
+        "database": "weiwu_backup_test_16a4564c3b6c4befb78917096c4c141b",
+        "log": ".private\\enterprise-native-20261029\\cluster-49f0fbfc-37ef-4055-a1f6-09b769c55cbf\\enterprise-backup-native.test.ts.log",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 81239.6766
+      }
+    ],
+    "nativePassed": 14,
+    "pglite": [
+      {
+        "tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 6972.6229
+      },
+      {
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 16747.8874
+      },
+      {
+        "tests": 13,
+        "passed": 13,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 24951.6374
+      }
+    ],
+    "pglitePassed": 23,
+    "pure": [
+      {
+        "tests": 8,
+        "passed": 8,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "durationMs": 6827.8425
+      }
+    ],
+    "purePassed": 8,
+    "unresolvedFailures": 0,
+    "skipped": 0
+  },
+  "commands": [
+    {
+      "command": "node .private/enterprise-native-20261029/run-owned-postgres.mjs tests/backup-restore-native.test.ts tests/enterprise-backup-native.test.ts",
+      "phase": "before-fix",
+      "exitCode": 1,
+      "note": "Physical6 passed; enterprise7 rejected formal PG17 catalog before export."
+    },
+    {
+      "command": "node .private/enterprise-native-20261029/run-owned-postgres.mjs tests/enterprise-backup-catalog.test.ts",
+      "phase": "red",
+      "exitCode": 1
+    },
+    {
+      "command": "node .private/enterprise-native-20261029/run-owned-postgres.mjs tests/enterprise-backup-catalog.test.ts tests/enterprise-backup-native.test.ts",
+      "phase": "green",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/test-integration.mjs tests/enterprise-backup-catalog.test.ts tests/enterprise-backup-export.test.ts tests/enterprise-backup-restore.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "node --import tsx --test tests/enterprise-backup-schema.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0
+    },
+    {
+      "command": "node .private/enterprise-native-20261029/cleanup-self-check.mjs",
+      "phase": "before-cleanup-fix",
+      "exitCode": 1
+    },
+    {
+      "command": "node .private/enterprise-native-20261029/cleanup-self-check.mjs",
+      "phase": "after-cleanup-fix",
+      "exitCode": 0,
+      "passed": 5
+    },
+    {
+      "command": "node .private/enterprise-native-20261029/run-owned-postgres.mjs tests/enterprise-backup-catalog.test.ts",
+      "phase": "live-run-after-cleanup-fix",
+      "exitCode": 0,
+      "note": "Repeated catalog case; not added to native14 count."
+    }
+  ],
+  "phases": [
+    {
+      "engine": "postgresql",
+      "phase": "prepared",
+      "fault": null,
+      "operationId": "f9fa2460-5385-49bc-a2e0-91d87c82ffd6",
+      "inputDigest": "70d0915b675c291710326b910a054bd32d768d226f51776e673bf9ac02e60f1e",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": false
+    },
+    {
+      "engine": "postgresql",
+      "phase": "old-moved",
+      "fault": null,
+      "operationId": "2433ddcf-d305-4fc4-92bb-9d8e60b96001",
+      "inputDigest": "9752b69e7d2c8b0c586ee7000aa271bca28b183909583dc8b56fba69a4bf7a11",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": false
+    },
+    {
+      "engine": "postgresql",
+      "phase": "installed",
+      "fault": null,
+      "operationId": "1de50e95-3457-4e12-b174-4a2161b9f3eb",
+      "inputDigest": "77feff22bd43ddbbee196f82d080cba555983e118a03a9306b341d01d2badc8a",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": false
+    },
+    {
+      "engine": "postgresql",
+      "phase": "committed",
+      "fault": null,
+      "operationId": "4a8216de-4161-412b-9747-c7475373a49e",
+      "inputDigest": "dbb54da002c00ba49c1349d866c87a8a4ce106e5e1b807b5a175350a1cfbadd2",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": true
+    },
+    {
+      "engine": "postgresql",
+      "phase": "committed",
+      "fault": "marker",
+      "operationId": "03608540-1d23-4774-ae96-40367dba6fda",
+      "inputDigest": "2b376f8be764d94884e59ab2c82f3985dad73ccad8417c83ff0af4c04756edaf",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": true
+    },
+    {
+      "engine": "postgresql",
+      "phase": "committed",
+      "fault": "generation",
+      "operationId": "5f309291-2f42-4a72-8fe3-a99c64488f7a",
+      "inputDigest": "b5664ddb8a588387ec5023f137aea1e8140b3f2d9703ee60685f2f9e9c2a3d46",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": true
+    },
+    {
+      "engine": "postgresql",
+      "phase": "committed",
+      "fault": "file",
+      "operationId": "bcce850f-7fc0-48bd-8a30-428eb6e8c15a",
+      "inputDigest": "a7dd74e750c22b86a7a7b91f21d44277e17935c9dff25363e4fabb7ac56d547f",
+      "sourceUnchanged": true,
+      "targetExecutionBlocked": true
+    }
+  ],
+  "review": {
+    "reviewer": "/root/native_catalog_review",
+    "mode": "independent-read-only",
+    "importantFound": 1,
+    "fixed": "Runner could exit0 after an unverified shutdown. Actual cleanup block fault-injection RED0-vs-1, then GREEN5/5; real native catalog rerun confirms stopped/dataRemoved true. No product catalog findings.",
+    "declinedToJudge": "Company IdP, task profile and prior accepted-stop suite are outside this bugfix scope; their earlier unverified status is retained."
+  },
+  "runtime": "Community binary used only in an isolated temporary test runtime; original PG binary hashes retained. No production dependency/service installed.",
+  "unverified": [
+    "Company IdP and JJ target deployment acceptance",
+    "Other native PostgreSQL major versions/OS combinations",
+    "Whole-repository suite",
+    "Enterprise task profile remains gated"
+  ],
+  "modelCalls": 0,
+  "deploymentOperations": 0,
+  "aggregation": "Final per-file results; native physical6 predate the catalog-only fix. PGlite and native results describe different environments, not extra unique business cases.",
+  "artifacts": [
+    {
+      "path": "native-physical-pass.txt",
+      "sha256Utf8LF": "fb9c576536f1060bbe90ddc304dee1252738185a6753d7026b4ec2af6a5178ad",
+      "bytes": 763
+    },
+    {
+      "path": "native-enterprise-red.txt",
+      "sha256Utf8LF": "8c29a2ee51d42dcf3799225139411a3174d1173a6a4b79c3dfee53a3828c250f",
+      "bytes": 6944
+    },
+    {
+      "path": "native-catalog-red.txt",
+      "sha256Utf8LF": "2aace1f566c11753eaac2fe5d102ccf8a3869df9ec3c2b12669258c6f8473fe6",
+      "bytes": 1204
+    },
+    {
+      "path": "native-catalog-green.txt",
+      "sha256Utf8LF": "d25af4a70488d9484987502148bea2712765de19885721ec1aebf9da724d9eab",
+      "bytes": 228
+    },
+    {
+      "path": "native-enterprise-green.txt",
+      "sha256Utf8LF": "ff4a11ce417759c205e546a46a0e01694652b1211f33f6e2d402ba408c00eda8",
+      "bytes": 2488
+    },
+    {
+      "path": "pglite-regressions.txt",
+      "sha256Utf8LF": "0dccabfb11cf079cfde726c7bcf3ae44f4789a4ba79e815a84939449cec612ee",
+      "bytes": 2817
+    },
+    {
+      "path": "schema-pure.txt",
+      "sha256Utf8LF": "742eead90aa744c04bdbef5a68cd5cb3c86df6411f5fdcd383b7609cf594eecd",
+      "bytes": 983
+    },
+    {
+      "path": "build.txt",
+      "sha256Utf8LF": "bd8565e5039932c090aa2b2e3a50da3ecf7c7cdd1ce496c55624d9951279b6e0",
+      "bytes": 765
+    },
+    {
+      "path": "failed-data-cleanup.json",
+      "sha256Utf8LF": "ff762c3e060489abfe02d9a9f09c03a5de2cb4f20a51821d67d34303827c8f72",
+      "bytes": 441
+    },
+    {
+      "path": "runtime-verification.json",
+      "sha256Utf8LF": "e1ab752aa2de683b692b30bf70aee6bed1b0ab1b6b1fea938fc52f1968157c0c",
+      "bytes": 6295
+    },
+    {
+      "path": "catalog-pglite.json",
+      "sha256Utf8LF": "0424262c97ec52f78c1e76c7c9d4cf92ab41a9182c50d7d23569372accb8156e",
+      "bytes": 156086
+    },
+    {
+      "path": "catalog-native-before-fix.json",
+      "sha256Utf8LF": "c421cb2fbc2acfdd303774d80a3d1111bb30ea4be35f93a327012f8cb4698e4b",
+      "bytes": 98413
+    },
+    {
+      "path": "catalog-difference-summary.json",
+      "sha256Utf8LF": "2d8319f3b9bfea358db22ead36d442932b34a57382bc6a84c398ffb554fd157e",
+      "bytes": 55
+    },
+    {
+      "path": "owned-native-harness.mjs.txt",
+      "sha256Utf8LF": "e3eddb95450d57633a84fe83c852ecec15ff567b6dedf95f72fa8094c15798d0",
+      "bytes": 6081
+    },
+    {
+      "path": "prepare-runtime.mjs.txt",
+      "sha256Utf8LF": "2a9c4f91fc3cb0d319646101beefb217ade08db9388fd1038c886c9290b01f6c",
+      "bytes": 2787
+    },
+    {
+      "path": "cleanup-self-check.mjs.txt",
+      "sha256Utf8LF": "7aa0f1882720172901014c88724ec903ff75f5ceffc248ebbb3d48b533e626c2",
+      "bytes": 1845
+    },
+    {
+      "path": "cleanup-red.txt",
+      "sha256Utf8LF": "e4217bd738b5ea953fef49e62fd8cb97f6d8e5feb83a78f0f6d561f5413da8a4",
+      "bytes": 656
+    },
+    {
+      "path": "cleanup-green.txt",
+      "sha256Utf8LF": "f72511a6fd04a98a0935de2bca6f6e1e808231c87addf9b6015a1140558e5f83",
+      "bytes": 120
+    },
+    {
+      "path": "runner-final.txt",
+      "sha256Utf8LF": "b2c162581f61d5ad8df53eaf94a0d2f6c2764057db6acadf1a5a568d8c20d7bc",
+      "bytes": 596
+    },
+    {
+      "path": "final-native-result.json",
+      "sha256Utf8LF": "c3c379e10f2301166f220d55f2743f752a706666ca105488173580c94a1932a5",
+      "bytes": 934
+    },
+    {
+      "path": "initial-native-result.json",
+      "sha256Utf8LF": "6f9a778e806c1328a78d1af1ea059a3fe67ef175380fa786c842c3d156a65e3f",
+      "bytes": 991
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/api/src/enterprise-backup-catalog.ts",
+      "sha256Utf8LF": "5899c7ada206a9372d7971afadfac2058b4b5ed2a3c98e7332c26565a74c3ddb"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-tables.ts",
+      "sha256Utf8LF": "00bca3470cdc2749a6887cb990cdb6dcc9e6e9c9a921c1e1cd89d72e2d668c24"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-export.ts",
+      "sha256Utf8LF": "ac9cd0cd4be1d3052f613ca36616cd5ad020bdcbd3d6c8f557b5a8d27894437b"
+    },
+    {
+      "path": "apps/api/src/enterprise-backup-restore.ts",
+      "sha256Utf8LF": "d6aaf1eaed80744ff17d8c9399b3deb1386093d9ff20c9d0798cad1ea17aa492"
+    },
+    {
+      "path": "apps/api/src/backup-restore-state.ts",
+      "sha256Utf8LF": "efb12a41b72508b4c56acd26c848141de499f8d8d71cd5425ea8a9b26e53d7f9"
+    },
+    {
+      "path": "tests/enterprise-backup-catalog.test.ts",
+      "sha256Utf8LF": "4b5724bebb04466f2562187330fcb97afba1487deaab87ff34b576baa5a85d3a"
+    },
+    {
+      "path": "tests/backup-restore-native.test.ts",
+      "sha256Utf8LF": "0590b8526360c3e38c64924b8f74668d6626761b9d9b83ba920aef7f876c5e88"
+    },
+    {
+      "path": "tests/enterprise-backup-native.test.ts",
+      "sha256Utf8LF": "b11f1fdd9aa33e19bf3120db12e726073a012dc3c46246b4cbda613a188613c6"
+    },
+    {
+      "path": "tests/helpers/enterprise-backup-crash.ts",
+      "sha256Utf8LF": "d32e226a043793e40494841b672671d85f80889970d73ec4aabf633109d6b636"
+    },
+    {
+      "path": "tests/fixtures/backup-restore-crash.mjs",
+      "sha256Utf8LF": "fd4778870bccbd7c6cc80794d9b6d2412097cf30f798a09ae0883904defe24f9"
+    }
+  ],
+  "cleanup": {
+    "faultInjectionPassed": 5,
+    "liveRerun": "9d6fc27b-e3ae-4162-ab24-c6f2e62927a3",
+    "stopped": true,
+    "dataRemoved": true
+  }
+}

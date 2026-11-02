@@ -1,0 +1,21 @@
+✔ source authority exists only in its actual manager callback and native guard alone grants none (449.0737ms)
+✔ source scope assertion rejects fake managers and copied real assertion closures (368.6889ms)
+✔ source expires after sync and async callbacks including escaped async resources (507.757ms)
+✔ source refuses nesting, writer ownership and cross-root authority in either direction (527.9449ms)
+✔ source cannot bind a journal, mutate registered files or reuse an earlier writer handle (690.6567ms)
+✔ sync and async read validation rejection releases the source guard and preserves original errors (1420.3049ms)
+✔ source validates inputs and native options without leaking guards or invoking rejected callbacks (363.1609ms)
+✔ source forwards contended timeout and abort and never enters the callback (579.9987ms)
+✔ real processes enforce writer to source to writer exclusion until each original callback settles (1188.0801ms)
+✔ a failed original writer physically blocks manager source until its process exits (708.8461ms)
+✔ source fails closed on native identity-assert until its process exits (788.522ms)
+✔ source fails closed on native identity-final until its process exits (753.0824ms)
+✔ source fails closed on native release-failure until its process exits (870.0587ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9405.3558
