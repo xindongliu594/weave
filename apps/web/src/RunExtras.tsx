@@ -74,7 +74,7 @@ export function RunRecoveryConfirmationPanel({intent,submitting,disabled,onCance
    <p>原运行 <span className="trace-id">{intent.runId}</span> · 原方案 v{intent.version}</p>
    <p>原项目费用上限不变，历史费用和调用次数继续计入；{intent.retainUncertainCosts?'未知费用预留继续占用原预算。':'费用仍按原账本核对。'}</p>
    <p>{intent.resume?'保留已核验的完成节点和文件，只继续未完成任务。':'将重新执行全部任务，可能重复之前的操作，并再次产生费用；原完成记录和文件仍保留在原运行档案。'}</p>
-   {intent.checkpointId&&<p>在新运行中恢复所选步骤的文件版本和工作记录。原运行保留；费用不回退。若涉及其他员工成果或外部副作用，恢复会被阻止。检查点：<code>{intent.checkpointId}</code></p>}
+   {intent.checkpointId&&<p>在新运行中恢复所选员工的文件版本和工作记录，保留已核验的其他员工成果。若回退会改变已验收节点的输入，或存在未核对的外部操作，恢复会被阻止。原运行保留，费用不回退。检查点：<code>{intent.checkpointId}</code></p>}
    <p>确认后会重新检查费用、方案和未知操作的核对选择；操作审批与预算规则仍然生效。</p>
    {submitting&&<p role="status">正在重新检查并提交，请等待结果，不要重复提交。取消此确认不会撤销已经提交的运行。</p>}
    <button type="button" onClick={onCancel}>取消</button>
@@ -176,7 +176,7 @@ export function RunExtras({id,status,integrity,events,traceEvents,snapshot,recov
  {['failed','interrupted','cancelled'].includes(status)&&!planningBlocked&&<div className="notice-box run-recovery">
   <p>{recovery?.checkpointBlocked??'可以保留已核验的完成任务；返工结果须已通过独立复验。'}重试会创建新的运行档案，沿用原项目剩余预算和任务调用上限。</p>
   <CostCarryoverChoice state={costs} disabled={busy}/>
-  {snapshot.executionTarget?.backend?.kind==='openshell'&&events.some(e=>e.type==='step/checkpoint')&&<label className="field">恢复位置<select disabled={busy||checkingRecovery} value={checkpointId??''} onChange={e=>setSelectedStep(e.target.value?{runId:id,id:e.target.value}:undefined)}><option value="">最新工作现场（推荐）</option>{events.filter(e=>e.type==='step/checkpoint'&&!tasks.some(t=>t.id===e.data.boundary.taskId&&t.status==='completed')).slice(-50).reverse().map(e=><option key={e.data.id} value={e.data.id}>{taskName(e.data.boundary.taskId)} · {stepCheckpointNames[e.data.boundary.trigger]??"进度已保存"} · #{e.seq} · {e.at} · {e.data.files.length} 个文件</option>)}</select><small>较早的检查点会在新运行中恢复对应文件；仍须通过版本、权限、费用与外部操作核验。</small></label>}
+  {snapshot.executionTarget?.backend?.kind==='openshell'&&events.some(e=>e.type==='step/checkpoint')&&<label className="field">恢复位置<select disabled={busy||checkingRecovery} value={checkpointId??''} onChange={e=>setSelectedStep(e.target.value?{runId:id,id:e.target.value}:undefined)}><option value="">{snapshot.executionProfile==='task-attempt-openshell-v1'?'请选择未完成任务的步骤检查点':'最新工作现场（推荐）'}</option>{events.filter(e=>e.type==='step/checkpoint'&&(snapshot.executionProfile!=='task-attempt-openshell-v1'||e.data.version===2)&&!tasks.some(t=>t.id===e.data.boundary.taskId&&t.status==='completed')).slice(-50).reverse().map(e=><option key={e.data.id} value={e.data.id}>{taskName(e.data.boundary.taskId)} · {stepCheckpointNames[e.data.boundary.trigger]??"进度已保存"} · #{e.seq} · {e.at} · {e.data.files.length} 个文件</option>)}</select><small>恢复所选员工的工作版本；保留已核验的完成节点。提交前重新检查版本、权限、费用及外部操作。</small></label>}
   {recovery?.costBlocked&&!costs.readiness&&<p className="banner error" role="status">{recovery.costBlocked} <a href="#usage">核对调用费用</a></p>}
   {unknown.length>0&&<div><p>以下操作的结果尚未确认，恢复前需要单独检查：</p>{unknown.map(operation=><pre className="product-pre" key={operation.callId}>{operation.name} · {JSON.stringify(operation.arguments)}</pre>)}<label><input type="checkbox" checked={acknowledged} disabled={busy||checkingRecovery} onChange={e=>setAcknowledged(e.target.checked)}/>我已核对这些操作和现有产物，允许未完成部分重新执行。</label></div>}
   <RecoveryConditionsView result={checkedRecovery?.data} stale={recoveryStale} checking={checkingRecovery} error={recoveryError} disabled={busy} staticEstimate={snapshot.estimatedCost} onCheck={()=>void checkRecovery(costs)}/>

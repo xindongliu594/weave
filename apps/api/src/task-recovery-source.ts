@@ -94,6 +94,27 @@ export async function withTaskRecoverySourceTransaction<T>(writers:ArchiveWriter
  return sourceTransaction(signal,async db=>body(await captureTaskRecoverySourceIn(writers,ids,db,signal),db));
 }
 
+/** Server-only route seam. Owns the original connection and transaction so a
+ * new approved child and its complete source-derived snapshot publish together. */
+export async function withTaskRecoveryCreationTransaction<T>(writers:ArchiveWriterManager,sourceRunId:string,signal:AbortSignal,body:(db:pg.PoolClient)=>Promise<T>){
+ z.uuid().parse(sourceRunId);assertArchiveSourceScope(writers,sourceRunId);signal.throwIfAborted();
+ return sourceTransaction(signal,async db=>{
+  const identity=(await db.query('SELECT project_id FROM project_runs WHERE id=$1',[sourceRunId])).rows[0];if(!identity)denied('来源运行不存在');
+  await db.query('SELECT id FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id]);
+  const source=(await db.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[sourceRunId])).rows[0];
+  if(!source||source.project_id!==identity.project_id)denied('来源项目已变化');
+  const operations=(await db.query('SELECT id,device_id FROM local_operations WHERE run_id=$1 ORDER BY id COLLATE "C" LIMIT 4097 FOR UPDATE',[sourceRunId])).rows;
+  if(operations.length>4096)denied('来源操作过多');
+  const devices=[...new Set([source.snapshot.executionTarget?.deviceId,...operations.map(row=>row.device_id)].filter(Boolean))].sort();
+  if(devices.length)await db.query('SELECT id FROM local_devices WHERE id=ANY($1::text[]) ORDER BY id COLLATE "C" FOR UPDATE',[devices]);
+  const scopes=await db.query('SELECT task_id FROM task_attempt_workspaces WHERE run_id=$1 ORDER BY task_id COLLATE "C",attempt_id COLLATE "C",generation LIMIT 4097 FOR UPDATE',[sourceRunId]);
+  if(scopes.rows.length>4096)denied('来源工作区过多');
+  // A newly inserted child is invisible to other transactions. Source rows are
+  // locked before the route obtains actor/authority locks, as in capture.
+  return body(db);
+ });
+}
+
 /** Revalidation within the same original transaction; caller rows cannot stand
  * in for a real connection or native source scope. */
 export async function captureTaskRecoverySourceIn(writers:ArchiveWriterManager,ids:TaskRecoveryLocator,db:pg.PoolClient,signal:AbortSignal){

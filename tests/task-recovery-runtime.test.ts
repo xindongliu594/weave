@@ -5,6 +5,7 @@ import {join,resolve,sep} from 'node:path';
 import {pool,migrate} from '../apps/api/src/db.ts';
 import {taskRecoverySourceFixture,completeTaskRecoverySnapshot} from './helpers/task-recovery-source-fixture.ts';
 import {initializeLiveTaskRecovery} from '../apps/api/src/task-recovery-initialization.ts';
+import {previewTaskRecovery} from '../apps/api/src/task-recovery-preview.ts';
 
 const api=await import('../apps/api/src/task-recovery-runtime.ts').catch(error=>{if(error.code==='ERR_MODULE_NOT_FOUND'&&error.message.includes('task-recovery-runtime.ts'))return {} as any;throw error;});
 const isolated=process.env.SIMULATED_INTEGRATION==='pglite',base=resolve('.private/recovery-live-20261102');let root:string;
@@ -40,5 +41,15 @@ test('locator-only private initialization cannot authorize running a team',{skip
   await initializeLiveTaskRecovery(f.writers,f.input,new AbortController().signal);
   const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[f.childRunId])).rows[0];
   await assert.rejects(()=>api.assertTaskRecoveryRuntime(pool,root,row));
+ }finally{await f.close();}
+});
+test('read-only preview uses the full candidate and requires an explicit task checkpoint',{skip:!isolated},async()=>{
+ const f=await taskRecoverySourceFixture(root);try{
+  await assert.rejects(()=>previewTaskRecovery(pool,root,f.runId));
+  const preview=await previewTaskRecovery(pool,root,f.runId,f.cp.id);
+  assert.deepEqual(preview.scope.retained.map(item=>item.key.taskId),['b']);
+  assert.equal(Buffer.from(preview.scope.candidate.files.find(file=>file.path==='a.txt')!.content,'base64').toString(),'A checkpoint');
+  assert.equal(Buffer.from(preview.scope.candidate.files.find(file=>file.path==='b.txt')!.content,'base64').toString(),'B accepted later');
+  assert.equal((await pool.query('SELECT task_evidence FROM project_runs WHERE id=$1',[f.childRunId])).rows[0].task_evidence,null);
  }finally{await f.close();}
 });

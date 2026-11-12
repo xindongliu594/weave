@@ -7,6 +7,8 @@ import {decodeTaskRecoveryEvidence} from './task-recovery-state.ts';
 import {readCommittedCanonical} from './task-canonical.ts';
 import {verifyRecoveryCommitChain} from './task-recovery-provenance.ts';
 import {AppError} from './provider.ts';
+import {effectiveTaskContract,pinnedInputs,rebuildTaskScope,taskCapabilityHashes} from './task-execution.ts';
+import type {TaskRecoveryCommitChain} from './task-recovery-provenance.ts';
 
 const {canonicalManifest}=createRequire(import.meta.url)('../../desktop/local-executor.cjs');
 const hash=(value:any)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -39,10 +41,11 @@ export async function assertTaskRecoveryRuntime(db:Pick<pg.PoolClient,'query'>,t
  const scopes=(await db.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 ORDER BY task_id,attempt_id,generation LIMIT 4097',[actual.id])).rows;
  const operations=(await db.query('SELECT * FROM local_operations WHERE run_id=$1 ORDER BY created_at,id LIMIT 4097',[actual.id])).rows;
  if(scopes.length>4096||operations.length>4096)denied('恢复运行历史超出支持范围');
+ let chain:TaskRecoveryCommitChain|undefined;
  if(currentCanonical.ref.mergeId===null){
   if(!isDeepStrictEqual(actual.canonical_workspace,initialization.initialHead)||operations.some(row=>row.merge_state==='committed'))denied('恢复初始成果与 SQL 初始化不同');
  }else{
-  const chain=verifyRecoveryCommitChain(traceRoot,actual,scopes,operations,source.authority.backend);
+  chain=verifyRecoveryCommitChain(traceRoot,actual,scopes,operations,source.authority.backend);
   if(!isDeepStrictEqual(chain.initial.ref,initialCanonical.ref))denied('后续提交没有连接原恢复根');
  }
  const seedManifest=canonicalManifest(initialization.initialHead.manifest.filter(file=>initialization.readPaths.includes(file.path)));
@@ -61,5 +64,27 @@ export async function assertTaskRecoveryRuntime(db:Pick<pg.PoolClient,'query'>,t
  }
  const completed=snapshot.completedCheckpoints,restored=snapshot.recovery.completed.map((task:any)=>task.taskId);
  if(completed.length!==ids.size||new Set(completed).size!==ids.size||completed.some((id:string)=>!ids.has(id))||restored.length!==ids.size||new Set(restored).size!==ids.size||restored.some((id:string)=>!ids.has(id)))denied('恢复团队完成状态与原验收不一致');
- return {initialization,initialCanonical,currentCanonical,retained,selectedSeed,seedOutputs};
+ const state={initialization,initialCanonical,currentCanonical,retained,selectedSeed,seedOutputs};
+ for(const task of scopes){
+  if(ids.has(task.task_id))denied('已保留验收的员工不能创建另一份工作区');
+  const expected=task.task_id===cp.key.taskId?selectedSeed:undefined;
+  if(task.scope&&!isDeepStrictEqual(task.scope.recoverySeed,expected))denied('已保存工作区的恢复基线身份不同');
+ }
+ // A self-consistent merge hash cannot authorize a made-up seed or foreign
+ // input. Rebuild each original queued scope against its genuine child prefix.
+ if(chain)for(const commit of chain.commits){
+  const queued=archived.events.filter(event=>event.type==='local/operation-queued'&&event.data.operationId===commit.row.id);
+  const expected={operationId:commit.row.id,name:commit.row.payload.name,deviceId:commit.row.device_id,...commit.row.payload.context};
+  if(queued.length!==1||!isDeepStrictEqual(queued[0].data,expected))denied('恢复提交缺少原始排队身份');
+  const task=commit.task,assignment={...commit.scope.key,agentId:task.principal,sessionId:task.session_id,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash};
+  const historical={...actual,events:archived.events.filter(event=>event.seq<=queued[0].seq)},contract=effectiveTaskContract(historical,assignment);
+  const employee=snapshot.agents.find((agent:any)=>agent.id===assignment.agentId);
+  if(!employee)denied('恢复提交员工未获批准');
+  const inputs=pinnedInputs(historical,assignment,contract,initialCanonical.ref.revision,state);
+  const before=readCommittedCanonical(traceRoot,{...actual,canonical_workspace:{version:1,...commit.record.before,receipt:commit.index===0?null:chain.commits[commit.index-1].receipt}});
+  const own=chain.commits.slice(0,commit.index).filter(item=>item.task===task).map(item=>task.committed_outputs.find((entry:any)=>entry.receipt.operationId===item.row.id));
+  const rebuilt=rebuildTaskScope({run:historical,assignment,contract,hashes:taskCapabilityHashes(snapshot,employee),canonical:{files:before.files,revision:before.ref.revision},inputs,committedOutputs:own,recovery:state});
+  if(!isDeepStrictEqual(rebuilt,commit.scope))denied('恢复原操作的输入或工作基线与真实初始化不同');
+ }
+ return state;
 }

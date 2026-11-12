@@ -1,6 +1,9 @@
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { createRunArchive, readRun } from './trace-store.mjs';
+import {createHash} from 'node:crypto';
+import {isDeepStrictEqual} from 'node:util';
+import { createRunArchive, openRunArchive, readRun, redact } from './trace-store.mjs';
+import {canonicalManifest,manifest,revision} from '../../apps/desktop/local-executor.cjs';
 import {assertArchiveCapacity,ARCHIVE_ROOT_LIMIT_BYTES} from './archive-storage.mjs';
 import { createTeamHost } from './host.mjs';
 import { OpenAiCompatibleAdapter } from './openai-compatible.mjs';
@@ -13,6 +16,24 @@ import { GoalGuard } from './goal-guard.mjs';
 
 const provider = 'department-relay';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+function openInitializedTaskArchive(root,runId,snapshot,prepared){
+  const invalid=()=>{throw Error('TASK_RECOVERY_INITIALIZATION_INVALID');},sha=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+  if(!prepared||Object.keys(prepared).sort().join(',')!=='currentRevision,initializationDigest,kind,runId'||
+    prepared.kind!=='task-recovery-initialized'||prepared.runId!==runId||!sha(prepared.initializationDigest)||!sha(prepared.currentRevision))invalid();
+  const run=readRun(root,runId),archived=run?.snapshot,reference=snapshot.recovery.workspaceCheckpoint;
+  if(!run||run.integrity!=='ok'||!archived||archived.id!==runId||archived.formatVersion!==1||!Number.isFinite(Date.parse(archived.createdAt))||
+    !isDeepStrictEqual(archived,{...(redact(snapshot)),id:runId,createdAt:archived.createdAt,formatVersion:1})||
+    run.events[0]?.type!=='run/created'||run.events.filter(event=>event.type==='run/created').length!==1)invalid();
+  const events=run.events.filter(event=>event.type==='task/recovery-initialized'),event=events[0]?.data,initialization=event?.initialization;
+  if(events.length!==1||event.version!==1||event.sourceKey!=='task-recovery-initialized:'+runId||initialization?.version!==1||
+    initialization.childRunId!==runId||initialization.digest!==prepared.initializationDigest||
+    initialization.source?.sourceRunId!==snapshot.recovery.sourceRunId||reference?.runId!==snapshot.recovery.sourceRunId||
+    initialization.source?.sourceCheckpoint?.id!==reference?.id||initialization.source?.sourceCheckpoint?.sha256!==reference?.sha256)invalid();
+  // This checks the coordinator's freshly materialized mirror, not source authority.
+  if(revisionManifest(listArtifacts(join(root,runId,'artifacts')))!==prepared.currentRevision)invalid();
+  return openRunArchive(root,runId);
+}
+const revisionManifest=files=>createHash('sha256').update(JSON.stringify(canonicalManifest(files))).digest('hex');
 function drainError(error) {
   const unproven = value => value?.code === 'RUNTIME_WRITER_DRAIN_UNPROVEN' || value?.errors?.some(unproven);
   const code = unproven(error) ? 'RUNTIME_WRITER_DRAIN_UNPROVEN' : 'RUNTIME_WRITER_DRAIN_FAILED';
@@ -67,11 +88,12 @@ export class ProductDshRuntime {
       throw Object.assign(Error('RUNTIME_TEARDOWN_PENDING: 原宿主清理尚未结束，请稍后重试'), { code: 'RUNTIME_TEARDOWN_PENDING' });
     if (this.jobs.has(runId)) throw new Error('RUN_ALREADY_ACTIVE');
     assertArchiveCapacity(this.traceRoot,ARCHIVE_ROOT_LIMIT_BYTES);
-    // The coordinator supplies this synchronous, source-only preparation.
-    // Admission and preparation share one stack, so a rejected launch cannot
-    // leave imported files that prevent the same queued run from starting.
-    prepareWorkspace?.();
-    const archive = createRunArchive(this.traceRoot, approvedSnapshot, { id: runId });
+    // The coordinator validates SQL recovery and mirrors its current head in
+    // this synchronous callback while it still owns the child writer.
+    const prepared=prepareWorkspace?.();
+    const recovery=approvedSnapshot.executionProfile==='task-attempt-openshell-v1'&&approvedSnapshot.recovery;
+    const archive = recovery?openInitializedTaskArchive(this.traceRoot,runId,approvedSnapshot,prepared)
+      :createRunArchive(this.traceRoot, approvedSnapshot, { id: runId });
     archive.append('run/queued', { projectId: approvedSnapshot.projectId, projectVersion: approvedSnapshot.planVersion });
     const job = { runId, controller: new AbortController(), host: undefined, cancelled: false };
     const completion = Promise.resolve().then(() => this.execute(job, archive, approvedSnapshot, routes));
@@ -153,7 +175,7 @@ export class ProductDshRuntime {
     const usages = [];
     let runtimeFailure, deliveryStop;
     let deliverySettlementAttempted = false;
-    let host, adapter, goal, sandbox, supervisor;
+    let host, adapter, goal, sandbox, supervisor, currentArtifacts;
     const taskMode=snapshot.executionProfile==='task-attempt-openshell-v1';
     const gate = new Semaphore(snapshot.policy.maxConcurrentAgents);
     const timer = setTimeout(() => {
@@ -165,22 +187,31 @@ export class ProductDshRuntime {
     try {
       if(taskMode){
         if(snapshot.executionTarget?.kind!=='local'||snapshot.executionTarget.backend?.kind!=='openshell'||typeof this.createExecutor!=='function')throw Error('TASK_EXECUTION_REQUIRED: 任务执行只能使用已配置的 OpenShell 任务执行器');
-        if(snapshot.recovery)throw Error('TASK_RECOVERY_UNAVAILABLE: 任务检查点恢复链路尚未完成');
         sandbox=this.createExecutor(archive,snapshot); job.executor=sandbox;
         if(!sandbox||['prepare','prepareTask','prepareCheckpoint','bindAttempt','execute','close'].some(name=>typeof sandbox[name]!=='function'))throw Error('TASK_EXECUTION_REQUIRED: 任务执行器缺少可信接口');
         if(typeof sandbox.finalizeAccepted!=='function')throw Error('TASK_FINALIZATION_REQUIRED: 任务执行器缺少可信终态停止接口');
         // The root is a compatibility cache, never the publication authority.
         // Rebuild it from the committed head before supervisor/Handoff reads.
         await sandbox.prepare(job.controller.signal);job.controller.signal.throwIfAborted();
+        if(snapshot.recovery){
+          if(typeof sandbox.readCanonical!=='function')throw Error('TASK_RECOVERY_CANONICAL_REQUIRED');
+          const canonical=await sandbox.readCanonical(job.controller.signal);job.controller.signal.throwIfAborted();
+          try{
+            const actual=manifest(canonical.files);
+            if(canonical.ref.revision!==revision(canonical.files)||!isDeepStrictEqual(canonical.ref.manifest,actual)||
+              !isDeepStrictEqual(canonicalManifest(listArtifacts(sandbox.root)),actual))throw Error();
+            currentArtifacts=actual;
+          }catch{throw Error('TASK_RECOVERY_CANONICAL_INVALID');}
+        }
       }else sandbox=this.createExecutor?.(archive,snapshot)??new RunSandbox(archive.id,join(archive.dir,'artifacts'));
       job.executor=sandbox;
-      supervisor=new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
+      supervisor=new RuntimeSupervisor({archive,policy:snapshot.policy,artifacts:currentArtifacts??listArtifacts(sandbox.root),onFailure:error=>{runtimeFailure??=error;adapter?.stopAdmission(error);}});
       const durableArchive=archive;
       archive={...archive,append(type,data,ref){const event=durableArchive.append(type,data,ref);if(event)supervisor.observe(event);return event;}};
       archive.append('runtime/supervision',{version:1,progressTimeoutSeconds:snapshot.policy.progressTimeoutSeconds??300,repeatActionLimit:snapshot.policy.repeatActionLimit??8,repeatErrorLimit:snapshot.policy.repeatErrorLimit??3,maxReadRetries:snapshot.policy.maxReadRetries??2});
       goal = new GoalGuard({ snapshot, archive, onFailure: error => { runtimeFailure ??= error; supervisor.stop(error); adapter?.stopAdmission(error); } });
       if(!taskMode)await sandbox.prepare?.(job.controller.signal);
-      for (const file of snapshot.recovery?.files ?? []) {
+      for (const file of !taskMode?snapshot.recovery?.files??[]:[]) {
         if (inspectArtifact(sandbox.root,file).sha256 !== file.sha256) throw Error('RECOVERY_FILE_CHANGED: ' + file.path);
       }
       adapter = new OpenAiCompatibleAdapter({

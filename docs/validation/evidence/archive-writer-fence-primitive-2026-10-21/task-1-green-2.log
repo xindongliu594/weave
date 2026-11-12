@@ -1,8 +1,0 @@
-✔ private archive fence factory exists (2.5494ms)
-✔ guards are frozen, privately owned, mode/run scoped and expire only on release (294.7628ms)
-✔ UUID sets, options and pre-abort reject before acquisition (32.2482ms)
-✔ actual process writers coexist, block source and release independently (554.899ms)
-✔ root exclusive blocks writers in another process (404.0097ms)
-✔ multi-run timeout and waiting abort clean earlier run and root locks (669.6481ms)
-✔ journal returns values, retains outer guard, and rejects async/thenable/reentry/early release (474.188ms)
-✔ journal actual process contention times out without callback and short wait succeeds (956.113ms)

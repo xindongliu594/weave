@@ -1,3 +1,0 @@
-command=./node_modules/.bin/tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext --types node services/agent-runtime/archive-write-fence.d.mts
-exit=0
-durationMs=3873

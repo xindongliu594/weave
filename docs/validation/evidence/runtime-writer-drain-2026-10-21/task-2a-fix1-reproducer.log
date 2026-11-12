@@ -1,4 +1,0 @@
-{"beforeRequestPending":true,"writerDrained":false,"activeRequests":1,"beforeRequestCalls":1}
-RUNTIME_STOPPING
-COMMAND: review exact in-memory PowerShell here-string reproducer | node --input-type=module
-EXIT: 0

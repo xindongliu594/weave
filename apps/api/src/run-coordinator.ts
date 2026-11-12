@@ -8,6 +8,10 @@ import {join} from 'node:path';
 import { prepareImportedWorkspace } from './work-files.ts';
 import {readLiveCanonical} from './live-canonical-reader.ts';
 import {restoreStepWorkspace} from './step-checkpoint-recovery.ts';
+import {initializeLiveTaskRecovery} from './task-recovery-initialization.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
+import {materializeCommittedCanonical} from './task-canonical.ts';
+import {isDeepStrictEqual} from 'node:util';
 import {requireResolvedProjectEffectsIn} from './tool-operations.ts';
 import {createToolEffectComposition} from './tool-effect-composition.ts';
 import { pool } from './db.ts';
@@ -33,6 +37,7 @@ async function heartbeatForCaller(work:Promise<Heartbeat>,signal?:AbortSignal){
   try{return await Promise.race([work,cancelled]);}finally{signal.removeEventListener('abort',abort!);}
 }
 export class RunCoordinator {
+  private preparedRecovery=new Map<string,{snapshot:any;head:any;evidence:any}>();
   owner=randomUUID(); runtime:ProductDshRuntime; active=new Map<string,ActiveRun>();closing?:Promise<void>; ticking=false; stopped=false; timer?:NodeJS.Timeout;heartbeatWork?:Promise<Heartbeat>;
   constructor(public traceRoot:string,public writers:ArchiveWriterManager,createExecutor?:ConstructorParameters<typeof ProductDshRuntime>[0]['createExecutor'],maintenance:{startPaused?:boolean;sandboxMaintenance?:()=>SandboxMaintenance|undefined;toolEffects?:ReturnType<typeof createToolEffectComposition>}={}){
     if(!writers||writers.traceRoot!==traceRoot)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
@@ -162,6 +167,17 @@ export class RunCoordinator {
     const existing=readRun(this.traceRoot,row.id);const archive=existing?openRunArchive(this.traceRoot,row.id):createRunArchive(this.traceRoot,row.snapshot,{id:row.id});archive.append('run/finished',{status,message});
   }
 
+  private async prepareRecovery(id:string){
+    const row=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0];
+    if(row?.snapshot.executionProfile!=='task-attempt-openshell-v1'||!row.snapshot.recovery)return;
+    const reference=row.snapshot.recovery.workspaceCheckpoint;
+    if(!reference||row.parent_run_id!==reference.runId)throw new AppError(409,'恢复运行缺少原检查点定位','TASK_RECOVERY_UNAVAILABLE');
+    await initializeLiveTaskRecovery(this.writers,{sourceRunId:reference.runId,checkpointId:reference.id,childRunId:id},AbortSignal.timeout(120000));
+    const current=(await pool.query('SELECT * FROM project_runs WHERE id=$1',[id])).rows[0];
+    await assertTaskRecoveryRuntime(pool,this.traceRoot,current);
+    this.preparedRecovery.set(id,{snapshot:structuredClone(current.snapshot),head:structuredClone(current.canonical_workspace),evidence:structuredClone(current.task_evidence)});
+  }
+
   async tick(){
     if(this.ticking||this.stopped)return;this.ticking=true;
     try{
@@ -178,6 +194,17 @@ export class RunCoordinator {
           COALESCE(NULLIF(a.department_ids,'{}'),ARRAY[a.snapshot->>'departmentId']) && COALESCE(NULLIF(r.department_ids,'{}'),ARRAY[r.snapshot->>'departmentId']))
         ORDER BY r.created_at LIMIT 1`)).rows[0];
       if(!candidate)return;
+      // Source certification must finish before the child owner exists. A
+      // writer cannot upgrade its native fence to read a different source.
+      try{await this.prepareRecovery(candidate.id);}catch(error){
+        await this.writers.withWriter([candidate.id],()=>lockedRun(this.writers,candidate.id,async(client,row)=>{
+          if(!row||row.status!=='queued')return;
+          const message=error instanceof Error?error.message:'恢复初始化失败';
+          await client.query("UPDATE project_runs SET status='interrupted',error=$2,finished_at=now(),lease_owner=NULL,lease_until=NULL WHERE id=$1",[row.id,message]);
+          await client.query("UPDATE projects SET status='INTERRUPTED' WHERE id=$1 AND version=$2",[row.project_id,row.project_version]);
+          this.traceFinished(row,'interrupted',message);
+        }));return;
+      }
       let writer:ArchiveWriterOwner|undefined=await this.writers.acquireOwner([candidate.id]);
       try{
       const job=await writer.run(async()=>{
@@ -195,6 +222,10 @@ export class RunCoordinator {
               COALESCE(NULLIF(a.department_ids,'{}'),ARRAY[a.snapshot->>'departmentId']) && COALESCE(NULLIF(r.department_ids,'{}'),ARRAY[r.snapshot->>'departmentId']))
             FOR UPDATE OF r SKIP LOCKED`,[candidate.id,project.id,project.version])).rows[0];
           if(job&&!this.stopped){
+            if(job.snapshot.executionProfile==='task-attempt-openshell-v1'&&job.snapshot.recovery){
+              const pin=this.preparedRecovery.get(job.id);
+              if(!pin||!isDeepStrictEqual(pin,{snapshot:job.snapshot,head:job.canonical_workspace,evidence:job.task_evidence}))throw new AppError(409,'恢复批准在领租约前发生变化','TASK_RECOVERY_RUNTIME_INVALID');
+            }
             try{await assertCurrentRunAuthority(client,job.id,'resume');}
             catch(error){
               if(!(error instanceof AppError)||error.code!=='RUN_AUTHORITY_REVOKED')throw error;
@@ -216,7 +247,7 @@ export class RunCoordinator {
     }catch(e){if(!this.stopped)console.error('Run worker:',e instanceof Error?e.name:'error');}finally{this.ticking=false;}
   }
   launch(row:any,writer?:ArchiveWriterOwner){
-    const work=writer?this.launchWithOwner(row,writer):this.writers.acquireOwner([row.id]).then(owner=>this.launchWithOwner(row,owner));
+    const work=writer?this.launchWithOwner(row,writer):this.prepareRecovery(row.id).then(()=>this.writers.acquireOwner([row.id])).then(owner=>this.launchWithOwner(row,owner));
     work.catch(error=>{if(!this.stopped)console.error('Run completion:',error instanceof Error?error.name:'error');});
     return work;
   }
@@ -255,7 +286,21 @@ export class RunCoordinator {
       }
       if(this.stopped)throw new AppError(409,'工作进程已关闭，任务未启动','WORKER_STOPPED');
       let prepareWorkspace:()=>void;
-      if(row.snapshot.recovery?.workspaceCheckpoint)prepareWorkspace=()=>restoreStepWorkspace(this.traceRoot,row.snapshot.recovery.workspaceCheckpoint,join(this.traceRoot,row.id,'artifacts'));
+      if(row.snapshot.executionProfile==='task-attempt-openshell-v1'&&row.snapshot.recovery){
+        if(!this.preparedRecovery.has(row.id))throw new AppError(409,'恢复启动尚未重新认证来源','TASK_RECOVERY_RUNTIME_INVALID');
+        const prepared=await lockedRun(this.writers,row.id,async(client,current)=>{
+          if(!isDeepStrictEqual(current.snapshot,row.snapshot))throw new AppError(409,'恢复快照已变化','TASK_RECOVERY_RUNTIME_INVALID');
+          const state=await assertTaskRecoveryRuntime(client,this.traceRoot,current);
+          if(!state)throw new AppError(409,'缺少完整恢复状态','TASK_RECOVERY_RUNTIME_INVALID');
+          return {row:current,state};
+        });
+        if(!prepared)throw new AppError(409,'恢复运行不存在','TASK_RECOVERY_RUNTIME_INVALID');
+        prepareWorkspace=()=>{
+          materializeCommittedCanonical({traceRoot:this.traceRoot,writers:this.writers},prepared.row);
+          return {kind:'task-recovery-initialized' as const,runId:row.id,initializationDigest:prepared.state.initialization.digest,currentRevision:prepared.state.currentCanonical.ref.revision};
+        };
+      }
+      else if(row.snapshot.recovery?.workspaceCheckpoint)prepareWorkspace=()=>restoreStepWorkspace(this.traceRoot,row.snapshot.recovery.workspaceCheckpoint,join(this.traceRoot,row.id,'artifacts'));
       else {
         const parent=row.parent_run_id&&row.snapshot.approval?.kind!=='retry'?(await pool.query('SELECT * FROM project_runs WHERE id=$1',[row.parent_run_id])).rows[0]:undefined;
         const canonical=parent?await readLiveCanonical(pool,this.traceRoot,parent,readRun(this.traceRoot,parent.id)):undefined;
@@ -284,6 +329,7 @@ export class RunCoordinator {
       const message=error instanceof Error?error.message:'启动失败';
       await finishRun(this.writers,row.id,this.owner,'failed',message,record=>this.traceFinished(record,'failed',message));
     }finally{
+      this.preparedRecovery.delete(row.id);
       entry.phase='draining';entry.writer.closeAdmission();
       try{await entry.writerDrained;}catch(error){
         const code=(error as any)?.code==='RUNTIME_WRITER_DRAIN_UNPROVEN'?'RUNTIME_WRITER_DRAIN_UNPROVEN':'RUNTIME_WRITER_DRAIN_FAILED';

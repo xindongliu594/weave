@@ -1,7 +1,0 @@
-
-> agent-department@0.2.0 build
-> tsc --noEmit && vite build
-
-tests/run-terminal-maintenance.test.ts(130,3): error TS2353: Object literal may only specify known properties, and 'windowsHide' does not exist in type 'ForkOptions'.
-tests/run-terminal-maintenance.test.ts(151,105): error TS2554: Expected 4 arguments, but got 3.
-EXIT=2

@@ -8,6 +8,8 @@ import {ancestors} from '../../../services/agent-runtime/checkpoint-context.mjs'
 import {AppError} from './provider.ts';
 import {assertNoUnresolvedTaskOperation} from './task-operation-admission.ts';
 import {assertTaskAcceptedStopAdmission} from './task-accepted-stop-state.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
+import {canonicalEvidence} from '../../../packages/contracts/run-lineage-evidence.ts';
 const {createTaskWorkspace,validateTaskExport}=createRequire(import.meta.url)('../../desktop/task-workspace.cjs') as TaskWorkspacePlanner;
 const hash=(value:any)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const bytesHash=(value:Buffer)=>createHash('sha256').update(value).digest('hex');
@@ -73,17 +75,23 @@ export async function bindTrustedAttempt(db:pg.PoolClient,run:any,candidate:Trus
  await db.query('INSERT INTO task_attempt_workspaces(run_id,task_id,attempt_id,generation,principal,session_id,runtime_task_id,contract_hash,permission_hash,capability_hash,contract) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[run.id,candidate.taskId,candidate.attemptId,generation,candidate.agentId,candidate.sessionId,candidate.runtimeTaskId,candidate.contractHash,hashes.permissionHash,hashes.capabilityHash,contract]);
  return {...candidate,generation};
 }
-export function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:any,revision:string):TaskInputOrigin[]{
+type RecoveryState=NonNullable<Awaited<ReturnType<typeof assertTaskRecoveryRuntime>>>;
+export function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:any,revision:string,recovery?:RecoveryState|null):TaskInputOrigin[]{
  const employee=run.snapshot.agents.find((a:any)=>a.id===assignment.agentId);
  return contract.inputs.map((input:any)=>{
   const base={path:input.path,runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,acceptedRevision:revision};
   if(input.producerTaskId){
-   const accepted=run.events?.findLast((e:any)=>e.type==='handoff/accepted'&&e.data.taskId===input.producerTaskId)?.data;
+   const current=run.events?.findLast((e:any)=>e.type==='handoff/accepted'&&e.data.taskId===input.producerTaskId)?.data;
+   const accepted=current??recovery?.retained.find(record=>record.taskId===input.producerTaskId);
    // Recovery ancestry is admitted in Task 5; never relabel a foreign checkpoint as this run.
    const output=accepted?.outputs?.find((o:any)=>o.path===input.path);
    const upstream=ancestors(run.snapshot.tasks,contract.id).has(input.producerTaskId)||contract.kind==='repair'&&contract.sourceTaskId===input.producerTaskId;
-   if(accepted?.runId!==run.id||!output||!accepted.attemptId||!/^[a-f0-9]{64}$/.test(accepted.workspaceRevision)||!upstream)denied('输入没有本运行已接受的生产者证据');
+   if(!accepted||!output||!accepted.attemptId||!/^[a-f0-9]{64}$/.test(accepted.workspaceRevision)||!upstream)denied('输入没有已接受的生产者证据');
    if(input.sha256&&input.sha256!==output.sha256)denied('输入 SHA 与已接受版本不同');
+   if(accepted.runId!==run.id){
+    if(!recovery||current||!recovery.retained.includes(accepted))return denied('外来输入没有固定恢复验收来源');
+    return {path:input.path,sha256:output.sha256,origin:{path:input.path,runId:accepted.runId,taskId:accepted.taskId,attemptId:accepted.attemptId,acceptedRevision:accepted.workspaceRevision},source:{kind:'recovery-accepted',initializationDigest:recovery.initialization.digest,key:accepted.taskExecution.key,revision:accepted.workspaceRevision,acceptedDigest:createHash('sha256').update(canonicalEvidence(accepted)).digest('hex')}};
+   }
    return {path:input.path,sha256:output.sha256,origin:{...base,taskId:accepted.taskId,attemptId:accepted.attemptId,acceptedRevision:accepted.workspaceRevision},source:{kind:'accepted',runId:run.id,taskId:accepted.taskId,attemptId:accepted.attemptId,revision:accepted.workspaceRevision}};
   }
   const imported=run.snapshot.importedFiles?.find((f:any)=>f.path===input.path);
@@ -92,15 +100,20 @@ export function pinnedInputs(run:any,assignment:TrustedTaskAssignment,contract:a
  });
 }
 /** Pure reconstruction only; this does not prove SQL provenance, current authority or live admission. */
-export function rebuildTaskScope({run,assignment,contract,hashes,canonical,inputs,committedOutputs}:{run:any;assignment:TrustedTaskAssignment;contract:any;hashes:ReturnType<typeof taskCapabilityHashes>;canonical:TaskCanonical;inputs:TaskInputOrigin[];committedOutputs:TaskCommittedOutput[]}):TaskExecutionScope{
+export function rebuildTaskScope({run,assignment,contract,hashes,canonical,inputs,committedOutputs,recovery}:{run:any;assignment:TrustedTaskAssignment;contract:any;hashes:ReturnType<typeof taskCapabilityHashes>;canonical:TaskCanonical;inputs:TaskInputOrigin[];committedOutputs:TaskCommittedOutput[];recovery?:RecoveryState|null}):TaskExecutionScope{
  const writePaths=taskWritePaths(contract);
  const origins=new Map(inputs.map(i=>[i.path,i.origin])),expected=new Map(inputs.map(i=>[i.path,i.sha256]));
  const key={runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation};
+ const seed=recovery?.selectedSeed.sourceCheckpoint.key.taskId===assignment.taskId?recovery.selectedSeed:undefined;
+ if(seed){
+  if(assignment.generation!==1)denied('恢复基线不能自动继承到另一代员工');
+  for(const file of recovery!.seedOutputs){expected.set(file.path,file.sha256);origins.set(file.path,file.origin);}
+ }
  const operations=new Set<string>();
  for(const commit of committedOutputs){
   const r=commit.receipt,s=commit.scope;
   const binding=s?.workspace?.binding;
-  if(!s||s.profile!=='task-attempt-openshell-v1'||!isDeepStrictEqual(s.key,key)||s.capabilityHash!==hashes.capabilityHash||!isDeepStrictEqual(s.inputOrigins,inputs)||
+  if(!s||s.profile!=='task-attempt-openshell-v1'||!isDeepStrictEqual(s.recoverySeed,seed)||!isDeepStrictEqual(s.key,key)||s.capabilityHash!==hashes.capabilityHash||!isDeepStrictEqual(s.inputOrigins,inputs)||
    r.profile!=='task-attempt-openshell-v1'||!isDeepStrictEqual(r.key,key)||r.scopeHash!==s.workspace.scopeHash||r.beforeWorkRevision!==s.workRevision||s.workRevision!==s.workspace.baseCanonicalRevision||!r.operationId||!/^[a-f0-9]{64}$/.test(r.afterWorkRevision)||
    operations.has(r.operationId)||!binding||binding.runId!==run.id||binding.taskId!==assignment.taskId||binding.attemptId!==assignment.attemptId||binding.generation!==assignment.generation||binding.assigneeId!==assignment.agentId||binding.projectId!==run.project_id||binding.planVersion!==run.project_version||
    s.workspace.binding.contractHash!==assignment.contractHash||s.workspace.binding.permissionHash!==hashes.permissionHash||!isDeepStrictEqual([...s.workspace.writePaths].sort(),[...writePaths].sort())||
@@ -116,18 +129,24 @@ export function rebuildTaskScope({run,assignment,contract,hashes,canonical,input
  const backend=run.snapshot.executionTarget?.backend;if(run.snapshot.executionTarget?.kind!=='local'||backend?.kind!=='openshell')denied('任务要求本机 OpenShell');
  const workspace=createTaskWorkspace({binding:{projectId:run.project_id,planVersion:run.project_version,runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,assigneeId:assignment.agentId,generation:assignment.generation,contractHash:assignment.contractHash,permissionHash:hashes.permissionHash,backend:{kind:'openshell',version:backend.version,image:backend.image,policyHash:backend.policySha256}},readPaths:[...expected.keys()],writePaths,canonicalFiles:canonical.files,origins:[...origins.values()]});
  if(workspace.baseCanonicalRevision!==canonical.revision)denied('可信工作版本与完整 manifest 不符');
- return {profile:'task-attempt-openshell-v1',key,workspace,workRevision:canonical.revision,capabilityHash:hashes.capabilityHash,inputOrigins:inputs};
+ return {profile:'task-attempt-openshell-v1',key,workspace,workRevision:canonical.revision,capabilityHash:hashes.capabilityHash,inputOrigins:inputs,...(seed?{recoverySeed:seed}:{})};
 }
-export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:TrustedTaskAssignment,canonical:TaskCanonical,previous:TaskExecutionScope|null):Promise<TaskExecutionScope>{
+export async function resolveTaskScope(db:pg.PoolClient,run:any,assignment:TrustedTaskAssignment,canonical:TaskCanonical,previous:TaskExecutionScope|null,traceRoot?:string):Promise<TaskExecutionScope>{
  identity(assignment,true);const {employee,contract}=activeTaskAssignment(run,assignment);await assertLease(db,run);
  await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:assignment.taskId,attemptId:assignment.attemptId,generation:assignment.generation});
- if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)throw new AppError(422,'任务沙箱恢复尚未接通可信 canonical 与检查点来源，请保留原恢复记录','TASK_RECOVERY_UNAVAILABLE');
+ let recovery:RecoveryState|null=null;
+ if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length){
+  if(!traceRoot)denied('恢复任务缺少可信档案位置');
+  recovery=await assertTaskRecoveryRuntime(db,traceRoot!,run);
+  if(!recovery||recovery.currentCanonical.ref.revision!==canonical.revision||!isDeepStrictEqual(recovery.currentCanonical.files,canonical.files))denied('恢复任务的当前文件来源不符');
+ }
  const row=(await db.query("SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4 AND phase='active' FOR UPDATE",[run.id,assignment.taskId,assignment.attemptId,assignment.generation])).rows[0];
  const hashes=taskCapabilityHashes(run.snapshot,employee);
  if(!row||row.principal!==assignment.agentId||row.session_id!==assignment.sessionId||row.runtime_task_id!==assignment.runtimeTaskId||row.contract_hash!==assignment.contractHash||row.permission_hash!==hashes.permissionHash||row.capability_hash!==hashes.capabilityHash||!isDeepStrictEqual(row.contract,contract))denied('任务未绑定或授权已变化');
  if(previous&&!isDeepStrictEqual(row.scope,previous))denied('操作 scope 已过期');
- const inputs:TaskInputOrigin[]=row.scope?row.input_origins:pinnedInputs(run,assignment,contract,canonical.revision);
- const scope=rebuildTaskScope({run,assignment,contract,hashes,canonical,inputs,committedOutputs:row.committed_outputs});
+ const inputs:TaskInputOrigin[]=recovery?pinnedInputs(run,assignment,contract,recovery.initialCanonical.ref.revision,recovery):(row.scope?row.input_origins:pinnedInputs(run,assignment,contract,canonical.revision));
+ if(row.scope&&!isDeepStrictEqual(row.input_origins,inputs))denied('原固定输入与当前已批准来源不符');
+ const scope=rebuildTaskScope({run,assignment,contract,hashes,canonical,inputs,committedOutputs:row.committed_outputs,recovery});
  await db.query('UPDATE task_attempt_workspaces SET scope=$1,input_origins=$2::jsonb,work_revision=$3 WHERE run_id=$4 AND task_id=$5 AND attempt_id=$6 AND generation=$7',[scope,JSON.stringify(inputs),canonical.revision,run.id,assignment.taskId,assignment.attemptId,assignment.generation]);
  return scope;
 }

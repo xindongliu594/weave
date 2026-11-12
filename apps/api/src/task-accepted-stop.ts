@@ -17,9 +17,10 @@ import {assertCurrentRunPermissions} from './execution-policy.ts';
 import {assertExecutionBackendBinding,executionBackend} from './execution-backend.ts';
 import {assertNoUnresolvedTaskOperation} from './task-operation-admission.ts';
 import {readLiveCanonical} from './live-canonical-reader.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
 import {acceptedVerificationRevision} from './handoff-checkpoints.ts';
 import type {TaskCheckpointContext} from './task-checkpoint-state.ts';
-import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
+import {readRun,redact} from '../../../services/agent-runtime/trace-store.mjs';
 import {readStepCheckpoint,checkpointDigest,checkpointContract,checkpointEnvironment,validateTaskCheckpointRefs} from '../../../services/agent-runtime/step-checkpoints.mjs';
 import {assertAcceptanceChecks} from '../../../services/agent-runtime/acceptance-checks.mjs';
 import {assertHandoffReport} from '../../../packages/contracts/handoff-report.mjs';
@@ -33,6 +34,7 @@ type Provider=()=>SandboxMaintenance|undefined;
 type Selected=Readonly<Pick<SandboxMaintenance,'deviceId'|'grantId'|'fingerprint'|'executor'>&{stop:NonNullable<SandboxMaintenance['executor']['stopAcceptedTask']>;reconcile:NonNullable<SandboxMaintenance['executor']['reconcileAcceptedTaskStop']>;capabilities:NonNullable<SandboxMaintenance['executor']['acceptedStopCapabilities']>;capability:Readonly<{version:1;deadline:'shared-abort-v1'}>}>;
 type Subject=TaskCheckpointContext&{runId:string;runtimeTaskId:string;contractHash:string};
 type Selection={marker:TaskAcceptedStopRecord;recheck:()=>void};
+type RecoveryState=Awaited<ReturnType<typeof assertTaskRecoveryRuntime>>;
 const rowKey=(row:any):TaskAttemptKey=>({runId:row.run_id,taskId:row.task_id,attemptId:row.attempt_id,generation:row.generation});
 const sameKey=(left:any,right:any)=>isDeepStrictEqual(left,right);
 const maintenanceMs=120000,deadlines=new WeakMap<AbortSignal,number>();
@@ -108,6 +110,11 @@ export class TaskAcceptedStopLifecycle{
   const archived:any=readRun(this.service.traceRoot,this.runId);
   if(!archived||archived.integrity!=='ok'||archived.id!==run.id||archived.snapshot.projectId!==run.project_id||archived.snapshot.planVersion!==run.project_version||
    archived.snapshot.executionProfile!==run.snapshot.executionProfile||!isDeepStrictEqual(archived.snapshot.executionTarget,run.snapshot.executionTarget))return denied('任务停止可信档案或批准身份已变化');
+  if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length){
+   const initialized=archived.events.filter((event:any)=>event.type==='task/recovery-initialized');
+   if(!isDeepStrictEqual(archived.snapshot,{...(redact(run.snapshot) as any),id:run.id,createdAt:archived.snapshot.createdAt,formatVersion:1})||
+    !run.task_evidence?.recoveryInitialization||initialized.length!==1||!isDeepStrictEqual(initialized[0].data,{version:1,sourceKey:'task-recovery-initialized:'+run.id,initialization:run.task_evidence.recoveryInitialization}))denied('任务停止恢复快照或初始化档案已变化');
+  }
   run.events=archived.events;return archived;
  }
  private async transaction<T>(fn:(db:pg.PoolClient,run:any)=>Promise<T>,signal?:AbortSignal):Promise<T>{
@@ -154,11 +161,12 @@ export class TaskAcceptedStopLifecycle{
  }
  private async current(db:pg.PoolClient,run:any,selected:Selected,signal:AbortSignal){
   signal.throwIfAborted();this.selected(selected);this.archive(run);
-  if(run.snapshot.executionProfile!=='task-attempt-openshell-v1'||run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length||run.status!=='running'||run.cancel_requested||run.lease_owner!==this.service.owner)denied('停止运行当前权限或来源无效');
+  if(run.snapshot.executionProfile!=='task-attempt-openshell-v1'||run.status!=='running'||run.cancel_requested||run.lease_owner!==this.service.owner)denied('停止运行当前权限或来源无效');
   await assertCurrentRunPermissions(run,db,{requireLocalOnline:false});
   if(!(await db.query("SELECT id FROM project_runs WHERE id=$1 AND lease_owner=$2 AND status='running' AND cancel_requested=false AND lease_until>clock_timestamp()",[run.id,this.service.owner])).rowCount)denied('停止运行租约失效');
   const target=run.snapshot.executionTarget;
   if(target?.kind!=='local'||target.deviceId!==selected.deviceId||target.grantId!==selected.grantId||target.backend?.kind!=='openshell'||target.backend.fingerprint!==selected.fingerprint)denied('停止 provider 与批准设备不同');
+  return run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length?assertTaskRecoveryRuntime(db,this.service.traceRoot,run):null;
  }
  private async markers(db:pg.PoolClient){
   const rows=(await db.query('SELECT run_id,task_id,attempt_id,generation,accepted_stop FROM task_attempt_workspaces WHERE run_id=$1 AND accepted_stop IS NOT NULL',[this.runId])).rows;
@@ -201,7 +209,7 @@ export class TaskAcceptedStopLifecycle{
   signal.throwIfAborted();this.selected(selected);
  }
  private async verify(db:pg.PoolClient,run:any,key:TaskAttemptKey,selected:Selected,signal:AbortSignal,own?:TaskAcceptedStopRecord):Promise<Selection>{
-  await this.current(db,run,selected,signal);await assertNoUnresolvedTaskOperation(db,run.id);
+  const recovery=await this.current(db,run,selected,signal);await assertNoUnresolvedTaskOperation(db,run.id);
   // Locate without row locks, then follow operations -> device -> exact scope.
   const located=(await db.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4',[run.id,key.taskId,key.attemptId,key.generation])).rows[0];
   if(!located)denied('原停止任务不存在');
@@ -234,9 +242,9 @@ export class TaskAcceptedStopLifecycle{
   if(boundaryEvent?.type!=='step/boundary'||boundaryEvent.taskId!==key.taskId||boundaryEvent.attemptId!==key.attemptId||boundaryEvent.data.taskId!==key.taskId||boundaryEvent.data.attemptId!==key.attemptId||boundaryEvent.sessionId!==task.session_id||boundaryEvent.data.trigger!=='node-accepted'||
    !(acceptedEvent.seq<boundaryEvent.seq&&boundaryEvent.seq<cpEvent.seq)||boundary.contractHash!==checkpointContract(run.snapshot,contract,refs)||
    !run.events.some((event:any)=>event.type==='team/checkpoint'&&event.seq>cpEvent.seq&&event.data.tasks?.some((item:any)=>item.id===task.runtime_task_id&&item.status==='completed'&&item.assignee===task.principal&&item.attemptId===key.attemptId)))denied('原验收、边界与完成检查点顺序不完整');
-  if(!refs.lastMerge||refs.canonical.revision!==accepted.workspaceRevision||checkpointDigest(refs.workManifest)!==accepted.sandboxWorkRevision||refs.scopeHash!==task.scope.workspace.scopeHash||refs.capabilityHash!==task.capability_hash||
+  if(!refs.lastMerge||!isDeepStrictEqual(refs.recoverySeed,task.scope.recoverySeed)||refs.canonical.revision!==accepted.workspaceRevision||checkpointDigest(refs.workManifest)!==accepted.sandboxWorkRevision||refs.scopeHash!==task.scope.workspace.scopeHash||refs.capabilityHash!==task.capability_hash||
    task.scope.workRevision!==refs.canonical.revision||!isDeepStrictEqual(refs.inputOrigins,task.input_origins)||!isDeepStrictEqual(refs.inputManifest,task.scope.workspace.inputManifest)||!isDeepStrictEqual(refs.workManifest,manifest(task.scope.workspace.importedFiles)))denied('原验收工作版本或 scope 与持久检查点不同');
-  const fixedInputs=pinnedInputs(run,assignment,contract,task.input_origins.find((input:any)=>input.source.kind==='import')?.origin.acceptedRevision??task.scope.workRevision);
+  const fixedInputs=pinnedInputs(run,assignment,contract,task.input_origins.find((input:any)=>input.source.kind==='import')?.origin.acceptedRevision??task.scope.workRevision,recovery);
   if(!isDeepStrictEqual(fixedInputs,task.input_origins))denied('原固定输入来源已变化');
   const outputPaths=(contract.outputs??[]).map((output:any)=>output.path).sort();
   if(!Array.isArray(accepted.outputs)||!isDeepStrictEqual(accepted.outputs.map((entry:any)=>entry.path).sort(),outputPaths)||!Array.isArray(accepted.inputs)||accepted.inputs.length!==fixedInputs.length)denied('原验收文件合同不完整');
@@ -275,7 +283,7 @@ export class TaskAcceptedStopLifecycle{
    const currentBoundary=run.events.find((event:any)=>event.seq===fresh.boundary.eventCursor);
    if(fresh.sha256!==proof.checkpoint.sha256||fresh.seq!==proof.checkpoint.seq||!currentBoundary||digest(currentBoundary)!==originalBoundaryDigest||
     !run.events.some((event:any)=>event.type==='team/checkpoint'&&event.seq>fresh.seq&&event.data.tasks?.some((item:any)=>item.id===task.runtime_task_id&&item.status==='completed'&&item.assignee===task.principal&&item.attemptId===key.attemptId)))denied('停止前原边界或完成事实已变化');
-   if(!isDeepStrictEqual(pinnedInputs(run,assignment,contract,task.input_origins.find((input:any)=>input.source.kind==='import')?.origin.acceptedRevision??task.scope.workRevision),task.input_origins))denied('停止前原固定输入来源已变化');
+   if(!isDeepStrictEqual(pinnedInputs(run,assignment,contract,task.input_origins.find((input:any)=>input.source.kind==='import')?.origin.acceptedRevision??task.scope.workRevision,recovery),task.input_origins))denied('停止前原固定输入来源已变化');
    const checkedObjects=new Set<string>([...fresh.inputManifest,...fresh.workManifest,...fresh.canonical.manifest].map((file:any)=>file.sha256+':'+file.size));
    for(const file of objects){const objectKey=file.sha256+':'+file.size;if(checkedObjects.has(objectKey))continue;readArchiveObject(join(this.service.traceRoot,run.id,'checkpoint-objects'),file);checkedObjects.add(objectKey);}
   };
@@ -305,7 +313,8 @@ export class TaskAcceptedStopLifecycle{
  private async observation(db:pg.PoolClient,run:any,selected:Selected,marker:TaskAcceptedStopRecord,signal:AbortSignal){
   signal.throwIfAborted();this.selected(selected);this.archive(run);
   const {identity,proof}=marker,key=identity.key;
-  if(run.snapshot.executionProfile!=='task-attempt-openshell-v1'||run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length||proof.deviceId!==selected.deviceId||proof.grantId!==selected.grantId||proof.fingerprint!==selected.fingerprint)denied('原停止观察身份或来源不同');
+  if(run.snapshot.executionProfile!=='task-attempt-openshell-v1'||proof.deviceId!==selected.deviceId||proof.grantId!==selected.grantId||proof.fingerprint!==selected.fingerprint)denied('原停止观察身份或来源不同');
+  const recovery=run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length?await assertTaskRecoveryRuntime(db,this.service.traceRoot,run):null;
   const located=(await db.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 AND task_id=$2 AND attempt_id=$3 AND generation=$4',[run.id,key.taskId,key.attemptId,key.generation])).rows[0];
   if(!located)denied('原停止观察 scope 不存在');
   const ids=[...new Set<string>((located.committed_outputs??[]).map((entry:any)=>entry.receipt?.operationId))].sort();
@@ -329,12 +338,12 @@ export class TaskAcceptedStopLifecycle{
    !run.events.some((event:any)=>event.type==='team/checkpoint'&&event.seq>cp.seq&&event.data.tasks?.some((item:any)=>item.id===proof.runtimeTaskId&&item.status==='completed'&&item.assignee===proof.principal&&item.attemptId===key.attemptId)))denied('原停止观察持久边界不完整');
   validateTaskCheckpointRefs(refs,{runId:run.id,taskId:key.taskId,attemptId:key.attemptId,archiveDir:join(this.service.traceRoot,run.id)});
   const checkedRevision=acceptedVerificationRevision({...run.snapshot,id:run.id},accepted,key.taskId,key.attemptId);
-  if(checkedRevision!==identity.workspaceRevision||refs.canonical.revision!==accepted.workspaceRevision||checkpointDigest(refs.workManifest)!==identity.workspaceRevision||!refs.lastMerge||refs.lastMerge.operationId!==proof.originalOperationId||
+  if(checkedRevision!==identity.workspaceRevision||!isDeepStrictEqual(refs.recoverySeed,task.scope?.recoverySeed)||refs.canonical.revision!==accepted.workspaceRevision||checkpointDigest(refs.workManifest)!==identity.workspaceRevision||!refs.lastMerge||refs.lastMerge.operationId!==proof.originalOperationId||
    refs.scopeHash!==task.scope?.workspace.scopeHash||refs.capabilityHash!==proof.capabilityHash||!isDeepStrictEqual(refs.inputOrigins,task.input_origins)||!isDeepStrictEqual(refs.inputManifest,task.scope.workspace.inputManifest)||!isDeepStrictEqual(refs.workManifest,manifest(task.scope.workspace.importedFiles)))denied('原停止观察版本不同');
   for(const command of task.contract.verify??[]){const actual=accepted.commands.findLast((entry:any)=>entry.command===command),exit=task.contract.acceptanceChecks?.find((entry:any)=>entry.command===command)?.expectedExitCode??0;if(!actual||actual.exitCode!==exit||actual.workspaceRevision!==checkedRevision)denied('原停止观察命令验收不同');}
   if(task.contract.acceptanceChecks!==undefined&&!isDeepStrictEqual(assertAcceptanceChecks(task.contract,accepted.commands,checkedRevision),accepted.acceptanceChecks))denied('原停止观察逐项验收不同');assertHandoffReport(task.contract,accepted.employeeReport);
   const historical={...run,events:run.events.filter((event:any)=>event.seq<=cp.seq)},assignment={...key,agentId:proof.principal,sessionId:proof.sessionId,runtimeTaskId:proof.runtimeTaskId,contractHash:proof.contractHash};
-  if(!isDeepStrictEqual(pinnedInputs(historical,assignment,task.contract,task.input_origins.find((input:any)=>input.source.kind==='import')?.origin.acceptedRevision??task.scope.workRevision),task.input_origins))denied('原停止观察输入来源不同');
+  if(!isDeepStrictEqual(pinnedInputs(historical,assignment,task.contract,task.input_origins.find((input:any)=>input.source.kind==='import')?.origin.acceptedRevision??task.scope.workRevision,recovery),task.input_origins))denied('原停止观察输入来源不同');
   if(!Array.isArray(accepted.outputs)||!isDeepStrictEqual(accepted.outputs.map((entry:any)=>entry.path).sort(),task.contract.outputs.map((entry:any)=>entry.path).sort())||!Array.isArray(accepted.inputs)||accepted.inputs.length!==task.input_origins.length)denied('原停止观察验收文件不完整');
   for(const output of accepted.outputs){const file=refs.workManifest.find((entry:any)=>entry.path===output.path);if(!file||file.sha256!==output.sha256||file.size!==output.size)denied('原停止观察输出不同');}
   for(const input of task.input_origins){const file=accepted.inputs.find((entry:any)=>entry.path===input.path);if(!file||file.sha256!==input.sha256||file.size!==refs.inputManifest.find((entry:any)=>entry.path===input.path)?.size)denied('原停止观察输入不同');}
@@ -351,12 +360,33 @@ export class TaskAcceptedStopLifecycle{
   };
  }
  /** Only current approved slots participate in fresh authority; retained history stays distinct. */
- private terminalAuthority(run:any,tasks:any[]){
+ private terminalAuthority(run:any,tasks:any[],recovery:RecoveryState=null){
   const archived=this.archive(run);
   if(!isDeepStrictEqual(archived.snapshot.tasks,run.snapshot.tasks)||!isDeepStrictEqual(archived.snapshot.agents,run.snapshot.agents)||!Array.isArray(run.snapshot.tasks)||!run.snapshot.tasks.length||new Set(run.snapshot.tasks.map((task:any)=>task.id)).size!==run.snapshot.tasks.length)denied('终态批准快照不完整');
   const state=run.events.findLast((event:any)=>event.type==='team/checkpoint')?.data;
   return digest(run.snapshot.tasks.map((approved:any)=>{
-   const native=checkpointNative(run,approved.id),task=tasks.find(row=>row.task_id===approved.id&&row.runtime_task_id===native?.id&&row.attempt_id===native?.attemptId);
+   const native=checkpointNative(run,approved.id),retained=recovery?.retained.find((record:any)=>record.taskId===approved.id);
+   if(retained){
+    if(tasks.some(row=>row.task_id===approved.id)||!native||native.status!=='completed'||native.assignee!==approved.assignee||native.attemptId!==retained.attemptId||
+     !isDeepStrictEqual(run.snapshot.handoffCheckpoints.find((record:any)=>record.taskId===approved.id),retained)||
+     (approved.dependencies??[]).some((id:string)=>!recovery!.retained.some((record:any)=>record.taskId===id)))denied('保留验收与当前完成身份或独立依赖不同');
+    const checkedRevision=acceptedVerificationRevision({...run.snapshot,id:retained.runId},retained,approved.id,retained.attemptId);
+    const employee=run.snapshot.agents.find((item:any)=>item.id===approved.assignee);
+    if(!employee||retained.taskExecution.capabilityHash!==taskCapabilityHashes(run.snapshot,employee).capabilityHash)denied('保留验收当前员工能力已变化');
+    for(const command of approved.verify??[]){const actual=retained.commands.findLast((entry:any)=>entry.command===command),exit=approved.acceptanceChecks?.find((entry:any)=>entry.command===command)?.expectedExitCode??0;if(!actual||actual.exitCode!==exit||actual.workspaceRevision!==checkedRevision)denied('保留验收缺少准确通过命令');}
+    if(approved.acceptanceChecks!==undefined&&!isDeepStrictEqual(assertAcceptanceChecks(approved,retained.commands,checkedRevision),retained.acceptanceChecks))denied('保留验收逐项检查已变化');
+    assertHandoffReport(approved,retained.employeeReport);
+    for(const kind of ['inputs','outputs'] as const){
+     if(!Array.isArray(retained[kind])||!isDeepStrictEqual(retained[kind].map((file:any)=>file.path).sort(),(approved[kind]??[]).map((file:any)=>file.path).sort()))denied('保留验收文件合同不完整');
+     for(const file of retained[kind]){
+      const current=recovery!.currentCanonical.ref.manifest.find((entry:any)=>entry.path===file.path),contract=approved[kind].find((entry:any)=>entry.path===file.path);
+      if(!current||current.sha256!==file.sha256||current.size!==file.size||contract.sha256&&contract.sha256!==file.sha256)denied('保留验收文件或固定输入已变化');
+      if(kind==='inputs'&&contract.producerTaskId&&!recovery!.retained.some((record:any)=>record.taskId===contract.producerTaskId&&record.outputs?.some((output:any)=>output.path===file.path&&output.sha256===file.sha256&&output.size===file.size)))denied('保留验收固定输入没有原独立生产者');
+     }
+    }
+    return {retained,initializationDigest:recovery!.initialization.digest,contract:approved,native:{id:native.id,attemptId:native.attemptId,assignee:native.assignee,completed:true}};
+   }
+   const task=tasks.find(row=>row.task_id===approved.id&&row.runtime_task_id===native?.id&&row.attempt_id===native?.attemptId);
    const member=state?.members?.find((item:any)=>item.id===task?.session_id);
    if(!task||task.phase!=='active'||native.status!=='completed'||native.assignee!==task.principal||!member||member.name!==task.principal||member.status==='removed')denied('终态批准节点没有当前完成身份');
    const subject={...rowKey(task),agentId:task.principal,sessionId:task.session_id,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash};
@@ -364,13 +394,13 @@ export class TaskAcceptedStopLifecycle{
   }));
  }
  private async terminalEvidence(db:pg.PoolClient,run:any,selected:Selected,signal:AbortSignal,own?:TaskAcceptedStopRecord){
-  await this.current(db,run,selected,signal);await this.ownFence(db,own);await assertNoUnresolvedTaskOperation(db,run.id);
+  const recovery=await this.current(db,run,selected,signal);await this.ownFence(db,own);await assertNoUnresolvedTaskOperation(db,run.id);
   // Prelock the complete operation set before device/scopes; source verifiers
   // below only reacquire locks already held in the original global order.
   await db.query('SELECT id FROM local_operations WHERE run_id=$1 ORDER BY id FOR UPDATE',[run.id]);
   await db.query('SELECT id FROM local_devices WHERE id=$1 FOR UPDATE',[selected.deviceId]);
   const rows=(await db.query('SELECT * FROM task_attempt_workspaces WHERE run_id=$1 ORDER BY task_id,attempt_id,generation FOR UPDATE',[run.id])).rows;
-  const authority=this.terminalAuthority(run,rows),current:any[]=run.snapshot.tasks.map((approved:any)=>{
+  const authority=this.terminalAuthority(run,rows,recovery),current:any[]=run.snapshot.tasks.filter((approved:any)=>!recovery?.retained.some((record:any)=>record.taskId===approved.id)).map((approved:any)=>{
    const native=checkpointNative(run,approved.id);return rows.find(row=>row.task_id===approved.id&&row.runtime_task_id===native.id&&row.attempt_id===native.attemptId);
   });
   const selections:Selection[]=[];
@@ -381,12 +411,12 @@ export class TaskAcceptedStopLifecycle{
   const candidates:TaskAttemptKey[]=current.filter((row:any)=>row.accepted_stop===null).map(rowKey);
   if(candidates.length>2)denied('终态新停止超过原运行容量上限','TASK_STOP_FINALIZE_LIMIT');
   const retainedPending=rows.some(row=>!current.includes(row)&&(row.accepted_stop===null||decodeTaskAcceptedStop(row.accepted_stop).state!=='stopped'));
-  return {run,rows,authority,selections,candidates,retainedPending};
+  return {run,rows,authority,selections,candidates,retainedPending,recovery};
  }
  private terminalSync(evidence:Awaited<ReturnType<TaskAcceptedStopLifecycle['terminalEvidence']>>,selected:Selected,signal:AbortSignal){
   signal.throwIfAborted();this.selected(selected);
   for(const selection of evidence.selections)selection.recheck();
-  if(this.terminalAuthority(evidence.run,evidence.rows)!==evidence.authority)denied('终态提交后批准完成证明发生变化');
+  if(this.terminalAuthority(evidence.run,evidence.rows,evidence.recovery)!==evidence.authority)denied('终态提交后批准完成证明发生变化');
   signal.throwIfAborted();this.selected(selected);
  }
  /** Trusted source-only acceptance boundary. No target or client proof is accepted. */

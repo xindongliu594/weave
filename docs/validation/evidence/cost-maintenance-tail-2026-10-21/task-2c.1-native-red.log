@@ -1,3 +1,0 @@
-{"nativeTestExit":null,"signal":"SIGTERM","timedOut":true,"fixtureId":"6b34551459144b38b25e50dbfe010c99","test":"tests/cost-maintenance-native.test.ts","modelCalls":0,"productionAccess":false}
-COMMAND=node .superpowers/sdd/2026-10-21-archive-writer-fence/postgres-runtime/run-cost-tail.mjs
-EXIT=124

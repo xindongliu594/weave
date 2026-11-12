@@ -4,6 +4,7 @@ import type pg from 'pg';
 import {AppError} from './provider.ts';
 import {readCommittedCanonical,validateTaskOperationResult} from './task-canonical.ts';
 import {assertNoUnresolvedTaskOperation} from './task-operation-admission.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
 
 export type LiveCanonical=ReturnType<typeof readCommittedCanonical>;
 const blocked=(message:string):never=>{throw new AppError(409,message,'TASK_CANONICAL_INVALID');};
@@ -19,7 +20,11 @@ export async function readLiveCanonical(db:Pick<pg.PoolClient,'query'>,traceRoot
  if(!row||!archive||archive.integrity!=='ok'||row.id!==archive.id||row.project_id!==archive.snapshot.projectId||row.snapshot.planVersion!==archive.snapshot.planVersion)blocked('可信任务运行档案或 SQL 身份不完整');
  // parent_run_id is used by retry/resume only; a full retry may still start a
  // fresh live task run. Recovery ancestry itself needs the frozen source contract.
- if(row.snapshot.recovery||archive.snapshot.recovery||[row.snapshot,archive.snapshot].some(snapshot=>snapshot.resumedFrom&&snapshot.approval?.kind!=='retry'))blocked('任务恢复来源尚未认证，当前不能读取成果');
+ if(row.snapshot.recovery||archive.snapshot.recovery||[row.snapshot,archive.snapshot].some(snapshot=>snapshot.resumedFrom&&snapshot.approval?.kind!=='retry')){
+  const recovery=await assertTaskRecoveryRuntime(db,traceRoot,row);
+  if(!recovery)return blocked('任务恢复来源尚未认证，当前不能读取成果');
+  await assertNoUnresolvedTaskOperation(db,row.id);return recovery.currentCanonical;
+ }
  let selected:LiveCanonical;
  try{selected=readCommittedCanonical(traceRoot,row);}catch(error){if(error instanceof AppError)throw error;return blocked('完整 canonical 对象缺失或损坏：'+(error as Error).message);}
  // A restored head cannot be certified by an empty live operation index. Until

@@ -1,4 +1,5 @@
 import type {ArchiveWriterManager} from '../../../services/agent-runtime/archive-writer-scope.mjs';
+import type pg from 'pg';
 import {lockedRun} from './run-state.ts';
 import {assertRunAuthorization} from './execution-policy.ts';
 import {hasUnplannedTasks,planningRequiredMessage} from '../../../packages/contracts/index.ts';
@@ -32,6 +33,23 @@ import {projectAuditOutbox} from './audit-outbox.ts';
 import {readRunBounds} from './source-bounds.ts';
 import {requireResolvedProjectEffectsIn} from './tool-operations.ts';
 import {assertCurrentRunAuthority,recordRunAuthorityDenial} from './run-current-authority.ts';
+import {captureTaskRecoverySourceIn,withTaskRecoveryCreationTransaction} from './task-recovery-source.ts';
+import {readStepCheckpoint} from '../../../services/agent-runtime/step-checkpoints.mjs';
+
+/** Pure context assembly after source capture; this function grants no authority. */
+export function buildTaskRecoveryChildContext(run:{id:string;snapshot:any;events:any[]},facts:Awaited<ReturnType<typeof captureTaskRecoverySourceIn>>,traceRoot:string){
+ const states=completedTasks(run.events,run.snapshot),done=new Map<string,any>();
+ for(const retained of facts.scope.retained){
+  const id=retained.key.taskId,state=states.get(id);
+  if(done.has(id)||!state||(state.attemptId??state.attempt_id)!==retained.key.attemptId)throw new AppError(409,'保留验收与原生完成任务身份不一致','TASK_RECOVERY_SOURCE_INVALID');
+  done.set(id,state);
+ }
+ const handoffCheckpoints=facts.scope.retained.map(item=>item.accepted),prefix=run.events.filter(event=>event.seq<=facts.selected.event.seq);
+ const recovery=buildCheckpointContext({...run.snapshot,handoffCheckpoints},prefix,checkpointTasks(prefix,run.snapshot),done,join(traceRoot,run.id,'artifacts'),run.id,facts.scope.candidate.manifest);
+ recovery.workspaceCheckpoint={id:facts.source.sourceCheckpoint.id,runId:run.id,sha256:facts.source.sourceCheckpoint.sha256};
+ recovery.budgetEvidence=sourceBudgetEvidence(run.snapshot,run.events,run.id);
+ return {handoffCheckpoints,completedCheckpoints:[...done.keys()],recovery};
+}
 export function runManagementRouter(traceRoot:string,writers:ArchiveWriterManager){
  if(!writers||writers.traceRoot!==traceRoot)throw Error('ARCHIVE_WRITER_CONFIG_REQUIRED');
  const router=Router();
@@ -124,13 +142,17 @@ export function runManagementRouter(traceRoot:string,writers:ArchiveWriterManage
   if(input.budgetPreviewId&&input.confirmation!=='APPROVE_RESOURCES_AND_RESUME')throw new AppError(400,'请明确确认资源额度与续跑','RESOURCE_CONFIRMATION_REQUIRED');
   if(input.budgetPreviewId&&!input.resume)throw new AppError(409,'资源补充只允许续跑未完成节点','RESOURCE_RESUME_ONLY');
   const newId=randomUUID();
-  const admission=await writers.withWriter([newId],async()=>{
-  const client=await pool.connect();
-  let commitDispatched=false,discard=false;
-  try{await client.query('BEGIN');await shareCostMaintenance(client);
+  // This lookup chooses the native fence only. Every source fact is re-read
+  // under that fence and the authoritative transaction before admission.
+  const taskMode=!!input.checkpointId&&(await pool.query("SELECT snapshot->>'executionProfile' AS execution_profile FROM project_runs WHERE id=$1",[id])).rows[0]?.execution_profile==='task-attempt-openshell-v1';
+  const process=async(client:pg.PoolClient)=>{
    const identity=(await client.query('SELECT project_id FROM project_runs WHERE id=$1',[id])).rows[0];if(!identity)throw new AppError(404,'运行不存在');
    const project=(await client.query('SELECT * FROM projects WHERE id=$1 FOR UPDATE',[identity.project_id])).rows[0];
    const old=(await client.query('SELECT * FROM project_runs WHERE id=$1 FOR UPDATE',[id])).rows[0];if(!old)throw new AppError(404,'运行不存在');
+   const taskProfile=old.snapshot.executionProfile==='task-attempt-openshell-v1';
+   if(taskProfile&&(!input.resume||!input.checkpointId||input.budgetPreviewId))throw new AppError(409,'任务恢复必须选定原始任务检查点并沿用原资源','CHECKPOINT_RESUME_ONLY');
+   if(taskProfile!==taskMode)throw new AppError(409,'运行执行方式已变化，请重新核对恢复点','RUN_REAPPROVAL_REQUIRED');
+   if(taskMode&&(old.parent_run_id!==null||old.snapshot.recovery||old.snapshot.resumedFrom||old.snapshot.handoffCheckpoints?.length))throw new AppError(409,'任务恢复仅支持原始停止运行','TASK_RECOVERY_SOURCE_INVALID');
    const principal=httpPrincipal(res);
    // Recovery checks two people. Lock their rows in one order before either
    // person's memberships, then recheck original authority in this transaction.
@@ -150,7 +172,7 @@ export function runManagementRouter(traceRoot:string,writers:ArchiveWriterManage
     if(input.budgetPreviewId&&(already.snapshot.approval?.kind!=='resume-resources'||already.snapshot.resourceApproval?.previewId!==input.budgetPreviewId||
        already.snapshot.resourceApproval?.sourceRunId!==id||already.snapshot.resourceRevision!==(old.snapshot.resourceRevision??0)+1))
       throw new AppError(409,'此运行已有其他续跑记录，请打开已有运行后重新核对资源方案','RESOURCE_PREVIEW_STALE');
-    commitDispatched=true;await client.query('COMMIT');return {ok:true as const,status:200,data:{id:already.id,existing:true}};
+    return {ok:true as const,status:200,data:{id:already.id,existing:true}};
    }
    if((await client.query("SELECT id FROM project_runs WHERE project_id=$1 AND status IN ('queued','running')",[old.project_id])).rowCount)throw new AppError(409,'此项目已有运行');
    await requireResolvedProjectEffectsIn(client,old.project_id);
@@ -162,7 +184,15 @@ export function runManagementRouter(traceRoot:string,writers:ArchiveWriterManage
    let snapshot=structuredClone(old.snapshot);snapshot.runtimeArchitecture='employee-host-v1';let done=new Map<string,any>();
    snapshot.approvedTasks??=structuredClone(snapshot.tasks);
    if(!input.resume){snapshot.tasks=structuredClone(snapshot.approvedTasks);delete snapshot.handoffCheckpoints;delete snapshot.completedCheckpoints;delete snapshot.recovery;}
-   if(input.resume&&run){
+   if(taskMode&&run){
+    done=completedTasks(run.events,snapshot);
+    try{
+     const checkpoint=readStepCheckpoint({root:traceRoot,runId:id,checkpointId:input.checkpointId!});
+     if(checkpoint.version!==2||checkpoint.profile!=='task-attempt-openshell-v1')throw Error('CHECKPOINT_MANIFEST_INVALID');
+     snapshot.recovery={sourceRunId:id,workspaceCheckpoint:{id:checkpoint.id,runId:id,sha256:checkpoint.sha256}};
+     delete snapshot.handoffCheckpoints;delete snapshot.completedCheckpoints;
+    }catch(error){throw new AppError(409,stepCheckpointError(error),'CHECKPOINT_RESTORE_BLOCKED');}
+   }else if(input.resume&&run){
     done=completedTasks(run.events,snapshot);
     snapshot.tasks=structuredClone(snapshot.approvedTasks);
     let selected:ReturnType<typeof selectStepCheckpoint>|undefined;
@@ -195,20 +225,37 @@ export function runManagementRouter(traceRoot:string,writers:ArchiveWriterManage
    snapshot.departmentBudgets=Object.fromEntries(Object.entries(previousBudgets).map(([departmentId,value])=>[departmentId,previousTotal>0?snapshot.executionBudget*Number(value)/previousTotal:(departmentId===snapshot.departmentId?snapshot.executionBudget:0)]));
    const config=await lockCostPolicy(client);await checkDailyBudget(client,config,snapshot.departmentId,snapshot.departmentBudgets[snapshot.departmentId]??0,snapshot.executionBudget);
    for(const departmentId of snapshot.departmentIds??[snapshot.departmentId])if(departmentId!==snapshot.departmentId)await checkDailyBudget(client,config,departmentId,snapshot.departmentBudgets[departmentId]??0,0);
-   snapshot.resumedFrom=id;snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.budgetPreviewId?'resume-resources':input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id,retainUncertainCosts:input.retainUncertainCosts,...(unknown.length?{reconciledOperations:unknown}: {})};
+   snapshot.resumedFrom=id;if(!taskMode)snapshot.completedCheckpoints=[...done.keys()];snapshot.approval={kind:input.budgetPreviewId?'resume-resources':input.resume?'resume':'retry',approvedAt:new Date().toISOString(),parentRunId:id,retainUncertainCosts:input.retainUncertainCosts,...(unknown.length?{reconciledOperations:unknown}: {})};
    const attempt=Number((await client.query('SELECT COALESCE(max(attempt),0)+1 AS next FROM project_runs WHERE project_id=$1 AND project_version=$2',[old.project_id,old.project_version])).rows[0].next);
    const sourceBounds=await readRunBounds(client,id),departments=old.department_ids??snapshot.departmentIds??[snapshot.departmentId];
    if(sourceBounds.requiredDepartmentIds.some(department=>!departments.includes(department)))throw new AppError(422,'目标运行必须保留全部来源部门','SOURCE_BOUNDS_INVALID');
    await client.query('INSERT INTO project_runs(id,project_id,project_version,status,snapshot,attempt,parent_run_id,department_ids,requested_by_user_id,authorized_by_user_id,authorized_epoch,authority_kind,authority_department_ids,source_bounds) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$9,$10,$11,$12,$13)',[newId,old.project_id,old.project_version,'queued',snapshot,attempt,id,departments,principal.kind==='human'?principal.userId:null,principal.kind==='human'?principal.sessionEpoch:null,principal.kind==='human'?'human':'local-owner',authority.departmentIds,sourceBounds]);
+   if(taskMode){
+    const facts=await captureTaskRecoverySourceIn(writers,{sourceRunId:id,checkpointId:input.checkpointId!,childRunId:newId},client,recoverySignal);
+    Object.assign(snapshot,buildTaskRecoveryChildContext({id:old.id,snapshot:old.snapshot,events:run!.events},facts,traceRoot));
+    done=new Map([...completedTasks(run!.events,old.snapshot)].filter(([taskId])=>snapshot.completedCheckpoints.includes(taskId)));
+    assertRecoveryBudgetIssues(recoveryHistoryBudgetIssues(snapshot,history,new Set(done.keys())));
+    await client.query('UPDATE project_runs SET snapshot=$1 WHERE id=$2',[snapshot,newId]);
+   }
    await client.query("UPDATE projects SET status='QUEUED' WHERE id=$1 AND version=$2",[old.project_id,old.project_version]);
    await routeAudit(client,principal,authority,'run.recover',newId,{state:'requested',...(input.checkpointId?{checkpointId:input.checkpointId}:{})},{projectId:old.project_id,runId:newId});
-   commitDispatched=true;await client.query('COMMIT');return {ok:true as const,status:202,data:{id:newId,completedCheckpoints:[...done.keys()]}};
-  }catch(error){
-   try{await client.query('ROLLBACK');}catch{discard=true;throw error;}
-   if(commitDispatched)throw error;
-   return {ok:false as const,error};
-  }finally{client.release(discard);}
-  });
+   if(taskMode)await captureTaskRecoverySourceIn(writers,{sourceRunId:id,checkpointId:input.checkpointId!,childRunId:newId},client,recoverySignal);
+   return {ok:true as const,status:202,data:{id:newId,completedCheckpoints:[...done.keys()]}};
+  };
+  const recoverySignal=AbortSignal.timeout(120000);
+  let admission;
+  try{
+   admission=taskMode?await writers.withRecoverySource(id,newId,()=>withTaskRecoveryCreationTransaction(writers,id,recoverySignal,process),{signal:recoverySignal}):await writers.withWriter([newId],async()=>{
+    const client=await pool.connect();let commitDispatched=false,discard=false;
+    try{
+     await client.query('BEGIN');await shareCostMaintenance(client);const result=await process(client);
+     commitDispatched=true;await client.query('COMMIT');return result;
+    }catch(error){
+     try{await client.query('ROLLBACK');}catch{discard=true;throw error;}
+     if(commitDispatched)throw error;return {ok:false as const,error};
+    }finally{client.release(discard);}
+   });
+  }catch(error){await recordRunAuthorityDenial(pool,error);throw error;}
   if(!admission.ok){await recordRunAuthorityDenial(pool,admission.error);throw admission.error;}
   res.status(admission.status).json(admission.data);
  });

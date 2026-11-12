@@ -1,5 +1,0 @@
-apps/api/src/task-recovery-archive.ts(7,9): error TS2305: Module '"../../../services/agent-runtime/archive-writer-scope.mjs"' has no exported member 'assertArchiveSourceScope'.
-tests/task-recovery-archive.test.ts(47,46): error TS2339: Property 'withSource' does not exist on type 'ArchiveWriterManager'.
-tests/task-recovery-archive.test.ts(196,19): error TS2339: Property 'withSource' does not exist on type 'ArchiveWriterManager'.
-tests/task-recovery-archive.test.ts(198,19): error TS2339: Property 'withSource' does not exist on type 'ArchiveWriterManager'.
-tests/task-recovery-archive.test.ts(212,19): error TS2339: Property 'withSource' does not exist on type 'ArchiveWriterManager'.

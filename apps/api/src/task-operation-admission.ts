@@ -7,6 +7,7 @@ import {readCommittedCanonical} from './task-canonical.ts';
 import {resolveTaskScope} from './task-execution.ts';
 import {readRun} from '../../../services/agent-runtime/trace-store.mjs';
 import {assertTaskAcceptedStopAdmission} from './task-accepted-stop-state.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
 
 export const taskOperationDenied=(message:string,code='TASK_SCOPE_DENIED'):never=>{throw new AppError(409,message,code);};
 export function publicTaskScope(scope:TaskExecutionScope){return {profile:scope.profile,key:scope.key,scopeHash:scope.workspace.scopeHash,workRevision:scope.workRevision};}
@@ -25,10 +26,11 @@ export function taskDeviceScope(scope:TaskExecutionScope,workRevision:string){co
 /** Per-operation authority for the closed task profile. This does not open the
  * run launch gate: every stored task binding and current permission is proved. */
 export async function admitTaskOperation(db:pg.PoolClient,run:any,traceRoot:string,context:any,expected?:TaskExecutionScope,exceptId:string|null=null,{requireLocalOnline=false}={}){
- if(run.snapshot.executionProfile!=='task-attempt-openshell-v1'||run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length||
+ if(run.snapshot.executionProfile!=='task-attempt-openshell-v1'||
   run.status!=='running'||run.cancel_requested||!context||!Number.isSafeInteger(context.generation)||context.generation<1||
   ['agentId','sessionId','taskId','attemptId'].some(k=>typeof context[k]!=='string'||!context[k]))taskOperationDenied('任务执行身份或运行状态无效');
  await assertCurrentRunPermissions(run,db,{requireLocalOnline});
+ if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)await assertTaskRecoveryRuntime(db,traceRoot,run);
  await assertTaskAcceptedStopAdmission(db,run.id,{runId:run.id,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation});
  await assertNoUnresolvedTaskOperation(db,run.id,exceptId);
  const archived=readRun(traceRoot,run.id);if(!archived||archived.integrity!=='ok')taskOperationDenied('可信任务档案不可用');run.events=archived!.events;
@@ -36,7 +38,7 @@ export async function admitTaskOperation(db:pg.PoolClient,run:any,traceRoot:stri
  if(!task||task.principal!==context.agentId||task.session_id!==context.sessionId)taskOperationDenied('任务分派尚未注册或已变化');
  const canonical=readCommittedCanonical(traceRoot,run);
  if(expected&&(!isDeepStrictEqual(task.scope,expected)||expected.workRevision!==canonical.ref.revision))taskOperationDenied('已批准操作 scope 或工作版本已过期');
- const scope=await resolveTaskScope(db,run,{runId:run.id,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation,agentId:context.agentId,sessionId:context.sessionId,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash},{files:canonical.files,revision:canonical.ref.revision},task.scope);
+ const scope=await resolveTaskScope(db,run,{runId:run.id,taskId:context.taskId,attemptId:context.attemptId,generation:context.generation,agentId:context.agentId,sessionId:context.sessionId,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash},{files:canonical.files,revision:canonical.ref.revision},task.scope,traceRoot);
  if(expected&&!isDeepStrictEqual(scope,expected)||!isDeepStrictEqual(context.executionScope,publicTaskScope(scope)))taskOperationDenied('操作未绑定准确的可信 scope');
  return {scope,task,canonical};
 }

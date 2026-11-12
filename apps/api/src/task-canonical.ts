@@ -10,6 +10,7 @@ import {shareCostMaintenance} from './cost-control.ts';
 import {AppError} from './provider.ts';
 import {assertCurrentRunPermissions} from './execution-policy.ts';
 import {resolveTaskScope} from './task-execution.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
 import {assertExecutionBackendBinding,assertExecutionBackendReceipt,executionBackend} from './execution-backend.ts';
 import {checkpointFiles} from '../../../services/agent-runtime/step-checkpoints.mjs';
 import {storeArchiveObjects,readArchiveObject} from '../../../services/agent-runtime/archive-objects.mjs';
@@ -109,6 +110,7 @@ export async function initializeTaskCanonical(service:LocalOperationService,runI
  const state:Persistence={uncertain:false,rolledBack:false};
  try{return {ok:true as const,value:await transaction(service,state,runId,null,async(db,run)=>{
   signal.throwIfAborted();await permissions(db,run,service);
+  if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)await assertTaskRecoveryRuntime(db,service.traceRoot,run);
   if(run.canonical_workspace){
    const canonical=readCommittedCanonical(service.traceRoot,run);
    persist(state,()=>materializeCommittedCanonical(service,run));return canonical;
@@ -154,7 +156,7 @@ async function admit(db:pg.PoolClient,run:any,row:any,device:any,service:LocalOp
  if(!task||!isDeepStrictEqual(task.scope,scope))denied('原操作 scope 或分派已过期');
  const canonical=readCommittedCanonical(service.traceRoot,run);
  // Reuse actual trusted resolver for assignment, contract, capability and input ancestry.
- const current=await resolveTaskScope(db,run,{...scope.key,agentId:task.principal,sessionId:task.session_id,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash},{files:canonical.files,revision:canonical.ref.revision},scope);
+ const current=await resolveTaskScope(db,run,{...scope.key,agentId:task.principal,sessionId:task.session_id,runtimeTaskId:task.runtime_task_id,contractHash:task.contract_hash},{files:canonical.files,revision:canonical.ref.revision},scope,service.traceRoot);
  if(!isDeepStrictEqual(current,scope))denied('操作 canonical 基线已变化','TASK_WORKSPACE_CONFLICT');
  validateTaskOperationResult(row,row.result.result);
  return {scope,canonical,task};

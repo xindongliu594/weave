@@ -1,6 +1,0 @@
-Simulated integration: PGlite + pgvector, a fresh database for each test file and one product DB connection.
-Models are test doubles; native device scenarios use real temporary workspaces. Docker and independent backend locks are excluded.
-✔ known cancellation denial drains before outward error: missing (3036.6669ms)
-✖ known cancellation denial drains before outward error: missing-locked (15058.0665ms)
-INTERRUPTED_BY_CONTROLLER_CTRL_C; actual session exit 1; test callback wrapper hung; not product failure
-EXIT=1

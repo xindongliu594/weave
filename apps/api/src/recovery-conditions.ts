@@ -5,6 +5,7 @@ import { AppError } from './provider.ts';
 import { projectCostReadiness, checkDailyBudget, type ProjectCostReadiness } from './cost-control.ts';
 import { budgetHistory } from './budget-history.ts';
 import { assertRunAuthorization } from './execution-policy.ts';
+import {previewTaskRecovery} from './task-recovery-preview.ts';
 import { assertRunModels } from './model-capabilities.ts';
 import { completedTasks, resumeHandoff } from './handoff-checkpoints.ts';
 import { readRun } from '../../../services/agent-runtime/trace-store.mjs';
@@ -121,7 +122,10 @@ export async function inspectRecoveryConditions(db: Database, traceRoot: string,
   if(snapshot.resourceRevision)retryReasons.push(issue(409,'RESOURCE_RESUME_ONLY','资源补充只批准未完成节点，完整重试需要另外批准方案'));
   if (!run) resumeReasons.push(issue(409, 'BUDGET_HISTORY_MISSING', '运行档案缺失，无法恢复上下文和核对调用上限；请先恢复备份'));
   if (run && run.integrity === 'ok') {
-    try {const selected=choices.checkpointId?selectStepCheckpoint(traceRoot,run,choices.checkpointId):undefined;resumeHandoff(snapshot, run.events, done, join(traceRoot, runId, 'artifacts'),selected?.checkpoint.files); }
+    try {
+      if(snapshot.executionProfile==='task-attempt-openshell-v1')await previewTaskRecovery(db,traceRoot,runId,choices.checkpointId);
+      else {const selected=choices.checkpointId?selectStepCheckpoint(traceRoot,run,choices.checkpointId):undefined;resumeHandoff(snapshot, run.events, done, join(traceRoot, runId, 'artifacts'),selected?.checkpoint.files);}
+    }
     catch (error) { resumeReasons.push(issue(409, 'HANDOFF_CHECKPOINT_INVALID', stepCheckpointError(error))); }
   }
   if (!snapshot.tasks.some((task: any) => !done.has(task.id))) resumeReasons.push(issue(409, 'RUN_ALREADY_COMPLETE', '所有任务已有完成记录，请查看交付结果，无需重跑'));

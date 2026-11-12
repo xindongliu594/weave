@@ -13,6 +13,7 @@ import {shareCostMaintenance} from './cost-control.ts';
 import {assertRunAuthorization,assertCurrentRunPermissions,assertExecutionProfile} from './execution-policy.ts';
 import {assertCurrentRunAuthority,recordRunAuthorityDenial} from './run-current-authority.ts';
 import {initializeTaskCanonical,readCommittedCanonical,commitTaskResult,validateTaskOperationResult} from './task-canonical.ts';
+import {assertTaskRecoveryRuntime} from './task-recovery-runtime.ts';
 import {bindTrustedAttempt,resolveTaskScope} from './task-execution.ts';
 import {prepareTaskCheckpoint,type TaskCheckpointContext,type TaskCheckpointOptions} from './task-checkpoint-state.ts';
 import {TaskAcceptedStopLifecycle,requireTaskStopProvider} from './task-accepted-stop.ts';
@@ -277,6 +278,10 @@ export class LocalRunExecutor {
   });if(!result.ok)throw result.error;return result.value;
  }
  revision(){return revision(exportFiles(this.root));}
+ readCanonical(signal:AbortSignal){return this.perform(()=>this.taskTransaction(signal,async(db,run)=>{
+  if(run.snapshot.recovery||run.snapshot.handoffCheckpoints?.length)await assertTaskRecoveryRuntime(db,this.service.traceRoot,run);
+  return readCommittedCanonical(this.service.traceRoot,run);
+ }),signal);}
  /** Source-only trusted terminal boundary; never registered as an employee tool. */
  finalizeAccepted(signal:AbortSignal){
   if(this.closed)return Promise.reject(new AppError(409,'本机执行器已关闭','LOCAL_EXECUTOR_CLOSED'));
@@ -333,7 +338,7 @@ export class LocalRunExecutor {
    // Once initialized, SQL + verified objects are the sole task baseline.
    const canonical=run.canonical_workspace?readCommittedCanonical(this.service.traceRoot,run):null;
    if(!canonical)persist(()=>mkdirSync(this.root,{recursive:true,mode:0o700}));
-   return resolveTaskScope(db,run,assignment,canonical?{files:canonical.files,revision:canonical.ref.revision}:{files:exportFiles(this.root),revision:this.revision()},row.scope);
+   return resolveTaskScope(db,run,assignment,canonical?{files:canonical.files,revision:canonical.ref.revision}:{files:exportFiles(this.root),revision:this.revision()},row.scope,this.service.traceRoot);
   });
  }
  prepareTask(context:{agentId:string;sessionId:string;taskId:string;attemptId:string;generation:number},signal:AbortSignal):Promise<TaskExecutionScope>{if(this.snapshot.executionProfile==='task-attempt-openshell-v1')requireTaskStopProvider(this.maintenance.sandboxMaintenance);return this.perform(()=>this.prepareTaskOwned(context,signal),signal);}

@@ -1,2 +1,0 @@
-COMMAND: node node_modules/typescript/bin/tsc --noEmit --strict --target ES2022 --lib ES2023,DOM,DOM.Iterable --module NodeNext --moduleResolution NodeNext --types node services/agent-runtime/product-runtime.d.mts services/agent-runtime/openai-compatible.d.mts
-EXIT: 0
